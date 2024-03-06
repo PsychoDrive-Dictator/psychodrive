@@ -18,6 +18,23 @@
 #include <fstream>
 #include <ios>
 #include <vector>
+#include <chrono>
+#include <thread>
+
+enum Input
+{
+	NEUTRAL = 0,
+	UP = 1,
+	DOWN = 2,
+	BACK = 4, 
+	FORWARD = 8,
+	LP = 16,
+	MP = 32,
+	HP = 64,
+	LK = 128,
+	MK = 256,
+	HK = 512,
+};
 
 std::string readFile(const std::string &fileName)
 {
@@ -175,15 +192,24 @@ int main(int, char**)
     std::string namesText = readFile("honda_names.json");
     auto namesJson = nlohmann::json::parse(namesText);
 
-    bool leftDown = false;
+    std::string triggerGroupsText = readFile("honda_trigger_groups.json");
+    auto triggerGroupsJson = nlohmann::json::parse(triggerGroupsText);
+
+    std::string triggersText = readFile("honda_triggers.json");
+    auto triggersJson = nlohmann::json::parse(triggersText);
 
     float posX = 50.0f;
     float posY = 0.0f;
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
+    float velocityX = 0.0f;
+    float velocityY = 0.0f;
 
-    int currentAction = 902;
+    int currentAction = 1;
     int currentFrame = 0;
+    int actionFrameDuration = 0;
+    int currentInput = 0;
+    
 
     std::string actionName;
 
@@ -209,7 +235,34 @@ int main(int, char**)
                 switch (event.key.keysym.sym)
                 {
                     case SDLK_a:
-                        leftDown = true;
+                        currentInput |= BACK;
+                        break;
+                    case SDLK_s:
+                        currentInput |= DOWN;
+                        break;
+                    case SDLK_d:
+                        currentInput |= FORWARD;
+                        break;
+                    case SDLK_SPACE:
+                        currentInput |= UP;
+                        break;
+                    case SDLK_u:
+                        currentInput |= LP;
+                        break;
+                    case SDLK_i:
+                        currentInput |= MP;
+                        break;
+                    case SDLK_o:
+                        currentInput |= HP;
+                        break;
+                    case SDLK_j:
+                        currentInput |= LK;
+                        break;
+                    case SDLK_k:
+                        currentInput |= MK;
+                        break;
+                    case SDLK_l:
+                        currentInput |= HK;
                         break;
                     case SDLK_ESCAPE:
                         done = true;
@@ -221,7 +274,34 @@ int main(int, char**)
                 switch (event.key.keysym.sym)
                 {
                     case SDLK_a:
-                        leftDown = false;
+                        currentInput &= ~BACK;
+                        break;
+                    case SDLK_s:
+                        currentInput &= ~DOWN;
+                        break;
+                    case SDLK_d:
+                        currentInput &= ~FORWARD;
+                        break;
+                    case SDLK_SPACE:
+                        currentInput &= ~UP;
+                        break;
+                    case SDLK_u:
+                        currentInput &= ~LP;
+                        break;
+                    case SDLK_i:
+                        currentInput &= ~MP;
+                        break;
+                    case SDLK_o:
+                        currentInput &= ~HP;
+                        break;
+                    case SDLK_j:
+                        currentInput &= ~LK;
+                        break;
+                    case SDLK_k:
+                        currentInput &= ~MK;
+                        break;
+                    case SDLK_l:
+                        currentInput &= ~HK;
                         break;
                 }
             }
@@ -247,6 +327,10 @@ int main(int, char**)
             ImGui::SliderInt("action", &currentAction, 1, 1500);            // Edit 1 float using a slider from 0.0f to 1.0f
             ImGui::SliderInt("frame", &currentFrame, 0, 100);
             ImGui::Text(actionName.c_str());
+            ImGui::Text("currentInput %d", currentInput);
+
+            if (ImGui::Button("reset"))
+                currentFrame = 0;
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
@@ -275,9 +359,6 @@ int main(int, char**)
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
         glScalef(1.0f, -1.0f, 1.0f);
 
-        glTranslatef(posX, posY, 0.0f);
-        posOffsetX = 0.0f;
-        posOffsetY = 0.0f;
 
         auto actionIDString = to_string_leading_zeroes(currentAction, 4);
         bool validAction = namesJson.contains(actionIDString);
@@ -285,6 +366,8 @@ int main(int, char**)
         
         if (movesDictJson.contains(actionName))
         {
+            actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
+
             if (movesDictJson[actionName].contains("PlaceKey"))
             {
                 for (auto& [placeKeyID, placeKey] : movesDictJson[actionName]["PlaceKey"].items())
@@ -294,18 +377,21 @@ int main(int, char**)
                     }
 
                     for (auto& [frame, offset] : placeKey["PosList"].items()) {
-                        if (atoi(frame.c_str()) == currentFrame || atoi(frame.c_str()) == 0) {
+                        int keyStartFrame = placeKey["_StartFrame"];
+                        if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
                             if (placeKey["Axis"] == 0) {
-                                posOffsetX += offset.get<int>();
-                                glTranslatef(offset, 0.0, 0.0);
+                                posOffsetX = offset.get<int>();
                             } else if (placeKey["Axis"] == 1) {
-                                posOffsetY += offset.get<int>();
-                                glTranslatef(0.0, offset, 0.0);    
+                                posOffsetY = offset.get<int>();    
                             }
                         }
                     }
                 }
             }
+
+            posX += velocityX;
+            posY += velocityY;
+            glTranslatef(posX + posOffsetX, posY + posOffsetY, 0.0f);
 
             if (movesDictJson[actionName].contains("SteerKey"))
             {
@@ -316,11 +402,13 @@ int main(int, char**)
                     }
 
                     if (steerKey["OperationType"] == 1) {
-                        int steerStartFrame = steerKey["_StartFrame"];
                         float fixValue = steerKey["FixValue"];
-                        float offset = (currentFrame - steerStartFrame) * fixValue;
-                        posOffsetX += offset;
-                        glTranslatef(offset, 0.0, 0.0);
+
+                        if ( steerKey["ValueType"] == 0 ) {
+                            velocityX = fixValue;
+                        } else if (steerKey["ValueType"] == 1) {
+                            velocityY = fixValue;
+                        }
                     }
                 }
             }
@@ -387,12 +475,69 @@ int main(int, char**)
                     }                    
                 }
             }
+
+            bool branched = false;
+
+            if (movesDictJson[actionName].contains("BranchKey"))
+            {
+                for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
+                {
+                    if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                        continue;
+                    }
+
+                    if (key["Type"] == 0) //always?
+                    {
+                        currentAction = key["Action"];
+                        currentFrame = 0;
+                        branched = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!branched && movesDictJson[actionName].contains("TriggerKey"))
+            {
+                for (auto& [keyID, key] : movesDictJson[actionName]["TriggerKey"].items())
+                {
+                    if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                        continue;
+                    }
+
+                    auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
+                    for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
+                    {
+                        int triggerID = atoi(keyID.c_str());
+                        std::string actionString = key;
+                        int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
+
+                        auto triggerIDString = std::to_string(triggerID);
+                        auto actionIDString = to_string_leading_zeroes(actionID, 4);
+
+                        auto norm = triggersJson[actionIDString][triggerIDString]["norm"];
+                        if (norm["command_index"] == -1 && norm["ok_key_flags"] != 0 && norm["ok_key_flags"] == currentInput )
+                        {
+                            currentAction = actionID;
+                            currentFrame = 0;
+                        }
+                    }
+                }
+            }
         }
 
         //drawBox( rectJson["OffsetX"], rectJson["OffsetY"], rectJson["SizeX"], rectJson["SizeY"] );
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        currentFrame++;
+
+        if (currentFrame >= actionFrameDuration)
+        {
+            currentAction = 1;
+            currentFrame = 0;
+        }
     }
 
     // Cleanup
