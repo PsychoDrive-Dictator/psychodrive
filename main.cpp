@@ -195,8 +195,11 @@ int main(int, char**)
     float posOffsetY = 0.0f;
     float velocityX = 0.0f;
     float velocityY = 0.0f;
+    float accelX = 0.0f;
+    float accelY = 0.0f;
 
     int currentAction = 1;
+    int nextAction = -1;
     int currentFrame = 0;
     int actionFrameDuration = 0;
     int currentInput = 0;
@@ -319,6 +322,8 @@ int main(int, char**)
             ImGui::SliderInt("frame", &currentFrame, 0, 100);
             ImGui::Text(actionName.c_str());
             ImGui::Text("currentInput %d", currentInput);
+            ImGui::Text("vel %f %f", velocityX, velocityY);
+            ImGui::Text("accel %f %f", accelX, accelY);
 
             if (ImGui::Button("reset"))
                 currentFrame = 0;
@@ -354,12 +359,13 @@ int main(int, char**)
         auto actionIDString = to_string_leading_zeroes(currentAction, 4);
         bool validAction = namesJson.contains(actionIDString);
         actionName = validAction ? namesJson[actionIDString] : "invalid";
-        
+
         if (movesDictJson.contains(actionName))
         {
             actionFrameDuration = movesDictJson[actionName]["fab"]["ActionFrame"]["MarginFrame"];
-            if (actionFrameDuration == 0) {
-                actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"]; ; //standing has 0 marginframe
+            if (actionFrameDuration == 0 || actionFrameDuration == -1) {
+                //standing has 0 marginframe, pre-jump has -1
+                actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
             }
 
             if (movesDictJson[actionName].contains("PlaceKey"))
@@ -383,8 +389,19 @@ int main(int, char**)
                 }
             }
 
+            velocityX += accelX;
+            velocityY += accelY;
+
             posX += velocityX;
             posY += velocityY;
+
+            if ( posY < 0 )
+            {
+                posY = 0;
+                velocityY = 0;
+                accelY = 0;
+                nextAction = 39;
+            }
             glTranslatef(posX + posOffsetX, posY + posOffsetY, 0.0f);
 
             if (movesDictJson[actionName].contains("SteerKey"))
@@ -402,6 +419,10 @@ int main(int, char**)
                             velocityX = fixValue;
                         } else if (steerKey["ValueType"] == 1) {
                             velocityY = fixValue;
+                        } else if (steerKey["ValueType"] == 2) {
+                            accelX = fixValue; // ?
+                        } else if (steerKey["ValueType"] == 4) {
+                            accelY = fixValue;
                         }
                     }
                 }
@@ -470,8 +491,6 @@ int main(int, char**)
                 }
             }
 
-            bool branched = false;
-
             if (movesDictJson[actionName].contains("BranchKey"))
             {
                 for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
@@ -482,19 +501,15 @@ int main(int, char**)
 
                     if (key["Type"] == 0) //always?
                     {
-                        currentAction = key["Action"];
-                        currentFrame = 0;
-                        branched = true;
-                        posX += posOffsetX;
-                        posOffsetX = 0.0f;
-                        posY += posOffsetY;
-                        posOffsetY = 0.0f;
-                        break;
+                        nextAction = key["Action"];
+                        // do those also override if higher branchID?
                     }
                 }
             }
 
-            if (!branched && movesDictJson[actionName].contains("TriggerKey"))
+            // should this fall through and let triggers also happen? prolly
+
+            if (movesDictJson[actionName].contains("TriggerKey"))
             {
                 for (auto& [keyID, key] : movesDictJson[actionName]["TriggerKey"].items())
                 {
@@ -518,12 +533,10 @@ int main(int, char**)
                           (norm["ok_key_flags"].get<int>() & currentInput) == norm["ok_key_flags"] &&
                           (norm["dc_exc_flags"] == 0 || (norm["dc_exc_flags"].get<int>() & currentInput) == norm["dc_exc_flags"]))
                         {
-                            currentAction = actionID;
-                            currentFrame = 0;
-                            posX += posOffsetX;
-                            posOffsetX = 0.0f;
-                            posY += posOffsetY;
-                            posOffsetY = 0.0f;
+                            // need to obey deferral
+                            nextAction = actionID;
+                            // specifically don't break here, i think another trigger can have higher priority
+                            // walking in reverse and breaking would be smarter :-)
                         }
                     }
                 }
@@ -540,13 +553,50 @@ int main(int, char**)
 
         if (currentFrame >= actionFrameDuration)
         {
-            currentAction = 1;
+            if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
+                // If done with pre-jump, transition to jump
+                nextAction = currentAction + 3;
+            }
+            else {
+                nextAction = 1;
+            }
+        }
+
+        // Process movement if any
+        if ( nextAction == 1 || ( nextAction == -1 && currentAction == 1 ) )
+        {
+            if ( currentInput & 1 ) {
+                if ( currentInput & 4 ) {
+                    nextAction = 35;
+                }
+                if ( currentInput & 8 ) {
+                    nextAction = 34;
+                } else {
+                    nextAction = 33;
+                }
+            } else if ( currentInput & 2 ) {
+                nextAction = 4;
+            } else {
+                if ( currentInput & 4 ) {
+                    nextAction = 13;
+                }
+                if ( currentInput & 8 ) {
+                    nextAction = 9;
+                }
+            }
+        }
+    
+        // Transition
+        if ( nextAction != -1)
+        {
+            currentAction = nextAction;
             currentFrame = 0;
             posX += posOffsetX;
             posOffsetX = 0.0f;
             posY += posOffsetY;
             posOffsetY = 0.0f;
 
+            nextAction = -1;
         }
     }
 
