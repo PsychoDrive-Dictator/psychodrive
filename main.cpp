@@ -9,8 +9,10 @@
 #include <fstream>
 #include <ios>
 #include <vector>
+#include <deque>
 #include <chrono>
 #include <thread>
+#include <bitset>
 
 enum Input
 {
@@ -110,6 +112,41 @@ static inline void parseRootOffset( nlohmann::json& keyJson, int&offsetX, int& o
     }
 }
 
+bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0 )
+{
+
+    if (dcExcFlags != 0 ) {
+        if ((dcExcFlags & input) != dcExcFlags) {
+            return false;
+        }
+    }
+
+    if (okCondFlags & 2) {
+        if ((input & 0xF) == (okKeyFlags & 0xF)) {
+            return true; // match exact direction
+        }
+        return false;
+    }
+
+    uint32_t match = okKeyFlags & input;
+
+    if (okCondFlags & 0x80) {
+        if (match == okKeyFlags) {
+            return true; // match all?
+        }
+    } else if (okCondFlags & 0x40) {
+        if (std::bitset<32>(match).count() >= 2) {
+            return true; // match 2?
+        }
+    } else {
+        if (match != 0) {
+            return true; // match any? :/
+        }
+    }
+
+    return false;
+}
+
 // Main code
 int main(int, char**)
 {
@@ -160,26 +197,6 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    // - Our Emscripten build process allows embedding fonts to be accessible at runtime from the "fonts/" folder. See Makefile.emscripten for details.
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != nullptr);
-
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
     auto movesDictJson = parse_json_file("honda_moves.json");
@@ -204,6 +221,7 @@ int main(int, char**)
     int actionFrameDuration = 0;
     int marginFrame = 0;
     int currentInput = 0;
+    std::deque<int> inputBuffer;
     
 
     std::string actionName;
@@ -212,11 +230,6 @@ int main(int, char**)
     bool done = false;
     while (!done)
     {
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -302,24 +315,21 @@ int main(int, char**)
             }
         }
 
+        inputBuffer.push_front(currentInput);
+        // how much is too much?
+        if (inputBuffer.size() > 20) {
+            inputBuffer.pop_back();
+        }
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        // if (show_demo_window)
-        //     ImGui::ShowDemoWindow(&show_demo_window);
-
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
-            ImGui::Begin(movesDictJson["0010_DMG_HL_ST"]["DamageCollisionKey"]["1"]["ATTR"].dump().c_str());
+            ImGui::Begin("Psycho Drive");
 
-            ImGui::Text(rectsJson["08"]["001"]["OffsetX"].dump().c_str());               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderInt("action", &currentAction, 1, 1500);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::SliderInt("action", &currentAction, 1, 1500);
             ImGui::SliderInt("frame", &currentFrame, 0, 100);
             ImGui::Text(actionName.c_str());
             ImGui::Text("currentInput %d", currentInput);
@@ -335,18 +345,8 @@ int main(int, char**)
             ImGui::End();
         }
 
-        // 3. Show another simple window.
-        // if (show_another_window)
-        // {
-        //     ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        //     ImGui::Text("Hello from another window!");
-        //     if (ImGui::Button("Close Me"))
-        //         show_another_window = false;
-        //     ImGui::End();
-        // }
-
-        // Rendering
         ImGui::Render();
+
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -529,13 +529,57 @@ int main(int, char**)
                         auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
                         auto norm = triggersJson[actionIDString][triggerIDString]["norm"];
-                        if (norm["command_index"] == -1 &&
-                          norm["ok_key_flags"] != 0 &&
-                          (norm["ok_key_flags"].get<int>() & currentInput) == norm["ok_key_flags"] &&
-                          (norm["dc_exc_flags"] == 0 || (norm["dc_exc_flags"].get<int>() & currentInput) == norm["dc_exc_flags"]))
+                        int commandNo = norm["command_no"];
+                        uint32_t okKeyFlags = norm["ok_key_flags"];
+                        uint32_t okCondFlags = norm["ok_key_cond_flags"];
+                        uint32_t dcExcFlags = norm["dc_exc_flags"];
+                        // condflags..
+                        // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
+                        // 10100000001100000: EX, so any two out of three button mask?
+                        // 00100000000100000: heavy punch with one button mask
+                        // 00100000001100000: normal throw, two out of two mask t
+                        // 00100000010100000: taunt, 6 out of 6 in mask
+                        if (okKeyFlags && matchInput(currentInput, okKeyFlags, okCondFlags, dcExcFlags))
                         {
-                            // need to obey deferral
-                            nextAction = actionID;
+                            // todo need to obey deferral
+                            if ( commandNo == -1 ) {
+                                nextAction = actionID;
+                            } else {
+                                std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
+                                int inputID = commandsJson[commandNoString]["0"]["input_num"].get<int>() - 1;
+                                auto commandInputs = commandsJson[commandNoString]["0"]["inputs"];
+
+                                uint32_t inputBufferCursor = 0;
+
+                                while (inputID >= 0 )
+                                {
+                                    auto input = commandInputs[to_string_leading_zeroes(inputID, 2)]["normal"];
+                                    // does 0x40000000 mean neutral?
+                                    uint32_t inputOkKeyFlags = input["ok_key_flags"];
+                                    uint32_t inputOkCondFlags = input["ok_key_cond_check_flags"];
+                                    // condflags..
+                                    // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
+                                    // 10100000001100000: EX, so any two out of three button mask?
+                                    // 00100000000100000: heavy punch with one button mask
+                                    // 00100000001100000: normal throw, two out of two mask t
+                                    // 00100000010100000: taunt, 6 out of 6 in mask
+                                    while (inputBufferCursor < inputBuffer.size())
+                                    {
+                                        if (matchInput(inputBuffer[inputBufferCursor++], inputOkKeyFlags, inputOkCondFlags)) {
+                                            inputID--;
+                                            break;
+                                        }
+                                    }
+
+                                    if (inputBufferCursor == inputBuffer.size()) {
+                                        break;
+                                    }
+                                }
+
+                                if (inputID < 0) {
+                                    nextAction = actionID;
+                                }
+                            }
                             // specifically don't break here, i think another trigger can have higher priority
                             // walking in reverse and breaking would be smarter :-)
                         }
