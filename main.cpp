@@ -43,6 +43,12 @@ std::string readFile(const std::string &fileName)
     return std::string(&bytes[0], fileSize);
 }
 
+nlohmann::json parse_json_file(const std::string &fileName)
+{
+    std::string fileText = readFile(fileName);
+    return nlohmann::json::parse(fileText);
+}
+
 void drawBox( float x, float y, float w, float h, float r, float g, float b)
 {
     glColor4f(r,g,b, 0.3f);
@@ -78,6 +84,8 @@ std::string to_string_leading_zeroes(unsigned int number, unsigned int length) {
     
     return leading_zeros + num_str;
 }
+
+
 
 static inline void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, float r, float g, float b )
 {
@@ -174,20 +182,12 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
-    std::string movesDictText = readFile("honda_dict.json");
-    auto movesDictJson = nlohmann::json::parse(movesDictText);
-
-    std::string rectsText = readFile("honda_rects.json");
-    auto rectsJson = nlohmann::json::parse(rectsText);
-
-    std::string namesText = readFile("honda_names.json");
-    auto namesJson = nlohmann::json::parse(namesText);
-
-    std::string triggerGroupsText = readFile("honda_trigger_groups.json");
-    auto triggerGroupsJson = nlohmann::json::parse(triggerGroupsText);
-
-    std::string triggersText = readFile("honda_triggers.json");
-    auto triggersJson = nlohmann::json::parse(triggersText);
+    auto movesDictJson = parse_json_file("honda_moves.json");
+    auto rectsJson = parse_json_file("honda_rects.json");
+    auto namesJson = parse_json_file("honda_names.json");
+    auto triggerGroupsJson = parse_json_file("honda_trigger_groups.json");
+    auto triggersJson = parse_json_file("honda_triggers.json");
+    auto commandsJson = parse_json_file("honda_commands.json");
 
     float posX = 50.0f;
     float posY = 0.0f;
@@ -202,6 +202,7 @@ int main(int, char**)
     int nextAction = -1;
     int currentFrame = 0;
     int actionFrameDuration = 0;
+    int marginFrame = 0;
     int currentInput = 0;
     
 
@@ -322,6 +323,8 @@ int main(int, char**)
             ImGui::SliderInt("frame", &currentFrame, 0, 100);
             ImGui::Text(actionName.c_str());
             ImGui::Text("currentInput %d", currentInput);
+            ImGui::Text("pos %f %f", posX, posY);
+            ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
             ImGui::Text("vel %f %f", velocityX, velocityY);
             ImGui::Text("accel %f %f", accelX, accelY);
 
@@ -362,11 +365,9 @@ int main(int, char**)
 
         if (movesDictJson.contains(actionName))
         {
-            actionFrameDuration = movesDictJson[actionName]["fab"]["ActionFrame"]["MarginFrame"];
-            if (actionFrameDuration == 0 || actionFrameDuration == -1) {
-                //standing has 0 marginframe, pre-jump has -1
-                actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
-            }
+            marginFrame = movesDictJson[actionName]["fab"]["ActionFrame"]["MarginFrame"];
+            //standing has 0 marginframe, pre-jump has -1, crouch -1..
+            actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
 
             if (movesDictJson[actionName].contains("PlaceKey"))
             {
@@ -392,15 +393,15 @@ int main(int, char**)
             velocityX += accelX;
             velocityY += accelY;
 
+            float oldPosY = posY;
+
             posX += velocityX;
             posY += velocityY;
 
-            if ( posY < 0 )
+            if ( oldPosY > 0.0f && posY <= 0.0f ) // iffy but we prolly move to fixed point anyway at some point
             {
-                posY = 0;
-                velocityY = 0;
-                accelY = 0;
-                nextAction = 39;
+                posY = 0.0f;
+                nextAction = 39; // land - need other landing if did air attack?
             }
             glTranslatef(posX + posOffsetX, posY + posOffsetY, 0.0f);
 
@@ -562,27 +563,47 @@ int main(int, char**)
             }
         }
 
+
+        bool canMove = false;
+        int actionCheckCanMove = currentAction;
+        if (nextAction != -1 ) {
+            actionCheckCanMove = nextAction;
+        }
+        bool movingForward = actionCheckCanMove == 9 || actionCheckCanMove == 10 || actionCheckCanMove == 11;
+        bool movingBackward = actionCheckCanMove == 13 || actionCheckCanMove == 14 || actionCheckCanMove == 15;
+        if (actionCheckCanMove == 1 || actionCheckCanMove == 2 || actionCheckCanMove == 4 || //stands, crouch
+            movingForward || movingBackward) {
+            canMove = true;
+        }
+
+        if ( marginFrame != -1 && currentFrame >= marginFrame ) {
+            canMove = true;
+        }
+
         // Process movement if any
-        if ( nextAction == 1 || ( nextAction == -1 && currentAction == 1 ) )
+        if ( canMove )
         {
             if ( currentInput & 1 ) {
                 if ( currentInput & 4 ) {
-                    nextAction = 35;
-                }
-                if ( currentInput & 8 ) {
-                    nextAction = 34;
+                    nextAction = 35; // BAS_JUMP_B_START
+                } else if ( currentInput & 8 ) {
+                    nextAction = 34; // BAS_JUMP_F_START
                 } else {
-                    nextAction = 33;
+                    nextAction = 33; // BAS_JUMP_N_START
                 }
             } else if ( currentInput & 2 ) {
-                nextAction = 4;
+                nextAction = 4; // BAS_CRH_Loop
             } else {
-                if ( currentInput & 4 ) {
-                    nextAction = 13;
+                if ( currentInput & 4 && !movingBackward ) {
+                    nextAction = 13; // BAS_BACKWARD_START
                 }
-                if ( currentInput & 8 ) {
-                    nextAction = 9;
+                if ( currentInput & 8 && !movingForward) {
+                    nextAction = 9; // BAS_FORWARD_START
                 }
+            }
+
+            if ( currentInput == 0 ) { // only do that if we're not post-margin for correctness
+                nextAction = 1;
             }
         }
     
@@ -591,12 +612,22 @@ int main(int, char**)
         {
             currentAction = nextAction;
             currentFrame = 0;
+
+            // commit current place offset
             posX += posOffsetX;
             posOffsetX = 0.0f;
             posY += posOffsetY;
             posOffsetY = 0.0f;
 
             nextAction = -1;
+
+            // if grounded, reset velocities on transition
+            if ( posY == 0.0) {
+                velocityX = 0;
+                velocityY = 0;
+                accelX = 0;
+                accelY = 0;
+            }
         }
     }
 
