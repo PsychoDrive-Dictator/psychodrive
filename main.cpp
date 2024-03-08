@@ -542,17 +542,32 @@ int main(int, char**)
                     }
                 }
             }
-        }
+            currentFrame++;
 
-        //drawBox( rectJson["OffsetX"], rectJson["OffsetY"], rectJson["SizeX"], rectJson["SizeY"] );
+            // evaluate branches after the frame bump, branch frames are meant to be elided afaict
+            if (movesDictJson[actionName].contains("BranchKey"))
+            {
+                for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
+                {
+                    if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                        continue;
+                    }
+
+                    if (key["Type"] == 0) //always?
+                    {
+                        nextAction = key["Action"];
+                        // do those also override if higher branchID?
+                    }
+                }
+            }
+        }
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        currentFrame++;
 
-        if (currentFrame >= actionFrameDuration)
+        if (currentFrame >= actionFrameDuration && nextAction == -1)
         {
             if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
                 // If done with pre-jump, transition to jump
@@ -562,7 +577,6 @@ int main(int, char**)
                 nextAction = 1;
             }
         }
-
 
         bool canMove = false;
         int actionCheckCanMove = currentAction;
