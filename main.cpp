@@ -53,7 +53,7 @@ nlohmann::json parse_json_file(const std::string &fileName)
 
 void drawBox( float x, float y, float w, float h, float r, float g, float b)
 {
-    glColor4f(r,g,b, 0.3f);
+    glColor4f(r,g,b, 0.2f);
 
     glBegin(GL_QUADS);
     
@@ -89,7 +89,7 @@ std::string to_string_leading_zeroes(unsigned int number, unsigned int length) {
 
 
 
-static inline void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, float r, float g, float b )
+static inline void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, float r, float g, float b, bool isDrive = false, bool isParry = false, bool isDI = false )
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
@@ -101,6 +101,25 @@ static inline void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int bo
     int yOrig = rectJson["OffsetY"];
     int xRadius = rectJson["SizeX"];
     int yRadius = rectJson["SizeY"];
+    if (isDrive || isParry || isDI ) {
+        int xRadiusDrive = xRadius + 10;
+        int yRadiusDrive = yRadius + 10;
+        float colorR = 0.0;
+        float colorG = 0.6;
+        float colorB = 0.1;
+        if (isParry) {
+            colorR = 0.3;
+            colorG = 0.7;
+            colorB = 0.9;
+        }
+        if (isDI) {
+            colorR = 0.9;
+            colorG = 0.0;
+            colorB = 0.0;
+        }
+        drawBox( xOrig - xRadiusDrive + offsetX, yOrig - yRadiusDrive + offsetY, xRadiusDrive * 2, yRadiusDrive * 2,
+                colorR,colorG,colorB);
+    }
     drawBox( xOrig - xRadius + offsetX, yOrig - yRadius + offsetY, xRadius * 2, yRadius * 2,r,g,b );
 }
 
@@ -145,6 +164,20 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
     }
 
     return false;
+}
+
+static inline void doSteerKeyOperation(float &value, float keyValue, int operationType)
+{
+    switch (operationType) {
+        case 1: // set
+        value = keyValue; 
+        break;
+        case 2: // add ?
+        value += keyValue;
+        break;
+        default:
+        abort();
+    }
 }
 
 // Main code
@@ -224,7 +257,14 @@ int main(int, char**)
     std::deque<int> inputBuffer;
 
     int deferredActionFrame = -1;
-    int deferredAction = 0;    
+    int deferredAction = 0;
+
+    bool isDrive = false;
+    bool wasDrive = false;
+
+    float charColorR = 0.8;
+    float charColorG = 0.6;
+    float charColorB = 0.2;
 
     std::string actionName;
 
@@ -415,18 +455,36 @@ int main(int, char**)
                         continue;
                     }
 
-                    if (steerKey["OperationType"] == 1) {
-                        float fixValue = steerKey["FixValue"];
+                    int operationType = steerKey["OperationType"];
+                    int valueType = steerKey["ValueType"];
+                    float fixValue = steerKey["FixValue"];
 
-                        if ( steerKey["ValueType"] == 0 ) {
-                            velocityX = fixValue;
-                        } else if (steerKey["ValueType"] == 1) {
-                            velocityY = fixValue;
-                        } else if (steerKey["ValueType"] == 2) {
-                            accelX = fixValue; // ?
-                        } else if (steerKey["ValueType"] == 4) {
-                            accelY = fixValue;
-                        }
+                    switch (valueType) {
+                        case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
+                        case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
+                        case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
+                        case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                    }
+                }
+            }
+
+            if (wasDrive && movesDictJson[actionName].contains("DriveSteerKey"))
+            {
+                for (auto& [steerKeyID, steerKey] : movesDictJson[actionName]["DriveSteerKey"].items())
+                {
+                    if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
+                        continue;
+                    }
+
+                    int operationType = steerKey["OperationType"];
+                    int valueType = steerKey["ValueType"];
+                    float fixValue = steerKey["FixValue"];
+
+                    switch (valueType) {
+                        case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
+                        case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
+                        case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
+                        case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
                     }
                 }
             }
@@ -442,7 +500,7 @@ int main(int, char**)
                     int rootOffsetY = 0;
                     parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
 
-                    drawRectsBox( rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, 1.0,1.0,1.0 );
+                    drawRectsBox( rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, 1.0,1.0,1.0);
                 }
             }
             if (movesDictJson[actionName].contains("DamageCollisionKey"))
@@ -457,14 +515,18 @@ int main(int, char**)
                     int rootOffsetY = 0;
                     parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
 
+                    bool drive = isDrive || wasDrive;
+                    bool parry = currentAction >= 480 && currentAction <= 489;
+                    bool di = currentAction >= 850 && currentAction <= 859;
+
                     for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                        drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,1.0,0.0,1.0 );
+                        drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,charColorR,charColorG,charColorB,drive,parry,di);
                     }
                     for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                        drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,1.0,0.0,1.0 );
+                        drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,charColorR,charColorG,charColorB,drive,parry,di);
                     }
                     for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                        drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,1.0,0.0,1.0 );
+                        drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,charColorR,charColorG,charColorB,drive,parry,di);
                     }
                     for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
                         drawRectsBox( rectsJson, 7, boxID,rootOffsetX, rootOffsetY,0.95,0.95,0.85 );
@@ -488,7 +550,7 @@ int main(int, char**)
                         if (hitBox["CollisionType"] == 3) {
                             drawRectsBox( rectsJson, 3, boxID,rootOffsetX, rootOffsetY,0.5,0.5,0.5 );
                         } else if (hitBox["CollisionType"] == 0) {
-                            drawRectsBox( rectsJson, 0, boxID,rootOffsetX, rootOffsetY,1.0,0.0,0.0 );
+                            drawRectsBox( rectsJson, 0, boxID,rootOffsetX, rootOffsetY,1.0,0.0,0.0, isDrive || wasDrive );
                         }
                     }                    
                 }
@@ -675,10 +737,11 @@ int main(int, char**)
             } else if ( currentInput & 2 ) {
                 nextAction = 4; // BAS_CRH_Loop
             } else {
-                if ( currentInput & 4 && !movingBackward ) {
+                if ((currentInput & (32+256)) == 32+256) {
+                    nextAction = 480; // DPA_STD_START
+                } else if ( currentInput & 4 && !movingBackward ) {
                     nextAction = 13; // BAS_BACKWARD_START
-                }
-                if ( currentInput & 8 && !movingForward) {
+                } else if ( currentInput & 8 && !movingForward) {
                     nextAction = 9; // BAS_FORWARD_START
                 }
             }
@@ -703,11 +766,19 @@ int main(int, char**)
             nextAction = -1;
 
             // if grounded, reset velocities on transition
-            if ( posY == 0.0) {
+            if ( posY == 0.0 && !isDrive) {
                 velocityX = 0;
                 velocityY = 0;
                 accelX = 0;
                 accelY = 0;
+            }
+            if (currentAction == 500 || currentAction == 501) {
+                isDrive = true;
+            } else if (isDrive == true) {
+                isDrive = false;
+                wasDrive = true;
+            } else {
+                wasDrive = false;
             }
         }
     }
