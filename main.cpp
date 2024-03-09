@@ -196,7 +196,7 @@ int main(int, char**)
 
     SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -230,7 +230,7 @@ int main(int, char**)
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -242,7 +242,7 @@ int main(int, char**)
 
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
-    std::string character = "honda";
+    std::string character = "ryu";
 
     auto movesDictJson = parse_json_file(character + "_moves.json");
     auto rectsJson = parse_json_file(character + "_rects.json");
@@ -277,6 +277,8 @@ int main(int, char**)
     float charColorR = 0.8;
     float charColorG = 0.6;
     float charColorB = 0.2;
+
+    int uniqueCharge = 0;
 
     std::string actionName;
 
@@ -331,6 +333,69 @@ int main(int, char**)
                         break;
                 }
             }
+            if (event.type == SDL_CONTROLLERDEVICEADDED)
+            {
+                SDL_GameController *controller = SDL_GameControllerOpen(event.cdevice.which);
+                log("controller added " + std::to_string(event.cdevice.which) + " " + std::to_string((uint64_t)controller));
+            }
+            if (event.type == SDL_CONTROLLERAXISMOTION)
+            {
+                switch (event.caxis.axis)
+                {
+                    case SDL_CONTROLLER_AXIS_LEFTX:
+                        // log("SDL_CONTROLLER_AXIS_LEFTX " + std::to_string(event.caxis.value));
+                        if (event.caxis.value < 0 )  {
+                            currentInput |= BACK;
+                        } else if (event.caxis.value > 0 ) {
+                            currentInput |= FORWARD;
+                        } else if (event.caxis.value == 0){
+                            currentInput &= ~BACK;
+                            currentInput &= ~FORWARD;
+                        }
+                        break;
+                    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+                        if (event.caxis.value > 0 ) {
+                            currentInput |= HK;
+                        } else {
+                            currentInput &= ~HK;
+                        }
+                        break;
+                }
+            }
+            if (event.type == SDL_CONTROLLERBUTTONDOWN)
+            {
+                switch (event.cbutton.button)
+                {
+                // log("controller event " + std::to_string(event.button.button))
+                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                        currentInput |= BACK;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                        currentInput |= DOWN;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                        currentInput |= FORWARD;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                        currentInput |= UP;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_A:
+                        currentInput |= LK;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_B:
+                        currentInput |= MK;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_X:
+                        currentInput |= LP;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_Y:
+                        currentInput |= MP;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+                        currentInput |= HP;
+                        break;
+                }
+            }
             if (event.type == SDL_KEYUP)
             {
                 switch (event.key.keysym.sym)
@@ -367,6 +432,40 @@ int main(int, char**)
                         break;
                 }
             }
+            if (event.type == SDL_CONTROLLERBUTTONUP)
+            {
+                switch (event.cbutton.button)
+                {
+                // log("controller event " + std::to_string(event.button.button))
+                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                        currentInput &= ~BACK;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                        currentInput &= ~DOWN;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                        currentInput &= ~FORWARD;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                        currentInput &= ~UP;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_A:
+                        currentInput &= ~LK;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_B:
+                        currentInput &= ~MK;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_X:
+                        currentInput &= ~LP;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_Y:
+                        currentInput &= ~MP;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+                        currentInput &= ~HP;
+                        break;
+                }
+            }
         }
 
         inputBuffer.push_front(currentInput);
@@ -391,6 +490,7 @@ int main(int, char**)
             ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
             ImGui::Text("vel %f %f", velocityX, velocityY);
             ImGui::Text("accel %f %f", accelX, accelY);
+            ImGui::Text("unique %i", uniqueCharge);
 
             if (ImGui::Button("reset"))
                 currentFrame = 0;
@@ -526,6 +626,19 @@ int main(int, char**)
                 accelX = 0.0f;
             }
 
+            if (movesDictJson[actionName].contains("EventKey"))
+            {
+                for (auto& [keyID, key] : movesDictJson[actionName]["EventKey"].items())
+                {
+                    if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                        continue;
+                    }
+
+                    if (key["_IsUNIQUE_UNIQUE_PARAM_05"] == true) {
+                        uniqueCharge = 1;
+                    }
+                }
+            }
             if (movesDictJson[actionName].contains("PushCollisionKey"))
             {
                 for (auto& [pushBoxID, pushBox] : movesDictJson[actionName]["PushCollisionKey"].items())
@@ -632,7 +745,17 @@ int main(int, char**)
                         auto triggerIDString = std::to_string(triggerID);
                         auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-                        auto norm = triggersJson[actionIDString][triggerIDString]["norm"];
+                        auto trigger = triggersJson[actionIDString][triggerIDString];
+                        bool usinguniquecharge = false;
+
+                        if (trigger["_UseUniqueParam"] == true) {
+                            if (!uniqueCharge) {
+                                continue;
+                            }
+                            usinguniquecharge = true;
+                        }
+
+                        auto norm = trigger["norm"];
                         int commandNo = norm["command_no"];
                         uint32_t okKeyFlags = norm["ok_key_flags"];
                         uint32_t okCondFlags = norm["ok_key_cond_flags"];
@@ -645,13 +768,16 @@ int main(int, char**)
                         // 00100000010100000: taunt, 6 out of 6 in mask
                         if (okKeyFlags && matchInput(currentInput, okKeyFlags, okCondFlags, dcExcFlags))
                         {
-                            // todo need to obey deferral
+                            //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
                             if ( commandNo == -1 ) {
                                 if (defer) {
                                     deferredAction = actionID;
                                     deferredActionFrame = triggerEndFrame;
                                 } else {
                                     nextAction = actionID;
+                                }
+                                if ( usinguniquecharge ) {
+                                    uniqueCharge = 0;
                                 }
                             } else {
                                 std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
@@ -691,6 +817,9 @@ int main(int, char**)
                                         deferredActionFrame = triggerEndFrame;
                                     } else {
                                         nextAction = actionID;
+                                    }
+                                    if ( usinguniquecharge ) {
+                                        uniqueCharge = 0;
                                     }
                                 }
                             }
