@@ -166,6 +166,16 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
     return false;
 }
 
+std::deque<std::string> logQueue;
+
+void log(std::string logLine)
+{
+    logQueue.push_back(logLine);
+    if (logQueue.size() > 20) {
+        logQueue.pop_front();
+    }
+}
+
 static inline void doSteerKeyOperation(float &value, float keyValue, int operationType)
 {
     switch (operationType) {
@@ -176,7 +186,7 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
         value += keyValue;
         break;
         default:
-        abort();
+        log("Uknown steer keyoperation!");
     }
 }
 
@@ -232,12 +242,14 @@ int main(int, char**)
 
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
-    auto movesDictJson = parse_json_file("honda_moves.json");
-    auto rectsJson = parse_json_file("honda_rects.json");
-    auto namesJson = parse_json_file("honda_names.json");
-    auto triggerGroupsJson = parse_json_file("honda_trigger_groups.json");
-    auto triggersJson = parse_json_file("honda_triggers.json");
-    auto commandsJson = parse_json_file("honda_commands.json");
+    std::string character = "honda";
+
+    auto movesDictJson = parse_json_file(character + "_moves.json");
+    auto rectsJson = parse_json_file(character + "_rects.json");
+    auto namesJson = parse_json_file(character + "_names.json");
+    auto triggerGroupsJson = parse_json_file(character + "_trigger_groups.json");
+    auto triggersJson = parse_json_file(character + "_triggers.json");
+    auto commandsJson = parse_json_file(character + "_commands.json");
 
     float posX = 50.0f;
     float posY = 0.0f;
@@ -385,6 +397,12 @@ int main(int, char**)
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
+
+            ImGui::Begin("Debug Log");
+            for (auto logLine : logQueue) {
+                ImGui::Text(logLine.c_str());
+            }
+            ImGui::End();
         }
 
         ImGui::Render();
@@ -432,20 +450,33 @@ int main(int, char**)
                 }
             }
 
+            float prevVelX = velocityX;
+
             velocityX += accelX;
             velocityY += accelY;
+
+            // log(std::to_string(currentAction) + " " + std::to_string(prevVelX) + " " + std::to_string(velocityX));
+
+            if ( (velocityX * prevVelX) < 0.0f || (accelX != 0.0f && velocityX == 0.0f) ) {
+                // sign change?
+                velocityX = 0.0f;
+                accelX = 0.0f;
+            }
 
             float oldPosY = posY;
 
             posX += velocityX;
             posY += velocityY;
 
+            // landing
             if ( oldPosY > 0.0f && posY <= 0.0f ) // iffy but we prolly move to fixed point anyway at some point
             {
                 posY = 0.0f;
                 nextAction = 39; // land - need other landing if did air attack?
             }
             glTranslatef(posX + posOffsetX, posY + posOffsetY, 0.0f);
+
+            prevVelX = velocityX;
 
             if (movesDictJson[actionName].contains("SteerKey"))
             {
@@ -487,6 +518,12 @@ int main(int, char**)
                         case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
                     }
                 }
+            }
+
+            if ( (velocityX * prevVelX) < 0.0f || (accelX != 0.0f && velocityX == 0.0f) ) {
+                // sign change?
+                velocityX = 0.0f;
+                accelX = 0.0f;
             }
 
             if (movesDictJson[actionName].contains("PushCollisionKey"))
@@ -694,7 +731,7 @@ int main(int, char**)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(4));
 
         if (currentFrame >= actionFrameDuration && nextAction == -1)
         {
@@ -751,6 +788,10 @@ int main(int, char**)
             }
         }
 
+        if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {
+            nextAction = 482; // DPA_STD_END
+        }
+
         // Transition
         if ( nextAction != -1 )
         {
@@ -772,7 +813,8 @@ int main(int, char**)
                 accelX = 0;
                 accelY = 0;
             }
-            if (currentAction == 500 || currentAction == 501) {
+            if (currentAction == 500 || currentAction == 501 ||
+                currentAction == 739 || currentAction == 740) {
                 isDrive = true;
             } else if (isDrive == true) {
                 isDrive = false;
