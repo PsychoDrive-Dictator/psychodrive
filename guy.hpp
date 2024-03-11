@@ -8,13 +8,19 @@
 class Guy {
 public:
     Guy(std::string charName, float startPosX, float startPosY, int startDir, color renderColor);
+    void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
     void Input(int input);
     void PreFrame(void);
     void Frame(void);
 
+    // for opponent direction
+    float getPosX() {
+        return posX + (posOffsetX*direction);
+    }
+
     int getCurrentAction() { return currentAction; }
     std::string getActionName() { return actionName; }
-    void getPos( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
+    void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
         outPosX = posX;
         outPosY = posY;
         outPosOffsetX = posOffsetX;
@@ -29,6 +35,7 @@ public:
 
 private:
     std::string character;
+    Guy *pOpponent = nullptr;
 
     nlohmann::json movesDictJson;
     nlohmann::json rectsJson;

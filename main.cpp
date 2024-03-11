@@ -176,6 +176,8 @@ int main(int, char**)
 
     Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
     Guy otherGuy("ryu", 400.0f, 0.0f, -1, {1.0,1.0,1.0});
+    guy.setOpponent(&otherGuy);
+    otherGuy.setOpponent(&guy);
     int currentInput = 0;
 
     // Main loop
@@ -378,7 +380,7 @@ int main(int, char**)
             ImGui::Text("action %s frame %i", guy.getActionName().c_str(), guy.getCurrentAction());
             ImGui::Text("currentInput %d", currentInput);
             float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
-            guy.getPos(posX, posY, posOffsetX, posOffsetY);
+            guy.getPosDebug(posX, posY, posOffsetX, posOffsetY);
             guy.getVel(velX, velY, accelX, accelY);
             ImGui::Text("pos %f %f", posX, posY);
             ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
