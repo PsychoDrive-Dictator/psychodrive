@@ -3,10 +3,11 @@
 #include "json.hpp"
 #include <deque>
 #include <string>
+#include "main.hpp"
 
 class Guy {
 public:
-    Guy(std::string charName, float startPosX, float startPosY);
+    Guy(std::string charName, float startPosX, float startPosY, int startDir, color renderColor);
     void Input(int input);
     void PreFrame(void);
     void Frame(void);
@@ -37,8 +38,10 @@ private:
     nlohmann::json commandsJson;
     nlohmann::json chargeJson;
 
-    float posX = 50.0f;
+    float posX = 0.0f;
     float posY = 0.0f;
+    int direction = 1;
+
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
     float velocityX = 0.0f;
@@ -60,9 +63,9 @@ private:
     bool isDrive = false;
     bool wasDrive = false;
 
-    float charColorR = 0.8;
-    float charColorG = 0.6;
-    float charColorB = 0.2;
+    float charColorR = 1.0;
+    float charColorG = 1.0;
+    float charColorB = 1.0;
 
     int uniqueCharge = 0;
 

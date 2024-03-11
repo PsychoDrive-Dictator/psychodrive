@@ -83,11 +83,15 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
     }
 }
 
-Guy::Guy(std::string charName, float startPosX, float startPosY)
+Guy::Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)
 {
     character = charName;
     posX = startPosX;
     posY = startPosY;
+    direction = startDir;
+    charColorR = color.r;
+    charColorG = color.g;
+    charColorB = color.b;
 
     movesDictJson = parse_json_file(character + "_moves.json");
     rectsJson = parse_json_file(character + "_rects.json");
@@ -157,7 +161,7 @@ void Guy::PreFrame(void)
 
         float oldPosY = posY;
 
-        posX += velocityX;
+        posX += (velocityX * direction);
         posY += velocityY;
 
         // landing
@@ -166,7 +170,6 @@ void Guy::PreFrame(void)
             posY = 0.0f;
             nextAction = 39; // land - need other landing if did air attack?
         }
-        //glTranslatef(posX + posOffsetX, posY + posOffsetY, 0.0f);
 
         prevVelX = velocityX;
 
@@ -254,10 +257,10 @@ void Guy::PreFrame(void)
                 int rootOffsetX = 0;
                 int rootOffsetY = 0;
                 parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
-                rootOffsetX += posX + posOffsetX;
+                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
                 rootOffsetY += posY + posOffsetY;
 
-                drawRectsBox( rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, 1.0,1.0,1.0);
+                drawRectsBox( rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction, {1.0,1.0,1.0});
             }
         }
         if (movesDictJson[actionName].contains("DamageCollisionKey"))
@@ -271,7 +274,7 @@ void Guy::PreFrame(void)
                 int rootOffsetX = 0;
                 int rootOffsetY = 0;
                 parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
-                rootOffsetX += posX + posOffsetX;
+                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
                 rootOffsetY += posY + posOffsetY;
 
                 bool drive = isDrive || wasDrive;
@@ -279,16 +282,16 @@ void Guy::PreFrame(void)
                 bool di = currentAction >= 850 && currentAction <= 859;
 
                 for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,charColorR,charColorG,charColorB,drive,parry,di);
+                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction,{charColorR,charColorG,charColorB},drive,parry,di);
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,charColorR,charColorG,charColorB,drive,parry,di);
+                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction,{charColorR,charColorG,charColorB},drive,parry,di);
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,charColorR,charColorG,charColorB,drive,parry,di);
+                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction,{charColorR,charColorG,charColorB},drive,parry,di);
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                    drawRectsBox( rectsJson, 7, boxID,rootOffsetX, rootOffsetY,0.95,0.95,0.85 );
+                    drawRectsBox( rectsJson, 7, boxID,rootOffsetX, rootOffsetY,direction,{0.75,0.75,0.65} );
                 }
             }
         }
@@ -304,14 +307,14 @@ void Guy::PreFrame(void)
                 int rootOffsetX = 0;
                 int rootOffsetY = 0;
                 parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
-                rootOffsetX += posX + posOffsetX;
+                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
                 rootOffsetY += posY + posOffsetY;
 
                 for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
                     if (hitBox["CollisionType"] == 3) {
-                        drawRectsBox( rectsJson, 3, boxID,rootOffsetX, rootOffsetY,0.5,0.5,0.5 );
+                        drawRectsBox( rectsJson, 3, boxID,rootOffsetX, rootOffsetY,direction,{0.5,0.5,0.5});
                     } else if (hitBox["CollisionType"] == 0) {
-                        drawRectsBox( rectsJson, 0, boxID,rootOffsetX, rootOffsetY,1.0,0.0,0.0, isDrive || wasDrive );
+                        drawRectsBox( rectsJson, 0, boxID,rootOffsetX, rootOffsetY,direction,{1.0,0.0,0.0}, isDrive || wasDrive );
                     }
                 }                    
             }
@@ -584,7 +587,7 @@ void Guy::Frame(void)
         currentFrame = 0;
 
         // commit current place offset
-        posX += posOffsetX;
+        posX += (posOffsetX * direction);
         posOffsetX = 0.0f;
         posY += posOffsetY;
         posOffsetY = 0.0f;
