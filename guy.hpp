@@ -9,14 +9,25 @@ class Guy {
 public:
     Guy(std::string charName, float startPosX, float startPosY, int startDir, color renderColor);
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
+
     void Input(int input);
     void PreFrame(void);
+    bool Push(Guy *pOtherGuy);
+    bool CheckHit(Guy *pOtherGuy);
+    void Hit(int hitStun, int destX, int destY, int destTime);
     void Frame(void);
 
     // for opponent direction
     float getPosX() {
         return posX + (posOffsetX*direction);
     }
+
+    int getComboHits() { return comboHits; }
+    int getWarudo() { return warudo; }
+
+    std::vector<Box> *getPushBoxes() { return &pushBoxes; }
+    std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
+    std::vector<Box> *getHurtBoxes() { return &hurtBoxes; }
 
     int getCurrentAction() { return currentAction; }
     std::string getActionName() { return actionName; }
@@ -44,6 +55,7 @@ private:
     nlohmann::json triggersJson;
     nlohmann::json commandsJson;
     nlohmann::json chargeJson;
+    nlohmann::json hitJson;
 
     float posX = 0.0f;
     float posY = 0.0f;
@@ -63,6 +75,20 @@ private:
     int marginFrame = 0;
     int currentInput = 0;
     std::deque<int> inputBuffer;
+
+    int canHitID = 0;
+
+    int warudo = 0;
+
+    int hitStun = 0;
+    float hitVelX = 0.0f;
+    float hitVelY = 0.0f;
+    int hitVelFrames = 0;
+    int comboHits = 0;
+
+    std::vector<Box> pushBoxes;
+    std::vector<HitBox> hitBoxes;
+    std::vector<Box> hurtBoxes;
 
     int deferredActionFrame = -1;
     int deferredAction = 0;
