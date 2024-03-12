@@ -395,7 +395,7 @@ int main(int, char**)
             ImGui::Text("vel %f %f", velX, velY);
             ImGui::Text("accel %f %f", accelX, accelY);
             ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
-            ImGui::Text("COMBO HITS %i", pGuy->getComboHits());
+            ImGui::Text("COMBO HITS %i hitstun %i", pGuy->getComboHits(), pGuy->getHitStun());
             //ImGui::Text("unique %i", uniqueCharge);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);

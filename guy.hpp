@@ -24,6 +24,7 @@ public:
 
     int getComboHits() { return comboHits; }
     int getWarudo() { return warudo; }
+    int getHitStun() { return hitStun; }
 
     std::vector<Box> *getPushBoxes() { return &pushBoxes; }
     std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
