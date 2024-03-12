@@ -633,7 +633,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 void Guy::Hit(int stun, int destX, int destY, int destTime)
 {
     comboHits++;
-    hitStun = stun + 1; // ?? why do i need this to make it match
+    hitStun = stun + 1 + hitStunAdder; // ?? why do i need this to make it match
     hitVelFrames = destTime;
 
     // assume hit direction is opposite as facing for now, not sure if that's true
@@ -659,10 +659,22 @@ void Guy::Frame(void)
                 continue;
             }
 
+            bool branch = false;
+
             if (key["Type"] == 0) //always?
             {
+                branch = true;
+            } else if (key["Type"] == 2) // on hit
+            {
+                if (canHitID > 0) { // has hit ever this move.. not sure if right
+                    branch = true;
+                }
+            }
+
+            // do those also override if higher branchID?
+            if (branch) {
                 nextAction = key["Action"];
-                // do those also override if higher branchID?
+                keepPlace = key["_KeepPlace"];
             }
         }
     }
@@ -759,15 +771,20 @@ void Guy::Frame(void)
     if ( nextAction != -1 )
     {
         currentAction = nextAction;
-        currentFrame = 0;
+        if (!keepPlace) {
+            currentFrame = 0;
+
+            // commit current place offset
+            posX += (posOffsetX * direction);
+            posOffsetX = 0.0f;
+            posY += posOffsetY;
+            posOffsetY = 0.0f;
+        } else {
+            currentFrame--; //rewind
+        }
+        keepPlace = false;
 
         canHitID = 0;
-
-        // commit current place offset
-        posX += (posOffsetX * direction);
-        posOffsetX = 0.0f;
-        posY += posOffsetY;
-        posOffsetY = 0.0f;
 
         nextAction = -1;
 

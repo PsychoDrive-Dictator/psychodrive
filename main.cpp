@@ -17,6 +17,8 @@
 #include "guy.hpp"
 #include "main.hpp"
 
+int hitStunAdder = 0;
+
 std::string readFile(const std::string &fileName)
 {
     std::ifstream ifs(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
@@ -180,6 +182,7 @@ int main(int, char**)
     Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
+
     int currentInput = 0;
 
     // Main loop
@@ -396,6 +399,7 @@ int main(int, char**)
             ImGui::Text("accel %f %f", accelX, accelY);
             ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
             ImGui::Text("COMBO HITS %i hitstun %i", pGuy->getComboHits(), pGuy->getHitStun());
+            ImGui::SliderInt("hitstun adder", &hitStunAdder, -10, 10);
             //ImGui::Text("unique %i", uniqueCharge);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
