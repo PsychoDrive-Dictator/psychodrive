@@ -135,7 +135,7 @@ int main(int, char**)
 {
     SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER ) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER /*| SDL_INIT_GAMECONTROLLER*/ ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -179,7 +179,7 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("ryu", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
     Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
@@ -203,7 +203,6 @@ int main(int, char**)
                 done = true;
             if (event.type == SDL_KEYDOWN && event.key.repeat == 0)
             {
-                log("SDL_CONTROLLER_AXIS_LEFTX ");
                 switch (event.key.keysym.sym)
                 {
                     case SDLK_a:
@@ -254,19 +253,29 @@ int main(int, char**)
             }
             if (event.type == SDL_CONTROLLERAXISMOTION)
             {
+                const static int deadzone = 1024;
                 switch (event.caxis.axis)
                 {
                     case SDL_CONTROLLER_AXIS_LEFTX:
-                        // log("SDL_CONTROLLER_AXIS_LEFTX " + std::to_string(event.caxis.value));
-                        if (event.caxis.value < 0 )  {
+                        if (event.caxis.value < -deadzone )  {
                             currentInput |= BACK;
                             currentInput &= ~FORWARD;
-                        } else if (event.caxis.value > 0 ) {
+                        } else if (event.caxis.value > deadzone ) {
                             currentInput |= FORWARD;
                             currentInput &= ~BACK;
-                        } else if (event.caxis.value == 0){
-                            currentInput &= ~BACK;
-                            currentInput &= ~FORWARD;
+                        } else {
+                            currentInput &= ~(FORWARD+BACK);
+                        }
+                        break;
+                    case SDL_CONTROLLER_AXIS_LEFTY:
+                        if (event.caxis.value < -deadzone )  {
+                            currentInput |= UP;
+                            currentInput &= ~DOWN;
+                        } else if (event.caxis.value > deadzone ) {
+                            currentInput |= DOWN;
+                            currentInput &= ~UP;
+                        } else {
+                            currentInput &= ~(DOWN+UP);
                         }
                         break;
                     case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
@@ -283,7 +292,6 @@ int main(int, char**)
             {
                 switch (event.cbutton.button)
                 {
-                // log("controller event " + std::to_string(event.button.button))
                     case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
                         currentInput |= BACK;
                         break;
@@ -358,7 +366,6 @@ int main(int, char**)
             {
                 switch (event.cbutton.button)
                 {
-                // log("controller event " + std::to_string(event.button.button))
                     case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
                         currentInput &= ~BACK;
                         break;
