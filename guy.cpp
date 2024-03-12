@@ -474,7 +474,22 @@ void Guy::PreFrame(void)
                     // 00100000000100000: heavy punch with one button mask
                     // 00100000001100000: normal throw, two out of two mask t
                     // 00100000010100000: taunt, 6 out of 6 in mask
-                    if (okKeyFlags && matchInput(currentInput, okKeyFlags, okCondFlags, dcExcFlags))
+                    uint32_t i = 0;
+                    bool initialMatch = false;
+                    uint32_t initialSearch = globalInputBufferLength;
+                    if (inputBuffer.size() < initialSearch) {
+                        initialSearch = inputBuffer.size();
+                    }
+                    while (i < initialSearch)
+                    {
+                        if (okKeyFlags && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
+                        {
+                            initialMatch = true;
+                            break;
+                        }
+                        i++;
+                    }
+                    if (initialMatch)
                     {
                         //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
                         if ( commandNo == -1 ) {
@@ -515,7 +530,7 @@ void Guy::PreFrame(void)
                                     int dirCount = 0;
                                     int dirNotMatchCount = 0;
                                     // count matching direction in input buffer, super naive but will work for testing
-                                    uint32_t inputBufferCursor = 0;
+                                    uint32_t inputBufferCursor = i;
                                     while (inputBufferCursor < inputBuffer.size())
                                     {
                                         if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
