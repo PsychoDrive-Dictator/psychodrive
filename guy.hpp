@@ -11,12 +11,14 @@ public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
 
     void Input(int input);
-    void PreFrame(void);
+    bool PreFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
-    bool CheckHit(Guy *pOtherGuy, int &hitStopGuy, int &hitStopOtherGuy);
+    bool CheckHit(Guy *pOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime);
     void Frame(void);
+
+    void addWarudo(int w) { warudo += w; }
 
     // for opponent direction
     float getPosX() {
@@ -82,6 +84,7 @@ private:
     int canHitID = 0;
 
     int warudo = 0;
+    int timeInWarudo = 0;
 
     int hitStun = 0;
     float hitVelX = 0.0f;

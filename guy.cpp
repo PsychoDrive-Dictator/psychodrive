@@ -146,13 +146,20 @@ void Guy::Input(int input)
 
     inputBuffer.push_front(input);
     // how much is too much?
-    if (inputBuffer.size() > 50) {
+    if (inputBuffer.size() > 200) {
         inputBuffer.pop_back();
     }
 }
 
-void Guy::PreFrame(void)
+bool Guy::PreFrame(void)
 {
+    if (warudo > 0) {
+        timeInWarudo++;
+        warudo--;
+    }
+    if (warudo > 0) {
+        return false;
+    }
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     bool validAction = namesJson.contains(actionIDString);
     actionName = validAction ? namesJson[actionIDString] : "invalid";
@@ -311,7 +318,7 @@ void Guy::PreFrame(void)
                 }
 
                 if (key["Type"] == 0) {
-                    warudo = key["Timer"].get<int>() * -1;
+                    pOpponent->addWarudo(key["Timer"].get<int>() * -1);
                 }
             }
         }
@@ -491,7 +498,7 @@ void Guy::PreFrame(void)
                     // 00100000010100000: taunt, 6 out of 6 in mask
                     uint32_t i = 0;
                     bool initialMatch = false;
-                    uint32_t initialSearch = globalInputBufferLength;
+                    uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
                     if (inputBuffer.size() < initialSearch) {
                         initialSearch = inputBuffer.size();
                     }
@@ -500,7 +507,9 @@ void Guy::PreFrame(void)
                         if (okKeyFlags && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
                         {
                             initialMatch = true;
-                            break;
+                        } else if (initialMatch == true) {
+                            i--;
+                            break; // break once initialMatch no longer true, set i on last true
                         }
                         i++;
                     }
@@ -569,25 +578,30 @@ void Guy::PreFrame(void)
                             {
                                 auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
                                 auto inputNorm = input["normal"];
-                                // does 0x40000000 mean neutral?
                                 uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
                                 uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
                                 uint32_t numFrames = input["frame_num"];
-                                // condflags..
-                                // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
-                                // 10100000001100000: EX, so any two out of three button mask?
-                                // 00100000000100000: heavy punch with one button mask
-                                // 00100000001100000: normal throw, two out of two mask t
-                                // 00100000010100000: taunt, 6 out of 6 in mask
+                                bool match = false;
                                 while (inputBufferCursor < inputBuffer.size())
                                 {
-                                    if (matchInput(inputBuffer[inputBufferCursor++], inputOkKeyFlags, inputOkCondFlags)) {
-                                        if (inputBufferCursor - i - 1 < numFrames || chargeBit) {
+                                    bool thismatch = false;
+                                    if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                        uint32_t spaceSinceLastInput = inputBufferCursor - i;
+                                        if ( commandNo == 7 ) {
+                                            log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
+                                            " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i));
+                                        }
+                                        if ((spaceSinceLastInput < numFrames) || chargeBit) {
+                                            match = true;
+                                            thismatch = true;
                                             i = inputBufferCursor;
-                                            inputID--;
-                                            break;
                                         }
                                     }
+                                    if (match == true && thismatch == false) {
+                                        inputID--;
+                                        break;
+                                    }
+                                    inputBufferCursor++;
                                 }
 
                                 if (inputBufferCursor == inputBuffer.size()) {
@@ -621,6 +635,8 @@ void Guy::PreFrame(void)
             deferredAction = 0;
         }
     }
+
+    return true;
 }
 
 void Guy::Render(void) {
@@ -636,7 +652,7 @@ bool Guy::Push(Guy *pOtherGuy)
             if (doBoxesHit(pushbox, otherPushBox)) {
 
                 int difference = pushbox.x + pushbox.w - otherPushBox.x;
-                log("push " + std::to_string(difference));
+                // log("push " + std::to_string(difference));
                 posX -= difference;
                 return true;
             }
@@ -646,7 +662,7 @@ bool Guy::Push(Guy *pOtherGuy)
     return false;
 }
 
-bool Guy::CheckHit(Guy *pOtherGuy, int &hitStopGuy, int &hitStopOtherGuy)
+bool Guy::CheckHit(Guy *pOtherGuy)
 {
     for (auto hitbox : hitBoxes ) {
         if (hitbox.hitID < canHitID) {
@@ -661,8 +677,9 @@ bool Guy::CheckHit(Guy *pOtherGuy, int &hitStopGuy, int &hitStopOtherGuy)
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
 
-                hitStopGuy += hitEntry["HitStopOwner"].get<int>();
-                hitStopOtherGuy += hitEntry["HitStopTarget"].get<int>();
+                // 2X seems to line up with the real game
+                addWarudo(2*hitEntry["HitStopOwner"].get<int>());
+                pOtherGuy->addWarudo(2*hitEntry["HitStopTarget"].get<int>());
 
                 if (wasDrive) {
                     hitStun+=4;
@@ -686,7 +703,7 @@ void Guy::Hit(int stun, int destX, int destY, int destTime)
     // assume hit direction is opposite as facing for now, not sure if that's true
     hitVelX = (direction * destX * -1) / (float)destTime;
     velocityY = destY * 4 / (float)destTime;
-    //hitVelY = destY * 4 / (float)destTime;
+    //hitVelY = destY * 2 / (float)destTime;
     //velocityX = (direction * destX * -1) / (float)destTime;
     accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
 
@@ -865,5 +882,9 @@ void Guy::Frame(void)
         } else {
             wasDrive = false;
         }
+    }
+
+    if (warudo == 0) {
+        timeInWarudo = 0;
     }
 }
