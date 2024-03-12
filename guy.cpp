@@ -321,27 +321,6 @@ void Guy::PreFrame(void)
         hurtBoxes.clear();
         renderBoxes.clear();
 
-        if (movesDictJson[actionName].contains("PushCollisionKey"))
-        {
-            for (auto& [pushBoxID, pushBox] : movesDictJson[actionName]["PushCollisionKey"].items())
-            {
-                if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-                int rootOffsetX = 0;
-                int rootOffsetY = 0;
-                parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
-                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-                rootOffsetY += posY + posOffsetY;
-
-                Box rect;
-                
-                if (getRect(rect, rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
-                    pushBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {1.0,1.0,1.0}});
-                }
-            }
-        }
         if (movesDictJson[actionName].contains("DamageCollisionKey"))
         {
             for (auto& [hurtBoxID, hurtBox] : movesDictJson[actionName]["DamageCollisionKey"].items())
@@ -387,7 +366,30 @@ void Guy::PreFrame(void)
                 }
             }
         }
+        if (movesDictJson[actionName].contains("PushCollisionKey"))
+        {
+            for (auto& [pushBoxID, pushBox] : movesDictJson[actionName]["PushCollisionKey"].items())
+            {
+                if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
+                    continue;
+                }
+                int rootOffsetX = 0;
+                int rootOffsetY = 0;
+                parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
+                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+                rootOffsetY += posY + posOffsetY;
 
+                Box rect;
+                
+                if (getRect(rect, rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                    pushBoxes.push_back(rect);
+                    renderBoxes.push_back({rect, {1.0,1.0,1.0}});
+                } else if (getRect(rect, rectsJson, 7, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                    pushBoxes.push_back(rect);
+                    renderBoxes.push_back({rect, {1.0,1.0,1.0}});
+                }
+            }
+        }
         if (movesDictJson[actionName].contains("AttackCollisionKey"))
         {
             for (auto& [hitBoxID, hitBox] : movesDictJson[actionName]["AttackCollisionKey"].items())
