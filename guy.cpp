@@ -543,7 +543,7 @@ void Guy::PreFrame(void)
 
                                     if (dirCount < chargeFrames) {
                                         log ("match charge " + std::to_string(chargeBit) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
-                                        break; // cancel trigger
+                                        continue; // cancel trigger
                                     }
                                 }
                             }
