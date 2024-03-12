@@ -23,12 +23,16 @@ void parseRootOffset( nlohmann::json& keyJson, int&offsetX, int& offsetY)
 
 bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0 )
 {
-
+    // do that before stripping held keys since apparently holding parry to drive rush depends on it
     if (dcExcFlags != 0 ) {
         if ((dcExcFlags & input) != dcExcFlags) {
             return false;
         }
     }
+
+    input &= ~(LP+MP+HP+LK+MK+HK);
+    input |= (input & (LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed)) >> 6;
+    input &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
 
     if (okCondFlags & 2) {
         if ((input & 0xF) == (okKeyFlags & 0xF)) {
@@ -653,7 +657,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 void Guy::Hit(int stun, int destX, int destY, int destTime)
 {
     comboHits++;
-    hitStun = stun + 1 + hitStunAdder; // ?? why do i need this to make it match
+    // +1 because i think we're off by one frame where we run this
+    hitStun = stun + 1 + hitStunAdder;
     hitVelFrames = destTime;
 
     // assume hit direction is opposite as facing for now, not sure if that's true
@@ -662,6 +667,9 @@ void Guy::Hit(int stun, int destX, int destY, int destTime)
     //hitVelY = destY * 4 / (float)destTime;
     //velocityX = (direction * destX * -1) / (float)destTime;
     accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
+
+    // i think this vel wants to apply this frame, lame workaround to get same intensity
+    velocityY -= accelY; //
 
     nextAction = 205; // HIT_MM, not sure how to pick which
 }

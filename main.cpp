@@ -18,7 +18,7 @@
 #include "main.hpp"
 
 int hitStunAdder = 0;
-uint32_t globalInputBufferLength = 5; // 4 frames of input buffering
+uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
 std::string readFile(const std::string &fileName)
 {
@@ -190,6 +190,9 @@ int main(int, char**)
     bool done = false;
     while (!done)
     {
+        // clear new press bits
+        currentInput &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
+
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -198,8 +201,9 @@ int main(int, char**)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
-            if (event.type == SDL_KEYDOWN)
+            if (event.type == SDL_KEYDOWN && event.key.repeat == 0)
             {
+                log("SDL_CONTROLLER_AXIS_LEFTX ");
                 switch (event.key.keysym.sym)
                 {
                     case SDLK_a:
@@ -216,21 +220,27 @@ int main(int, char**)
                         break;
                     case SDLK_u:
                         currentInput |= LP;
+                        currentInput |= LP_pressed;
                         break;
                     case SDLK_i:
                         currentInput |= MP;
+                        currentInput |= MP_pressed;
                         break;
                     case SDLK_o:
                         currentInput |= HP;
+                        currentInput |= HP_pressed;
                         break;
                     case SDLK_j:
                         currentInput |= LK;
+                        currentInput |= LK_pressed;
                         break;
                     case SDLK_k:
                         currentInput |= MK;
+                        currentInput |= MK_pressed;
                         break;
                     case SDLK_l:
                         currentInput |= HK;
+                        currentInput |= HK_pressed;
                         break;
                     case SDLK_ESCAPE:
                         done = true;
@@ -260,6 +270,7 @@ int main(int, char**)
                     case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
                         if (event.caxis.value > 0 ) {
                             currentInput |= HK;
+                            currentInput |= HK_pressed;
                         } else {
                             currentInput &= ~HK;
                         }
@@ -285,18 +296,23 @@ int main(int, char**)
                         break;
                     case SDL_CONTROLLER_BUTTON_A:
                         currentInput |= LK;
+                        currentInput |= LK_pressed;
                         break;
                     case SDL_CONTROLLER_BUTTON_B:
                         currentInput |= MK;
+                        currentInput |= MK_pressed;
                         break;
                     case SDL_CONTROLLER_BUTTON_X:
                         currentInput |= LP;
+                        currentInput |= LP_pressed;
                         break;
                     case SDL_CONTROLLER_BUTTON_Y:
                         currentInput |= MP;
+                        currentInput |= MP_pressed;
                         break;
                     case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
                         currentInput |= HP;
+                        currentInput |= HP_pressed;
                         break;
                 }
             }
