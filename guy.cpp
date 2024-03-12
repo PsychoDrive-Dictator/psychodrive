@@ -217,6 +217,14 @@ void Guy::PreFrame(void)
             nextAction = 39; // land - need other landing if did air attack?
         }
 
+        // super crude corner snapping
+        if ( posX < 20.0 ) {
+            posX = 20.0f;
+        }
+        if ( posX > 800.0f ) {
+            posX = 800.0f;
+        }
+
         prevVelX = velocityX;
 
         if (movesDictJson[actionName].contains("SteerKey"))
@@ -311,6 +319,7 @@ void Guy::PreFrame(void)
         pushBoxes.clear();
         hitBoxes.clear();
         hurtBoxes.clear();
+        renderBoxes.clear();
 
         if (movesDictJson[actionName].contains("PushCollisionKey"))
         {
@@ -329,7 +338,7 @@ void Guy::PreFrame(void)
                 
                 if (getRect(rect, rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                     pushBoxes.push_back(rect);
-                    drawHitBox( rect, {1.0,1.0,1.0});
+                    renderBoxes.push_back({rect, {1.0,1.0,1.0}});
                 }
             }
         }
@@ -356,24 +365,24 @@ void Guy::PreFrame(void)
                 for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
                     if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
-                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
                     if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
-                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
                     if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
-                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
                     if (getRect(rect, rectsJson, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
-                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
             }
@@ -398,14 +407,14 @@ void Guy::PreFrame(void)
                 for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
                     if (hitBox["CollisionType"] == 3) {
                         if (getRect(rect, rectsJson, 3, boxID,rootOffsetX, rootOffsetY,direction)) {
-                            drawHitBox(rect, {0.5,0.5,0.5});
+                            renderBoxes.push_back({rect, {0.5,0.5,0.5}});
                         }
                     } else if (hitBox["CollisionType"] == 0) {
                         if (getRect(rect, rectsJson, 0, boxID,rootOffsetX, rootOffsetY,direction)) {
                             int hitEntryID = hitBox["AttackDataListIndex"];
                             int hitID = hitBox["HitID"];
                             hitBoxes.push_back({rect,hitEntryID,hitID});
-                            drawHitBox(rect,{1.0,0.0,0.0}, isDrive || wasDrive);
+                            renderBoxes.push_back({rect, {1.0,0.0,0.0}, isDrive || wasDrive});
                         }
                     }
                 }                    
@@ -612,6 +621,12 @@ void Guy::PreFrame(void)
     }
 }
 
+void Guy::Render(void) {
+    for (auto box : renderBoxes) {
+        drawHitBox(box.box,box.col,box.drive,box.parry,box.di);
+    }
+}
+
 bool Guy::Push(Guy *pOtherGuy) 
 {
     for (auto pushbox : pushBoxes ) {
@@ -625,10 +640,11 @@ bool Guy::Push(Guy *pOtherGuy)
             }
         }
     }
+
     return false;
 }
 
-bool Guy::CheckHit(Guy *pOtherGuy)
+bool Guy::CheckHit(Guy *pOtherGuy, int &hitStopGuy, int &hitStopOtherGuy)
 {
     for (auto hitbox : hitBoxes ) {
         if (hitbox.hitID < canHitID) {
@@ -642,6 +658,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int destX = hitEntry["MoveDest"]["x"];
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
+
+                hitStopGuy += hitEntry["HitStopOwner"].get<int>();
+                hitStopOtherGuy += hitEntry["HitStopTarget"].get<int>();
+
                 if (wasDrive) {
                     hitStun+=4;
                 }
@@ -829,6 +849,11 @@ void Guy::Frame(void)
             accelX = 0;
             accelY = 0;
         }
+
+        if ( posY > 0.0 && !hitStun ) { // if not grounded, fall to the ground i guess?
+            accelY = -1;        
+        }
+
         if (currentAction == 500 || currentAction == 501 ||
             currentAction == 739 || currentAction == 740) {
             isDrive = true;

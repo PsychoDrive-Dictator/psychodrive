@@ -12,8 +12,9 @@ public:
 
     void Input(int input);
     void PreFrame(void);
+    void Render(void);
     bool Push(Guy *pOtherGuy);
-    bool CheckHit(Guy *pOtherGuy);
+    bool CheckHit(Guy *pOtherGuy, int &hitStopGuy, int &hitStopOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime);
     void Frame(void);
 
@@ -91,6 +92,8 @@ private:
     std::vector<Box> pushBoxes;
     std::vector<HitBox> hitBoxes;
     std::vector<Box> hurtBoxes;
+
+    std::vector<RenderBox> renderBoxes;
 
     int deferredActionFrame = -1;
     int deferredAction = 0;
