@@ -81,7 +81,7 @@ private:
     int currentInput = 0;
     std::deque<int> inputBuffer;
 
-    int canHitID = 0;
+    int canHitID = -1;
 
     int warudo = 0;
     int timeInWarudo = 0;

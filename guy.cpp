@@ -311,14 +311,25 @@ bool Guy::PreFrame(void)
 
         if (movesDictJson[actionName].contains("WorldKey"))
         {
+            bool tokiToTomare = false;
             for (auto& [keyID, key] : movesDictJson[actionName]["WorldKey"].items())
             {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                if ( !tokiToTomare && (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame)) {
                     continue;
                 }
 
-                if (key["Type"] == 0) {
-                    pOpponent->addWarudo(key["Timer"].get<int>() * -1);
+                if (key["Type"] == 0 || key["Type"] == 1) {
+                    // time stops, need to find when it resumes
+                    // timer field here isn't always set, so we're going to look ahead for type 5
+                    //pOpponent->addWarudo(key["Timer"].get<int>() * -1);
+                    tokiToTomare = true;
+                }
+
+                if (tokiToTomare && key["Type"] == 5) {
+                    // if we find a move with two shuffled pairs of those
+                    // we might need to introduce more careful matching
+                    tokiToTomare = false;
+                    pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1);
                 }
             }
         }
@@ -684,9 +695,16 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
 
-                // 2X seems to line up with the real game
-                addWarudo(2*hitEntry["HitStopOwner"].get<int>());
-                pOtherGuy->addWarudo(2*hitEntry["HitStopTarget"].get<int>());
+                // 2X seems to line up with the real game, also +1 since we don't seem to line up
+                // test with hands, lots of small hits
+                int hitStopSelf = hitEntry["HitStopOwner"];
+                int hitStopTarget = hitEntry["HitStopTarget"];
+                if ( hitStopSelf ) {
+                    addWarudo(hitStopSelf+1);
+                }
+                if ( hitStopTarget ) {
+                    pOpponent->addWarudo(hitStopTarget+1);
+                }
 
                 if (wasDrive) {
                     hitStun+=4;
@@ -853,12 +871,12 @@ void Guy::Frame(void)
             posOffsetX = 0.0f;
             posY += posOffsetY;
             posOffsetY = 0.0f;
+            
+            canHitID = -1;
         } else {
             currentFrame--; //rewind
         }
         keepPlace = false;
-
-        canHitID = 0;
 
         nextAction = -1;
 
