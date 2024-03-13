@@ -129,6 +129,34 @@ Guy::Guy(std::string charName, float startPosX, float startPosY, int startDir, c
     hitJson = parse_json_file(character + "_hit.json");
 }
 
+Guy::Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
+{
+    character = parent.character;
+    posX = parent.posX + posOffsetX;
+    posY = parent.posY + posOffsetY;
+    direction = parent.direction;
+    charColorR = parent.charColorR;
+    charColorG = parent.charColorG;
+    charColorB = parent.charColorB;
+
+    movesDictJson = parent.movesDictJson;
+    rectsJson = parent.rectsJson;
+    namesJson = parent.namesJson;
+    triggerGroupsJson = parent.triggerGroupsJson;
+    triggersJson = parent.triggersJson;
+    commandsJson = parent.commandsJson;
+    chargeJson = parent.chargeJson;
+    hitJson = parent.hitJson;
+
+    pOpponent = parent.pOpponent;
+
+    currentAction = startAction;
+
+    isProjectile = true;
+    projHitCount = -1; // unset yet, is in the first action
+    pParent = &parent;
+}
+
 void Guy::Input(int input)
 {
     if (direction < 0) {
@@ -160,6 +188,7 @@ bool Guy::PreFrame(void)
     if (warudo > 0) {
         return false;
     }
+
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     bool validAction = namesJson.contains(actionIDString);
     actionName = validAction ? namesJson[actionIDString] : "invalid";
@@ -169,6 +198,11 @@ bool Guy::PreFrame(void)
         marginFrame = movesDictJson[actionName]["fab"]["ActionFrame"]["MarginFrame"];
         //standing has 0 marginframe, pre-jump has -1, crouch -1..
         actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
+
+        if (isProjectile && projHitCount == -1) {
+            projHitCount = movesDictJson[actionName]["pdata"]["HitCount"];
+            // log("initial hitcount " + std::to_string(projHitCount));
+        }
 
         if (movesDictJson[actionName].contains("PlaceKey"))
         {
@@ -309,6 +343,25 @@ bool Guy::PreFrame(void)
             }
         }
 
+        if (movesDictJson[actionName].contains("ShotKey"))
+        {
+            for (auto& [keyID, key] : movesDictJson[actionName]["ShotKey"].items())
+            {
+                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                    continue;
+                }
+
+                // int posOffsetX = key["PosOffset"]["x"];
+                // int posOffsetY = key["PosOffset"]["y"];
+                int posOffsetX = 79 * direction;
+                int posOffsetY = 110;
+
+                // spawn new guy
+                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
+                minions.push_back(pNewGuy);
+            }
+        }
+
         if (movesDictJson[actionName].contains("WorldKey"))
         {
             bool tokiToTomare = false;
@@ -329,7 +382,9 @@ bool Guy::PreFrame(void)
                     // if we find a move with two shuffled pairs of those
                     // we might need to introduce more careful matching
                     tokiToTomare = false;
-                    pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1);
+                    if (pOpponent ) {
+                        pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1);
+                    }
                 }
             }
         }
@@ -425,43 +480,59 @@ bool Guy::PreFrame(void)
                 Box rect;
 
                 for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
-                    if (hitBox["CollisionType"] == 3) {
-                        if (getRect(rect, rectsJson, 3, boxID,rootOffsetX, rootOffsetY,direction)) {
-                            renderBoxes.push_back({rect, {0.5,0.5,0.5}});
-                        }
-                    } else if (hitBox["CollisionType"] == 0) {
-                        if (getRect(rect, rectsJson, 0, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    int collisionType = hitBox["CollisionType"];
+                    color collisionColor = {1.0,0.0,0.0};
+                    if (collisionType == 3 ) collisionColor = {0.5,0.5,0.5};
+
+                    if (getRect(rect, rectsJson, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
+                        renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
+
+                        if (collisionType != 3) {
                             int hitEntryID = hitBox["AttackDataListIndex"];
                             int hitID = hitBox["HitID"];
                             hitBoxes.push_back({rect,hitEntryID,hitID});
-                            renderBoxes.push_back({rect, {1.0,0.0,0.0}, isDrive || wasDrive});
                         }
                     }
                 }                    
             }
         }
 
-        if (movesDictJson[actionName].contains("BranchKey"))
-        {
-            for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
+        // if (movesDictJson[actionName].contains("BranchKey"))
+        // {
+        //     for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
+        //     {
+        //         if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+        //             continue;
+        //         }
 
-                if ((key["Type"] == 29) && uniqueCharge) {
-                    // probably should check the count somewhere?
-                    // probably how jamie drinks work too? not sure
-                    nextAction = key["Action"];
-                }
+        //         int branchType = key["Type"];
+        //         int branchAction = key["Action"];
+        //         bool doBranch = false;
+        //         switch (branchType) {
+        //             case 0: // always?
+        //                 doBranch = true; 
+        //                 break;
+        //             case 29:
+        //                 if (uniqueCharge) {
+        //                     // probably should check the count somewhere?
+        //                     // probably how jamie drinks work too? not sure
+        //                     doBranch = true;
+        //                 }
+        //                 break;
+        //             case 45:
+        //                 if (isProjectile && projHitCount == 0 ) {
+        //                     doBranch = true;
+        //                 }
+        //                 break;
+        //         }
 
-                if (key["Type"] == 0) //always?
-                {
-                    nextAction = key["Action"];
-                    // do those also override if higher branchID?
-                }
-            }
-        }
+        //         if (doBranch)
+        //         {
+        //             nextAction = key["Action"];
+        //             // do those also override if higher branchID? // let's not break for now
+        //         }
+        //     }
+        // }
 
         // should this fall through and let triggers also happen? prolly
 
@@ -486,7 +557,14 @@ bool Guy::PreFrame(void)
                     auto triggerIDString = std::to_string(triggerID);
                     auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-                    auto trigger = triggersJson[actionIDString][triggerIDString];
+                    nlohmann::json trigger;
+
+                    for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
+                        if ( atoi(keyID.c_str()) == triggerID ) {
+                            trigger = key;
+                            break;
+                        }
+                    }
                     bool usinguniquecharge = false;
 
                     if (trigger["_UseUniqueParam"] == true) {
@@ -654,6 +732,10 @@ bool Guy::PreFrame(void)
         }
     }
 
+    for ( auto minion : minions ) {
+        minion->PreFrame();
+    }
+
     return true;
 }
 
@@ -661,20 +743,41 @@ void Guy::Render(void) {
     for (auto box : renderBoxes) {
         drawHitBox(box.box,box.col,box.drive,box.parry,box.di);
     }
+
+    for ( auto minion : minions ) {
+        minion->Render();
+    }
 }
 
 bool Guy::Push(Guy *pOtherGuy) 
 {
+    bool hasPushed = false;
+    float pushY = 0;
+    float pushX = 0;
     for (auto pushbox : pushBoxes ) {
         for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
-                int difference = pushbox.x + pushbox.w - otherPushBox.x;
+                float difference = -(pushbox.x + pushbox.w - otherPushBox.x);
                 // log("push " + std::to_string(difference));
-                posX -= difference;
-                return true;
+                pushX = std::min(difference, pushX);
+                hasPushed = true;
             }
         }
+        if (pushbox.y < 0) {
+            pushY = std::max(-pushbox.y, pushY);
+            hasPushed = true;
+        }
+    }
+
+    for ( auto minion : minions ) {
+        minion->Push(pOtherGuy);
+    }
+
+    if ( hasPushed ) {
+        posX += pushX;
+        posY += pushY;
+        return true;
     }
 
     return false;
@@ -682,6 +785,7 @@ bool Guy::Push(Guy *pOtherGuy)
 
 bool Guy::CheckHit(Guy *pOtherGuy)
 {
+    bool retHit = false;
     for (auto hitbox : hitBoxes ) {
         if (hitbox.hitID < canHitID) {
             continue;
@@ -695,27 +799,42 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
 
-                // 2X seems to line up with the real game, also +1 since we don't seem to line up
-                // test with hands, lots of small hits
+                // +1 since we don't seem to line up, test with hands, lots of small hits
+                // todo need to move this where +1 isn't needed
                 int hitStopSelf = hitEntry["HitStopOwner"];
                 int hitStopTarget = hitEntry["HitStopTarget"];
                 if ( hitStopSelf ) {
-                    addWarudo(hitStopSelf+1);
+                    if (pParent) {
+                        pParent->addWarudo(hitStopSelf+1);
+                    } else {
+                        addWarudo(hitStopSelf+1);
+                    }
                 }
-                if ( hitStopTarget ) {
+                if ( hitStopTarget && pOpponent) {
                     pOpponent->addWarudo(hitStopTarget+1);
                 }
 
                 if (wasDrive) {
                     hitStun+=4;
                 }
-                pOpponent->Hit(hitStun, destX, destY, destTime);
+                if (pOpponent) {
+                    pOpponent->Hit(hitStun, destX, destY, destTime);
+                }
                 canHitID = hitbox.hitID + 1;
-                return true;
+                retHit = true;
+                break;
             }
         }
+        if (retHit) break;
     }
-    return false;
+
+    for ( auto minion : minions ) {
+        if ( minion->CheckHit(pOtherGuy) ) {
+            retHit = true;
+        }
+    }
+
+    return retHit;
 }
 
 void Guy::Hit(int stun, int destX, int destY, int destTime)
@@ -738,9 +857,15 @@ void Guy::Hit(int stun, int destX, int destY, int destTime)
     nextAction = 205; // HIT_MM, not sure how to pick which
 }
 
-void Guy::Frame(void)
+bool Guy::Frame(void)
 {
     currentFrame++;
+
+    if (isProjectile && canHitID >= 0) {
+        projHitCount--;
+        //log("proj hitcount " + std::to_string(projHitCount));
+        canHitID = -1; // re-arm, all projectile hitboxes seem to have hitID 0
+    }
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     if (movesDictJson[actionName].contains("BranchKey"))
@@ -751,24 +876,45 @@ void Guy::Frame(void)
                 continue;
             }
 
-            bool branch = false;
+            bool doBranch = false;
+            int branchType = key["Type"];
+            int branchAction = key["Action"];
 
-            if (key["Type"] == 0) //always?
-            {
-                branch = true;
-            } else if (key["Type"] == 2) // on hit
-            {
-                if (canHitID > 0) { // has hit ever this move.. not sure if right
-                    branch = true;
-                }
+            switch (branchType) {
+                case 0: // always?
+                    doBranch = true; 
+                    break;
+                case 2:
+                    if (canHitID >= 0) { // has hit ever this move.. not sure if right
+                        doBranch = true;
+                    }
+                    break;
+                case 29:
+                    if (uniqueCharge) {
+                        // probably should check the count somewhere?
+                        // probably how jamie drinks work too? not sure
+                        doBranch = true;
+                    }
+                    break;
+                case 45:
+                    if (isProjectile && projHitCount == 0 ) {
+                        // log("hitcount=0 branch");
+                        projHitCount = -1;
+                        doBranch = true;
+                    }
+                    break;
             }
 
             // do those also override if higher branchID?
-            if (branch) {
-                nextAction = key["Action"];
+            if (doBranch) {
+                nextAction = branchAction;
                 keepPlace = key["_KeepPlace"];
             }
         }
+    }
+
+    if (isProjectile && projHitCount == 0) {
+        return false; // die
     }
 
     if (hitStun > 0)
@@ -788,7 +934,10 @@ void Guy::Frame(void)
 
     if (currentFrame >= actionFrameDuration && nextAction == -1)
     {
-        if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
+        if ( isProjectile ) {
+            //currentFrame = 0; // just loop? :/
+            return false; // die
+        } else if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             nextAction = currentAction + 3;
         }
@@ -912,4 +1061,16 @@ void Guy::Frame(void)
     if (warudo == 0) {
         timeInWarudo = 0;
     }
+
+    std::vector<Guy*> minionsNotFinished;
+    for ( auto minion : minions ) {
+        if (minion->Frame()) {
+            minionsNotFinished.push_back(minion);
+        } else {
+            delete minion;
+        }
+    }
+    minions = minionsNotFinished;
+
+    return true;
 }
