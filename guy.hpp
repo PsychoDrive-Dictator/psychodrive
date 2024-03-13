@@ -36,6 +36,7 @@ public:
     std::vector<Box> *getHurtBoxes() { return &hurtBoxes; }
 
     int getCurrentAction() { return currentAction; }
+    int getCurrentFrame() { return currentFrame; }
     std::string getActionName() { return actionName; }
     void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
         outPosX = posX;
