@@ -591,7 +591,7 @@ bool Guy::PreFrame(void)
                             if ( usinguniquecharge ) {
                                 uniqueCharge = 0;
                             }
-                            log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                            //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                         } else {
                             std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
                             auto command = commandsJson[commandNoString]["0"];
@@ -675,7 +675,7 @@ bool Guy::PreFrame(void)
                                     }
 
                                     if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                        log ("match charge " + std::to_string(chargeBit) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
+                                        //log("match charge " + std::to_string(chargeBit) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
                                         continue; // cancel trigger
                                     }
                                 }
@@ -691,7 +691,7 @@ bool Guy::PreFrame(void)
                                 if ( usinguniquecharge ) {
                                     uniqueCharge = 0;
                                 }
-                                log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                                //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                             }
                         }
                         // specifically don't break here, i think another trigger can have higher priority
@@ -770,11 +770,48 @@ bool Guy::CheckHit(Guy *pOtherGuy)
         for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
             if (doBoxesHit(hitbox.box, hurtbox)) {
                 std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
-                auto hitEntry = hitJson[hitIDString]["common"]["0"];
+
+                int hitEntryFlag = 0;
+
+                bool otherGuyAirborne = pOtherGuy->posY > 0;
+
+                if (otherGuyAirborne > 0) {
+                    hitEntryFlag |= air;
+                }
+                if (forceCounter) {
+                    hitEntryFlag |= counter;
+                }
+                if (forcePunishCounter) {
+                    hitEntryFlag |= punish_counter;
+                }
+
+                std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
+                auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+                int juggleFirst = hitEntry["Juggle1st"];
+                int juggleAdd = hitEntry["JuggleAdd"];
+                int juggleLimit = hitEntry["JuggleLimit"];
                 int hitStun = hitEntry["HitStun"];
                 int destX = hitEntry["MoveDest"]["x"];
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
+
+                // make drive attacks ignore juggle limit for now, not sure how that works exactly
+                if (otherGuyAirborne && !wasDrive && pOtherGuy->juggleCounter > juggleLimit) {
+                    break;
+                }
+
+                // we're hitting for sure after this point, side effects
+                //log("hit! id " + hitIDString + " entry " + hitEntryFlagString);
+
+                // other guy is going airborne, apply juggle
+                // also use this to reset juggle for drive attacks - same, not sure
+                if (!wasDrive || (!otherGuyAirborne && destY != 0)) {
+                    if (pOtherGuy->juggleCounter == 0) {
+                        pOtherGuy->juggleCounter = juggleFirst; // ?
+                    } else {
+                        pOtherGuy->juggleCounter += juggleAdd;
+                    }
+                }
 
                 // +1 since we don't seem to line up, test with hands, lots of small hits
                 // todo need to move this where +1 isn't needed
@@ -906,6 +943,7 @@ bool Guy::Frame(void)
         {
             nextAction = 1;
             comboHits = 0;
+            juggleCounter = 0;
         }
     }
 

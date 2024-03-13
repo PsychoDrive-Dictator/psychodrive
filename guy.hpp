@@ -28,6 +28,7 @@ public:
     }
 
     int getComboHits() { return comboHits; }
+    int getJuggleCounter() { return juggleCounter; }
     int getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
 
@@ -89,16 +90,19 @@ private:
     int currentInput = 0;
     std::deque<int> inputBuffer;
 
+    // hitting side
     int canHitID = -1;
 
     int warudo = 0;
     int timeInWarudo = 0;
 
+    // getting hit side
     int hitStun = 0;
     float hitVelX = 0.0f;
     float hitVelY = 0.0f;
     int hitVelFrames = 0;
     int comboHits = 0;
+    int juggleCounter = 0;
 
     std::vector<Box> pushBoxes;
     std::vector<HitBox> hitBoxes;

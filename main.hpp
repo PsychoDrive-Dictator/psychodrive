@@ -3,6 +3,16 @@
 #include <string>
 #include "json.hpp"
 
+enum hitentryflags {
+    crouch = 1,
+    air = 2,
+    special = 4,
+    counter = 8,
+    block = 16,
+    otg = crouch|air,
+    punish_counter = special|counter,
+};
+
 enum Input
 {
 	NEUTRAL = 0,
@@ -52,7 +62,11 @@ struct RenderBox {
 };
 
 void log(std::string logLine);
+
+extern bool forceCounter;
+extern bool forcePunishCounter;
 extern int hitStunAdder;
+
 extern uint32_t globalInputBufferLength;
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
