@@ -803,8 +803,15 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
 
-                // make drive attacks ignore juggle limit for now, not sure how that works exactly
-                if (otherGuyAirborne && !wasDrive && pOtherGuy->juggleCounter > juggleLimit) {
+                if (wasDrive) {
+                    juggleAdd = 0;
+                    juggleFirst = 0;
+                    juggleLimit = 4;
+                    // trying like that
+                    // supposedly drive attacks dont add to the limit but obey some limit?
+                }
+
+                if (otherGuyAirborne && pOtherGuy->juggleCounter > juggleLimit) {
                     break;
                 }
 
@@ -812,8 +819,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 //log("hit! id " + hitIDString + " entry " + hitEntryFlagString);
 
                 // other guy is going airborne, apply juggle
-                // also use this to reset juggle for drive attacks - same, not sure
-                if (!wasDrive || (!otherGuyAirborne && destY != 0)) {
+                if (!otherGuyAirborne && destY != 0) {
                     if (pOtherGuy->juggleCounter == 0) {
                         pOtherGuy->juggleCounter = juggleFirst; // ?
                     } else {
@@ -955,11 +961,6 @@ bool Guy::Frame(void)
         }
     }
 
-    if (warudo > 0)
-    {
-        warudo--;
-    }
-
     if (currentFrame >= actionFrameDuration && nextAction == -1)
     {
         if ( isProjectile ) {
@@ -1080,6 +1081,7 @@ bool Guy::Frame(void)
             isDrive = true;
         } else if (isDrive == true) {
             isDrive = false;
+            // at some point make it so we cant drive specials
             wasDrive = true;
         } else {
             wasDrive = false;
