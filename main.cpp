@@ -186,8 +186,8 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("ryu", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
-    Guy otherGuy("honda", 750.0f, 0.0f, -1, {1.0,1.0,1.0});
+    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
 

@@ -497,42 +497,7 @@ bool Guy::PreFrame(void)
             }
         }
 
-        // if (movesDictJson[actionName].contains("BranchKey"))
-        // {
-        //     for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
-        //     {
-        //         if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-        //             continue;
-        //         }
-
-        //         int branchType = key["Type"];
-        //         int branchAction = key["Action"];
-        //         bool doBranch = false;
-        //         switch (branchType) {
-        //             case 0: // always?
-        //                 doBranch = true; 
-        //                 break;
-        //             case 29:
-        //                 if (uniqueCharge) {
-        //                     // probably should check the count somewhere?
-        //                     // probably how jamie drinks work too? not sure
-        //                     doBranch = true;
-        //                 }
-        //                 break;
-        //             case 45:
-        //                 if (isProjectile && projHitCount == 0 ) {
-        //                     doBranch = true;
-        //                 }
-        //                 break;
-        //         }
-
-        //         if (doBranch)
-        //         {
-        //             nextAction = key["Action"];
-        //             // do those also override if higher branchID? // let's not break for now
-        //         }
-        //     }
-        // }
+        DoBranchKey();
 
         // should this fall through and let triggers also happen? prolly
 
@@ -857,17 +822,8 @@ void Guy::Hit(int stun, int destX, int destY, int destTime)
     nextAction = 205; // HIT_MM, not sure how to pick which
 }
 
-bool Guy::Frame(void)
+void Guy::DoBranchKey(void)
 {
-    currentFrame++;
-
-    if (isProjectile && canHitID >= 0) {
-        projHitCount--;
-        //log("proj hitcount " + std::to_string(projHitCount));
-        canHitID = -1; // re-arm, all projectile hitboxes seem to have hitID 0
-    }
-
-    // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     if (movesDictJson[actionName].contains("BranchKey"))
     {
         for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
@@ -912,6 +868,20 @@ bool Guy::Frame(void)
             }
         }
     }
+}
+
+bool Guy::Frame(void)
+{
+    currentFrame++;
+
+    if (isProjectile && canHitID >= 0) {
+        projHitCount--;
+        //log("proj hitcount " + std::to_string(projHitCount));
+        canHitID = -1; // re-arm, all projectile hitboxes seem to have hitID 0
+    }
+
+    // evaluate branches after the frame bump, branch frames are meant to be elided afaict
+    DoBranchKey();
 
     if (isProjectile && projHitCount == 0) {
         return false; // die

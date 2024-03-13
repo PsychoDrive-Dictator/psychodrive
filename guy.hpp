@@ -17,6 +17,7 @@ public:
     bool Push(Guy *pOtherGuy);
     bool CheckHit(Guy *pOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime);
+    void DoBranchKey(void);
     bool Frame(void);
 
     void addWarudo(int w) { warudo += w; }
