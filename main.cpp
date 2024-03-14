@@ -197,7 +197,9 @@ int main(int, char**)
     int currentInput = 0;
 
     // Main loop
+    bool paused = false;
     bool done = false;
+    bool oneframe = false;
     while (!done)
     {
         const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -258,6 +260,12 @@ int main(int, char**)
                     case SDLK_l:
                         currentInput |= HK;
                         currentInput |= HK_pressed;
+                        break;
+                    case SDLK_p:
+                        paused = !paused;
+                        break;
+                    case SDLK_0:
+                        oneframe = true;
                         break;
                     case SDLK_ESCAPE:
                         done = true;
@@ -442,7 +450,7 @@ int main(int, char**)
             ImGui::Text("vel %f %f", velX, velY);
             ImGui::Text("accel %f %f", accelX, accelY);
             ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
-            ImGui::Text("COMBO HITS %i hitstun %i juggle %i", pGuy->getComboHits(), pGuy->getHitStun(), pGuy->getJuggleCounter());
+            ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter());
             ImGui::SliderInt("hitstun adder", &hitStunAdder, -10, 10);
             ImGui::Checkbox("force counter", &forceCounter);
             ImGui::SameLine();
@@ -478,8 +486,12 @@ int main(int, char**)
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
         glScalef(1.5f, -1.5f, 1.0f);
 
-        bool guyInWarudo = !guy.PreFrame();
-        bool otherGuyInWarudo = !otherGuy.PreFrame();
+        bool guyInWarudo = false;
+        bool otherGuyInWarudo = false;
+        if (oneframe || !paused) {
+            guyInWarudo = !guy.PreFrame();
+            otherGuyInWarudo = !otherGuy.PreFrame();
+        }
 
         guy.Render();
         otherGuy.Render();
@@ -487,17 +499,21 @@ int main(int, char**)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
-        if ( !guyInWarudo ) {
-            guy.Push(&otherGuy);
-            guy.CheckHit(&otherGuy);
-            guy.Frame();
+        if (oneframe || !paused) {
+            if ( !guyInWarudo ) {
+                guy.Push(&otherGuy);
+                guy.CheckHit(&otherGuy);
+                guy.Frame();
+            }
+
+            if ( !otherGuyInWarudo ) {
+                // otherGuy.Push(&guy);
+                otherGuy.CheckHit(&guy);
+                otherGuy.Frame();
+            }
         }
 
-        if ( !otherGuyInWarudo ) {
-            // otherGuy.Push(&guy);
-            otherGuy.CheckHit(&guy);
-            otherGuy.Frame();
-        }
+        oneframe = false;
     }
 
     // Cleanup

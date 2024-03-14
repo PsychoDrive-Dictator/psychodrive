@@ -16,7 +16,7 @@ public:
     void Render(void);
     bool Push(Guy *pOtherGuy);
     bool CheckHit(Guy *pOtherGuy);
-    void Hit(int hitStun, int destX, int destY, int destTime);
+    void Hit(int hitStun, int destX, int destY, int destTime, int damage);
     void DoBranchKey(void);
     bool Frame(void);
 
@@ -31,6 +31,7 @@ public:
     int getJuggleCounter() { return juggleCounter; }
     int getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
+    int getComboDamage() { return comboDamage; }
 
     std::vector<Box> *getPushBoxes() { return &pushBoxes; }
     std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
@@ -103,6 +104,7 @@ private:
     int hitVelFrames = 0;
     int comboHits = 0;
     int juggleCounter = 0;
+    int comboDamage = 0;
 
     std::vector<Box> pushBoxes;
     std::vector<HitBox> hitBoxes;
