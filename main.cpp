@@ -24,7 +24,10 @@
 bool forceCounter = false;
 bool forcePunishCounter = false;
 int hitStunAdder = 0;
+
 uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
+
+int globalFrameCount = 0;
 
 std::string readFile(const std::string &fileName)
 {
@@ -196,6 +199,7 @@ int main(int, char**)
     uint32_t frameStartTime = SDL_GetTicks();
     int currentInput = 0;
 
+
     // Main loop
     bool paused = false;
     bool done = false;
@@ -212,6 +216,8 @@ int main(int, char**)
         frameStartTime = SDL_GetTicks();
         // clear new press bits
         currentInput &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
+
+        globalFrameCount++;
 
         SDL_Event event;
         while (SDL_PollEvent(&event))

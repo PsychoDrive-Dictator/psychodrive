@@ -99,12 +99,16 @@ private:
 
     // getting hit side
     int hitStun = 0;
+    bool resetHitStunOnLand = false;
+    int hitStunOnLand = 0;
     float hitVelX = 0.0f;
     float hitVelY = 0.0f;
     int hitVelFrames = 0;
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;
+
+    int recoveryTiming = 0;
 
     std::vector<Box> pushBoxes;
     std::vector<HitBox> hitBoxes;
