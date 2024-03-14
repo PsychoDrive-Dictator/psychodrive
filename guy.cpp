@@ -41,10 +41,6 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
         return false;
     }
 
-    if (okKeyFlags & 0x10000) {
-        return true; // allow neutral? really not sure
-    }
-
     uint32_t match = okKeyFlags & input;
 
     if (okCondFlags & 0x80) {
@@ -327,6 +323,22 @@ bool Guy::PreFrame(void)
             // sign change?
             velocityX = 0.0f;
             accelX = 0.0f;
+        }
+
+        if (movesDictJson[actionName].contains("SwitchKey"))
+        {
+            for (auto& [keyID, key] : movesDictJson[actionName]["SwitchKey"].items())
+            {
+                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                    continue;
+                }
+
+                int flag = key["SystemFlag"];
+
+                if (flag & 0x8000000) {
+                    isDrive = true;
+                }
+            }
         }
 
         if (movesDictJson[actionName].contains("EventKey"))
@@ -616,7 +628,6 @@ bool Guy::PreFrame(void)
                         } else {
                             std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
                             auto command = commandsJson[commandNoString]["0"];
-                            int chargeBit = command["charge_bit"];
                             int inputID = command["input_num"].get<int>() - 1;
                             auto commandInputs = command["inputs"];
 
@@ -631,76 +642,86 @@ bool Guy::PreFrame(void)
                                 int numFrames = input["frame_num"];
                                 bool match = false;
                                 int lastMatchInput = i;
-                                while (inputBufferCursor < inputBuffer.size())
+
+                                if (inputOkKeyFlags & 0x10000)
                                 {
-                                    bool thismatch = false;
-                                    if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                        int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                                        // if ( commandNo == 7 ) {
-                                        //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
-                                        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i));
-                                        // }
-                                        if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                            match = true;
-                                            thismatch = true;
-                                            i = inputBufferCursor;
+                                    // charge release
+                                    bool chargeMatch = false;
+                                    nlohmann::json resourceMatch;
+                                    int chargeID = inputOkKeyFlags & 0xFF;
+                                    for (auto& [keyID, key] : chargeJson.items()) {
+                                        resourceMatch = key["resource"];
+                                        if (resourceMatch["charge_id"] == chargeID ) {
+                                            chargeMatch = true;
+                                            break;
                                         }
                                     }
-                                    if (match == true && (thismatch == false || numFrames <= 0)) {
-                                        //inputBufferCursor++;
+
+                                    if (chargeMatch) {
+                                        uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
+                                        uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
+                                        uint32_t chargeFrames = resourceMatch["ok_frame"];
+                                        uint32_t keepFrames = resourceMatch["keep_frame"];
+                                        uint32_t dirCount = 0;
+                                        uint32_t dirNotMatchCount = 0;
+                                        // count matching direction in input buffer, super naive but will work for testing
+                                        inputBufferCursor = i;
+                                        uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                                        while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                                        {
+                                            if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                                dirCount++;
+                                                if (dirCount >= chargeFrames) {
+                                                    break;
+                                                }
+                                            } else {
+                                                dirNotMatchCount++;
+                                            }
+                                            inputBufferCursor++;
+                                        }
+
+                                        // int beginningCharge = inputBufferCursorl
+                                        // int chargeConsumed = initialI;
+
+                                        if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
+                                            //log("match charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
+                                            break; // cancel trigger
+                                        }
+                                        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
                                         inputID--;
-                                        break;
+                                    } else {
+                                        log("charge entries mismatch?");
+                                        break; // cancel trigger
                                     }
-                                    inputBufferCursor++;
+                                } else {
+                                    while (inputBufferCursor < inputBuffer.size())
+                                    {
+                                        bool thismatch = false;
+                                        if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                            int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                                            // if ( commandNo == 32 ) {
+                                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
+                                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i) + " initial " + std::to_string(initialSearch));
+                                            // }
+                                            if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                                match = true;
+                                                thismatch = true;
+                                                i = inputBufferCursor;
+                                            }
+                                        }
+                                        if (match == true && (thismatch == false || numFrames <= 0)) {
+                                            //inputBufferCursor++;
+                                            inputID--;
+                                            break;
+                                        }
+                                        inputBufferCursor++;
+                                    }
                                 }
 
                                 if (inputBufferCursor == inputBuffer.size()) {
                                     break;
                                 }
-                            }
-
-                            // check charge
-                            if (inputID < 0 && chargeBit)
-                            {
-                                bool chargeMatch = false;
-                                nlohmann::json resourceMatch;
-                                for (auto& [keyID, key] : chargeJson.items()) {
-                                    resourceMatch = key["resource"];
-                                    if (resourceMatch["group_bit"] == chargeBit) {
-                                        chargeMatch = true;
-                                        break;
-                                    }
-                                }
-
-                                if (chargeMatch) {
-                                    uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
-                                    uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
-                                    uint32_t chargeFrames = resourceMatch["ok_frame"];
-                                    uint32_t keepFrames = resourceMatch["keep_frame"];
-                                    uint32_t dirCount = 0;
-                                    uint32_t dirNotMatchCount = 0;
-                                    // count matching direction in input buffer, super naive but will work for testing
-                                    inputBufferCursor = i;
-                                    uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                                    while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
-                                    {
-                                        if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                            dirCount++;
-                                            if (dirCount >= chargeFrames) {
-                                                break;
-                                            }
-                                        } else {
-                                            dirNotMatchCount++;
-                                        }
-                                        inputBufferCursor++;
-                                    }
-
-                                    if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                        //log("match charge " + std::to_string(chargeBit) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
-                                        continue; // cancel trigger
-                                    }
-                                }
-                            }                            
+                            }                           
 
                             if (inputID < 0) {
                                 if (defer) {
@@ -986,7 +1007,7 @@ bool Guy::Frame(void)
         if (hitStun == 0)
         {
             int advantage = globalFrameCount - pOpponent->recoveryTiming;
-            log("recovered! adv " + std::to_string(-advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+            log("recovered! adv " + std::to_string(advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
             nextAction = 1;
             comboHits = 0;
             juggleCounter = 0;
@@ -1114,10 +1135,7 @@ bool Guy::Frame(void)
             accelY = -1;        
         }
 
-        if (currentAction == 500 || currentAction == 501 ||
-            currentAction == 739 || currentAction == 740) {
-            isDrive = true;
-        } else if (isDrive == true) {
+        if (isDrive == true) {
             isDrive = false;
             // at some point make it so we cant drive specials
             wasDrive = true;
