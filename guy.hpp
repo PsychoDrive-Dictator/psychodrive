@@ -26,6 +26,7 @@ public:
     std::string getCharacter() { return character; }
     // for opponent direction
     Guy *getOpponent() { return pOpponent; }
+    Guy *getParent() { return pParent; }
     std::vector<Guy*> &getMinions() { return minions; }
     float getPosX() {
         return posX + (posOffsetX*direction);
@@ -61,6 +62,13 @@ public:
         outVelY = velocityY;
         outAccelX = accelX;
         outAccelY = accelY;
+    }
+
+    ~Guy() {
+        for (auto minion : minions) {
+            delete minion;
+        }
+        minions.clear();
     }
 
     Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)

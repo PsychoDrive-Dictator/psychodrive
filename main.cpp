@@ -99,6 +99,7 @@ void log(std::string logLine)
 
 int main(int, char**)
 {
+    srand(time(NULL));
     auto window = initWindowRender();
     initUI();
     ImGuiIO& io = ImGui::GetIO(); // why doesn't the one from initUI work? who knows
@@ -147,6 +148,7 @@ int main(int, char**)
                 guy->Frame();
             }
         }
+        oneframe = false;
 
         color clearColor = {0.0,0.0,0.0};
 
@@ -177,7 +179,7 @@ int main(int, char**)
 
         SDL_GL_SwapWindow(window);
 
-        oneframe = false;
+        resetpos = false;
     }
 
     for (auto guy : guys)
