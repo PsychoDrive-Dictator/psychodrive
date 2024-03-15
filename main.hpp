@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "guy.hpp"
 #include "json.hpp"
 
 enum hitentryflags {
@@ -62,6 +63,10 @@ struct RenderBox {
 };
 
 void log(std::string logLine);
+
+class Guy;
+extern std::vector<Guy *> guys;
+extern bool resetpos;
 
 extern int globalFrameCount;
 

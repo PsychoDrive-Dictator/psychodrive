@@ -1,14 +1,5 @@
-#include "imgui.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL.h>
-#include <SDL_opengl.h>
-
-#include "json.hpp"
-
 #include <unistd.h>
-
 #include <string>
 #include <fstream>
 #include <ios>
@@ -18,8 +9,14 @@
 #include <thread>
 #include <bitset>
 
+#include <SDL.h>
+#include <SDL_opengl.h>
+
+#include "json.hpp"
+
 #include "guy.hpp"
 #include "main.hpp"
+#include "ui.hpp"
 
 
 bool forceCounter = false;
@@ -29,6 +26,9 @@ int hitStunAdder = 0;
 uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
 int globalFrameCount = 0;
+bool resetpos = false;
+std::vector<Guy *> guys;
+int currentInput = 0;
 
 std::string readFile(const std::string &fileName)
 {
@@ -135,12 +135,11 @@ std::deque<std::string> logQueue;
 void log(std::string logLine)
 {
     logQueue.push_back(logLine);
-    if (logQueue.size() > 20) {
+    if (logQueue.size() > 15) {
         logQueue.pop_front();
     }
 }
 
-// Main code
 int main(int, char**)
 {
     SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
@@ -175,37 +174,26 @@ int main(int, char**)
 
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
-    SDL_GL_SetSwapInterval(1); // Enable vsync
+    SDL_GL_SetSwapInterval(1);
 
-    // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("guile", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
-    Guy otherGuy("honda", 450.0f, 0.0f, -1, {1.0,1.0,1.0});
-    guy.setOpponent(&otherGuy);
-    otherGuy.setOpponent(&guy);
-
     uint32_t frameStartTime = SDL_GetTicks();
-    int currentInput = 0;
-
 
     // Main loop
     bool paused = false;
     bool done = false;
     bool oneframe = false;
-    bool resetpos = false;
+
     while (!done)
     {
         const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -213,7 +201,6 @@ int main(int, char**)
         if (currentTime - frameStartTime < desiredFrameTimeMS) {
             const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
             usleep(timeToSleepMS * 1000 - 100);
-            //std::this_thread::sleep_for(std::chrono::milliseconds(int(timeToSleepMS)));
         }
         frameStartTime = SDL_GetTicks();
         // clear new press bits
@@ -434,63 +421,45 @@ int main(int, char**)
             }
         }
 
-        guy.Input(currentInput);
-        otherGuy.Input(0);
+        bool hasInput = true;
+        for (auto guy : guys) {
+            guy->Input( hasInput ? currentInput : 0);
+            hasInput = false;
+        }
+
+        std::vector<Guy *> guysWhoFrame;
+
+        if (oneframe || !paused) {
+            for (auto guy : guys) {
+                if (guy->PreFrame()) {
+                    guysWhoFrame.push_back(guy);
+                }
+            }
+        }
+
+        bool push = true; // only push the first guy until this actually works
+        if (oneframe || !paused) {
+            for (auto guy : guysWhoFrame) {
+                if ( push ) {
+                    guy->Push(guy->getOpponent());
+                    push = false;
+                }
+                guy->CheckHit(guy->getOpponent());
+                guy->Frame();
+            }
+        }
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-        {
-            ImGui::Begin("Psycho Drive");
-
-            Guy *pGuy = &guy;
-            static bool otherguy = true;
-            ImGui::Checkbox("P2", &otherguy);
-            if (otherguy) {
-                pGuy = &otherGuy;
-            }
-            ImGui::Text("action %s frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentFrame());
-            ImGui::Text("currentInput %d", currentInput);
-            ImGui::SameLine();
-            resetpos = resetpos || ImGui::Button("reset");
-            float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
-            pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
-            pGuy->getVel(velX, velY, accelX, accelY);
-            ImGui::Text("pos %f %f", posX, posY);
-            ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
-            ImGui::Text("vel %f %f", velX, velY);
-            ImGui::Text("accel %f %f", accelX, accelY);
-            ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
-            ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter());
-            ImGui::SliderInt("hitstun adder", &hitStunAdder, -10, 10);
-            ImGui::Checkbox("force counter", &forceCounter);
-            ImGui::SameLine();
-            ImGui::Checkbox("force PC", &forcePunishCounter);
-            //ImGui::Text("unique %i", uniqueCharge);
-
-            if (resetpos) {
-                guy.setPosDebug(100.0f, 0.0f);
-                otherGuy.setPosDebug(450.0f, 0.0f);
-                resetpos = false;
-            }
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-
-            ImGui::Begin("Debug Log");
-            for (auto logLine : logQueue) {
-                ImGui::Text(logLine.c_str());
-            }
-            ImGui::End();
-        }
-
-        ImGui::Render();
-        
+        ImGui::NewFrame(); 
         ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
-        if (guy.getWarudo() || otherGuy.getWarudo()) {
+        bool ticktock = false;
+        for (auto guy : guys) {
+            ticktock = ticktock || guy->getWarudo();
+        }
+        if (ticktock) {
             clear_color = ImVec4(0.075f, 0.075f, 0.075f, 1.00f);
         }
 
@@ -505,32 +474,23 @@ int main(int, char**)
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
         glScalef(1.5f, -1.5f, 1.0f);
 
-        bool guyInWarudo = false;
-        bool otherGuyInWarudo = false;
-        if (oneframe || !paused) {
-            guyInWarudo = !guy.PreFrame();
-            otherGuyInWarudo = !otherGuy.PreFrame();
-        }
-
-        guy.Render();
-        otherGuy.Render();
-
+        renderUI(currentInput, io.Framerate, &logQueue);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(window);
 
-        if (oneframe || !paused) {
-            if ( !guyInWarudo ) {
-                guy.Push(&otherGuy);
-                guy.CheckHit(&otherGuy);
-                guy.Frame();
+        for (auto guy : guys) {
+            guy->Render();
+        }
+
+        if (resetpos) {
+            if (guys.size() > 0 ) {
+                guys[0]->setPosDebug(100.0f, 0.0f);
             }
-
-            if ( !otherGuyInWarudo ) {
-                // otherGuy.Push(&guy);
-                otherGuy.CheckHit(&guy);
-                otherGuy.Frame();
+            if (guys.size() > 1 ) {
+                guys[1]->setPosDebug(450.0f, 0.0f);
             }
         }
+
+        SDL_GL_SwapWindow(window);
 
         oneframe = false;
     }

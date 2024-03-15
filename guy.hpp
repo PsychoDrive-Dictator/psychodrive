@@ -7,8 +7,6 @@
 
 class Guy {
 public:
-    Guy(std::string charName, float startPosX, float startPosY, int startDir, color renderColor);
-    Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction);
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
 
     void Input(int input);
@@ -22,7 +20,10 @@ public:
 
     void addWarudo(int w) { warudo += w; }
 
+    std::string getCharacter() { return character; }
     // for opponent direction
+    Guy *getOpponent() { return pOpponent; }
+    std::vector<Guy*> &getMinions() { return minions; }
     float getPosX() {
         return posX + (posOffsetX*direction);
     }
@@ -37,6 +38,7 @@ public:
     int getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
+    std::string getName() { return name; }
 
     std::vector<Box> *getPushBoxes() { return &pushBoxes; }
     std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
@@ -58,7 +60,58 @@ public:
         outAccelY = accelY;
     }
 
+    Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)
+    {
+        character = charName;
+        name = character;
+        posX = startPosX;
+        posY = startPosY;
+        direction = startDir;
+        charColorR = color.r;
+        charColorG = color.g;
+        charColorB = color.b;
+
+        movesDictJson = parse_json_file(character + "_moves.json");
+        rectsJson = parse_json_file(character + "_rects.json");
+        namesJson = parse_json_file(character + "_names.json");
+        triggerGroupsJson = parse_json_file(character + "_trigger_groups.json");
+        triggersJson = parse_json_file(character + "_triggers.json");
+        commandsJson = parse_json_file(character + "_commands.json");
+        chargeJson = parse_json_file(character + "_charge.json");
+        hitJson = parse_json_file(character + "_hit.json");
+    }
+
+    Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
+    {
+        character = parent.character;
+        name = character + "'s minion";
+        posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
+        posY = parent.posY + parent.posOffsetY + posOffsetY;
+        direction = parent.direction;
+        charColorR = parent.charColorR;
+        charColorG = parent.charColorG;
+        charColorB = parent.charColorB;
+
+        movesDictJson = parent.movesDictJson;
+        rectsJson = parent.rectsJson;
+        namesJson = parent.namesJson;
+        triggerGroupsJson = parent.triggerGroupsJson;
+        triggersJson = parent.triggersJson;
+        commandsJson = parent.commandsJson;
+        chargeJson = parent.chargeJson;
+        hitJson = parent.hitJson;
+
+        pOpponent = parent.pOpponent;
+
+        currentAction = startAction;
+
+        isProjectile = true;
+        projHitCount = -1; // unset yet, is in the first action
+        pParent = &parent;
+    }
+
 private:
+    std::string name;
     std::string character;
     Guy *pOpponent = nullptr;
 

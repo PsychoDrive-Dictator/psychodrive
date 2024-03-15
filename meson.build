@@ -8,6 +8,7 @@ project(
 project_source_files = [
   'main.cpp',
   'guy.cpp',
+  'ui.cpp',
   'imgui/imgui.cpp',
   'imgui/imgui_draw.cpp',
   'imgui/imgui_widgets.cpp',
