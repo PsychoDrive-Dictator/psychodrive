@@ -1,7 +1,3 @@
-#include "guy.hpp"
-#include "main.hpp"
-#include <string>
-
 #include <stdio.h>
 
 #include <fstream>
@@ -11,6 +7,11 @@
 #include <chrono>
 #include <thread>
 #include <bitset>
+
+#include "guy.hpp"
+#include "main.hpp"
+#include "render.hpp"
+#include <string>
 
 void parseRootOffset( nlohmann::json& keyJson, int&offsetX, int& offsetY)
 {
