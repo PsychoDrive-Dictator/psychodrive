@@ -144,7 +144,11 @@ int main(int, char**)
                     guy->Push(guy->getOpponent());
                     push = false;
                 }
+            }
+            for (auto guy : guysWhoFrame) {
                 guy->CheckHit(guy->getOpponent());
+            }
+            for (auto guy : guysWhoFrame) {
                 guy->Frame();
             }
         }
