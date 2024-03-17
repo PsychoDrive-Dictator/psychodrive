@@ -153,9 +153,18 @@ bool Guy::PreFrame(void)
 
     if (actionJson != nullptr)
     {
-        marginFrame = actionJson["fab"]["ActionFrame"]["MarginFrame"];
-        //standing has 0 marginframe, pre-jump has -1, crouch -1..
-        actionFrameDuration = actionJson["fab"]["Frame"];
+        if (!actionFrameDataInitialized) {
+            //standing has 0 marginframe, pre-jump has -1, crouch -1..
+            auto fab = actionJson["fab"];
+            marginFrame = fab["ActionFrame"]["MarginFrame"];
+            actionFrameDuration = fab["Frame"];
+            loopPoint = fab["State"]["EndStateParam"];
+            if ( loopPoint == -1 ) {
+                loopPoint = 0;
+            }
+            loopCount = fab["State"]["LoopCount"];
+            actionFrameDataInitialized = true;
+        }
 
         if (isProjectile && projHitCount == -1) {
             projHitCount = actionJson["pdata"]["HitCount"];
@@ -1077,17 +1086,21 @@ bool Guy::Frame(void)
 
     }
 
-    if (!hitStun && currentFrame >= (actionFrameDuration - 2) && nextAction == -1)
+    if (currentFrame >= (actionFrameDuration - 1) && nextAction == -1)
     {
-        if ( isProjectile ) {
-            //currentFrame = 0; // just loop? :/
-            return false; // die
-        } else if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
+        if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             nextAction = currentAction + 3;
             airborne = true; // probably should get it thru statuskey?
-        }
-        else {
+        } else if (loopCount == -1 || loopCount > 0) {
+            currentFrame = loopPoint;
+            if (loopCount > 0) {
+                loopCount--;
+            }
+        } else {
+            if (isProjectile) {
+                return false; // die
+            }
             nextAction = 1;
         }
     }
@@ -1207,6 +1220,8 @@ bool Guy::Frame(void)
         } else {
             wasDrive = false;
         }
+
+        actionFrameDataInitialized = false;
     }
 
     if (warudo == 0) {
