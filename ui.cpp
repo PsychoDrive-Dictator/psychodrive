@@ -10,7 +10,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
     ImGui::Begin(windowName);
     ImGui::Text("name %s moveset %s", pGuy->getName().c_str(), pGuy->getCharacter().c_str());
-    ImGui::Text("action %s frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentFrame());
+    ImGui::Text("action %s id %i frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentAction(), pGuy->getCurrentFrame());
     float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
     pGuy->getVel(velX, velY, accelX, accelY);
