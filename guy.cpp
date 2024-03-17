@@ -145,8 +145,10 @@ bool Guy::PreFrame(void)
     actionName = validAction ? namesJson[actionIDString] : "invalid";
 
     actionJson = nullptr;
+    bool commonAction = false;
     if (commonMovesJson.contains(std::to_string(currentAction))) {
         actionJson = commonMovesJson[std::to_string(currentAction)];
+        commonAction = true;
     } else if (movesDictJson.contains(actionName)) {
         actionJson = movesDictJson[actionName];
     }
@@ -388,29 +390,30 @@ bool Guy::PreFrame(void)
                 bool di = currentAction >= 850 && currentAction <= 859;
 
                 Box rect;
-
                 int magicHurtBoxID = 8; // i hate you magic array of boxes
 
+                auto rects = commonAction ? commonRectsJson : rectsJson;
+
                 for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                    if (getRect(rect, rectsJson, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                    if (getRect(rect, rectsJson, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                    if (getRect(rect, rectsJson, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                    if (getRect(rect, rectsJson, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
@@ -430,11 +433,12 @@ bool Guy::PreFrame(void)
                 rootOffsetY += posY + posOffsetY;
 
                 Box rect;
+                auto rects = commonAction ? commonRectsJson : rectsJson;
                 
-                if (getRect(rect, rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                     pushBoxes.push_back(rect);
                     renderBoxes.push_back({rect, {1.0,1.0,1.0}});
-                } else if (getRect(rect, rectsJson, 7, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                } else if (getRect(rect, rects, 7, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                     pushBoxes.push_back(rect);
                     renderBoxes.push_back({rect, {1.0,1.0,1.0}});
                 }
@@ -456,13 +460,14 @@ bool Guy::PreFrame(void)
                 rootOffsetY += posY + posOffsetY;
 
                 Box rect;
+                auto rects = commonAction ? commonRectsJson : rectsJson;
 
                 for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
                     int collisionType = hitBox["CollisionType"];
                     color collisionColor = {1.0,0.0,0.0};
                     if (collisionType == 3 ) collisionColor = {0.5,0.5,0.5};
 
-                    if (getRect(rect, rectsJson, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rects, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
                         renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
 
                         if (collisionType != 3) {
