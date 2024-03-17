@@ -73,7 +73,7 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
 {
     switch (operationType) {
         case 1: // set
-        value = keyValue; 
+        value = keyValue;
         break;
         case 2: // add ?
         value += keyValue;
@@ -176,9 +176,9 @@ bool Guy::PreFrame(void)
                 projHitCount = pdataJson["HitCount"];
                 // log("initial hitcount " + std::to_string(projHitCount));
             }
-            if (limitShotCategory == -1) {
-                limitShotCategory = pdataJson["Category"];
-            }
+
+            limitShotCategory = pdataJson["Category"];
+            noPush = pdataJson["_NoPush"];
         }
 
         if (actionJson.contains("PlaceKey"))
@@ -195,7 +195,7 @@ bool Guy::PreFrame(void)
                         if (placeKey["Axis"] == 0) {
                             posOffsetX = offset.get<int>();
                         } else if (placeKey["Axis"] == 1) {
-                            posOffsetY = offset.get<int>();    
+                            posOffsetY = offset.get<int>();
                         }
                     }
                 }
@@ -377,7 +377,7 @@ bool Guy::PreFrame(void)
                 float posOffsetY = key["PosOffset"]["y"];
 
                 // spawn new guy
-                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
+                Guy *pNewGuy = new Guy(pParent ? *pParent : *this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
                 minions.push_back(pNewGuy);
             }
         }
@@ -477,7 +477,7 @@ bool Guy::PreFrame(void)
 
                 Box rect;
                 auto rects = commonAction ? commonRectsJson : rectsJson;
-                
+
                 if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                     pushBoxes.push_back(rect);
                     renderBoxes.push_back({rect, {1.0,1.0,1.0}});
@@ -704,7 +704,7 @@ bool Guy::PreFrame(void)
                                 if (inputBufferCursor == inputBuffer.size()) {
                                     break;
                                 }
-                            }                           
+                            }
 
                             if (inputID < 0) {
                                 if (defer) {
@@ -757,7 +757,7 @@ void Guy::Render(void) {
     }
 }
 
-bool Guy::Push(Guy *pOtherGuy) 
+bool Guy::Push(Guy *pOtherGuy)
 {
     if ( !pOtherGuy ) return false;
 
@@ -778,7 +778,9 @@ bool Guy::Push(Guy *pOtherGuy)
 
     // if you think of commenting this again try ryu's SA1
     for ( auto minion : minions ) {
-        minion->Push(pOtherGuy);
+        if (!minion->noPush) {
+            minion->Push(pOtherGuy);
+        }
     }
 
     if ( hasPushed ) {
@@ -821,7 +823,7 @@ bool Guy::WorldPhysics(void)
     landed = false;
 
     // landing - not sure about velocity check there, but otherwise we land during buttslam ascent
-    if (floorpush && airborne && velocityY < 0) 
+    if (floorpush && airborne && velocityY < 0)
     {
         pushY = 0.0f;
         posY = 0.0f;
@@ -836,7 +838,7 @@ bool Guy::WorldPhysics(void)
 
         if ( hitStunOnLand > 0 ) {
             // there's some additional knockdown delay there
-            hitStun += hitStunOnLand + 1 + 30; 
+            hitStun += hitStunOnLand + 1 + 30;
             hitStunOnLand = 0;
         }
 
@@ -845,9 +847,11 @@ bool Guy::WorldPhysics(void)
         //log ("landed " + std::to_string(hitStun));
     }
 
-    // for ( auto minion : minions ) {
-    //     minion->WorldPhysics();
-    // }
+    for ( auto minion : minions ) {
+        if (!minion->noPush) {
+            minion->WorldPhysics();
+        }
+    }
 
     if ( hasPushed ) {
         posX += pushX;
@@ -1084,14 +1088,9 @@ void Guy::DoBranchKey(void)
             int branchAction = key["Action"];
             int branchFrame = key["ActionFrame"];
 
-            if (branchAction == currentAction && branchFrame == currentFrame) {
-                log("avoided infinite loop!");
-                continue;
-            }
-
             switch (branchType) {
                 case 0: // always?
-                    doBranch = true; 
+                    doBranch = true;
                     break;
                 case 1:
                     // else?! jesus christ we're turing complete soon
@@ -1186,14 +1185,14 @@ void Guy::DoBranchKey(void)
                                 count++;
                             }
                         }
-                        if (branchParam1 == 5 && branchParam2 == count) {
+                        if (branchParam1 == 5 && count == branchParam2) {
                             // equals certain count?
                             doBranch = true;
                         }
-                        // if (branchParam1 == 3 && count >= branchParam2) {
-                        //     // is 0? :/
-                        //     doBranch = true;
-                        // }
+                        if (branchParam1 == 3 && count == branchParam2) {
+                            // same? strict equals? aaa
+                            doBranch = true;
+                        }
                     }
                     break;
                 default:
@@ -1207,6 +1206,9 @@ void Guy::DoBranchKey(void)
                 if (branchFrame != 0 && branchAction != currentAction) {
                     log("unsupported change for both action and frame");
                 }
+                if (branchAction == currentAction && branchFrame == 0 ) {
+                    log("ignoring");
+                } else {
 
                 if (branchFrame != 0 && branchAction == currentAction) {
                     // unclear where we'll hit it so not sure if we need to offset yet
@@ -1214,12 +1216,16 @@ void Guy::DoBranchKey(void)
                 } else {
                     nextAction = branchAction;
                 }
+                }
 
                 deniedLastBranch = false;
 
                 keepPlace = key["_KeepPlace"];
-            } else if (branchType != 1) {
-                deniedLastBranch = true;
+                break;
+            } else {
+                if (branchType != 1) {
+                    deniedLastBranch = true;
+                }
             }
         }
     }
@@ -1358,7 +1364,7 @@ bool Guy::Frame(void)
             posOffsetX = 0.0f;
             posY += posOffsetY;
             posOffsetY = 0.0f;
-            
+
             canHitID = -1;
         } else {
             currentFrame--; //rewind
@@ -1382,7 +1388,7 @@ bool Guy::Frame(void)
         }
 
         if ( posY > 0.0 && !hitStun && !isProjectile ) { // if not grounded, fall to the ground i guess?
-            accelY = -1;        
+            accelY = -1;
         }
 
         if (isDrive == true) {
