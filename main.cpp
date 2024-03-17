@@ -159,10 +159,10 @@ int main(int argc, char**argv)
                 }
             }
             for (auto guy : guysWhoFrame) {
-                guy->CheckHit(guy->getOpponent());
+                guy->WorldPhysics();
             }
             for (auto guy : guysWhoFrame) {
-                guy->WorldPhysics();
+                guy->CheckHit(guy->getOpponent());
             }
             for (auto guy : guysWhoFrame) {
                 guy->Frame();

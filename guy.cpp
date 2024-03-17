@@ -147,12 +147,12 @@ bool Guy::PreFrame(void)
     actionName = validAction ? namesJson[actionIDString] : "invalid";
 
     actionJson = nullptr;
-    bool commonAction = false;
     if (commonMovesJson.contains(std::to_string(currentAction))) {
         actionJson = commonMovesJson[std::to_string(currentAction)];
         commonAction = true;
     } else if (movesDictJson.contains(actionName)) {
         actionJson = movesDictJson[actionName];
+        commonAction = false;
     }
 
     if (actionJson != nullptr)
@@ -447,40 +447,8 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (actionJson.contains("AttackCollisionKey"))
-        {
-            for (auto& [hitBoxID, hitBox] : actionJson["AttackCollisionKey"].items())
-            {
-                if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int rootOffsetX = 0;
-                int rootOffsetY = 0;
-                parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
-                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-                rootOffsetY += posY + posOffsetY;
-
-                Box rect;
-                auto rects = commonAction ? commonRectsJson : rectsJson;
-
-                for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
-                    int collisionType = hitBox["CollisionType"];
-                    color collisionColor = {1.0,0.0,0.0};
-                    if (collisionType == 3 ) collisionColor = {0.5,0.5,0.5};
-
-                    if (getRect(rect, rects, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
-                        renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
-
-                        if (collisionType != 3) {
-                            int hitEntryID = hitBox["AttackDataListIndex"];
-                            int hitID = hitBox["HitID"];
-                            hitBoxes.push_back({rect,hitEntryID,hitID});
-                        }
-                    }
-                }                    
-            }
-        }
+        DoHitBoxKey("AttackCollisionKey");
+        DoHitBoxKey("OtherCollisionKey", true);
 
         DoBranchKey();
 
@@ -643,8 +611,8 @@ bool Guy::PreFrame(void)
                                         }
 
                                         if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                            log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                                            "keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+                                            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                                            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
                                             break; // cancel trigger
                                         }
                                         //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
@@ -747,6 +715,7 @@ bool Guy::Push(Guy *pOtherGuy)
         }
     }
 
+    // if you think of commenting this again try ryu's SA1
     for ( auto minion : minions ) {
         minion->Push(pOtherGuy);
     }
@@ -815,9 +784,9 @@ bool Guy::WorldPhysics(void)
         //log ("landed " + std::to_string(hitStun));
     }
 
-    for ( auto minion : minions ) {
-        minion->WorldPhysics();
-    }
+    // for ( auto minion : minions ) {
+    //     minion->WorldPhysics();
+    // }
 
     if ( hasPushed ) {
         posX += pushX;
@@ -834,11 +803,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
     bool retHit = false;
     for (auto hitbox : hitBoxes ) {
-        if (hitbox.hitID < canHitID) {
+        if (!hitbox.domain && hitbox.hitID < canHitID) {
             continue;
         }
         for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
-            if (doBoxesHit(hitbox.box, hurtbox)) {
+            if (hitbox.domain || doBoxesHit(hitbox.box, hurtbox)) {
                 std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
 
                 int hitEntryFlag = 0;
@@ -877,7 +846,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     // supposedly drive attacks dont add to the limit but obey some limit?
                 }
 
-                if (otherGuyAirborne && pOtherGuy->juggleCounter > juggleLimit) {
+                if (!hitbox.domain && otherGuyAirborne && pOtherGuy->juggleCounter > juggleLimit) {
                     break;
                 }
 
@@ -925,7 +894,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 int moveType = hitEntry["MoveType"];
                 int curveTargetID = hitEntry["CurveTgtID"];
-                log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
+                //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
 
                 canHitID = hitbox.hitID + 1;
@@ -954,12 +923,18 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     hitStun = stun + 1 + hitStunAdder;
     hitVelFrames = destTime;
 
-    // assume hit direction is opposite as facing for now, not sure if that's true
-    hitVelX = (direction * destX * -1) / (float)destTime;
-    velocityY = destY * 4 / (float)destTime;
-    //hitVelY = destY * 2 / (float)destTime;
-    //velocityX = (direction * destX * -1) / (float)destTime;
-    accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
+    if (destTime != 0) {
+        // assume hit direction is opposite as facing for now, not sure if that's true
+        // todo pushback in corner - all destX _must_ be traveled by either side
+        if ( destX != 0 ) {
+            hitVelX = (direction * destX * -1) / (float)destTime;
+        }
+
+        if (destY != 0) {
+            velocityY = destY * 4 / (float)destTime;
+            accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
+        }
+    }
 
     // i think this vel wants to apply this frame, lame workaround to get same intensity
     velocityY -= accelY; //
@@ -986,6 +961,46 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
         // } else {
         //     nextAction = 232; // 00
         // }
+    }
+}
+
+void Guy::DoHitBoxKey(const char *name, bool domain)
+{
+    if (actionJson.contains(name))
+    {
+        for (auto& [hitBoxID, hitBox] : actionJson[name].items())
+        {
+            if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            int rootOffsetX = 0;
+            int rootOffsetY = 0;
+            parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
+            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+            rootOffsetY += posY + posOffsetY;
+
+            Box rect={0,0,1280,720};
+            auto rects = commonAction ? commonRectsJson : rectsJson;
+
+            for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
+                int collisionType = hitBox["CollisionType"];
+                color collisionColor = {1.0,0.0,0.0};
+                if (collisionType == 3 ) collisionColor = {0.5,0.5,0.5};
+
+                if (domain || getRect(rect, rects, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
+
+                    if (collisionType != 3) {
+                        int hitEntryID = hitBox["AttackDataListIndex"];
+                        int hitID = hitBox["HitID"];
+                        if (hitEntryID != -1) {
+                            hitBoxes.push_back({rect,hitEntryID,hitID,domain});
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
