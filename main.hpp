@@ -26,6 +26,11 @@ struct HitBox {
     int hitID;
 };
 
+static inline float randFloat()
+{
+    float ret = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    return ret;
+}
 
 void log(std::string logLine);
 

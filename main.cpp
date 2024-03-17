@@ -97,13 +97,26 @@ void log(std::string logLine)
     }
 }
 
-int main(int, char**)
+int main(int argc, char**argv)
 {
     srand(time(NULL));
     auto window = initWindowRender();
     initUI();
     ImGuiIO& io = ImGui::GetIO(); // why doesn't the one from initUI work? who knows
     initRenderUI();
+
+    if ( argc > 1 ) {
+        Guy *pNewGuy = new Guy(argv[1], 100.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        guys.push_back(pNewGuy);
+
+        if ( argc > 2 ) {
+            pNewGuy = new Guy(argv[2], 400.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+            guys.push_back(pNewGuy);
+
+            pNewGuy->setOpponent(guys[0]);
+            guys[0]->setOpponent(pNewGuy);
+        }
+    }
 
     uint32_t frameStartTime = SDL_GetTicks();
 
@@ -146,6 +159,9 @@ int main(int, char**)
                 }
             }
             for (auto guy : guysWhoFrame) {
+                guy->WorldPhysics();
+            }
+            for (auto guy : guysWhoFrame) {
                 guy->CheckHit(guy->getOpponent());
             }
             for (auto guy : guysWhoFrame) {
@@ -174,10 +190,10 @@ int main(int, char**)
 
         if (resetpos) {
             if (guys.size() > 0 ) {
-                guys[0]->setPosDebug(100.0f, 0.0f);
+                guys[0]->resetPosDebug(100.0f, 0.0f);
             }
             if (guys.size() > 1 ) {
-                guys[1]->setPosDebug(450.0f, 0.0f);
+                guys[1]->resetPosDebug(450.0f, 0.0f);
             }
         }
 

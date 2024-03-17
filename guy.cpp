@@ -127,6 +127,9 @@ void Guy::Input(int input)
     }
 }
 
+nlohmann::json Guy::commonMovesJson = nullptr;
+nlohmann::json Guy::commonRectsJson = nullptr;
+
 bool Guy::PreFrame(void)
 {
     if (warudo > 0) {
@@ -141,20 +144,27 @@ bool Guy::PreFrame(void)
     bool validAction = namesJson.contains(actionIDString);
     actionName = validAction ? namesJson[actionIDString] : "invalid";
 
-    if (movesDictJson.contains(actionName))
+    actionJson = nullptr;
+    if (commonMovesJson.contains(std::to_string(currentAction))) {
+        actionJson = commonMovesJson[std::to_string(currentAction)];
+    } else if (movesDictJson.contains(actionName)) {
+        actionJson = movesDictJson[actionName];
+    }
+
+    if (actionJson != nullptr)
     {
-        marginFrame = movesDictJson[actionName]["fab"]["ActionFrame"]["MarginFrame"];
+        marginFrame = actionJson["fab"]["ActionFrame"]["MarginFrame"];
         //standing has 0 marginframe, pre-jump has -1, crouch -1..
-        actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
+        actionFrameDuration = actionJson["fab"]["Frame"];
 
         if (isProjectile && projHitCount == -1) {
-            projHitCount = movesDictJson[actionName]["pdata"]["HitCount"];
+            projHitCount = actionJson["pdata"]["HitCount"];
             // log("initial hitcount " + std::to_string(projHitCount));
         }
 
-        if (movesDictJson[actionName].contains("PlaceKey"))
+        if (actionJson.contains("PlaceKey"))
         {
-            for (auto& [placeKeyID, placeKey] : movesDictJson[actionName]["PlaceKey"].items())
+            for (auto& [placeKeyID, placeKey] : actionJson["PlaceKey"].items())
             {
                 if ( !placeKey.contains("_StartFrame") || placeKey["_StartFrame"] > currentFrame || placeKey["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -174,9 +184,16 @@ bool Guy::PreFrame(void)
         }
 
         float prevVelX = velocityX;
+        float prevVelY = velocityY;
 
         velocityX += accelX;
         velocityY += accelY;
+
+        if ((velocityY * prevVelY) < 0.0f || (accelY != 0.0f && velocityY == 0.0f)) {
+            startsFalling = true;
+        } else {
+            startsFalling = false;
+        }
 
         // log(std::to_string(currentAction) + " " + std::to_string(prevVelX) + " " + std::to_string(velocityX));
 
@@ -186,10 +203,14 @@ bool Guy::PreFrame(void)
             accelX = 0.0f;
         }
 
-        float oldPosY = posY;
+        float prevPosY = posY;
 
         posX += (velocityX * direction);
         posY += velocityY;
+
+        if (prevPosY == 0.0f && posY > 0.0f) {
+            airborne = true; // i think we should go by statusKey instead
+        }
 
         if (hitVelFrames > 0) {
             posX += hitVelX;
@@ -197,41 +218,11 @@ bool Guy::PreFrame(void)
             hitVelFrames--;
         }
 
-        // landing
-        if ( oldPosY > 0.0f && posY <= 0.0f ) // iffy but we prolly move to fixed point anyway at some point
-        {
-            posY = 0.0f;
-            velocityY = 0.0f;
-            accelY = 0.0f;
-            nextAction = 39; // land - need other landing if did air attack?
-
-            if ( resetHitStunOnLand ) {
-                hitStun = 1;
-                resetHitStunOnLand = false;
-            }
-
-            if ( hitStunOnLand > 0 ) {
-                // there's some additional knockdown delay there
-                hitStun += hitStunOnLand + 1 + 30; 
-                hitStunOnLand = 0;
-            }
-
-            //log ("landed " + std::to_string(hitStun));
-        }
-
-        // super crude corner snapping
-        if ( posX < 20.0 ) {
-            posX = 20.0f;
-        }
-        if ( posX > 800.0f ) {
-            posX = 800.0f;
-        }
-
         prevVelX = velocityX;
 
-        if (movesDictJson[actionName].contains("SteerKey"))
+        if (actionJson.contains("SteerKey"))
         {
-            for (auto& [steerKeyID, steerKey] : movesDictJson[actionName]["SteerKey"].items())
+            for (auto& [steerKeyID, steerKey] : actionJson["SteerKey"].items())
             {
                 if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -250,9 +241,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (wasDrive && movesDictJson[actionName].contains("DriveSteerKey"))
+        if (wasDrive && actionJson.contains("DriveSteerKey"))
         {
-            for (auto& [steerKeyID, steerKey] : movesDictJson[actionName]["DriveSteerKey"].items())
+            for (auto& [steerKeyID, steerKey] : actionJson["DriveSteerKey"].items())
             {
                 if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -277,9 +268,9 @@ bool Guy::PreFrame(void)
             accelX = 0.0f;
         }
 
-        if (movesDictJson[actionName].contains("SwitchKey"))
+        if (actionJson.contains("SwitchKey"))
         {
-            for (auto& [keyID, key] : movesDictJson[actionName]["SwitchKey"].items())
+            for (auto& [keyID, key] : actionJson["SwitchKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -293,9 +284,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (movesDictJson[actionName].contains("EventKey"))
+        if (actionJson.contains("EventKey"))
         {
-            for (auto& [keyID, key] : movesDictJson[actionName]["EventKey"].items())
+            for (auto& [keyID, key] : actionJson["EventKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -320,9 +311,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (movesDictJson[actionName].contains("ShotKey"))
+        if (actionJson.contains("ShotKey"))
         {
-            for (auto& [keyID, key] : movesDictJson[actionName]["ShotKey"].items())
+            for (auto& [keyID, key] : actionJson["ShotKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -337,10 +328,10 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (movesDictJson[actionName].contains("WorldKey"))
+        if (actionJson.contains("WorldKey"))
         {
             bool tokiToTomare = false;
-            for (auto& [keyID, key] : movesDictJson[actionName]["WorldKey"].items())
+            for (auto& [keyID, key] : actionJson["WorldKey"].items())
             {
                 if ( !tokiToTomare && (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame)) {
                     continue;
@@ -369,9 +360,9 @@ bool Guy::PreFrame(void)
         hurtBoxes.clear();
         renderBoxes.clear();
 
-        if (movesDictJson[actionName].contains("DamageCollisionKey"))
+        if (actionJson.contains("DamageCollisionKey"))
         {
-            for (auto& [hurtBoxID, hurtBox] : movesDictJson[actionName]["DamageCollisionKey"].items())
+            for (auto& [hurtBoxID, hurtBox] : actionJson["DamageCollisionKey"].items())
             {
                 if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -389,20 +380,22 @@ bool Guy::PreFrame(void)
 
                 Box rect;
 
+                int magicHurtBoxID = 8; // i hate you magic array of boxes
+
                 for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                    if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rectsJson, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                    if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rectsJson, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                    if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    if (getRect(rect, rectsJson, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                         hurtBoxes.push_back(rect);
                         renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
                     }
@@ -414,9 +407,9 @@ bool Guy::PreFrame(void)
                 }
             }
         }
-        if (movesDictJson[actionName].contains("PushCollisionKey"))
+        if (actionJson.contains("PushCollisionKey"))
         {
-            for (auto& [pushBoxID, pushBox] : movesDictJson[actionName]["PushCollisionKey"].items())
+            for (auto& [pushBoxID, pushBox] : actionJson["PushCollisionKey"].items())
             {
                 if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -438,9 +431,10 @@ bool Guy::PreFrame(void)
                 }
             }
         }
-        if (movesDictJson[actionName].contains("AttackCollisionKey"))
+
+        if (actionJson.contains("AttackCollisionKey"))
         {
-            for (auto& [hitBoxID, hitBox] : movesDictJson[actionName]["AttackCollisionKey"].items())
+            for (auto& [hitBoxID, hitBox] : actionJson["AttackCollisionKey"].items())
             {
                 if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -476,9 +470,9 @@ bool Guy::PreFrame(void)
 
         // should this fall through and let triggers also happen? prolly
 
-        if (movesDictJson[actionName].contains("TriggerKey"))
+        if (actionJson.contains("TriggerKey"))
         {
-            for (auto& [keyID, key] : movesDictJson[actionName]["TriggerKey"].items())
+            for (auto& [keyID, key] : actionJson["TriggerKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -735,14 +729,77 @@ bool Guy::Push(Guy *pOtherGuy)
                 hasPushed = true;
             }
         }
-        if (pushbox.y < 0) {
-            pushY = std::max(-pushbox.y, pushY);
-            hasPushed = true;
-        }
     }
 
     for ( auto minion : minions ) {
         minion->Push(pOtherGuy);
+    }
+
+    if ( hasPushed ) {
+        posX += pushX;
+        posY += pushY;
+        return true;
+    }
+
+    return false;
+}
+
+bool Guy::WorldPhysics(void)
+{
+    // needs to run after pushboxes computed, after player push?
+    bool hasPushed = false;
+    float pushX = 0;
+    float pushY = 0;
+    bool floorpush = false;
+    touchedWall = false;
+    for (auto pushbox : pushBoxes ) {
+        if (pushbox.y < 0) {
+            pushY = std::max(-pushbox.y, pushY);
+            floorpush = true;
+            hasPushed = true;
+        }
+
+        if (pushbox.x < 0.0 ) {
+            pushX = std::max(-pushbox.x, pushX);
+            touchedWall = true;
+            hasPushed = true;
+        }
+        if (pushbox.x + pushbox.w > 500.0f ) {
+            float diff = -(pushbox.x + pushbox.w - 500.0f);
+            pushX = std::min(diff, pushX);
+            touchedWall = true;
+            hasPushed = true;
+        }
+    }
+
+    landed = false;
+
+    // landing
+    if (floorpush && airborne)
+    {
+        posY = 0.0f;
+        velocityY = 0.0f;
+        accelY = 0.0f;
+        nextAction = 39; // land - need other landing if did air attack?
+
+        if ( resetHitStunOnLand ) {
+            hitStun = 1;
+            resetHitStunOnLand = false;
+        }
+
+        if ( hitStunOnLand > 0 ) {
+            // there's some additional knockdown delay there
+            hitStun += hitStunOnLand + 1 + 30; 
+            hitStunOnLand = 0;
+        }
+
+        airborne = false;
+        landed = true;
+        //log ("landed " + std::to_string(hitStun));
+    }
+
+    for ( auto minion : minions ) {
+        minion->WorldPhysics();
     }
 
     if ( hasPushed ) {
@@ -850,7 +907,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 if (pOpponent) {
                     int moveType = hitEntry["MoveType"];
-                    log("hit id " +hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime) + " moveType " + std::to_string(moveType));
+                    int curveTargetID = hitEntry["CurveTgtID"];
+                    log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
                     pOpponent->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 }
                 canHitID = hitbox.hitID + 1;
@@ -888,17 +946,36 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     // i think this vel wants to apply this frame, lame workaround to get same intensity
     velocityY -= accelY; //
 
+    if (destY > 0 ) {
+        airborne = true;
+    }
+
     nextAction = 205; // HIT_MM, not sure how to pick which
     if (  destY != 0 ) {
-        nextAction = 253; // 246 if hit head? 
+
+        //nextAction = 253; // 246 if head - we should do a pre-histop trsansition there
+        if (destY > destX) {
+            nextAction = 230; // 90
+        } else if (destX > destY * 2.5) {
+            nextAction = 232; // 00
+        } else {
+            nextAction = 231;
+        }
+        // if ((curveTargetID & 0x9) == 0x9) {
+        //     nextAction = 230; // 90
+        // } else if (curveTargetID & 0x1) {
+        //     nextAction = 231; // 45
+        // } else {
+        //     nextAction = 232; // 00
+        // }
     }
 }
 
 void Guy::DoBranchKey(void)
 {
-    if (movesDictJson[actionName].contains("BranchKey"))
+    if (actionJson != nullptr && actionJson.contains("BranchKey"))
     {
-        for (auto& [keyID, key] : movesDictJson[actionName]["BranchKey"].items())
+        for (auto& [keyID, key] : actionJson["BranchKey"].items())
         {
             if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                 continue;
@@ -906,6 +983,8 @@ void Guy::DoBranchKey(void)
 
             bool doBranch = false;
             int branchType = key["Type"];
+            int64_t branchParam0 = key["Param00"];
+            int64_t branchParam1 = key["Param01"];
             int branchAction = key["Action"];
 
             switch (branchType) {
@@ -915,6 +994,21 @@ void Guy::DoBranchKey(void)
                 case 2:
                     if (canHitID >= 0) { // has hit ever this move.. not sure if right
                         doBranch = true;
+                    }
+                    break;
+                case 13:
+                    if (landed) {
+                        doBranch = true;
+                    }
+                    break;
+                case 18:
+                    if ((branchParam0 == -2147483647) && (branchParam1 == 2)) {
+                        // sign change on vel? used for transitioning between rise and fall
+                        if (startsFalling) {
+                            doBranch = true;
+                        }
+                    } else {
+                        log("unknown steer branch");
                     }
                     break;
                 case 29:
@@ -983,7 +1077,7 @@ bool Guy::Frame(void)
 
     }
 
-    if (currentFrame >= (actionFrameDuration - 2) && nextAction == -1)
+    if (!hitStun && currentFrame >= (actionFrameDuration - 2) && nextAction == -1)
     {
         if ( isProjectile ) {
             //currentFrame = 0; // just loop? :/
@@ -991,6 +1085,7 @@ bool Guy::Frame(void)
         } else if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             nextAction = currentAction + 3;
+            airborne = true; // probably should get it thru statuskey?
         }
         else {
             nextAction = 1;
