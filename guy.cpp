@@ -892,8 +892,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 pOtherGuy->hitStunOnLand = floorTime;
 
-                int moveType = hitEntry["MoveType"];
-                int curveTargetID = hitEntry["CurveTgtID"];
+                // int moveType = hitEntry["MoveType"];
+                // int curveTargetID = hitEntry["CurveTgtID"];
                 //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
 
