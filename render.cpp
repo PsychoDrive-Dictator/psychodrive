@@ -4,10 +4,9 @@
 SDL_Window* window = nullptr;
 SDL_GLContext gl_context;
 
-void drawBox( float x, float y, float w, float h, float r, float g, float b)
+void drawQuad(float x, float y, float w, float h, float r, float g, float b, float a)
 {
-    glColor4f(r,g,b, 0.2f);
-
+    glColor4f(r,g,b,a);
     glBegin(GL_QUADS);
 
     glVertex2f(x, y);
@@ -16,9 +15,11 @@ void drawBox( float x, float y, float w, float h, float r, float g, float b)
     glVertex2i(x, y+h);
 
     glEnd();
+}
 
-    glColor4f(r,g,b, 1.0f);
-
+void drawLoop(float x, float y, float w, float h, float r, float g, float b, float a)
+{
+    glColor4f(r,g,b,a);
     glBegin(GL_LINE_LOOP);
 
     glVertex2f(x, y);
@@ -27,6 +28,12 @@ void drawBox( float x, float y, float w, float h, float r, float g, float b)
     glVertex2i(x, y+h);
 
     glEnd();
+}
+
+void drawBox( float x, float y, float w, float h, float r, float g, float b)
+{
+    drawQuad(x,y,w,h,r,g,b,0.2f);
+    drawLoop(x,y,w,h,r,g,b,1.0f);
 }
 
 void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )

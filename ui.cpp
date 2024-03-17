@@ -19,7 +19,11 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Text("vel %f %f", velX, velY);
     ImGui::Text("accel %f %f", accelX, accelY);
     ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
-    ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i warudo %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getWarudo());
+    if (pGuy->getProjectile()) {
+        ImGui::Text("limit category %i hit count %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount() );
+    } else {
+        ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i warudo %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getWarudo());
+    }
     if ( ImGui::Button("destroy") ) { pGuyToDelete = pGuy; }
     ImGui::End();
 

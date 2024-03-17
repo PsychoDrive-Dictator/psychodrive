@@ -58,6 +58,10 @@ public:
     int getComboDamage() { return comboDamage; }
     std::string getName() { return name; }
 
+    bool getProjectile() { return isProjectile; }
+    int getProjHitCount() { return projHitCount; }
+    int getLimitShotCategory() { return limitShotCategory; }
+
     std::vector<Box> *getPushBoxes() { return &pushBoxes; }
     std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
     std::vector<Box> *getHurtBoxes() { return &hurtBoxes; }
@@ -147,9 +151,12 @@ private:
     std::string character;
     Guy *pOpponent = nullptr;
 
+    bool deniedLastBranch = false;
+
     std::vector<Guy*> minions;
     bool isProjectile = false;
     int projHitCount = 0;
+    int limitShotCategory = -1;
     Guy *pParent = nullptr;
 
     nlohmann::json movesDictJson;
