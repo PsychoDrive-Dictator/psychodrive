@@ -1000,6 +1000,7 @@ void Guy::DoBranchKey(void)
             int64_t branchParam0 = key["Param00"];
             int64_t branchParam1 = key["Param01"];
             int64_t branchParam2 = key["Param02"];
+            int64_t branchParam3 = key["Param03"];
             int branchAction = key["Action"];
             int branchFrame = key["ActionFrame"];
 
@@ -1030,6 +1031,11 @@ void Guy::DoBranchKey(void)
                         }
                     } else {
                         log("unknown steer branch");
+                    }
+                    break;
+                case 20:
+                    if (branchParam3 == 1 && !(currentInput & branchParam1)) {
+                        doBranch = true;
                     }
                     break;
                 case 29:
