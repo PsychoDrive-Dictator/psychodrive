@@ -448,7 +448,7 @@ bool Guy::PreFrame(void)
         }
 
         DoHitBoxKey("AttackCollisionKey");
-        DoHitBoxKey("OtherCollisionKey", true);
+        //DoHitBoxKey("OtherCollisionKey", true);
 
         DoBranchKey();
 
