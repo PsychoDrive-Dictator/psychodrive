@@ -140,6 +140,8 @@ bool Guy::PreFrame(void)
         return false;
     }
 
+    hitThisFrame = false;
+
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     bool validAction = namesJson.contains(actionIDString);
     actionName = validAction ? namesJson[actionIDString] : "invalid";
@@ -791,6 +793,7 @@ bool Guy::WorldPhysics(void)
     // landing - not sure about velocity check there, but otherwise we land during buttslam ascent
     if (floorpush && airborne && velocityY < 0) 
     {
+        pushY = 0.0f;
         posY = 0.0f;
         velocityY = 0.0f;
         accelY = 0.0f;
@@ -840,14 +843,15 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 int hitEntryFlag = 0;
 
-                bool otherGuyAirborne = pOtherGuy->posY > 0;
+                bool otherGuyAirborne = pOtherGuy->airborne;
 
-                if (otherGuyAirborne > 0) {
+                if (otherGuyAirborne) {
                     hitEntryFlag |= air;
                 }
                 if (forceCounter && pOtherGuy->comboHits == 0) {
                     hitEntryFlag |= counter;
                 }
+                // this doesn't do the right thing for multi hit moves like hands
                 if (forcePunishCounter && pOtherGuy->comboHits == 0) {
                     hitEntryFlag |= punish_counter;
                 }
@@ -919,13 +923,13 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 pOtherGuy->hitStunOnLand = floorTime;
 
-                if (pOpponent) {
-                    int moveType = hitEntry["MoveType"];
-                    int curveTargetID = hitEntry["CurveTgtID"];
-                    log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
-                    pOpponent->Hit(targetHitStun, destX, destY, destTime, dmgValue);
-                }
+                int moveType = hitEntry["MoveType"];
+                int curveTargetID = hitEntry["CurveTgtID"];
+                log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
+                pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
+
                 canHitID = hitbox.hitID + 1;
+                hitThisFrame = true;
                 retHit = true;
                 break;
             }
@@ -1042,6 +1046,13 @@ void Guy::DoBranchKey(void)
                     if (uniqueCharge) {
                         // probably should check the count somewhere?
                         // probably how jamie drinks work too? not sure
+                        doBranch = true;
+                    }
+                    break;
+                case 37:
+                    // Hit catch vs just hit.. is this one "ever hit" and the other 'hit this frame'?
+                    // or the opposite...?
+                    if (hitThisFrame) {
                         doBranch = true;
                     }
                     break;
