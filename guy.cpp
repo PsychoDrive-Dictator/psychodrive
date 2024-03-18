@@ -427,8 +427,6 @@ bool Guy::PreFrame(void)
             }
         }
 
-        // should this fall through and let triggers also happen? prolly
-
         if (actionJson.contains("TriggerKey"))
         {
             for (auto& [keyID, key] : actionJson["TriggerKey"].items())
@@ -461,7 +459,12 @@ bool Guy::PreFrame(void)
                 }
 
                 auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
+                std::deque<std::pair<std::string,std::string>> vecReverseTriggers;
                 for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
+                {
+                    vecReverseTriggers.push_front(std::make_pair(keyID, key));
+                }
+                for (auto& [keyID, key] : vecReverseTriggers)
                 {
                     int triggerID = atoi(keyID.c_str());
                     std::string actionString = key;
@@ -486,7 +489,6 @@ bool Guy::PreFrame(void)
                         }
                         usinguniquecharge = true;
                     }
-
                     int limitShotCount = trigger["cond_limit_shot_num"];
                     if (limitShotCount) {
                         int count = 0;
@@ -544,6 +546,7 @@ bool Guy::PreFrame(void)
                                 uniqueCharge = 0;
                             }
                             //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                            break; // we found our trigger walking back, blow up the whole group
                         } else {
                             std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
                             auto command = commandsJson[commandNoString]["0"];
@@ -651,10 +654,9 @@ bool Guy::PreFrame(void)
                                     uniqueCharge = 0;
                                 }
                                 //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                                break; // we found our trigger walking back, blow up the whole group
                             }
                         }
-                        // specifically don't break here, i think another trigger can have higher priority
-                        // walking in reverse and breaking would be smarter :-)
                     }
                 }
             }
