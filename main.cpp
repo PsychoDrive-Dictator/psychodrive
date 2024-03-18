@@ -153,9 +153,6 @@ int main(int argc, char**argv)
         bool push = true; // only push the first guy until this actually works
         if (oneframe || !paused) {
             for (auto guy : guysWhoFrame) {
-                guy->UpdateBoxes();
-            }
-            for (auto guy : guysWhoFrame) {
                 if ( push ) {
                     guy->Push(guy->getOpponent());
                     push = false;
