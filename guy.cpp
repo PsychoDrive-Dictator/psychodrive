@@ -758,6 +758,10 @@ void Guy::UpdateBoxes(void)
 
     DoHitBoxKey("AttackCollisionKey");
     //DoHitBoxKey("OtherCollisionKey", true);
+
+    for ( auto minion : minions ) {
+        minion->UpdateBoxes();
+    }
 }
 
 void Guy::Render(void) {
