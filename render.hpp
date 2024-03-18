@@ -19,6 +19,10 @@ struct RenderBox {
     bool di = false;
 };
 
+extern float zoom;
+extern int translateX;
+extern int translateY;
+
 void setRenderState(color clearColor, int sizeX, int sizeY);
 void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ );
 void drawBox(float x, float y, float w, float h, float r, float g, float b);

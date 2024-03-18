@@ -106,11 +106,11 @@ int main(int argc, char**argv)
     initRenderUI();
 
     if ( argc > 1 ) {
-        Guy *pNewGuy = new Guy(argv[1], 100.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        Guy *pNewGuy = new Guy(argv[1], 685.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
         guys.push_back(pNewGuy);
 
         if ( argc > 2 ) {
-            pNewGuy = new Guy(argv[2], 400.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+            pNewGuy = new Guy(argv[2], 765.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
             guys.push_back(pNewGuy);
 
             pNewGuy->setOpponent(guys[0]);
@@ -153,13 +153,13 @@ int main(int argc, char**argv)
         bool push = true; // only push the first guy until this actually works
         if (oneframe || !paused) {
             for (auto guy : guysWhoFrame) {
+                guy->WorldPhysics();
+            }
+            for (auto guy : guysWhoFrame) {
                 if ( push ) {
                     guy->Push(guy->getOpponent());
                     push = false;
                 }
-            }
-            for (auto guy : guysWhoFrame) {
-                guy->WorldPhysics();
             }
             for (auto guy : guysWhoFrame) {
                 guy->CheckHit(guy->getOpponent());
