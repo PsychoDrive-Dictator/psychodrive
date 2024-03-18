@@ -16,6 +16,7 @@ public:
     bool PreFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
+    void UpdateBoxes(void);
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime, int damage);
@@ -212,11 +213,12 @@ private:
     int timeInWarudo = 0;
 
     // getting hit side
+    Guy *pAttacker = nullptr;
     int hitStun = 0;
     bool resetHitStunOnLand = false;
     int hitStunOnLand = 0;
     float hitVelX = 0.0f;
-    float hitVelY = 0.0f;
+    float pushBackThisFrame = 0.0f;
     int hitVelFrames = 0;
     int comboHits = 0;
     int juggleCounter = 0;
