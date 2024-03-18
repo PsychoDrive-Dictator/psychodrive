@@ -82,7 +82,7 @@ SDL_Window* initWindowRender()
     // this somehow takes ages on my home machine so putting it behind a flag - multiple seconds on startup
     const char *pEnv = getenv("ENABLE_CONTROLLER");
     auto SDL_init_flags = SDL_INIT_VIDEO | SDL_INIT_TIMER;
-    if ( pEnv ) SDL_init_flags |= SDL_INIT_GAMECONTROLLER;
+    if ( pEnv && pEnv[0] == '1' ) SDL_init_flags |= SDL_INIT_GAMECONTROLLER;
     if (SDL_Init(SDL_init_flags ) != 0) {
         printf("Error: %s\n", SDL_GetError());
         return nullptr;
