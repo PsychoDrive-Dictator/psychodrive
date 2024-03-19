@@ -15,9 +15,9 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
     pGuy->getVel(velX, velY, accelX, accelY);
-    ImGui::Text("pos %f %f", posX, posY);
+    ImGui::Text("pos %f %f %f", posX, posY, pGuy->getPosX());
     ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
-    ImGui::Text("vel %f %f", velX, velY);
+    ImGui::Text("vel %f %f %f", velX, velY, pGuy->getHitVelX());
     ImGui::Text("accel %f %f", accelX, accelY);
     ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
