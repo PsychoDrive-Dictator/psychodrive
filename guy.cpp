@@ -372,25 +372,51 @@ bool Guy::PreFrame(void)
                     continue;
                 }
 
-                if (key["Type"] == 0)
+                int eventType = key["Type"];
+                int64_t param1 = key["Param01"];
+                int64_t param2 = key["Param02"];
+                int64_t param3 = key["Param03"];
+                int64_t param4 = key["Param04"];
+                //int64_t param5 = key["Param05"];
+
+                switch (eventType)
                 {
-                    float steerForward = fixedToFloat(key["Param02"].get<int>());
-                    float steerBackward = fixedToFloat(key["Param03"].get<int>());
+                    case 0:
+                        {
+                            float steerForward = fixedToFloat(param2);
+                            float steerBackward = fixedToFloat(param3);
 
-                    if (currentInput & FORWARD) {
-                        posX += steerForward;
-                        log("steerForward " + std::to_string(steerForward));
-                    } else if (currentInput & BACK) {
-                        posX += steerBackward;
-                        log("steerBackward " + std::to_string(steerBackward));
-                    }
-
-                } else if (key["Type"] == 1) {
-                    // System event??? :///
-                    int flags = key["Param01"];
-                    log("mystery system event 1, flags " + std::to_string(flags));
-                } else if (key["_IsUNIQUE_UNIQUE_PARAM_05"] == true) {
-                    uniqueCharge = 1;
+                            if (currentInput & FORWARD) {
+                                posX += steerForward;
+                                log("steerForward " + std::to_string(steerForward));
+                            } else if (currentInput & BACK) {
+                                posX += steerBackward;
+                                log("steerBackward " + std::to_string(steerBackward));
+                            }
+                        }
+                        break;
+                    case 1:
+                        log("mystery system event 1, flags " + std::to_string(param1));
+                        break;
+                    case 2:
+                        // this is how to remove frames for the solid puncher install, param2 is -200 for smol booms
+                        break;
+                    case 7:
+                        // honda spirit buff, param345 are 1
+                        // mini sonic break, 234 are 1, 5 is 3
+                        // maaaaaybe
+                        if (param3 == 0) { // set
+                            uniqueCharge = param4;
+                        } else if (param3 == 1) { //add?
+                            uniqueCharge += param4;
+                            // maybe param5 is the max?
+                        }
+                        break;
+                    default:
+                        log("unhandled event, type " + std::to_string(eventType));
+                    case 11:
+                    case 5: //those are kinda everywhere, esp 11
+                        break;
                 }
             }
         }
@@ -1207,10 +1233,12 @@ void Guy::DoBranchKey(void)
                         doBranch = true;
                     }
                     break;
-                case 29:
-                    if (uniqueCharge) {
-                        // probably should check the count somewhere?
-                        // probably how jamie drinks work too? not sure
+                case 29: // unique param
+                    if ((branchParam1 == 0 && uniqueCharge == branchParam3) ||
+                        (branchParam1 == 1 && uniqueCharge > branchParam3)) {
+                        //param 1 can be one.. greater or equals? not sure
+                        // honda spirit, guile puncher
+                        // probably how jamie drinks work too? not sure yet
                         doBranch = true;
                     }
                     break;
@@ -1245,7 +1273,7 @@ void Guy::DoBranchKey(void)
                     break;
                 case 47: // todo incapacitated
                     break;
-                case 52:
+                case 52: // shot count
                     {
                         int count = 0;
                         for ( auto minion : minions ) {
@@ -1282,6 +1310,7 @@ void Guy::DoBranchKey(void)
                     // unclear where we'll hit it so not sure if we need to offset yet
                     currentFrame = branchFrame;
                 } else {
+                    //log("branching to action " + std::to_string(branchAction));
                     nextAction = branchAction;
                 }
                 }
