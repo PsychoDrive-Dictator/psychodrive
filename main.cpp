@@ -150,6 +150,10 @@ int main(int argc, char**argv)
             }
         }
 
+        if (guysWhoFrame.size() == 0) {
+            globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
+        }
+
         bool push = true; // only push the first guy until this actually works
         if (oneframe || !paused) {
             // everyone gets world physics
