@@ -118,9 +118,6 @@ void Guy::BuildMoveListDropdown()
 
 void Guy::Input(int input)
 {
-    if (input == 0 && inputOverride != 0) {
-        input = inputOverride;
-    }
     if (direction < 0) {
         int newMask = 0;
         if (input & BACK) {
@@ -131,6 +128,9 @@ void Guy::Input(int input)
         }
         input &= ~(FORWARD+BACK);
         input |= newMask;
+    }
+    if (input == 0 && inputOverride != 0) {
+        input = inputOverride;
     }
     currentInput = input;
 
@@ -985,6 +985,12 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (forcePunishCounter && pOtherGuy->comboHits == 0) {
                     hitEntryFlag |= punish_counter;
                 }
+                bool otherGuyCanBlock = !otherGuyAirborne && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
+                if (pOtherGuy->blocking || otherGuyCanBlock) {
+                    hitEntryFlag = block;
+                    pOtherGuy->blocking = true;
+                    log(logHits, "block!");
+                }
 
                 std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
                 auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
@@ -1047,15 +1053,17 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 // this is set on honda airborne hands
                 // free hit until falls to ground - implement properly at some point
-                if (dmgType & 8) {
-                    targetHitStun += 500000;
-                    pOtherGuy->resetHitStunOnLand = true;
-                } else {
-                    pOtherGuy->resetHitStunOnLand = false;
+                if (destY > 0)
+                {
+                    if (dmgValue != 0 && dmgType & 8) {
+                        targetHitStun += 500000;
+                        pOtherGuy->resetHitStunOnLand = true;
+                    } else {
+                        pOtherGuy->resetHitStunOnLand = false;
+                    }
+                    pOtherGuy->hitStunOnLand = floorTime;
+                    pOtherGuy->knockDownFrames = downTime;
                 }
-
-                pOtherGuy->hitStunOnLand = floorTime;
-                pOtherGuy->knockDownFrames = downTime;
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
@@ -1065,7 +1073,9 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pOtherGuy->noCounterPush = noZu; // bro it better
 
                 canHitID = hitbox.hitID + 1;
-                hitThisFrame = true;
+                if (!pOtherGuy->blocking) {
+                    hitThisFrame = true;
+                }
                 retHit = true;
                 break;
             }
@@ -1084,10 +1094,14 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
 void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
 {
-    comboHits++;
     comboDamage += damage;
+
+    if (!blocking) {
+        beenHitThisFrame = true;
+        comboHits++;
+    }
+
     hitStun = stun + hitStunAdder;
-    beenHitThisFrame = true;
 
     if (destY > 0 ) {
         airborne = true;
@@ -1112,27 +1126,32 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
         if (destY != 0) {
             velocityY = destY * 4 / (float)destTime;
             accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
+            // i think this vel wants to apply this frame, lame workaround to get same intensity
+            velocityY -= accelY; //
         }
     }
 
-    // i think this vel wants to apply this frame, lame workaround to get same intensity
-    velocityY -= accelY; //
-
-
     // need to figure out if body or head is getting hit here later
 
-    nextAction = 205; // HIT_MM, not sure how to pick which
-    if ( crouching ) {
-        nextAction = 213;
-    }
-    if ((airborne || posY > 0.0) && destY != 0 ) {
+    if (blocking) {
+        nextAction = 161;
+        if (crouching) {
+            nextAction = 175;
+        }
+    } else {
+        nextAction = 205; // HIT_MM, not sure how to pick which
+        if ( crouching ) {
+            nextAction = 213;
+        }
+        if ((airborne || posY > 0.0) && destY != 0 ) {
 
-        if (destY > destX) {
-            nextAction = 251; // 90
-        } else if (destX > destY * 2.5) {
-            nextAction = 253; // 00
-        } else {
-            nextAction = 252; // 45
+            if (destY > destX) {
+                nextAction = 251; // 90
+            } else if (destX > destY * 2.5) {
+                nextAction = 253; // 00
+            } else {
+                nextAction = 252; // 45
+            }
         }
     }
 }
@@ -1390,7 +1409,9 @@ bool Guy::Frame(void)
         nextAction = currentAction - 21;
     }
 
-    // do we want to count down while in hitstop? that may be why we need +1
+    bool recovered = false;
+
+    // first hitstun countdown happens on the same "frame" as hit, before hitstop
     if (hitStun > 0)
     {
         hitStun--;
@@ -1407,9 +1428,11 @@ bool Guy::Frame(void)
                     nextAction = 340;
                     knockedDown = false;
                 }
+            } else {
+                blocking = false;
+                recovered = true;
             }
         }
-
     }
 
     if (currentFrame >= actionFrameDuration && nextAction == -1)
@@ -1521,9 +1544,13 @@ bool Guy::Frame(void)
         }
     }
 
-    if (canMove && comboHits) {
+    if (recovered || (canMove && comboHits)) {
         int advantage = globalFrameCount - pOpponent->recoveryTiming;
-        log(true, "recovered! adv " + std::to_string(advantage) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+        std::string message = "recovered! adv " + std::to_string(advantage);
+        if ( comboHits) {
+            message += " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage);
+        }
+        log(true, message );
         comboHits = 0;
         juggleCounter = 0;
         comboDamage = 0;

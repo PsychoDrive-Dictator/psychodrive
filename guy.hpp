@@ -229,6 +229,7 @@ private:
     bool touchedWall = false;
     bool startsFalling = false;
     bool crouching = false;
+    bool blocking = false;
 
     int landingAdjust = 0;
     int poseStatus = 0;
