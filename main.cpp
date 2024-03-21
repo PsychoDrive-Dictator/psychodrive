@@ -35,6 +35,10 @@ bool paused = false;
 bool oneframe = false;
 int globalFrameCount = 0;
 
+bool recordingInput = false;
+std::vector<int> recordedInput;
+int recordingStartFrame = 0;
+
 std::string readFile(const std::string &fileName)
 {
     std::ifstream ifs(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
@@ -134,6 +138,10 @@ int main(int argc, char**argv)
         globalFrameCount++;
 
         currentInput = getInput( currentInput );
+
+        if (recordingInput) {
+            recordedInput.push_back(currentInput);
+        }
 
         bool hasInput = true;
         for (auto guy : guys) {

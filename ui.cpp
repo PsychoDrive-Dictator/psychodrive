@@ -1,8 +1,12 @@
+#include "imgui_neo_sequencer.h"
+
 #include "guy.hpp"
 #include "ui.hpp"
 #include "main.hpp"
 
+
 #include <string>
+#include <unordered_map>
 
 Guy *pGuyToDelete = nullptr;
 
@@ -55,6 +59,96 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         std::string minionWinName = std::string(windowName) + "'s Minion " + std::to_string(minionID++);
         drawGuyStatusWindow(minionWinName.c_str(), minion);
     }
+}
+
+struct timelineItem {
+    int frame;
+    int input;
+};
+
+void drawInputEditor()
+{
+    int32_t currentFrame = recordedInput.size();
+    if (recordingInput == false) {
+        currentFrame = 0;
+    }
+    static int32_t startFrame = 0;
+    static int32_t endFrame = 1000;
+    //static bool transformOpen = false;
+    static bool doDelete = false;
+
+    static std::unordered_map<int, timelineItem*> mapTimelineItems;
+    static unsigned int recordingProgress = 0;
+
+    unsigned int i = recordingProgress;
+    static int uniqueID = 0;
+    while (i < recordedInput.size()) {
+        int key = 0;
+        while (key < 10)
+        {
+            if (recordedInput[i] & 1<<key) {
+                timelineItem *pNewNote = new timelineItem;
+                *pNewNote = {
+                    (int)i,
+                    1<<key
+                };
+                mapTimelineItems[uniqueID++] = pNewNote;
+            }
+            key++;
+        }
+        i++;
+    }
+    recordingProgress = i;
+
+    ImGui::Begin("input editor");
+    if (ImGui::BeginNeoSequencer("input", &currentFrame, &startFrame, &endFrame, {0, 0},
+                                 ImGuiNeoSequencerFlags_AllowLengthChanging |
+                                 ImGuiNeoSequencerFlags_EnableSelection |
+                                 ImGuiNeoSequencerFlags_Selection_EnableDragging |
+                                 ImGuiNeoSequencerFlags_Selection_EnableDeletion))
+    {
+        int key = 0;
+        while (key < 10)
+        {
+            if (ImGui::BeginNeoTimelineEx(std::to_string(key).c_str()))
+            {
+                for (auto elem : mapTimelineItems)
+                {
+                    if (elem.second->input == 1<<key) {
+                        ImGui::NeoKeyframe(&elem.second->frame);
+                    }
+                }
+                // unsigned int i = 0;
+                // while (i < recordedInput.size()) {
+                //     if (recordedInput[i] & 1<<key) {
+                //         auto index = std::make_pair(i, 1<<key);
+                //         if (!mapTimelineItems.contains(index)) {
+                //             mapTimelineItems[index] = i;
+                //         }
+                //         ImGui::NeoKeyframe(&mapTimelineItems[index]);
+                //     }
+                //     i++;
+                // }
+
+
+                if (doDelete)
+                {
+                    uint32_t count = ImGui::GetNeoKeyframeSelectionSize();
+
+                    ImGui::FrameIndexType * toRemove = new ImGui::FrameIndexType[count];
+
+                    ImGui::GetNeoKeyframeSelection(toRemove);
+
+                    //Delete keyframes from your structure
+                }
+                ImGui::EndNeoTimeLine();
+            }
+            key++;
+        }
+        ImGui::EndNeoSequencer();
+    }
+
+    ImGui::End();
 }
 
 void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQueue)
@@ -142,6 +236,8 @@ void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQu
         pGuyToDelete = nullptr;
     }
 
+    drawInputEditor();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -152,6 +248,7 @@ ImGuiIO& initUI(void)
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     ImGui::StyleColorsDark();
 

@@ -44,6 +44,10 @@ extern bool paused;
 extern bool oneframe;
 extern int globalFrameCount;
 
+extern bool recordingInput;
+extern std::vector<int> recordedInput;
+extern int recordingStartFrame;
+
 extern bool forceCounter;
 extern bool forcePunishCounter;
 extern int hitStunAdder;
