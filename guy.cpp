@@ -1418,6 +1418,8 @@ bool Guy::Frame(void)
             // If done with pre-jump, transition to jump
             nextAction = currentAction + 3;
             airborne = true; // probably should get it thru statuskey?
+        } else if (currentAction == 5) {
+            nextAction = 4; // finish transition to crouch
         } else if (loopCount == -1 || loopCount > 0) {
             currentFrame = loopPoint;
             hasLooped = true;
@@ -1437,10 +1439,11 @@ bool Guy::Frame(void)
     if (nextAction != -1 ) {
         actionCheckCanMove = nextAction;
     }
+    crouching = actionCheckCanMove == 4 || actionCheckCanMove == 5;
     bool movingForward = actionCheckCanMove == 9 || actionCheckCanMove == 10 || actionCheckCanMove == 11;
     bool movingBackward = actionCheckCanMove == 13 || actionCheckCanMove == 14 || actionCheckCanMove == 15;
     if (actionCheckCanMove == 1 || actionCheckCanMove == 2 || actionCheckCanMove == 4 || //stands, crouch
-        movingForward || movingBackward) {
+        movingForward || movingBackward || crouching) {
         canMove = true;
     }
 
@@ -1460,8 +1463,6 @@ bool Guy::Frame(void)
     // Process movement if any
     if ( canMove )
     {
-        crouching = false;
-
         if ( currentInput & 1 ) {
             if ( currentInput & 4 ) {
                 nextAction = 35; // BAS_JUMP_B_START
@@ -1471,8 +1472,10 @@ bool Guy::Frame(void)
                 nextAction = 33; // BAS_JUMP_N_START
             }
         } else if ( currentInput & 2 ) {
-            crouching = true;
-            nextAction = 4; // BAS_CRH_Loop
+            if ( !crouching ) {
+                crouching = true;
+                nextAction = 5; // BAS_STD_CRH
+            }
         } else {
             if ((currentInput & (32+256)) == 32+256) {
                 nextAction = 480; // DPA_STD_START
@@ -1563,6 +1566,10 @@ bool Guy::Frame(void)
             posOffsetY = 0.0f;
 
             canHitID = -1;
+
+            poseStatus = 0; // correct spot?
+            actionStatus = 0;
+            jumpStatus = 0;
         } else {
             currentFrame--; //rewind
         }
@@ -1656,6 +1663,9 @@ void Guy::DoStatusKey(void)
             if ( adjust != 0 ) {
                 landingAdjust = adjust;
             }
+            poseStatus = key["PoseStatus"];
+            actionStatus = key["ActionStatus"];
+            jumpStatus = key["JumpStatus"];
         }
     }
 }
