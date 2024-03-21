@@ -105,14 +105,25 @@ bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  f
     return true;
 }
 
-void Guy::BuildMoveListDropdown()
+void Guy::BuildMoveList()
 {
+    // for UI dropdown selector
     vecMoveList.push_back(strdup("1 no action (obey input)"));
     auto triggerGroupString = to_string_leading_zeroes(0, 3);
     for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
     {
         std::string actionString = key;
         vecMoveList.push_back(strdup(actionString.c_str()));
+    }
+
+    for (auto& [keyID, key] : movesDictJson.items())
+    {
+        int actionID = key["fab"]["ActionID"];
+        int styleID = 0;
+        if (key.contains("_PL_StyleID")) {
+            styleID = key["_PL_StyleID"];
+        }
+        mapMoveStyle[actionID] = styleID;
     }
 }
 
@@ -428,7 +439,19 @@ bool Guy::PreFrame(void)
                         log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
                         break;
                     case 2:
-                        // this is how to remove frames for the solid puncher install, param2 is -200 for smol booms
+                        if (param1 == 0) {
+                            styleInstall = param2;
+                            // what's param3? it's 1 for solid puncher..
+                            styleInstallFrames = param4;
+                        } else if (param1 == 1) {
+                            if (styleInstall > 0) {
+                                styleInstallFrames += param2;
+                            } else {
+                                log(true, "no style install but point deduction?");
+                            }
+                        } else {
+                            log(logUnknowns, "event type 2 param1 " + std::to_string(param1));
+                        }
                         break;
                     case 7:
                         // honda spirit buff, param345 are 1
@@ -446,6 +469,18 @@ bool Guy::PreFrame(void)
                     case 5: //those are kinda everywhere, esp 11
                         break;
                 }
+            }
+        }
+
+        if (styleInstallFrames) {
+            styleInstallFrames--;
+
+            if ( styleInstallFrames < 0) {
+                styleInstallFrames = 0;
+            }
+
+            if (styleInstallFrames == 0) {
+                styleInstall = 0;
             }
         }
 
@@ -549,6 +584,10 @@ void Guy::DoTriggers()
                 int triggerID = atoi(keyID.c_str());
                 std::string actionString = key;
                 int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
+
+                if (mapMoveStyle[actionID] != 0 && mapMoveStyle[actionID] != styleInstall ) {
+                    continue;
+                }
 
                 auto triggerIDString = std::to_string(triggerID);
                 auto actionIDString = to_string_leading_zeroes(actionID, 4);
