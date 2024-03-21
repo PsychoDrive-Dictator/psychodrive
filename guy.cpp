@@ -13,11 +13,11 @@
 #include "render.hpp"
 #include <string>
 
-void parseRootOffset( nlohmann::json& keyJson, int&offsetX, int& offsetY)
+void parseRootOffset( nlohmann::json& keyJson, float&offsetX, float& offsetY)
 {
     if ( keyJson.contains("RootOffset") && keyJson["RootOffset"].contains("X") && keyJson["RootOffset"].contains("Y") ) {
-        offsetX = keyJson["RootOffset"]["X"];
-        offsetY = keyJson["RootOffset"]["Y"];
+        offsetX = keyJson["RootOffset"]["X"].get<int>();
+        offsetY = keyJson["RootOffset"]["Y"].get<int>();
     }
 }
 
@@ -83,7 +83,7 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
     }
 }
 
-bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, int dir)
+bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  float offsetX, float offsetY, int dir)
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
@@ -733,8 +733,8 @@ void Guy::UpdateBoxes(void)
                 continue;
             }
 
-            int rootOffsetX = 0;
-            int rootOffsetY = 0;
+            float rootOffsetX = 0;
+            float rootOffsetY = 0;
             parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY += posY + posOffsetY;
@@ -780,8 +780,8 @@ void Guy::UpdateBoxes(void)
             if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
                 continue;
             }
-            int rootOffsetX = 0;
-            int rootOffsetY = 0;
+            float rootOffsetX = 0;
+            float rootOffsetY = 0;
             parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY += posY + posOffsetY;
@@ -1108,6 +1108,7 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     // need to figure out if body or head is getting hit here later
 
     nextAction = 205; // HIT_MM, not sure how to pick which
+    nextAction = 213; // if crouching
     if ((airborne || posY > 0.0) && destY != 0 ) {
 
         if (destY > destX) {
@@ -1130,8 +1131,8 @@ void Guy::DoHitBoxKey(const char *name, bool domain)
                 continue;
             }
 
-            int rootOffsetX = 0;
-            int rootOffsetY = 0;
+            float rootOffsetX = 0;
+            float rootOffsetY = 0;
             parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY += posY + posOffsetY;
@@ -1494,7 +1495,7 @@ bool Guy::Frame(void)
 
     if (canMove && comboHits) {
         int advantage = globalFrameCount - pOpponent->recoveryTiming;
-        log(true, "recovered! adv " + std::to_string(advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+        log(true, "recovered! adv " + std::to_string(advantage) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
         comboHits = 0;
         juggleCounter = 0;
         comboDamage = 0;
@@ -1559,7 +1560,9 @@ bool Guy::Frame(void)
             accelY = 0;
         }
 
-        if ( posY > 0.0 && !hitStun && !isProjectile ) { // if not grounded, fall to the ground i guess?
+        // if not grounded, fall to the ground i guess?
+        // i don't think this is supposed to be needed, just a crutch for now
+        if ( posY > 0.0 && !hitStun && !isProjectile && accelY == 0.0 ) {
             accelY = -1;
         }
 
