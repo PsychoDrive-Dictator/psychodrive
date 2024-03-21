@@ -19,7 +19,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
     ImGui::Text("vel %f %f %f", velX, velY, pGuy->getHitVelX());
     ImGui::Text("accel %f %f", accelX, accelY);
-    ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
+    ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hurt %" PRIi64 , pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount() );
     } else {
