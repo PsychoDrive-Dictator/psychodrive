@@ -271,6 +271,7 @@ private:
     // hitting side
     int canHitID = -1;
     bool hitThisFrame = false;
+    bool blocked = false;
 
     int warudo = 0;
     int timeInWarudo = 0;
