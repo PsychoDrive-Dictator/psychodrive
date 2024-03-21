@@ -164,6 +164,8 @@ void Guy::UpdateActionData(void)
     if (!actionFrameDataInitialized) {
         //standing has 0 marginframe, pre-jump has -1, crouch -1..
         auto fab = actionJson["fab"];
+        mainFrame = fab["ActionFrame"]["MainFrame"];
+        followFrame = fab["ActionFrame"]["FollowFrame"];
         marginFrame = fab["ActionFrame"]["MarginFrame"];
         actionFrameDuration = fab["Frame"];
         loopPoint = fab["State"]["EndStateParam"];
@@ -366,6 +368,9 @@ bool Guy::PreFrame(void)
             airborne = true; // i think we should go by statusKey instead?
         }
 
+        counterState = false;
+        punishCounterState = false;
+
         if (actionJson.contains("SwitchKey"))
         {
             for (auto& [keyID, key] : actionJson["SwitchKey"].items())
@@ -378,6 +383,12 @@ bool Guy::PreFrame(void)
 
                 if (flag & 0x8000000) {
                     isDrive = true;
+                }
+                if (flag & 0x800000) {
+                    punishCounterState = true;
+                }
+                if (flag & 0x2) {
+                    counterState = true;
                 }
             }
         }
@@ -978,11 +989,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (otherGuyAirborne) {
                     hitEntryFlag |= air;
                 }
-                if (forceCounter && pOtherGuy->comboHits == 0) {
+                if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0)) {
                     hitEntryFlag |= counter;
                 }
-                // this doesn't do the right thing for multi hit moves like hands
-                if (forcePunishCounter && pOtherGuy->comboHits == 0) {
+                // the force from the UI doesn't do the right thing for multi hit moves like hands ATM
+                if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0)) {
                     hitEntryFlag |= punish_counter;
                 }
                 bool otherGuyCanBlock = !otherGuyAirborne && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;

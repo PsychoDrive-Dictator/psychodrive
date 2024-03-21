@@ -236,6 +236,9 @@ private:
     int actionStatus = 0;
     int jumpStatus = 0;
 
+    bool counterState = false;
+    bool punishCounterState = false;
+
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
     float velocityX = 0.0f;
@@ -248,6 +251,8 @@ private:
     bool keepPlace = false;
     int currentFrame = 0;
     int actionFrameDuration = 0;
+    int mainFrame = 0;
+    int followFrame = 0;
     int marginFrame = 0;
     int loopCount = 0;
     int loopPoint = 0;
