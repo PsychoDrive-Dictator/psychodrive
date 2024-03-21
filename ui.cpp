@@ -11,6 +11,12 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Begin(windowName);
     ImGui::Text("name %s moveset %s", pGuy->getName().c_str(), pGuy->getCharacter().c_str());
     ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName().c_str());
+    if (!pGuy->getProjectile()) {
+        const char* states[] = { "stand", "jump", "crouch" };
+        ImGui::Combo("state", pGuy->getInputOverridePtr(), states, IM_ARRAYSIZE(states));
+        std::vector<char *> &vecMoveList = pGuy->getMoveList();
+        ImGui::Combo("neutral action", pGuy->getNeutralMovePtr(), vecMoveList.data(), vecMoveList.size());
+    }
     ImGui::Text("airborne %i", pGuy->getAirborne());
     float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);

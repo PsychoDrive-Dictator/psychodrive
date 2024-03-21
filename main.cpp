@@ -137,7 +137,7 @@ int main(int argc, char**argv)
 
         bool hasInput = true;
         for (auto guy : guys) {
-            guy->Input( hasInput ? currentInput : 2);
+            guy->Input( hasInput ? currentInput : 0);
             hasInput = false;
         }
 
