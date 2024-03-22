@@ -99,10 +99,8 @@ void timelineToInputBuffer(std::deque<int> &inputBuffer)
 
 void drawInputEditor()
 {
-    int32_t currentFrame = recordedInput.size();
-    if (recordingInput == false) {
-        currentFrame = 0;
-    }
+    static int32_t currentFrame = 0;
+
     static int32_t startFrame = 0;
     static int32_t endFrame = 1000;
     //static bool transformOpen = false;
@@ -119,16 +117,22 @@ void drawInputEditor()
             if (recordedInput[i] & 1<<key) {
                 timelineItem *pNewNote = new timelineItem;
                 *pNewNote = {
-                    (int)i,
+                    currentFrame + (int)i-(int)recordingProgress,
                     1<<key
                 };
                 mapTimelineItems[uniqueID++] = pNewNote;
             }
             key++;
         }
+        // advance timeline as we record
+        currentFrame++;
         i++;
     }
     recordingProgress = i;
+
+    if (playingBackInput) {
+        currentFrame = playBackFrame;
+    }
 
     ImGui::Begin("input editor");
     if (ImGui::BeginNeoSequencer("input", &currentFrame, &startFrame, &endFrame, {0, 0},
@@ -148,18 +152,6 @@ void drawInputEditor()
                         ImGui::NeoKeyframe(&elem.second->frame);
                     }
                 }
-                // unsigned int i = 0;
-                // while (i < recordedInput.size()) {
-                //     if (recordedInput[i] & 1<<key) {
-                //         auto index = std::make_pair(i, 1<<key);
-                //         if (!mapTimelineItems.contains(index)) {
-                //             mapTimelineItems[index] = i;
-                //         }
-                //         ImGui::NeoKeyframe(&mapTimelineItems[index]);
-                //     }
-                //     i++;
-                // }
-
 
                 if (doDelete)
                 {

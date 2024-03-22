@@ -641,10 +641,13 @@ namespace ImGui
         const auto viewStart = *start + context.OffsetFrame;
         const auto viewEnd = viewStart + viewWidth;
 
+        // PL snap to current frame
         if (*frame > (int)viewEnd) {
             context.OffsetFrame = *frame - 5;
         }
-
+        if (*frame < (int)viewStart) {
+            context.OffsetFrame = *frame;
+        }
         if (res)
         {
             auto sliderColor = GetStyleNeoSequencerColorVec4(ImGuiNeoSequencerCol_ZoomBarSlider);
