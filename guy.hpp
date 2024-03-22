@@ -68,6 +68,7 @@ public:
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     int getUniqueParam() { return uniqueCharge; }
+    int getInstallFrames() { return styleInstallFrames; }
     std::string getName() { return name; }
     int getPoseStatus() { return poseStatus; }
     int getActionStatus() { return actionStatus; }
@@ -266,6 +267,7 @@ private:
 
     int styleInstall = -1;
     int styleInstallFrames = 0;
+    bool countingDownInstall = false;
 
     int currentInput = 0;
     std::deque<int> inputBuffer;

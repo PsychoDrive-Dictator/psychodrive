@@ -478,11 +478,12 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (styleInstallFrames) {
+        if (countingDownInstall && styleInstallFrames) {
             styleInstallFrames--;
 
             if ( styleInstallFrames < 0) {
                 styleInstallFrames = 0;
+                countingDownInstall = false;
             }
 
             if (styleInstallFrames == 0) {
@@ -1650,6 +1651,11 @@ bool Guy::Frame(void)
         if (currentAction != nextAction) {
             currentAction = nextAction;
             log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace));
+
+            if (styleInstallFrames && !countingDownInstall) {
+                // start counting down on wakeup after install super?
+                countingDownInstall = true;
+            }
        }
 
         if (!keepPlace) {
@@ -1705,8 +1711,10 @@ bool Guy::Frame(void)
         actionFrameDataInitialized = false;
 
         if (deferredAction != 0) {
-            log(true, "weird transition here?");
+            log(true, "eating deferred action! give back sumo spirit?");
         }
+        deferredAction = 0;
+        deferredActionFrame = 0;
     }
 
     if (warudo == 0) {
