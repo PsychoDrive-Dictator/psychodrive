@@ -30,6 +30,11 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
         }
     }
 
+    // commands can have only exc/inc flags?
+    if (okKeyFlags == 0 && okCondFlags == 0) {
+        return true;
+    }
+
     input &= ~(LP+MP+HP+LK+MK+HK);
     input |= (input & (LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed)) >> 6;
     input &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
@@ -642,7 +647,8 @@ void Guy::DoTriggers()
                 }
                 while (i < initialSearch)
                 {
-                    if (okKeyFlags && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
+                    // guile 1112 has 0s everywhere
+                    if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
                     {
                         initialMatch = true;
                     } else if (initialMatch == true) {
@@ -806,6 +812,7 @@ void Guy::UpdateBoxes(void)
 
             bool drive = isDrive || wasDrive;
             bool parry = currentAction >= 480 && currentAction <= 489;
+            // doesn't work for all chars, prolly need to find a system bit like drive
             bool di = currentAction >= 850 && currentAction <= 859;
 
             Box rect;
@@ -1561,9 +1568,10 @@ bool Guy::Frame(void)
                 }
             }
         } else {
-            if ((currentInput & (32+256)) == 32+256) {
-                nextAction = 480; // DPA_STD_START
-            } else if ( currentInput & 4 && !movingBackward ) {
+            // if ((currentInput & (32+256)) == 32+256) {
+            //     nextAction = 480; // DPA_STD_START
+            // } else
+             if ( currentInput & 4 && !movingBackward ) {
                 nextAction = 13; // BAS_BACKWARD_START
             } else if ( currentInput & 8 && !movingForward) {
                 nextAction = 9; // BAS_FORWARD_START
