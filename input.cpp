@@ -77,6 +77,8 @@ int getInput(int currentInput)
                 case SDLK_r:
                     recordingInput = !recordingInput;
                     if (recordingInput == true) {
+                        // so we can easily look for dupes
+                        timelineToInputBuffer(playBackInputBuffer);
                         recordingStartFrame = globalFrameCount;
                         if (playingBackInput) {
                             playingBackInput = false;
@@ -87,6 +89,8 @@ int getInput(int currentInput)
                     playingBackInput = !playingBackInput;
                     if (playingBackInput == true) {
                         timelineToInputBuffer(playBackInputBuffer);
+                    } else {
+                        currentInput = 0;
                     }
                     playBackFrame = 0;
                     break;
