@@ -126,11 +126,11 @@ int main(int argc, char**argv)
     initRenderUI();
 
     if ( argc > 1 ) {
-        Guy *pNewGuy = new Guy(argv[1], 50.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        Guy *pNewGuy = new Guy(argv[1], -350.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
         guys.push_back(pNewGuy);
 
         if ( argc > 2 ) {
-            pNewGuy = new Guy(argv[2], 250.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+            pNewGuy = new Guy(argv[2], -150.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
             guys.push_back(pNewGuy);
 
             pNewGuy->setOpponent(guys[0]);
@@ -244,10 +244,10 @@ int main(int argc, char**argv)
 
         if (resetpos) {
             if (guys.size() > 0 ) {
-                guys[0]->resetPosDebug(50.0f, 0.0f);
+                guys[0]->resetPosDebug(-350.0f, 0.0f);
             }
             if (guys.size() > 1 ) {
-                guys[1]->resetPosDebug(250.0f, 0.0f);
+                guys[1]->resetPosDebug(-150.0f, 0.0f);
             }
         }
 
