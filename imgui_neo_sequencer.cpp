@@ -50,7 +50,7 @@ namespace ImGui
 
         float FilledHeight = 0.0f; // Height of whole sequencer
 
-        float Zoom = 10.0f;
+        float Zoom = 75.0f;
 
         ImGuiID Id;
 
@@ -644,13 +644,13 @@ namespace ImGui
         // PL snap to current frame
         if (*frame > (int)viewEnd) {
             if ( context.HoldingZoomSlider) {
-                *frame = viewStart + viewWidth / 2;
+                *frame = viewStart + viewWidth / 5;
             } else {
                 context.OffsetFrame = *frame - 5;
             }
         } else if (*frame < (int)viewStart) {
             if ( context.HoldingZoomSlider) {
-                *frame = viewStart + viewWidth / 2;
+                *frame = viewStart + viewWidth / 5;
             } else {
                 context.OffsetFrame = *frame;
             }
