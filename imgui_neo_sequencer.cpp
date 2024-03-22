@@ -1373,9 +1373,9 @@ ImGuiNeoSequencerStyle::ImGuiNeoSequencerStyle()
     Colors[ImGuiNeoSequencerCol_FramePointerPressed] = ImVec4{0.98f, 0.08f, 0.08f, 1.00f};
 
     Colors[ImGuiNeoSequencerCol_Keyframe] = ImVec4{0.59f, 0.59f, 0.59f, 0.50f};
-    Colors[ImGuiNeoSequencerCol_KeyframeHovered] = ImVec4{0.98f, 0.39f, 0.36f, 1.00f};
+    Colors[ImGuiNeoSequencerCol_KeyframeHovered] = ImVec4{0.66f, 0.69f, 0.98f, 1.00f};
     Colors[ImGuiNeoSequencerCol_KeyframePressed] = ImVec4{0.98f, 0.39f, 0.36f, 1.00f};
-    Colors[ImGuiNeoSequencerCol_KeyframeSelected] = ImVec4{0.32f, 0.23f, 0.98f, 1.00f};
+    Colors[ImGuiNeoSequencerCol_KeyframeSelected] = ImVec4{0.98f, 0.39f, 0.36f, 1.00f};
 
     Colors[ImGuiNeoSequencerCol_FramePointerLine] = ImVec4{0.98f, 0.98f, 0.98f, 0.8f};
 
