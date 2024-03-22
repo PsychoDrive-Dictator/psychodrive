@@ -36,6 +36,7 @@ bool oneframe = false;
 int globalFrameCount = 0;
 
 bool recordingInput = false;
+bool initialLoading = false;
 std::vector<int> recordedInput;
 int recordingStartFrame = 0;
 
@@ -43,9 +44,17 @@ bool playingBackInput = false;
 std::deque<int> playBackInputBuffer;
 int playBackFrame = 0;
 
+void writeFile(const std::string &fileName, std::string contents)
+{
+    std::ofstream ofs(fileName.c_str(), std::ios::out | std::ios::trunc);
+    if (ofs.is_open()) {
+        ofs.write(contents.c_str(), contents.size());
+    }
+}
+
 std::string readFile(const std::string &fileName)
 {
-    std::ifstream ifs(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+    std::ifstream ifs(fileName.c_str(), std::ios::in | std::ios::ate);
 
     std::ifstream::pos_type fileSize = ifs.tellg();
     if (fileSize < 0)                             
@@ -125,6 +134,12 @@ int main(int argc, char**argv)
             pNewGuy->setOpponent(guys[0]);
             guys[0]->setOpponent(pNewGuy);
         }
+    }
+
+    nlohmann::json inputTimeline = parse_json_file("timeline.json");
+    if (inputTimeline != nullptr) {
+        recordedInput = inputTimeline.get<std::vector<int>>();
+        initialLoading = true;
     }
 
     uint32_t frameStartTime = SDL_GetTicks();
@@ -230,6 +245,11 @@ int main(int argc, char**argv)
 
         resetpos = false;
     }
+
+    // save timeline buffer to disk
+    timelineToInputBuffer(playBackInputBuffer);
+    nlohmann::json jsonInput(playBackInputBuffer);
+    writeFile("timeline.json", nlohmann::to_string(jsonInput));
 
     for (auto guy : guys)
     {
