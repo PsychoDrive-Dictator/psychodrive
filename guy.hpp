@@ -133,6 +133,8 @@ public:
             commonMovesInitialized = true;
         }
 
+        Input(0);
+
         BuildMoveList();
     
         UpdateActionData();
