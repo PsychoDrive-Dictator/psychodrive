@@ -53,6 +53,8 @@ extern bool playingBackInput;
 extern std::deque<int> playBackInputBuffer;
 extern int playBackFrame;
 
+extern bool deleteInputs;
+
 extern bool forceCounter;
 extern bool forcePunishCounter;
 extern int hitStunAdder;

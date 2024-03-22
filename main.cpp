@@ -44,6 +44,8 @@ bool playingBackInput = false;
 std::deque<int> playBackInputBuffer;
 int playBackFrame = 0;
 
+bool deleteInputs = false;
+
 void writeFile(const std::string &fileName, std::string contents)
 {
     std::ofstream ofs(fileName.c_str(), std::ios::out | std::ios::trunc);
