@@ -44,6 +44,8 @@ bool playingBackInput = false;
 std::deque<int> playBackInputBuffer;
 int playBackFrame = 0;
 
+bool limitRate = true;
+
 bool deleteInputs = false;
 
 void writeFile(const std::string &fileName, std::string contents)
@@ -153,7 +155,7 @@ int main(int argc, char**argv)
     {
         const float desiredFrameTimeMS = 1000.0 / 60.0f;
         uint32_t currentTime = SDL_GetTicks();
-        if (currentTime - frameStartTime < desiredFrameTimeMS) {
+        if ((limitRate || !playingBackInput) && currentTime - frameStartTime < desiredFrameTimeMS) {
             const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
             usleep(timeToSleepMS * 1000 - 100);
         }
