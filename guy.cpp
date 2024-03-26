@@ -165,16 +165,24 @@ void Guy::UpdateActionData(void)
     landingAdjust = 0;
 
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
-    bool validAction = namesJson.contains(actionIDString);
-    actionName = validAction ? namesJson[actionIDString] : "invalid";
-
+    commonAction = false;
     actionJson = nullptr;
-    if (commonMovesJson.contains(std::to_string(currentAction))) {
-        actionJson = commonMovesJson[std::to_string(currentAction)];
-        commonAction = true;
-    } else if (movesDictJson.contains(actionName)) {
-        actionJson = movesDictJson[actionName];
-        commonAction = false;
+
+    if (opponentAction) {
+        bool validAction = pOpponent->namesJson.contains(actionIDString);
+        actionName = validAction ? pOpponent->namesJson[actionIDString] : "invalid";
+
+        actionJson = pOpponent->movesDictJson[actionName];
+    } else {
+        bool validAction = namesJson.contains(actionIDString);
+        actionName = validAction ? namesJson[actionIDString] : "invalid";
+
+        if (commonMovesJson.contains(std::to_string(currentAction))) {
+            actionJson = commonMovesJson[std::to_string(currentAction)];
+            commonAction = true;
+        } else if (movesDictJson.contains(actionName)) {
+            actionJson = movesDictJson[actionName];
+        }
     }
 
     if (!actionFrameDataInitialized) {
@@ -209,6 +217,7 @@ bool Guy::PreFrame(void)
     }
 
     hitThisFrame = false;
+    grabbedThisFrame = false;
     blocked = false;
     beenHitThisFrame = false;
     landed = false;
@@ -530,6 +539,38 @@ bool Guy::PreFrame(void)
                     tokiToTomare = false;
                     if (pOpponent ) {
                         pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1);
+                    }
+                }
+            }
+        }
+
+        if (actionJson.contains("LockKey"))
+        {
+            for (auto& [keyID, key] : actionJson["LockKey"].items())
+            {
+                if (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame) {
+                    continue;
+                }
+
+                int type = key["Type"];
+                int param01 = key["Param01"];
+                int param02 = key["Param02"];
+
+                if (type == 1) {
+                    if (pOpponent) {
+                        pOpponent->nextAction = param01;
+                        pOpponent->nextActionOpponentAction = true;
+                        // test
+                        pOpponent->direction = direction;
+                        pOpponent->posX = posX;
+                        pOpponent->posY = posY;
+                    }
+                } else if (type == 2) {
+                    // apply hit DT param 02
+                    std::string hitIDString = to_string_leading_zeroes(param02, 3);
+                    auto hitEntry = hitJson[hitIDString]["common"]["0"]; // going by crowd wisdom there
+                    if (pOpponent) {
+                        pOpponent->ApplyHitEffect(hitEntry, false, true, false, false);
                     }
                 }
             }
@@ -1022,10 +1063,14 @@ bool Guy::CheckHit(Guy *pOtherGuy)
         if (!hitbox.domain && hitbox.hitID < canHitID) {
             continue;
         }
+        if (hitbox.collisionType == 3) {
+            // right now we do nothing with trip guard
+            continue;
+        }
+        bool isGrab = hitbox.collisionType == 2;
         for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
             if (hitbox.domain || doBoxesHit(hitbox.box, hurtbox)) {
                 std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
-
                 int hitEntryFlag = 0;
 
                 if (pOtherGuy->knockedDown && !pOtherGuy->airborne)
@@ -1047,6 +1092,9 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     hitEntryFlag |= punish_counter;
                 }
                 bool otherGuyCanBlock = !otherGuyAirborne && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
+                if (isGrab) {
+                    otherGuyCanBlock = false;
+                }
                 if (pOtherGuy->blocking || otherGuyCanBlock) {
                     hitEntryFlag = block;
                     pOtherGuy->blocking = true;
@@ -1054,96 +1102,44 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     log(logHits, "block!");
                 }
 
-                std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
-                auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
-                int juggleFirst = hitEntry["Juggle1st"];
-                int juggleAdd = hitEntry["JuggleAdd"];
-                int juggleLimit = hitEntry["JuggleLimit"];
-                int hitStun = hitEntry["HitStun"];
-                int destX = hitEntry["MoveDest"]["x"];
-                int destY = hitEntry["MoveDest"]["y"];
-                int destTime = hitEntry["MoveTime"];
-                int dmgValue = hitEntry["DmgValue"];
-                int dmgType = hitEntry["DmgType"];
-                int floorTime = hitEntry["FloorTime"];
-                int downTime = hitEntry["DownTime"];
-                bool noZu = hitEntry["_no_zu"];
-
-                if (wasDrive) {
-                    juggleAdd = 0;
-                    juggleFirst = 0;
-                    juggleLimit += 3;
-                    // trying like that
-                    // supposedly drive attacks dont add to the limit but obey some limit?
-                }
-
-                if (!hitbox.domain && otherGuyAirborne && pOtherGuy->juggleCounter > juggleLimit) {
+                if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
+                    // a grab would whiff if opponent is in blockstun
                     break;
                 }
 
-                // we're hitting for sure after this point, side effects
-                //log("hit! frame " + std::to_string(currentFrame) + " id " + hitIDString + " entry " + hitEntryFlagString);
+                std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
+                auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+                int destX = hitEntry["MoveDest"]["x"];
+                int destY = hitEntry["MoveDest"]["y"];
+                int hitHitStun = hitEntry["HitStun"];
+                int dmgType = hitEntry["DmgType"];
+                // we're hitting for sure after this point (modulo juggle), side effects
 
-                // other guy is going airborne, apply juggle
-                if (!otherGuyAirborne && destY != 0) {
-                    if (pOtherGuy->juggleCounter == 0) {
-                        pOtherGuy->juggleCounter = juggleFirst; // ?
-                    } else {
-                        pOtherGuy->juggleCounter += juggleAdd;
+                // not hitstun for initial grab hit as we dont want to recover during the lock
+                if ( pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.domain) ) {
+                    int hitStopSelf = hitEntry["HitStopOwner"];
+                    if ( hitStopSelf ) {
+                        if (pParent) {
+                            pParent->addWarudo(hitStopSelf+1);
+                        } else {
+                            addWarudo(hitStopSelf+1);
+                        }
                     }
-                }
 
-                // +1 since we don't seem to line up, test with hands, lots of small hits
-                // todo need to move this where +1 isn't needed
-                int hitStopSelf = hitEntry["HitStopOwner"];
-                int hitStopTarget = hitEntry["HitStopTarget"];
-                if ( hitStopSelf ) {
-                    if (pParent) {
-                        pParent->addWarudo(hitStopSelf+1);
-                    } else {
-                        addWarudo(hitStopSelf+1);
+                    pOtherGuy->pAttacker = this;
+
+                    if (isGrab) {
+                        grabbedThisFrame = true;
                     }
-                }
-                if ( hitStopTarget && pOpponent) {
-                    pOpponent->addWarudo(hitStopTarget+1);
-                }
 
-                int targetHitStun = hitStun;
-                if (wasDrive) {
-                    targetHitStun+=4;
-                }
-
-                // like guile 4HK has destY but stays grounded if hits grounded
-                if (!(dmgType & 8) && !pOtherGuy->airborne) {
-                    destY = 0;
-                }
-
-                // this is set on honda airborne hands
-                // free hit until falls to ground - implement properly at some point
-                if (destY > 0)
-                {
-                    if (dmgValue != 0 && dmgType & 8) {
-                        targetHitStun += 500000;
-                        pOtherGuy->resetHitStunOnLand = true;
-                    } else {
-                        pOtherGuy->resetHitStunOnLand = false;
+                    canHitID = hitbox.hitID + 1;
+                    if (!pOtherGuy->blocking) {
+                        hitThisFrame = true;
                     }
-                    pOtherGuy->hitStunOnLand = floorTime;
-                    pOtherGuy->knockDownFrames = downTime;
+                    retHit = true;
+                    log(logHits, "hit type " + std::to_string(hitbox.collisionType) + " id " + std::to_string(hitbox.hitID) + " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType));
                 }
 
-                // int moveType = hitEntry["MoveType"];
-                // int curveTargetID = hitEntry["CurveTgtID"];
-                log(logHits, "hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " hitStun " + std::to_string(hitStun) + " dmgType " + std::to_string(dmgType));
-                pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
-                pOtherGuy->pAttacker = this;
-                pOtherGuy->noCounterPush = noZu; // bro it better
-
-                canHitID = hitbox.hitID + 1;
-                if (!pOtherGuy->blocking) {
-                    hitThisFrame = true;
-                }
-                retHit = true;
                 break;
             }
         }
@@ -1159,16 +1155,80 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     return retHit;
 }
 
-void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
+bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain)
 {
-    comboDamage += damage;
+    int juggleFirst = hitEffect["Juggle1st"];
+    int juggleAdd = hitEffect["JuggleAdd"];
+    int juggleLimit = hitEffect["JuggleLimit"];
+    int hitEntryHitStun = hitEffect["HitStun"];
+    int destX = hitEffect["MoveDest"]["x"];
+    int destY = hitEffect["MoveDest"]["y"];
+    int destTime = hitEffect["MoveTime"];
+    int dmgValue = hitEffect["DmgValue"];
+    int dmgType = hitEffect["DmgType"];
+    int floorTime = hitEffect["FloorTime"];
+    int downTime = hitEffect["DownTime"];
+    bool noZu = hitEffect["_no_zu"];
+    int hitStopTarget = hitEffect["HitStopTarget"];
+    // int moveType = hitEntry["MoveType"];
+    // int curveTargetID = hitEntry["CurveTgtID"];
 
-    if (!blocking) {
+    if (isDrive) {
+        juggleAdd = 0;
+        juggleFirst = 0;
+        juggleLimit += 3;
+    }
+
+    if (!isDomain && airborne && juggleCounter > juggleLimit) {
+        return false;
+    }
+
+    // if going airborne, start counting juggle
+    if (!airborne && destY != 0) {
+        if (juggleCounter == 0) {
+            juggleCounter = juggleFirst; // ?
+        } else {
+            juggleCounter += juggleAdd;
+        }
+    }
+
+    if (hitStopTarget) {
+        addWarudo(hitStopTarget+1);
+    }
+
+    if (isDrive) {
+        hitEntryHitStun += 4;
+    }
+
+    // like guile 4HK has destY but stays grounded if hits grounded
+    if (!(dmgType & 8) && !airborne) {
+        destY = 0;
+    }
+
+    if (destY > 0)
+    {
+        // this is set on honda airborne hands
+        // juggle state, just add a bunch of hitstun
+        if (dmgValue != 0 && dmgType & 8) {
+            hitEntryHitStun += 500000;
+            resetHitStunOnLand = true;
+        } else {
+            resetHitStunOnLand = false;
+        }
+        hitStunOnLand = floorTime;
+        knockDownFrames = downTime;
+    }
+
+    comboDamage += dmgValue;
+
+    if (!blocking && applyHit) {
         beenHitThisFrame = true;
         comboHits++;
     }
 
-    hitStun = stun + hitStunAdder;
+    if (applyHitStun) {
+        hitStun = hitEntryHitStun + hitStunAdder;
+    }
 
     if (destY > 0 ) {
         airborne = true;
@@ -1221,6 +1281,9 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
             }
         }
     }
+
+    noCounterPush = noZu;
+    return true;
 }
 
 void Guy::DoHitBoxKey(const char *name, bool domain)
@@ -1250,12 +1313,10 @@ void Guy::DoHitBoxKey(const char *name, bool domain)
                 if (domain || getRect(rect, rects, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
                     renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
 
-                    if (collisionType != 3) {
-                        int hitEntryID = hitBox["AttackDataListIndex"];
-                        int hitID = hitBox["HitID"];
-                        if (hitEntryID != -1) {
-                            hitBoxes.push_back({rect,hitEntryID,hitID,domain});
-                        }
+                    int hitEntryID = hitBox["AttackDataListIndex"];
+                    int hitID = hitBox["HitID"];
+                    if (hitEntryID != -1) {
+                        hitBoxes.push_back({rect,collisionType,hitEntryID,hitID,domain});
                     }
                 }
             }
@@ -1348,6 +1409,11 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 31: // todo loop count
+                case 36:
+                    if (grabbedThisFrame) {
+                        doBranch = true;
+                    }
+                    break;
                 case 37:
                     // Hit catch vs just hit.. is this one "ever hit" and the other 'hit this frame'?
                     // or the opposite...?
@@ -1394,6 +1460,13 @@ void Guy::DoBranchKey(void)
                             // same? strict equals? aaa
                             doBranch = true;
                         }
+                    }
+                    break;
+                case 63:
+                    // what's the difference between this and 20?
+                    // this is used for backthrow, the other thing for held buttons
+                    if (branchParam2 == 1 && currentInput & branchParam1) {
+                        doBranch = true;
                     }
                     break;
                 default:
@@ -1472,7 +1545,7 @@ bool Guy::Frame(void)
             hitStun += hitStunOnLand + 1 + 30;
             hitStunOnLand = 0;
 
-            nextAction = 350; // combo state
+            nextAction = 350; // combo/bounce state
         }
     }
 
@@ -1663,7 +1736,14 @@ bool Guy::Frame(void)
                 // start counting down on wakeup after install super?
                 countingDownInstall = true;
             }
-       }
+        }
+
+        if (nextActionOpponentAction) {
+            opponentAction = true;
+            nextActionOpponentAction = false;
+        } else {
+            opponentAction = false;
+        }
 
         if (!keepPlace) {
             currentFrame = 0;

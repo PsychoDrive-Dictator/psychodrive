@@ -23,6 +23,7 @@ struct Box {
 
 struct HitBox {
     Box box;
+    int collisionType;
     int hitEntryID;
     int hitID;
     bool domain = false;

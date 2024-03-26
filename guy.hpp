@@ -20,7 +20,7 @@ public:
     void UpdateBoxes(void);
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
-    void Hit(int hitStun, int destX, int destY, int destTime, int damage);
+    bool ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
     void DoBranchKey();
     void DoHitBoxKey(const char *name, bool domain = false);
     void DoStatusKey();
@@ -262,6 +262,8 @@ private:
     int loopCount = 0;
     int loopPoint = 0;
     bool commonAction = false;
+    bool nextActionOpponentAction = false;
+    bool opponentAction = false;
     bool hasLooped = false;
     bool actionFrameDataInitialized = false;
 
@@ -275,6 +277,7 @@ private:
     // hitting side
     int canHitID = -1;
     bool hitThisFrame = false;
+    bool grabbedThisFrame = false;
     bool blocked = false;
 
     int warudo = 0;
