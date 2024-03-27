@@ -21,12 +21,20 @@ struct Box {
     float h;
 };
 
+enum hitBoxType {
+    hit = 1,
+    grab = 2,
+    projectile = 3,
+    domain = 4,
+    destroy_projectile = 5,
+    proximity_guard = 6,
+};
+
 struct HitBox {
     Box box;
-    int collisionType;
+    hitBoxType type;
     int hitEntryID;
     int hitID;
-    bool domain = false;
 };
 
 static inline float randFloat()
