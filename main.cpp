@@ -185,11 +185,12 @@ int main(int argc, char**argv)
             }
         }
 
+        bool firstguy = true;
         for (auto guy : guys) {
             if ( hasInput ) {
-                guy->Input( currentInput);
+                guy->Input( firstguy ? currentInput : 0 );
+                firstguy = false;
             }
-            hasInput = false;
         }
 
         std::vector<Guy *> guysWhoFrame;
