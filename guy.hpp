@@ -235,6 +235,7 @@ private:
     bool startsFalling = false;
     bool crouching = false;
     bool blocking = false;
+    bool bounced = false;
 
     int landingAdjust = 0;
     int prevPoseStatus = 0;
@@ -289,7 +290,6 @@ private:
     int hitStun = 0;
     bool resetHitStunOnLand = false;
     bool resetHitStunOnTransition = false;
-    int hitStunOnLand = 0;
     float hitVelX = 0.0f;
     float hitAccelX = 0.0f;
     float pushBackThisFrame = 0.0f;
@@ -301,6 +301,11 @@ private:
     bool forceKnockDown = false;
     bool isDown = false;
     int knockDownFrames = 0;
+    bool groundBounce = false;
+    float groundBounceVelX = 0.0f;
+    float groundBounceVelY = 0.0f;
+    float groundBounceAccelX = 0.0f;
+    float groundBounceAccelY = 0.0f;
 
     int recoveryTiming = 0;
 

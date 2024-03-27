@@ -1030,6 +1030,15 @@ bool Guy::WorldPhysics(void)
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
 
+    if (!airborne && groundBounce) {
+        log (logTransitions, "ground bounce!");
+        // dont let stuff below see landed/grounded
+        airborne = true;
+        landed = false;
+
+        bounced = true;
+    }
+
     for ( auto minion : minions ) {
         minion->WorldPhysics();
     }
@@ -1049,7 +1058,7 @@ bool Guy::WorldPhysics(void)
         UpdateBoxes();
     }
 
-    if (landed || forceLanding) {
+    if (landed || forceLanding || bounced) {
         // don't update hitboxes before setting posY, the current frame
         // or the box will be too high up as we're still on the falling box
         // see heave donky into lp dp
@@ -1118,6 +1127,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int hitHitStun = hitEntry["HitStun"];
                 int dmgType = hitEntry["DmgType"];
                 int moveType = hitEntry["MoveType"];
+                int attr0 = hitEntry["Attr0"];
                 // we're hitting for sure after this point (modulo juggle), side effects
 
                 // not hitstun for initial grab hit as we dont want to recover during the lock
@@ -1146,6 +1156,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                      " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                      " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                      " moveType " + std::to_string(moveType) );
+                    log(logHits, "attr0 " + std::to_string(attr0));
                 }
 
                 break;
@@ -1178,6 +1189,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     int floorTime = hitEffect["FloorTime"];
     int downTime = hitEffect["DownTime"];
     bool noZu = hitEffect["_no_zu"];
+    bool jimenBound = hitEffect["_jimen_bound"];
     int hitStopTarget = hitEffect["HitStopTarget"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
@@ -1213,17 +1225,17 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         destY = 0;
     }
 
-    if (destY > 0)
+    resetHitStunOnLand = false;
+    resetHitStunOnTransition = false;
+    knockDownFrames = 0;
+    if (destY != 0)
     {
         // this is set on honda airborne hands
         // juggle state, just add a bunch of hitstun
         if (dmgValue != 0 && dmgType & 8) {
             hitEntryHitStun += 500000;
             resetHitStunOnLand = true;
-        } else {
-            resetHitStunOnLand = false;
         }
-        hitStunOnLand = floorTime;
         knockDownFrames = downTime;
     }
 
@@ -1250,18 +1262,31 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         forceKnockDown = true;
     }
 
+    if (jimenBound) {
+        int floorDestX = hitEffect["FloorDest"]["x"];
+        int floorDestY = hitEffect["FloorDest"]["y"];
+        groundBounce = true;
+        groundBounceVelX = direction * floorDestX / (float)floorTime;
+        groundBounceAccelX = -direction * floorDestX / 2.0 / (float)floorTime * 2.0 / (float)floorTime;
+        groundBounceVelX -= groundBounceAccelX;
+
+        groundBounceVelY = floorDestY * 4.0 / (float)floorTime;
+        groundBounceAccelY = floorDestY * -4.0 / (float)floorTime * 2.0 / (float)floorTime;
+        groundBounceVelY -= accelY;
+    }
+
     if (destTime != 0) {
         // assume hit direction is opposite as facing for now, not sure if that's true
         // todo pushback in corner - all destX _must_ be traveled by either side
         if ( destX != 0) {
-            if (!airborne) {
+            if (!airborne && !jimenBound) {
                 int time = destTime;
-                hitVelX = direction * destX * 2 * -1 / (float)time;
-                hitAccelX = direction * destX * 1 / (float)time * 2.0 / (float)time;
+                hitVelX = direction * destX * -2.0 / (float)time;
+                hitAccelX = direction * destX / (float)time * 2.0 / (float)time;
                 hitVelX -= hitAccelX;
             } else {
                 // keep itvel pushback from last grounded hit
-                velocityX = (-destX) / (float)destTime;
+                velocityX = direction * destX / (float)destTime;
             }
         }
 
@@ -1592,15 +1617,23 @@ bool Guy::Frame(void)
             hitStun = 1;
             resetHitStunOnLand = false;
         }
+    }
 
-        if ( hitStunOnLand > 0 ) {
-            // there's some additional knockdown delay there
-            // this is actually supposed to be a bounce
-            hitStun += hitStunOnLand + 1 + 30;
-            hitStunOnLand = 0;
+    if (bounced) {
+        nextAction = 350; // combo/bounce state
 
-            nextAction = 350; // combo/bounce state
-        }
+        velocityX = groundBounceVelX;
+        accelX = groundBounceAccelX;
+        velocityY = groundBounceVelY;
+        accelY = groundBounceAccelY;
+
+        groundBounce = false;
+        groundBounceVelX = 0.0f;
+        groundBounceAccelX = 0.0f;
+        groundBounceVelY = 0.0f;
+        groundBounceAccelY = 0.0f;
+
+        bounced = false;
     }
 
     if (currentAction >= 251 && currentAction <= 253 && nextAction == -1)
