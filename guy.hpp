@@ -298,7 +298,8 @@ private:
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;
-    bool knockedDown = false;
+    bool forceKnockDown = false;
+    bool isDown = false;
     int knockDownFrames = 0;
 
     int recoveryTiming = 0;
