@@ -1513,8 +1513,13 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 20:
-                    if (branchParam3 == 1 && !(currentInput & branchParam1)) {
-                        doBranch = true;
+                    if (branchParam3 == 1 || branchParam3 == 0) { // classic controls? is 0 catchall?
+                        if (branchParam0 == 1 && (currentInput & branchParam1)) {
+                            doBranch = true;
+                        }
+                        if (branchParam0 == 0 && !(currentInput & branchParam1)) {
+                            doBranch = true;
+                        }
                     }
                     break;
                 case 29: // unique param
