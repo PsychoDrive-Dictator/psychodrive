@@ -214,7 +214,7 @@ void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQu
     ImGui::Begin("Psycho Drive", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | 
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
-    const char* chars[] = { "ryu", "honda", "ed", "jp", "guile", "chunli", "dhalsim" };
+    const char* chars[] = { "ryu", "honda", "ed", "jp", "guile", "chunli", "dhalsim", "jamie", "marisa" };
     static int charID = rand() % IM_ARRAYSIZE(chars);
     static float newCharPos = randFloat();
     ImGui::SliderFloat("##newcharpos", &newCharPos, 0.0, 1.0);
