@@ -983,6 +983,9 @@ bool Guy::WorldPhysics(void)
     bool floorpush = false;
     touchedWall = false;
 
+    const float wallDistance = 765.0;
+    const float maxPlayerDistance = 490.0;
+
     if (!noPush) {
         // Floor
 
@@ -996,15 +999,29 @@ bool Guy::WorldPhysics(void)
         // Walls
 
         float x = getPosX();
-        if (x < -765.0 ) {
-            pushX = -(x - -765.0f);
+        if (x < -wallDistance ) {
+            pushX = -(x - -wallDistance);
             touchedWall = true;
             hasPushed = true;
         }
-        if (x > 765.0f ) {
-            pushX = -(x - 765.0f);
+        if (x > wallDistance ) {
+            pushX = -(x - wallDistance);
             touchedWall = true;
             hasPushed = true;
+        }
+
+        if (pOpponent && velocityX) {
+            float opX = pOpponent->getPosX();
+            if (fabsf(opX - x) > maxPlayerDistance) {
+                int directionToOpponent = (int)(opX - x) / abs((int)(opX - x));
+                // if moving away from opponent, obey virtual wall
+                if (directionToOpponent == direction) {
+                    touchedWall = true;
+                    hasPushed = true;
+
+                    pushX = (fabsf(opX - x) - maxPlayerDistance) * direction;
+                }
+            }
         }
     }
 
@@ -1190,6 +1207,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     int downTime = hitEffect["DownTime"];
     bool noZu = hitEffect["_no_zu"];
     bool jimenBound = hitEffect["_jimen_bound"];
+    bool kabeBound = hitEffect["_kabe_bound"];
     int hitStopTarget = hitEffect["HitStopTarget"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
@@ -1265,14 +1283,31 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     if (jimenBound) {
         int floorDestX = hitEffect["FloorDest"]["x"];
         int floorDestY = hitEffect["FloorDest"]["y"];
+
         groundBounce = true;
-        groundBounceVelX = direction * floorDestX / (float)floorTime;
-        groundBounceAccelX = -direction * floorDestX / 2.0 / (float)floorTime * 2.0 / (float)floorTime;
+        groundBounceVelX = -floorDestX / (float)floorTime;
+        groundBounceAccelX = floorDestX / 2.0 / (float)floorTime * 2.0 / (float)floorTime;
         groundBounceVelX -= groundBounceAccelX;
 
         groundBounceVelY = floorDestY * 4.0 / (float)floorTime;
         groundBounceAccelY = floorDestY * -4.0 / (float)floorTime * 2.0 / (float)floorTime;
-        groundBounceVelY -= accelY;
+        groundBounceVelY -= groundBounceAccelY;
+    }
+
+    if (kabeBound) {
+        int wallDestX = hitEffect["WallDest"]["x"];
+        int wallDestY = hitEffect["WallDest"]["y"];
+        int wallTime = hitEffect["WallTime"];
+        wallStopFrames = hitEffect["WallStop"];
+
+        wallBounce = true;
+        wallBounceVelX = -wallDestX / (float)wallTime;
+        //wallBounceAccelX = -direction * wallDestX / 2.0 / (float)wallTime * 2.0 / (float)wallTime;
+        //wallBounceVelX -= wallBounceAccelX;
+
+        wallBounceVelY = wallDestY * 4.0 / (float)wallTime;
+        wallBounceAccelY = wallDestY * -4.0 / (float)wallTime * 2.0 / (float)wallTime;
+        wallBounceVelY -= wallBounceAccelY;
     }
 
     if (destTime != 0) {
@@ -1286,7 +1321,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
                 hitVelX -= hitAccelX;
             } else {
                 // keep itvel pushback from last grounded hit
-                velocityX = direction * destX / (float)destTime;
+                velocityX = -destX / (float)destTime;
             }
         }
 
@@ -1307,7 +1342,9 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         }
     } else {
         //if (dmgType & 3) { // crumple? :/
-        if (moveType == 11) {
+        if (moveType == 13) { // set on wall bounce
+            nextAction = 232;
+        } else if (moveType == 11) {
             nextAction = 277; // back crumple?
         } else if (moveType == 10) {
             nextAction = 276;
@@ -1613,9 +1650,38 @@ bool Guy::Frame(void)
     }
 
     if (landed) {
+        wallBounce = false; // just in case we didn't reach a wall
         if ( resetHitStunOnLand ) {
             hitStun = 1;
             resetHitStunOnLand = false;
+        }
+    }
+
+    if (wallBounce && touchedWall) {
+        wallStopped = true;
+        velocityX = 0.0;
+        velocityY = 0.0;
+        accelX = 0.0;
+        accelY = 0.0f;
+        nextAction = 256;
+    }
+
+    if (wallStopped) {
+        wallStopFrames--;
+        if (wallStopFrames <= 0) {
+            nextAction = 235; // combo/bounce state
+
+            velocityX = wallBounceVelX;
+            accelX = wallBounceAccelX;
+            velocityY = wallBounceVelY;
+            accelY = wallBounceAccelY;
+
+            wallBounce = false;
+            wallStopped = false;
+            wallBounceVelX = 0.0f;
+            wallBounceAccelX = 0.0f;
+            wallBounceVelY = 0.0f;
+            wallBounceAccelY = 0.0f;
         }
     }
 
