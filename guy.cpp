@@ -1477,6 +1477,11 @@ void Guy::DoBranchKey(void)
                         doBranch = true;
                     }
                     break;
+                case 5: // swing.. not hit?
+                    if (canHitID == -1) {
+                        doBranch = true;
+                    }
+                    break;
                 case 11:
                     if (pParent) {
                         if (pParent->currentAction == branchParam0) {
