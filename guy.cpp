@@ -1266,7 +1266,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 canHitID = hitbox.hitID + 1;
                 if (!pOtherGuy->blocking) {
-                    if (hitEntryFlag & punish_counter) {
+                    if (!armor && hitEntryFlag & punish_counter) {
                         punishCounterThisFrame = true;
                     }
                     hitThisFrame = true;
@@ -1322,6 +1322,11 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         return false;
     }
 
+    // like guile 4HK has destY but stays grounded if hits grounded
+    if (!(dmgType & 8) && !airborne) {
+        destY = 0;
+    }
+
     // if going airborne, start counting juggle
     if (!airborne && destY != 0) {
         if (juggleCounter == 0) {
@@ -1337,11 +1342,6 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
 
     if (isDrive) {
         hitEntryHitStun += 4;
-    }
-
-    // like guile 4HK has destY but stays grounded if hits grounded
-    if (!(dmgType & 8) && !airborne) {
-        destY = 0;
     }
 
     resetHitStunOnLand = false;
@@ -1766,7 +1766,13 @@ bool Guy::Frame(void)
         // we'll re-run it in PreFrame
         return false;
     }
+    int curNextAction = nextAction;
+    bool didTrigger = false;
     DoTriggers();
+    if (nextAction != curNextAction) {
+        didTrigger = true;
+    }
+
     DoBranchKey();
 
     currentFrame++;
@@ -2027,12 +2033,17 @@ bool Guy::Frame(void)
     if (deferredAction != 0 && deferredActionFrame == currentFrame) {
         log(logTransitions, "deferred nextAction " + std::to_string(deferredAction));
         nextAction = deferredAction;
+        didTrigger = true;
 
         deferredActionFrame = -1;
         deferredAction = 0;
 
         // don't run triggers again though
         canMove = false;
+    }
+
+    if (didTrigger) {
+        //scaling stuff here?
     }
 
     // Transition
