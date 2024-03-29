@@ -27,7 +27,13 @@ public:
     void DoTriggers();
     bool Frame(void);
 
-    void addWarudo(int w) { warudo += w; }
+    void addWarudo(int w) {
+        if (pParent) {
+            pParent->addWarudo(w);
+            return;
+        }
+        warudo += w;
+    }
 
     std::string getCharacter() { return character; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
@@ -80,7 +86,9 @@ public:
 
     std::vector<Box> *getPushBoxes() { return &pushBoxes; }
     std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
-    std::vector<Box> *getHurtBoxes() { return &hurtBoxes; }
+    std::vector<HurtBox> *getHurtBoxes() { return &hurtBoxes; }
+    std::vector<Box> *getThrowBoxes() { return &throwBoxes; }
+    std::vector<ArmorBox> *getArmorBoxes() { return &armorBoxes; }
 
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
@@ -126,11 +134,13 @@ public:
         commandsJson = parse_json_file(character + "_commands.json");
         chargeJson = parse_json_file(character + "_charge.json");
         hitJson = parse_json_file(character + "_hit.json");
+        atemiJson = parse_json_file(character + "_atemi.json");
 
         static bool commonMovesInitialized = false;
         if (!commonMovesInitialized) {
             commonMovesJson = parse_json_file("common_moves.json");
             commonRectsJson = parse_json_file("common_rects.json");
+            commonAtemiJson = parse_json_file("common_atemi.json");
             commonMovesInitialized = true;
         }
 
@@ -160,6 +170,7 @@ public:
         commandsJson = parent.commandsJson;
         chargeJson = parent.chargeJson;
         hitJson = parent.hitJson;
+        atemiJson = parent.hitJson;
 
         pOpponent = parent.pOpponent;
 
@@ -219,9 +230,11 @@ private:
     nlohmann::json commandsJson;
     nlohmann::json chargeJson;
     nlohmann::json hitJson;
+    nlohmann::json atemiJson;
 
     static nlohmann::json commonMovesJson;
     static nlohmann::json commonRectsJson;
+    static nlohmann::json commonAtemiJson;
 
     std::map<int, int> mapMoveStyle;
 
@@ -316,12 +329,16 @@ private:
     float wallBounceAccelY = 0.0f;
     bool wallStopped = false;
     int wallStopFrames = 0;
+    int currentAtemiID = -1;
+    int atemiHitsLeft = 0;
 
     int recoveryTiming = 0;
 
     std::vector<Box> pushBoxes;
     std::vector<HitBox> hitBoxes;
-    std::vector<Box> hurtBoxes;
+    std::vector<ArmorBox> armorBoxes;
+    std::vector<HurtBox> hurtBoxes;
+    std::vector<Box> throwBoxes;
 
     std::vector<RenderBox> renderBoxes;
 

@@ -37,6 +37,18 @@ struct HitBox {
     int hitID;
 };
 
+struct HurtBox {
+    Box box;
+    bool head;
+    bool body;
+    bool legs;
+};
+
+struct ArmorBox {
+    HurtBox hurtBox;
+    int armorID;
+};
+
 static inline float randFloat()
 {
     float ret = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
