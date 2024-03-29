@@ -437,7 +437,7 @@ bool Guy::PreFrame(void)
                 int64_t param2 = key["Param02"];
                 int64_t param3 = key["Param03"];
                 int64_t param4 = key["Param04"];
-                //int64_t param5 = key["Param05"];
+                int64_t param5 = key["Param05"];
 
                 switch (eventType)
                 {
@@ -481,6 +481,11 @@ bool Guy::PreFrame(void)
                             uniqueCharge = param4;
                         } else if (param3 == 1) { //add?
                             uniqueCharge += param4;
+                            // this feels like a horrible workaround but so far works for
+                            // everything - without it honda hands can charge to 2/3/4 and break
+                            if (param2 == 0 && uniqueCharge > param5) {
+                                uniqueCharge = param5;
+                            }
                         }
                         break;
                     default:
