@@ -218,9 +218,11 @@ bool Guy::PreFrame(void)
     }
 
     hitThisFrame = false;
+    punishCounterThisFrame = false;
     grabbedThisFrame = false;
     blocked = false;
     beenHitThisFrame = false;
+    atemiThisFrame = false;
     landed = false;
     pushBackThisFrame = 0.0f;
 
@@ -1179,7 +1181,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0)) {
                 hitEntryFlag |= punish_counter;
             }
-            bool otherGuyCanBlock = !otherGuyAirborne && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
+            bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
+            bool otherGuyCanBlock = !otherGuyAirborne && !otherGuyHit && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
             if (isGrab) {
                 otherGuyCanBlock = false;
             }
@@ -1228,7 +1231,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     pOtherGuy->currentAtemiID = armorID;
                 }
                 if ( pOtherGuy->currentAtemiID == armorID ) {
-                   pOtherGuy->atemiHitsLeft--;
+                    pOtherGuy->atemiHitsLeft--;
                     if (pOtherGuy->atemiHitsLeft <= 0) {
                         armor = false;
                         if (pOtherGuy->atemiHitsLeft == 0) {
@@ -1238,6 +1241,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                         }
                     } else {
                         // apply gauge effects here
+
+                        pOtherGuy->atemiThisFrame = true;
 
                         addWarudo(armorHitStopHitter+1);
                         pOtherGuy->addWarudo(armorHitStopHitted+1);
@@ -1261,6 +1266,9 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 canHitID = hitbox.hitID + 1;
                 if (!pOtherGuy->blocking) {
+                    if (hitEntryFlag & punish_counter) {
+                        punishCounterThisFrame = true;
+                    }
                     hitThisFrame = true;
                 }
                 retHit = true;
@@ -1300,6 +1308,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     bool noZu = hitEffect["_no_zu"];
     bool jimenBound = hitEffect["_jimen_bound"];
     bool kabeBound = hitEffect["_kabe_bound"];
+    bool kabeTataki = hitEffect["_kabe_tataki"];
     int hitStopTarget = hitEffect["HitStopTarget"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
@@ -1384,9 +1393,17 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         groundBounceVelY = floorDestY * 4.0 / (float)floorTime;
         groundBounceAccelY = floorDestY * -4.0 / (float)floorTime * 2.0 / (float)floorTime;
         groundBounceVelY -= groundBounceAccelY;
+    } else {
+        groundBounce = false;
     }
 
-    if (kabeBound) {
+    wallSplat = false;
+    wallBounce = false;
+    if (kabeTataki) {
+        // this can happen even if you block! blocked DI
+        wallSplat = true;
+        wallStopFrames = hitEffect["WallStop"];
+    } else if (kabeBound) {
         int wallDestX = hitEffect["WallDest"]["x"];
         int wallDestY = hitEffect["WallDest"]["y"];
         int wallTime = hitEffect["WallTime"];
@@ -1617,6 +1634,11 @@ void Guy::DoBranchKey(void)
                         }
                     }
                     break;
+                case 21: // armor
+                    if (atemiThisFrame) {
+                        doBranch = true;
+                    }
+                    break;
                 case 29: // unique param
                     if ((branchParam1 == 0 && uniqueCharge == branchParam3) ||
                         (branchParam1 == 1 && uniqueCharge > branchParam3)) {
@@ -1660,6 +1682,11 @@ void Guy::DoBranchKey(void)
                         doBranch = true;
                     }
                     break;
+                case 46: // counter..
+                    if (branchParam0 == 1 && punishCounterThisFrame) {
+                        doBranch = true;
+                    }
+                    break;
                 case 47: // todo incapacitated
                     break;
                 case 52: // shot count
@@ -1681,7 +1708,11 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 54:
-                    if (touchedOpponent) {
+                    // that isn't right? DIs don't go to (2) on contact
+                    // there's probably a flag that says touch a specific hitbox
+                    // but it works to turn it into counter after armor..
+                    // param0 is 7 ot 32..
+                    if (branchParam0 == 7 && touchedOpponent) {
                         doBranch = true;
                     }
                     break;
@@ -1754,38 +1785,57 @@ bool Guy::Frame(void)
     }
 
     if (landed) {
-        wallBounce = false; // just in case we didn't reach a wall
         if ( resetHitStunOnLand ) {
             hitStun = 1;
             resetHitStunOnLand = false;
         }
     }
 
-    if (wallBounce && touchedWall) {
-        wallStopped = true;
+    if ((wallBounce || wallSplat) && touchedWall) {
+        wallStopped = wallBounce || airborne;
         velocityX = 0.0;
         velocityY = 0.0;
         accelX = 0.0;
         accelY = 0.0f;
-        nextAction = 256;
+        if (wallSplat) {
+            if (airborne) {
+                nextAction = 285;
+            } else {
+                nextAction = 145;
+                // crumple
+                blocking = false;
+                hitStun = 50000;
+                resetHitStunOnTransition = true;
+                wallSplat = false;
+                forceKnockDown = true;
+            }
+        } else {
+            nextAction = 256;
+        }
     }
 
     if (wallStopped) {
         wallStopFrames--;
         if (wallStopFrames <= 0) {
-            nextAction = 235; // combo/bounce state
+            if (wallSplat) {
+                nextAction = 287;
+                wallSplat = false;
+                accelY = -0.6;
+            } else {
+                nextAction = 235; // combo/bounce state
 
-            velocityX = wallBounceVelX;
-            accelX = wallBounceAccelX;
-            velocityY = wallBounceVelY;
-            accelY = wallBounceAccelY;
+                velocityX = wallBounceVelX;
+                accelX = wallBounceAccelX;
+                velocityY = wallBounceVelY;
+                accelY = wallBounceAccelY;
 
-            wallBounce = false;
+                wallBounce = false;
+                wallBounceVelX = 0.0f;
+                wallBounceAccelX = 0.0f;
+                wallBounceVelY = 0.0f;
+                wallBounceAccelY = 0.0f;
+            }
             wallStopped = false;
-            wallBounceVelX = 0.0f;
-            wallBounceAccelX = 0.0f;
-            wallBounceVelY = 0.0f;
-            wallBounceAccelY = 0.0f;
         }
     }
 
@@ -1969,6 +2019,8 @@ bool Guy::Frame(void)
         juggleCounter = 0;
         comboDamage = 0;
         pAttacker = nullptr;
+        wallBounce = false; // just in case we didn't reach a wall
+        wallSplat = false;
     }
 
     // this can be true even if canMove
