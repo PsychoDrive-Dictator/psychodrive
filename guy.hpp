@@ -186,7 +186,8 @@ public:
     std::vector<char *> &getMoveList() { return vecMoveList; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
-
+    int *getInputIDPtr() { return &inputID; }
+    int *getInputListIDPtr() { return &inputListID; }
 private:
     std::string name;
     std::string character;
@@ -212,6 +213,8 @@ private:
     int neutralMove = 0;
 
     int inputOverride = 0;
+    int inputID = 0;
+    int inputListID = 0;
 
     bool deniedLastBranch = false;
 

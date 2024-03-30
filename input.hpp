@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 enum Input
 {
 	NEUTRAL = 0,
@@ -21,4 +23,9 @@ enum Input
 	HK_pressed = 32768,
 };
 
-int getInput(int);
+static const int keyboardID = 0;
+static const int recordingID = 1;
+static const int firstJoystickID = 10;
+extern std::map<int, int> currentInputMap;
+
+void updateInputs(void);

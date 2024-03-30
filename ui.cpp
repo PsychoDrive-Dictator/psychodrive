@@ -3,7 +3,9 @@
 #include "guy.hpp"
 #include "ui.hpp"
 #include "main.hpp"
+#include "input.hpp"
 
+#include <cstdlib>
 
 #include <string>
 #include <unordered_map>
@@ -14,6 +16,15 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
     ImGui::Begin(windowName);
     ImGui::Text("name %s moveset %s", pGuy->getName().c_str(), pGuy->getCharacter().c_str());
+    ImGui::SameLine();
+    std::vector<const char *> vecInputs;
+    std::vector<std::string> vecInputLabels;
+    for (auto i : currentInputMap) {
+        vecInputLabels.push_back( std::to_string(i.first));
+        vecInputs.push_back(vecInputLabels[vecInputLabels.size() -1].c_str());
+    }
+    ImGui::Combo("input", pGuy->getInputListIDPtr(), vecInputs.data(), vecInputs.size());
+    *pGuy->getInputIDPtr() = atoi(vecInputLabels[*pGuy->getInputListIDPtr()].c_str());
     ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName().c_str());
     if (!pGuy->getProjectile()) {
         const char* states[] = { "stand", "jump", "crouch", "not you", "block", "not you", "crouch block" };
@@ -207,7 +218,7 @@ void drawInputEditor()
     ImGui::End();
 }
 
-void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQueue)
+void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
@@ -237,7 +248,9 @@ void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQu
         charID = rand() % IM_ARRAYSIZE(chars);
         newCharPos = randFloat();
     }
-    ImGui::Text("currentInput %d", currentInput);
+    for (auto i : currentInputMap) {
+        ImGui::Text("input %i %i", i.first, i.second);
+    }
     ImGui::SameLine();
     resetpos = resetpos || ImGui::Button("reset positions");
     ImGui::SameLine();
