@@ -1,39 +1,143 @@
+#include <gl3w.h>
+
 #include "render.hpp"
 #include "ui.hpp"
 
 SDL_Window* window = nullptr;
 SDL_GLContext gl_context;
 
-void drawQuad(float x, float y, float w, float h, float r, float g, float b, float a)
-{
-    glColor4f(r,g,b,a);
-    glBegin(GL_QUADS);
+float projMatrix[16];
+float viewMatrix[16];
+GLuint vbo;
+GLuint vao;
+GLuint program;
 
-    glVertex2i(x, y);
-    glVertex2i(x+w, y);
-    glVertex2i(x+w, y+h);
-    glVertex2i(x, y+h);
+const GLuint loc_attrib = 0;
+const GLuint loc_view = 0;
+const GLuint loc_proj = 1;
+const GLuint loc_size = 2;
+const GLuint loc_offset = 3;
+const GLuint loc_color = 4;
 
-    glEnd();
+void crossProduct( float *a, float *b, float *res) {
+ 
+    res[0] = a[1] * b[2]  -  b[1] * a[2];
+    res[1] = a[2] * b[0]  -  b[2] * a[0];
+    res[2] = a[0] * b[1]  -  b[0] * a[1];
 }
 
-void drawLoop(float x, float y, float w, float h, float r, float g, float b, float a)
-{
-    glColor4f(r,g,b,a);
-    glBegin(GL_LINE_LOOP);
+void normalize(float *a) {
+ 
+    float mag = sqrt(a[0] * a[0]  +  a[1] * a[1]  +  a[2] * a[2]);
+ 
+    a[0] /= mag;
+    a[1] /= mag;
+    a[2] /= mag;
+}
 
-    glVertex2i(x, y);
-    glVertex2i(x+w, y);
-    glVertex2i(x+w, y+h);
-    glVertex2i(x, y+h);
-
-    glEnd();
+void setIdentityMatrix( float *mat, int size = 4) {
+ 
+    // fill matrix with 0s
+    for (int i = 0; i < size * size; ++i)
+            mat[i] = 0.0f;
+ 
+    // fill diagonal with 1s
+    for (int i = 0; i < size; ++i)
+        mat[i + i * size] = 1.0f;
+}
+ 
+// a *= b
+void multMatrix(float *a, float *b) {
+ 
+    float res[16];
+ 
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            res[j*4 + i] = 0.0f;
+            for (int k = 0; k < 4; ++k) {
+                res[j*4 + i] += a[k*4 + i] * b[j*4 + k];
+            }
+        }
+    }
+    memcpy(a, res, 16 * sizeof(float));
+ 
+}
+ 
+void setTranslationMatrix(float *mat, float x, float y, float z) {
+ 
+    setIdentityMatrix(mat,4);
+    mat[12] = x;
+    mat[13] = y;
+    mat[14] = z;
+}
+ 
+void buildProjectionMatrix(float fov, float ratio, float nearP, float farP) {
+ 
+    float f = 1.0f / tan (fov * (M_PI / 360.0));
+ 
+    setIdentityMatrix(projMatrix,4);
+ 
+    projMatrix[0] = f / ratio;
+    projMatrix[1 * 4 + 1] = f;
+    projMatrix[2 * 4 + 2] = (farP + nearP) / (nearP - farP);
+    projMatrix[3 * 4 + 2] = (2.0f * farP * nearP) / (nearP - farP);
+    projMatrix[2 * 4 + 3] = -1.0f;
+    projMatrix[3 * 4 + 3] = 0.0f;
+}
+ 
+void setCamera(float posX, float posY, float posZ,
+               float lookAtX, float lookAtY, float lookAtZ) {
+ 
+    float dir[3], right[3], up[3];
+ 
+    up[0] = 0.0f;   up[1] = 1.0f;   up[2] = 0.0f;
+ 
+    dir[0] =  (lookAtX - posX);
+    dir[1] =  (lookAtY - posY);
+    dir[2] =  (lookAtZ - posZ);
+    normalize(dir);
+ 
+    crossProduct(dir,up,right);
+    normalize(right);
+ 
+    crossProduct(right,dir,up);
+    normalize(up);
+ 
+    float aux[16];
+ 
+    viewMatrix[0]  = right[0];
+    viewMatrix[4]  = right[1];
+    viewMatrix[8]  = right[2];
+    viewMatrix[12] = 0.0f;
+ 
+    viewMatrix[1]  = up[0];
+    viewMatrix[5]  = up[1];
+    viewMatrix[9]  = up[2];
+    viewMatrix[13] = 0.0f;
+ 
+    viewMatrix[2]  = -dir[0];
+    viewMatrix[6]  = -dir[1];
+    viewMatrix[10] = -dir[2];
+    viewMatrix[14] =  0.0f;
+ 
+    viewMatrix[3]  = 0.0f;
+    viewMatrix[7]  = 0.0f;
+    viewMatrix[11] = 0.0f;
+    viewMatrix[15] = 1.0f;
+ 
+    setTranslationMatrix(aux, -posX, -posY, -posZ);
+ 
+    multMatrix(viewMatrix, aux);
 }
 
 void drawBox( float x, float y, float w, float h, float r, float g, float b)
 {
-    drawQuad(x,y,w,h,r,g,b,0.2f);
-    drawLoop(x,y,w,h,r,g,b,1.0f);
+    glUniform2f(loc_size, w, h);
+    glUniform2f(loc_offset, x, y);
+    glUniform4f(loc_color, r,g,b,1.0);
+
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
@@ -58,9 +162,52 @@ void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= f
     drawBox( box.x, box.y, box.w, box.h,col.r,col.g,col.b );
 }
 
-float zoom = 1.20;
-int translateX = 960;
-int translateY = -20;
+float zoom = 0.0;
+int translateX = 0.0;
+int translateY = 200.0;
+
+const float SQUARE[] = {
+    0.0f, 1.0f, 0.0,
+    0.0f, 0.0f, 0.0,
+    1.0f, 1.0f, 0.0,
+    1.0f, 0.0f, 0.0,
+};
+
+static GLuint
+compile_shader(GLenum type, const GLchar *source)
+{
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+    GLint param;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &param);
+    if (!param) {
+        GLchar log[4096];
+        glGetShaderInfoLog(shader, sizeof(log), NULL, log);
+        fprintf(stderr, "error: %s: %s\n",
+                type == GL_FRAGMENT_SHADER ? "frag" : "vert", (char *) log);
+        exit(EXIT_FAILURE);
+    }
+    return shader;
+}
+
+static GLuint
+link_program(GLuint vert, GLuint frag)
+{
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vert);
+    glAttachShader(program, frag);
+    glLinkProgram(program);
+    GLint param;
+    glGetProgramiv(program, GL_LINK_STATUS, &param);
+    if (!param) {
+        GLchar log[4096];
+        glGetProgramInfoLog(program, sizeof(log), NULL, log);
+        fprintf(stderr, "error: link: %s\n", (char *) log);
+        exit(EXIT_FAILURE);
+    }
+    return program;
+}
 
 void setRenderState(color clearColor, int sizeX, int sizeY)
 {
@@ -68,16 +215,20 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    glViewport(0, 0, sizeX, sizeY);
     glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0f, sizeX, sizeY, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
+    //glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(0.0f + translateX,sizeY + translateY,0.0f);
-    glScalef(zoom, -zoom, 1.0f);
+    glViewport(0, 0, sizeX, sizeY);
+    buildProjectionMatrix(90.0, (float)sizeX / (float)sizeY, 1.0, 1000.0);
+    setCamera(translateX, translateY, 500.0 - zoom, 0.0, 200.0, 100.0);
+
+
+    glUseProgram(program);
+
+    glUniformMatrix4fv(loc_proj, 1, false, projMatrix);
+    glUniformMatrix4fv(loc_view, 1, false, viewMatrix);
 }
 
 SDL_Window* initWindowRender()
@@ -93,10 +244,12 @@ SDL_Window* initWindowRender()
     }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -112,12 +265,39 @@ SDL_Window* initWindowRender()
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_GL_SetSwapInterval(0);
 
+    if (gl3wInit()) {
+        fprintf(stderr, "gl3w: failed to initialize\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Compile and link OpenGL program */
+    GLuint vert = compile_shader(GL_VERTEX_SHADER, readFile("data/shaders/vert.glsl").c_str());
+    GLuint frag = compile_shader(GL_FRAGMENT_SHADER, readFile("data/shaders/frag.glsl").c_str());
+    program = link_program(vert, frag);
+    glDeleteShader(frag);
+    glDeleteShader(vert);
+
+    /* Prepare vertex buffer object (VBO) */
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(SQUARE), SQUARE, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* Prepare vertrex array object (VAO) */
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glVertexAttribPointer(loc_attrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(loc_attrib);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
     return window;
 }
 
 void initRenderUI(void)
 {
-    const char* glsl_version = "#version 130";
+    const char* glsl_version = "#version 330";
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 }

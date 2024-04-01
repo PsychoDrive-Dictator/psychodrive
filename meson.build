@@ -1,6 +1,6 @@
 project(
   'psychodrive',
-  'cpp',
+  ['c','cpp'],
   version : '0.0.1',
   default_options : ['warning_level=3']
 )
@@ -11,6 +11,7 @@ project_source_files = [
   'ui.cpp',
   'input.cpp',
   'render.cpp',
+  'gl3w.c',
   'imgui/imgui.cpp',
   'imgui/imgui_draw.cpp',
   'imgui/imgui_widgets.cpp',

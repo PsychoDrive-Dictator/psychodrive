@@ -956,8 +956,8 @@ void Guy::Render(void) {
     float x = posX + (posOffsetX * direction);
     float y = posY + posOffsetY;
 
-    drawQuad(x - 8, y - 8, 16, 16, charColorR,charColorG,charColorB,0.8);
-    drawLoop(x - 8, y - 8, 16, 16, 1.0,1.0,1.0,1.0);
+    // drawQuad(x - 8, y - 8, 16, 16, charColorR,charColorG,charColorB,0.8);
+    // drawLoop(x - 8, y - 8, 16, 16, 1.0,1.0,1.0,1.0);
 
     for ( auto minion : minions ) {
         minion->Render();
@@ -1206,6 +1206,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             int dmgType = hitEntry["DmgType"];
             int moveType = hitEntry["MoveType"];
             int attr0 = hitEntry["Attr0"];
+            int hitMark = hitEntry["Hitmark"];
             // we're hitting for sure after this point (modulo juggle), side effects
 
             if (armor && armorID) {
@@ -1276,7 +1277,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                     " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                     " moveType " + std::to_string(moveType) );
-                log(logHits, "attr0 " + std::to_string(attr0));
+                log(logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
             }
         }
         if (retHit) break;

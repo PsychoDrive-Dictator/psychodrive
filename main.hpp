@@ -86,5 +86,6 @@ extern uint32_t globalInputBufferLength;
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 nlohmann::json parse_json_file(const std::string &fileName);
+std::string readFile(const std::string &fileName);
 
 bool doBoxesHit(Box box1, Box box2);
