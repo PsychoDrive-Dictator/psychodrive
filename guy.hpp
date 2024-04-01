@@ -44,6 +44,9 @@ public:
     float getPosX() {
         return posX + (posOffsetX*direction);
     }
+    float getPosY() {
+        return posY;
+    }
 
     void resetPosDebug( float x, float y) {
         posX = x;

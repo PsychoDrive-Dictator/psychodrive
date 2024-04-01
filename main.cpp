@@ -255,6 +255,8 @@ int main(int argc, char**argv)
             guy->Render();
         }
 
+        renderMarkersAndStuff();
+
         if (resetpos) {
             if (guys.size() > 0 ) {
                 guys[0]->resetPosDebug(startPos1, 0.0f);

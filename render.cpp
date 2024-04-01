@@ -2,6 +2,7 @@
 
 #include "render.hpp"
 #include "ui.hpp"
+#include "guy.hpp"
 
 SDL_Window* window = nullptr;
 SDL_GLContext gl_context;
@@ -19,6 +20,7 @@ const GLuint loc_size = 2;
 const GLuint loc_offset = 3;
 const GLuint loc_color = 4;
 const GLuint loc_isgrid = 5;
+const GLuint loc_progress = 6;
 
 void crossProduct( float *a, float *b, float *res) {
  
@@ -176,11 +178,11 @@ const float cube[] = {
     1.0, 1.0, 1.0,
 };
 
-void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b)
+void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b, float a)
 {
     glUniform3f(loc_size, w, h, thickness);
     glUniform3f(loc_offset, x, y, -thickness/2.0);
-    glUniform4f(loc_color, r, g, b, 1.0);
+    glUniform4f(loc_color, r, g, b, a);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, IM_ARRAYSIZE(cube) / 3);
@@ -204,9 +206,9 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,thickness,colorR,colorG,colorB);
+        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,thickness,colorR,colorG,colorB,1.0);
     }
-    drawBox( box.x, box.y, box.w, box.h,thickness,col.r,col.g,col.b );
+    drawBox( box.x, box.y, box.w, box.h,thickness,col.r,col.g,col.b,1.0);
 }
 
 float zoom = 0.0;
@@ -249,6 +251,44 @@ link_program(GLuint vert, GLuint frag)
     return program;
 }
 
+std::vector<HitMarker> vecMarkers;
+
+void addHitMarker(HitMarker newMarker)
+{
+    vecMarkers.push_back(newMarker);
+}
+
+void renderMarkersAndStuff(void)
+{
+    int markerToDelete = -1;
+    glUniform1i(loc_isgrid, 2);
+    for (uint i = 0; i < vecMarkers.size(); i++)
+    {
+        float hitMarkPosX = vecMarkers[i].pOrigin->getPosX() + vecMarkers[i].x;
+        float hitMarkPosY = vecMarkers[i].pOrigin->getPosY() + vecMarkers[i].y;
+        int progress = vecMarkers[i].radius + vecMarkers[i].time + 4;
+        color col = {0.9, 0.4, 0.3};
+        float alpha = 0.9;
+        if (vecMarkers[i].type==2) {
+            col = {0.55, 0.7, 0.8};
+            alpha = 0.75;
+            progress = vecMarkers[i].radius + vecMarkers[i].maxtime / 2 - vecMarkers[i].time;
+        }
+        glUniform1i(loc_progress, progress);
+        drawBox(hitMarkPosX - vecMarkers[i].radius, hitMarkPosY - vecMarkers[i].radius,
+        vecMarkers[i].radius*2, vecMarkers[i].radius*2, vecMarkers[i].radius*2, col.r,col.g,col.b,alpha);
+        if (!vecMarkers[i].pOrigin->getWarudo()) {
+            vecMarkers[i].time++;
+        }
+        if (vecMarkers[i].time > vecMarkers[i].maxtime) {
+            markerToDelete = i;
+        }
+    }
+    if (markerToDelete != -1) {
+        vecMarkers.erase(vecMarkers.begin()+markerToDelete);
+    }
+}
+
 void setRenderState(color clearColor, int sizeX, int sizeY)
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -272,7 +312,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
 
     // render stage
     glUniform1i(loc_isgrid, 1);
-    drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0);
+    drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0);
     glUniform1i(loc_isgrid, 0);
 }
 

@@ -902,7 +902,7 @@ void Guy::UpdateBoxes(void)
                     renderBoxes.push_back({box.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
                 } else {
                     hurtBoxes.push_back(box);
-                    renderBoxes.push_back({box.box, box.head ? 17.5 : 25.0, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    renderBoxes.push_back({box.box, box.head ? 17.5f : 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
                 }
             }
 
@@ -1135,6 +1135,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             for (auto throwBox : *pOtherGuy->getThrowBoxes() ) {
                 if (hitbox.type == domain || doBoxesHit(hitbox.box, throwBox)) {
                     foundBox = true;
+                    hurtBox.box = throwBox;
                     break;
                 }
             }
@@ -1258,6 +1259,21 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if ( !armor && hitStopSelf ) {
                     addWarudo(hitStopSelf+1);
                 }
+
+                float hitMarkerOffsetX = hitbox.box.x - pOtherGuy->getPosX();
+                if (direction > 0) {
+                    hitMarkerOffsetX += hitbox.box.w;
+                }
+                float hitMarkerOffsetY = hitbox.box.y+hitbox.box.h/2 - pOtherGuy->posY;
+                int hitMarkerType = 1;
+                float hitMarkerRadius = 25.0f;
+                if (blocked) {
+                    hitMarkerType = 2;
+                }
+                if (hitEntryFlag & punish_counter) {
+                    hitMarkerRadius = 35.0f;
+                }
+                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
 
                 pOtherGuy->pAttacker = this;
 
