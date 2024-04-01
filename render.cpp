@@ -18,6 +18,7 @@ const GLuint loc_proj = 1;
 const GLuint loc_size = 2;
 const GLuint loc_offset = 3;
 const GLuint loc_color = 4;
+const GLuint loc_isgrid = 5;
 
 void crossProduct( float *a, float *b, float *res) {
  
@@ -130,20 +131,66 @@ void setCamera(float posX, float posY, float posZ,
     multMatrix(viewMatrix, aux);
 }
 
-void drawBox( float x, float y, float w, float h, float r, float g, float b)
+const float cube[] = {
+    // front
+    0.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    1.0, 1.0, 0.0,
+    0.0, 0.0, 0.0,
+    1.0, 1.0, 0.0,
+    0.0, 1.0, 0.0,
+    // back
+    0.0, 0.0, 1.0,
+    1.0, 0.0, 1.0,
+    1.0, 1.0, 1.0,
+    0.0, 0.0, 1.0,
+    1.0, 1.0, 1.0,
+    0.0, 1.0, 1.0,
+    // bottom
+    0.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0,
+    1.0, 0.0, 1.0,
+    // left
+    0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0,
+    0.0, 1.0, 1.0,
+    // right
+    1.0, 0.0, 0.0,
+    1.0, 1.0, 0.0,
+    1.0, 0.0, 1.0,
+    1.0, 1.0, 0.0,
+    1.0, 0.0, 1.0,
+    1.0, 1.0, 1.0,
+    // top
+    0.0, 1.0, 0.0,
+    1.0, 1.0, 0.0,
+    0.0, 1.0, 1.0,
+    1.0, 1.0, 0.0,
+    0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0,
+};
+
+void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b)
 {
-    glUniform2f(loc_size, w, h);
-    glUniform2f(loc_offset, x, y);
-    glUniform4f(loc_color, r,g,b,1.0);
+    glUniform3f(loc_size, w, h, thickness);
+    glUniform3f(loc_offset, x, y, -thickness/2.0);
+    glUniform4f(loc_color, r, g, b, 1.0);
 
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, IM_ARRAYSIZE(cube) / 3);
 }
 
-void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
+void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
 {
     if (isDrive || isParry || isDI ) {
         int driveOffset = 5;
+        thickness += 10;
         float colorR = 0.0;
         float colorG = 0.6;
         float colorB = 0.1;
@@ -157,21 +204,14 @@ void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= f
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,colorR,colorG,colorB);
+        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,thickness,colorR,colorG,colorB);
     }
-    drawBox( box.x, box.y, box.w, box.h,col.r,col.g,col.b );
+    drawBox( box.x, box.y, box.w, box.h,thickness,col.r,col.g,col.b );
 }
 
 float zoom = 0.0;
 int translateX = 0.0;
 int translateY = 200.0;
-
-const float SQUARE[] = {
-    0.0f, 1.0f, 0.0,
-    0.0f, 0.0f, 0.0,
-    1.0f, 1.0f, 0.0,
-    1.0f, 0.0f, 0.0,
-};
 
 static GLuint
 compile_shader(GLenum type, const GLchar *source)
@@ -221,14 +261,19 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     //glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, sizeX, sizeY);
-    buildProjectionMatrix(90.0, (float)sizeX / (float)sizeY, 1.0, 1000.0);
-    setCamera(translateX, translateY, 500.0 - zoom, 0.0, 200.0, 100.0);
+    buildProjectionMatrix(50.0, (float)sizeX / (float)sizeY, 1.0, 1000.0);
+    setCamera(translateX, translateY, 500.0 - zoom, translateX, translateY, -1000.0);
 
 
     glUseProgram(program);
 
     glUniformMatrix4fv(loc_proj, 1, false, projMatrix);
     glUniformMatrix4fv(loc_view, 1, false, viewMatrix);
+
+    // render stage
+    glUniform1i(loc_isgrid, 1);
+    drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0);
+    glUniform1i(loc_isgrid, 0);
 }
 
 SDL_Window* initWindowRender()
@@ -280,7 +325,7 @@ SDL_Window* initWindowRender()
     /* Prepare vertex buffer object (VBO) */
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(SQUARE), SQUARE, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     /* Prepare vertrex array object (VAO) */

@@ -899,17 +899,17 @@ void Guy::UpdateBoxes(void)
             for (auto box : boxes) {
                 if (isArmor) {
                     armorBoxes.push_back({box, armorID});
-                    renderBoxes.push_back({box.box, {0.8,0.5,0.0}, drive,parry,di});
+                    renderBoxes.push_back({box.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
                 } else {
                     hurtBoxes.push_back(box);
-                    renderBoxes.push_back({box.box, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    renderBoxes.push_back({box.box, box.head ? 17.5 : 25.0, {charColorR,charColorG,charColorB}, drive,parry,di});
                 }
             }
 
             for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
                 if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
                     throwBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {0.15,0.20,0.8}, drive,parry,di});
+                    renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
                 }
             }
         }
@@ -932,10 +932,10 @@ void Guy::UpdateBoxes(void)
 
             if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                 pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, {0.8,0.7,0.0}});            
+                renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});            
             } else if (getRect(rect, commonRectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                 pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, {0.8,0.7,0.0}});
+                renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});
             }
         }
     }
@@ -950,7 +950,7 @@ void Guy::UpdateBoxes(void)
 
 void Guy::Render(void) {
     for (auto box : renderBoxes) {
-        drawHitBox(box.box,box.col,box.drive,box.parry,box.di);
+        drawHitBox(box.box,box.thickness,box.col,box.drive,box.parry,box.di);
     }
 
     float x = posX + (posOffsetX * direction);
@@ -1536,8 +1536,13 @@ void Guy::DoHitBoxKey(const char *name)
                     }
                 }
 
+                float thickness = 50.0;
+                if (type == proximity_guard) {
+                    thickness = 5.0;
+                }
+
                 if ((type == domain) || getRect(rect, rects, rectListID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
+                    renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
 
                     int hitEntryID = hitBox["AttackDataListIndex"];
                     int hitID = hitBox["HitID"];

@@ -273,10 +273,10 @@ void updateInputs(void)
             if(event.type == SDL_MOUSEWHEEL)
             {
                 if(event.wheel.y > 0) {
-                    zoom += 100.0;
+                    zoom += 50.0;
                 }
                 if(event.wheel.y < 0) {
-                    zoom -= 100.0;
+                    zoom -= 50.0;
                 }
             }
             static bool mouseLeftPressed = false;
