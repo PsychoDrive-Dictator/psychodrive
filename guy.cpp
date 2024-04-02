@@ -210,7 +210,10 @@ bool Guy::PreFrame(void)
         warudo--;
         // increment the frame we skipped at the beginning of warudo
         if (warudo == 0) {
-            Frame();
+            if (!Frame()) {
+                delete this;
+                return false;
+            }
         }
     }
     if (warudo > 0) {
@@ -396,7 +399,7 @@ bool Guy::PreFrame(void)
         if (prevPosY == 0.0f && posY > 0.0f) {
             airborne = true; // i think we should go by statusKey instead?
         }
-        if (prevPosY > 0.0f && posY == 0.0f) {
+        if (prevPosY > 0.0f && posY - landingAdjust == 0.0f) {
             airborne = false;
             landed = true;
         }
@@ -525,6 +528,7 @@ bool Guy::PreFrame(void)
 
                 // spawn new guy
                 Guy *pNewGuy = new Guy(pParent ? *pParent : *this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
+                pNewGuy->PreFrame();
                 minions.push_back(pNewGuy);
             }
         }
@@ -590,10 +594,6 @@ bool Guy::PreFrame(void)
         
         // steer/etc could have had side effects there
         UpdateBoxes();
-    }
-
-    for ( auto minion : minions ) {
-        minion->PreFrame();
     }
 
     return true;
@@ -942,10 +942,6 @@ void Guy::UpdateBoxes(void)
 
     DoHitBoxKey("AttackCollisionKey");
     DoHitBoxKey("OtherCollisionKey");
-
-    for ( auto minion : minions ) {
-        minion->UpdateBoxes();
-    }
 }
 
 void Guy::Render(void) {
@@ -958,14 +954,11 @@ void Guy::Render(void) {
 
     // drawQuad(x - 8, y - 8, 16, 16, charColorR,charColorG,charColorB,0.8);
     // drawLoop(x - 8, y - 8, 16, 16, 1.0,1.0,1.0,1.0);
-
-    for ( auto minion : minions ) {
-        minion->Render();
-    }
 }
 
 bool Guy::Push(Guy *pOtherGuy)
 {
+    if (warudo) return false;
     if ( !pOtherGuy ) return false;
 
     bool hasPushed = false;
@@ -985,10 +978,6 @@ bool Guy::Push(Guy *pOtherGuy)
                 hasPushed = true;
             }
         }
-    }
-
-    for ( auto minion : minions ) {
-        minion->Push(pOtherGuy);
     }
 
     if ( hasPushed ) {
@@ -1083,8 +1072,8 @@ bool Guy::WorldPhysics(void)
         bounced = true;
     }
 
-    for ( auto minion : minions ) {
-        minion->WorldPhysics();
+    if (landed && forceKnockDown) {
+        isDown = true; // can't let stuff hit us on landing frame - see donkey kick into mp dp
     }
 
     if ( hasPushed ) {
@@ -1114,6 +1103,7 @@ bool Guy::WorldPhysics(void)
 
 bool Guy::CheckHit(Guy *pOtherGuy)
 {
+    if (warudo) return false;
     if ( !pOtherGuy ) return false;
 
     bool retHit = false;
@@ -1297,12 +1287,6 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             }
         }
         if (retHit) break;
-    }
-
-    for ( auto minion : minions ) {
-        if ( minion->CheckHit(pOtherGuy) ) {
-            retHit = true;
-        }
     }
 
     return retHit;
@@ -1786,7 +1770,7 @@ bool Guy::Frame(void)
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers
         // we'll re-run it in PreFrame
-        return false;
+        return true;
     }
     int curNextAction = nextAction;
     bool didTrigger = false;
@@ -2174,16 +2158,6 @@ bool Guy::Frame(void)
     // if we need landing adjust/etc during warudo, need this updated now
     prevPoseStatus = poseStatus;
     DoStatusKey();
-
-    std::vector<Guy*> minionsNotFinished;
-    for ( auto minion : minions ) {
-        if (minion->Frame()) {
-            minionsNotFinished.push_back(minion);
-        } else {
-            delete minion;
-        }
-    }
-    minions = minionsNotFinished;
 
     return true;
 }
