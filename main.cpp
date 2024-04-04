@@ -215,35 +215,6 @@ int main(int argc, char**argv)
             }
         }
 
-        if (replayingGameState) {
-            if (oneframe || !paused) {
-                if (gameStateFrame >= (int)gameStateDump.size()) {
-                    replayingGameState = false;
-                    gameStateFrame = 0;
-                    log("game replay finished, errors: " + std::to_string(replayErrors));
-                } else {
-                    int inputLeft = gameStateDump[gameStateFrame]["players"][0]["currentInput"];
-                    int inputRight = gameStateDump[gameStateFrame]["players"][1]["currentInput"];
-                    inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
-                    inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
-                    currentInputMap[replayLeft] = inputLeft;
-                    currentInputMap[replayRight] = inputRight;
-                }
-            } else {
-                hasInput = false;
-            }
-        }
-
-        for (auto guy : guys) {
-            if ( hasInput ) {
-                int input = 0;
-                if (currentInputMap.count(*guy->getInputIDPtr())) {
-                    input = currentInputMap[*guy->getInputIDPtr()];
-                }
-                guy->Input( input );
-            }
-        }
-
         std::vector<Guy *> everyone;
 
         for (auto guy : guys) {
@@ -292,6 +263,66 @@ int main(int argc, char**argv)
                     push = false;
                 }
             }
+        }
+
+        if (replayingGameState) {
+            if (oneframe || !paused) {
+                static bool firstFrame = true;
+                int targetDumpFrame = gameStateFrame;
+                if (firstFrame) {
+                    firstFrame = false;
+                } else {
+                    float dumpPosXLeft = gameStateDump[targetDumpFrame]["players"][0]["posX"];
+                    float diffLeft = guys[0]->getPosX() - dumpPosXLeft;
+                    float dumpPosXRight = gameStateDump[targetDumpFrame]["players"][1]["posX"];
+                    float diffRight = guys[1]->getPosX() - dumpPosXRight;
+                    if (fabsf(diffLeft) > 0.01 || fabsf(diffRight) > 0.01) {
+                        log("guy 0 pos " + std::to_string(guys[0]->getPosX()) + " game pos " + std::to_string(dumpPosXLeft) + " diff " + std::to_string(diffLeft));
+                        log("guy 1 pos " + std::to_string(guys[1]->getPosX()) + " game pos " + std::to_string(dumpPosXRight) + " diff " + std::to_string(diffRight));
+                        replayErrors++;
+                    }
+                    int actionLeft = gameStateDump[gameStateFrame]["players"][0]["actionID"];
+                    int actionRight = gameStateDump[gameStateFrame]["players"][1]["actionID"];
+                    if (guys[0]->getCurrentAction() != actionLeft || guys[1]->getCurrentAction() != actionRight) {
+                        log("guy 0 action " + std::to_string(guys[0]->getCurrentAction()) + " " + guys[0]->getActionName() + " game action " + std::to_string(actionLeft) + " " + guys[0]->getActionName(actionLeft));
+                        log("guy 1 action " + std::to_string(guys[1]->getCurrentAction()) + " " + guys[1]->getActionName() + " game action " + std::to_string(actionRight) + " " + guys[1]->getActionName(actionRight));
+                        // replayErrors++;
+                    }
+                    gameStateFrame++;
+                }
+            }
+        }
+
+        if (replayingGameState) {
+            if (oneframe || !paused) {
+                if (gameStateFrame >= (int)gameStateDump.size()) {
+                    replayingGameState = false;
+                    gameStateFrame = 0;
+                    log("game replay finished, errors: " + std::to_string(replayErrors));
+                } else {
+                    int inputLeft = gameStateDump[gameStateFrame]["players"][0]["currentInput"];
+                    int inputRight = gameStateDump[gameStateFrame]["players"][1]["currentInput"];
+                    inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
+                    inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
+                    currentInputMap[replayLeft] = inputLeft;
+                    currentInputMap[replayRight] = inputRight;
+                }
+            } else {
+                hasInput = false;
+            }
+        }
+
+        for (auto guy : guys) {
+            if ( hasInput ) {
+                int input = 0;
+                if (currentInputMap.count(*guy->getInputIDPtr())) {
+                    input = currentInputMap[*guy->getInputIDPtr()];
+                }
+                guy->Input( input );
+            }
+        }
+
+        if (oneframe || !paused) { 
             for (auto guy : everyone) {
                 bool die = !guy->Frame();
 
@@ -300,7 +331,6 @@ int main(int argc, char**argv)
                 }
             }
         }
-        oneframe = false;
 
         color clearColor = {0.0,0.0,0.0};
 
@@ -332,38 +362,14 @@ int main(int argc, char**argv)
             }
         }
 
-        if (replayingGameState) {
-            if (oneframe || !paused) {
-                static bool firstFrame = true;
-                int targetDumpFrame = gameStateFrame-1;
-                if (firstFrame) {
-                    targetDumpFrame = gameStateFrame;
-                    firstFrame = false;
-                }
-                float dumpPosXLeft = gameStateDump[targetDumpFrame]["players"][0]["posX"];
-                float diffLeft = guys[0]->getPosX() - dumpPosXLeft;
-                float dumpPosXRight = gameStateDump[targetDumpFrame]["players"][1]["posX"];
-                float diffRight = guys[1]->getPosX() - dumpPosXRight;
-                if (fabsf(diffLeft) > 0.01 || fabsf(diffRight) > 0.01) {
-                    log("guy 0 pos " + std::to_string(guys[0]->getPosX()) + " game pos " + std::to_string(dumpPosXLeft) + " diff " + std::to_string(diffLeft));
-                    log("guy 1 pos " + std::to_string(guys[1]->getPosX()) + " game pos " + std::to_string(dumpPosXRight) + " diff " + std::to_string(diffRight));
-                    paused = true;
-                    replayErrors++;
-                }
-                int actionLeft = gameStateDump[gameStateFrame]["players"][0]["actionID"];
-                int actionRight = gameStateDump[gameStateFrame]["players"][1]["actionID"];
-                if (guys[0]->getCurrentAction() != actionLeft || guys[1]->getCurrentAction() != actionRight) {
-                    log("guy 0 action " + std::to_string(guys[0]->getCurrentAction()) + " " + guys[0]->getActionName() + " game action " + std::to_string(actionLeft) + " " + guys[0]->getActionName(actionLeft));
-                    log("guy 1 action " + std::to_string(guys[1]->getCurrentAction()) + " " + guys[1]->getActionName() + " game action " + std::to_string(actionRight) + " " + guys[1]->getActionName(actionRight));
-                    paused = true;
-                    replayErrors++;
-                }
-                gameStateFrame++;
-            }
-        }
         SDL_GL_SwapWindow(window);
 
         resetpos = false;
+        oneframe = false;
+        static int lasterrorcount = replayErrors;
+        if (lasterrorcount != replayErrors) {
+            paused = true; // cant pause in the middle above
+        }
     }
 
     // save timeline buffer to disk
