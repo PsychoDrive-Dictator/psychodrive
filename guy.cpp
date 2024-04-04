@@ -161,6 +161,14 @@ nlohmann::json Guy::commonMovesJson = nullptr;
 nlohmann::json Guy::commonRectsJson = nullptr;
 nlohmann::json Guy::commonAtemiJson = nullptr;
 
+std::string Guy::getActionName(int actionID)
+{
+    auto actionIDString = to_string_leading_zeroes(actionID, 4);
+    bool validAction = namesJson.contains(actionIDString);
+    std::string ret = validAction ? namesJson[actionIDString] : "invalid";
+    return ret;
+}
+
 void Guy::UpdateActionData(void)
 {
     landingAdjust = 0;

@@ -28,9 +28,12 @@ enum InputID
 	nullInputID = 0,
 	keyboardID = 1,
 	recordingID = 2,
+	replayLeft = 3,
+	replayRight = 4,
 	firstJoystickID = 10,
 };
 
 extern std::map<int, int> currentInputMap;
 
+int addPressBits(int curInput, int prevInput);
 void updateInputs(void);
