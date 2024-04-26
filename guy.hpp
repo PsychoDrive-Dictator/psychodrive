@@ -79,6 +79,7 @@ public:
     int getPoseStatus() { return poseStatus; }
     int getActionStatus() { return actionStatus; }
     int getJumpStatus() { return jumpStatus; }
+    int getLandingAdjust() { return landingAdjust; }
 
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }
