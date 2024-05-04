@@ -636,6 +636,7 @@ void Guy::DoTriggers()
             //int condFlag = key["ConditionFlag"];
             // killbox says "5199 and 5131 are like on hit and on block"
             // but not 5135
+            // todo i can still do JP heavy target combo on whiff so clearly something is not right still
             int condition = key["_Condition"];
             if ( (condition == 5199 || condition == 5131) && canHitID == -1) {
                 continue;
@@ -690,6 +691,24 @@ void Guy::DoTriggers()
                     }
                     if (count >= limitShotCount) {
                         continue;
+                    }
+                }
+
+                int vitalOp = trigger["cond_vital_ope"];
+                if (vitalOp != 0) {
+                    float vitalRatio = (float)health / maxHealth * 100;
+
+                    switch (vitalOp) {
+                        case 2:
+                            if (vitalRatio > trigger["cond_vital_ratio"]) {
+                                // todo figure out exact rounding rules here
+                                continue;
+                            }
+                            break;
+                        default:
+                            log(logUnknowns, "unknown vital op on trigger " + std::to_string(triggerID));
+                            continue;
+                            break;
                     }
                 }
 
@@ -1400,6 +1419,8 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         knockDownFrames = downTime;
     }
 
+    health -= dmgValue; // todo scaling here
+
     comboDamage += dmgValue;
 
     if (!blocking && applyHit) {
@@ -1630,6 +1651,7 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 5: // swing.. not hit?
+                    // todo not always right - JP's 4HK has some extra condition to get into (2)
                     if (canHitID == -1) {
                         doBranch = true;
                     }
@@ -1728,6 +1750,16 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 47: // todo incapacitated
+                    break;
+                case 49: // status, used for at least hitstun - see jp sa3
+                    if (branchParam0 == 1 && branchParam3 == 1) {
+                        // just matching branch in SAA_LV3_START(1) for now
+                        if (pOpponent && pOpponent->hitStun) {
+                            doBranch = true;
+                        }
+                    } else {
+                        log(logUnknowns, "unknown sort of status branch");
+                    }
                     break;
                 case 52: // shot count
                     {
@@ -2083,7 +2115,7 @@ bool Guy::Frame(void)
     }
 
     if (didTrigger) {
-        //scaling stuff here?
+        // todo scaling stuff here?
     }
 
     // Transition
