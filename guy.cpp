@@ -1728,13 +1728,24 @@ void Guy::DoBranchKey(void)
                 case 40:
                     if (pOpponent) {
                         int distX = branchParam2 & 0xFFFF;
-                        int distY = (branchParam2 & 0xFFFF0000) >> 32;
+                        int distY = (branchParam2 & 0xFFFF0000) >> 16;
 
-                        // ughh i guess we need an actual distance between pushboxes or something?
-                        // jp normal ghost has like 60 distX distance - *2 for now just to unblock
-                        if (std::abs(pOpponent->posX - posX) < distX * 2 &&
+                        // todo whole thing feels like a hack and i'm missing something, but it works for angled portal spikes now
+                        int signedDistX = branchParam1 & 0xFFFF;
+                        if (signedDistX > 0x8000) signedDistX = -(0xFFFF - signedDistX);
+
+                        if (std::abs(pOpponent->posX - posX) < distX &&
                             std::abs(pOpponent->posY - posY) < distY) {
-                                doBranch = true;
+                                if (signedDistX != 0 ) {
+                                    int signedDistToOpponentX = pOpponent->posX - posX;
+                                    if (signedDistX > 0 && signedDistToOpponentX > 0 && signedDistToOpponentX < signedDistX ) {
+                                        doBranch = true;
+                                    } else if (signedDistX < 0 && signedDistToOpponentX < 0 && signedDistToOpponentX > signedDistX ) {
+                                        doBranch = true;
+                                    }
+                                } else {
+                                    doBranch = true;
+                                }
                         }
                     }
                     break;
