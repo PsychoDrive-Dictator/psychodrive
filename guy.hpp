@@ -129,6 +129,7 @@ public:
 
     Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)
     {
+        const std::string charPath = "data/chars/";
         character = charName;
         name = character;
         posX = startPosX;
@@ -138,21 +139,21 @@ public:
         charColorG = color.g;
         charColorB = color.b;
 
-        movesDictJson = parse_json_file(character + "_moves.json");
-        rectsJson = parse_json_file(character + "_rects.json");
-        namesJson = parse_json_file(character + "_names.json");
-        triggerGroupsJson = parse_json_file(character + "_trigger_groups.json");
-        triggersJson = parse_json_file(character + "_triggers.json");
-        commandsJson = parse_json_file(character + "_commands.json");
-        chargeJson = parse_json_file(character + "_charge.json");
-        hitJson = parse_json_file(character + "_hit.json");
-        atemiJson = parse_json_file(character + "_atemi.json");
+        movesDictJson = parse_json_file(charPath + character + "_moves.json");
+        rectsJson = parse_json_file(charPath + character + "_rects.json");
+        namesJson = parse_json_file(charPath + character + "_names.json");
+        triggerGroupsJson = parse_json_file(charPath + character + "_trigger_groups.json");
+        triggersJson = parse_json_file(charPath + character + "_triggers.json");
+        commandsJson = parse_json_file(charPath + character + "_commands.json");
+        chargeJson = parse_json_file(charPath + character + "_charge.json");
+        hitJson = parse_json_file(charPath + character + "_hit.json");
+        atemiJson = parse_json_file(charPath + character + "_atemi.json");
 
         static bool commonMovesInitialized = false;
         if (!commonMovesInitialized) {
-            commonMovesJson = parse_json_file("common_moves.json");
-            commonRectsJson = parse_json_file("common_rects.json");
-            commonAtemiJson = parse_json_file("common_atemi.json");
+            commonMovesJson = parse_json_file(charPath + "common_moves.json");
+            commonRectsJson = parse_json_file(charPath + "common_rects.json");
+            commonAtemiJson = parse_json_file(charPath + "common_atemi.json");
             commonMovesInitialized = true;
         }
 
