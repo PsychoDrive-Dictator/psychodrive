@@ -210,9 +210,10 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
     drawBox( box.x, box.y, box.w, box.h,thickness,col.r,col.g,col.b,1.0);
 }
 
-float zoom = 0.0;
+float zoom = 500.0;
+float fov = 50.0;
 int translateX = 0.0;
-int translateY = 200.0;
+int translateY = 150.0;
 
 static GLuint
 compile_shader(GLenum type, const GLchar *source)
@@ -301,7 +302,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, sizeX, sizeY);
     buildProjectionMatrix(50.0, (float)sizeX / (float)sizeY, 1.0, 1000.0);
-    setCamera(translateX, translateY, 500.0 - zoom, translateX, translateY, -1000.0);
+    setCamera(translateX, translateY, zoom, translateX, translateY, -1000.0);
 
 
     glUseProgram(program);

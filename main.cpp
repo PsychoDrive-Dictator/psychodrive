@@ -334,6 +334,20 @@ int main(int argc, char**argv)
 
         color clearColor = {0.0,0.0,0.0};
 
+        // find camera position if we have 2 guys
+        if (guys.size() >= 2) {
+            float distGuys = fabs( guys[1]->getPosX() - guys[0]->getPosX() );
+            distGuys += 50.0; // account for some buffer behind
+            float angleRad = 90 - (fov / 2.0);
+            angleRad *= (M_PI / 360.0);
+            zoom = distGuys / 2.0 / tanf( angleRad );
+            translateX = (guys[1]->getPosX() + guys[0]->getPosX()) / 2.0;
+            zoom = fmax(zoom, 360.0);
+            translateX = fmin(translateX, 550.0);
+            translateX = fmax(translateX, -550.0);
+            //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
+        }
+
         setRenderState(clearColor, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 
         renderUI(io.Framerate, &logQueue);
