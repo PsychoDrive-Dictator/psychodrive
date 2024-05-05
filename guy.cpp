@@ -233,6 +233,7 @@ bool Guy::PreFrame(void)
     grabbedThisFrame = false;
     blocked = false;
     beenHitThisFrame = false;
+    armorThisFrame = false;
     atemiThisFrame = false;
     landed = false;
     pushBackThisFrame = 0.0f;
@@ -876,10 +877,16 @@ void Guy::UpdateBoxes(void)
     hurtBoxes.clear();
     renderBoxes.clear();
     throwBoxes.clear();
-    armorBoxes.clear();
 
     if (actionJson.contains("DamageCollisionKey"))
     {
+        bool drive = isDrive || wasDrive;
+        bool parry = currentAction >= 480 && currentAction <= 489;
+        // doesn't work for all chars, prolly need to find a system bit like drive
+        bool di = currentAction >= 850 && currentAction <= 859;
+
+        std::deque<HurtBox> newHurtBoxes;
+
         for (auto& [hurtBoxID, hurtBox] : actionJson["DamageCollisionKey"].items())
         {
             if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
@@ -888,6 +895,9 @@ void Guy::UpdateBoxes(void)
 
             bool isArmor = hurtBox["_isArm"];
             int armorID = hurtBox["AtemiDataListIndex"];
+            bool isAtemi = hurtBox["_isAtm"];
+            int immune = hurtBox["Immune"];
+            int typeFlags = hurtBox["TypeFlag"];
 
             float rootOffsetX = 0;
             float rootOffsetY = 0;
@@ -895,41 +905,56 @@ void Guy::UpdateBoxes(void)
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY += posY + posOffsetY;
 
-            bool drive = isDrive || wasDrive;
-            bool parry = currentAction >= 480 && currentAction <= 489;
-            // doesn't work for all chars, prolly need to find a system bit like drive
-            bool di = currentAction >= 850 && currentAction <= 859;
 
             Box rect;
             int magicHurtBoxID = 8; // i hate you magic array of boxes
 
             auto rects = commonAction ? commonRectsJson : rectsJson;
 
-            std::vector<HurtBox> boxes;
-
+            HurtBox baseBox;
+            if (isArmor) {
+                baseBox.flags |= armor;
+                baseBox.armorID = armorID;
+            }
+            if (isAtemi) {
+                baseBox.flags |= atemi;
+            }
+            // those are from gelatin's viewer.. why are they not actual flags?
+            // every normal hurtbox has typeFlags == 3 so clearly it's not just flags
+            if (typeFlags == 1) {
+                baseBox.flags |= projectile_invul;
+            }
+            if (typeFlags == 2) {
+                baseBox.flags |= full_strike_invul;
+            }
+            if (immune == 4) {
+                baseBox.flags |= air_strike_invul;
+            }
+            if (immune == 11) {
+                baseBox.flags |= ground_strike_invul;
+            }
             for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
                 if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    boxes.push_back({rect, true, false, false});
+                    HurtBox newBox = baseBox;
+                    newBox.box = rect;
+                    newBox.flags |= head;
+                    newHurtBoxes.push_front(newBox);
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
                 if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    boxes.push_back({rect, false, true, false});
+                    HurtBox newBox = baseBox;
+                    newBox.box = rect;
+                    newBox.flags |= body;
+                    newHurtBoxes.push_front(newBox);
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
                 if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    boxes.push_back({rect, false, false, true});
-                }
-            }
-
-            for (auto box : boxes) {
-                if (isArmor) {
-                    armorBoxes.push_back({box, armorID});
-                    renderBoxes.push_back({box.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
-                } else {
-                    hurtBoxes.push_back(box);
-                    renderBoxes.push_back({box.box, box.head ? 17.5f : 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    HurtBox newBox = baseBox;
+                    newBox.box = rect;
+                    newBox.flags |= legs;
+                    newHurtBoxes.push_front(newBox);
                 }
             }
 
@@ -938,6 +963,19 @@ void Guy::UpdateBoxes(void)
                     throwBoxes.push_back(rect);
                     renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
                 }
+            }
+        }
+
+        // we queued the hurtboxes in newHurtBoxes in reverse order, and now we add them to the real list
+        // hurtboxes at the end of the list are meant to be checked first, and take precedence
+        // basing that off of armor moves having the armor box at the end
+
+        for (auto box : newHurtBoxes) {
+            hurtBoxes.push_back(box);
+            if (box.flags & armor) {
+                renderBoxes.push_back({box.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
+            } else {
+                renderBoxes.push_back({box.box, (box.flags & head) ? 17.5f : 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
             }
         }
     }
@@ -1167,13 +1205,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             continue;
         }
         if (hitbox.type == proximity_guard || hitbox.type == destroy_projectile) {
-            // right now we do nothing with those
+            // todo right now we do nothing with those
             continue;
         }
         bool isGrab = hitbox.type == grab;
         bool foundBox = false;
-        bool armor = false;
-        int armorID = -1;
         HurtBox hurtBox;
 
         if (isGrab) {
@@ -1185,22 +1221,18 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
             }
         } else {
-            for (auto armorBox : *pOtherGuy->getArmorBoxes() ) {
-                if (hitbox.type == domain || doBoxesHit(hitbox.box, armorBox.hurtBox.box)) {
-                    foundBox = true;
-                    hurtBox = armorBox.hurtBox;
-                    armor = true;
-                    armorID = armorBox.armorID;
-                    break;
+            for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
+                if (hitbox.type == hit && hurtbox.flags & full_strike_invul) {
+                    continue;
                 }
-            }
-            if (!foundBox) {
-                for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
-                    if (hitbox.type == domain || doBoxesHit(hitbox.box, hurtbox.box)) {
-                        hurtBox = hurtbox;
-                        foundBox = true;
-                        break;
-                    }
+                if (hitbox.type == projectile && hurtbox.flags & projectile_invul) {
+                    continue;
+                }
+                // todo air/ground strike invul here
+                if (hitbox.type == domain || doBoxesHit(hitbox.box, hurtbox.box)) {
+                    hurtBox = hurtbox;
+                    foundBox = true;
+                    break;
                 }
             }
         }
@@ -1210,8 +1242,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             int hitEntryFlag = 0;
 
             if (pOtherGuy->isDown) {
-                // need to check for otg capability there i guess?
-                // and cotninue instead of breaking!!!
+                // todo need to check for otg capability there i guess?
+                // and cotninue instead of breaking!!! move up in the for hurtbox loop
                 break;
             }
 
@@ -1255,8 +1287,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             int hitMark = hitEntry["Hitmark"];
             // we're hitting for sure after this point (modulo juggle), side effects
 
-            if (armor && armorID) {
-                auto atemiIDString = std::to_string(armorID);
+            bool hitArmor = false;
+            if (hurtBox.flags & armor && hurtBox.armorID) {
+                hitArmor = true;
+                auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
                 nlohmann::json atemi = nullptr;
                 if (pOtherGuy->atemiJson.contains(atemiIDString)) {
@@ -1273,15 +1307,15 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int armorBreakHitStopHitted = atemi["TargetStopShell"]; // ??
                 int armorBreakHitStopHitter = atemi["OwnerStopShell"];
 
-                if (pOtherGuy->currentAtemiID != armorID) {
-                    pOtherGuy->atemiHitsLeft = atemi["ResistLimit"].get<int>() + 1;
-                    pOtherGuy->currentAtemiID = armorID;
+                if (pOtherGuy->currentArmorID != hurtBox.armorID) {
+                    pOtherGuy->armorHitsLeft = atemi["ResistLimit"].get<int>() + 1;
+                    pOtherGuy->currentArmorID = hurtBox.armorID;
                 }
-                if ( pOtherGuy->currentAtemiID == armorID ) {
-                    pOtherGuy->atemiHitsLeft--;
-                    if (pOtherGuy->atemiHitsLeft <= 0) {
-                        armor = false;
-                        if (pOtherGuy->atemiHitsLeft == 0) {
+                if ( pOtherGuy->currentArmorID == hurtBox.armorID ) {
+                    pOtherGuy->armorHitsLeft--;
+                    if (pOtherGuy->armorHitsLeft <= 0) {
+                        hitArmor = false;
+                        if (pOtherGuy->armorHitsLeft == 0) {
                             log(logHits, "armor break!");
                             addWarudo(armorBreakHitStopHitter+1);
                             pOtherGuy->addWarudo(armorBreakHitStopHitted+1);
@@ -1289,8 +1323,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     } else {
                         // apply gauge effects here
 
-                        pOtherGuy->atemiThisFrame = true;
+                        pOtherGuy->armorThisFrame = true;
 
+                        // todo i think this is wrong, it needs to add to the normal hitstop?
+                        // there's TargetStopAdd too, figure it out at some point
                         addWarudo(armorHitStopHitter+1);
                         pOtherGuy->addWarudo(armorHitStopHitted+1);
                         log(logHits, "armor hit!");
@@ -1298,10 +1334,17 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
             }
 
+            if (hurtBox.flags & atemi) {
+                // like armor except onthing really happens beyond setting the flag
+                hitArmor = true;
+                pOtherGuy->atemiThisFrame = true;
+                log(logHits, "atemi hit!");
+            }
+
             // not hitstun for initial grab hit as we dont want to recover during the lock
-            if ( armor || pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
+            if ( hitArmor || pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
                 int hitStopSelf = hitEntry["HitStopOwner"];
-                if ( !armor && hitStopSelf ) {
+                if ( !hitArmor && hitStopSelf ) {
                     addWarudo(hitStopSelf+1);
                 }
 
@@ -1328,7 +1371,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 canHitID = hitbox.hitID + 1;
                 if (!pOtherGuy->blocking) {
-                    if (!armor && hitEntryFlag & punish_counter) {
+                    if (!hitArmor && hitEntryFlag & punish_counter) {
                         punishCounterThisFrame = true;
                     }
                     hitThisFrame = true;
@@ -1699,6 +1742,11 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 21: // armor
+                    if (armorThisFrame) {
+                        doBranch = true;
+                    }
+                    break;
+                case 22: // atemi/counter
                     if (atemiThisFrame) {
                         doBranch = true;
                     }
@@ -2166,7 +2214,7 @@ bool Guy::Frame(void)
             posOffsetY = 0.0f;
 
             canHitID = -1;
-            currentAtemiID = -1; // uhhh
+            currentArmorID = -1; // uhhh
 
             poseStatus = 0; // correct spot?
             actionStatus = 0;

@@ -91,7 +91,6 @@ public:
     std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
     std::vector<HurtBox> *getHurtBoxes() { return &hurtBoxes; }
     std::vector<Box> *getThrowBoxes() { return &throwBoxes; }
-    std::vector<ArmorBox> *getArmorBoxes() { return &armorBoxes; }
 
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
@@ -352,15 +351,15 @@ private:
     float wallBounceAccelY = 0.0f;
     bool wallStopped = false;
     int wallStopFrames = 0;
-    int currentAtemiID = -1;
-    int atemiHitsLeft = 0;
+    int currentArmorID = -1;
+    int armorHitsLeft = 0;
+    bool armorThisFrame = false;
     bool atemiThisFrame = false;
 
     int recoveryTiming = 0;
 
     std::vector<Box> pushBoxes;
     std::vector<HitBox> hitBoxes;
-    std::vector<ArmorBox> armorBoxes;
     std::vector<HurtBox> hurtBoxes;
     std::vector<Box> throwBoxes;
 

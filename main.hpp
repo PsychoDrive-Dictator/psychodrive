@@ -30,6 +30,18 @@ enum hitBoxType {
     proximity_guard = 6,
 };
 
+enum hurtBoxFlags {
+    full_strike_invul = 1,
+    projectile_invul = 2,
+    air_strike_invul = 4,
+    ground_strike_invul = 8,
+    armor = 16,
+    atemi = 32,
+    head = 64,
+    body = 128,
+    legs = 256,
+};
+
 struct HitBox {
     Box box;
     hitBoxType type;
@@ -39,14 +51,8 @@ struct HitBox {
 
 struct HurtBox {
     Box box;
-    bool head;
-    bool body;
-    bool legs;
-};
-
-struct ArmorBox {
-    HurtBox hurtBox;
-    int armorID;
+    int flags = 0;
+    int armorID = 0;
 };
 
 static inline float randFloat()
