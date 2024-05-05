@@ -972,15 +972,17 @@ void Guy::UpdateBoxes(void)
 }
 
 void Guy::Render(void) {
+    float x = posX + (posOffsetX * direction);
+    float y = posY + posOffsetY;
+
     for (auto box : renderBoxes) {
         drawHitBox(box.box,box.thickness,box.col,box.drive,box.parry,box.di);
     }
 
-    float x = posX + (posOffsetX * direction);
-    float y = posY + posOffsetY;
-
-    // drawQuad(x - 8, y - 8, 16, 16, charColorR,charColorG,charColorB,0.8);
-    // drawLoop(x - 8, y - 8, 16, 16, 1.0,1.0,1.0,1.0);
+    float radius = 16.5;
+    drawBox(x-radius/2,y-radius/2,radius,radius,radius,1.0,1.0,1.0,1.0);
+    radius = 15;
+    drawBox(x-radius/2,y-radius/2,radius,radius,radius,charColorR,charColorG,charColorB,1.0);
 }
 
 bool Guy::Push(Guy *pOtherGuy)
