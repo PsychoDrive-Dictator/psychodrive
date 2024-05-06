@@ -536,9 +536,13 @@ bool Guy::PreFrame(void)
                 float posOffsetY = key["PosOffset"]["y"];
 
                 // spawn new guy
-                Guy *pNewGuy = new Guy(pParent ? *pParent : *this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
+                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
                 pNewGuy->PreFrame();
-                minions.push_back(pNewGuy);
+                if (pParent) {
+                    pParent->minions.push_back(pNewGuy);
+                } else {
+                    minions.push_back(pNewGuy);
+                }
             }
         }
 
@@ -1773,7 +1777,7 @@ void Guy::DoBranchKey(void)
                         doBranch = true;
                     }
                     break;
-                case 40:
+                case 40: // area target
                     if (pOpponent) {
                         int distX = branchParam2 & 0xFFFF;
                         int distY = (branchParam2 & 0xFFFF0000) >> 16;
