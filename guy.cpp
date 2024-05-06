@@ -1782,22 +1782,25 @@ void Guy::DoBranchKey(void)
                         int distX = branchParam2 & 0xFFFF;
                         int distY = (branchParam2 & 0xFFFF0000) >> 16;
 
-                        // todo whole thing feels like a hack and i'm missing something, but it works for angled portal spikes now
-                        int signedDistX = branchParam1 & 0xFFFF;
-                        if (signedDistX > 0x8000) signedDistX = -(0xFFFF - signedDistX);
+                        int offsetX = branchParam1 & 0xFFFF;
+                        if (offsetX > 0x8000) offsetX = -(0xFFFF - offsetX);
 
-                        if (std::abs(pOpponent->posX - posX) < distX &&
-                            std::abs(pOpponent->posY - posY) < distY) {
-                                if (signedDistX != 0 ) {
-                                    int signedDistToOpponentX = pOpponent->posX - posX;
-                                    if (signedDistX > 0 && signedDistToOpponentX > 0 && signedDistToOpponentX < signedDistX ) {
-                                        doBranch = true;
-                                    } else if (signedDistX < 0 && signedDistToOpponentX < 0 && signedDistToOpponentX > signedDistX ) {
-                                        doBranch = true;
-                                    }
-                                } else {
-                                    doBranch = true;
-                                }
+                        int offsetY = (branchParam1 & 0xFFFF0000) >> 16;
+                        if (offsetY > 0x8000) offsetY = -(0xFFFF - offsetY);
+
+                        // and?
+                        if (branchParam0 == 0 &&
+                            (std::abs(pOpponent->posX - offsetX - posX) < distX &&
+                            std::abs(pOpponent->posY - offsetY - posY) < distY)) {
+                            doBranch = true;
+                        }
+
+                        // or? no idea
+                        // there's also branchParam3 that's 0 or 1 - they're both called AREA_ALL?
+                        if (branchParam0 == 1 &&
+                            (std::abs(pOpponent->posX - offsetX - posX) < distX ||
+                            std::abs(pOpponent->posY - offsetY - posY) < distY)) {
+                            doBranch = true;
                         }
                     }
                     break;
