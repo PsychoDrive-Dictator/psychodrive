@@ -280,8 +280,12 @@ bool Guy::PreFrame(void)
         // don't apply steer for looped anims? or just velocity set?
         // this is just a hack to have both looping working jumps but
         // i'm sure this will be replace by something proper
+
         if (!hasLooped && actionJson.contains("SteerKey"))
         {
+            float steerKeyHomeTargetOffsetX = 0.0;
+            float steerKeyHomeTargetOffsetY = 0.0;
+
             for (auto& [steerKeyID, steerKey] : actionJson["SteerKey"].items())
             {
                 if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
@@ -299,6 +303,39 @@ bool Guy::PreFrame(void)
                 switch (operationType) {
                     case 1:
                     case 2:
+                    case 9:
+                    case 10:
+                        if (operationType == 9 || operationType == 10) {
+                            // home to target
+                            if (targetType != 1) {
+                                log(logUnknowns, "unknown home target type");
+                                continue;
+                            } else if (!pOpponent) {
+                                log(true, "can't home to opponent, no opponent");
+                                continue;
+                            }
+                            float homePosX = pOpponent->getPosX() + steerKeyHomeTargetOffsetX;
+                            float homePosY = pOpponent->getPosY() + steerKeyHomeTargetOffsetY;
+                            if (valueType == 0) {
+                                if (operationType == 9 && getPosX() < homePosX) {
+                                    continue;
+                                }
+                                if (operationType == 10 && getPosX() > homePosX) {
+                                    continue;
+                                }
+                            }
+                            if (valueType == 1) {
+                                if (operationType == 9 && getPosY() < homePosY) {
+                                    continue;
+                                }
+                                if (operationType == 10 && getPosY() > homePosY) {
+                                    continue;
+                                }
+                            }
+                            // todo CalcValueFrame? is it only recompute every N frames?
+                            // fall through to normal set operaiton below after those checks
+                            operationType = 1;
+                        }
                         switch (valueType) {
                             case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
                             case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
@@ -320,8 +357,8 @@ bool Guy::PreFrame(void)
                             for ( auto minion : minions ) {
                                 if (shotCategory & (1 << minion->limitShotCategory)) {
                                     minionFound = true;
-                                    posX = minion->posX + targetOffsetX;
-                                    posY = minion->posY + targetOffsetY;
+                                    posX = minion->getPosX() + targetOffsetX * minion->direction;
+                                    posY = minion->getPosY() + targetOffsetY;
                                     if (posY > 0.0) {
                                         airborne = true;
                                     }
@@ -330,6 +367,13 @@ bool Guy::PreFrame(void)
                             }
                             if (!minionFound) {
                                 log(true, "minion to teleport not found");
+                            }
+                        } else if (targetType == 4) {
+                            // set the offset for homing? so weird, why not use the offset fields
+                            // in the homing steerkeys directly?
+                            if (pOpponent) {
+                                steerKeyHomeTargetOffsetX = targetOffsetX * -pOpponent->direction;
+                                steerKeyHomeTargetOffsetY = targetOffsetY;
                             }
                         } else {
                             log(logUnknowns, "unknown teleport?");
@@ -1785,21 +1829,23 @@ void Guy::DoBranchKey(void)
                         int offsetX = branchParam1 & 0xFFFF;
                         if (offsetX > 0x8000) offsetX = -(0xFFFF - offsetX);
 
+                        offsetX *= -pOpponent->direction;
+
                         int offsetY = (branchParam1 & 0xFFFF0000) >> 16;
                         if (offsetY > 0x8000) offsetY = -(0xFFFF - offsetY);
 
                         // and?
                         if (branchParam0 == 0 &&
-                            (std::abs(pOpponent->posX - offsetX - posX) < distX &&
-                            std::abs(pOpponent->posY - offsetY - posY) < distY)) {
+                            (std::abs(pOpponent->getPosX() - offsetX - getPosX()) < distX &&
+                            std::abs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
                             doBranch = true;
                         }
 
                         // or? no idea
                         // there's also branchParam3 that's 0 or 1 - they're both called AREA_ALL?
                         if (branchParam0 == 1 &&
-                            (std::abs(pOpponent->posX - offsetX - posX) < distX ||
-                            std::abs(pOpponent->posY - offsetY - posY) < distY)) {
+                            (std::abs(pOpponent->getPosX() - offsetX - getPosX()) < distX ||
+                            std::abs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
                             doBranch = true;
                         }
                     }
@@ -1888,6 +1934,7 @@ void Guy::DoBranchKey(void)
                 deniedLastBranch = false;
 
                 keepPlace = key["_KeepPlace"];
+                keepFrame = key["_InheritFrameX"];
                 break;
             } else {
                 if (branchType != 1) {
@@ -2196,7 +2243,7 @@ bool Guy::Frame(void)
 
         if (currentAction != nextAction) {
             currentAction = nextAction;
-            log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace));
+            log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace) + " keep frame " + std::to_string(keepFrame));
 
             if (styleInstallFrames && !countingDownInstall) {
                 // start counting down on wakeup after install super?
@@ -2212,13 +2259,15 @@ bool Guy::Frame(void)
         }
 
         if (!keepPlace) {
-            currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
-
             // commit current place offset
             posX += (posOffsetX * direction);
             posOffsetX = 0.0f;
             posY += posOffsetY;
             posOffsetY = 0.0f;
+        }
+
+        if (!keepFrame) {
+            currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
 
             canHitID = -1;
             currentArmorID = -1; // uhhh
@@ -2226,10 +2275,9 @@ bool Guy::Frame(void)
             poseStatus = 0; // correct spot?
             actionStatus = 0;
             jumpStatus = 0;
-        } else {
-            currentFrame--; //rewind
         }
         keepPlace = false;
+        keepFrame = false;
 
         nextAction = -1;
         nextActionFrame = -1;
