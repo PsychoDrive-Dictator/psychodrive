@@ -289,6 +289,9 @@ private:
     float accelX = 0.0f;
     float accelY = 0.0f;
 
+    float homeTargetX = 0.0;
+    float homeTargetY = 0.0;
+
     int maxHealth;
     int health;
 

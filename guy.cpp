@@ -283,9 +283,6 @@ bool Guy::PreFrame(void)
 
         if (!hasLooped && actionJson.contains("SteerKey"))
         {
-            float steerKeyHomeTargetOffsetX = 0.0;
-            float steerKeyHomeTargetOffsetY = 0.0;
-
             for (auto& [steerKeyID, steerKey] : actionJson["SteerKey"].items())
             {
                 if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
@@ -299,6 +296,7 @@ bool Guy::PreFrame(void)
                 float targetOffsetY = steerKey["FixTargetOffsetY"];
                 int shotCategory = steerKey["_ShotCategory"];
                 int targetType = steerKey["TarType"];
+                int calcValueFrame = steerKey["CalcValueFrame"];
 
                 switch (operationType) {
                     case 1:
@@ -314,21 +312,19 @@ bool Guy::PreFrame(void)
                                 log(true, "can't home to opponent, no opponent");
                                 continue;
                             }
-                            float homePosX = pOpponent->getPosX() + steerKeyHomeTargetOffsetX;
-                            float homePosY = pOpponent->getPosY() + steerKeyHomeTargetOffsetY;
                             if (valueType == 0) {
-                                if (operationType == 9 && getPosX() < homePosX) {
+                                if (operationType == 9 && getPosX() < homeTargetX) {
                                     continue;
                                 }
-                                if (operationType == 10 && getPosX() > homePosX) {
+                                if (operationType == 10 && getPosX() > homeTargetX) {
                                     continue;
                                 }
                             }
                             if (valueType == 1) {
-                                if (operationType == 9 && getPosY() < homePosY) {
+                                if (operationType == 9 && getPosY() < homeTargetY) {
                                     continue;
                                 }
-                                if (operationType == 10 && getPosY() > homePosY) {
+                                if (operationType == 10 && getPosY() > homeTargetY) {
                                     continue;
                                 }
                             }
@@ -351,17 +347,16 @@ bool Guy::PreFrame(void)
                         }
                         break;
                     case 13:
+                        // set teleport/home target
                         if (targetType == 16) {
-                            // teleport to projectile, i think
+                            // to projectile
                             bool minionFound = false;
                             for ( auto minion : minions ) {
                                 if (shotCategory & (1 << minion->limitShotCategory)) {
                                     minionFound = true;
-                                    posX = minion->getPosX() + targetOffsetX * minion->direction;
-                                    posY = minion->getPosY() + targetOffsetY;
-                                    if (posY > 0.0) {
-                                        airborne = true;
-                                    }
+                                    homeTargetX = minion->getPosX() + targetOffsetX * minion->direction;
+                                    homeTargetY = minion->getPosY() + targetOffsetY;
+
                                     break;
                                 }
                             }
@@ -369,14 +364,25 @@ bool Guy::PreFrame(void)
                                 log(true, "minion to teleport not found");
                             }
                         } else if (targetType == 4) {
-                            // set the offset for homing? so weird, why not use the offset fields
-                            // in the homing steerkeys directly?
+                            // to opponent
                             if (pOpponent) {
-                                steerKeyHomeTargetOffsetX = targetOffsetX * -pOpponent->direction;
-                                steerKeyHomeTargetOffsetY = targetOffsetY;
+                                homeTargetX = pOpponent->getPosX() + targetOffsetX * -pOpponent->direction;
+                                homeTargetY = pOpponent->getPosY() + targetOffsetY;
                             }
                         } else {
-                            log(logUnknowns, "unknown teleport?");
+                            log(logUnknowns, "unknown set teleport/home target");
+                        }
+                        break;
+                    case 15:
+                        // teleport/lerp position?
+                        if (fixValue == 0.0 && calcValueFrame == 1) {
+                            posX = homeTargetX;
+                            posY = homeTargetY;
+                            if (posY > 0.0) {
+                                airborne = true;
+                            }
+                        } else {
+                            log(logUnknowns, "unsupported teleport/lerp, only instant for now");
                         }
                         break;
                     default:
