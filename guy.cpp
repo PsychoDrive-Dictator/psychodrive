@@ -346,6 +346,17 @@ bool Guy::PreFrame(void)
                             case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
                         }
                         break;
+                    case 12:
+                        // set on cancel from current action
+                        // guessing there's also one to add on cancel too? not sure
+                        operationType = 1;
+                        switch (valueType) {
+                            case 0: doSteerKeyOperation(cancelVelocityX, fixValue,operationType); break;
+                            case 1: doSteerKeyOperation(cancelVelocityY, fixValue,operationType); break;
+                            case 3: doSteerKeyOperation(cancelAccelX, fixValue,operationType); break;
+                            case 4: doSteerKeyOperation(cancelAccelY, fixValue,operationType); break;
+                        }
+                        break;
                     case 6:
                         // uhhhhh
                         if (valueType == 3 && steerKey["_EndFrame"] == currentFrame + 1 && airborne && !landed) {
@@ -837,6 +848,7 @@ void Guy::DoTriggers()
                         } else {
                             nextAction = actionID;
                         }
+                        didTrigger = true;
                         log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                         break; // we found our trigger walking back, blow up the whole group
                     } else {
@@ -944,6 +956,7 @@ void Guy::DoTriggers()
                             }
                             // try to consume the input
                             inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
+                            didTrigger = true;
                             log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer) + "initial I " + std::to_string(initialI));
                             break; // we found our trigger walking back, blow up the whole group
                         }
@@ -2347,6 +2360,25 @@ bool Guy::Frame(void)
             accelY *= inherit["Accelaleration"]["y"].get<float>();
             velocityX *= inherit["Velocity"]["x"].get<float>();
             velocityY *= inherit["Velocity"]["y"].get<float>();
+        }
+
+        if (didTrigger) {
+            if (cancelAccelX) {
+                accelX = cancelAccelX;
+                cancelAccelX = 0.0;
+            }
+            if (cancelAccelY) {
+                accelY = cancelAccelY;
+                cancelAccelY = 0.0;
+            }
+            if (cancelVelocityX) {
+                velocityX = cancelVelocityX;
+                cancelVelocityX = 0.0;
+            }
+            if (cancelVelocityY) {
+                velocityY = cancelVelocityY;
+                cancelVelocityY = 0.0;
+            }
         }
 
         if (isDrive == true) {

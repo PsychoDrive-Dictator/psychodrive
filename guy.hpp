@@ -289,6 +289,11 @@ private:
     float accelX = 0.0f;
     float accelY = 0.0f;
 
+    float cancelVelocityX = 0.0f;
+    float cancelVelocityY = 0.0f;
+    float cancelAccelX = 0.0f;
+    float cancelAccelY = 0.0f;
+
     float homeTargetX = 0.0;
     float homeTargetY = 0.0;
 
@@ -297,6 +302,7 @@ private:
 
     int currentAction = 1;
     int nextAction = -1;
+    bool didTrigger = false;
     int nextActionFrame = -1;
     bool keepPlace = false;
     bool keepFrame = false;
