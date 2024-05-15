@@ -484,6 +484,7 @@ bool Guy::PreFrame(void)
 
         counterState = false;
         punishCounterState = false;
+        forceKnockDownState = false;
 
         if (actionJson.contains("SwitchKey"))
         {
@@ -500,6 +501,39 @@ bool Guy::PreFrame(void)
                 }
                 if (flag & 0x800000) {
                     punishCounterState = true;
+                }
+                if (flag & 0x400000) {
+                    forceKnockDownState = true;
+                }
+                if (flag & 0x2) {
+                    counterState = true;
+                }
+            }
+        }
+
+        if (actionJson.contains("ExtSwitchKey"))
+        {
+            for (auto& [keyID, key] : actionJson["ExtSwitchKey"].items())
+            {
+                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                    continue;
+                }
+
+                int validStyles = key["_ValidStyle"];
+                if ( !(validStyles & (1 << styleInstall)) ) {
+                    continue;
+                }
+
+                int flag = key["SystemFlag"];
+
+                if (flag & 0x8000000) {
+                    isDrive = true;
+                }
+                if (flag & 0x800000) {
+                    punishCounterState = true;
+                }
+                if (flag & 0x400000) {
+                    forceKnockDownState = true;
                 }
                 if (flag & 0x2) {
                     counterState = true;
@@ -558,7 +592,9 @@ bool Guy::PreFrame(void)
                         log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
                         break;
                     case 2:
-                        if (param1 == 0) {
+                        // look at _IsCHARA_STYLE_CHANGE
+                        // wire up Style TerminateState
+                        if (param1 == 0) { // 0 is set, 1 is add? look at jamie
                             styleInstall = param2;
                             // what's param3? it's 1 for solid puncher..
                             styleInstallFrames = param4;
@@ -1569,6 +1605,10 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         if (dmgValue != 0 && dmgType & 8) {
             hitEntryHitStun += 500000;
             resetHitStunOnLand = true;
+        }
+        if (forceKnockDownState) {
+            hitEntryHitStun += 500000;
+            forceKnockDown = true;
         }
         knockDownFrames = downTime;
     }

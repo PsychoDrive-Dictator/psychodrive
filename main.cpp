@@ -168,11 +168,12 @@ int main(int argc, char**argv)
             guys[1]->resetPosDebug(gameStateDump[i]["players"][1]["posX"], gameStateDump[0]["players"][1]["posY"]);
             *guys[1]->getInputIDPtr() = replayRight;
             *guys[1]->getInputListIDPtr() = replayRight;
+
+            gameStateFrame = gameStateDump[i]["frameCount"];
+            replayingGameState = true;
+            currentInputMap[replayLeft] = 0;
+            currentInputMap[replayRight] = 0;
         }
-        gameStateFrame = gameStateDump[i]["frameCount"];
-        replayingGameState = true;
-        currentInputMap[replayLeft] = 0;
-        currentInputMap[replayRight] = 0;
     }
 
     uint32_t frameStartTime = SDL_GetTicks();

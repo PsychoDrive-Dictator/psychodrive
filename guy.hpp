@@ -74,6 +74,7 @@ public:
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     int getUniqueParam() { return uniqueCharge; }
+    int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
     std::string getName() { return name; }
     int getPoseStatus() { return poseStatus; }
@@ -281,6 +282,7 @@ private:
 
     bool counterState = false;
     bool punishCounterState = false;
+    bool forceKnockDownState = false;
 
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
