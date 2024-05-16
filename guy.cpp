@@ -999,7 +999,9 @@ void Guy::DoBranchKey(void)
             int branchType = key["Type"];
             int64_t branchParam0 = key["Param00"];
             int64_t branchParam1 = key["Param01"];
+            int64_t branchParam2 = key["Param02"];
             int branchAction = key["Action"];
+            int branchFrame = key["ActionFrame"];
 
             switch (branchType) {
                 case 0: // always?
@@ -1012,6 +1014,11 @@ void Guy::DoBranchKey(void)
                     break;
                 case 13:
                     if (landed) {
+                        doBranch = true;
+                    }
+                    break;
+                case 14:
+                    if (touchedWall) {
                         doBranch = true;
                     }
                     break;
@@ -1030,6 +1037,19 @@ void Guy::DoBranchKey(void)
                         // probably should check the count somewhere?
                         // probably how jamie drinks work too? not sure
                         doBranch = true;
+                    }
+                    break;
+                case 40:
+                    if (pOpponent) {
+                        int distX = branchParam2 & 0xFFFF;
+                        int distY = (branchParam2 & 0xFFFF0000) >> 32;
+
+                        // ughh i guess we need an actual distance between pushboxes or something?
+                        // jp normal ghost has like 60 distX distance - *2 for now just to unblock
+                        if (std::abs(pOpponent->posX - posX) < distX * 2 &&
+                            std::abs(pOpponent->posY - posY) < distY) {
+                                doBranch = true;
+                        }
                     }
                     break;
                 case 45:
@@ -1051,7 +1071,17 @@ void Guy::DoBranchKey(void)
 
             // do those also override if higher branchID?
             if (doBranch) {
-                nextAction = branchAction;
+                if (branchFrame != 0 && branchAction != currentAction) {
+                    log("unsupported change for both action and frame");
+                }
+
+                if (branchFrame != 0 && branchAction == currentAction) {
+                    // unclear where we'll hit it so not sure if we need to offset yet
+                    currentFrame = branchFrame;
+                } else {
+                    nextAction = branchAction;
+                }
+
                 keepPlace = key["_KeepPlace"];
             }
         }
@@ -1122,7 +1152,7 @@ bool Guy::Frame(void)
         canMove = true;
     }
 
-    if ( marginFrame != -1 && currentFrame >= marginFrame ) {
+    if ( marginFrame != -1 && currentFrame >= marginFrame - 1 ) {
         canMove = true;
     }
 
