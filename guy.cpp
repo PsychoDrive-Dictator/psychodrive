@@ -167,6 +167,10 @@ bool Guy::PreFrame(void)
     if (warudo > 0) {
         timeInWarudo++;
         warudo--;
+        // increment the frame we skipped at the beginning of warudo
+        if (warudo == 0) {
+            Frame();
+        }
     }
     if (warudo > 0) {
         return false;
@@ -377,7 +381,7 @@ bool Guy::PreFrame(void)
                 int64_t param2 = key["Param02"];
                 int64_t param3 = key["Param03"];
                 int64_t param4 = key["Param04"];
-                int64_t param5 = key["Param05"];
+                //int64_t param5 = key["Param05"];
 
                 switch (eventType)
                 {
@@ -409,10 +413,6 @@ bool Guy::PreFrame(void)
                             uniqueCharge = param4;
                         } else if (param3 == 1) { //add?
                             uniqueCharge += param4;
-                            // maybe param5 is the max?
-                            if ( param5 != 0 && uniqueCharge > param5) {
-                                uniqueCharge = 1;
-                            }
                         }
                         break;
                     default:
@@ -507,6 +507,7 @@ void Guy::DoTriggers()
 
             //int condFlag = key["ConditionFlag"];
             // killbox says "5199 and 5131 are like on hit and on block"
+            // but not 5135
             int condition = key["_Condition"];
             if ( (condition == 5199 || condition == 5131) && canHitID == -1) {
                 continue;
@@ -707,7 +708,7 @@ void Guy::DoTriggers()
                             if ( usinguniquecharge ) {
                                 uniqueCharge = 0;
                             }
-                            log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                            log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer) + "initial I " + std::to_string(initialI));
                             break; // we found our trigger walking back, blow up the whole group
                         }
                     }
@@ -976,7 +977,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int juggleFirst = hitEntry["Juggle1st"];
                 int juggleAdd = hitEntry["JuggleAdd"];
                 int juggleLimit = hitEntry["JuggleLimit"];
-                int targetHitStun = hitEntry["HitStun"];
+                int hitStun = hitEntry["HitStun"];
                 int destX = hitEntry["MoveDest"]["x"];
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
@@ -1025,6 +1026,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     pOpponent->addWarudo(hitStopTarget+1);
                 }
 
+                int targetHitStun = hitStun;
                 if (wasDrive) {
                     targetHitStun+=4;
                 }
@@ -1043,7 +1045,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
-                //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
+                log(logHits, "hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " hitStun " + std::to_string(hitStun));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 pOtherGuy->pAttacker = this;
                 pOtherGuy->noCounterPush = noZu; // bro it better
@@ -1070,8 +1072,7 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
 {
     comboHits++;
     comboDamage += damage;
-    // +1 because it starts counting down next frame
-    hitStun = stun + 1 + hitStunAdder;
+    hitStun = stun + hitStunAdder;
     beenHitThisFrame = true;
 
     if (destY > 0 ) {
@@ -1327,6 +1328,12 @@ void Guy::DoBranchKey(void)
 
 bool Guy::Frame(void)
 {
+    if (warudo) {
+        // if we just entered hitstop, don't go to next frame right now
+        // we want to have a chance to get hitstop input before triggers
+        // we'll re-run it in PreFrame
+        return false;
+    }
     DoTriggers();
     DoBranchKey();
 
@@ -1353,6 +1360,7 @@ bool Guy::Frame(void)
 
         if ( hitStunOnLand > 0 ) {
             // there's some additional knockdown delay there
+            // this is actually supposed to be a bounce
             hitStun += hitStunOnLand + 1 + 30;
             hitStunOnLand = 0;
 
@@ -1429,7 +1437,7 @@ bool Guy::Frame(void)
     if (hitStun) {
         canMove = false;
     }
-
+    
     bool turnaround = false;
 
     // Process movement if any
@@ -1501,6 +1509,9 @@ bool Guy::Frame(void)
 
         deferredActionFrame = -1;
         deferredAction = 0;
+
+        // don't run triggers again though
+        canMove = false;
     }
 
     // Transition
