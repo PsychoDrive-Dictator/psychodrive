@@ -30,12 +30,6 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     }
 }
 
-static inline float randFloat()
-{
-    float ret = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    return ret;
-}
-
 void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQueue)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));

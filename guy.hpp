@@ -16,9 +16,10 @@ public:
     bool PreFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
+    bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime, int damage);
-    void DoBranchKey(void);
+    void DoBranchKey();
     bool Frame(void);
 
     void addWarudo(int w) { warudo += w; }
@@ -32,9 +33,21 @@ public:
         return posX + (posOffsetX*direction);
     }
 
-    void setPosDebug( float x, float y) {
+    void resetPosDebug( float x, float y) {
         posX = x;
         posY = y;
+
+        airborne = false;
+        landed = false;
+        touchedWall = false;
+        startsFalling = false;
+
+        posOffsetX = 0.0f;
+        posOffsetY = 0.0f;
+        velocityX = 0.0f;
+        velocityY = 0.0f;
+        accelX = 0.0f;
+        accelY = 0.0f;
     }
 
     int getComboHits() { return comboHits; }
@@ -90,6 +103,13 @@ public:
         commandsJson = parse_json_file(character + "_commands.json");
         chargeJson = parse_json_file(character + "_charge.json");
         hitJson = parse_json_file(character + "_hit.json");
+
+        static bool commonMovesInitialized = false;
+        if (!commonMovesInitialized) {
+            commonMovesJson = parse_json_file("common_moves.json");
+            commonRectsJson = parse_json_file("common_rects.json");
+            commonMovesInitialized = true;
+        }
     }
 
     Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
@@ -140,9 +160,17 @@ private:
     nlohmann::json chargeJson;
     nlohmann::json hitJson;
 
+    static nlohmann::json commonMovesJson;
+    static nlohmann::json commonRectsJson;
+
     float posX = 0.0f;
     float posY = 0.0f;
     int direction = 1;
+
+    bool airborne = false;
+    bool landed = false;
+    bool touchedWall = false;
+    bool startsFalling = false;
 
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
@@ -198,4 +226,5 @@ private:
     int uniqueCharge = 0;
 
     std::string actionName;
+    nlohmann::json actionJson;
 };
