@@ -94,6 +94,9 @@ int getInput(int currentInput)
                     }
                     playBackFrame = 0;
                     break;
+                case SDLK_DELETE:
+                    deleteInputs = true;
+                    break;
                 case SDLK_ESCAPE:
                     done = true;
                     break;

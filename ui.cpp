@@ -64,6 +64,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 struct timelineItem {
     int frame;
     int input;
+    int uniqueID;
 };
 
 std::unordered_map<int, timelineItem*> mapTimelineItems;
@@ -104,7 +105,6 @@ void drawInputEditor()
     static int32_t startFrame = 0;
     static int32_t endFrame = 10000;
     //static bool transformOpen = false;
-    static bool doDelete = false;
 
     unsigned int i = 0;
     static int uniqueID = 0;
@@ -125,7 +125,8 @@ void drawInputEditor()
                 timelineItem *pNewNote = new timelineItem;
                 *pNewNote = {
                     targetFrame,
-                    1<<key
+                    1<<key,
+                    uniqueID
                 };
                 mapTimelineItems[uniqueID++] = pNewNote;
             }
@@ -162,7 +163,7 @@ void drawInputEditor()
                     }
                 }
 
-                if (doDelete)
+                if (deleteInputs)
                 {
                     uint32_t count = ImGui::GetNeoKeyframeSelectionSize();
 
@@ -170,7 +171,27 @@ void drawInputEditor()
 
                     ImGui::GetNeoKeyframeSelection(toRemove);
 
-                    //Delete keyframes from your structure
+                    std::vector<int> vecUniqueIDs;
+                    for (auto elem : mapTimelineItems)
+                    {
+                        if (elem.second->input == 1<<key) {
+                            unsigned int delIndex = 0;
+                            while (delIndex < count) {
+                                if (elem.second->frame == toRemove[delIndex]) {
+                                    vecUniqueIDs.push_back(elem.second->uniqueID);
+                                }
+                                delIndex++;
+                            }
+                        }
+                    }
+
+                    for (auto id : vecUniqueIDs)
+                    {
+                        delete mapTimelineItems[id];
+                        mapTimelineItems.erase(id);
+                    }
+
+                    delete[] toRemove;
                 }
                 ImGui::EndNeoTimeLine();
             }
@@ -178,6 +199,8 @@ void drawInputEditor()
         }
         ImGui::EndNeoSequencer();
     }
+
+    deleteInputs = false;
 
     ImGui::End();
 }
