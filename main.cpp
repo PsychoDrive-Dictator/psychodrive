@@ -21,6 +21,7 @@
 #include "guy.hpp"
 #include "main.hpp"
 
+
 bool forceCounter = false;
 bool forcePunishCounter = false;
 int hitStunAdder = 0;
@@ -204,13 +205,14 @@ int main(int, char**)
     bool paused = false;
     bool done = false;
     bool oneframe = false;
+    bool resetpos = false;
     while (!done)
     {
         const float desiredFrameTimeMS = 1000.0 / 60.0f;
         uint32_t currentTime = SDL_GetTicks();
         if (currentTime - frameStartTime < desiredFrameTimeMS) {
             const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
-            usleep(timeToSleepMS * 1000);
+            usleep(timeToSleepMS * 1000 - 100);
             //std::this_thread::sleep_for(std::chrono::milliseconds(int(timeToSleepMS)));
         }
         frameStartTime = SDL_GetTicks();
@@ -269,6 +271,9 @@ int main(int, char**)
                         break;
                     case SDLK_p:
                         paused = !paused;
+                        break;
+                    case SDLK_q:
+                        resetpos = true;
                         break;
                     case SDLK_0:
                         oneframe = true;
@@ -448,6 +453,8 @@ int main(int, char**)
             }
             ImGui::Text("action %s frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentFrame());
             ImGui::Text("currentInput %d", currentInput);
+            ImGui::SameLine();
+            resetpos = resetpos || ImGui::Button("reset");
             float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
             pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
             pGuy->getVel(velX, velY, accelX, accelY);
@@ -462,6 +469,12 @@ int main(int, char**)
             ImGui::SameLine();
             ImGui::Checkbox("force PC", &forcePunishCounter);
             //ImGui::Text("unique %i", uniqueCharge);
+
+            if (resetpos) {
+                guy.setPosDebug(100.0f, 0.0f);
+                otherGuy.setPosDebug(450.0f, 0.0f);
+                resetpos = false;
+            }
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();

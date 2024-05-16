@@ -27,6 +27,11 @@ public:
         return posX + (posOffsetX*direction);
     }
 
+    void setPosDebug( float x, float y) {
+        posX = x;
+        posY = y;
+    }
+
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
     int getWarudo() { return warudo; }

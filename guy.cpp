@@ -1,4 +1,3 @@
-
 #include "guy.hpp"
 #include "main.hpp"
 #include <string>
@@ -264,7 +263,7 @@ bool Guy::PreFrame(void)
                 hitStunOnLand = 0;
             }
 
-            log ("landed " + std::to_string(hitStun));
+            //log ("landed " + std::to_string(hitStun));
         }
 
         // super crude corner snapping
@@ -680,11 +679,9 @@ bool Guy::PreFrame(void)
                                             inputBufferCursor++;
                                         }
 
-                                        // int beginningCharge = inputBufferCursorl
-                                        // int chargeConsumed = initialI;
-
                                         if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                            //log("match charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
+                                            log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                                            "keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
                                             break; // cancel trigger
                                         }
                                         //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
@@ -1016,7 +1013,7 @@ bool Guy::Frame(void)
 
     }
 
-    if (currentFrame >= (actionFrameDuration - 1) && nextAction == -1)
+    if (currentFrame >= (actionFrameDuration - 2) && nextAction == -1)
     {
         if ( isProjectile ) {
             //currentFrame = 0; // just loop? :/
