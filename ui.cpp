@@ -102,7 +102,7 @@ void drawInputEditor()
     static int32_t currentFrame = 0;
 
     static int32_t startFrame = 0;
-    static int32_t endFrame = 1000;
+    static int32_t endFrame = 10000;
     //static bool transformOpen = false;
     static bool doDelete = false;
 
