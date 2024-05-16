@@ -323,6 +323,8 @@ private:
     int styleInstallFrames = 0;
     bool countingDownInstall = false;
 
+    int airActionCounter = 0;
+
     int currentInput = 0;
     std::deque<int> inputBuffer;
 

@@ -563,10 +563,22 @@ bool Guy::PreFrame(void)
                             // what's param3? it's 1 for solid puncher..
                             styleInstallFrames = param4;
                         } else if (param1 == 1) {
-                            if (styleInstall > 0) {
+                            if (airborne) {
+                                airActionCounter += param2;
+                                if (airActionCounter < 0) {
+                                    airActionCounter = 0;
+                                }
+                                if (styleInstallFrames > 0) {
+                                    // i can't find a flag that differentiates those 2 EventKeys
+                                    // so it must be airbrone vs not but i refuse to believe it
+                                    // it would mean you couldn't have an air attack that deducts
+                                    // install timer like mini-booms.................
+                                    log (true, "kinda ambiguous, worth a look");
+                                }
+                            } else if (styleInstall > 0) {
                                 styleInstallFrames += param2;
                             } else {
-                                log(true, "no style install but point deduction?");
+                                log(true, "no style install or airborne but point deduction?");
                             }
                         } else {
                             log(logUnknowns, "event type 2 param1 " + std::to_string(param1));
@@ -581,7 +593,7 @@ bool Guy::PreFrame(void)
                             // dhalsim unique timer, only one that doesn't have this set?
                             bool isParam = key["_IsUNIQUE_UNIQUE_PARAM"];
                             if (!isParam) {
-                                // if it's not a param, clearly it's a timer
+                                // if it's not a param, clearly it's a timer :harold:
                                 uniqueTimer = true;
                             }
                         } else if (param3 == 1) { //add?
@@ -786,6 +798,13 @@ void Guy::DoTriggers()
                         }
                     }
                     if (count >= limitShotCount) {
+                        continue;
+                    }
+                }
+
+                int airActionCountLimit = trigger["cond_jump_cmd_count"];
+                if (airActionCountLimit) {
+                    if (airActionCounter >= airActionCountLimit) {
                         continue;
                     }
                 }
@@ -2043,6 +2062,9 @@ bool Guy::Frame(void)
         if ( resetHitStunOnLand ) {
             hitStun = 1;
             resetHitStunOnLand = false;
+        }
+        if ( airActionCounter ) {
+            airActionCounter = 0;
         }
     }
 
