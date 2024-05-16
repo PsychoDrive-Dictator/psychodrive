@@ -15,7 +15,7 @@
 
 void parseRootOffset( nlohmann::json& keyJson, int&offsetX, int& offsetY)
 {
-    if ( keyJson.contains("RootOffset") ) {
+    if ( keyJson.contains("RootOffset") && keyJson["RootOffset"].contains("X") && keyJson["RootOffset"].contains("Y") ) {
         offsetX = keyJson["RootOffset"]["X"];
         offsetY = keyJson["RootOffset"]["Y"];
     }
@@ -132,8 +132,8 @@ Guy::Guy(std::string charName, float startPosX, float startPosY, int startDir, c
 Guy::Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
 {
     character = parent.character;
-    posX = parent.posX + posOffsetX;
-    posY = parent.posY + posOffsetY;
+    posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
+    posY = parent.posY + parent.posOffsetY + posOffsetY;
     direction = parent.direction;
     charColorR = parent.charColorR;
     charColorG = parent.charColorG;
@@ -351,10 +351,8 @@ bool Guy::PreFrame(void)
                     continue;
                 }
 
-                // int posOffsetX = key["PosOffset"]["x"];
-                // int posOffsetY = key["PosOffset"]["y"];
-                int posOffsetX = 79 * direction;
-                int posOffsetY = 110;
+                float posOffsetX = key["PosOffset"]["x"].get<float>() * direction;
+                float posOffsetY = key["PosOffset"]["y"];
 
                 // spawn new guy
                 Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
@@ -511,7 +509,19 @@ bool Guy::PreFrame(void)
 
                 bool defer = !key["_NotDefer"];
                 int triggerEndFrame = key["_EndFrame"];
+                //int other = key["_Other"];
 
+                // not sure what that is but always some nonsense
+                // like 22p into everything, or 3HK special cancellable?
+                // if ( other == 64 ) {
+                //     continue;
+                // }
+
+                // on hit or block? not sure
+                // int state = key["_State"];
+                // if ( state == 48 && canHitID == -1) {
+                //     continue;
+                // }
                 auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
                 for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
                 {
@@ -581,6 +591,7 @@ bool Guy::PreFrame(void)
                             if ( usinguniquecharge ) {
                                 uniqueCharge = 0;
                             }
+                            log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                         } else {
                             std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
                             auto command = commandsJson[commandNoString]["0"];
@@ -680,6 +691,7 @@ bool Guy::PreFrame(void)
                                 if ( usinguniquecharge ) {
                                     uniqueCharge = 0;
                                 }
+                                log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                             }
                         }
                         // specifically don't break here, i think another trigger can have higher priority

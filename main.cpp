@@ -186,8 +186,8 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
-    Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
+    Guy guy("ryu", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy otherGuy("honda", 450.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
 
@@ -430,7 +430,7 @@ int main(int, char**)
             if (otherguy) {
                 pGuy = &otherGuy;
             }
-            ImGui::Text("action %s frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentAction());
+            ImGui::Text("action %s frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentFrame());
             ImGui::Text("currentInput %d", currentInput);
             float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
             pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
