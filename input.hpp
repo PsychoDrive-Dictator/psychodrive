@@ -23,9 +23,14 @@ enum Input
 	HK_pressed = 32768,
 };
 
-static const int keyboardID = 0;
-static const int recordingID = 1;
-static const int firstJoystickID = 10;
+enum InputID
+{
+	nullInputID = 0,
+	keyboardID = 1,
+	recordingID = 2,
+	firstJoystickID = 10,
+};
+
 extern std::map<int, int> currentInputMap;
 
 void updateInputs(void);

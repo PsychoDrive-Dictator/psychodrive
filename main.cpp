@@ -131,6 +131,8 @@ int main(int argc, char**argv)
 
     if ( argc > 1 ) {
         Guy *pNewGuy = new Guy(argv[1], startPos1, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        *pNewGuy->getInputIDPtr() = keyboardID;
+        *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
         guys.push_back(pNewGuy);
 
         if ( argc > 2 ) {
@@ -150,7 +152,9 @@ int main(int argc, char**argv)
 
     uint32_t frameStartTime = SDL_GetTicks();
 
+    currentInputMap[nullInputID] = 0;
     currentInputMap[keyboardID] = 0;
+    currentInputMap[recordingID] = 0;
 
     while (!done)
     {
