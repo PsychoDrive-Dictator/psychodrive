@@ -643,10 +643,17 @@ namespace ImGui
 
         // PL snap to current frame
         if (*frame > (int)viewEnd) {
-            context.OffsetFrame = *frame - 5;
-        }
-        if (*frame < (int)viewStart) {
-            context.OffsetFrame = *frame;
+            if ( context.HoldingZoomSlider) {
+                *frame = viewStart + viewWidth / 2;
+            } else {
+                context.OffsetFrame = *frame - 5;
+            }
+        } else if (*frame < (int)viewStart) {
+            if ( context.HoldingZoomSlider) {
+                *frame = viewStart + viewWidth / 2;
+            } else {
+                context.OffsetFrame = *frame;
+            }
         }
         if (res)
         {
