@@ -26,6 +26,7 @@ public:
     void DoStatusKey();
     void DoTriggers();
     bool Frame(void);
+    std::string getActionName(int actionID);
 
     void addWarudo(int w) {
         warudo += w;

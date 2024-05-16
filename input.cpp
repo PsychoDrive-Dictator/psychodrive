@@ -7,6 +7,23 @@
 
 std::map<int, int> currentInputMap;
 
+int addPressBits(int curInput, int prevInput)
+{
+    // put down the _pressed bits on first appearance
+    int retInput = curInput;
+    int key = 4;
+    while (key < 10)
+    {
+        int keyInput = 1<<key;
+        if (curInput & keyInput && !(prevInput & keyInput)) {
+            retInput |= 1<<(key+6);
+        }
+        key++;
+    }
+
+    return retInput;
+}
+
 void updateInputs(void)
 {
     // clear new press bits
