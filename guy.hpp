@@ -81,6 +81,8 @@ public:
     int getJumpStatus() { return jumpStatus; }
     int getLandingAdjust() { return landingAdjust; }
 
+    int getHealth() { return health; }
+
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }
     int getLimitShotCategory() { return limitShotCategory; }
@@ -159,6 +161,8 @@ public:
         BuildMoveList();
     
         UpdateActionData();
+
+        health = maxHealth = 10000; // todo pull that, need to make one of the dumps contain vital_max
     }
 
     Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
@@ -280,6 +284,9 @@ private:
     float velocityY = 0.0f;
     float accelX = 0.0f;
     float accelY = 0.0f;
+
+    int maxHealth;
+    int health;
 
     int currentAction = 1;
     int nextAction = -1;
