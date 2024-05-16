@@ -931,8 +931,8 @@ void Guy::DoTriggers()
                                 nlohmann::json resourceMatch;
                                 int chargeID = inputOkKeyFlags & 0xFF;
                                 for (auto& [keyID, key] : chargeJson.items()) {
-                                    resourceMatch = key["resource"];
-                                    if (resourceMatch["charge_id"] == chargeID ) {
+                                    if (key["charge_id"] == chargeID ) {
+                                        resourceMatch = key;
                                         chargeMatch = true;
                                         break;
                                     }
