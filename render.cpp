@@ -58,9 +58,9 @@ void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= f
     drawBox( box.x, box.y, box.w, box.h,col.r,col.g,col.b );
 }
 
-float zoom = 1.5;
-int translateX = 0;
-int translateY = 0;
+float zoom = 1.20;
+int translateX = 960;
+int translateY = -20;
 
 void setRenderState(color clearColor, int sizeX, int sizeY)
 {

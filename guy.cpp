@@ -52,7 +52,7 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
         if (match == okKeyFlags) {
             return true; // match all?
         }
-    } else if (okCondFlags & 0x40) {
+    } else if ((okCondFlags & 0x60) == 0x60) {
         if (std::bitset<32>(match).count() >= 2) {
             return true; // match 2?
         }
@@ -952,8 +952,8 @@ bool Guy::WorldPhysics(void)
         // Walls
 
         float x = getPosX();
-        if (x < 0.0 ) {
-            pushX = -x;
+        if (x < -765.0 ) {
+            pushX = -(x - -765.0f);
             touchedWall = true;
             hasPushed = true;
         }
