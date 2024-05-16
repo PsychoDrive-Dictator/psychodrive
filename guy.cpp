@@ -1554,7 +1554,11 @@ bool Guy::Frame(void)
         } else if ( currentInput & 2 ) {
             if ( !crouching ) {
                 crouching = true;
-                nextAction = 5; // BAS_STD_CRH
+                if (poseStatus == 2) {
+                    nextAction = 4; // crouch loop after the first sitting down anim if already crouched
+                } else {
+                    nextAction = 5; // BAS_STD_CRH
+                }
             }
         } else {
             if ((currentInput & (32+256)) == 32+256) {

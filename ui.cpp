@@ -111,13 +111,22 @@ void drawInputEditor()
     unsigned int i = recordingProgress;
     static int uniqueID = 0;
     while (i < recordedInput.size()) {
+        // in timeline frames
+        int targetFrame = currentFrame + (int)i-(int)recordingProgress;
+
         int key = 0;
         while (key < 10)
         {
             if (recordedInput[i] & 1<<key) {
+
+                if ((int)playBackInputBuffer.size() > targetFrame && playBackInputBuffer[targetFrame] & 1<<key) {
+                    key++;
+                    continue;
+                }
+
                 timelineItem *pNewNote = new timelineItem;
                 *pNewNote = {
-                    currentFrame + (int)i-(int)recordingProgress,
+                    targetFrame,
                     1<<key
                 };
                 mapTimelineItems[uniqueID++] = pNewNote;
