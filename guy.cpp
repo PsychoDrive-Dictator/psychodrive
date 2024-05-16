@@ -142,6 +142,7 @@ bool Guy::PreFrame(void)
 
     hitThisFrame = false;
     landed = false;
+    pushBackThisFrame = 0.0f;
 
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     bool validAction = namesJson.contains(actionIDString);
@@ -326,12 +327,12 @@ bool Guy::PreFrame(void)
         posY += velocityY;
 
         if (prevPosY == 0.0f && posY > 0.0f) {
-            airborne = true; // i think we should go by statusKey instead
+            airborne = true; // i think we should go by statusKey instead?
         }
 
         if (hitVelFrames > 0) {
             posX += hitVelX;
-            posY += hitVelY;
+            pushBackThisFrame = hitVelX;
             hitVelFrames--;
         }
 
@@ -425,88 +426,6 @@ bool Guy::PreFrame(void)
                 }
             }
         }
-
-        pushBoxes.clear();
-        hitBoxes.clear();
-        hurtBoxes.clear();
-        renderBoxes.clear();
-
-        if (actionJson.contains("DamageCollisionKey"))
-        {
-            for (auto& [hurtBoxID, hurtBox] : actionJson["DamageCollisionKey"].items())
-            {
-                if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int rootOffsetX = 0;
-                int rootOffsetY = 0;
-                parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
-                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-                rootOffsetY += posY + posOffsetY;
-
-                bool drive = isDrive || wasDrive;
-                bool parry = currentAction >= 480 && currentAction <= 489;
-                bool di = currentAction >= 850 && currentAction <= 859;
-
-                Box rect;
-                int magicHurtBoxID = 8; // i hate you magic array of boxes
-
-                auto rects = commonAction ? commonRectsJson : rectsJson;
-
-                for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                    if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                        hurtBoxes.push_back(rect);
-                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
-                    }
-                }
-                for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                    if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                        hurtBoxes.push_back(rect);
-                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
-                    }
-                }
-                for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                    if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                        hurtBoxes.push_back(rect);
-                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
-                    }
-                }
-                for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                    if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
-                        renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
-                    }
-                }
-            }
-        }
-        if (actionJson.contains("PushCollisionKey"))
-        {
-            for (auto& [pushBoxID, pushBox] : actionJson["PushCollisionKey"].items())
-            {
-                if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-                int rootOffsetX = 0;
-                int rootOffsetY = 0;
-                parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
-                rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-                rootOffsetY += posY + posOffsetY;
-
-                Box rect;
-                auto rects = commonAction ? commonRectsJson : rectsJson;
-
-                if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
-                    pushBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {1.0,1.0,1.0}});
-                } else if (getRect(rect, rects, 7, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
-                    pushBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {1.0,1.0,1.0}});
-                }
-            }
-        }
-
-        DoHitBoxKey("AttackCollisionKey");
-        //DoHitBoxKey("OtherCollisionKey", true);
 
         // should this fall through and let triggers also happen? prolly
 
@@ -756,6 +675,91 @@ bool Guy::PreFrame(void)
     return true;
 }
 
+void Guy::UpdateBoxes(void)
+{
+    pushBoxes.clear();
+    hitBoxes.clear();
+    hurtBoxes.clear();
+    renderBoxes.clear();
+
+    if (actionJson.contains("DamageCollisionKey"))
+    {
+        for (auto& [hurtBoxID, hurtBox] : actionJson["DamageCollisionKey"].items())
+        {
+            if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            int rootOffsetX = 0;
+            int rootOffsetY = 0;
+            parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
+            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+            rootOffsetY += posY + posOffsetY;
+
+            bool drive = isDrive || wasDrive;
+            bool parry = currentAction >= 480 && currentAction <= 489;
+            bool di = currentAction >= 850 && currentAction <= 859;
+
+            Box rect;
+            int magicHurtBoxID = 8; // i hate you magic array of boxes
+
+            auto rects = commonAction ? commonRectsJson : rectsJson;
+
+            for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
+                if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    hurtBoxes.push_back(rect);
+                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+            for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
+                if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    hurtBoxes.push_back(rect);
+                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+            for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
+                if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    hurtBoxes.push_back(rect);
+                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+            for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
+                if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+        }
+    }
+    if (actionJson.contains("PushCollisionKey"))
+    {
+        for (auto& [pushBoxID, pushBox] : actionJson["PushCollisionKey"].items())
+        {
+            if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+            int rootOffsetX = 0;
+            int rootOffsetY = 0;
+            parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
+            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+            rootOffsetY += posY + posOffsetY;
+
+            Box rect;
+            auto rects = commonAction ? commonRectsJson : rectsJson;
+
+            if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                pushBoxes.push_back(rect);
+                renderBoxes.push_back({rect, {1.0,1.0,1.0}});
+            } else if (getRect(rect, rects, 7, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                pushBoxes.push_back(rect);
+                renderBoxes.push_back({rect, {1.0,1.0,1.0}});
+            }
+        }
+    }
+
+    DoHitBoxKey("AttackCollisionKey");
+    //DoHitBoxKey("OtherCollisionKey", true);
+}
+
 void Guy::Render(void) {
     for (auto box : renderBoxes) {
         drawHitBox(box.box,box.col,box.drive,box.parry,box.di);
@@ -780,7 +784,9 @@ bool Guy::Push(Guy *pOtherGuy)
     float pushY = 0;
     float pushX = 0;
     for (auto pushbox : pushBoxes ) {
+
         if (noPush) break;
+
         for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
@@ -813,43 +819,40 @@ bool Guy::WorldPhysics(void)
     float pushY = 0;
     bool floorpush = false;
     touchedWall = false;
-    for (auto pushbox : pushBoxes ) {
-        if (noPush) break;
 
+    if (!noPush) {
         // Floor
 
         // if knocked down, go by pushbox, otherwise just by position
         // there's probably a status flag that governs this :harold:
         if (knockedDown && airborne) {
-            if (pushbox.y < 0) {
-                pushY = std::max(-pushbox.y, pushY);
-                floorpush = true;
-                hasPushed = true;
+            for (auto pushbox : hurtBoxes ) {
+                if (pushbox.y < 0) {
+                    pushY = std::max(-pushbox.y, pushY);
+                    //log("floorpush hurtbox");
+                    floorpush = true;
+                    hasPushed = true;
+                }
             }
         } else {
             if (posY < 0) {
+                //log("floorpush pos");
                 pushY = -posY;
                 floorpush = true;
                 hasPushed = true;
             }
         }
 
-        if ((airborne || posY > 0) && pushbox.y < 0) {
-            pushY = std::max(-pushbox.y, pushY);
-            floorpush = true;
-            hasPushed = true;
-        }
-
         // Walls
 
-        if (pushbox.x < 0.0 ) {
-            pushX = std::max(-pushbox.x, pushX);
+        float x = posX + (posOffsetX * direction);
+        if (x < 0.0 ) {
+            pushX = -x;
             touchedWall = true;
             hasPushed = true;
         }
-        if (pushbox.x + pushbox.w > 800.0f ) {
-            float diff = -(pushbox.x + pushbox.w - 800.0f);
-            pushX = std::min(diff, pushX);
+        if (x > 765.0f ) {
+            pushX = -(x - 765.0f);
             touchedWall = true;
             hasPushed = true;
         }
@@ -860,7 +863,9 @@ bool Guy::WorldPhysics(void)
     {
         pushY = 0.0f;
         posY = 0.0f;
+        velocityX = 0.0f;
         velocityY = 0.0f;
+        accelX = 0.0f;
         accelY = 0.0f;
 
         airborne = false;
@@ -875,6 +880,14 @@ bool Guy::WorldPhysics(void)
     if ( hasPushed ) {
         posX += pushX;
         posY += pushY;
+
+        if (pushBackThisFrame != 0.0f && pushX != 0 && pushX * pushBackThisFrame < 0.0f) {
+            // some pushback went into the wall, it needs to go into opponent
+            if (pAttacker && !pAttacker->noPush) {
+                pAttacker->posX += std::max(pushX, pushBackThisFrame * -1.0f);
+            }
+        }
+
         return true;
     }
 
@@ -896,7 +909,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 int hitEntryFlag = 0;
 
-                bool otherGuyAirborne = pOtherGuy->airborne;
+                // it's possible to hit them on the frames they owuld have landed
+                // now that we run hits after physics
+                // this is eg. lp dp after heavy donkey
+                // i think this is how the game works too bc pos is already snapped at 0 when it hits
+                bool otherGuyAirborne = pOtherGuy->airborne || pOtherGuy->landed;
 
                 if (otherGuyAirborne) {
                     hitEntryFlag |= air;
@@ -980,8 +997,9 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
-                //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " moveType " + std::to_string(moveType) + " curveTargetID " + std::to_string(curveTargetID));
+                //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
+                pOtherGuy->pAttacker = this;
 
                 canHitID = hitbox.hitID + 1;
                 hitThisFrame = true;
@@ -1007,13 +1025,28 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     comboDamage += damage;
     // +1 because i think we're off by one frame where we run this
     hitStun = stun + 1 + hitStunAdder;
-    hitVelFrames = destTime;
+
+    if (destY > 0 ) {
+        airborne = true;
+        knockedDown = true;
+        // it's possible to hit them on the frames they owuld have landed
+        // now that we run hits after physics
+        // this is eg. lp dp after heavy donkey
+        // i think this is how the game works too bc pos is already snapped at 0 when it hits
+        landed = false; 
+    }
 
     if (destTime != 0) {
         // assume hit direction is opposite as facing for now, not sure if that's true
         // todo pushback in corner - all destX _must_ be traveled by either side
         if ( destX != 0 ) {
-            hitVelX = (direction * destX * -1) / (float)destTime;
+            if (!airborne) {
+                hitVelX = (direction * destX * -1) / (float)destTime;
+                hitVelFrames = destTime;
+            } else {
+                // keep itvel pushback from last grounded hit
+                velocityX = (-destX) / (float)destTime;
+            }
         }
 
         if (destY != 0) {
@@ -1024,11 +1057,6 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
 
     // i think this vel wants to apply this frame, lame workaround to get same intensity
     velocityY -= accelY; //
-
-    if (destY > 0 ) {
-        airborne = true;
-        knockedDown = true;
-    }
 
     nextAction = 205; // HIT_MM, not sure how to pick which
     if ((airborne || posY > 0.0) && destY != 0 ) {
@@ -1129,7 +1157,7 @@ void Guy::DoBranchKey(void)
                     if (pParent) {
                         if (pParent->currentAction == branchParam0) {
                            doBranch = true;
-                           log("action branch1");
+                           //log("action branch1");
                         }
                     } else {
                         log("that branch not gonna work");
@@ -1411,6 +1439,7 @@ bool Guy::Frame(void)
         comboHits = 0;
         juggleCounter = 0;
         comboDamage = 0;
+        pAttacker = nullptr;
     }
 
     // Transition
