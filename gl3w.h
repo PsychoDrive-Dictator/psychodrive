@@ -225,9 +225,7 @@ union GL3WProcs {
 		PFNGLFLUSHMAPPEDBUFFERRANGEPROC                         FlushMappedBufferRange;
 		PFNGLFLUSHMAPPEDNAMEDBUFFERRANGEPROC                    FlushMappedNamedBufferRange;
 		PFNGLFRAMEBUFFERPARAMETERIPROC                          FramebufferParameteri;
-#ifndef WIN32
-		PFNGLFRAMEBUFFERPARAMETERIMESAPROC                      FramebufferParameteriMESA;
-#endif
+		PFNGLFRAMEBUFFERPARAMETERIPROC                      	FramebufferParameteriMESA;
 		PFNGLFRAMEBUFFERRENDERBUFFERPROC                        FramebufferRenderbuffer;
 		PFNGLFRAMEBUFFERTEXTUREPROC                             FramebufferTexture;
 		PFNGLFRAMEBUFFERTEXTURE1DPROC                           FramebufferTexture1D;
@@ -277,9 +275,7 @@ union GL3WProcs {
 		PFNGLGETFRAGDATALOCATIONPROC                            GetFragDataLocation;
 		PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC            GetFramebufferAttachmentParameteriv;
 		PFNGLGETFRAMEBUFFERPARAMETERIVPROC                      GetFramebufferParameteriv;
-#ifndef WIN32
-		PFNGLGETFRAMEBUFFERPARAMETERIVMESAPROC                  GetFramebufferParameterivMESA;
-#endif
+		PFNGLGETFRAMEBUFFERPARAMETERIVPROC                  	GetFramebufferParameterivMESA;
 		PFNGLGETGRAPHICSRESETSTATUSPROC                         GetGraphicsResetStatus;
 		PFNGLGETINTEGER64I_VPROC                                GetInteger64i_v;
 		PFNGLGETINTEGER64VPROC                                  GetInteger64v;
