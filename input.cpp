@@ -74,6 +74,12 @@ int getInput(int currentInput)
                 case SDLK_0:
                     oneframe = true;
                     break;
+                case SDLK_r:
+                    recordingInput = !recordingInput;
+                    if (recordingInput == true) {
+                        recordingStartFrame = globalFrameCount;
+                    }
+                    break;
                 case SDLK_ESCAPE:
                     done = true;
                     break;
