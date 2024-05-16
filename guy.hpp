@@ -69,6 +69,9 @@ public:
     int getComboDamage() { return comboDamage; }
     int getUniqueParam() { return uniqueCharge; }
     std::string getName() { return name; }
+    int getPoseStatus() { return poseStatus; }
+    int getActionStatus() { return actionStatus; }
+    int getJumpStatus() { return jumpStatus; }
 
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }
@@ -228,6 +231,9 @@ private:
     bool crouching = false;
 
     int landingAdjust = 0;
+    int poseStatus = 0;
+    int actionStatus = 0;
+    int jumpStatus = 0;
 
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;

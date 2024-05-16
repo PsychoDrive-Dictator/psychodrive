@@ -17,7 +17,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         std::vector<char *> &vecMoveList = pGuy->getMoveList();
         ImGui::Combo("neutral action", pGuy->getNeutralMovePtr(), vecMoveList.data(), vecMoveList.size());
     }
-    ImGui::Text("airborne %i", pGuy->getAirborne());
+    ImGui::Text("airborne %i poseStatus %i actionStatus %i jumpStatus %i", pGuy->getAirborne(), pGuy->getPoseStatus(), pGuy->getActionStatus(), pGuy->getJumpStatus());
     float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
     pGuy->getVel(velX, velY, accelX, accelY);
