@@ -14,6 +14,7 @@ struct color {
 
 struct RenderBox {
     Box box;
+    float thickness = 10.0;
     color col;
     bool drive = false;
     bool parry = false;
@@ -25,8 +26,8 @@ extern int translateX;
 extern int translateY;
 
 void setRenderState(color clearColor, int sizeX, int sizeY);
-void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ );
-void drawBox(float x, float y, float w, float h, float r, float g, float b);
+void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ );
+void drawBox(float x, float y, float w, float h, float thickness, float r, float g, float b);
 void drawQuad(float x, float y, float w, float h, float r, float g, float b, float a);
 void drawLoop(float x, float y, float w, float h, float r, float g, float b, float a);
 SDL_Window* initWindowRender(void);
