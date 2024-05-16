@@ -64,7 +64,15 @@ static inline float randFloat()
 void log(std::string logLine);
 
 class Guy;
+
+extern const char* charNames[];
+extern const int charNameCount;
+
+extern float startPos1;
+extern float startPos2;
+
 extern std::vector<Guy *> guys;
+
 extern bool resetpos;
 
 extern bool done;

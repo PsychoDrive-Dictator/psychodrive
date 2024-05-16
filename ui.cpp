@@ -222,19 +222,24 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
-    ImGui::Begin("Psycho Drive", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | 
+    ImGui::Begin("PsychoDrive", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
-    const char* chars[] = { "ryu", "honda", "ed", "jp", "guile", "chunli", "dhalsim", "jamie", "marisa" };
-    static int charID = rand() % IM_ARRAYSIZE(chars);
+    static int charID = rand() % charNameCount;
     static float newCharPos = randFloat();
-    ImGui::SliderFloat("##newcharpos", &newCharPos, 0.0, 1.0);
+    ImGui::Text("start positions:");
+    ImGui::SliderFloat("##startpos1", &startPos1, -765.0, 765.0);
+    ImGui::SliderFloat("##startpos2", &startPos2, -765.0, 765.0);
+    ImGui::SameLine();
+    resetpos = resetpos || ImGui::Button("reset positions (Q)");
+    ImGui::Text("add new guy:");
+    ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
     ImGui::ColorEdit3("##newcharcolor", newCharColor);
-    ImGui::Combo("##newcharchar", &charID, chars, IM_ARRAYSIZE(chars));
+    ImGui::Combo("##newcharchar", &charID, charNames, charNameCount);
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
-        Guy *pNewGuy = new Guy(chars[charID], newCharPos * 750.0, 0.0, 1, col );
+        Guy *pNewGuy = new Guy(charNames[charID], newCharPos, 0.0, 1, col );
         if (guys.size()) {
             pNewGuy->setOpponent(guys[0]);
             if (guys.size() == 1) {
@@ -245,15 +250,12 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
         newCharColor[0] = randFloat();
         newCharColor[1] = randFloat();
         newCharColor[2] = randFloat();
-        charID = rand() % IM_ARRAYSIZE(chars);
+        charID = rand() % charNameCount;
         newCharPos = randFloat();
     }
     for (auto i : currentInputMap) {
         ImGui::Text("input %i %i", i.first, i.second);
     }
-    ImGui::SameLine();
-    resetpos = resetpos || ImGui::Button("reset positions");
-    ImGui::SameLine();
     ImGui::Text("frame %d", globalFrameCount);
     if (paused) {
         ImGui::SameLine();
@@ -268,18 +270,18 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "RECORDING");
     }
     ImGui::SameLine();
-    if ( ImGui::Button("pause") ) {
+    if ( ImGui::Button("pause (P)") ) {
         paused = !paused;
     }
     ImGui::SameLine();
-    if ( ImGui::Button("step one") ) {
+    if ( ImGui::Button("step one (0)") ) {
         oneframe = true;
     }
     ImGui::SliderInt("hitstun adder", &hitStunAdder, -10, 10);
     ImGui::Checkbox("force counter", &forceCounter);
     ImGui::SameLine();
     ImGui::Checkbox("force PC", &forcePunishCounter);
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / frameRate, frameRate);
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / frameRate, frameRate);
     for (auto logLine : *pLogQueue) {
         ImGui::Text(logLine.c_str());
     }

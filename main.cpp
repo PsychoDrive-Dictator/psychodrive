@@ -26,7 +26,35 @@ int hitStunAdder = 0;
 
 uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
+const char* charNames[] = {
+    "ryu",
+    "ken",
+    "luke",
+    "honda",
+    "zangief",
+    "manon",
+    "ed",
+    "jp",
+    "guile",
+    "rashid",
+    "aki",
+    "chunli",
+    "lily",
+    "deejay",
+    "cammy",
+    "dhalsim",
+    "kimberly",
+    "jamie",
+    "marisa",
+    "blanka"
+};
+const int charNameCount = IM_ARRAYSIZE(charNames);
+
+float startPos1 = -150.0;
+float startPos2 = 150.0;
+
 bool resetpos = false;
+
 std::vector<Guy *> guys;
 
 bool done = false;
@@ -121,9 +149,6 @@ void log(std::string logLine)
     }
 }
 
-float startPos1 = -765.0;
-float startPos2 = -660.0;
-
 int main(int argc, char**argv)
 {
     srand(time(NULL));
@@ -132,20 +157,30 @@ int main(int argc, char**argv)
     ImGuiIO& io = ImGui::GetIO(); // why doesn't the one from initUI work? who knows
     initRenderUI();
 
+    char *charNameLeft = nullptr;
+    char *charNameRight = nullptr;
+
     if ( argc > 1 ) {
-        Guy *pNewGuy = new Guy(argv[1], startPos1, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
-        *pNewGuy->getInputIDPtr() = keyboardID;
-        *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
-        guys.push_back(pNewGuy);
-
-        if ( argc > 2 ) {
-            pNewGuy = new Guy(argv[2], startPos2, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
-            guys.push_back(pNewGuy);
-
-            pNewGuy->setOpponent(guys[0]);
-            guys[0]->setOpponent(pNewGuy);
-        }
+        charNameLeft = argv[1];
+    } else {
+        charNameLeft = (char*)charNames[rand() % charNameCount];
     }
+    if ( argc > 2 ) {
+        charNameRight = argv[2];
+    } else {
+        charNameRight = (char*)charNames[rand() % charNameCount];
+    }
+    Guy *pNewGuy = new Guy(charNameLeft, startPos1, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+    *pNewGuy->getInputIDPtr() = keyboardID;
+    *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
+    guys.push_back(pNewGuy);
+
+
+    pNewGuy = new Guy(charNameRight, startPos2, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+    guys.push_back(pNewGuy);
+
+    pNewGuy->setOpponent(guys[0]);
+    guys[0]->setOpponent(pNewGuy);
 
     nlohmann::json inputTimeline = parse_json_file("timeline.json");
     if (inputTimeline != nullptr) {

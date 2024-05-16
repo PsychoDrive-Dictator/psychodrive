@@ -18,7 +18,7 @@ out vec4 color;
 
 float edge(float dist)
 {
-    if (dist == 0.0) {
+    if (dist < 0.0001) {
         return boxalpha;
     }
     if (dist < distedge) {
