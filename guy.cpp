@@ -648,13 +648,16 @@ void Guy::DoTriggers()
                         break;
                     }
                 }
-                bool usinguniquecharge = false;
 
                 if (trigger["_UseUniqueParam"] == true) {
-                    if (!uniqueCharge) {
+                    int op = trigger["cond_param_ope"];
+                    int value = trigger["cond_param_value"];
+                    if (op == 0 && value != uniqueCharge ) {
                         continue;
                     }
-                    usinguniquecharge = true;
+                    if (op == 5 && value > uniqueCharge ) {
+                        continue;
+                    }
                 }
                 int limitShotCount = trigger["cond_limit_shot_num"];
                 if (limitShotCount) {
@@ -709,9 +712,6 @@ void Guy::DoTriggers()
                             deferredActionFrame = triggerEndFrame;
                         } else {
                             nextAction = actionID;
-                        }
-                        if ( usinguniquecharge ) {
-                            uniqueCharge = 0;
                         }
                         log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                         break; // we found our trigger walking back, blow up the whole group
@@ -817,9 +817,6 @@ void Guy::DoTriggers()
                                 deferredActionFrame = triggerEndFrame;
                             } else {
                                 nextAction = actionID;
-                            }
-                            if ( usinguniquecharge ) {
-                                uniqueCharge = 0;
                             }
                             // try to consume the input
                             inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
@@ -1867,8 +1864,7 @@ bool Guy::Frame(void)
         pAttacker = nullptr;
     }
 
-    // this might have been a cancel containing state like blowing up some bar
-    // so better honor it! put it last here - this can be true even if canMove!
+    // this can be true even if canMove
     if (deferredAction != 0 && deferredActionFrame == currentFrame) {
         log(logTransitions, "deferred nextAction " + std::to_string(deferredAction));
         nextAction = deferredAction;
@@ -1957,9 +1953,6 @@ bool Guy::Frame(void)
 
         actionFrameDataInitialized = false;
 
-        if (deferredAction != 0) {
-            log(true, "eating deferred action! give back sumo spirit?");
-        }
         deferredAction = 0;
         deferredActionFrame = 0;
     }
