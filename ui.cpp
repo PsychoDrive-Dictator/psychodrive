@@ -49,8 +49,10 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Checkbox("branches", &pGuy->logBranches);
     ImGui::SameLine();
     ImGui::Checkbox("transitions", &pGuy->logTransitions);
-    for (auto logLine : pGuy->getLogQueue()) {
-        ImGui::Text(logLine.c_str());
+    auto logQueue = pGuy->getLogQueue();
+    for (int i = logQueue.size() - 1; i >= 0; i--) {
+    //for (auto logLine : pGuy->getLogQueue()) {
+        ImGui::Text(logQueue[i].c_str());
     }
     ImGui::End();
 
@@ -240,9 +242,17 @@ void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQu
     resetpos = resetpos || ImGui::Button("reset positions");
     ImGui::SameLine();
     ImGui::Text("frame %d", globalFrameCount);
-    ImGui::SameLine();
     if (paused) {
+        ImGui::SameLine();
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "PAUSED");
+    }
+    if ( playingBackInput ) {
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0, 1, 0, 1), "PLAY");
+    }
+    if ( recordingInput ) {
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), "RECORDING");
     }
     ImGui::SameLine();
     if ( ImGui::Button("pause") ) {

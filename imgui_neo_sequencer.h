@@ -84,7 +84,7 @@ struct ImGuiNeoSequencerStyle {
     float       TimelineBorderSize      = 1.0f;
     float       CurrentFramePointerSize = 7.0f;                 // Size of pointing arrow above current frame line
     float       CurrentFrameLineWidth   = 1.0f;                 // Width of line showing current frame over timeline
-    float       ZoomHeightScale         = 1.0f;                 // Scale of Zoom bar, base height is font size
+    float       ZoomHeightScale         = 5.0f;                 // Scale of Zoom bar, base height is font size
     float       CollidedKeyframeOffset  = 3.5f;                 // Offset on which colliding keyframes are rendered
 
     float       MaxSizePerTick          = 4.0f;                 // Maximum amount of pixels per tick on timeline (if less pixels is present, ticks are not rendered)

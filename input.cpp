@@ -89,10 +89,11 @@ int getInput(int currentInput)
                     playingBackInput = !playingBackInput;
                     if (playingBackInput == true) {
                         timelineToInputBuffer(playBackInputBuffer);
+                        playBackFrame = 0;
                     } else {
                         currentInput = 0;
                     }
-                    playBackFrame = 0;
+                    paused = false;
                     break;
                 case SDLK_DELETE:
                     deleteInputs = true;
