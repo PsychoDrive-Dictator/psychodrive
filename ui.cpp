@@ -46,7 +46,7 @@ void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQu
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
-        Guy *pNewGuy = new Guy(chars[charID], newCharPos * 700.0, 0.0, 1, col );
+        Guy *pNewGuy = new Guy(chars[charID], newCharPos * 750.0, 0.0, 1, col );
         if (guys.size()) {
             pNewGuy->setOpponent(guys[0]);
             if (guys.size() == 1) {

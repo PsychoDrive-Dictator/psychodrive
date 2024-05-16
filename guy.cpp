@@ -749,8 +749,8 @@ bool Guy::WorldPhysics(void)
             touchedWall = true;
             hasPushed = true;
         }
-        if (pushbox.x + pushbox.w > 500.0f ) {
-            float diff = -(pushbox.x + pushbox.w - 500.0f);
+        if (pushbox.x + pushbox.w > 800.0f ) {
+            float diff = -(pushbox.x + pushbox.w - 800.0f);
             pushX = std::min(diff, pushX);
             touchedWall = true;
             hasPushed = true;
