@@ -60,6 +60,7 @@ public:
     int getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
+    int getUniqueParam() { return uniqueCharge; }
     std::string getName() { return name; }
 
     bool getProjectile() { return isProjectile; }
