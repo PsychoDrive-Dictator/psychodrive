@@ -133,7 +133,7 @@ public:
             commonMovesInitialized = true;
         }
 
-        BuildMoveListDropdown();
+        BuildMoveList();
     
         UpdateActionData();
     }
@@ -193,7 +193,7 @@ private:
     int lastLogFrame = 0;
     std::deque<std::string> logQueue;
 
-    void BuildMoveListDropdown();
+    void BuildMoveList();
     std::vector<char *> vecMoveList;
     int neutralMove = 0;
 
@@ -219,6 +219,8 @@ private:
 
     static nlohmann::json commonMovesJson;
     static nlohmann::json commonRectsJson;
+
+    std::map<int, int> mapMoveStyle;
 
     float posX = 0.0f;
     float posY = 0.0f;
@@ -259,6 +261,9 @@ private:
     bool commonAction = false;
     bool hasLooped = false;
     bool actionFrameDataInitialized = false;
+
+    int styleInstall = -1;
+    int styleInstallFrames = 0;
 
     int currentInput = 0;
     std::deque<int> inputBuffer;
