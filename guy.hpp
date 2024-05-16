@@ -142,9 +142,9 @@ public:
     {
         character = parent.character;
         name = character + "'s minion";
+        direction = parent.direction;
         posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
         posY = parent.posY + parent.posOffsetY + posOffsetY;
-        direction = parent.direction;
         charColorR = parent.charColorR;
         charColorG = parent.charColorG;
         charColorB = parent.charColorB;
