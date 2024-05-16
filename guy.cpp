@@ -83,6 +83,28 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
     }
 }
 
+bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, int dir)
+{
+    std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
+    std::string boxIDString = to_string_leading_zeroes(boxID, 3);
+    if (!rectsJson.contains(pageIDString) || !rectsJson[pageIDString].contains(boxIDString)) {
+        return false;
+    }
+    auto rectJson = rectsJson[pageIDString][boxIDString];
+    int xOrig = rectJson["OffsetX"];
+    int yOrig = rectJson["OffsetY"];
+    int xRadius = rectJson["SizeX"];
+    int yRadius = rectJson["SizeY"];
+    xOrig *= dir;
+
+    outBox.x = xOrig - xRadius + offsetX;
+    outBox.y = yOrig - yRadius + offsetY;
+    outBox.w = xRadius * 2;
+    outBox.h = yRadius * 2;
+
+    return true;
+}
+
 Guy::Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)
 {
     character = charName;
@@ -100,15 +122,27 @@ Guy::Guy(std::string charName, float startPosX, float startPosY, int startDir, c
     triggersJson = parse_json_file(character + "_triggers.json");
     commandsJson = parse_json_file(character + "_commands.json");
     chargeJson = parse_json_file(character + "_charge.json");
+    hitJson = parse_json_file(character + "_hit.json");
 }
 
 void Guy::Input(int input)
 {
+    if (direction < 0) {
+        int newMask = 0;
+        if (input & BACK) {
+            newMask |= FORWARD;
+        }
+        if (input & FORWARD) {
+            newMask |= BACK;
+        }
+        input &= ~(FORWARD+BACK);
+        input |= newMask;
+    }
     currentInput = input;
 
     inputBuffer.push_front(input);
     // how much is too much?
-    if (inputBuffer.size() > 60) {
+    if (inputBuffer.size() > 50) {
         inputBuffer.pop_back();
     }
 }
@@ -163,6 +197,12 @@ void Guy::PreFrame(void)
 
         posX += (velocityX * direction);
         posY += velocityY;
+
+        if (hitVelFrames > 0) {
+            posX += hitVelX;
+            posY += hitVelY;
+            hitVelFrames--;
+        }
 
         // landing
         if ( oldPosY > 0.0f && posY <= 0.0f ) // iffy but we prolly move to fixed point anyway at some point
@@ -247,6 +287,25 @@ void Guy::PreFrame(void)
                 }
             }
         }
+
+        if (movesDictJson[actionName].contains("WorldKey"))
+        {
+            for (auto& [keyID, key] : movesDictJson[actionName]["WorldKey"].items())
+            {
+                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                    continue;
+                }
+
+                if (key["Type"] == 0) {
+                    warudo = key["Timer"].get<int>() * -1;
+                }
+            }
+        }
+
+        pushBoxes.clear();
+        hitBoxes.clear();
+        hurtBoxes.clear();
+
         if (movesDictJson[actionName].contains("PushCollisionKey"))
         {
             for (auto& [pushBoxID, pushBox] : movesDictJson[actionName]["PushCollisionKey"].items())
@@ -260,7 +319,12 @@ void Guy::PreFrame(void)
                 rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
                 rootOffsetY += posY + posOffsetY;
 
-                drawRectsBox( rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction, {1.0,1.0,1.0});
+                Box rect;
+                
+                if (getRect(rect, rectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                    pushBoxes.push_back(rect);
+                    drawHitBox( rect, {1.0,1.0,1.0});
+                }
             }
         }
         if (movesDictJson[actionName].contains("DamageCollisionKey"))
@@ -281,17 +345,30 @@ void Guy::PreFrame(void)
                 bool parry = currentAction >= 480 && currentAction <= 489;
                 bool di = currentAction >= 850 && currentAction <= 859;
 
+                Box rect;
+
                 for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction,{charColorR,charColorG,charColorB},drive,parry,di);
+                    if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
+                        hurtBoxes.push_back(rect);
+                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                    }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction,{charColorR,charColorG,charColorB},drive,parry,di);
+                    if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
+                        hurtBoxes.push_back(rect);
+                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                    }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                    drawRectsBox( rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction,{charColorR,charColorG,charColorB},drive,parry,di);
+                    if (getRect(rect, rectsJson, 8, boxID,rootOffsetX, rootOffsetY,direction)) {
+                        hurtBoxes.push_back(rect);
+                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                    }
                 }
                 for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                    drawRectsBox( rectsJson, 7, boxID,rootOffsetX, rootOffsetY,direction,{0.75,0.75,0.65} );
+                    if (getRect(rect, rectsJson, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
+                        drawHitBox(rect,{charColorR,charColorG,charColorB}, drive,parry,di);
+                    }
                 }
             }
         }
@@ -310,11 +387,20 @@ void Guy::PreFrame(void)
                 rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
                 rootOffsetY += posY + posOffsetY;
 
+                Box rect;
+
                 for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
                     if (hitBox["CollisionType"] == 3) {
-                        drawRectsBox( rectsJson, 3, boxID,rootOffsetX, rootOffsetY,direction,{0.5,0.5,0.5});
+                        if (getRect(rect, rectsJson, 3, boxID,rootOffsetX, rootOffsetY,direction)) {
+                            drawHitBox(rect, {0.5,0.5,0.5});
+                        }
                     } else if (hitBox["CollisionType"] == 0) {
-                        drawRectsBox( rectsJson, 0, boxID,rootOffsetX, rootOffsetY,direction,{1.0,0.0,0.0}, isDrive || wasDrive );
+                        if (getRect(rect, rectsJson, 0, boxID,rootOffsetX, rootOffsetY,direction)) {
+                            int hitEntryID = hitBox["AttackDataListIndex"];
+                            int hitID = hitBox["HitID"];
+                            hitBoxes.push_back({rect,hitEntryID,hitID});
+                            drawHitBox(rect,{1.0,0.0,0.0}, isDrive || wasDrive);
+                        }
                     }
                 }                    
             }
@@ -500,6 +586,61 @@ void Guy::PreFrame(void)
     }
 }
 
+bool Guy::Push(Guy *pOtherGuy) 
+{
+    for (auto pushbox : pushBoxes ) {
+        for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
+            if (doBoxesHit(pushbox, otherPushBox)) {
+
+                int difference = pushbox.x + pushbox.w - otherPushBox.x;
+                log("push " + std::to_string(difference));
+                posX -= difference;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Guy::CheckHit(Guy *pOtherGuy)
+{
+    for (auto hitbox : hitBoxes ) {
+        if (hitbox.hitID < canHitID) {
+            continue;
+        }
+        for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
+            if (doBoxesHit(hitbox.box, hurtbox)) {
+                std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
+                auto hitEntry = hitJson[hitIDString]["common"]["0"];
+                int hitStun = hitEntry["HitStun"];
+                int destX = hitEntry["MoveDest"]["x"];
+                int destY = hitEntry["MoveDest"]["y"];
+                int destTime = hitEntry["MoveTime"];
+                if (wasDrive) {
+                    hitStun+=4;
+                }
+                pOpponent->Hit(hitStun, destX, destY, destTime);
+                canHitID = hitbox.hitID + 1;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void Guy::Hit(int stun, int destX, int destY, int destTime)
+{
+    comboHits++;
+    hitStun = stun + 3;
+    hitVelFrames = destTime;
+
+    // assume hit direction is opposite as facing for now, not sure if that's true
+    hitVelX = (direction * destX * -1) / (float)destTime;
+    hitVelY = destY / (float)destTime;
+
+    nextAction = 205; // HIT_MM, not sure how to pick which
+}
+
 void Guy::Frame(void)
 {
     currentFrame++;
@@ -519,6 +660,21 @@ void Guy::Frame(void)
                 // do those also override if higher branchID?
             }
         }
+    }
+
+    if (hitStun > 0)
+    {
+        hitStun--;
+        if (hitStun == 0)
+        {
+            nextAction = 1;
+            comboHits = 0;
+        }
+    }
+
+    if (warudo > 0)
+    {
+        warudo--;
     }
 
     if (currentFrame >= actionFrameDuration && nextAction == -1)
@@ -546,6 +702,10 @@ void Guy::Frame(void)
 
     if ( marginFrame != -1 && currentFrame >= marginFrame ) {
         canMove = true;
+    }
+
+    if (posY > 0.0f) {
+        canMove = false;
     }
 
     bool turnaround = false;
@@ -595,6 +755,8 @@ void Guy::Frame(void)
     {
         currentAction = nextAction;
         currentFrame = 0;
+
+        canHitID = 0;
 
         // commit current place offset
         posX += (posOffsetX * direction);

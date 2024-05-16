@@ -24,9 +24,23 @@ struct color {
     float b;
 };
 
+struct Box {
+    float x;
+    float y;
+    float w;
+    float h;
+};
+
+struct HitBox {
+    Box box;
+    int hitEntryID;
+    int hitID;
+};
+
 void log(std::string logLine);
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 nlohmann::json parse_json_file(const std::string &fileName);
 
-void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, int dir, color col, bool isDrive = false, bool isParry = false, bool isDI = false );
+bool doBoxesHit(Box box1, Box box2);
+void drawHitBox(Box box, color col, bool isDrive = false, bool isParry = false, bool isDI = false );

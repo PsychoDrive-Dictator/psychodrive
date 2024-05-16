@@ -76,23 +76,28 @@ std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
     
     return leading_zeros + num_str;
 }
- 
-void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, int dir, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
+
+bool doBoxesHit(Box box1, Box box2)
 {
-    std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
-    std::string boxIDString = to_string_leading_zeroes(boxID, 3);
-    if (!rectsJson.contains(pageIDString) || !rectsJson[pageIDString].contains(boxIDString)) {
-        return;
+    if (box1.x + box1.w < box2.x) {
+        return false;
     }
-    auto rectJson = rectsJson[pageIDString][boxIDString];
-    int xOrig = rectJson["OffsetX"];
-    int yOrig = rectJson["OffsetY"];
-    int xRadius = rectJson["SizeX"];
-    int yRadius = rectJson["SizeY"];
-    xOrig *= dir;
+    if (box2.x + box2.w < box1.x) {
+        return false;
+    }
+    if (box1.y + box1.h < box2.y) {
+        return false;
+    }
+    if (box2.y + box2.h < box1.y) {
+        return false;
+    }
+    return true;
+}
+ 
+void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
+{
     if (isDrive || isParry || isDI ) {
-        int xRadiusDrive = xRadius + 10;
-        int yRadiusDrive = yRadius + 10;
+        int driveOffset = 5;
         float colorR = 0.0;
         float colorG = 0.6;
         float colorB = 0.1;
@@ -106,10 +111,9 @@ void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offs
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( xOrig - xRadiusDrive + offsetX, yOrig - yRadiusDrive + offsetY, xRadiusDrive * 2, yRadiusDrive * 2,
-                colorR,colorG,colorB);
+        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,colorR,colorG,colorB);
     }
-    drawBox( xOrig - xRadius + offsetX, yOrig - yRadius + offsetY, xRadius * 2, yRadius * 2,col.r,col.g,col.b );
+    drawBox( box.x, box.y, box.w, box.h,col.r,col.g,col.b );
 }
 
 
@@ -172,10 +176,8 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-
     Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
-    Guy otherGuy("ryu", 400.0f, 0.0f, -1, {1.0,1.0,1.0});
+    Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
     int currentInput = 0;
@@ -367,7 +369,7 @@ int main(int, char**)
         }
 
         guy.Input(currentInput);
-        otherGuy.Input(currentInput);
+        otherGuy.Input(0);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -377,15 +379,23 @@ int main(int, char**)
         {
             ImGui::Begin("Psycho Drive");
 
-            ImGui::Text("action %s frame %i", guy.getActionName().c_str(), guy.getCurrentAction());
+            Guy *pGuy = &guy;
+            static bool otherguy = true;
+            ImGui::Checkbox("P2", &otherguy);
+            if (otherguy) {
+                pGuy = &otherGuy;
+            }
+            ImGui::Text("action %s frame %i", pGuy->getActionName().c_str(), pGuy->getCurrentAction());
             ImGui::Text("currentInput %d", currentInput);
             float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
-            guy.getPosDebug(posX, posY, posOffsetX, posOffsetY);
-            guy.getVel(velX, velY, accelX, accelY);
+            pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
+            pGuy->getVel(velX, velY, accelX, accelY);
             ImGui::Text("pos %f %f", posX, posY);
             ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
             ImGui::Text("vel %f %f", velX, velY);
             ImGui::Text("accel %f %f", accelX, accelY);
+            ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
+            ImGui::Text("COMBO HITS %i", pGuy->getComboHits());
             //ImGui::Text("unique %i", uniqueCharge);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
@@ -399,6 +409,12 @@ int main(int, char**)
         }
 
         ImGui::Render();
+        
+        ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+
+        if (guy.getWarudo() || otherGuy.getWarudo()) {
+            clear_color = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+        }
 
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
@@ -411,16 +427,29 @@ int main(int, char**)
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
         glScalef(1.5f, -1.5f, 1.0f);
 
-        guy.PreFrame();
-        otherGuy.PreFrame();
+        if ( !otherGuy.getWarudo() ) {
+            guy.PreFrame();
+        }
+
+        if ( !guy.getWarudo() ) {
+            otherGuy.PreFrame();
+        }
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(8));
+        std::this_thread::sleep_for(std::chrono::milliseconds(4));
 
-        guy.Frame();
-        otherGuy.Frame();
+        guy.Push(&otherGuy);
+        guy.CheckHit(&otherGuy);
+
+        if ( !otherGuy.getWarudo() ) {
+            guy.Frame();
+        }
+
+        if ( !guy.getWarudo() ) {
+            otherGuy.Frame();
+        }
     }
 
     // Cleanup
