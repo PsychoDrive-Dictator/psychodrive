@@ -179,7 +179,7 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy guy("ryu", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
     Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
@@ -434,7 +434,7 @@ int main(int, char**)
         ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
         if (guy.getWarudo() || otherGuy.getWarudo()) {
-            clear_color = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+            clear_color = ImVec4(0.75f, 0.75f, 0.75f, 1.00f);
         }
 
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
