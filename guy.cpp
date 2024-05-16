@@ -496,7 +496,7 @@ bool Guy::PreFrame(void)
                     // 00100000000100000: heavy punch with one button mask
                     // 00100000001100000: normal throw, two out of two mask t
                     // 00100000010100000: taunt, 6 out of 6 in mask
-                    uint32_t i = 0;
+                    uint32_t i = 0, initialI = 0;
                     bool initialMatch = false;
                     uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
                     if (inputBuffer.size() < initialSearch) {
@@ -509,6 +509,7 @@ bool Guy::PreFrame(void)
                             initialMatch = true;
                         } else if (initialMatch == true) {
                             i--;
+                            initialI = i;
                             break; // break once initialMatch no longer true, set i on last true
                         }
                         i++;
@@ -533,8 +534,47 @@ bool Guy::PreFrame(void)
                             int inputID = command["input_num"].get<int>() - 1;
                             auto commandInputs = command["inputs"];
 
+                            uint32_t inputBufferCursor = i;
+
+                            while (inputID >= 0 )
+                            {
+                                auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
+                                auto inputNorm = input["normal"];
+                                uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
+                                uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
+                                int numFrames = input["frame_num"];
+                                bool match = false;
+                                int lastMatchInput = i;
+                                while (inputBufferCursor < inputBuffer.size())
+                                {
+                                    bool thismatch = false;
+                                    if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                        int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                                        // if ( commandNo == 7 ) {
+                                        //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
+                                        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i));
+                                        // }
+                                        if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                            match = true;
+                                            thismatch = true;
+                                            i = inputBufferCursor;
+                                        }
+                                    }
+                                    if (match == true && (thismatch == false || numFrames <= 0)) {
+                                        //inputBufferCursor++;
+                                        inputID--;
+                                        break;
+                                    }
+                                    inputBufferCursor++;
+                                }
+
+                                if (inputBufferCursor == inputBuffer.size()) {
+                                    break;
+                                }
+                            }
+
                             // check charge
-                            if (chargeBit)
+                            if (inputID < 0 && chargeBit)
                             {
                                 bool chargeMatch = false;
                                 nlohmann::json resourceMatch;
@@ -549,65 +589,32 @@ bool Guy::PreFrame(void)
                                 if (chargeMatch) {
                                     uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
                                     uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
-                                    int chargeFrames = resourceMatch["ok_frame"];
-                                    // int keepFrames = resourceMatch["keep_frame"];
-                                    int dirCount = 0;
-                                    int dirNotMatchCount = 0;
+                                    uint32_t chargeFrames = resourceMatch["ok_frame"];
+                                    uint32_t keepFrames = resourceMatch["keep_frame"];
+                                    uint32_t dirCount = 0;
+                                    uint32_t dirNotMatchCount = 0;
                                     // count matching direction in input buffer, super naive but will work for testing
-                                    uint32_t inputBufferCursor = i;
-                                    while (inputBufferCursor < inputBuffer.size())
+                                    inputBufferCursor = i;
+                                    uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                                    while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
                                     {
                                         if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
                                             dirCount++;
+                                            if (dirCount >= chargeFrames) {
+                                                break;
+                                            }
                                         } else {
                                             dirNotMatchCount++;
                                         }
                                         inputBufferCursor++;
                                     }
 
-                                    if (dirCount < chargeFrames) {
+                                    if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
                                         log ("match charge " + std::to_string(chargeBit) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
                                         continue; // cancel trigger
                                     }
                                 }
-                            }
-
-                            uint32_t inputBufferCursor = i;
-
-                            while (inputID >= 0 )
-                            {
-                                auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
-                                auto inputNorm = input["normal"];
-                                uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
-                                uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
-                                uint32_t numFrames = input["frame_num"];
-                                bool match = false;
-                                while (inputBufferCursor < inputBuffer.size())
-                                {
-                                    bool thismatch = false;
-                                    if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                        uint32_t spaceSinceLastInput = inputBufferCursor - i;
-                                        if ( commandNo == 7 ) {
-                                            log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
-                                            " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i));
-                                        }
-                                        if ((spaceSinceLastInput < numFrames) || chargeBit) {
-                                            match = true;
-                                            thismatch = true;
-                                            i = inputBufferCursor;
-                                        }
-                                    }
-                                    if (match == true && thismatch == false) {
-                                        inputID--;
-                                        break;
-                                    }
-                                    inputBufferCursor++;
-                                }
-
-                                if (inputBufferCursor == inputBuffer.size()) {
-                                    break;
-                                }
-                            }
+                            }                            
 
                             if (inputID < 0) {
                                 if (defer) {
