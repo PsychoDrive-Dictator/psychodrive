@@ -522,6 +522,14 @@ bool Guy::PreFrame(void)
                 // if ( state == 48 && canHitID == -1) {
                 //     continue;
                 // }
+
+                //int condFlag = key["ConditionFlag"];
+                // killbox says "5199 and 5131 are like on hit and on block"
+                int condition = key["_Condition"];
+                if ( (condition == 5199 || condition == 5131) && canHitID == -1) {
+                    continue;
+                }
+
                 auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
                 for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
                 {
