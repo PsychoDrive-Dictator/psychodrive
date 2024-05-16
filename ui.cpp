@@ -133,14 +133,16 @@ void drawInputEditor()
             }
             key++;
         }
-        // advance timeline as we record
-        currentFrame++;
         i++;
     }
     recordingProgress = i;
 
     if (playingBackInput) {
         currentFrame = playBackFrame;
+    }
+
+    if (recordingInput) {
+        currentFrame = recordingProgress;
     }
 
     ImGui::Begin("input editor");
