@@ -21,7 +21,9 @@ struct RenderBox {
 
 void setRenderState(color clearColor, int sizeX, int sizeY);
 void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ );
-
+void drawBox(float x, float y, float w, float h, float r, float g, float b);
+void drawQuad(float x, float y, float w, float h, float r, float g, float b, float a);
+void drawLoop(float x, float y, float w, float h, float r, float g, float b, float a);
 SDL_Window* initWindowRender(void);
 void initRenderUI(void);
 void destroyRender(void);

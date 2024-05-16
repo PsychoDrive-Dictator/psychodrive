@@ -170,9 +170,15 @@ bool Guy::PreFrame(void)
             actionFrameDataInitialized = true;
         }
 
-        if (isProjectile && projHitCount == -1) {
-            projHitCount = actionJson["pdata"]["HitCount"];
-            // log("initial hitcount " + std::to_string(projHitCount));
+        if (isProjectile) {
+            auto pdataJson = actionJson["pdata"];
+            if (projHitCount == -1) {
+                projHitCount = pdataJson["HitCount"];
+                // log("initial hitcount " + std::to_string(projHitCount));
+            }
+            if (limitShotCategory == -1) {
+                limitShotCategory = pdataJson["Category"];
+            }
         }
 
         if (actionJson.contains("PlaceKey"))
@@ -244,13 +250,48 @@ bool Guy::PreFrame(void)
                 int operationType = steerKey["OperationType"];
                 int valueType = steerKey["ValueType"];
                 float fixValue = steerKey["FixValue"];
+                float targetOffsetX = steerKey["FixTargetOffsetX"];
+                float targetOffsetY = steerKey["FixTargetOffsetY"];
+                int shotCategory = steerKey["_ShotCategory"];
+                int targetType = steerKey["TarType"];
 
-                switch (valueType) {
-                    case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
-                    case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
-                    case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
-                    case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                switch (operationType) {
+                    case 1:
+                    case 2:
+                        switch (valueType) {
+                            case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
+                            case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
+                            case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
+                            case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                        }
+                        break;
+                    case 13:
+                        if (targetType == 16) {
+                            // teleport to projectile, i think
+                            bool minionFound = false;
+                            for ( auto minion : minions ) {
+                                if (shotCategory & (1 << minion->limitShotCategory)) {
+                                    minionFound = true;
+                                    posX = minion->posX + targetOffsetX;
+                                    posY = minion->posY + targetOffsetY;
+                                    if (posY > 0.0) {
+                                        airborne = true;
+                                    }
+                                    break;
+                                }
+                            }
+                            if (!minionFound) {
+                                log("minion to teleport not found");
+                            }
+                        } else {
+                            log("unknown teleport?");
+                        }
+                        break;
+                    default:
+                        log("unknown steer keyoperation " + std::to_string(operationType));
+                        break;
                 }
+
             }
         }
 
@@ -512,6 +553,20 @@ bool Guy::PreFrame(void)
                         usinguniquecharge = true;
                     }
 
+                    int limitShotCount = trigger["cond_limit_shot_num"];
+                    if (limitShotCount) {
+                        int count = 0;
+                        int limitShotCategory = trigger["limit_shot_category"];
+                        for ( auto minion : minions ) {
+                            if (limitShotCategory & (1 << minion->limitShotCategory)) {
+                                count++;
+                            }
+                        }
+                        if (count >= limitShotCount) {
+                            continue;
+                        }
+                    }
+
                     auto norm = trigger["norm"];
                     int commandNo = norm["command_no"];
                     uint32_t okKeyFlags = norm["ok_key_flags"];
@@ -690,6 +745,12 @@ void Guy::Render(void) {
     for (auto box : renderBoxes) {
         drawHitBox(box.box,box.col,box.drive,box.parry,box.di);
     }
+
+    float x = posX + (posOffsetX * direction);
+    float y = posY + posOffsetY;
+
+    drawQuad(x - 8, y - 8, 16, 16, charColorR,charColorG,charColorB,0.8);
+    drawLoop(x - 8, y - 8, 16, 16, 1.0,1.0,1.0,1.0);
 
     for ( auto minion : minions ) {
         minion->Render();
@@ -1023,13 +1084,35 @@ void Guy::DoBranchKey(void)
             int branchAction = key["Action"];
             int branchFrame = key["ActionFrame"];
 
+            if (branchAction == currentAction && branchFrame == currentFrame) {
+                log("avoided infinite loop!");
+                continue;
+            }
+
             switch (branchType) {
                 case 0: // always?
                     doBranch = true; 
                     break;
+                case 1:
+                    // else?! jesus christ we're turing complete soon
+                    // i dont know what it means though
+                    if (deniedLastBranch) {
+                        doBranch = true;
+                    }
+                    break;
                 case 2:
                     if (canHitID >= 0) { // has hit ever this move.. not sure if right
                         doBranch = true;
+                    }
+                    break;
+                case 11:
+                    if (pParent) {
+                        if (pParent->currentAction == branchParam0) {
+                           doBranch = true;
+                           log("action branch1");
+                        }
+                    } else {
+                        log("that branch not gonna work");
                     }
                     break;
                 case 13:
@@ -1064,6 +1147,7 @@ void Guy::DoBranchKey(void)
                         doBranch = true;
                     }
                     break;
+                case 31: // todo loop count
                 case 37:
                     // Hit catch vs just hit.. is this one "ever hit" and the other 'hit this frame'?
                     // or the opposite...?
@@ -1092,8 +1176,25 @@ void Guy::DoBranchKey(void)
                         doBranch = true;
                     }
                     break;
-                case 31: // todo loop count
                 case 47: // todo incapacitated
+                    break;
+                case 52:
+                    {
+                        int count = 0;
+                        for ( auto minion : minions ) {
+                            if (branchParam0 == minion->limitShotCategory) {
+                                count++;
+                            }
+                        }
+                        if (branchParam1 == 5 && branchParam2 == count) {
+                            // equals certain count?
+                            doBranch = true;
+                        }
+                        // if (branchParam1 == 3 && count >= branchParam2) {
+                        //     // is 0? :/
+                        //     doBranch = true;
+                        // }
+                    }
                     break;
                 default:
                     std::string typeName = key["_TypesName"];
@@ -1114,7 +1215,11 @@ void Guy::DoBranchKey(void)
                     nextAction = branchAction;
                 }
 
+                deniedLastBranch = false;
+
                 keepPlace = key["_KeepPlace"];
+            } else if (branchType != 1) {
+                deniedLastBranch = true;
             }
         }
     }
@@ -1276,7 +1381,7 @@ bool Guy::Frame(void)
             accelY = 0;
         }
 
-        if ( posY > 0.0 && !hitStun ) { // if not grounded, fall to the ground i guess?
+        if ( posY > 0.0 && !hitStun && !isProjectile ) { // if not grounded, fall to the ground i guess?
             accelY = -1;        
         }
 

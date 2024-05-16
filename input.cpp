@@ -32,6 +32,10 @@ int getInput(int currentInput)
                 case SDLK_SPACE:
                     currentInput |= UP;
                     break;
+                case SDLK_y:
+                    currentInput |= LP+MP+HP;
+                    currentInput |= LP_pressed+MP_pressed+HP_pressed;
+                    break;
                 case SDLK_u:
                     currentInput |= LP;
                     currentInput |= LP_pressed;
@@ -43,6 +47,10 @@ int getInput(int currentInput)
                 case SDLK_o:
                     currentInput |= HP;
                     currentInput |= HP_pressed;
+                    break;
+                case SDLK_h:
+                    currentInput |= LK+MK+HK;
+                    currentInput |= LK_pressed+MK_pressed+HK_pressed;
                     break;
                 case SDLK_j:
                     currentInput |= LK;
@@ -166,6 +174,9 @@ int getInput(int currentInput)
                 case SDLK_SPACE:
                     currentInput &= ~UP;
                     break;
+                case SDLK_y:
+                    currentInput &= ~(LP+MP+HP);
+                    break;
                 case SDLK_u:
                     currentInput &= ~LP;
                     break;
@@ -174,6 +185,9 @@ int getInput(int currentInput)
                     break;
                 case SDLK_o:
                     currentInput &= ~HP;
+                    break;
+                case SDLK_h:
+                    currentInput &= ~(LK+MK+HK);
                     break;
                 case SDLK_j:
                     currentInput &= ~LK;
