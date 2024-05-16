@@ -262,7 +262,7 @@ void renderMarkersAndStuff(void)
 {
     int markerToDelete = -1;
     glUniform1i(loc_isgrid, 2);
-    for (uint i = 0; i < vecMarkers.size(); i++)
+    for (uint32_t i = 0; i < vecMarkers.size(); i++)
     {
         float hitMarkPosX = vecMarkers[i].pOrigin->getPosX() + vecMarkers[i].x;
         float hitMarkPosY = vecMarkers[i].pOrigin->getPosY() + vecMarkers[i].y;
