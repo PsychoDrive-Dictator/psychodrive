@@ -95,6 +95,9 @@ int getInput(int currentInput)
                     }
                     paused = false;
                     break;
+                case SDLK_F8:
+                    limitRate = !limitRate;
+                    break;
                 case SDLK_DELETE:
                     deleteInputs = true;
                     break;

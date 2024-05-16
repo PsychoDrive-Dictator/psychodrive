@@ -780,6 +780,8 @@ void Guy::DoTriggers()
                             if ( usinguniquecharge ) {
                                 uniqueCharge = 0;
                             }
+                            // try to consume the input
+                            inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
                             log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer) + "initial I " + std::to_string(initialI));
                             break; // we found our trigger walking back, blow up the whole group
                         }
@@ -1111,6 +1113,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     targetHitStun+=4;
                 }
 
+                // like guile 4HK has destY but stays grounded if hits grounded
+                if (!(dmgType & 8) && !pOtherGuy->airborne) {
+                    destY = 0;
+                }
+
                 // this is set on honda airborne hands
                 // free hit until falls to ground - implement properly at some point
                 if (destY > 0)
@@ -1127,7 +1134,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
-                log(logHits, "hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " hitStun " + std::to_string(hitStun));
+                log(logHits, "hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " hitStun " + std::to_string(hitStun) + " dmgType " + std::to_string(dmgType));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 pOtherGuy->pAttacker = this;
                 pOtherGuy->noCounterPush = noZu; // bro it better

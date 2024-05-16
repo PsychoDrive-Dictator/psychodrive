@@ -55,6 +55,8 @@ extern int playBackFrame;
 
 extern bool deleteInputs;
 
+extern bool limitRate;
+
 extern bool forceCounter;
 extern bool forcePunishCounter;
 extern int hitStunAdder;
