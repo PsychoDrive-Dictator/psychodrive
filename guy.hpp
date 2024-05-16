@@ -295,6 +295,7 @@ private:
     // hitting side
     int canHitID = -1;
     bool hitThisFrame = false;
+    bool punishCounterThisFrame = false;
     bool grabbedThisFrame = false;
     bool blocked = false;
 
@@ -323,6 +324,7 @@ private:
     float groundBounceAccelX = 0.0f;
     float groundBounceAccelY = 0.0f;
     bool wallBounce = false;
+    bool wallSplat = false;
     float wallBounceVelX = 0.0f;
     float wallBounceVelY = 0.0f;
     float wallBounceAccelX = 0.0f;
@@ -331,6 +333,7 @@ private:
     int wallStopFrames = 0;
     int currentAtemiID = -1;
     int atemiHitsLeft = 0;
+    bool atemiThisFrame = false;
 
     int recoveryTiming = 0;
 
