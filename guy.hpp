@@ -185,6 +185,10 @@ private:
     int currentFrame = 0;
     int actionFrameDuration = 0;
     int marginFrame = 0;
+    int loopCount = 0;
+    int loopPoint = 0;
+    bool actionFrameDataInitialized = false;
+
     int currentInput = 0;
     std::deque<int> inputBuffer;
 
