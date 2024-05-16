@@ -198,9 +198,9 @@ bool Guy::PreFrame(void)
                     int keyStartFrame = placeKey["_StartFrame"];
                     if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
                         if (placeKey["Axis"] == 0) {
-                            posOffsetX = offset.get<int>();
+                            posOffsetX = offset.get<float>();
                         } else if (placeKey["Axis"] == 1) {
-                            posOffsetY = offset.get<int>();
+                            posOffsetY = offset.get<float>();
                         }
                     }
                 }
@@ -330,10 +330,18 @@ bool Guy::PreFrame(void)
             airborne = true; // i think we should go by statusKey instead?
         }
 
-        if (hitVelFrames > 0) {
+        if (hitVelX != 0.0f) {
+            float prevHitVelX = hitVelX;
+            hitVelX += hitAccelX;
+            if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
+                hitAccelX = 0.0f;
+                hitVelX = 0.0f;
+            }
+
             posX += hitVelX;
+
             pushBackThisFrame = hitVelX;
-            hitVelFrames--;
+            //hitVelFrames--;
         }
 
         if (actionJson.contains("SwitchKey"))
@@ -1015,7 +1023,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
-                //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
+                log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 pOtherGuy->pAttacker = this;
 
@@ -1059,8 +1067,13 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
         // todo pushback in corner - all destX _must_ be traveled by either side
         if ( destX != 0 ) {
             if (!airborne) {
-                hitVelX = (direction * destX * -1) / (float)destTime;
-                hitVelFrames = destTime;
+                //hitVelX = (direction * destX * -1) / (float)(destTime - 1);
+                int time = destTime;
+                hitVelX = direction * destX * 2 * -1 / (float)time;
+                hitAccelX = direction * destX * 1 / (float)time * 2.0 / (float)time;
+                hitVelX -= hitAccelX;
+
+                //hitVelFrames = destTime;
             } else {
                 // keep itvel pushback from last grounded hit
                 velocityX = (-destX) / (float)destTime;
@@ -1312,6 +1325,28 @@ bool Guy::Frame(void)
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     DoBranchKey();
+
+    // update place after the bump? maybeeeee - we inch back some 0.6x for the buffed ex hands loop
+    if (actionJson.contains("PlaceKey"))
+    {
+        for (auto& [placeKeyID, placeKey] : actionJson["PlaceKey"].items())
+        {
+            if ( !placeKey.contains("_StartFrame") || placeKey["_StartFrame"] > currentFrame || placeKey["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            for (auto& [frame, offset] : placeKey["PosList"].items()) {
+                int keyStartFrame = placeKey["_StartFrame"];
+                if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
+                    if (placeKey["Axis"] == 0) {
+                        posOffsetX = offset.get<float>();
+                    } else if (placeKey["Axis"] == 1) {
+                        posOffsetY = offset.get<float>();
+                    }
+                }
+            }
+        }
+    }
 
     if (isProjectile && projHitCount == 0) {
         return false; // die

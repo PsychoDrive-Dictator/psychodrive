@@ -58,6 +58,10 @@ void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= f
     drawBox( box.x, box.y, box.w, box.h,col.r,col.g,col.b );
 }
 
+float zoom = 1.5;
+int translateX = 0;
+int translateY = 0;
+
 void setRenderState(color clearColor, int sizeX, int sizeY)
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -72,8 +76,8 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     glOrtho(0.0f, sizeX, sizeY, 0.0f, 0.0f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(0.0f,sizeY,0.0f);
-    glScalef(1.5f, -1.5f, 1.0f);
+    glTranslatef(0.0f + translateX,sizeY + translateY,0.0f);
+    glScalef(zoom, -zoom, 1.0f);
 }
 
 SDL_Window* initWindowRender()

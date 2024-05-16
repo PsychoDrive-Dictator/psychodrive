@@ -218,6 +218,7 @@ private:
     bool resetHitStunOnLand = false;
     int hitStunOnLand = 0;
     float hitVelX = 0.0f;
+    float hitAccelX = 0.0f;
     float pushBackThisFrame = 0.0f;
     int hitVelFrames = 0;
     int comboHits = 0;
