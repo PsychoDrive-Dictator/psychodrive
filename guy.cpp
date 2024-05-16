@@ -104,54 +104,6 @@ bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  i
     return true;
 }
 
-Guy::Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)
-{
-    character = charName;
-    posX = startPosX;
-    posY = startPosY;
-    direction = startDir;
-    charColorR = color.r;
-    charColorG = color.g;
-    charColorB = color.b;
-
-    movesDictJson = parse_json_file(character + "_moves.json");
-    rectsJson = parse_json_file(character + "_rects.json");
-    namesJson = parse_json_file(character + "_names.json");
-    triggerGroupsJson = parse_json_file(character + "_trigger_groups.json");
-    triggersJson = parse_json_file(character + "_triggers.json");
-    commandsJson = parse_json_file(character + "_commands.json");
-    chargeJson = parse_json_file(character + "_charge.json");
-    hitJson = parse_json_file(character + "_hit.json");
-}
-
-Guy::Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
-{
-    character = parent.character;
-    posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
-    posY = parent.posY + parent.posOffsetY + posOffsetY;
-    direction = parent.direction;
-    charColorR = parent.charColorR;
-    charColorG = parent.charColorG;
-    charColorB = parent.charColorB;
-
-    movesDictJson = parent.movesDictJson;
-    rectsJson = parent.rectsJson;
-    namesJson = parent.namesJson;
-    triggerGroupsJson = parent.triggerGroupsJson;
-    triggersJson = parent.triggersJson;
-    commandsJson = parent.commandsJson;
-    chargeJson = parent.chargeJson;
-    hitJson = parent.hitJson;
-
-    pOpponent = parent.pOpponent;
-
-    currentAction = startAction;
-
-    isProjectile = true;
-    projHitCount = -1; // unset yet, is in the first action
-    pParent = &parent;
-}
-
 void Guy::Input(int input)
 {
     if (direction < 0) {
@@ -767,6 +719,8 @@ void Guy::Render(void) {
 
 bool Guy::Push(Guy *pOtherGuy) 
 {
+    if ( !pOtherGuy ) return false;
+
     bool hasPushed = false;
     float pushY = 0;
     float pushX = 0;
@@ -801,6 +755,8 @@ bool Guy::Push(Guy *pOtherGuy)
 
 bool Guy::CheckHit(Guy *pOtherGuy)
 {
+    if ( !pOtherGuy ) return false;
+
     bool retHit = false;
     for (auto hitbox : hitBoxes ) {
         if (hitbox.hitID < canHitID) {
@@ -965,9 +921,17 @@ void Guy::DoBranchKey(void)
                 case 45:
                     if (isProjectile && projHitCount == 0 ) {
                         // log("hitcount=0 branch");
+                        // branch action will reset hitcount?
                         projHitCount = -1;
                         doBranch = true;
                     }
+                    break;
+                case 31: // todo loop count
+                case 47: // todo incapacitated
+                    break;
+                default:
+                    std::string typeName = key["_TypesName"];
+                    log("unsupported branch id " + std::to_string(branchType) + " type " + typeName);
                     break;
             }
 
