@@ -941,6 +941,7 @@ bool Guy::Push(Guy *pOtherGuy)
     if ( !pOtherGuy ) return false;
 
     bool hasPushed = false;
+    touchedOpponent = false;
     float pushY = 0;
     float pushX = 0;
     for (auto pushbox : pushBoxes ) {
@@ -963,6 +964,7 @@ bool Guy::Push(Guy *pOtherGuy)
     }
 
     if ( hasPushed ) {
+        touchedOpponent = true; // could be touching anyone really but can fix later
         posX += pushX;
         posY += pushY;
         UpdateBoxes();
@@ -1585,6 +1587,11 @@ void Guy::DoBranchKey(void)
                         }
                     }
                     break;
+                case 54:
+                    if (touchedOpponent) {
+                        doBranch = true;
+                    }
+                    break;
                 case 63:
                     // what's the difference between this and 20?
                     // this is used for backthrow, the other thing for held buttons
@@ -1600,21 +1607,18 @@ void Guy::DoBranchKey(void)
 
             // do those also override if higher branchID?
             if (doBranch) {
-                if (branchFrame != 0 && branchAction != currentAction) {
-                    log(logUnknowns, "unsupported change for both action and frame");
-                }
                 if (branchAction == currentAction && branchFrame == 0 ) {
                     log(true, "ignoring branch to frame 0? that's how jp stuff owrks dunno");
                 } else {
-
-                if (branchFrame != 0 && branchAction == currentAction) {
-                    // unclear where we'll hit it so not sure if we need to offset yet
-                    log(true, "if this happens check we're not off by 1");
-                    currentFrame = branchFrame;
-                } else {
-                    log(logBranches, "branching to action " + std::to_string(branchAction));
-                    nextAction = branchAction;
-                }
+                    if (branchFrame != 0 && branchAction == currentAction) {
+                        // unclear where we'll hit it so not sure if we need to offset yet
+                        log(true, "if this happens check we're not off by 1");
+                        currentFrame = branchFrame;
+                    } else {
+                        log(logBranches, "branching to action " + std::to_string(branchAction));
+                        nextAction = branchAction;
+                        nextActionFrame = branchFrame;
+                    }
                 }
 
                 deniedLastBranch = false;
@@ -1912,7 +1916,7 @@ bool Guy::Frame(void)
         }
 
         if (!keepPlace) {
-            currentFrame = 0;
+            currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
 
             // commit current place offset
             posX += (posOffsetX * direction);
@@ -1931,6 +1935,7 @@ bool Guy::Frame(void)
         keepPlace = false;
 
         nextAction = -1;
+        nextActionFrame = -1;
 
         if (turnaround) {
             direction *= -1;

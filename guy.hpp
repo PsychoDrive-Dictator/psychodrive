@@ -232,6 +232,7 @@ private:
     bool airborne = false;
     bool landed = false;
     bool touchedWall = false;
+    bool touchedOpponent = false;
     bool startsFalling = false;
     bool crouching = false;
     bool blocking = false;
@@ -256,6 +257,7 @@ private:
 
     int currentAction = 1;
     int nextAction = -1;
+    int nextActionFrame = -1;
     bool keepPlace = false;
     int currentFrame = 0;
     int actionFrameDuration = 0;
