@@ -1,12 +1,3 @@
-// Dear ImGui: standalone example application for SDL2 + OpenGL
-// (SDL is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan/Metal graphics context creation, etc.)
-
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
-
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
@@ -135,7 +126,7 @@ int main(int, char**)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    SDL_Window* window = SDL_CreateWindow("Psycho Drive", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     if (window == nullptr)
     {
         printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
@@ -366,7 +357,10 @@ int main(int, char**)
         
         if (movesDictJson.contains(actionName))
         {
-            actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"];
+            actionFrameDuration = movesDictJson[actionName]["fab"]["ActionFrame"]["MarginFrame"];
+            if (actionFrameDuration == 0) {
+                actionFrameDuration = movesDictJson[actionName]["fab"]["Frame"]; ; //standing has 0 marginframe
+            }
 
             if (movesDictJson[actionName].contains("PlaceKey"))
             {
@@ -491,6 +485,10 @@ int main(int, char**)
                         currentAction = key["Action"];
                         currentFrame = 0;
                         branched = true;
+                        posX += posOffsetX;
+                        posOffsetX = 0.0f;
+                        posY += posOffsetY;
+                        posOffsetY = 0.0f;
                         break;
                     }
                 }
@@ -515,10 +513,17 @@ int main(int, char**)
                         auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
                         auto norm = triggersJson[actionIDString][triggerIDString]["norm"];
-                        if (norm["command_index"] == -1 && norm["ok_key_flags"] != 0 && norm["ok_key_flags"] == currentInput )
+                        if (norm["command_index"] == -1 &&
+                          norm["ok_key_flags"] != 0 &&
+                          (norm["ok_key_flags"].get<int>() & currentInput) == norm["ok_key_flags"] &&
+                          (norm["dc_exc_flags"] == 0 || (norm["dc_exc_flags"].get<int>() & currentInput) == norm["dc_exc_flags"]))
                         {
                             currentAction = actionID;
                             currentFrame = 0;
+                            posX += posOffsetX;
+                            posOffsetX = 0.0f;
+                            posY += posOffsetY;
+                            posOffsetY = 0.0f;
                         }
                     }
                 }
@@ -530,13 +535,18 @@ int main(int, char**)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         currentFrame++;
 
         if (currentFrame >= actionFrameDuration)
         {
             currentAction = 1;
             currentFrame = 0;
+            posX += posOffsetX;
+            posOffsetX = 0.0f;
+            posY += posOffsetY;
+            posOffsetY = 0.0f;
+
         }
     }
 
