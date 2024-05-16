@@ -43,6 +43,14 @@ struct HitBox {
     int hitID;
 };
 
+struct RenderBox {
+    Box box;
+    color col;
+    bool drive = false;
+    bool parry = false;
+    bool di = false;
+};
+
 void log(std::string logLine);
 extern int hitStunAdder;
 extern uint32_t globalInputBufferLength;

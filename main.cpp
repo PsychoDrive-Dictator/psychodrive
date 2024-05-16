@@ -179,12 +179,14 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("ryu", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
     Guy otherGuy("honda", 250.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
 
     int currentInput = 0;
+    int hitStopLeft = 0;
+    int hitStopRight = 0;
 
     // Main loop
     bool done = false;
@@ -434,7 +436,7 @@ int main(int, char**)
         ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
         if (guy.getWarudo() || otherGuy.getWarudo()) {
-            clear_color = ImVec4(0.75f, 0.75f, 0.75f, 1.00f);
+            clear_color = ImVec4(0.075f, 0.075f, 0.075f, 1.00f);
         }
 
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -448,28 +450,39 @@ int main(int, char**)
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
         glScalef(1.5f, -1.5f, 1.0f);
 
-        if ( !otherGuy.getWarudo() ) {
+        if ( !otherGuy.getWarudo() && !hitStopLeft) {
             guy.PreFrame();
         }
 
-        if ( !guy.getWarudo() ) {
+        if ( !guy.getWarudo() && !hitStopRight ) {
             otherGuy.PreFrame();
         }
+
+        guy.Render();
+        otherGuy.Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(4));
 
-        guy.Push(&otherGuy);
-        guy.CheckHit(&otherGuy);
-
-        if ( !otherGuy.getWarudo() ) {
+        if ( !otherGuy.getWarudo() && !hitStopLeft) {
+            guy.Push(&otherGuy);
+            guy.CheckHit(&otherGuy, hitStopLeft, hitStopRight);
             guy.Frame();
         }
 
-        if ( !guy.getWarudo() ) {
+        if ( !guy.getWarudo() && !hitStopRight) {
+            // otherGuy.Push(&guy);
+            otherGuy.CheckHit(&guy, hitStopRight, hitStopLeft);
             otherGuy.Frame();
+        }
+
+        if ( hitStopLeft > 0) {
+            hitStopLeft--;
+        }
+        if ( hitStopRight > 0) {
+            hitStopRight--;
         }
     }
 
