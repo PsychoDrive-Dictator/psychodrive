@@ -48,6 +48,7 @@ std::string readFile(const std::string &fileName)
 nlohmann::json parse_json_file(const std::string &fileName)
 {
     std::string fileText = readFile(fileName);
+    if (fileText == "") return nullptr;
     return nlohmann::json::parse(fileText);
 }
 
@@ -147,6 +148,10 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
         return false;
     }
 
+    if (okKeyFlags & 0x10000) {
+        return true; // allow neutral? really not sure
+    }
+
     uint32_t match = okKeyFlags & input;
 
     if (okCondFlags & 0x80) {
@@ -162,6 +167,7 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
             return true; // match any? :/
         }
     }
+
 
     return false;
 }
@@ -196,7 +202,7 @@ int main(int, char**)
 
     SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER ) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -250,6 +256,7 @@ int main(int, char**)
     auto triggerGroupsJson = parse_json_file(character + "_trigger_groups.json");
     auto triggersJson = parse_json_file(character + "_triggers.json");
     auto commandsJson = parse_json_file(character + "_commands.json");
+    auto chargeJson = parse_json_file(character + "_charge.json");
 
     float posX = 50.0f;
     float posY = 0.0f;
@@ -470,7 +477,7 @@ int main(int, char**)
 
         inputBuffer.push_front(currentInput);
         // how much is too much?
-        if (inputBuffer.size() > 20) {
+        if (inputBuffer.size() > 60) {
             inputBuffer.pop_back();
         }
 
@@ -516,7 +523,7 @@ int main(int, char**)
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
-        glScalef(1.0f, -1.0f, 1.0f);
+        glScalef(1.5f, -1.5f, 1.0f);
 
 
         auto actionIDString = to_string_leading_zeroes(currentAction, 4);
@@ -787,8 +794,49 @@ int main(int, char**)
                                 }
                             } else {
                                 std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-                                int inputID = commandsJson[commandNoString]["0"]["input_num"].get<int>() - 1;
-                                auto commandInputs = commandsJson[commandNoString]["0"]["inputs"];
+                                auto command = commandsJson[commandNoString]["0"];
+                                int chargeBit = command["charge_bit"];
+                                int inputID = command["input_num"].get<int>() - 1;
+                                auto commandInputs = command["inputs"];
+
+                                // check charge
+                                if (chargeBit)
+                                {
+                                    bool chargeMatch = false;
+                                    nlohmann::json resourceMatch;
+                                    for (auto& [keyID, key] : chargeJson.items()) {
+                                        resourceMatch = key["resource"];
+                                        if (resourceMatch["group_bit"] == chargeBit) {
+                                            chargeMatch = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (chargeMatch) {
+                                        uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
+                                        uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
+                                        int chargeFrames = resourceMatch["ok_frame"];
+                                        // int keepFrames = resourceMatch["keep_frame"];
+                                        int dirCount = 0;
+                                        int dirNotMatchCount = 0;
+                                        // count matching direction in input buffer, super naive but will work for testing
+                                        uint32_t inputBufferCursor = 0;
+                                        while (inputBufferCursor < inputBuffer.size())
+                                        {
+                                            if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                                dirCount++;
+                                            } else {
+                                                dirNotMatchCount++;
+                                            }
+                                            inputBufferCursor++;
+                                        }
+
+                                        if (dirCount < chargeFrames) {
+                                            log ("match charge " + std::to_string(chargeBit) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames));
+                                            break; // cancel trigger
+                                        }
+                                    }
+                                }
 
                                 uint32_t inputBufferCursor = 0;
 
@@ -866,7 +914,7 @@ int main(int, char**)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(4));
+        std::this_thread::sleep_for(std::chrono::milliseconds(8));
 
         if (currentFrame >= actionFrameDuration && nextAction == -1)
         {
