@@ -16,6 +16,12 @@ enum Input
 	LK = 128,
 	MK = 256,
 	HK = 512,
+	LP_pressed = 1024,
+	MP_pressed = 2048,
+	HP_pressed = 4096,
+	LK_pressed = 8192,
+	MK_pressed = 16384,
+	HK_pressed = 32768,
 };
 
 struct color {
