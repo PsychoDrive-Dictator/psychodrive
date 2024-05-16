@@ -159,6 +159,7 @@ void Guy::Input(int input)
 
 nlohmann::json Guy::commonMovesJson = nullptr;
 nlohmann::json Guy::commonRectsJson = nullptr;
+nlohmann::json Guy::commonAtemiJson = nullptr;
 
 void Guy::UpdateActionData(void)
 {
@@ -836,6 +837,8 @@ void Guy::UpdateBoxes(void)
     hitBoxes.clear();
     hurtBoxes.clear();
     renderBoxes.clear();
+    throwBoxes.clear();
+    armorBoxes.clear();
 
     if (actionJson.contains("DamageCollisionKey"))
     {
@@ -844,6 +847,9 @@ void Guy::UpdateBoxes(void)
             if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
                 continue;
             }
+
+            bool isArmor = hurtBox["_isArm"];
+            int armorID = hurtBox["AtemiDataListIndex"];
 
             float rootOffsetX = 0;
             float rootOffsetY = 0;
@@ -861,26 +867,37 @@ void Guy::UpdateBoxes(void)
 
             auto rects = commonAction ? commonRectsJson : rectsJson;
 
+            std::vector<HurtBox> boxes;
+
             for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
                 if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    hurtBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    boxes.push_back({rect, true, false, false});
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
                 if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    hurtBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    boxes.push_back({rect, false, true, false});
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
                 if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    hurtBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    boxes.push_back({rect, false, false, true});
                 }
             }
+
+            for (auto box : boxes) {
+                if (isArmor) {
+                    armorBoxes.push_back({box, armorID});
+                    renderBoxes.push_back({box.box, {0.8,0.5,0.0}, drive,parry,di});
+                } else {
+                    hurtBoxes.push_back(box);
+                    renderBoxes.push_back({box.box, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+
             for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
                 if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
+                    throwBoxes.push_back(rect);
                     renderBoxes.push_back({rect, {0.15,0.20,0.8}, drive,parry,di});
                 }
             }
@@ -1098,84 +1115,151 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             continue;
         }
         bool isGrab = hitbox.type == grab;
-        for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
-            if (hitbox.type == domain || doBoxesHit(hitbox.box, hurtbox)) {
-                std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
-                int hitEntryFlag = 0;
+        bool foundBox = false;
+        bool armor = false;
+        int armorID = -1;
+        HurtBox hurtBox;
 
-                if (pOtherGuy->isDown) {
-                    // need to check for otg capability there i guess?
+        if (isGrab) {
+            for (auto throwBox : *pOtherGuy->getThrowBoxes() ) {
+                if (hitbox.type == domain || doBoxesHit(hitbox.box, throwBox)) {
+                    foundBox = true;
                     break;
                 }
-
-                bool otherGuyAirborne = pOtherGuy->airborne || pOtherGuy->poseStatus == 3;
-
-                if (otherGuyAirborne) {
-                    hitEntryFlag |= air;
-                }
-                if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0)) {
-                    hitEntryFlag |= counter;
-                }
-                // the force from the UI doesn't do the right thing for multi hit moves like hands ATM
-                if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0)) {
-                    hitEntryFlag |= punish_counter;
-                }
-                bool otherGuyCanBlock = !otherGuyAirborne && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
-                if (isGrab) {
-                    otherGuyCanBlock = false;
-                }
-                if (pOtherGuy->blocking || otherGuyCanBlock) {
-                    hitEntryFlag = block;
-                    pOtherGuy->blocking = true;
-                    blocked = true;
-                    log(logHits, "block!");
-                }
-
-                if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
-                    // a grab would whiff if opponent is in blockstun
+            }
+        } else {
+            for (auto armorBox : *pOtherGuy->getArmorBoxes() ) {
+                if (hitbox.type == domain || doBoxesHit(hitbox.box, armorBox.hurtBox.box)) {
+                    foundBox = true;
+                    hurtBox = armorBox.hurtBox;
+                    armor = true;
+                    armorID = armorBox.armorID;
                     break;
                 }
-
-                std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
-                auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
-                int destX = hitEntry["MoveDest"]["x"];
-                int destY = hitEntry["MoveDest"]["y"];
-                int hitHitStun = hitEntry["HitStun"];
-                int dmgType = hitEntry["DmgType"];
-                int moveType = hitEntry["MoveType"];
-                int attr0 = hitEntry["Attr0"];
-                // we're hitting for sure after this point (modulo juggle), side effects
-
-                // not hitstun for initial grab hit as we dont want to recover during the lock
-                if ( pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
-                    int hitStopSelf = hitEntry["HitStopOwner"];
-                    if ( hitStopSelf ) {
-                        if (pParent) {
-                            pParent->addWarudo(hitStopSelf+1);
-                        } else {
-                            addWarudo(hitStopSelf+1);
-                        }
+            }
+            if (!foundBox) {
+                for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
+                    if (hitbox.type == domain || doBoxesHit(hitbox.box, hurtbox.box)) {
+                        hurtBox = hurtbox;
+                        foundBox = true;
+                        break;
                     }
-
-                    pOtherGuy->pAttacker = this;
-
-                    if (isGrab) {
-                        grabbedThisFrame = true;
-                    }
-
-                    canHitID = hitbox.hitID + 1;
-                    if (!pOtherGuy->blocking) {
-                        hitThisFrame = true;
-                    }
-                    retHit = true;
-                    log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
-                     " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
-                     " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
-                     " moveType " + std::to_string(moveType) );
-                    log(logHits, "attr0 " + std::to_string(attr0));
                 }
+            }
+        }
 
+        if (foundBox) {
+            std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
+            int hitEntryFlag = 0;
+
+            if (pOtherGuy->isDown) {
+                // need to check for otg capability there i guess?
+                // and cotninue instead of breaking!!!
                 break;
+            }
+
+            bool otherGuyAirborne = pOtherGuy->airborne || pOtherGuy->poseStatus == 3;
+
+            if (otherGuyAirborne) {
+                hitEntryFlag |= air;
+            }
+            if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0)) {
+                hitEntryFlag |= counter;
+            }
+            // the force from the UI doesn't do the right thing for multi hit moves like hands ATM
+            if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0)) {
+                hitEntryFlag |= punish_counter;
+            }
+            bool otherGuyCanBlock = !otherGuyAirborne && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
+            if (isGrab) {
+                otherGuyCanBlock = false;
+            }
+            if (pOtherGuy->blocking || otherGuyCanBlock) {
+                hitEntryFlag = block;
+                pOtherGuy->blocking = true;
+                blocked = true;
+                log(logHits, "block!");
+            }
+
+            if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
+                // a grab would whiff if opponent is in blockstun
+                continue;
+            }
+
+            std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
+            auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+            int destX = hitEntry["MoveDest"]["x"];
+            int destY = hitEntry["MoveDest"]["y"];
+            int hitHitStun = hitEntry["HitStun"];
+            int dmgType = hitEntry["DmgType"];
+            int moveType = hitEntry["MoveType"];
+            int attr0 = hitEntry["Attr0"];
+            // we're hitting for sure after this point (modulo juggle), side effects
+
+            if (armor && armorID) {
+                auto atemiIDString = std::to_string(armorID);
+                // need to pull from opponents atemi here or put in opponent method
+                nlohmann::json atemi = nullptr;
+                if (pOtherGuy->atemiJson.contains(atemiIDString)) {
+                    atemi = pOtherGuy->atemiJson[atemiIDString];
+                } else if (commonAtemiJson.contains(atemiIDString)) {
+                    atemi = commonAtemiJson[atemiIDString];
+                } else {
+                    log(true, "atemi not found!!");
+                    break;
+                }
+
+                int armorHitStopHitted = atemi["TargetStop"];
+                int armorHitStopHitter = atemi["OwnerStop"];
+                int armorBreakHitStopHitted = atemi["TargetStopShell"]; // ??
+                int armorBreakHitStopHitter = atemi["OwnerStopShell"];
+
+                if (pOtherGuy->currentAtemiID != armorID) {
+                    pOtherGuy->atemiHitsLeft = atemi["ResistLimit"].get<int>() + 1;
+                    pOtherGuy->currentAtemiID = armorID;
+                }
+                if ( pOtherGuy->currentAtemiID == armorID ) {
+                   pOtherGuy->atemiHitsLeft--;
+                    if (pOtherGuy->atemiHitsLeft <= 0) {
+                        armor = false;
+                        if (pOtherGuy->atemiHitsLeft == 0) {
+                            log(logHits, "armor break!");
+                            addWarudo(armorBreakHitStopHitter+1);
+                            pOtherGuy->addWarudo(armorBreakHitStopHitted+1);
+                        }
+                    } else {
+                        // apply gauge effects here
+
+                        addWarudo(armorHitStopHitter+1);
+                        pOtherGuy->addWarudo(armorHitStopHitted+1);
+                        log(logHits, "armor hit!");
+                    }
+                }
+            }
+
+            // not hitstun for initial grab hit as we dont want to recover during the lock
+            if ( armor || pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
+                int hitStopSelf = hitEntry["HitStopOwner"];
+                if ( !armor && hitStopSelf ) {
+                    addWarudo(hitStopSelf+1);
+                }
+
+                pOtherGuy->pAttacker = this;
+
+                if (isGrab) {
+                    grabbedThisFrame = true;
+                }
+
+                canHitID = hitbox.hitID + 1;
+                if (!pOtherGuy->blocking) {
+                    hitThisFrame = true;
+                }
+                retHit = true;
+                log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
+                    " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+                    " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
+                    " moveType " + std::to_string(moveType) );
+                log(logHits, "attr0 " + std::to_string(attr0));
             }
         }
         if (retHit) break;
@@ -1925,6 +2009,7 @@ bool Guy::Frame(void)
             posOffsetY = 0.0f;
 
             canHitID = -1;
+            currentAtemiID = -1; // uhhh
 
             poseStatus = 0; // correct spot?
             actionStatus = 0;
