@@ -28,7 +28,6 @@ uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
 bool resetpos = false;
 std::vector<Guy *> guys;
-int currentInput = 0;
 
 bool done = false;
 bool paused = false;
@@ -151,6 +150,8 @@ int main(int argc, char**argv)
 
     uint32_t frameStartTime = SDL_GetTicks();
 
+    currentInputMap[keyboardID] = 0;
+
     while (!done)
     {
         const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -163,10 +164,10 @@ int main(int argc, char**argv)
 
         globalFrameCount++;
 
-        currentInput = getInput( currentInput );
+        updateInputs();
 
         if (recordingInput) {
-            recordedInput.push_back(currentInput);
+            recordedInput.push_back(currentInputMap[recordingID]);
         }
 
         bool hasInput = true;
@@ -177,7 +178,7 @@ int main(int argc, char**argv)
                     playingBackInput = false;
                     playBackFrame = 0;
                 } else {
-                    currentInput = playBackInputBuffer[playBackFrame++];
+                    currentInputMap[recordingID] = playBackInputBuffer[playBackFrame++];
                     //log ("input from playback! " + std::to_string(currentInput));
                 }
             } else {
@@ -185,11 +186,13 @@ int main(int argc, char**argv)
             }
         }
 
-        bool firstguy = true;
         for (auto guy : guys) {
             if ( hasInput ) {
-                guy->Input( firstguy ? currentInput : 0 );
-                firstguy = false;
+                int input = 0;
+                if (currentInputMap.count(*guy->getInputIDPtr())) {
+                    input = currentInputMap[*guy->getInputIDPtr()];
+                }
+                guy->Input( input );
             }
         }
 
@@ -242,7 +245,7 @@ int main(int argc, char**argv)
 
         setRenderState(clearColor, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 
-        renderUI(currentInput, io.Framerate, &logQueue);
+        renderUI(io.Framerate, &logQueue);
 
         for (auto guy : guys) {
             guy->Render();

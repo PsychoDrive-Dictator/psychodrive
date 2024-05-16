@@ -7,6 +7,6 @@
 #include "imgui_impl_opengl3.h"
 
 void timelineToInputBuffer(std::deque<int> &inputBuffer);
-void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQueue);
+void renderUI(float frameRate, std::deque<std::string> *pLogQueue);
 ImGuiIO& initUI(void);
 void destroyUI(void);

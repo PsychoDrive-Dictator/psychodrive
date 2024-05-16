@@ -5,10 +5,14 @@
 #include "ui.hpp"
 #include "render.hpp"
 
-int getInput(int currentInput)
+std::map<int, int> currentInputMap;
+
+void updateInputs(void)
 {
     // clear new press bits
-    currentInput &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
+    for (auto i : currentInputMap) {
+        currentInputMap[i.first] &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
+    }
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -22,48 +26,48 @@ int getInput(int currentInput)
             switch (event.key.keysym.sym)
             {
                 case SDLK_a:
-                    currentInput |= BACK;
+                    currentInputMap[keyboardID] |= BACK;
                     break;
                 case SDLK_s:
-                    currentInput |= DOWN;
+                    currentInputMap[keyboardID] |= DOWN;
                     break;
                 case SDLK_d:
-                    currentInput |= FORWARD;
+                    currentInputMap[keyboardID] |= FORWARD;
                     break;
                 case SDLK_SPACE:
-                    currentInput |= UP;
+                    currentInputMap[keyboardID] |= UP;
                     break;
                 case SDLK_y:
-                    currentInput |= LP+MP+HP;
-                    currentInput |= LP_pressed+MP_pressed+HP_pressed;
+                    currentInputMap[keyboardID] |= LP+MP+HP;
+                    currentInputMap[keyboardID] |= LP_pressed+MP_pressed+HP_pressed;
                     break;
                 case SDLK_u:
-                    currentInput |= LP;
-                    currentInput |= LP_pressed;
+                    currentInputMap[keyboardID] |= LP;
+                    currentInputMap[keyboardID] |= LP_pressed;
                     break;
                 case SDLK_i:
-                    currentInput |= MP;
-                    currentInput |= MP_pressed;
+                    currentInputMap[keyboardID] |= MP;
+                    currentInputMap[keyboardID] |= MP_pressed;
                     break;
                 case SDLK_o:
-                    currentInput |= HP;
-                    currentInput |= HP_pressed;
+                    currentInputMap[keyboardID] |= HP;
+                    currentInputMap[keyboardID] |= HP_pressed;
                     break;
                 case SDLK_h:
-                    currentInput |= LK+MK+HK;
-                    currentInput |= LK_pressed+MK_pressed+HK_pressed;
+                    currentInputMap[keyboardID] |= LK+MK+HK;
+                    currentInputMap[keyboardID] |= LK_pressed+MK_pressed+HK_pressed;
                     break;
                 case SDLK_j:
-                    currentInput |= LK;
-                    currentInput |= LK_pressed;
+                    currentInputMap[keyboardID] |= LK;
+                    currentInputMap[keyboardID] |= LK_pressed;
                     break;
                 case SDLK_k:
-                    currentInput |= MK;
-                    currentInput |= MK_pressed;
+                    currentInputMap[keyboardID] |= MK;
+                    currentInputMap[keyboardID] |= MK_pressed;
                     break;
                 case SDLK_l:
-                    currentInput |= HK;
-                    currentInput |= HK_pressed;
+                    currentInputMap[keyboardID] |= HK;
+                    currentInputMap[keyboardID] |= HK_pressed;
                     break;
                 case SDLK_p:
                     paused = !paused;
@@ -91,7 +95,7 @@ int getInput(int currentInput)
                         timelineToInputBuffer(playBackInputBuffer);
                         playBackFrame = 0;
                     } else {
-                        currentInput = 0;
+                        currentInputMap[recordingID] = 0;
                     }
                     paused = false;
                     break;
@@ -114,75 +118,77 @@ int getInput(int currentInput)
         if (event.type == SDL_CONTROLLERAXISMOTION)
         {
             const static int deadzone = 8192;
+            int inputID = firstJoystickID + event.caxis.which;
             switch (event.caxis.axis)
             {
                 case SDL_CONTROLLER_AXIS_LEFTX:
                     if (event.caxis.value < -deadzone )  {
-                        currentInput |= BACK;
-                        currentInput &= ~FORWARD;
+                        currentInputMap[inputID] |= BACK;
+                        currentInputMap[inputID] &= ~FORWARD;
                     } else if (event.caxis.value > deadzone ) {
-                        currentInput |= FORWARD;
-                        currentInput &= ~BACK;
+                        currentInputMap[inputID] |= FORWARD;
+                        currentInputMap[inputID] &= ~BACK;
                     } else {
-                        currentInput &= ~(FORWARD+BACK);
+                        currentInputMap[inputID] &= ~(FORWARD+BACK);
                     }
                     break;
                 case SDL_CONTROLLER_AXIS_LEFTY:
                     if (event.caxis.value < -deadzone )  {
-                        currentInput |= UP;
-                        currentInput &= ~DOWN;
+                        currentInputMap[inputID] |= UP;
+                        currentInputMap[inputID] &= ~DOWN;
                     } else if (event.caxis.value > deadzone ) {
-                        currentInput |= DOWN;
-                        currentInput &= ~UP;
+                        currentInputMap[inputID] |= DOWN;
+                        currentInputMap[inputID] &= ~UP;
                     } else {
-                        currentInput &= ~(DOWN+UP);
+                        currentInputMap[inputID] &= ~(DOWN+UP);
                     }
                     break;
                 case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
                     if (event.caxis.value > 0 ) {
-                        currentInput |= HK;
-                        currentInput |= HK_pressed;
+                        currentInputMap[inputID] |= HK;
+                        currentInputMap[inputID] |= HK_pressed;
                     } else {
-                        currentInput &= ~HK;
+                        currentInputMap[inputID] &= ~HK;
                     }
                     break;
             }
         }
         if (event.type == SDL_CONTROLLERBUTTONDOWN)
         {
+            int inputID = firstJoystickID + event.cbutton.which;
             switch (event.cbutton.button)
             {
                 case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                    currentInput |= BACK;
+                    currentInputMap[inputID] |= BACK;
                     break;
                 case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-                    currentInput |= DOWN;
+                    currentInputMap[inputID] |= DOWN;
                     break;
                 case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-                    currentInput |= FORWARD;
+                    currentInputMap[inputID] |= FORWARD;
                     break;
                 case SDL_CONTROLLER_BUTTON_DPAD_UP:
-                    currentInput |= UP;
+                    currentInputMap[inputID] |= UP;
                     break;
                 case SDL_CONTROLLER_BUTTON_A:
-                    currentInput |= LK;
-                    currentInput |= LK_pressed;
+                    currentInputMap[inputID] |= LK;
+                    currentInputMap[inputID] |= LK_pressed;
                     break;
                 case SDL_CONTROLLER_BUTTON_B:
-                    currentInput |= MK;
-                    currentInput |= MK_pressed;
+                    currentInputMap[inputID] |= MK;
+                    currentInputMap[inputID] |= MK_pressed;
                     break;
                 case SDL_CONTROLLER_BUTTON_X:
-                    currentInput |= LP;
-                    currentInput |= LP_pressed;
+                    currentInputMap[inputID] |= LP;
+                    currentInputMap[inputID] |= LP_pressed;
                     break;
                 case SDL_CONTROLLER_BUTTON_Y:
-                    currentInput |= MP;
-                    currentInput |= MP_pressed;
+                    currentInputMap[inputID] |= MP;
+                    currentInputMap[inputID] |= MP_pressed;
                     break;
                 case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-                    currentInput |= HP;
-                    currentInput |= HP_pressed;
+                    currentInputMap[inputID] |= HP;
+                    currentInputMap[inputID] |= HP_pressed;
                     break;
             }
         }
@@ -191,73 +197,74 @@ int getInput(int currentInput)
             switch (event.key.keysym.sym)
             {
                 case SDLK_a:
-                    currentInput &= ~BACK;
+                    currentInputMap[keyboardID] &= ~BACK;
                     break;
                 case SDLK_s:
-                    currentInput &= ~DOWN;
+                    currentInputMap[keyboardID] &= ~DOWN;
                     break;
                 case SDLK_d:
-                    currentInput &= ~FORWARD;
+                    currentInputMap[keyboardID] &= ~FORWARD;
                     break;
                 case SDLK_SPACE:
-                    currentInput &= ~UP;
+                    currentInputMap[keyboardID] &= ~UP;
                     break;
                 case SDLK_y:
-                    currentInput &= ~(LP+MP+HP);
+                    currentInputMap[keyboardID] &= ~(LP+MP+HP);
                     break;
                 case SDLK_u:
-                    currentInput &= ~LP;
+                    currentInputMap[keyboardID] &= ~LP;
                     break;
                 case SDLK_i:
-                    currentInput &= ~MP;
+                    currentInputMap[keyboardID] &= ~MP;
                     break;
                 case SDLK_o:
-                    currentInput &= ~HP;
+                    currentInputMap[keyboardID] &= ~HP;
                     break;
                 case SDLK_h:
-                    currentInput &= ~(LK+MK+HK);
+                    currentInputMap[keyboardID] &= ~(LK+MK+HK);
                     break;
                 case SDLK_j:
-                    currentInput &= ~LK;
+                    currentInputMap[keyboardID] &= ~LK;
                     break;
                 case SDLK_k:
-                    currentInput &= ~MK;
+                    currentInputMap[keyboardID] &= ~MK;
                     break;
                 case SDLK_l:
-                    currentInput &= ~HK;
+                    currentInputMap[keyboardID] &= ~HK;
                     break;
             }
         }
         if (event.type == SDL_CONTROLLERBUTTONUP)
         {
+            int inputID = firstJoystickID + event.cbutton.which;
             switch (event.cbutton.button)
             {
                 case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                    currentInput &= ~BACK;
+                    currentInputMap[inputID] &= ~BACK;
                     break;
                 case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-                    currentInput &= ~DOWN;
+                    currentInputMap[inputID] &= ~DOWN;
                     break;
                 case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-                    currentInput &= ~FORWARD;
+                    currentInputMap[inputID] &= ~FORWARD;
                     break;
                 case SDL_CONTROLLER_BUTTON_DPAD_UP:
-                    currentInput &= ~UP;
+                    currentInputMap[inputID] &= ~UP;
                     break;
                 case SDL_CONTROLLER_BUTTON_A:
-                    currentInput &= ~LK;
+                    currentInputMap[inputID] &= ~LK;
                     break;
                 case SDL_CONTROLLER_BUTTON_B:
-                    currentInput &= ~MK;
+                    currentInputMap[inputID] &= ~MK;
                     break;
                 case SDL_CONTROLLER_BUTTON_X:
-                    currentInput &= ~LP;
+                    currentInputMap[inputID] &= ~LP;
                     break;
                 case SDL_CONTROLLER_BUTTON_Y:
-                    currentInput &= ~MP;
+                    currentInputMap[inputID] &= ~MP;
                     break;
                 case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-                    currentInput &= ~HP;
+                    currentInputMap[inputID] &= ~HP;
                     break;
             }
         }
@@ -288,5 +295,4 @@ int getInput(int currentInput)
             }
         }
    }
-    return currentInput;
 }
