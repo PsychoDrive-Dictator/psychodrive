@@ -2293,6 +2293,7 @@ bool Guy::Frame(void)
         if (!keepFrame) {
             currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
 
+            // todo this is probably fab.Inherit._HitID
             canHitID = -1;
             currentArmorID = -1; // uhhh
 
@@ -2310,21 +2311,17 @@ bool Guy::Frame(void)
             direction *= -1;
         }
 
-        // if grounded, reset velocities on transition
-        // need to test if still needed?
-        // probably just on transitioning to standing? not sure
-        // velocities already got transitioned tro 0 on actual landing even if in hitstun
-        if ( posY == 0.0 && !isDrive && !hitStun) {
-            velocityX = 0;
-            velocityY = 0;
-            accelX = 0;
-            accelY = 0;
-        }
+        actionFrameDataInitialized = false;
+        UpdateActionData();
 
-        // if not grounded, fall to the ground i guess?
-        // i don't think this is supposed to be needed, just a crutch for now
-        if ( posY > 0.0 && !hitStun && !isProjectile && accelY == 0.0 ) {
-            accelY = -1;
+        auto inherit = actionJson["fab"]["Inherit"];
+
+        if (!forceKnockDown) {
+            // hack - the actions like 282 or 251 don't inherit the velocity we set on it
+            accelX *= inherit["Accelaleration"]["x"].get<float>();
+            accelY *= inherit["Accelaleration"]["y"].get<float>();
+            velocityX *= inherit["Velocity"]["x"].get<float>();
+            velocityY *= inherit["Velocity"]["y"].get<float>();
         }
 
         if (isDrive == true) {
@@ -2335,8 +2332,6 @@ bool Guy::Frame(void)
             wasDrive = false;
         }
 
-        actionFrameDataInitialized = false;
-
         deferredAction = 0;
         deferredActionFrame = 0;
     }
@@ -2344,8 +2339,6 @@ bool Guy::Frame(void)
     if (warudo == 0) {
         timeInWarudo = 0;
     }
-
-    UpdateActionData();
 
     if (canMove) {
         // if we just went to idle, run triggers again
