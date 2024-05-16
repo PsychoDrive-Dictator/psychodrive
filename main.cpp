@@ -942,6 +942,7 @@ int main(int, char**)
             nextAction = -1;
 
             // if grounded, reset velocities on transition
+            // need to test if still needed?
             if ( posY == 0.0 && !isDrive) {
                 velocityX = 0;
                 velocityY = 0;
