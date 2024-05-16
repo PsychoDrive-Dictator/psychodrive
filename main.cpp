@@ -135,7 +135,7 @@ int main(int, char**)
 {
     SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -185,8 +185,6 @@ int main(int, char**)
     otherGuy.setOpponent(&guy);
 
     int currentInput = 0;
-    int hitStopLeft = 0;
-    int hitStopRight = 0;
 
     // Main loop
     bool done = false;
@@ -262,8 +260,10 @@ int main(int, char**)
                         // log("SDL_CONTROLLER_AXIS_LEFTX " + std::to_string(event.caxis.value));
                         if (event.caxis.value < 0 )  {
                             currentInput |= BACK;
+                            currentInput &= ~FORWARD;
                         } else if (event.caxis.value > 0 ) {
                             currentInput |= FORWARD;
+                            currentInput &= ~BACK;
                         } else if (event.caxis.value == 0){
                             currentInput &= ~BACK;
                             currentInput &= ~FORWARD;
@@ -450,13 +450,8 @@ int main(int, char**)
         glTranslatef(0.0f,io.DisplaySize.y,0.0f);
         glScalef(1.5f, -1.5f, 1.0f);
 
-        if ( !otherGuy.getWarudo() && !hitStopLeft) {
-            guy.PreFrame();
-        }
-
-        if ( !guy.getWarudo() && !hitStopRight ) {
-            otherGuy.PreFrame();
-        }
+        bool guyInWarudo = !guy.PreFrame();
+        bool otherGuyInWarudo = !otherGuy.PreFrame();
 
         guy.Render();
         otherGuy.Render();
@@ -466,23 +461,16 @@ int main(int, char**)
 
         std::this_thread::sleep_for(std::chrono::milliseconds(4));
 
-        if ( !otherGuy.getWarudo() && !hitStopLeft) {
+        if ( !guyInWarudo ) {
             guy.Push(&otherGuy);
-            guy.CheckHit(&otherGuy, hitStopLeft, hitStopRight);
+            guy.CheckHit(&otherGuy);
             guy.Frame();
         }
 
-        if ( !guy.getWarudo() && !hitStopRight) {
+        if ( !otherGuyInWarudo ) {
             // otherGuy.Push(&guy);
-            otherGuy.CheckHit(&guy, hitStopRight, hitStopLeft);
+            otherGuy.CheckHit(&guy);
             otherGuy.Frame();
-        }
-
-        if ( hitStopLeft > 0) {
-            hitStopLeft--;
-        }
-        if ( hitStopRight > 0) {
-            hitStopRight--;
         }
     }
 
