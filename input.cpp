@@ -78,6 +78,9 @@ int getInput(int currentInput)
                     recordingInput = !recordingInput;
                     if (recordingInput == true) {
                         recordingStartFrame = globalFrameCount;
+                        if (playingBackInput) {
+                            playingBackInput = false;
+                        }
                     }
                     break;
                 case SDLK_t:
