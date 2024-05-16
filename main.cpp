@@ -21,6 +21,8 @@
 #include "guy.hpp"
 #include "main.hpp"
 
+bool forceCounter = false;
+bool forcePunishCounter = false;
 int hitStunAdder = 0;
 uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
@@ -186,7 +188,7 @@ int main(int, char**)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    Guy guy("ryu", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
     Guy otherGuy("honda", 450.0f, 0.0f, -1, {1.0,1.0,1.0});
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
@@ -440,8 +442,11 @@ int main(int, char**)
             ImGui::Text("vel %f %f", velX, velY);
             ImGui::Text("accel %f %f", accelX, accelY);
             ImGui::Text("push %li hit %li hurt %li", pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
-            ImGui::Text("COMBO HITS %i hitstun %i", pGuy->getComboHits(), pGuy->getHitStun());
+            ImGui::Text("COMBO HITS %i hitstun %i juggle %i", pGuy->getComboHits(), pGuy->getHitStun(), pGuy->getJuggleCounter());
             ImGui::SliderInt("hitstun adder", &hitStunAdder, -10, 10);
+            ImGui::Checkbox("force counter", &forceCounter);
+            ImGui::SameLine();
+            ImGui::Checkbox("force PC", &forcePunishCounter);
             //ImGui::Text("unique %i", uniqueCharge);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
