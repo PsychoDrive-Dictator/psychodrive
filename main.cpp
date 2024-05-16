@@ -222,7 +222,9 @@ int main(int, char**)
     int marginFrame = 0;
     int currentInput = 0;
     std::deque<int> inputBuffer;
-    
+
+    int deferredActionFrame = -1;
+    int deferredAction = 0;    
 
     std::string actionName;
 
@@ -518,6 +520,9 @@ int main(int, char**)
                         continue;
                     }
 
+                    bool defer = !key["_NotDefer"];
+                    int triggerEndFrame = key["_EndFrame"];
+
                     auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
                     for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
                     {
@@ -543,7 +548,12 @@ int main(int, char**)
                         {
                             // todo need to obey deferral
                             if ( commandNo == -1 ) {
-                                nextAction = actionID;
+                                if (defer) {
+                                    deferredAction = actionID;
+                                    deferredActionFrame = triggerEndFrame;
+                                } else {
+                                    nextAction = actionID;
+                                }
                             } else {
                                 std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
                                 int inputID = commandsJson[commandNoString]["0"]["input_num"].get<int>() - 1;
@@ -577,7 +587,12 @@ int main(int, char**)
                                 }
 
                                 if (inputID < 0) {
-                                    nextAction = actionID;
+                                    if (defer) {
+                                        deferredAction = actionID;
+                                        deferredActionFrame = triggerEndFrame;
+                                    } else {
+                                        nextAction = actionID;
+                                    }
                                 }
                             }
                             // specifically don't break here, i think another trigger can have higher priority
@@ -586,6 +601,14 @@ int main(int, char**)
                     }
                 }
             }
+
+            if ( deferredActionFrame == currentFrame ) {
+                nextAction = deferredAction;
+
+                deferredActionFrame = -1;
+                deferredAction = 0;
+            }
+    
             currentFrame++;
 
             // evaluate branches after the frame bump, branch frames are meant to be elided afaict
@@ -664,9 +687,9 @@ int main(int, char**)
                 nextAction = 1;
             }
         }
-    
+
         // Transition
-        if ( nextAction != -1)
+        if ( nextAction != -1 )
         {
             currentAction = nextAction;
             currentFrame = 0;
