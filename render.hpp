@@ -34,6 +34,7 @@ struct HitMarker {
 };
 
 extern float zoom;
+extern float fov;
 extern int translateX;
 extern int translateY;
 
