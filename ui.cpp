@@ -64,6 +64,7 @@ void renderUI(int currentInput, float frameRate, std::deque<std::string> *pLogQu
         newCharColor[1] = randFloat();
         newCharColor[2] = randFloat();
         charID = rand() % IM_ARRAYSIZE(chars);
+        newCharPos = randFloat();
     }
     ImGui::Text("currentInput %d", currentInput);
     ImGui::SameLine();
