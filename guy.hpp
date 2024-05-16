@@ -192,7 +192,11 @@ public:
 
         isProjectile = true;
         projHitCount = -1; // unset yet, is in the first action
-        pParent = &parent;
+        if (parent.pParent) {
+            pParent = parent.pParent;
+        } else {
+            pParent = &parent;
+        }
 
         UpdateActionData();
     }
