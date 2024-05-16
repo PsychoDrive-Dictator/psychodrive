@@ -774,8 +774,8 @@ bool Guy::WorldPhysics(void)
 
     landed = false;
 
-    // landing
-    if (floorpush && airborne)
+    // landing - not sure about velocity check there, but otherwise we land during buttslam ascent
+    if (floorpush && airborne && velocityY < 0) 
     {
         posY = 0.0f;
         velocityY = 0.0f;
