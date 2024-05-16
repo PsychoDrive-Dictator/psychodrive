@@ -242,7 +242,7 @@ int main(int, char**)
 
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
-    std::string character = "ryu";
+    std::string character = "honda";
 
     auto movesDictJson = parse_json_file(character + "_moves.json");
     auto rectsJson = parse_json_file(character + "_rects.json");
@@ -712,6 +712,12 @@ int main(int, char**)
                 {
                     if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                         continue;
+                    }
+
+                    if ((key["Type"] == 29) && uniqueCharge) {
+                        // probably should check the count somewhere?
+                        // probably how jamie drinks work too? not sure
+                        nextAction = key["Action"];
                     }
 
                     if (key["Type"] == 0) //always?
