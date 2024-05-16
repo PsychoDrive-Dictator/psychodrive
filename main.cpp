@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+
 #include "json.hpp"
+
+#include <unistd.h>
+
 #include <string>
 #include <fstream>
 #include <ios>
@@ -135,7 +139,10 @@ int main(int, char**)
 {
     SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER /*| SDL_INIT_GAMECONTROLLER*/ ) != 0)
+    const char *pEnv = getenv("ENABLE_CONTROLLER");
+    auto SDL_init_flags = SDL_INIT_VIDEO | SDL_INIT_TIMER;
+    if ( pEnv ) SDL_init_flags |= SDL_INIT_GAMECONTROLLER;
+    if (SDL_Init(SDL_init_flags ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -184,12 +191,21 @@ int main(int, char**)
     guy.setOpponent(&otherGuy);
     otherGuy.setOpponent(&guy);
 
+    uint32_t frameStartTime = SDL_GetTicks();
     int currentInput = 0;
 
     // Main loop
     bool done = false;
     while (!done)
     {
+        const float desiredFrameTimeMS = 1000.0 / 60.0f;
+        uint32_t currentTime = SDL_GetTicks();
+        if (currentTime - frameStartTime < desiredFrameTimeMS) {
+            const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
+            usleep(timeToSleepMS * 1000);
+            //std::this_thread::sleep_for(std::chrono::milliseconds(int(timeToSleepMS)));
+        }
+        frameStartTime = SDL_GetTicks();
         // clear new press bits
         currentInput &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
 
@@ -253,7 +269,7 @@ int main(int, char**)
             }
             if (event.type == SDL_CONTROLLERAXISMOTION)
             {
-                const static int deadzone = 1024;
+                const static int deadzone = 8192;
                 switch (event.caxis.axis)
                 {
                     case SDL_CONTROLLER_AXIS_LEFTX:
@@ -465,8 +481,6 @@ int main(int, char**)
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(4));
 
         if ( !guyInWarudo ) {
             guy.Push(&otherGuy);
