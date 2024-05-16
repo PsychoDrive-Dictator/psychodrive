@@ -849,6 +849,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pOtherGuy->hitStunOnLand = floorTime;
 
                 if (pOpponent) {
+                    int moveType = hitEntry["MoveType"];
+                    log("hit id " +hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime) + " moveType " + std::to_string(moveType));
                     pOpponent->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 }
                 canHitID = hitbox.hitID + 1;
@@ -887,6 +889,9 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     velocityY -= accelY; //
 
     nextAction = 205; // HIT_MM, not sure how to pick which
+    if (  destY != 0 ) {
+        nextAction = 253; // 246 if hit head? 
+    }
 }
 
 void Guy::DoBranchKey(void)
@@ -1009,6 +1014,9 @@ bool Guy::Frame(void)
     }
 
     if (posY > 0.0f) {
+        canMove = false;
+    }
+    if (hitStun) {
         canMove = false;
     }
 
