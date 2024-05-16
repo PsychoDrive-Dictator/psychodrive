@@ -332,6 +332,18 @@ bool Guy::PreFrame(void)
         posX += (velocityX * direction);
         posY += velocityY;
 
+        if (hitVelX != 0.0f && !beenHitThisFrame) {
+            float prevHitVelX = hitVelX;
+            hitVelX += hitAccelX;
+            if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
+                hitAccelX = 0.0f;
+                hitVelX = 0.0f;
+            }
+
+            posX += hitVelX;
+            pushBackThisFrame = hitVelX;
+        }
+
         if (prevPosY == 0.0f && posY > 0.0f) {
             airborne = true; // i think we should go by statusKey instead?
         }
@@ -804,7 +816,7 @@ bool Guy::Push(Guy *pOtherGuy)
 
                 float difference = -(pushbox.x + pushbox.w - otherPushBox.x);
                 // log("push " + std::to_string(difference));
-                pushX = std::min(difference, pushX);
+                pushX = fminf(difference, pushX);
                 hasPushed = true;
             }
         }
@@ -844,7 +856,7 @@ bool Guy::WorldPhysics(void)
 
         // Walls
 
-        float x = posX + (posOffsetX * direction);
+        float x = getPosX();
         if (x < 0.0 ) {
             pushX = -x;
             touchedWall = true;
@@ -882,8 +894,9 @@ bool Guy::WorldPhysics(void)
 
         if (pushBackThisFrame != 0.0f && pushX != 0 && pushX * pushBackThisFrame < 0.0f) {
             // some pushback went into the wall, it needs to go into opponent
-            if (pAttacker && !pAttacker->noPush) {
-                pAttacker->posX += std::max(pushX, pushBackThisFrame * -1.0f);
+            if (pAttacker && !pAttacker->noPush && !noCounterPush) {
+                pAttacker->posX += fmaxf(pushX, pushBackThisFrame * -1.0f);
+                pAttacker->UpdateBoxes();
             }
         }
 
@@ -949,6 +962,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int dmgType = hitEntry["DmgType"];
                 int floorTime = hitEntry["FloorTime"];
                 int downTime = hitEntry["DownTime"];
+                bool noZu = hitEntry["_no_zu"];
 
                 if (wasDrive) {
                     juggleAdd = 0;
@@ -1010,6 +1024,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 pOtherGuy->pAttacker = this;
+                pOtherGuy->noCounterPush = noZu; // bro it better
 
                 canHitID = hitbox.hitID + 1;
                 hitThisFrame = true;
@@ -1033,7 +1048,7 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
 {
     comboHits++;
     comboDamage += damage;
-    // +1 because i think we're off by one frame where we run this
+    // +1 because it starts counting down next frame
     hitStun = stun + 1 + hitStunAdder;
     beenHitThisFrame = true;
 
@@ -1045,14 +1060,12 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     if (destTime != 0) {
         // assume hit direction is opposite as facing for now, not sure if that's true
         // todo pushback in corner - all destX _must_ be traveled by either side
-        if ( destX != 0 ) {
+        if ( destX != 0) {
             if (!airborne) {
-                //hitVelX = (direction * destX * -1) / (float)(destTime - 1);
                 int time = destTime;
                 hitVelX = direction * destX * 2 * -1 / (float)time;
                 hitAccelX = direction * destX * 1 / (float)time * 2.0 / (float)time;
                 hitVelX -= hitAccelX;
-                //hitVelFrames = destTime;
             } else {
                 // keep itvel pushback from last grounded hit
                 velocityX = (-destX) / (float)destTime;
@@ -1302,20 +1315,6 @@ bool Guy::Frame(void)
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     DoBranchKey();
 
-    if (hitVelX != 0.0f && !beenHitThisFrame) {
-        float prevHitVelX = hitVelX;
-        hitVelX += hitAccelX;
-        if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
-            hitAccelX = 0.0f;
-            hitVelX = 0.0f;
-        }
-
-        posX += hitVelX;
-        pushBackThisFrame = hitVelX;
-
-        WorldPhysics();
-    }
-
     if (isProjectile && projHitCount == 0) {
         return false; // die
     }
@@ -1394,7 +1393,7 @@ bool Guy::Frame(void)
         canMove = true;
     }
 
-    if ( marginFrame != -1 && currentFrame >= (marginFrame-1) && nextAction == -1 ) {
+    if ((marginFrame != -1 && currentFrame >= marginFrame) && nextAction == -1 ) {
         canMove = true;
     }
 

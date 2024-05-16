@@ -9,7 +9,7 @@ void drawQuad(float x, float y, float w, float h, float r, float g, float b, flo
     glColor4f(r,g,b,a);
     glBegin(GL_QUADS);
 
-    glVertex2f(x, y);
+    glVertex2i(x, y);
     glVertex2i(x+w, y);
     glVertex2i(x+w, y+h);
     glVertex2i(x, y+h);
@@ -22,7 +22,7 @@ void drawLoop(float x, float y, float w, float h, float r, float g, float b, flo
     glColor4f(r,g,b,a);
     glBegin(GL_LINE_LOOP);
 
-    glVertex2f(x, y);
+    glVertex2i(x, y);
     glVertex2i(x+w, y);
     glVertex2i(x+w, y+h);
     glVertex2i(x, y+h);

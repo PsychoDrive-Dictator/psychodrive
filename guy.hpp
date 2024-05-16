@@ -74,6 +74,7 @@ public:
     int getCurrentFrame() { return currentFrame; }
     std::string getActionName() { return actionName; }
     bool getAirborne() { return airborne; }
+    float getHitVelX() { return hitVelX; }
     void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
         outPosX = posX;
         outPosY = posY;
@@ -229,6 +230,7 @@ private:
     float hitVelX = 0.0f;
     float hitAccelX = 0.0f;
     float pushBackThisFrame = 0.0f;
+    bool noCounterPush = false;
     bool beenHitThisFrame = false;
     int comboHits = 0;
     int juggleCounter = 0;
