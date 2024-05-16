@@ -77,7 +77,7 @@ std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
     return leading_zeros + num_str;
 }
  
-void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, float r, float g, float b, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
+void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, int dir, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
@@ -89,6 +89,7 @@ void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offs
     int yOrig = rectJson["OffsetY"];
     int xRadius = rectJson["SizeX"];
     int yRadius = rectJson["SizeY"];
+    xOrig *= dir;
     if (isDrive || isParry || isDI ) {
         int xRadiusDrive = xRadius + 10;
         int yRadiusDrive = yRadius + 10;
@@ -108,7 +109,7 @@ void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offs
         drawBox( xOrig - xRadiusDrive + offsetX, yOrig - yRadiusDrive + offsetY, xRadiusDrive * 2, yRadiusDrive * 2,
                 colorR,colorG,colorB);
     }
-    drawBox( xOrig - xRadius + offsetX, yOrig - yRadius + offsetY, xRadius * 2, yRadius * 2,r,g,b );
+    drawBox( xOrig - xRadius + offsetX, yOrig - yRadius + offsetY, xRadius * 2, yRadius * 2,col.r,col.g,col.b );
 }
 
 
@@ -173,7 +174,8 @@ int main(int, char**)
 
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 
-    Guy guy("honda", 100.0f, 0.0f);
+    Guy guy("honda", 100.0f, 0.0f, 1, {0.8,0.6,0.2});
+    Guy otherGuy("ryu", 400.0f, 0.0f, -1, {1.0,1.0,1.0});
     int currentInput = 0;
 
     // Main loop
@@ -363,6 +365,7 @@ int main(int, char**)
         }
 
         guy.Input(currentInput);
+        otherGuy.Input(currentInput);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -407,6 +410,7 @@ int main(int, char**)
         glScalef(1.5f, -1.5f, 1.0f);
 
         guy.PreFrame();
+        otherGuy.PreFrame();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
@@ -414,6 +418,7 @@ int main(int, char**)
         std::this_thread::sleep_for(std::chrono::milliseconds(8));
 
         guy.Frame();
+        otherGuy.Frame();
     }
 
     // Cleanup

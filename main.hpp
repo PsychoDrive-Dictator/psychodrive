@@ -18,9 +18,15 @@ enum Input
 	HK = 512,
 };
 
+struct color {
+    float r;
+    float g;
+    float b;
+};
+
 void log(std::string logLine);
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 nlohmann::json parse_json_file(const std::string &fileName);
 
-void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, float r, float g, float b, bool isDrive = false, bool isParry = false, bool isDI = false );
+void drawRectsBox( nlohmann::json rectsJson, int rectsPage, int boxID,  int offsetX, int offsetY, int dir, color col, bool isDrive = false, bool isParry = false, bool isDI = false );
