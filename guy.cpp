@@ -204,6 +204,7 @@ bool Guy::PreFrame(void)
     }
 
     hitThisFrame = false;
+    blocked = false;
     beenHitThisFrame = false;
     landed = false;
     pushBackThisFrame = 0.0f;
@@ -1039,6 +1040,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (pOtherGuy->blocking || otherGuyCanBlock) {
                     hitEntryFlag = block;
                     pOtherGuy->blocking = true;
+                    blocked = true;
                     log(logHits, "block!");
                 }
 
@@ -1278,6 +1280,11 @@ void Guy::DoBranchKey(void)
                     break;
                 case 2:
                     if (canHitID >= 0) { // has hit ever this move.. not sure if right
+                        doBranch = true;
+                    }
+                    break;
+                case 4:
+                    if (blocked) { // just this frame.. enough?
                         doBranch = true;
                     }
                     break;
