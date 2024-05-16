@@ -38,6 +38,7 @@ struct HitBox {
 };
 
 void log(std::string logLine);
+extern int hitStunAdder;
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 nlohmann::json parse_json_file(const std::string &fileName);

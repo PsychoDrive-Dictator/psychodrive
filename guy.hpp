@@ -71,6 +71,7 @@ private:
 
     int currentAction = 1;
     int nextAction = -1;
+    bool keepPlace = false;
     int currentFrame = 0;
     int actionFrameDuration = 0;
     int marginFrame = 0;
