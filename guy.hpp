@@ -236,6 +236,7 @@ private:
     bool crouching = false;
     bool blocking = false;
     bool bounced = false;
+    bool wallbounced = false;
 
     int landingAdjust = 0;
     int prevPoseStatus = 0;
@@ -306,6 +307,13 @@ private:
     float groundBounceVelY = 0.0f;
     float groundBounceAccelX = 0.0f;
     float groundBounceAccelY = 0.0f;
+    bool wallBounce = false;
+    float wallBounceVelX = 0.0f;
+    float wallBounceVelY = 0.0f;
+    float wallBounceAccelX = 0.0f;
+    float wallBounceAccelY = 0.0f;
+    bool wallStopped = false;
+    int wallStopFrames = 0;
 
     int recoveryTiming = 0;
 
