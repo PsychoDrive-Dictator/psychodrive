@@ -509,15 +509,31 @@ bool Guy::PreFrame(void)
                 {
                     case 0:
                         {
+                            float posOffset = param1;
                             float steerForward = fixedToFloat(param2);
                             float steerBackward = fixedToFloat(param3);
 
+                            if (posOffset) {
+                                bool selfOffset = key["_IsOWNER_SELF_OFFSET"];
+                                bool opponentOffset = key["_IsOWNER_RIVAL_OFFSET"];
+
+                                if (selfOffset) {
+                                    posX += posOffset * direction;
+                                } else if (opponentOffset) {
+                                    if (pOpponent) {
+                                        posX = pOpponent->getPosX() + posOffset * direction;
+                                    }
+                                } else {
+                                    log(logUnknowns, "unimplemented owner offset");
+                                }
+                            }
+
                             if (currentInput & FORWARD) {
                                 posX += steerForward;
-                                log(true, "steerForward " + std::to_string(steerForward));
+                                //log(true, "steerForward " + std::to_string(steerForward));
                             } else if (currentInput & BACK) {
                                 posX += steerBackward;
-                                log(true, "steerBackward " + std::to_string(steerBackward));
+                                //log(true, "steerBackward " + std::to_string(steerBackward));
                             }
                         }
                         break;
