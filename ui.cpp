@@ -74,7 +74,7 @@ void timelineToInputBuffer(std::deque<int> &inputBuffer)
 
     for (auto elem : mapTimelineItems)
     {
-        while ((int)inputBuffer.size() < elem.second->frame) {
+        while ((int)inputBuffer.size() <= elem.second->frame) {
             inputBuffer.push_back(0);
         }
         inputBuffer[elem.second->frame] |= elem.second->input;
@@ -106,13 +106,11 @@ void drawInputEditor()
     //static bool transformOpen = false;
     static bool doDelete = false;
 
-    static unsigned int recordingProgress = 0;
-
-    unsigned int i = recordingProgress;
+    unsigned int i = 0;
     static int uniqueID = 0;
     while (i < recordedInput.size()) {
         // in timeline frames
-        int targetFrame = currentFrame + (int)i-(int)recordingProgress;
+        int targetFrame = currentFrame + (int)i;
 
         int key = 0;
         while (key < 10)
@@ -135,14 +133,14 @@ void drawInputEditor()
         }
         i++;
     }
-    recordingProgress = i;
+    recordedInput.clear();
 
     if (playingBackInput) {
         currentFrame = playBackFrame;
     }
 
     if (recordingInput) {
-        currentFrame = recordingProgress;
+        currentFrame++;
     }
 
     ImGui::Begin("input editor");
