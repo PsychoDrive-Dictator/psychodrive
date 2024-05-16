@@ -1024,7 +1024,7 @@ bool Guy::WorldPhysics(void)
         // we dont go through the landing transition here
         // we just need to go to the ground and not be airborne
         // so we can move after this script ends, like tatsu
-        if (!forceLanding || knockedDown) {
+        if (!forceLanding || forceKnockDown) {
             landed = true;
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
@@ -1078,13 +1078,12 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
                 int hitEntryFlag = 0;
 
-                if (pOtherGuy->knockedDown && !pOtherGuy->airborne)
-                {
+                if (pOtherGuy->isDown) {
                     // need to check for otg capability there i guess?
                     break;
                 }
 
-                bool otherGuyAirborne = pOtherGuy->airborne;
+                bool otherGuyAirborne = pOtherGuy->airborne || pOtherGuy->poseStatus == 3;
 
                 if (otherGuyAirborne) {
                     hitEntryFlag |= air;
@@ -1231,7 +1230,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     if (moveType == 11 || moveType == 10) { //airborne crumples
         hitEntryHitStun += 500000;
         resetHitStunOnTransition = true;
-        knockedDown = true;
+        forceKnockDown = true;
         knockDownFrames = downTime;
     }
 
@@ -1248,7 +1247,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
 
     if (destY > 0 ) {
         airborne = true;
-        knockedDown = true;
+        forceKnockDown = true;
     }
 
     if (destTime != 0) {
@@ -1646,14 +1645,16 @@ bool Guy::Frame(void)
         {
             nextAction = 1;
 
-            if (knockedDown) {
+            if (forceKnockDown) {
                 if (knockDownFrames) {
                     hitStun = knockDownFrames;
                     knockDownFrames = 0;
                     nextAction = 330;
+                    isDown = true;
                 } else {
                     nextAction = 340;
-                    knockedDown = false;
+                    isDown = false;
+                    forceKnockDown = false;
                 }
             } else {
                 blocking = false;
