@@ -234,27 +234,30 @@ int getInput(int currentInput)
                     break;
             }
         }
-        if(event.type == SDL_MOUSEWHEEL)
+        if (!ImGui::GetIO().WantCaptureMouse)
         {
-            if(event.wheel.y > 0) {
-                zoom += 0.2f;
+            if(event.type == SDL_MOUSEWHEEL)
+            {
+                if(event.wheel.y > 0) {
+                    zoom += 0.2f;
+                }
+                if(event.wheel.y < 0) {
+                    zoom -= 0.2f;
+                }
             }
-            if(event.wheel.y < 0) {
-                zoom -= 0.2f;
+            static bool mouseLeftPressed = false;
+            if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+            {
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    mouseLeftPressed = event.button.state == SDL_PRESSED;
+                }
             }
-        }
-        static bool mouseLeftPressed = false;
-        if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
-        {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                mouseLeftPressed = event.button.state == SDL_PRESSED;
-            }
-        }
-        if (event.type == SDL_MOUSEMOTION)
-        {
-            if (mouseLeftPressed) {
-                translateX += event.motion.xrel;
-                translateY += event.motion.yrel;
+            if (event.type == SDL_MOUSEMOTION)
+            {
+                if (mouseLeftPressed) {
+                    translateX += event.motion.xrel;
+                    translateY += event.motion.yrel;
+                }
             }
         }
    }

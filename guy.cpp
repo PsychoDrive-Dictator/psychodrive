@@ -105,8 +105,22 @@ bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  f
     return true;
 }
 
+void Guy::BuildMoveListDropdown()
+{
+    vecMoveList.push_back(strdup("1 no action (obey input)"));
+    auto triggerGroupString = to_string_leading_zeroes(0, 3);
+    for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
+    {
+        std::string actionString = key;
+        vecMoveList.push_back(strdup(actionString.c_str()));
+    }
+}
+
 void Guy::Input(int input)
 {
+    if (input == 0 && inputOverride != 0) {
+        input = inputOverride;
+    }
     if (direction < 0) {
         int newMask = 0;
         if (input & BACK) {
@@ -1108,7 +1122,9 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     // need to figure out if body or head is getting hit here later
 
     nextAction = 205; // HIT_MM, not sure how to pick which
-    nextAction = 213; // if crouching
+    if ( crouching ) {
+        nextAction = 213;
+    }
     if ((airborne || posY > 0.0) && destY != 0 ) {
 
         if (destY > destX) {
@@ -1444,6 +1460,8 @@ bool Guy::Frame(void)
     // Process movement if any
     if ( canMove )
     {
+        crouching = false;
+
         if ( currentInput & 1 ) {
             if ( currentInput & 4 ) {
                 nextAction = 35; // BAS_JUMP_B_START
@@ -1453,6 +1471,7 @@ bool Guy::Frame(void)
                 nextAction = 33; // BAS_JUMP_N_START
             }
         } else if ( currentInput & 2 ) {
+            crouching = true;
             nextAction = 4; // BAS_CRH_Loop
         } else {
             if ((currentInput & (32+256)) == 32+256) {
@@ -1475,6 +1494,12 @@ bool Guy::Frame(void)
                 turnaround = true;
             }
         }
+    }
+
+    if (canMove && comboHits && nextAction == 1 && neutralMove != 0) {
+        std::string moveString = vecMoveList[neutralMove];
+        int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
+        nextAction = actionID;
     }
 
     if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {

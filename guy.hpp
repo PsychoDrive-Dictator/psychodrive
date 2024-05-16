@@ -129,6 +129,8 @@ public:
             commonRectsJson = parse_json_file("common_rects.json");
             commonMovesInitialized = true;
         }
+
+        BuildMoveListDropdown();
     
         UpdateActionData();
     }
@@ -164,6 +166,10 @@ public:
         UpdateActionData();
     }
 
+    std::vector<char *> &getMoveList() { return vecMoveList; }
+    int *getNeutralMovePtr() { return &neutralMove; }
+    int *getInputOverridePtr() { return &inputOverride; }
+
 private:
     std::string name;
     std::string character;
@@ -183,6 +189,12 @@ private:
     void log(std::string logLine) { log(true, logLine ); }
     int lastLogFrame = 0;
     std::deque<std::string> logQueue;
+
+    void BuildMoveListDropdown();
+    std::vector<char *> vecMoveList;
+    int neutralMove = 0;
+
+    int inputOverride = 0;
 
     bool deniedLastBranch = false;
 
@@ -213,6 +225,7 @@ private:
     bool landed = false;
     bool touchedWall = false;
     bool startsFalling = false;
+    bool crouching = false;
 
     int landingAdjust = 0;
 
