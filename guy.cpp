@@ -802,11 +802,12 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int destX = hitEntry["MoveDest"]["x"];
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
+                int dmgValue = hitEntry["DmgValue"];
 
                 if (wasDrive) {
                     juggleAdd = 0;
                     juggleFirst = 0;
-                    juggleLimit = 4;
+                    juggleLimit += 3;
                     // trying like that
                     // supposedly drive attacks dont add to the limit but obey some limit?
                 }
@@ -816,7 +817,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
 
                 // we're hitting for sure after this point, side effects
-                //log("hit! id " + hitIDString + " entry " + hitEntryFlagString);
+                //log("hit! frame " + std::to_string(currentFrame) + " id " + hitIDString + " entry " + hitEntryFlagString);
 
                 // other guy is going airborne, apply juggle
                 if (!otherGuyAirborne && destY != 0) {
@@ -846,7 +847,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     hitStun+=4;
                 }
                 if (pOpponent) {
-                    pOpponent->Hit(hitStun, destX, destY, destTime);
+                    pOpponent->Hit(hitStun, destX, destY, destTime, dmgValue);
                 }
                 canHitID = hitbox.hitID + 1;
                 retHit = true;
@@ -865,9 +866,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     return retHit;
 }
 
-void Guy::Hit(int stun, int destX, int destY, int destTime)
+void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
 {
     comboHits++;
+    comboDamage += damage;
     // +1 because i think we're off by one frame where we run this
     hitStun = stun + 1 + hitStunAdder;
     hitVelFrames = destTime;
@@ -950,14 +952,17 @@ bool Guy::Frame(void)
         return false; // die
     }
 
+    // do we want to count down while in hitstop? that may be why we need +1
     if (hitStun > 0)
     {
         hitStun--;
         if (hitStun == 0)
         {
+            log("recovered! combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
             nextAction = 1;
             comboHits = 0;
             juggleCounter = 0;
+            comboDamage = 0;
         }
     }
 
