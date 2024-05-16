@@ -394,6 +394,10 @@ bool Guy::PreFrame(void)
         if (prevPosY == 0.0f && posY > 0.0f) {
             airborne = true; // i think we should go by statusKey instead?
         }
+        if (prevPosY > 0.0f && posY == 0.0f) {
+            airborne = false;
+            landed = true;
+        }
 
         counterState = false;
         punishCounterState = false;
