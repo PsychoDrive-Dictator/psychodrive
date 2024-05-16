@@ -426,242 +426,7 @@ bool Guy::PreFrame(void)
                 }
             }
         }
-
-        if (actionJson.contains("TriggerKey"))
-        {
-            for (auto& [keyID, key] : actionJson["TriggerKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                bool defer = !key["_NotDefer"];
-                int triggerEndFrame = key["_EndFrame"];
-                //int other = key["_Other"];
-
-                // not sure what that is but always some nonsense
-                // like 22p into everything, or 3HK special cancellable?
-                // if ( other == 64 ) {
-                //     continue;
-                // }
-
-                // on hit or block? not sure
-                // int state = key["_State"];
-                // if ( state == 48 && canHitID == -1) {
-                //     continue;
-                // }
-
-                //int condFlag = key["ConditionFlag"];
-                // killbox says "5199 and 5131 are like on hit and on block"
-                int condition = key["_Condition"];
-                if ( (condition == 5199 || condition == 5131) && canHitID == -1) {
-                    continue;
-                }
-
-                auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
-                std::deque<std::pair<std::string,std::string>> vecReverseTriggers;
-                for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
-                {
-                    vecReverseTriggers.push_front(std::make_pair(keyID, key));
-                }
-                for (auto& [keyID, key] : vecReverseTriggers)
-                {
-                    int triggerID = atoi(keyID.c_str());
-                    std::string actionString = key;
-                    int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
-
-                    auto triggerIDString = std::to_string(triggerID);
-                    auto actionIDString = to_string_leading_zeroes(actionID, 4);
-
-                    nlohmann::json trigger;
-
-                    for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
-                        if ( atoi(keyID.c_str()) == triggerID ) {
-                            trigger = key;
-                            break;
-                        }
-                    }
-                    bool usinguniquecharge = false;
-
-                    if (trigger["_UseUniqueParam"] == true) {
-                        if (!uniqueCharge) {
-                            continue;
-                        }
-                        usinguniquecharge = true;
-                    }
-                    int limitShotCount = trigger["cond_limit_shot_num"];
-                    if (limitShotCount) {
-                        int count = 0;
-                        int limitShotCategory = trigger["limit_shot_category"];
-                        for ( auto minion : minions ) {
-                            if (limitShotCategory & (1 << minion->limitShotCategory)) {
-                                count++;
-                            }
-                        }
-                        if (count >= limitShotCount) {
-                            continue;
-                        }
-                    }
-
-                    auto norm = trigger["norm"];
-                    int commandNo = norm["command_no"];
-                    uint32_t okKeyFlags = norm["ok_key_flags"];
-                    uint32_t okCondFlags = norm["ok_key_cond_flags"];
-                    uint32_t dcExcFlags = norm["dc_exc_flags"];
-                    // condflags..
-                    // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
-                    // 10100000001100000: EX, so any two out of three button mask?
-                    // 00100000000100000: heavy punch with one button mask
-                    // 00100000001100000: normal throw, two out of two mask t
-                    // 00100000010100000: taunt, 6 out of 6 in mask
-                    uint32_t i = 0, initialI = 0;
-                    bool initialMatch = false;
-                    uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
-                    if (inputBuffer.size() < initialSearch) {
-                        initialSearch = inputBuffer.size();
-                    }
-                    while (i < initialSearch)
-                    {
-                        if (okKeyFlags && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
-                        {
-                            initialMatch = true;
-                        } else if (initialMatch == true) {
-                            i--;
-                            initialI = i;
-                            break; // break once initialMatch no longer true, set i on last true
-                        }
-                        i++;
-                    }
-                    if (initialMatch)
-                    {
-                        //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
-                        if ( commandNo == -1 ) {
-                            if (defer) {
-                                deferredAction = actionID;
-                                deferredActionFrame = triggerEndFrame;
-                            } else {
-                                nextAction = actionID;
-                            }
-                            if ( usinguniquecharge ) {
-                                uniqueCharge = 0;
-                            }
-                            //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
-                            break; // we found our trigger walking back, blow up the whole group
-                        } else {
-                            std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-                            auto command = commandsJson[commandNoString]["0"];
-                            int inputID = command["input_num"].get<int>() - 1;
-                            auto commandInputs = command["inputs"];
-
-                            uint32_t inputBufferCursor = i;
-
-                            while (inputID >= 0 )
-                            {
-                                auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
-                                auto inputNorm = input["normal"];
-                                uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
-                                uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
-                                int numFrames = input["frame_num"];
-                                bool match = false;
-                                int lastMatchInput = i;
-
-                                if (inputOkKeyFlags & 0x10000)
-                                {
-                                    // charge release
-                                    bool chargeMatch = false;
-                                    nlohmann::json resourceMatch;
-                                    int chargeID = inputOkKeyFlags & 0xFF;
-                                    for (auto& [keyID, key] : chargeJson.items()) {
-                                        resourceMatch = key["resource"];
-                                        if (resourceMatch["charge_id"] == chargeID ) {
-                                            chargeMatch = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (chargeMatch) {
-                                        uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
-                                        uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
-                                        uint32_t chargeFrames = resourceMatch["ok_frame"];
-                                        uint32_t keepFrames = resourceMatch["keep_frame"];
-                                        uint32_t dirCount = 0;
-                                        uint32_t dirNotMatchCount = 0;
-                                        // count matching direction in input buffer, super naive but will work for testing
-                                        inputBufferCursor = i;
-                                        uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                                        while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
-                                        {
-                                            if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                                dirCount++;
-                                                if (dirCount >= chargeFrames) {
-                                                    break;
-                                                }
-                                            } else {
-                                                dirNotMatchCount++;
-                                            }
-                                            inputBufferCursor++;
-                                        }
-
-                                        if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                                            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-                                            break; // cancel trigger
-                                        }
-                                        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                                        inputID--;
-                                    } else {
-                                        log("charge entries mismatch?");
-                                        break; // cancel trigger
-                                    }
-                                } else {
-                                    while (inputBufferCursor < inputBuffer.size())
-                                    {
-                                        bool thismatch = false;
-                                        if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                            int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                                            // if ( commandNo == 32 ) {
-                                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
-                                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i) + " initial " + std::to_string(initialSearch));
-                                            // }
-                                            if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                                match = true;
-                                                thismatch = true;
-                                                i = inputBufferCursor;
-                                            }
-                                        }
-                                        if (match == true && (thismatch == false || numFrames <= 0)) {
-                                            //inputBufferCursor++;
-                                            inputID--;
-                                            break;
-                                        }
-                                        inputBufferCursor++;
-                                    }
-                                }
-
-                                if (inputBufferCursor == inputBuffer.size()) {
-                                    break;
-                                }
-                            }
-
-                            if (inputID < 0) {
-                                if (defer) {
-                                    deferredAction = actionID;
-                                    deferredActionFrame = triggerEndFrame;
-                                } else {
-                                    nextAction = actionID;
-                                }
-                                if ( usinguniquecharge ) {
-                                    uniqueCharge = 0;
-                                }
-                                //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
-                                break; // we found our trigger walking back, blow up the whole group
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        
         if ( deferredActionFrame == currentFrame ) {
             nextAction = deferredAction;
 
@@ -678,6 +443,244 @@ bool Guy::PreFrame(void)
     }
 
     return true;
+}
+
+void Guy::DoTriggers()
+{
+    if (actionJson.contains("TriggerKey"))
+    {
+        for (auto& [keyID, key] : actionJson["TriggerKey"].items())
+        {
+            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            bool defer = !key["_NotDefer"];
+            int triggerEndFrame = key["_EndFrame"];
+            //int other = key["_Other"];
+
+            // not sure what that is but always some nonsense
+            // like 22p into everything, or 3HK special cancellable?
+            // if ( other == 64 ) {
+            //     continue;
+            // }
+
+            // on hit or block? not sure
+            // int state = key["_State"];
+            // if ( state == 48 && canHitID == -1) {
+            //     continue;
+            // }
+
+            //int condFlag = key["ConditionFlag"];
+            // killbox says "5199 and 5131 are like on hit and on block"
+            int condition = key["_Condition"];
+            if ( (condition == 5199 || condition == 5131) && canHitID == -1) {
+                continue;
+            }
+
+            auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
+            std::deque<std::pair<std::string,std::string>> vecReverseTriggers;
+            for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
+            {
+                vecReverseTriggers.push_front(std::make_pair(keyID, key));
+            }
+            for (auto& [keyID, key] : vecReverseTriggers)
+            {
+                int triggerID = atoi(keyID.c_str());
+                std::string actionString = key;
+                int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
+
+                auto triggerIDString = std::to_string(triggerID);
+                auto actionIDString = to_string_leading_zeroes(actionID, 4);
+
+                nlohmann::json trigger;
+
+                for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
+                    if ( atoi(keyID.c_str()) == triggerID ) {
+                        trigger = key;
+                        break;
+                    }
+                }
+                bool usinguniquecharge = false;
+
+                if (trigger["_UseUniqueParam"] == true) {
+                    if (!uniqueCharge) {
+                        continue;
+                    }
+                    usinguniquecharge = true;
+                }
+                int limitShotCount = trigger["cond_limit_shot_num"];
+                if (limitShotCount) {
+                    int count = 0;
+                    int limitShotCategory = trigger["limit_shot_category"];
+                    for ( auto minion : minions ) {
+                        if (limitShotCategory & (1 << minion->limitShotCategory)) {
+                            count++;
+                        }
+                    }
+                    if (count >= limitShotCount) {
+                        continue;
+                    }
+                }
+
+                auto norm = trigger["norm"];
+                int commandNo = norm["command_no"];
+                uint32_t okKeyFlags = norm["ok_key_flags"];
+                uint32_t okCondFlags = norm["ok_key_cond_flags"];
+                uint32_t dcExcFlags = norm["dc_exc_flags"];
+                // condflags..
+                // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
+                // 10100000001100000: EX, so any two out of three button mask?
+                // 00100000000100000: heavy punch with one button mask
+                // 00100000001100000: normal throw, two out of two mask t
+                // 00100000010100000: taunt, 6 out of 6 in mask
+                uint32_t i = 0, initialI = 0;
+                bool initialMatch = false;
+                uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
+                if (inputBuffer.size() < initialSearch) {
+                    initialSearch = inputBuffer.size();
+                }
+                while (i < initialSearch)
+                {
+                    if (okKeyFlags && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
+                    {
+                        initialMatch = true;
+                    } else if (initialMatch == true) {
+                        i--;
+                        initialI = i;
+                        break; // break once initialMatch no longer true, set i on last true
+                    }
+                    i++;
+                }
+                if (initialMatch)
+                {
+                    //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
+                    if ( commandNo == -1 ) {
+                        if (defer) {
+                            deferredAction = actionID;
+                            deferredActionFrame = triggerEndFrame;
+                        } else {
+                            nextAction = actionID;
+                        }
+                        if ( usinguniquecharge ) {
+                            uniqueCharge = 0;
+                        }
+                        //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                        break; // we found our trigger walking back, blow up the whole group
+                    } else {
+                        std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
+                        auto command = commandsJson[commandNoString]["0"];
+                        int inputID = command["input_num"].get<int>() - 1;
+                        auto commandInputs = command["inputs"];
+
+                        uint32_t inputBufferCursor = i;
+
+                        while (inputID >= 0 )
+                        {
+                            auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
+                            auto inputNorm = input["normal"];
+                            uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
+                            uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
+                            int numFrames = input["frame_num"];
+                            bool match = false;
+                            int lastMatchInput = i;
+
+                            if (inputOkKeyFlags & 0x10000)
+                            {
+                                // charge release
+                                bool chargeMatch = false;
+                                nlohmann::json resourceMatch;
+                                int chargeID = inputOkKeyFlags & 0xFF;
+                                for (auto& [keyID, key] : chargeJson.items()) {
+                                    resourceMatch = key["resource"];
+                                    if (resourceMatch["charge_id"] == chargeID ) {
+                                        chargeMatch = true;
+                                        break;
+                                    }
+                                }
+
+                                if (chargeMatch) {
+                                    uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
+                                    uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
+                                    uint32_t chargeFrames = resourceMatch["ok_frame"];
+                                    uint32_t keepFrames = resourceMatch["keep_frame"];
+                                    uint32_t dirCount = 0;
+                                    uint32_t dirNotMatchCount = 0;
+                                    // count matching direction in input buffer, super naive but will work for testing
+                                    inputBufferCursor = i;
+                                    uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                                    while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                                    {
+                                        if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                            dirCount++;
+                                            if (dirCount >= chargeFrames) {
+                                                break;
+                                            }
+                                        } else {
+                                            dirNotMatchCount++;
+                                        }
+                                        inputBufferCursor++;
+                                    }
+
+                                    if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
+                                        //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                                        //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+                                        break; // cancel trigger
+                                    }
+                                    //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+                                    inputID--;
+                                } else {
+                                    log("charge entries mismatch?");
+                                    break; // cancel trigger
+                                }
+                            } else {
+                                while (inputBufferCursor < inputBuffer.size())
+                                {
+                                    bool thismatch = false;
+                                    if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                        int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                                        // if ( commandNo == 32 ) {
+                                        //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
+                                        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i) + " initial " + std::to_string(initialSearch));
+                                        // }
+                                        if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                            match = true;
+                                            thismatch = true;
+                                            i = inputBufferCursor;
+                                        }
+                                    }
+                                    if (match == true && (thismatch == false || numFrames <= 0)) {
+                                        //inputBufferCursor++;
+                                        inputID--;
+                                        break;
+                                    }
+                                    inputBufferCursor++;
+                                }
+                            }
+
+                            if (inputBufferCursor == inputBuffer.size()) {
+                                break;
+                            }
+                        }
+
+                        if (inputID < 0) {
+                            if (defer) {
+                                deferredAction = actionID;
+                                deferredActionFrame = triggerEndFrame;
+                            } else {
+                                nextAction = actionID;
+                            }
+                            if ( usinguniquecharge ) {
+                                uniqueCharge = 0;
+                            }
+                            //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                            break; // we found our trigger walking back, blow up the whole group
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Guy::UpdateBoxes(void)
@@ -1004,7 +1007,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
-                log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
+                //log("hit id " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " destTime " + std::to_string(destTime));
                 pOtherGuy->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 pOtherGuy->pAttacker = this;
 
@@ -1285,6 +1288,7 @@ void Guy::DoBranchKey(void)
 
 bool Guy::Frame(void)
 {
+    DoTriggers();
     DoBranchKey();
 
     currentFrame++;
@@ -1390,7 +1394,7 @@ bool Guy::Frame(void)
         canMove = true;
     }
 
-    if ( marginFrame != -1 && currentFrame >= marginFrame && nextAction == -1 ) {
+    if ( marginFrame != -1 && currentFrame >= (marginFrame-1) && nextAction == -1 ) {
         canMove = true;
     }
 
@@ -1472,12 +1476,10 @@ bool Guy::Frame(void)
             //log("recovered!");
         }
 
-        currentAction = nextAction;
-        //log ("current action " + std::to_string(currentAction));
-
-        auto actionIDString = to_string_leading_zeroes(currentAction, 4);
-        bool validAction = namesJson.contains(actionIDString);
-        actionName = validAction ? namesJson[actionIDString] : "invalid";
+        if (currentAction != nextAction) {
+            currentAction = nextAction;
+            //log ("current action " + std::to_string(currentAction));
+       }
 
         if (!keepPlace) {
             currentFrame = 0;
@@ -1532,6 +1534,18 @@ bool Guy::Frame(void)
 
     UpdateActionData();
 
+    if (canMove) {
+        // if we just went to idle, run triggers again
+        DoTriggers();
+        // if successful, eat this frame away and go right now
+        if (nextAction != -1) {
+            currentAction = nextAction;
+            log ("nvm! current action " + std::to_string(currentAction));
+            nextAction = -1;
+        }
+    }
+
+    // if we need landing adjust/etc during warudo, need this updated now
     DoStatusKey();
 
     std::vector<Guy*> minionsNotFinished;

@@ -24,6 +24,7 @@ public:
     void DoBranchKey();
     void DoHitBoxKey(const char *name, bool domain = false);
     void DoStatusKey();
+    void DoTriggers();
     bool Frame(void);
 
     void addWarudo(int w) { warudo += w; }
