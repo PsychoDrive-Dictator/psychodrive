@@ -28,10 +28,6 @@ public:
     bool Frame(void);
 
     void addWarudo(int w) {
-        if (pParent) {
-            pParent->addWarudo(w);
-            return;
-        }
         warudo += w;
     }
 
@@ -116,6 +112,15 @@ public:
             delete minion;
         }
         minions.clear();
+
+        if (pParent) {
+            // std erase when
+            const auto it = std::remove(pParent->minions.begin(), pParent->minions.end(), this);
+            pParent->minions.erase(it, pParent->minions.end());
+        } else {
+            const auto it = std::remove(guys.begin(), guys.end(), this);
+            guys.erase(it, guys.end());
+        }
     }
 
     Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)

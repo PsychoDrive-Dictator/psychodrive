@@ -42,7 +42,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Text("accel %f %f", accelX, accelY);
     ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hurt %" PRIi64 , pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
-        ImGui::Text("limit category %i hit count %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount() );
+        ImGui::Text("limit category %i hit count %i warudo %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getWarudo() );
     } else {
         ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i warudo %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getWarudo());
         ImGui::Text("unique %i install %i", pGuy->getUniqueParam(), pGuy->getInstallFrames());

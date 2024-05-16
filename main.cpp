@@ -200,58 +200,80 @@ int main(int argc, char**argv)
             }
         }
 
-        std::vector<Guy *> guysWhoFrame;
+        std::vector<Guy *> everyone;
 
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+
+        int frameGuyCount = 0;
         if (oneframe || !paused) {
-            for (auto guy : guys) {
+            for (auto guy : everyone) {
                 if (guy->PreFrame()) {
-                    guysWhoFrame.push_back(guy);
+                    frameGuyCount++;
                 }
             }
         }
 
-        if (guysWhoFrame.size() == 0) {
+        // gather everyone again in case of deletions/additions in PreFrame
+        everyone.clear(); 
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+
+        if (frameGuyCount == 0) {
             globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
         }
 
         bool push = true; // only push the first guy until this actually works
         if (oneframe || !paused) {
             // everyone gets world physics
-            for (auto guy : guys) {
+            for (auto guy : everyone) {
                 guy->WorldPhysics();
             }
-            for (auto guy : guysWhoFrame) {
+            for (auto guy : everyone) {
                 guy->CheckHit(guy->getOpponent());
             }
             // push after hit for fbs to work, but i think it's really that there's some pushboxes on hit only
             // see all air normals?
-            for (auto guy : guysWhoFrame) {
+            for (auto guy : everyone) {
                 if ( push ) {
                     guy->Push(guy->getOpponent());
                     push = false;
                 }
             }
-            for (auto guy : guysWhoFrame) {
-                guy->Frame();
+            for (auto guy : everyone) {
+                bool die = !guy->Frame();
+
+                if (die) {
+                    delete guy;
+                }
             }
         }
         oneframe = false;
 
         color clearColor = {0.0,0.0,0.0};
 
-        bool ticktock = false;
-        for (auto guy : guys) {
-            ticktock = ticktock || guy->getWarudo();
-        }
-        if (ticktock) {
-            clearColor = {0.075,0.075,0.075};
-        }
-
         setRenderState(clearColor, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 
         renderUI(io.Framerate, &logQueue);
 
+        // gather everyone again in case of deletions in Frame
+        everyone.clear(); 
         for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+
+        for (auto guy : everyone) {
             guy->Render();
         }
 
