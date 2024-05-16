@@ -1010,7 +1010,8 @@ bool Guy::WorldPhysics(void)
 
     // if we're going up (like jsut getting hit), we're not landing,
     // just being helped off the ground - see heavy donkey into lp dp
-    if (floorpush && airborne && velocityY < 0)
+    bool forceLanding = airborne && prevPoseStatus == 3 && poseStatus > 0 && poseStatus < 3;
+    if (forceLanding || (airborne && floorpush && velocityY < 0))
     {
         pushY = 0.0f;
         velocityX = 0.0f;
@@ -1019,8 +1020,14 @@ bool Guy::WorldPhysics(void)
         accelY = 0.0f;
 
         airborne = false;
-        landed = true;
-        //log ("landed " + std::to_string(hitStun));
+
+        // we dont go through the landing transition here
+        // we just need to go to the ground and not be airborne
+        // so we can move after this script ends, like tatsu
+        if (!forceLanding || knockedDown) {
+            landed = true;
+        }
+        log (logTransitions, "landed " + std::to_string(hitStun));
     }
 
     for ( auto minion : minions ) {
@@ -1040,18 +1047,16 @@ bool Guy::WorldPhysics(void)
         }
 
         UpdateBoxes();
-
-        if (landed) {
-            // don't update hitboxes before setting posY, the current frame
-            // or the box will be too high up as we're still on the falling box
-            // see heave donky into lp dp
-            posY = 0.0f;
-        }
-
-        return true;
     }
 
-    return false;
+    if (landed || forceLanding) {
+        // don't update hitboxes before setting posY, the current frame
+        // or the box will be too high up as we're still on the falling box
+        // see heave donky into lp dp
+        posY = 0.0f;
+    }
+
+    return hasPushed;
 }
 
 bool Guy::CheckHit(Guy *pOtherGuy)
@@ -1223,6 +1228,13 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         knockDownFrames = downTime;
     }
 
+    if (moveType == 11 || moveType == 10) { //airborne crumples
+        hitEntryHitStun += 500000;
+        resetHitStunOnTransition = true;
+        knockedDown = true;
+        knockDownFrames = downTime;
+    }
+
     comboDamage += dmgValue;
 
     if (!blocking && applyHit) {
@@ -1270,16 +1282,20 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
             nextAction = 175;
         }
     } else {
-        if (dmgType & 3) { // crumple? :/
-            if (moveType == 11) {
-                nextAction = 277; // back crumple?
-            } else if (moveType == 10) {
-                nextAction = 276;
-            }
-            if (airborne) {
-                nextAction = 255;
-            }
+        //if (dmgType & 3) { // crumple? :/
+        if (moveType == 11) {
+            nextAction = 277; // back crumple?
+        } else if (moveType == 10) {
+            nextAction = 276;
+        } else if (moveType == 3) {
+            // not a crumple, just a long stun
+            nextAction = 279; // seen on guile 5hp, moveType 3
+            //}
+            // if (airborne) {
+            //     nextAction = 255;
+            // }
         } else {
+            // HH / 202 if head?
             nextAction = 205; // HIT_MM, not sure how to pick which
             if ( crouching ) {
                 nextAction = 213;
@@ -1595,6 +1611,33 @@ bool Guy::Frame(void)
 
     bool recovered = false;
 
+    if (currentFrame >= actionFrameDuration && nextAction == -1)
+    {
+        if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
+            // If done with pre-jump, transition to jump
+            nextAction = currentAction + 3;
+            airborne = true; // probably should get it thru statuskey?
+        } else if (currentAction == 5) {
+            nextAction = 4; // finish transition to crouch
+        } else if (loopCount == -1 || loopCount > 0) {
+            currentFrame = loopPoint;
+            hasLooped = true;
+            if (loopCount > 0) {
+                loopCount--;
+            }
+        } else {
+            if (isProjectile) {
+                return false; // die
+            }
+            nextAction = 1;
+        }
+
+        if (resetHitStunOnTransition) {
+            hitStun = 1;
+            resetHitStunOnTransition = false;
+        }
+    }
+
     // first hitstun countdown happens on the same "frame" as hit, before hitstop
     if (hitStun > 0)
     {
@@ -1616,28 +1659,6 @@ bool Guy::Frame(void)
                 blocking = false;
                 recovered = true;
             }
-        }
-    }
-
-    if (currentFrame >= actionFrameDuration && nextAction == -1)
-    {
-        if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
-            // If done with pre-jump, transition to jump
-            nextAction = currentAction + 3;
-            airborne = true; // probably should get it thru statuskey?
-        } else if (currentAction == 5) {
-            nextAction = 4; // finish transition to crouch
-        } else if (loopCount == -1 || loopCount > 0) {
-            currentFrame = loopPoint;
-            hasLooped = true;
-            if (loopCount > 0) {
-                loopCount--;
-            }
-        } else {
-            if (isProjectile) {
-                return false; // die
-            }
-            nextAction = 1;
         }
     }
 
@@ -1748,7 +1769,7 @@ bool Guy::Frame(void)
 
     // this might have been a cancel containing state like blowing up some bar
     // so better honor it! put it last here - this can be true even if canMove!
-    if ( deferredActionFrame == currentFrame ) {
+    if (deferredAction != 0 && deferredActionFrame == currentFrame) {
         log(logTransitions, "deferred nextAction " + std::to_string(deferredAction));
         nextAction = deferredAction;
 
@@ -1864,6 +1885,7 @@ bool Guy::Frame(void)
     UpdateActionData();
 
     // if we need landing adjust/etc during warudo, need this updated now
+    prevPoseStatus = poseStatus;
     DoStatusKey();
 
     std::vector<Guy*> minionsNotFinished;

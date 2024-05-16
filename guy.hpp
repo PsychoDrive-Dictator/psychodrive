@@ -237,6 +237,7 @@ private:
     bool blocking = false;
 
     int landingAdjust = 0;
+    int prevPoseStatus = 0;
     int poseStatus = 0;
     int actionStatus = 0;
     int jumpStatus = 0;
@@ -287,6 +288,7 @@ private:
     Guy *pAttacker = nullptr;
     int hitStun = 0;
     bool resetHitStunOnLand = false;
+    bool resetHitStunOnTransition = false;
     int hitStunOnLand = 0;
     float hitVelX = 0.0f;
     float hitAccelX = 0.0f;
