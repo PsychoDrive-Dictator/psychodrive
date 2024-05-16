@@ -3,7 +3,10 @@
 #include "json.hpp"
 #include <deque>
 #include <string>
+
 #include "main.hpp"
+#include "render.hpp"
+#include "input.hpp"
 
 class Guy {
 public:

@@ -17,7 +17,8 @@
 #include "guy.hpp"
 #include "main.hpp"
 #include "ui.hpp"
-
+#include "input.hpp"
+#include "render.hpp"
 
 bool forceCounter = false;
 bool forcePunishCounter = false;
@@ -25,10 +26,14 @@ int hitStunAdder = 0;
 
 uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
-int globalFrameCount = 0;
 bool resetpos = false;
 std::vector<Guy *> guys;
 int currentInput = 0;
+
+bool done = false;
+bool paused = false;
+bool oneframe = false;
+int globalFrameCount = 0;
 
 std::string readFile(const std::string &fileName)
 {
@@ -51,31 +56,6 @@ nlohmann::json parse_json_file(const std::string &fileName)
     std::string fileText = readFile(fileName);
     if (fileText == "") return nullptr;
     return nlohmann::json::parse(fileText);
-}
-
-void drawBox( float x, float y, float w, float h, float r, float g, float b)
-{
-    glColor4f(r,g,b, 0.2f);
-
-    glBegin(GL_QUADS);
-    
-    glVertex2f(x, y);
-    glVertex2i(x+w, y);
-    glVertex2i(x+w, y+h);
-    glVertex2i(x, y+h);
-    
-    glEnd();
-
-    glColor4f(r,g,b, 1.0f);
-
-    glBegin(GL_LINE_LOOP);
-
-    glVertex2f(x, y);
-    glVertex2i(x+w, y);
-    glVertex2i(x+w, y+h);
-    glVertex2i(x, y+h);
-
-    glEnd();
 }
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
@@ -107,29 +87,6 @@ bool doBoxesHit(Box box1, Box box2)
     return true;
 }
  
-void drawHitBox(Box box, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
-{
-    if (isDrive || isParry || isDI ) {
-        int driveOffset = 5;
-        float colorR = 0.0;
-        float colorG = 0.6;
-        float colorB = 0.1;
-        if (isParry) {
-            colorR = 0.3;
-            colorG = 0.7;
-            colorB = 0.9;
-        }
-        if (isDI) {
-            colorR = 0.9;
-            colorG = 0.0;
-            colorB = 0.0;
-        }
-        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,colorR,colorG,colorB);
-    }
-    drawBox( box.x, box.y, box.w, box.h,col.r,col.g,col.b );
-}
-
-
 std::deque<std::string> logQueue;
 
 void log(std::string logLine)
@@ -142,57 +99,12 @@ void log(std::string logLine)
 
 int main(int, char**)
 {
-    SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
-    // Setup SDL
-    const char *pEnv = getenv("ENABLE_CONTROLLER");
-    auto SDL_init_flags = SDL_INIT_VIDEO | SDL_INIT_TIMER;
-    if ( pEnv ) SDL_init_flags |= SDL_INIT_GAMECONTROLLER;
-    if (SDL_Init(SDL_init_flags ) != 0)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        return -1;
-    }
-
-    // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-
-    // Create window with graphics context
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("Psycho Drive", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
-    if (window == nullptr)
-    {
-        printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
-        return -1;
-    }
-
-    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-    SDL_GL_MakeCurrent(window, gl_context);
-    SDL_GL_SetSwapInterval(1);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    ImGui::StyleColorsDark();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    auto window = initWindowRender();
+    initUI();
+    ImGuiIO& io = ImGui::GetIO(); // why doesn't the one from initUI work? who knows
+    initRenderUI();
 
     uint32_t frameStartTime = SDL_GetTicks();
-
-    // Main loop
-    bool paused = false;
-    bool done = false;
-    bool oneframe = false;
 
     while (!done)
     {
@@ -203,223 +115,10 @@ int main(int, char**)
             usleep(timeToSleepMS * 1000 - 100);
         }
         frameStartTime = SDL_GetTicks();
-        // clear new press bits
-        currentInput &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
 
         globalFrameCount++;
 
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
-                done = true;
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                done = true;
-            if (event.type == SDL_KEYDOWN && event.key.repeat == 0)
-            {
-                switch (event.key.keysym.sym)
-                {
-                    case SDLK_a:
-                        currentInput |= BACK;
-                        break;
-                    case SDLK_s:
-                        currentInput |= DOWN;
-                        break;
-                    case SDLK_d:
-                        currentInput |= FORWARD;
-                        break;
-                    case SDLK_SPACE:
-                        currentInput |= UP;
-                        break;
-                    case SDLK_u:
-                        currentInput |= LP;
-                        currentInput |= LP_pressed;
-                        break;
-                    case SDLK_i:
-                        currentInput |= MP;
-                        currentInput |= MP_pressed;
-                        break;
-                    case SDLK_o:
-                        currentInput |= HP;
-                        currentInput |= HP_pressed;
-                        break;
-                    case SDLK_j:
-                        currentInput |= LK;
-                        currentInput |= LK_pressed;
-                        break;
-                    case SDLK_k:
-                        currentInput |= MK;
-                        currentInput |= MK_pressed;
-                        break;
-                    case SDLK_l:
-                        currentInput |= HK;
-                        currentInput |= HK_pressed;
-                        break;
-                    case SDLK_p:
-                        paused = !paused;
-                        break;
-                    case SDLK_q:
-                        resetpos = true;
-                        break;
-                    case SDLK_0:
-                        oneframe = true;
-                        break;
-                    case SDLK_ESCAPE:
-                        done = true;
-                        break;
-                }
-            }
-            if (event.type == SDL_CONTROLLERDEVICEADDED)
-            {
-                SDL_GameController *controller = SDL_GameControllerOpen(event.cdevice.which);
-                log("controller added " + std::to_string(event.cdevice.which) + " " + std::to_string((uint64_t)controller));
-            }
-            if (event.type == SDL_CONTROLLERAXISMOTION)
-            {
-                const static int deadzone = 8192;
-                switch (event.caxis.axis)
-                {
-                    case SDL_CONTROLLER_AXIS_LEFTX:
-                        if (event.caxis.value < -deadzone )  {
-                            currentInput |= BACK;
-                            currentInput &= ~FORWARD;
-                        } else if (event.caxis.value > deadzone ) {
-                            currentInput |= FORWARD;
-                            currentInput &= ~BACK;
-                        } else {
-                            currentInput &= ~(FORWARD+BACK);
-                        }
-                        break;
-                    case SDL_CONTROLLER_AXIS_LEFTY:
-                        if (event.caxis.value < -deadzone )  {
-                            currentInput |= UP;
-                            currentInput &= ~DOWN;
-                        } else if (event.caxis.value > deadzone ) {
-                            currentInput |= DOWN;
-                            currentInput &= ~UP;
-                        } else {
-                            currentInput &= ~(DOWN+UP);
-                        }
-                        break;
-                    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-                        if (event.caxis.value > 0 ) {
-                            currentInput |= HK;
-                            currentInput |= HK_pressed;
-                        } else {
-                            currentInput &= ~HK;
-                        }
-                        break;
-                }
-            }
-            if (event.type == SDL_CONTROLLERBUTTONDOWN)
-            {
-                switch (event.cbutton.button)
-                {
-                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                        currentInput |= BACK;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-                        currentInput |= DOWN;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-                        currentInput |= FORWARD;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
-                        currentInput |= UP;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_A:
-                        currentInput |= LK;
-                        currentInput |= LK_pressed;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_B:
-                        currentInput |= MK;
-                        currentInput |= MK_pressed;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_X:
-                        currentInput |= LP;
-                        currentInput |= LP_pressed;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_Y:
-                        currentInput |= MP;
-                        currentInput |= MP_pressed;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-                        currentInput |= HP;
-                        currentInput |= HP_pressed;
-                        break;
-                }
-            }
-            if (event.type == SDL_KEYUP)
-            {
-                switch (event.key.keysym.sym)
-                {
-                    case SDLK_a:
-                        currentInput &= ~BACK;
-                        break;
-                    case SDLK_s:
-                        currentInput &= ~DOWN;
-                        break;
-                    case SDLK_d:
-                        currentInput &= ~FORWARD;
-                        break;
-                    case SDLK_SPACE:
-                        currentInput &= ~UP;
-                        break;
-                    case SDLK_u:
-                        currentInput &= ~LP;
-                        break;
-                    case SDLK_i:
-                        currentInput &= ~MP;
-                        break;
-                    case SDLK_o:
-                        currentInput &= ~HP;
-                        break;
-                    case SDLK_j:
-                        currentInput &= ~LK;
-                        break;
-                    case SDLK_k:
-                        currentInput &= ~MK;
-                        break;
-                    case SDLK_l:
-                        currentInput &= ~HK;
-                        break;
-                }
-            }
-            if (event.type == SDL_CONTROLLERBUTTONUP)
-            {
-                switch (event.cbutton.button)
-                {
-                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                        currentInput &= ~BACK;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-                        currentInput &= ~DOWN;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-                        currentInput &= ~FORWARD;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
-                        currentInput &= ~UP;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_A:
-                        currentInput &= ~LK;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_B:
-                        currentInput &= ~MK;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_X:
-                        currentInput &= ~LP;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_Y:
-                        currentInput &= ~MP;
-                        break;
-                    case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-                        currentInput &= ~HP;
-                        break;
-                }
-            }
-        }
+        currentInput = getInput( currentInput );
 
         bool hasInput = true;
         for (auto guy : guys) {
@@ -449,33 +148,19 @@ int main(int, char**)
             }
         }
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame(); 
-        ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+        color clearColor = {0.0,0.0,0.0};
 
         bool ticktock = false;
         for (auto guy : guys) {
             ticktock = ticktock || guy->getWarudo();
         }
         if (ticktock) {
-            clear_color = ImVec4(0.075f, 0.075f, 0.075f, 1.00f);
+            clearColor = {0.075,0.075,0.075};
         }
 
-        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0.0f, (int)io.DisplaySize.x, (int)io.DisplaySize.y, 0.0f, 0.0f, 1.0f);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTranslatef(0.0f,io.DisplaySize.y,0.0f);
-        glScalef(1.5f, -1.5f, 1.0f);
+        setRenderState(clearColor, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 
         renderUI(currentInput, io.Framerate, &logQueue);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         for (auto guy : guys) {
             guy->Render();
@@ -495,14 +180,14 @@ int main(int, char**)
         oneframe = false;
     }
 
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+    for (auto guy : guys)
+    {
+        delete guy;
+    }
+    guys.clear();
 
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    destroyUI();
+    destroyRender();
 
     return 0;
 }
