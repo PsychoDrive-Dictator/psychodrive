@@ -916,7 +916,7 @@ void Guy::UpdateBoxes(void)
     }
 
     DoHitBoxKey("AttackCollisionKey");
-    //DoHitBoxKey("OtherCollisionKey");
+    DoHitBoxKey("OtherCollisionKey");
 
     for ( auto minion : minions ) {
         minion->UpdateBoxes();
@@ -1060,16 +1060,16 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
     bool retHit = false;
     for (auto hitbox : hitBoxes ) {
-        if (!hitbox.domain && hitbox.hitID < canHitID) {
+        if (hitbox.type != domain && hitbox.hitID < canHitID) {
             continue;
         }
-        if (hitbox.collisionType == 3) {
-            // right now we do nothing with trip guard
+        if (hitbox.type == proximity_guard || hitbox.type == destroy_projectile) {
+            // right now we do nothing with those
             continue;
         }
-        bool isGrab = hitbox.collisionType == 2;
+        bool isGrab = hitbox.type == grab;
         for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
-            if (hitbox.domain || doBoxesHit(hitbox.box, hurtbox)) {
+            if (hitbox.type == domain || doBoxesHit(hitbox.box, hurtbox)) {
                 std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
                 int hitEntryFlag = 0;
 
@@ -1113,10 +1113,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int destY = hitEntry["MoveDest"]["y"];
                 int hitHitStun = hitEntry["HitStun"];
                 int dmgType = hitEntry["DmgType"];
+                int moveType = hitEntry["MoveType"];
                 // we're hitting for sure after this point (modulo juggle), side effects
 
                 // not hitstun for initial grab hit as we dont want to recover during the lock
-                if ( pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.domain) ) {
+                if ( pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
                     int hitStopSelf = hitEntry["HitStopOwner"];
                     if ( hitStopSelf ) {
                         if (pParent) {
@@ -1137,7 +1138,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                         hitThisFrame = true;
                     }
                     retHit = true;
-                    log(logHits, "hit type " + std::to_string(hitbox.collisionType) + " id " + std::to_string(hitbox.hitID) + " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) + " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType));
+                    log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
+                     " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+                     " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
+                     " moveType " + std::to_string(moveType) );
                 }
 
                 break;
@@ -1166,11 +1170,11 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     int destTime = hitEffect["MoveTime"];
     int dmgValue = hitEffect["DmgValue"];
     int dmgType = hitEffect["DmgType"];
+    int moveType = hitEffect["MoveType"];
     int floorTime = hitEffect["FloorTime"];
     int downTime = hitEffect["DownTime"];
     bool noZu = hitEffect["_no_zu"];
     int hitStopTarget = hitEffect["HitStopTarget"];
-    // int moveType = hitEntry["MoveType"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
     if (isDrive) {
@@ -1266,18 +1270,29 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
             nextAction = 175;
         }
     } else {
-        nextAction = 205; // HIT_MM, not sure how to pick which
-        if ( crouching ) {
-            nextAction = 213;
-        }
-        if ((airborne || posY > 0.0) && destY != 0 ) {
+        if (dmgType & 3) { // crumple? :/
+            if (moveType == 11) {
+                nextAction = 277; // back crumple?
+            } else if (moveType == 10) {
+                nextAction = 276;
+            }
+            if (airborne) {
+                nextAction = 255;
+            }
+        } else {
+            nextAction = 205; // HIT_MM, not sure how to pick which
+            if ( crouching ) {
+                nextAction = 213;
+            }
+            if ((airborne || posY > 0.0) && destY != 0 ) {
 
-            if (destY > destX) {
-                nextAction = 251; // 90
-            } else if (destX > destY * 2.5) {
-                nextAction = 253; // 00
-            } else {
-                nextAction = 252; // 45
+                if (destY > destX) {
+                    nextAction = 251; // 90
+                } else if (destX > destY * 2.5) {
+                    nextAction = 253; // 00
+                } else {
+                    nextAction = 252; // 45
+                }
             }
         }
     }
@@ -1286,7 +1301,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     return true;
 }
 
-void Guy::DoHitBoxKey(const char *name, bool domain)
+void Guy::DoHitBoxKey(const char *name)
 {
     if (actionJson.contains(name))
     {
@@ -1296,27 +1311,51 @@ void Guy::DoHitBoxKey(const char *name, bool domain)
                 continue;
             }
 
+            bool isOther = strcmp(name, "OtherCollisionKey") == 0;
+            //bool isUnique = strcmp(name, "UniqueCollisionKey") == 0;
+
             float rootOffsetX = 0;
             float rootOffsetY = 0;
             parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY += posY + posOffsetY;
 
-            Box rect={0,0,1280,720};
+            Box rect={-4096,-4096,8192,8192};
             auto rects = commonAction ? commonRectsJson : rectsJson;
 
             for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
                 int collisionType = hitBox["CollisionType"];
+                hitBoxType type = hit;
                 color collisionColor = {1.0,0.0,0.0};
-                if (collisionType == 3 ) collisionColor = {0.5,0.5,0.5};
+                int rectListID = collisionType;
+                if (isOther) { 
+                    if (collisionType == 7) {
+                        type = domain;
+                    } else if (collisionType == 10) {
+                        collisionColor = {0.0,1.0,0.5};
+                        type = destroy_projectile;
+                    }
+                    rectListID = 9;
+                } else {
+                    if (collisionType == 3 ) {
+                        collisionColor = {0.5,0.5,0.5};
+                        type = proximity_guard;
+                    } else if (collisionType == 2) {
+                        type = grab;
+                    } else if (collisionType == 1) {
+                        type = projectile;
+                    } else if (collisionType == 0) {
+                        type = hit;
+                    }
+                }
 
-                if (domain || getRect(rect, rects, collisionType, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if ((type == domain) || getRect(rect, rects, rectListID, boxID,rootOffsetX, rootOffsetY,direction)) {
                     renderBoxes.push_back({rect, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
 
                     int hitEntryID = hitBox["AttackDataListIndex"];
                     int hitID = hitBox["HitID"];
                     if (hitEntryID != -1) {
-                        hitBoxes.push_back({rect,collisionType,hitEntryID,hitID,domain});
+                        hitBoxes.push_back({rect,type,hitEntryID,hitID});
                     }
                 }
             }
