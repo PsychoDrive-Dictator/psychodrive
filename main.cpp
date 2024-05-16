@@ -18,6 +18,7 @@
 #include "main.hpp"
 
 int hitStunAdder = 0;
+uint32_t globalInputBufferLength = 5; // 4 frames of input buffering
 
 std::string readFile(const std::string &fileName)
 {
