@@ -141,6 +141,7 @@ bool Guy::PreFrame(void)
     }
 
     hitThisFrame = false;
+    landed = false;
 
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     bool validAction = namesJson.contains(actionIDString);
@@ -167,6 +168,7 @@ bool Guy::PreFrame(void)
                 loopPoint = 0;
             }
             loopCount = fab["State"]["LoopCount"];
+            hasLooped = false;
             actionFrameDataInitialized = true;
         }
 
@@ -179,6 +181,8 @@ bool Guy::PreFrame(void)
 
             limitShotCategory = pdataJson["Category"];
             noPush = pdataJson["_NoPush"];
+        } else {
+            noPush = false; // might be overridden below
         }
 
         if (actionJson.contains("PlaceKey"))
@@ -203,43 +207,12 @@ bool Guy::PreFrame(void)
         }
 
         float prevVelX = velocityX;
-        float prevVelY = velocityY;
-
-        velocityX += accelX;
-        velocityY += accelY;
-
-        if ((velocityY * prevVelY) < 0.0f || (accelY != 0.0f && velocityY == 0.0f)) {
-            startsFalling = true;
-        } else {
-            startsFalling = false;
-        }
-
-        // log(std::to_string(currentAction) + " " + std::to_string(prevVelX) + " " + std::to_string(velocityX));
-
-        if ( (velocityX * prevVelX) < 0.0f || (accelX != 0.0f && velocityX == 0.0f) ) {
-            // sign change?
-            velocityX = 0.0f;
-            accelX = 0.0f;
-        }
-
         float prevPosY = posY;
 
-        posX += (velocityX * direction);
-        posY += velocityY;
-
-        if (prevPosY == 0.0f && posY > 0.0f) {
-            airborne = true; // i think we should go by statusKey instead
-        }
-
-        if (hitVelFrames > 0) {
-            posX += hitVelX;
-            posY += hitVelY;
-            hitVelFrames--;
-        }
-
-        prevVelX = velocityX;
-
-        if (actionJson.contains("SteerKey"))
+        // don't apply steer for looped anims? or just velocity set?
+        // this is just a hack to have both looping working jumps but
+        // i'm sure this will be replace by something proper
+        if (!hasLooped && actionJson.contains("SteerKey"))
         {
             for (auto& [steerKeyID, steerKey] : actionJson["SteerKey"].items())
             {
@@ -263,6 +236,13 @@ bool Guy::PreFrame(void)
                             case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
                             case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
                             case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                        }
+                        break;
+                    case 6:
+                        // uhhhhh
+                        if (valueType == 3 && steerKey["_EndFrame"] == currentFrame + 1 && airborne && !landed) {
+                            currentFrame--;
+                            log("freezing time until landing!");
                         }
                         break;
                     case 13:
@@ -322,6 +302,39 @@ bool Guy::PreFrame(void)
             accelX = 0.0f;
         }
 
+        prevVelX = velocityX;
+        float prevVelY = velocityY;
+
+        velocityX += accelX;
+        velocityY += accelY;
+
+        if ((velocityY * prevVelY) < 0.0f || (accelY != 0.0f && velocityY == 0.0f)) {
+            startsFalling = true;
+        } else {
+            startsFalling = false;
+        }
+
+        // log(std::to_string(currentAction) + " " + std::to_string(prevVelX) + " " + std::to_string(velocityX));
+
+        if ( (velocityX * prevVelX) < 0.0f || (accelX != 0.0f && velocityX == 0.0f) ) {
+            // sign change?
+            velocityX = 0.0f;
+            accelX = 0.0f;
+        }
+
+        posX += (velocityX * direction);
+        posY += velocityY;
+
+        if (prevPosY == 0.0f && posY > 0.0f) {
+            airborne = true; // i think we should go by statusKey instead
+        }
+
+        if (hitVelFrames > 0) {
+            posX += hitVelX;
+            posY += hitVelY;
+            hitVelFrames--;
+        }
+
         if (actionJson.contains("SwitchKey"))
         {
             for (auto& [keyID, key] : actionJson["SwitchKey"].items())
@@ -359,6 +372,10 @@ bool Guy::PreFrame(void)
                         log("steerBackward " + std::to_string(steerBackward));
                     }
 
+                } else if (key["Type"] == 1) {
+                    // System event??? :///
+                    int flags = key["Param01"];
+                    log("mystery system event 1, flags " + std::to_string(flags));
                 } else if (key["_IsUNIQUE_UNIQUE_PARAM_05"] == true) {
                     uniqueCharge = 1;
                 }
@@ -490,8 +507,6 @@ bool Guy::PreFrame(void)
 
         DoHitBoxKey("AttackCollisionKey");
         //DoHitBoxKey("OtherCollisionKey", true);
-
-        DoBranchKey();
 
         // should this fall through and let triggers also happen? prolly
 
@@ -765,6 +780,7 @@ bool Guy::Push(Guy *pOtherGuy)
     float pushY = 0;
     float pushX = 0;
     for (auto pushbox : pushBoxes ) {
+        if (noPush) break;
         for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
@@ -776,11 +792,8 @@ bool Guy::Push(Guy *pOtherGuy)
         }
     }
 
-    // if you think of commenting this again try ryu's SA1
     for ( auto minion : minions ) {
-        if (!minion->noPush) {
-            minion->Push(pOtherGuy);
-        }
+        minion->Push(pOtherGuy);
     }
 
     if ( hasPushed ) {
@@ -801,11 +814,33 @@ bool Guy::WorldPhysics(void)
     bool floorpush = false;
     touchedWall = false;
     for (auto pushbox : pushBoxes ) {
-        if (pushbox.y < 0) {
+        if (noPush) break;
+
+        // Floor
+
+        // if knocked down, go by pushbox, otherwise just by position
+        // there's probably a status flag that governs this :harold:
+        if (knockedDown && airborne) {
+            if (pushbox.y < 0) {
+                pushY = std::max(-pushbox.y, pushY);
+                floorpush = true;
+                hasPushed = true;
+            }
+        } else {
+            if (posY < 0) {
+                pushY = -posY;
+                floorpush = true;
+                hasPushed = true;
+            }
+        }
+
+        if ((airborne || posY > 0) && pushbox.y < 0) {
             pushY = std::max(-pushbox.y, pushY);
             floorpush = true;
             hasPushed = true;
         }
+
+        // Walls
 
         if (pushbox.x < 0.0 ) {
             pushX = std::max(-pushbox.x, pushX);
@@ -820,27 +855,13 @@ bool Guy::WorldPhysics(void)
         }
     }
 
-    landed = false;
-
     // landing - not sure about velocity check there, but otherwise we land during buttslam ascent
-    if (floorpush && airborne && velocityY < 0)
+    if (floorpush && airborne)
     {
         pushY = 0.0f;
         posY = 0.0f;
         velocityY = 0.0f;
         accelY = 0.0f;
-        nextAction = 39; // land - need other landing if did air attack?
-
-        if ( resetHitStunOnLand ) {
-            hitStun = 1;
-            resetHitStunOnLand = false;
-        }
-
-        if ( hitStunOnLand > 0 ) {
-            // there's some additional knockdown delay there
-            hitStun += hitStunOnLand + 1 + 30;
-            hitStunOnLand = 0;
-        }
 
         airborne = false;
         landed = true;
@@ -848,9 +869,7 @@ bool Guy::WorldPhysics(void)
     }
 
     for ( auto minion : minions ) {
-        if (!minion->noPush) {
-            minion->WorldPhysics();
-        }
+        minion->WorldPhysics();
     }
 
     if ( hasPushed ) {
@@ -902,6 +921,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int dmgValue = hitEntry["DmgValue"];
                 int dmgType = hitEntry["DmgType"];
                 int floorTime = hitEntry["FloorTime"];
+                int downTime = hitEntry["DownTime"];
 
                 if (wasDrive) {
                     juggleAdd = 0;
@@ -956,6 +976,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
 
                 pOtherGuy->hitStunOnLand = floorTime;
+                pOtherGuy->knockDownFrames = downTime;
 
                 // int moveType = hitEntry["MoveType"];
                 // int curveTargetID = hitEntry["CurveTgtID"];
@@ -1006,11 +1027,11 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
 
     if (destY > 0 ) {
         airborne = true;
+        knockedDown = true;
     }
 
     nextAction = 205; // HIT_MM, not sure how to pick which
-    if (  destY != 0 ) {
-
+    if ((airborne || posY > 0.0) && destY != 0 ) {
         //nextAction = 253; // 246 if head - we should do a pre-histop trsansition there
         if (destY > destX) {
             nextAction = 230; // 90
@@ -1115,7 +1136,7 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 13:
-                    if (landed) {
+                    if (!airborne) { // it's technically landed, but like heavy buttslam checks one frame
                         doBranch = true;
                     }
                     break;
@@ -1233,6 +1254,8 @@ void Guy::DoBranchKey(void)
 
 bool Guy::Frame(void)
 {
+    DoBranchKey();
+
     currentFrame++;
 
     if (isProjectile && canHitID >= 0) {
@@ -1248,23 +1271,44 @@ bool Guy::Frame(void)
         return false; // die
     }
 
+    if (landed) {
+        if ( resetHitStunOnLand ) {
+            hitStun = 1;
+            resetHitStunOnLand = false;
+        }
+
+        if ( hitStunOnLand > 0 ) {
+            // there's some additional knockdown delay there
+            hitStun += hitStunOnLand + 1 + 30;
+            hitStunOnLand = 0;
+
+            nextAction = 350; // combo state
+        }
+    }
+
     // do we want to count down while in hitstop? that may be why we need +1
     if (hitStun > 0)
     {
         hitStun--;
         if (hitStun == 0)
         {
-            int advantage = globalFrameCount - pOpponent->recoveryTiming;
-            log("recovered! adv " + std::to_string(advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
             nextAction = 1;
-            comboHits = 0;
-            juggleCounter = 0;
-            comboDamage = 0;
+
+            if (knockedDown) {
+                if (knockDownFrames) {
+                    hitStun = knockDownFrames;
+                    knockDownFrames = 0;
+                    nextAction = 330;
+                } else {
+                    nextAction = 340;
+                    knockedDown = false;
+                }
+            }
         }
 
     }
 
-    if (currentFrame >= (actionFrameDuration - 1) && nextAction == -1)
+    if (currentFrame >= actionFrameDuration && nextAction == -1)
     {
         if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
@@ -1272,6 +1316,7 @@ bool Guy::Frame(void)
             airborne = true; // probably should get it thru statuskey?
         } else if (loopCount == -1 || loopCount > 0) {
             currentFrame = loopPoint;
+            hasLooped = true;
             if (loopCount > 0) {
                 loopCount--;
             }
@@ -1295,11 +1340,11 @@ bool Guy::Frame(void)
         canMove = true;
     }
 
-    if ( marginFrame != -1 && currentFrame >= marginFrame - 1 ) {
+    if ( marginFrame != -1 && currentFrame >= marginFrame && nextAction == -1 ) {
         canMove = true;
     }
 
-    if (posY > 0.0f) {
+    if (airborne || posY > 0.0f) {
         canMove = false;
     }
     if (hitStun) {
@@ -1348,6 +1393,26 @@ bool Guy::Frame(void)
         nextAction = 482; // DPA_STD_END
     }
 
+    if (landed && nextAction == -1) {
+        if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
+            nextAction = currentAction + 3; // generic landing
+        }
+
+        // better assume the script has something in mind for landing :/
+
+        if (hitStun) {
+            nextAction = 350; // being down? dunno
+        }
+    }
+
+    if (canMove && comboHits) {
+        int advantage = globalFrameCount - pOpponent->recoveryTiming;
+        log("recovered! adv " + std::to_string(advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+        comboHits = 0;
+        juggleCounter = 0;
+        comboDamage = 0;
+    }
+
     // Transition
     if ( nextAction != -1 )
     {
@@ -1355,7 +1420,13 @@ bool Guy::Frame(void)
             recoveryTiming = globalFrameCount;
             //log("recovered!");
         }
+
         currentAction = nextAction;
+
+        auto actionIDString = to_string_leading_zeroes(currentAction, 4);
+        bool validAction = namesJson.contains(actionIDString);
+        actionName = validAction ? namesJson[actionIDString] : "invalid";
+
         if (!keepPlace) {
             currentFrame = 0;
 
@@ -1380,6 +1451,7 @@ bool Guy::Frame(void)
         // if grounded, reset velocities on transition
         // need to test if still needed?
         // probably just on transitioning to standing? not sure
+        // velocities already got transitioned tro 0 on actual landing even if in hitstun
         if ( posY == 0.0 && !isDrive && !hitStun) {
             velocityX = 0;
             velocityY = 0;

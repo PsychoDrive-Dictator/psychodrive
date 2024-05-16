@@ -69,6 +69,7 @@ public:
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
     std::string getActionName() { return actionName; }
+    bool getAirborne() { return airborne; }
     void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
         outPosX = posX;
         outPosY = posY;
@@ -197,6 +198,7 @@ private:
     int loopCount = 0;
     int loopPoint = 0;
     bool commonAction = false;
+    bool hasLooped = false;
     bool actionFrameDataInitialized = false;
 
     int currentInput = 0;
@@ -219,6 +221,8 @@ private:
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;
+    bool knockedDown = false;
+    int knockDownFrames = 0;
 
     int recoveryTiming = 0;
 
