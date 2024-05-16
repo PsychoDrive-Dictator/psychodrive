@@ -30,6 +30,18 @@ include_dirs = [
   include_directories('imgui/backends'),
 ]
 
+if meson.is_cross_build()
+  add_global_arguments('-static-libgcc', language : 'cpp')
+  add_global_arguments('-static-libstdc++', language : 'cpp')
+  add_global_arguments('-Wl,-Bstatic', language : 'cpp')
+  add_global_arguments('-lstdc++', language : 'cpp')
+  add_global_link_arguments('-static-libgcc', language : 'cpp')
+  add_global_link_arguments('-static-libstdc++', language : 'cpp')
+  add_global_link_arguments('-Wl,-Bstatic', language : 'cpp')
+  add_global_link_arguments('-lstdc++', language : 'cpp')
+  add_global_link_arguments('-lpthread', language : 'cpp')
+endif
+
 # ===================================================================
 
 # ======

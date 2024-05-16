@@ -8,6 +8,7 @@
 class Guy {
 public:
     Guy(std::string charName, float startPosX, float startPosY, int startDir, color renderColor);
+    Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction);
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
 
     void Input(int input);
@@ -16,7 +17,7 @@ public:
     bool Push(Guy *pOtherGuy);
     bool CheckHit(Guy *pOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime);
-    void Frame(void);
+    bool Frame(void);
 
     void addWarudo(int w) { warudo += w; }
 
@@ -51,6 +52,11 @@ public:
 private:
     std::string character;
     Guy *pOpponent = nullptr;
+
+    std::vector<Guy*> minions;
+    bool isProjectile = false;
+    int projHitCount = 0;
+    Guy *pParent = nullptr;
 
     nlohmann::json movesDictJson;
     nlohmann::json rectsJson;
