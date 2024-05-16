@@ -84,6 +84,7 @@ bool doBoxesHit(Box box1, Box box2)
     if (box2.y + box2.h < box1.y) {
         return false;
     }
+    //log ("boxes hit! " + std::to_string(box1.x + box1.w - box2.x));
     return true;
 }
  
@@ -136,7 +137,7 @@ int main(int argc, char**argv)
 
         bool hasInput = true;
         for (auto guy : guys) {
-            guy->Input( hasInput ? currentInput : 0);
+            guy->Input( hasInput ? currentInput : 2);
             hasInput = false;
         }
 
