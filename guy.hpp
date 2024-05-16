@@ -13,6 +13,7 @@ public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
 
     void Input(int input);
+    void UpdateActionData(void);
     bool PreFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
@@ -22,6 +23,7 @@ public:
     void Hit(int hitStun, int destX, int destY, int destTime, int damage);
     void DoBranchKey();
     void DoHitBoxKey(const char *name, bool domain = false);
+    void DoStatusKey();
     bool Frame(void);
 
     void addWarudo(int w) { warudo += w; }
@@ -117,6 +119,8 @@ public:
             commonRectsJson = parse_json_file("common_rects.json");
             commonMovesInitialized = true;
         }
+    
+        UpdateActionData();
     }
 
     Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
@@ -146,6 +150,8 @@ public:
         isProjectile = true;
         projHitCount = -1; // unset yet, is in the first action
         pParent = &parent;
+
+        UpdateActionData();
     }
 
 private:
@@ -182,6 +188,8 @@ private:
     bool landed = false;
     bool touchedWall = false;
     bool startsFalling = false;
+
+    int landingAdjust = 0;
 
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
@@ -220,7 +228,7 @@ private:
     float hitVelX = 0.0f;
     float hitAccelX = 0.0f;
     float pushBackThisFrame = 0.0f;
-    int hitVelFrames = 0;
+    bool beenHitThisFrame = false;
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;

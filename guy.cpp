@@ -130,19 +130,9 @@ void Guy::Input(int input)
 nlohmann::json Guy::commonMovesJson = nullptr;
 nlohmann::json Guy::commonRectsJson = nullptr;
 
-bool Guy::PreFrame(void)
+void Guy::UpdateActionData(void)
 {
-    if (warudo > 0) {
-        timeInWarudo++;
-        warudo--;
-    }
-    if (warudo > 0) {
-        return false;
-    }
-
-    hitThisFrame = false;
-    landed = false;
-    pushBackThisFrame = 0.0f;
+    landingAdjust = 0;
 
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     bool validAction = namesJson.contains(actionIDString);
@@ -157,22 +147,38 @@ bool Guy::PreFrame(void)
         commonAction = false;
     }
 
+    if (!actionFrameDataInitialized) {
+        //standing has 0 marginframe, pre-jump has -1, crouch -1..
+        auto fab = actionJson["fab"];
+        marginFrame = fab["ActionFrame"]["MarginFrame"];
+        actionFrameDuration = fab["Frame"];
+        loopPoint = fab["State"]["EndStateParam"];
+        if ( loopPoint == -1 ) {
+            loopPoint = 0;
+        }
+        loopCount = fab["State"]["LoopCount"];
+        hasLooped = false;
+        actionFrameDataInitialized = true;
+    }
+}
+
+bool Guy::PreFrame(void)
+{
+    if (warudo > 0) {
+        timeInWarudo++;
+        warudo--;
+    }
+    if (warudo > 0) {
+        return false;
+    }
+
+    hitThisFrame = false;
+    beenHitThisFrame = false;
+    landed = false;
+    pushBackThisFrame = 0.0f;
+
     if (actionJson != nullptr)
     {
-        if (!actionFrameDataInitialized) {
-            //standing has 0 marginframe, pre-jump has -1, crouch -1..
-            auto fab = actionJson["fab"];
-            marginFrame = fab["ActionFrame"]["MarginFrame"];
-            actionFrameDuration = fab["Frame"];
-            loopPoint = fab["State"]["EndStateParam"];
-            if ( loopPoint == -1 ) {
-                loopPoint = 0;
-            }
-            loopCount = fab["State"]["LoopCount"];
-            hasLooped = false;
-            actionFrameDataInitialized = true;
-        }
-
         if (isProjectile) {
             auto pdataJson = actionJson["pdata"];
             if (projHitCount == -1) {
@@ -328,20 +334,6 @@ bool Guy::PreFrame(void)
 
         if (prevPosY == 0.0f && posY > 0.0f) {
             airborne = true; // i think we should go by statusKey instead?
-        }
-
-        if (hitVelX != 0.0f) {
-            float prevHitVelX = hitVelX;
-            hitVelX += hitAccelX;
-            if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
-                hitAccelX = 0.0f;
-                hitVelX = 0.0f;
-            }
-
-            posX += hitVelX;
-
-            pushBackThisFrame = hitVelX;
-            //hitVelFrames--;
         }
 
         if (actionJson.contains("SwitchKey"))
@@ -831,7 +823,6 @@ bool Guy::Push(Guy *pOtherGuy)
 
 bool Guy::WorldPhysics(void)
 {
-    // needs to run after pushboxes computed, after player push?
     bool hasPushed = false;
     float pushX = 0;
     float pushY = 0;
@@ -841,24 +832,11 @@ bool Guy::WorldPhysics(void)
     if (!noPush) {
         // Floor
 
-        // if knocked down, go by pushbox, otherwise just by position
-        // there's probably a status flag that governs this :harold:
-        if (knockedDown && airborne) {
-            for (auto pushbox : hurtBoxes ) {
-                if (pushbox.y < 0) {
-                    pushY = std::max(-pushbox.y, pushY);
-                    //log("floorpush hurtbox");
-                    floorpush = true;
-                    hasPushed = true;
-                }
-            }
-        } else {
-            if (posY < 0) {
-                //log("floorpush pos");
-                pushY = -posY;
-                floorpush = true;
-                hasPushed = true;
-            }
+        if (posY - landingAdjust < 0) {
+            //log("floorpush pos");
+            pushY = -posY;
+            floorpush = true;
+            hasPushed = true;
         }
 
         // Walls
@@ -876,8 +854,9 @@ bool Guy::WorldPhysics(void)
         }
     }
 
-    // landing - not sure about velocity check there, but otherwise we land during buttslam ascent
-    if (floorpush && airborne)
+    // if we're going up (like jsut getting hit), we're not landing,
+    // just being helped off the ground - see heavy donkey into lp dp
+    if (floorpush && airborne && velocityY < 0)
     {
         pushY = 0.0f;
         velocityX = 0.0f;
@@ -935,11 +914,13 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 int hitEntryFlag = 0;
 
-                // it's possible to hit them on the frames they owuld have landed
-                // now that we run hits after physics
-                // this is eg. lp dp after heavy donkey
-                // i think this is how the game works too bc pos is already snapped at 0 when it hits
-                bool otherGuyAirborne = pOtherGuy->airborne || pOtherGuy->landed;
+                if (pOtherGuy->knockedDown && !pOtherGuy->airborne)
+                {
+                    // need to check for otg capability there i guess?
+                    break;
+                }
+
+                bool otherGuyAirborne = pOtherGuy->airborne;
 
                 if (otherGuyAirborne) {
                     hitEntryFlag |= air;
@@ -1051,15 +1032,11 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     comboDamage += damage;
     // +1 because i think we're off by one frame where we run this
     hitStun = stun + 1 + hitStunAdder;
+    beenHitThisFrame = true;
 
     if (destY > 0 ) {
         airborne = true;
         knockedDown = true;
-        // it's possible to hit them on the frames they owuld have landed
-        // now that we run hits after physics
-        // this is eg. lp dp after heavy donkey
-        // i think this is how the game works too bc pos is already snapped at 0 when it hits
-        landed = false; 
     }
 
     if (destTime != 0) {
@@ -1072,7 +1049,6 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
                 hitVelX = direction * destX * 2 * -1 / (float)time;
                 hitAccelX = direction * destX * 1 / (float)time * 2.0 / (float)time;
                 hitVelX -= hitAccelX;
-
                 //hitVelFrames = destTime;
             } else {
                 // keep itvel pushback from last grounded hit
@@ -1089,23 +1065,19 @@ void Guy::Hit(int stun, int destX, int destY, int destTime, int damage)
     // i think this vel wants to apply this frame, lame workaround to get same intensity
     velocityY -= accelY; //
 
+
+    // need to figure out if body or head is getting hit here later
+
     nextAction = 205; // HIT_MM, not sure how to pick which
     if ((airborne || posY > 0.0) && destY != 0 ) {
-        //nextAction = 253; // 246 if head - we should do a pre-histop trsansition there
+
         if (destY > destX) {
-            nextAction = 230; // 90
+            nextAction = 251; // 90
         } else if (destX > destY * 2.5) {
-            nextAction = 232; // 00
+            nextAction = 253; // 00
         } else {
-            nextAction = 231;
+            nextAction = 252; // 45
         }
-        // if ((curveTargetID & 0x9) == 0x9) {
-        //     nextAction = 230; // 90
-        // } else if (curveTargetID & 0x1) {
-        //     nextAction = 231; // 45
-        // } else {
-        //     nextAction = 232; // 00
-        // }
     }
 }
 
@@ -1326,26 +1298,18 @@ bool Guy::Frame(void)
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     DoBranchKey();
 
-    // update place after the bump? maybeeeee - we inch back some 0.6x for the buffed ex hands loop
-    if (actionJson.contains("PlaceKey"))
-    {
-        for (auto& [placeKeyID, placeKey] : actionJson["PlaceKey"].items())
-        {
-            if ( !placeKey.contains("_StartFrame") || placeKey["_StartFrame"] > currentFrame || placeKey["_EndFrame"] <= currentFrame ) {
-                continue;
-            }
-
-            for (auto& [frame, offset] : placeKey["PosList"].items()) {
-                int keyStartFrame = placeKey["_StartFrame"];
-                if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
-                    if (placeKey["Axis"] == 0) {
-                        posOffsetX = offset.get<float>();
-                    } else if (placeKey["Axis"] == 1) {
-                        posOffsetY = offset.get<float>();
-                    }
-                }
-            }
+    if (hitVelX != 0.0f && !beenHitThisFrame) {
+        float prevHitVelX = hitVelX;
+        hitVelX += hitAccelX;
+        if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
+            hitAccelX = 0.0f;
+            hitVelX = 0.0f;
         }
+
+        posX += hitVelX;
+        pushBackThisFrame = hitVelX;
+
+        WorldPhysics();
     }
 
     if (isProjectile && projHitCount == 0) {
@@ -1365,6 +1329,11 @@ bool Guy::Frame(void)
 
             nextAction = 350; // combo state
         }
+    }
+
+    if (currentAction >= 251 && currentAction <= 253 && nextAction == -1)
+    {
+        nextAction = currentAction - 21;
     }
 
     // do we want to count down while in hitstop? that may be why we need +1
@@ -1457,7 +1426,7 @@ bool Guy::Frame(void)
             }
         }
 
-        if ( currentInput == 0 ) { // only do that if we're not post-margin for correctness
+        if ( nextAction == -1 && ((currentInput & 0xF) == 0) ) { // only do that if we're not post-margin for correctness
             nextAction = 1;
         }
 
@@ -1504,6 +1473,7 @@ bool Guy::Frame(void)
         }
 
         currentAction = nextAction;
+        //log ("current action " + std::to_string(currentAction));
 
         auto actionIDString = to_string_leading_zeroes(currentAction, 4);
         bool validAction = namesJson.contains(actionIDString);
@@ -1560,6 +1530,10 @@ bool Guy::Frame(void)
         timeInWarudo = 0;
     }
 
+    UpdateActionData();
+
+    DoStatusKey();
+
     std::vector<Guy*> minionsNotFinished;
     for ( auto minion : minions ) {
         if (minion->Frame()) {
@@ -1571,4 +1545,22 @@ bool Guy::Frame(void)
     minions = minionsNotFinished;
 
     return true;
+}
+
+void Guy::DoStatusKey(void)
+{
+    if (actionJson.contains("StatusKey"))
+    {
+        for (auto& [keyID, key] : actionJson["StatusKey"].items())
+        {
+            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            int adjust = key["LandingAdjust"];
+            if ( adjust != 0 ) {
+                landingAdjust = adjust;
+            }
+        }
+    }
 }

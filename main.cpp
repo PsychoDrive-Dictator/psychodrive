@@ -152,17 +152,20 @@ int main(int argc, char**argv)
 
         bool push = true; // only push the first guy until this actually works
         if (oneframe || !paused) {
-            for (auto guy : guysWhoFrame) {
+            // everyone gets world physics
+            for (auto guy : guys) {
                 guy->WorldPhysics();
             }
+            for (auto guy : guysWhoFrame) {
+                guy->CheckHit(guy->getOpponent());
+            }
+            // push after hit for fbs to work, but i think it's really that there's some pushboxes on hit only
+            // see all air normals?
             for (auto guy : guysWhoFrame) {
                 if ( push ) {
                     guy->Push(guy->getOpponent());
                     push = false;
                 }
-            }
-            for (auto guy : guysWhoFrame) {
-                guy->CheckHit(guy->getOpponent());
             }
             for (auto guy : guysWhoFrame) {
                 guy->Frame();
