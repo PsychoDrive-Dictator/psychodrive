@@ -20,6 +20,7 @@ public:
     bool CheckHit(Guy *pOtherGuy);
     void Hit(int hitStun, int destX, int destY, int destTime, int damage);
     void DoBranchKey();
+    void DoHitBoxKey(const char *name, bool domain = false);
     bool Frame(void);
 
     void addWarudo(int w) { warudo += w; }
@@ -187,6 +188,7 @@ private:
     int marginFrame = 0;
     int loopCount = 0;
     int loopPoint = 0;
+    bool commonAction = false;
     bool actionFrameDataInitialized = false;
 
     int currentInput = 0;

@@ -24,6 +24,7 @@ struct HitBox {
     Box box;
     int hitEntryID;
     int hitID;
+    bool domain = false;
 };
 
 static inline float randFloat()
