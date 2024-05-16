@@ -157,6 +157,7 @@ private:
     bool isProjectile = false;
     int projHitCount = 0;
     int limitShotCategory = -1;
+    bool noPush = false;
     Guy *pParent = nullptr;
 
     nlohmann::json movesDictJson;
