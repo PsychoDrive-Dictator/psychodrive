@@ -51,6 +51,7 @@ void updateInputs(void)
                 case SDLK_d:
                     currentInputMap[keyboardID] |= FORWARD;
                     break;
+                case SDLK_w:
                 case SDLK_SPACE:
                     currentInputMap[keyboardID] |= UP;
                     break;
@@ -222,6 +223,7 @@ void updateInputs(void)
                 case SDLK_d:
                     currentInputMap[keyboardID] &= ~FORWARD;
                     break;
+                case SDLK_w:
                 case SDLK_SPACE:
                     currentInputMap[keyboardID] &= ~UP;
                     break;
