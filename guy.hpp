@@ -296,6 +296,7 @@ private:
     int nextAction = -1;
     int nextActionFrame = -1;
     bool keepPlace = false;
+    bool keepFrame = false;
     int currentFrame = 0;
     int actionFrameDuration = 0;
     int mainFrame = 0;

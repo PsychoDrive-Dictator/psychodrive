@@ -121,8 +121,8 @@ void log(std::string logLine)
     }
 }
 
-float startPos1 = -340.0;
-float startPos2 = -140.0;
+float startPos1 = -765.0;
+float startPos2 = -660.0;
 
 int main(int argc, char**argv)
 {
