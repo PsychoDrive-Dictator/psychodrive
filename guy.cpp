@@ -548,6 +548,8 @@ void Guy::Frame(void)
         canMove = true;
     }
 
+    bool turnaround = false;
+
     // Process movement if any
     if ( canMove )
     {
@@ -574,6 +576,14 @@ void Guy::Frame(void)
         if ( currentInput == 0 ) { // only do that if we're not post-margin for correctness
             nextAction = 1;
         }
+
+        if (pOpponent) {
+            if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
+                turnaround = true;
+            } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
+                turnaround = true;
+            }
+        }
     }
 
     if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {
@@ -593,6 +603,10 @@ void Guy::Frame(void)
         posOffsetY = 0.0f;
 
         nextAction = -1;
+
+        if (turnaround) {
+            direction *= -1;
+        }
 
         // if grounded, reset velocities on transition
         // need to test if still needed?
