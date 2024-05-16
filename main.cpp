@@ -39,6 +39,10 @@ bool recordingInput = false;
 std::vector<int> recordedInput;
 int recordingStartFrame = 0;
 
+bool playingBackInput = false;
+std::deque<int> playBackInputBuffer;
+int playBackFrame = 0;
+
 std::string readFile(const std::string &fileName)
 {
     std::ifstream ifs(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
@@ -141,6 +145,15 @@ int main(int argc, char**argv)
 
         if (recordingInput) {
             recordedInput.push_back(currentInput);
+        }
+
+        if (playingBackInput) {
+            if (playBackFrame >= (int)playBackInputBuffer.size()) {
+                playingBackInput = false;
+                playBackFrame = 0;
+            } else {
+                currentInput = playBackInputBuffer[playBackFrame++];
+            }
         }
 
         bool hasInput = true;

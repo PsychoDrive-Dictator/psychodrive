@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <deque>
 #include "json.hpp"
 
 enum hitentryflags {
@@ -47,6 +48,10 @@ extern int globalFrameCount;
 extern bool recordingInput;
 extern std::vector<int> recordedInput;
 extern int recordingStartFrame;
+
+extern bool playingBackInput;
+extern std::deque<int> playBackInputBuffer;
+extern int playBackFrame;
 
 extern bool forceCounter;
 extern bool forcePunishCounter;

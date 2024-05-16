@@ -66,6 +66,37 @@ struct timelineItem {
     int input;
 };
 
+std::unordered_map<int, timelineItem*> mapTimelineItems;
+
+void timelineToInputBuffer(std::deque<int> &inputBuffer)
+{
+    inputBuffer.clear();
+
+    for (auto elem : mapTimelineItems)
+    {
+        while ((int)inputBuffer.size() < elem.second->frame) {
+            inputBuffer.push_back(0);
+        }
+        inputBuffer[elem.second->frame] |= elem.second->input;
+    }
+
+    inputBuffer.push_back(0); // add a neutral input at the end
+
+    unsigned int i = 0;
+    while (i < inputBuffer.size()) {
+        int key = 4; // put down the _pressed bits on first appearance
+        while (key < 10)
+        {
+            int input = 1<<key;
+            if (inputBuffer[i] & input && (i == 0 || !(inputBuffer[i-1] & input))) {
+                inputBuffer[i] |= 1<<(key+6);
+            }
+            key++;
+        }
+        i++;
+    }
+}
+
 void drawInputEditor()
 {
     int32_t currentFrame = recordedInput.size();
@@ -77,7 +108,6 @@ void drawInputEditor()
     //static bool transformOpen = false;
     static bool doDelete = false;
 
-    static std::unordered_map<int, timelineItem*> mapTimelineItems;
     static unsigned int recordingProgress = 0;
 
     unsigned int i = recordingProgress;

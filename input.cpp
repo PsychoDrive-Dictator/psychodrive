@@ -80,6 +80,13 @@ int getInput(int currentInput)
                         recordingStartFrame = globalFrameCount;
                     }
                     break;
+                case SDLK_t:
+                    playingBackInput = !playingBackInput;
+                    if (playingBackInput == true) {
+                        timelineToInputBuffer(playBackInputBuffer);
+                    }
+                    playBackFrame = 0;
+                    break;
                 case SDLK_ESCAPE:
                     done = true;
                     break;
