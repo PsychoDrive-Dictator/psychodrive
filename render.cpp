@@ -191,8 +191,7 @@ void drawBox( float x, float y, float w, float h, float thickness, float r, floa
 void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
 {
     if (isDrive || isParry || isDI ) {
-        int driveOffset = 5;
-        thickness += 10;
+        float driveOffset = 0.75;
         float colorR = 0.0;
         float colorG = 0.6;
         float colorB = 0.1;
@@ -206,7 +205,7 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,thickness,colorR,colorG,colorB,1.0);
+        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,1.0);
     }
     drawBox( box.x, box.y, box.w, box.h,thickness,col.r,col.g,col.b,1.0);
 }
