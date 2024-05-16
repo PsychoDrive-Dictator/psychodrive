@@ -297,6 +297,7 @@ bool Guy::PreFrame(void)
                 int shotCategory = steerKey["_ShotCategory"];
                 int targetType = steerKey["TarType"];
                 int calcValueFrame = steerKey["CalcValueFrame"];
+                int multiValueType = steerKey["MultiValueType"];
 
                 switch (operationType) {
                     case 1:
@@ -376,10 +377,11 @@ bool Guy::PreFrame(void)
                     case 15:
                         // teleport/lerp position?
                         if (fixValue == 0.0 && calcValueFrame == 1) {
-                            posX = homeTargetX;
-                            posY = homeTargetY;
-                            if (posY > 0.0) {
-                                airborne = true;
+                            if (multiValueType & 1) {
+                                posX = homeTargetX;
+                            }
+                            if (multiValueType & 2) {
+                                posY = homeTargetY;
                             }
                         } else {
                             log(logUnknowns, "unsupported teleport/lerp, only instant for now");
