@@ -548,14 +548,16 @@ void Guy::PreFrame(void)
                                 }
                             }
 
-                            uint32_t inputBufferCursor = 0;
+                            uint32_t inputBufferCursor = i;
 
                             while (inputID >= 0 )
                             {
-                                auto input = commandInputs[to_string_leading_zeroes(inputID, 2)]["normal"];
+                                auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
+                                auto inputNorm = input["normal"];
                                 // does 0x40000000 mean neutral?
-                                uint32_t inputOkKeyFlags = input["ok_key_flags"];
-                                uint32_t inputOkCondFlags = input["ok_key_cond_check_flags"];
+                                uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
+                                uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
+                                uint32_t numFrames = input["frame_num"];
                                 // condflags..
                                 // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
                                 // 10100000001100000: EX, so any two out of three button mask?
@@ -565,8 +567,11 @@ void Guy::PreFrame(void)
                                 while (inputBufferCursor < inputBuffer.size())
                                 {
                                     if (matchInput(inputBuffer[inputBufferCursor++], inputOkKeyFlags, inputOkCondFlags)) {
-                                        inputID--;
-                                        break;
+                                        if (inputBufferCursor - i - 1 < numFrames || chargeBit) {
+                                            i = inputBufferCursor;
+                                            inputID--;
+                                            break;
+                                        }
                                     }
                                 }
 
