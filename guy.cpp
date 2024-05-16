@@ -668,6 +668,9 @@ bool Guy::PreFrame(void)
             deferredActionFrame = -1;
             deferredAction = 0;
         }
+
+        // steer/etc could have had side effects there
+        UpdateBoxes();
     }
 
     for ( auto minion : minions ) {
@@ -727,7 +730,7 @@ void Guy::UpdateBoxes(void)
             }
             for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
                 if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
-                    renderBoxes.push_back({rect, {charColorR,charColorG,charColorB}, drive,parry,di});
+                    renderBoxes.push_back({rect, {0.15,0.20,0.8}, drive,parry,di});
                 }
             }
         }
@@ -750,16 +753,16 @@ void Guy::UpdateBoxes(void)
 
             if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                 pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, {1.0,1.0,1.0}});
-            } else if (getRect(rect, rects, 7, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+                renderBoxes.push_back({rect, {0.8,0.7,0.0}});            
+            } else if (getRect(rect, commonRectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                 pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, {1.0,1.0,1.0}});
+                renderBoxes.push_back({rect, {0.8,0.7,0.0}});
             }
         }
     }
 
     DoHitBoxKey("AttackCollisionKey");
-    //DoHitBoxKey("OtherCollisionKey", true);
+    //DoHitBoxKey("OtherCollisionKey");
 
     for ( auto minion : minions ) {
         minion->UpdateBoxes();
@@ -811,6 +814,7 @@ bool Guy::Push(Guy *pOtherGuy)
     if ( hasPushed ) {
         posX += pushX;
         posY += pushY;
+        UpdateBoxes();
         return true;
     }
 
@@ -868,7 +872,6 @@ bool Guy::WorldPhysics(void)
     if (floorpush && airborne)
     {
         pushY = 0.0f;
-        posY = 0.0f;
         velocityX = 0.0f;
         velocityY = 0.0f;
         accelX = 0.0f;
@@ -892,6 +895,15 @@ bool Guy::WorldPhysics(void)
             if (pAttacker && !pAttacker->noPush) {
                 pAttacker->posX += std::max(pushX, pushBackThisFrame * -1.0f);
             }
+        }
+
+        UpdateBoxes();
+
+        if (landed) {
+            // don't update hitboxes before setting posY, the current frame
+            // or the box will be too high up as we're still on the falling box
+            // see heave donky into lp dp
+            posY = 0.0f;
         }
 
         return true;
