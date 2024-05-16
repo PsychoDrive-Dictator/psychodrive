@@ -966,13 +966,13 @@ void Guy::Render(void) {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
-    if (warudo) return false;
+    //if (warudo) return false;
     if ( !pOtherGuy ) return false;
 
     bool hasPushed = false;
     touchedOpponent = false;
-    float pushY = 0;
-    float pushX = 0;
+    float pushXLeft = 0;
+    float pushXRight = 0;
     for (auto pushbox : pushBoxes ) {
 
         if (noPush) break;
@@ -980,19 +980,45 @@ bool Guy::Push(Guy *pOtherGuy)
         for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
-                float difference = -(pushbox.x + pushbox.w - otherPushBox.x);
-                // log("push " + std::to_string(difference));
-                pushX = fminf(difference, pushX);
+                pushXLeft = fmaxf(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
+                pushXRight = fminf(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
                 hasPushed = true;
             }
         }
     }
 
     if ( hasPushed ) {
+        pushXLeft = fmaxf(0.0, pushXLeft);
+        pushXRight = fminf(0.0, pushXRight);
+        float pushNeeded = -pushXRight;
+        if (fabsf(pushXLeft) < fabsf(pushXRight)) {
+            pushNeeded = -pushXLeft;
+        }
+        float velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
+        log(logTransitions, "push needed " + std::to_string(pushNeeded) + " vel diff " + std::to_string(velDiff));
+        // if (velDiff * pushNeeded < 0.0) {
+        //     // if velDiff different sign, we can deduct it
+        //     if (fabsf(velDiff) > fabsf(pushNeeded)) {
+        //         float velDiffSign = velDiff / fabsf(velDiff);
+        //         velDiff = fabsf(pushNeeded) * velDiffSign;
+        //     }
+        //     if (velocityX > pOtherGuy->velocityX) {
+        //         pOtherGuy->posX += velDiff;
+        //     } else {
+        //         posX += velDiff;
+        //     }
+        //     pushNeeded += velDiff;
+        // }
+        // log(logTransitions, "push still needed " + std::to_string(pushNeeded));
+        if (pushNeeded) {
+            posX += pushNeeded / 2.0;
+            pOtherGuy->posX += -pushNeeded / 2.0;
+        }
+
         touchedOpponent = true; // could be touching anyone really but can fix later
-        posX += pushX;
-        posY += pushY;
+        pOtherGuy->touchedOpponent = true;
         UpdateBoxes();
+        pOtherGuy->UpdateBoxes();
         return true;
     }
 
