@@ -196,6 +196,14 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
     }
 }
 
+static inline float fixedToFloat(int fixed)
+{
+    short integerPart = (fixed & 0xFFFF0000) >> 16;
+    float decimalPart = (fixed & 0xFFFF)/(float)0xFFFF;
+
+    return decimalPart + integerPart;
+}
+
 // Main code
 int main(int, char**)
 {
@@ -641,7 +649,20 @@ int main(int, char**)
                         continue;
                     }
 
-                    if (key["_IsUNIQUE_UNIQUE_PARAM_05"] == true) {
+                    if (key["Type"] == 0)
+                    {
+                        float steerForward = fixedToFloat(key["Param02"].get<int>());
+                        float steerBackward = fixedToFloat(key["Param03"].get<int>());
+
+                        if (currentInput & FORWARD) {
+                            posX += steerForward;
+                            log("steerForward " + std::to_string(steerForward));
+                        } else if (currentInput & BACK) {
+                            posX += steerBackward;
+                            log("steerBackward " + std::to_string(steerBackward));
+                        }
+
+                    } else if (key["_IsUNIQUE_UNIQUE_PARAM_05"] == true) {
                         uniqueCharge = 1;
                     }
                 }
