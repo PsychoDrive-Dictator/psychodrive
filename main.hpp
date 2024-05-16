@@ -63,6 +63,8 @@ struct RenderBox {
 
 void log(std::string logLine);
 
+extern int globalFrameCount;
+
 extern bool forceCounter;
 extern bool forcePunishCounter;
 extern int hitStunAdder;

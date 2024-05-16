@@ -256,6 +256,19 @@ bool Guy::PreFrame(void)
             velocityY = 0.0f;
             accelY = 0.0f;
             nextAction = 39; // land - need other landing if did air attack?
+
+            if ( resetHitStunOnLand ) {
+                hitStun = 1;
+                resetHitStunOnLand = false;
+            }
+
+            if ( hitStunOnLand > 0 ) {
+                // there's some additional knockdown delay there
+                hitStun += hitStunOnLand + 1 + 30; 
+                hitStunOnLand = 0;
+            }
+
+            log ("landed " + std::to_string(hitStun));
         }
 
         // super crude corner snapping
@@ -786,10 +799,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (otherGuyAirborne > 0) {
                     hitEntryFlag |= air;
                 }
-                if (forceCounter) {
+                if (forceCounter && pOtherGuy->comboHits == 0) {
                     hitEntryFlag |= counter;
                 }
-                if (forcePunishCounter) {
+                if (forcePunishCounter && pOtherGuy->comboHits == 0) {
                     hitEntryFlag |= punish_counter;
                 }
 
@@ -798,11 +811,13 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 int juggleFirst = hitEntry["Juggle1st"];
                 int juggleAdd = hitEntry["JuggleAdd"];
                 int juggleLimit = hitEntry["JuggleLimit"];
-                int hitStun = hitEntry["HitStun"];
+                int targetHitStun = hitEntry["HitStun"];
                 int destX = hitEntry["MoveDest"]["x"];
                 int destY = hitEntry["MoveDest"]["y"];
                 int destTime = hitEntry["MoveTime"];
                 int dmgValue = hitEntry["DmgValue"];
+                int dmgType = hitEntry["DmgType"];
+                int floorTime = hitEntry["FloorTime"];
 
                 if (wasDrive) {
                     juggleAdd = 0;
@@ -844,10 +859,22 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
 
                 if (wasDrive) {
-                    hitStun+=4;
+                    targetHitStun+=4;
                 }
+
+                // this is set on honda airborne hands
+                // free hit until falls to ground - implement properly at some point
+                if (dmgType & 8) {
+                    targetHitStun += 500000;
+                    pOtherGuy->resetHitStunOnLand = true;
+                } else {
+                    pOtherGuy->resetHitStunOnLand = false;
+                }
+
+                pOtherGuy->hitStunOnLand = floorTime;
+
                 if (pOpponent) {
-                    pOpponent->Hit(hitStun, destX, destY, destTime, dmgValue);
+                    pOpponent->Hit(targetHitStun, destX, destY, destTime, dmgValue);
                 }
                 canHitID = hitbox.hitID + 1;
                 retHit = true;
@@ -958,15 +985,17 @@ bool Guy::Frame(void)
         hitStun--;
         if (hitStun == 0)
         {
-            log("recovered! combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+            int advantage = globalFrameCount - pOpponent->recoveryTiming;
+            log("recovered! adv " + std::to_string(-advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
             nextAction = 1;
             comboHits = 0;
             juggleCounter = 0;
             comboDamage = 0;
         }
+
     }
 
-    if (currentFrame >= actionFrameDuration && nextAction == -1)
+    if (currentFrame >= (actionFrameDuration - 1) && nextAction == -1)
     {
         if ( isProjectile ) {
             //currentFrame = 0; // just loop? :/
@@ -1045,6 +1074,10 @@ bool Guy::Frame(void)
     // Transition
     if ( nextAction != -1 )
     {
+        if (currentAction != 1 && nextAction == 1) {
+            recoveryTiming = globalFrameCount;
+            //log("recovered!");
+        }
         currentAction = nextAction;
         if (!keepPlace) {
             currentFrame = 0;
