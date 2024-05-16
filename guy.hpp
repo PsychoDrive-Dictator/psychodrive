@@ -42,7 +42,7 @@ public:
         return posX + (posOffsetX*direction);
     }
     float getPosY() {
-        return posY;
+        return posY + posOffsetY;
     }
 
     void resetPosDebug( float x, float y) {
@@ -384,6 +384,7 @@ private:
     float charColorB = 1.0;
 
     int uniqueCharge = 0;
+    bool uniqueTimer = false;
 
     std::string actionName;
     nlohmann::json actionJson;

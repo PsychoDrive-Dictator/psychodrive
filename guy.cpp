@@ -228,6 +228,11 @@ bool Guy::PreFrame(void)
         return false;
     }
 
+    if (uniqueTimer) {
+        // might not be in the right spot, adjust if falling out of yoga float too early/late
+        uniqueCharge++;
+    }
+
     hitThisFrame = false;
     punishCounterThisFrame = false;
     grabbedThisFrame = false;
@@ -253,6 +258,8 @@ bool Guy::PreFrame(void)
             noPush = false; // might be overridden below
         }
 
+        float prevPosY = getPosY();
+
         if (actionJson.contains("PlaceKey"))
         {
             for (auto& [placeKeyID, placeKey] : actionJson["PlaceKey"].items())
@@ -275,7 +282,6 @@ bool Guy::PreFrame(void)
         }
 
         float prevVelX = velocityX;
-        float prevPosY = posY;
 
         // don't apply steer for looped anims? or just velocity set?
         // this is just a hack to have both looping working jumps but
@@ -457,10 +463,10 @@ bool Guy::PreFrame(void)
             pushBackThisFrame = hitVelX;
         }
 
-        if (prevPosY == 0.0f && posY > 0.0f) {
+        if (prevPosY == 0.0f && getPosY() > 0.0f) {
             airborne = true; // i think we should go by statusKey instead?
         }
-        if (prevPosY > 0.0f && posY - landingAdjust == 0.0f) {
+        if (prevPosY > 0.0f && getPosY() - landingAdjust == 0.0f) {
             airborne = false;
             landed = true;
         }
@@ -561,6 +567,12 @@ bool Guy::PreFrame(void)
                         // maaaaaybe
                         if (param3 == 0) { // set
                             uniqueCharge = param4;
+                            // dhalsim unique timer, only one that doesn't have this set?
+                            bool isParam = key["_IsUNIQUE_UNIQUE_PARAM"];
+                            if (!isParam) {
+                                // if it's not a param, clearly it's a timer
+                                uniqueTimer = true;
+                            }
                         } else if (param3 == 1) { //add?
                             uniqueCharge += param4;
                             // this feels like a horrible workaround but so far works for
@@ -1830,6 +1842,19 @@ void Guy::DoBranchKey(void)
                         // honda spirit, guile puncher
                         // probably how jamie drinks work too? not sure yet
                         doBranch = true;
+                    }
+                    break;
+                case 30: // unique timer
+                    if (uniqueTimer) {
+                        if (uniqueCharge == branchParam2) {
+                            doBranch = true;
+                            uniqueTimer = false;
+                        }
+                    } else {
+                        log(logUnknowns, "unique timer branch not in timer?");
+                    }
+                    if (branchParam1 != 5) {
+                        log(logUnknowns, "unique timer branch param unknown");
                     }
                     break;
                 case 31: // todo loop count
