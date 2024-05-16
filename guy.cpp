@@ -208,6 +208,8 @@ void Guy::PreFrame(void)
         if ( oldPosY > 0.0f && posY <= 0.0f ) // iffy but we prolly move to fixed point anyway at some point
         {
             posY = 0.0f;
+            velocityY = 0.0f;
+            accelY = 0.0f;
             nextAction = 39; // land - need other landing if did air attack?
         }
 
@@ -631,12 +633,15 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 void Guy::Hit(int stun, int destX, int destY, int destTime)
 {
     comboHits++;
-    hitStun = stun + 3;
+    hitStun = stun + 1; // ?? why do i need this to make it match
     hitVelFrames = destTime;
 
     // assume hit direction is opposite as facing for now, not sure if that's true
     hitVelX = (direction * destX * -1) / (float)destTime;
-    hitVelY = destY / (float)destTime;
+    velocityY = destY * 4 / (float)destTime;
+    //hitVelY = destY * 4 / (float)destTime;
+    //velocityX = (direction * destX * -1) / (float)destTime;
+    accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
 
     nextAction = 205; // HIT_MM, not sure how to pick which
 }
@@ -772,7 +777,8 @@ void Guy::Frame(void)
 
         // if grounded, reset velocities on transition
         // need to test if still needed?
-        if ( posY == 0.0 && !isDrive) {
+        // probably just on transitioning to standing? not sure
+        if ( posY == 0.0 && !isDrive && !hitStun) {
             velocityX = 0;
             velocityY = 0;
             accelX = 0;
