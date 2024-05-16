@@ -6,6 +6,7 @@ layout(location = 2) uniform vec3 size;
 layout(location = 3) uniform vec3 offset;
 layout(location = 4) uniform vec4 in_color;
 layout(location = 5) uniform int isGrid;
+layout(location = 6) uniform int progress;
 
 const float distedge = 0.5;
 const float feather = 0.5;
@@ -61,6 +62,16 @@ void main() {
             color = vec4(0.9,0.3,0.2,1.0);
         }
         //color.a = edgealpha;
+        return;
+    }
+
+    if (isGrid == 2) {
+        float distFromCenter = length(vertex_pos.xyz - (offset + size/2));
+        if (distFromCenter < progress) {
+            color = in_color;
+        } else {
+            color = vec4(0.0,0.0,0.0,0.0);
+        }
         return;
     }
 
