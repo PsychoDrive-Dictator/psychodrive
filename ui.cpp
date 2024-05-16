@@ -27,6 +27,21 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         ImGui::Text("unique %i", pGuy->getUniqueParam());
     }
     if ( ImGui::Button("destroy") ) { pGuyToDelete = pGuy; }
+    ImGui::SameLine();
+    ImGui::Text("log:");
+    ImGui::SameLine();
+    ImGui::Checkbox("unknowns", &pGuy->logUnknowns);
+    ImGui::SameLine();
+    ImGui::Checkbox("hits", &pGuy->logHits);
+    ImGui::SameLine();
+    ImGui::Checkbox("triggers", &pGuy->logTriggers);
+    ImGui::SameLine();
+    ImGui::Checkbox("branches", &pGuy->logBranches);
+    ImGui::SameLine();
+    ImGui::Checkbox("transitions", &pGuy->logTransitions);
+    for (auto logLine : pGuy->getLogQueue()) {
+        ImGui::Text(logLine.c_str());
+    }
     ImGui::End();
 
     int minionID = 1;

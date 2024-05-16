@@ -30,6 +30,7 @@ public:
     void addWarudo(int w) { warudo += w; }
 
     std::string getCharacter() { return character; }
+    std::deque<std::string> &getLogQueue() { return logQueue; }
     // for opponent direction
     Guy *getOpponent() { return pOpponent; }
     Guy *getParent() { return pParent; }
@@ -54,6 +55,12 @@ public:
         accelX = 0.0f;
         accelY = 0.0f;
     }
+
+    bool logTransitions = false;
+    bool logTriggers = false;
+    bool logUnknowns = true;
+    bool logHits = false;
+    bool logBranches = false;
 
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
@@ -161,6 +168,19 @@ private:
     std::string name;
     std::string character;
     Guy *pOpponent = nullptr;
+
+    void log(bool log, std::string logLine)
+    {
+        if (!log) return;
+        std::string frameDiff = to_string_leading_zeroes(globalFrameCount - lastLogFrame, 3);
+        logQueue.push_back(frameDiff + " " + logLine);
+        if (logQueue.size() > 15) {
+            logQueue.pop_front();
+        }
+        lastLogFrame = globalFrameCount;
+    }
+    int lastLogFrame = 0;
+    std::deque<std::string> logQueue;
 
     bool deniedLastBranch = false;
 

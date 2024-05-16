@@ -249,7 +249,7 @@ bool Guy::PreFrame(void)
                         // uhhhhh
                         if (valueType == 3 && steerKey["_EndFrame"] == currentFrame + 1 && airborne && !landed) {
                             currentFrame--;
-                            log("freezing time until landing!");
+                            log(logTransitions, "freezing time until landing!");
                         }
                         break;
                     case 13:
@@ -268,14 +268,14 @@ bool Guy::PreFrame(void)
                                 }
                             }
                             if (!minionFound) {
-                                log("minion to teleport not found");
+                                log(true, "minion to teleport not found");
                             }
                         } else {
-                            log("unknown teleport?");
+                            log(logUnknowns, "unknown teleport?");
                         }
                         break;
                     default:
-                        log("unknown steer keyoperation " + std::to_string(operationType));
+                        log(logUnknowns, "unknown steer keyoperation " + std::to_string(operationType));
                         break;
                 }
 
@@ -377,7 +377,7 @@ bool Guy::PreFrame(void)
                 int64_t param2 = key["Param02"];
                 int64_t param3 = key["Param03"];
                 int64_t param4 = key["Param04"];
-                //int64_t param5 = key["Param05"];
+                int64_t param5 = key["Param05"];
 
                 switch (eventType)
                 {
@@ -388,15 +388,15 @@ bool Guy::PreFrame(void)
 
                             if (currentInput & FORWARD) {
                                 posX += steerForward;
-                                log("steerForward " + std::to_string(steerForward));
+                                log(true, "steerForward " + std::to_string(steerForward));
                             } else if (currentInput & BACK) {
                                 posX += steerBackward;
-                                log("steerBackward " + std::to_string(steerBackward));
+                                log(true, "steerBackward " + std::to_string(steerBackward));
                             }
                         }
                         break;
                     case 1:
-                        log("mystery system event 1, flags " + std::to_string(param1));
+                        log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
                         break;
                     case 2:
                         // this is how to remove frames for the solid puncher install, param2 is -200 for smol booms
@@ -410,10 +410,13 @@ bool Guy::PreFrame(void)
                         } else if (param3 == 1) { //add?
                             uniqueCharge += param4;
                             // maybe param5 is the max?
+                            if ( param5 != 0 && uniqueCharge > param5) {
+                                uniqueCharge = 1;
+                            }
                         }
                         break;
                     default:
-                        log("unhandled event, type " + std::to_string(eventType));
+                        log(logUnknowns, "unhandled event, type " + std::to_string(eventType));
                     case 11:
                     case 5: //those are kinda everywhere, esp 11
                         break;
@@ -465,13 +468,6 @@ bool Guy::PreFrame(void)
             }
         }
         
-        if ( deferredActionFrame == currentFrame ) {
-            nextAction = deferredAction;
-
-            deferredActionFrame = -1;
-            deferredAction = 0;
-        }
-
         // steer/etc could have had side effects there
         UpdateBoxes();
     }
@@ -603,7 +599,7 @@ void Guy::DoTriggers()
                         if ( usinguniquecharge ) {
                             uniqueCharge = 0;
                         }
-                        //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                        log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                         break; // we found our trigger walking back, blow up the whole group
                     } else {
                         std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
@@ -668,7 +664,7 @@ void Guy::DoTriggers()
                                     //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
                                     inputID--;
                                 } else {
-                                    log("charge entries mismatch?");
+                                    log(true, "charge entries mismatch?");
                                     break; // cancel trigger
                                 }
                             } else {
@@ -711,7 +707,7 @@ void Guy::DoTriggers()
                             if ( usinguniquecharge ) {
                                 uniqueCharge = 0;
                             }
-                            //log("trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                            log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                             break; // we found our trigger walking back, blow up the whole group
                         }
                     }
@@ -1205,7 +1201,7 @@ void Guy::DoBranchKey(void)
                            //log("action branch1");
                         }
                     } else {
-                        log("that branch not gonna work");
+                        log(true, "that branch not gonna work");
                     }
                     break;
                 case 13:
@@ -1225,7 +1221,7 @@ void Guy::DoBranchKey(void)
                             doBranch = true;
                         }
                     } else {
-                        log("unknown steer branch");
+                        log(logUnknowns, "unknown steer branch");
                     }
                     break;
                 case 20:
@@ -1293,24 +1289,25 @@ void Guy::DoBranchKey(void)
                     break;
                 default:
                     std::string typeName = key["_TypesName"];
-                    log("unsupported branch id " + std::to_string(branchType) + " type " + typeName);
+                    log(logUnknowns, "unsupported branch id " + std::to_string(branchType) + " type " + typeName);
                     break;
             }
 
             // do those also override if higher branchID?
             if (doBranch) {
                 if (branchFrame != 0 && branchAction != currentAction) {
-                    log("unsupported change for both action and frame");
+                    log(logUnknowns, "unsupported change for both action and frame");
                 }
                 if (branchAction == currentAction && branchFrame == 0 ) {
-                    log("ignoring");
+                    log(true, "ignoring branch to frame 0? that's how jp stuff owrks dunno");
                 } else {
 
                 if (branchFrame != 0 && branchAction == currentAction) {
                     // unclear where we'll hit it so not sure if we need to offset yet
+                    log(true, "if this happens check we're not off by 1");
                     currentFrame = branchFrame;
                 } else {
-                    //log("branching to action " + std::to_string(branchAction));
+                    log(logBranches, "branching to action " + std::to_string(branchAction));
                     nextAction = branchAction;
                 }
                 }
@@ -1489,11 +1486,21 @@ bool Guy::Frame(void)
 
     if (canMove && comboHits) {
         int advantage = globalFrameCount - pOpponent->recoveryTiming;
-        log("recovered! adv " + std::to_string(advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+        log(true, "recovered! adv " + std::to_string(advantage - 1) + " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
         comboHits = 0;
         juggleCounter = 0;
         comboDamage = 0;
         pAttacker = nullptr;
+    }
+
+    // this might have been a cancel containing state like blowing up some bar
+    // so better honor it! put it last here - this can be true even if canMove!
+    if ( deferredActionFrame == currentFrame ) {
+        log(logTransitions, "deferred nextAction " + std::to_string(deferredAction));
+        nextAction = deferredAction;
+
+        deferredActionFrame = -1;
+        deferredAction = 0;
     }
 
     // Transition
@@ -1506,7 +1513,7 @@ bool Guy::Frame(void)
 
         if (currentAction != nextAction) {
             currentAction = nextAction;
-            //log ("current action " + std::to_string(currentAction));
+            log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace));
        }
 
         if (!keepPlace) {
@@ -1554,6 +1561,10 @@ bool Guy::Frame(void)
         }
 
         actionFrameDataInitialized = false;
+
+        if (deferredAction != 0) {
+            log(true, "weird transition here?");
+        }
     }
 
     if (warudo == 0) {
@@ -1568,10 +1579,13 @@ bool Guy::Frame(void)
         // if successful, eat this frame away and go right now
         if (nextAction != -1) {
             currentAction = nextAction;
-            log ("nvm! current action " + std::to_string(currentAction));
+            actionFrameDataInitialized = false;
+            log (logTransitions, "nvm! current action " + std::to_string(currentAction));
             nextAction = -1;
         }
     }
+
+    UpdateActionData();
 
     // if we need landing adjust/etc during warudo, need this updated now
     DoStatusKey();
