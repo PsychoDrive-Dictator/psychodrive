@@ -2445,12 +2445,20 @@ bool Guy::Frame(void)
 
         auto inherit = actionJson["fab"]["Inherit"];
 
-        if (!forceKnockDown) {
-            // hack - the actions like 282 or 251 don't inherit the velocity we set on it
-            accelX *= inherit["Accelaleration"]["x"].get<float>();
-            accelY *= inherit["Accelaleration"]["y"].get<float>();
-            velocityX *= inherit["Velocity"]["x"].get<float>();
-            velocityY *= inherit["Velocity"]["y"].get<float>();
+        if (!isDrive && !hitStun) {
+            // not sure about those manual checks for drive or hitstun but necessary for now
+            if (airborne) {
+                accelX *= inherit["Accelaleration"]["x"].get<float>();
+                accelY *= inherit["Accelaleration"]["y"].get<float>();
+                velocityX *= inherit["Velocity"]["x"].get<float>();
+                velocityY *= inherit["Velocity"]["y"].get<float>();
+            } else {
+                // bunch of grounded normals say they inherit 1.0 x velocity, ignore when grounded :|
+                accelX = 0.0f;
+                accelY = 0.0f;
+                velocityX = 0.0f;
+                velocityY = 0.0f;
+            }
         }
 
         if (didTrigger) {
