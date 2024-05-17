@@ -677,6 +677,7 @@ bool Guy::PreFrame(void)
             }
 
             if (styleInstallFrames == 0) {
+                // todo should go to parent?
                 styleInstall = 0;
             }
         }
@@ -816,6 +817,7 @@ void Guy::DoTriggers()
                 std::string actionString = key;
                 int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
 
+                // todo moves can exist in multiple styles, this map needs to be a bit smarter
                 if (mapMoveStyle[actionID] != 0 && mapMoveStyle[actionID] != styleInstall ) {
                     continue;
                 }
@@ -1359,6 +1361,7 @@ bool Guy::WorldPhysics(void)
         // or the box will be too high up as we're still on the falling box
         // see heave donky into lp dp
         posY = 0.0f;
+        posOffsetY = 0.0f;
     }
 
     return hasPushed;
@@ -2453,21 +2456,21 @@ bool Guy::Frame(void)
         if (didTrigger) {
             if (cancelAccelX) {
                 accelX = cancelAccelX;
-                cancelAccelX = 0.0;
             }
             if (cancelAccelY) {
                 accelY = cancelAccelY;
-                cancelAccelY = 0.0;
             }
             if (cancelVelocityX) {
                 velocityX = cancelVelocityX;
-                cancelVelocityX = 0.0;
             }
             if (cancelVelocityY) {
                 velocityY = cancelVelocityY;
-                cancelVelocityY = 0.0;
             }
         }
+        cancelAccelX = 0.0;
+        cancelAccelY = 0.0;
+        cancelVelocityX = 0.0;
+        cancelVelocityY = 0.0;
 
         if (isDrive == true) {
             isDrive = false;
