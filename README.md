@@ -3,10 +3,16 @@ PsychoDrive is a fighting game engine, currently able to express some of the scr
 ![](https://pbs.twimg.com/media/GNuFO7eaYAAuJIT?format=png&name=large "example neutral scene with two characters")
 ![](https://pbs.twimg.com/media/GNuKZPgaAAET4Jr?format=png&name=large "guile throwing sonic boom at ryu")
 
+It can be built on Linux or Windows, and Windows builds are available from the releases page:
+
+https://github.com/PsychoDrive-Dictator/psychodrive/releases
+
 More screenshots and videos there:
 
 https://twitter.com/DriveDictator
 
 Uses dumps from MMDK: https://github.com/alphazolam/MMDK
 
-Thanks to alphaZomega, Gelatin, killbox, adam, Ryn, Hatson and all other frame data enthusiasts I migth have forgotten about.
+Thanks to alphaZomega, Gelatin, killbox, adam, Ryn, Hatson and all other frame data enthusiasts I might have forgotten about.
+
+
