@@ -592,15 +592,29 @@ bool Guy::PreFrame(void)
                         log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
                         break;
                     case 2:
-                        // look at _IsCHARA_STYLE_CHANGE
-                        // wire up Style TerminateState
-                        if (param1 == 0) { // 0 is set, 1 is add? look at jamie
-                            styleInstall = param2;
-                            // what's param3? it's 1 for solid puncher..
-                            styleInstallFrames = param4;
-                        } else if (param1 == 1) {
+                        if (key["_IsCHARA_STYLE_CHANGE"]) {
+                            if (param1 == 0) { // 0 is set, 1 is add? look at jamie
+                                // todo wire up Style TerminateState
+                                styleInstall = param2;
+                            } else if (param1 == 1) {
+                                styleInstall += param2;
+                            } else {
+                                log(logUnknowns, "unknown operator in chara event style change");
+                            }
+                            if (param3 == 1) {
+                                styleInstallFrames = param4;
+                            }
+                        } else if (key["_IsCHARA_GAUGE_ADD"]) {
+                            // todo - see walk forward, etc - param1 is type of bar? 4 for drive
+                        } else {
                             if (airborne) {
-                                airActionCounter += param2;
+                                if (param1 == 0) {
+                                    airActionCounter = param2;
+                                } else if (param1 == 1) {
+                                    airActionCounter += param2;
+                                } else {
+                                    log(logUnknowns, "unknown operator in chara event");
+                                }
                                 if (airActionCounter < 0) {
                                     airActionCounter = 0;
                                 }
@@ -612,12 +626,16 @@ bool Guy::PreFrame(void)
                                     log (true, "kinda ambiguous, worth a look");
                                 }
                             } else if (styleInstall > 0) {
-                                styleInstallFrames += param2;
+                                if (param1 == 0) {
+                                    styleInstallFrames = param2;
+                                } else if (param1 == 1) {
+                                    styleInstallFrames += param2;
+                                } else {
+                                    log(logUnknowns, "unknown operator in chara event");
+                                }
                             } else {
                                 log(true, "no style install or airborne but point deduction?");
                             }
-                        } else {
-                            log(logUnknowns, "event type 2 param1 " + std::to_string(param1));
                         }
                         break;
                     case 7:
@@ -2105,6 +2123,14 @@ bool Guy::Frame(void)
         }
         if ( airActionCounter ) {
             airActionCounter = 0;
+        }
+        if (charInfoJson.contains("Styles")) {
+            auto styleJson = charInfoJson["Styles"][std::to_string(styleInstall)];
+            if (styleJson["StyleData"]["State"]["TerminateState"] == 0x3ff1fffffff) {
+                // that apparently means landing... figure out deeper meaning later
+                // go to parent or go to 0? :/
+                styleInstall = styleJson["ParentStyleID"];
+            }
         }
     }
 

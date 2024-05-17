@@ -148,6 +148,7 @@ public:
         chargeJson = parse_json_file(charPath + character + "_charge.json");
         hitJson = parse_json_file(charPath + character + "_hit.json");
         atemiJson = parse_json_file(charPath + character + "_atemi.json");
+        charInfoJson = parse_json_file(charPath + character + "_charinfo.json");
 
         static bool commonMovesInitialized = false;
         if (!commonMovesInitialized) {
@@ -186,6 +187,7 @@ public:
         chargeJson = parent.chargeJson;
         hitJson = parent.hitJson;
         atemiJson = parent.hitJson;
+        charInfoJson = parent.charInfoJson;
 
         pOpponent = parent.pOpponent;
 
@@ -253,6 +255,7 @@ private:
     nlohmann::json chargeJson;
     nlohmann::json hitJson;
     nlohmann::json atemiJson;
+    nlohmann::json charInfoJson;
 
     static nlohmann::json commonMovesJson;
     static nlohmann::json commonRectsJson;
@@ -321,7 +324,8 @@ private:
     bool hasLooped = false;
     bool actionFrameDataInitialized = false;
 
-    int styleInstall = -1;
+    // todo round begin action needs to set that
+    int styleInstall = 0;
     int styleInstallFrames = 0;
     bool countingDownInstall = false;
 
