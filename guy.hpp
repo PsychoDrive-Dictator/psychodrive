@@ -337,9 +337,11 @@ private:
     // hitting side
     int canHitID = -1;
     bool hitThisFrame = false;
+    bool hitArmorThisFrame = false;
+    bool hitAtemiThisFrame = false;
+    bool hasBeenBlockedThisFrame = false;
     bool punishCounterThisFrame = false;
     bool grabbedThisFrame = false;
-    bool blocked = false;
 
     int warudo = 0;
     int timeInWarudo = 0;
