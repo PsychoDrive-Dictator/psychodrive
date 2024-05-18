@@ -234,9 +234,11 @@ bool Guy::PreFrame(void)
     }
 
     hitThisFrame = false;
+    hitArmorThisFrame = false;
+    hitAtemiThisFrame = false;
+    hasBeenBlockedThisFrame = false;
     punishCounterThisFrame = false;
     grabbedThisFrame = false;
-    blocked = false;
     beenHitThisFrame = false;
     armorThisFrame = false;
     atemiThisFrame = false;
@@ -781,31 +783,64 @@ void Guy::DoTriggers()
             }
 
             bool defer = !key["_NotDefer"];
-            int triggerEndFrame = key["_EndFrame"];
-            //int other = key["_Other"];
-
-            // not sure what that is but always some nonsense
-            // like 22p into everything, or 3HK special cancellable?
-            // if ( other == 64 ) {
-            //     continue;
-            // }
-
-            // on hit or block? not sure
-            // int state = key["_State"];
-            // if ( state == 48 && canHitID == -1) {
-            //     continue;
-            // }
-
-            //int condFlag = key["ConditionFlag"];
-            // killbox says "5199 and 5131 are like on hit and on block"
-            // but not 5135
-            // todo i can still do JP heavy target combo on whiff so clearly something is not right still
+            int deferFrame = 0;
+            int triggerGroup = key["TriggerGroup"];
             int condition = key["_Condition"];
-            if ( (condition == 5199 || condition == 5131) && canHitID == -1) {
+
+            if (defer) {
+                // defer just seems to activate a subsequent matching non-deferred trigger
+                bool deferMatch = false;
+                for (auto& [matchKeyID, matchKey] : actionJson["TriggerKey"].items()) {
+                    if (matchKey.contains("_StartFrame") &&
+                        matchKey["_StartFrame"] <= key["_EndFrame"] && 
+                        matchKey["TriggerGroup"] == triggerGroup &&
+                        matchKey["_NotDefer"] == true) {
+                        condition = matchKey["_Condition"];
+                        deferFrame = matchKey["_StartFrame"];
+                        deferMatch = true;
+                        break;
+                    }
+                }
+                if (deferMatch == false) {
+                    // lots of those? hopefully not missing something - JP's 4HK
+                    //log(true, "couldn't find matching non-deferred trigger, broken trigger?");
+                    continue;
+                }
+            }
+
+            // condition bits
+            // bit 0 = on hit
+            // bit 1 = on block
+            // bit 2 = on whiff
+            // bit 3 = on armor
+            // bit 10 is set almost everywhere, but unknown as of yet
+            // bit 11 = on counter/atemi
+            // bit 12 = on parry
+            bool conditionMet = false;
+            if ( condition & (1<<0) && hitThisFrame) {
+                conditionMet = true;
+            }
+            if ( condition & (1<<1) && hasBeenBlockedThisFrame) {
+                conditionMet = true;
+            }
+            // todo don't forget to add 'not parried' there
+            if ( condition & (1<<2) &&
+                (!hitThisFrame && !hasBeenBlockedThisFrame && !hitAtemiThisFrame && !hitArmorThisFrame)) {
+                conditionMet = true;
+            }
+            if ( condition & (1<<3) && hitArmorThisFrame) {
+                conditionMet = true;
+            }
+            if ( condition & (1<<11) && hitAtemiThisFrame) {
+                conditionMet = true;
+            }
+            // todo hit parry
+
+            if (!conditionMet) {
                 continue;
             }
 
-            auto triggerGroupString = to_string_leading_zeroes(key["TriggerGroup"], 3);
+            auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
             std::deque<std::pair<std::string,std::string>> vecReverseTriggers;
             for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
             {
@@ -919,7 +954,7 @@ void Guy::DoTriggers()
                     if ( commandNo == -1 ) {
                         if (defer) {
                             deferredAction = actionID;
-                            deferredActionFrame = triggerEndFrame;
+                            deferredActionFrame = deferFrame;
                         } else {
                             nextAction = actionID;
                         }
@@ -1025,7 +1060,7 @@ void Guy::DoTriggers()
                         if (inputID < 0) {
                             if (defer) {
                                 deferredAction = actionID;
-                                deferredActionFrame = triggerEndFrame;
+                                deferredActionFrame = deferFrame;
                             } else {
                                 nextAction = actionID;
                             }
@@ -1440,7 +1475,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (pOtherGuy->blocking || otherGuyCanBlock) {
                 hitEntryFlag = block;
                 pOtherGuy->blocking = true;
-                blocked = true;
+                hasBeenBlockedThisFrame = true;
                 log(logHits, "block!");
             }
 
@@ -1463,6 +1498,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             bool hitArmor = false;
             if (hurtBox.flags & armor && hurtBox.armorID) {
                 hitArmor = true;
+                hitArmorThisFrame = true;
                 auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
                 nlohmann::json atemi = nullptr;
@@ -1510,6 +1546,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (hurtBox.flags & atemi) {
                 // like armor except onthing really happens beyond setting the flag
                 hitArmor = true;
+                hitAtemiThisFrame = true;
                 pOtherGuy->atemiThisFrame = true;
                 log(logHits, "atemi hit!");
             }
@@ -1528,7 +1565,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 float hitMarkerOffsetY = hitbox.box.y+hitbox.box.h/2 - pOtherGuy->posY;
                 int hitMarkerType = 1;
                 float hitMarkerRadius = 25.0f;
-                if (blocked) {
+                if (hasBeenBlockedThisFrame) {
                     hitMarkerType = 2;
                 }
                 if (hitEntryFlag & punish_counter) {
@@ -1868,7 +1905,7 @@ void Guy::DoBranchKey(void)
                     }
                     break;
                 case 4:
-                    if (blocked) { // just this frame.. enough?
+                    if (hasBeenBlockedThisFrame) { // just this frame.. enough?
                         doBranch = true;
                     }
                     break;
