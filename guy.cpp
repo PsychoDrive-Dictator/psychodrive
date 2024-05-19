@@ -1869,7 +1869,7 @@ void Guy::DoHitBoxKey(const char *name)
     }
 }
 
-void Guy::DoBranchKey(void)
+void Guy::DoBranchKey(bool preHit = false)
 {
     if (actionJson != nullptr && actionJson.contains("BranchKey"))
     {
@@ -1911,7 +1911,7 @@ void Guy::DoBranchKey(void)
                     break;
                 case 5: // swing.. not hit?
                     // todo not always right - JP's 4HK has some extra condition to get into (2)
-                    if (canHitID == -1) {
+                    if (!preHit && canHitID == -1) {
                         doBranch = true;
                     }
                     break;
@@ -2045,6 +2045,7 @@ void Guy::DoBranchKey(void)
                 case 47: // todo incapacitated
                     break;
                 case 49: // status, used for at least hitstun - see jp sa3
+                    // param0 = who's status - 0, self, 1 opponent, 2 "hit target", 3 owner
                     if (branchParam0 == 1 && branchParam3 == 1) {
                         // just matching branch in SAA_LV3_START(1) for now
                         if (pOpponent && pOpponent->hitStun) {
@@ -2150,7 +2151,7 @@ bool Guy::Frame(void)
     }
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
-    DoBranchKey();
+    DoBranchKey(true);
 
     if (isProjectile && projHitCount == 0) {
         return false; // die

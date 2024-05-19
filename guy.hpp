@@ -21,7 +21,7 @@ public:
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
     bool ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
-    void DoBranchKey();
+    void DoBranchKey(bool preHit);
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
     void DoTriggers();
