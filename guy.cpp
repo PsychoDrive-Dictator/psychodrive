@@ -1343,7 +1343,7 @@ bool Guy::WorldPhysics(void)
 
     // if we're going up (like jsut getting hit), we're not landing,
     // just being helped off the ground - see heavy donkey into lp dp
-    bool forceLanding = airborne && prevPoseStatus == 3 && poseStatus > 0 && poseStatus < 3;
+    bool forceLanding = airborne && prevPoseStatus == 3 && forcedPoseStatus > 0 && forcedPoseStatus < 3;
     if (forceLanding || (airborne && floorpush && velocityY < 0))
     {
         pushY = 0.0f;
@@ -1455,7 +1455,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 break;
             }
 
-            bool otherGuyAirborne = pOtherGuy->airborne || pOtherGuy->poseStatus == 3;
+            bool otherGuyAirborne = pOtherGuy->getPoseStatus() == 3;
 
             if (otherGuyAirborne) {
                 hitEntryFlag |= air;
@@ -2051,6 +2051,10 @@ void Guy::DoBranchKey(bool preHit = false)
                         if (pOpponent && pOpponent->hitStun) {
                             doBranch = true;
                         }
+                    } else if (branchParam0 == 1) {
+                        if (pOpponent && branchParam1 & (1 << (pOpponent->getPoseStatus() - 1))) {
+                            doBranch = true;
+                        }
                     } else {
                         log(logUnknowns, "unknown sort of status branch");
                     }
@@ -2340,7 +2344,7 @@ bool Guy::Frame(void)
         } else if ( currentInput & 2 ) {
             if ( !crouching ) {
                 crouching = true;
-                if (poseStatus == 2) {
+                if (forcedPoseStatus == 2) {
                     nextAction = 4; // crouch loop after the first sitting down anim if already crouched
                 } else {
                     nextAction = 5; // BAS_STD_CRH
@@ -2459,17 +2463,18 @@ bool Guy::Frame(void)
 
         if (!keepFrame) {
             currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
-
-            // todo this is probably fab.Inherit._HitID
-            canHitID = -1;
-            currentArmorID = -1; // uhhh
-
-            poseStatus = 0; // correct spot?
-            actionStatus = 0;
-            jumpStatus = 0;
         }
+
         keepPlace = false;
         keepFrame = false;
+
+        // todo this is probably fab.Inherit._HitID
+        canHitID = -1;
+        currentArmorID = -1; // uhhh
+
+        forcedPoseStatus = 0;
+        actionStatus = 0;
+        jumpStatus = 0;
 
         nextAction = -1;
         nextActionFrame = -1;
@@ -2483,7 +2488,7 @@ bool Guy::Frame(void)
 
         auto inherit = actionJson["fab"]["Inherit"];
 
-        if (!isDrive && !hitStun) {
+        if (!isDrive && (!hitStun || blocking)) {
             // not sure about those manual checks for drive or hitstun but necessary for now
             if (airborne) {
                 accelX *= inherit["Accelaleration"]["x"].get<float>();
@@ -2549,7 +2554,7 @@ bool Guy::Frame(void)
     UpdateActionData();
 
     // if we need landing adjust/etc during warudo, need this updated now
-    prevPoseStatus = poseStatus;
+    prevPoseStatus = forcedPoseStatus;
     DoStatusKey();
 
     return true;
@@ -2569,7 +2574,7 @@ void Guy::DoStatusKey(void)
             if ( adjust != 0 ) {
                 landingAdjust = adjust;
             }
-            poseStatus = key["PoseStatus"];
+            forcedPoseStatus = key["PoseStatus"];
             actionStatus = key["ActionStatus"];
             jumpStatus = key["JumpStatus"];
         }

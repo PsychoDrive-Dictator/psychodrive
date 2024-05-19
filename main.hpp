@@ -7,7 +7,7 @@
 enum hitentryflags {
     crouch = 1,
     air = 2,
-    special = 4,
+    special = 4, // todo this is also burnout
     counter = 8,
     block = 16,
     otg = crouch|air,
