@@ -2468,8 +2468,6 @@ bool Guy::Frame(void)
         keepPlace = false;
         keepFrame = false;
 
-        // todo this is probably fab.Inherit._HitID
-        canHitID = -1;
         currentArmorID = -1; // uhhh
 
         forcedPoseStatus = 0;
@@ -2487,6 +2485,12 @@ bool Guy::Frame(void)
         UpdateActionData();
 
         auto inherit = actionJson["fab"]["Inherit"];
+
+        bool inheritHitID = inherit["_HitID"]; 
+
+        if (!inheritHitID) {
+            canHitID = -1;
+        }
 
         if (!isDrive && (!hitStun || blocking)) {
             // not sure about those manual checks for drive or hitstun but necessary for now
