@@ -789,6 +789,7 @@ void Guy::DoTriggers()
 
             if (defer) {
                 // defer just seems to activate a subsequent matching non-deferred trigger
+                // todo this can span actions, so need to rethink approach here
                 bool deferMatch = false;
                 for (auto& [matchKeyID, matchKey] : actionJson["TriggerKey"].items()) {
                     if (matchKey.contains("_StartFrame") &&
