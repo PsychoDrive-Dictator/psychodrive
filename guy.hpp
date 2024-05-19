@@ -77,7 +77,19 @@ public:
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
     std::string getName() { return name; }
-    int getPoseStatus() { return poseStatus; }
+    int getforcedPoseStatus() { return forcedPoseStatus; }
+    int getPoseStatus() {
+        if (forcedPoseStatus) {
+            return forcedPoseStatus;
+        }
+        if (airborne) {
+            return 3;
+        }
+        if (crouching) {
+            return 2;
+        }
+        return 1;
+    }
     int getActionStatus() { return actionStatus; }
     int getJumpStatus() { return jumpStatus; }
     int getLandingAdjust() { return landingAdjust; }
@@ -96,6 +108,7 @@ public:
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
     std::string getActionName() { return actionName; }
+    bool getCrouching() { return crouching; }
     bool getAirborne() { return airborne; }
     float getHitVelX() { return hitVelX; }
     void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
@@ -279,7 +292,7 @@ private:
 
     int landingAdjust = 0;
     int prevPoseStatus = 0;
-    int poseStatus = 0;
+    int forcedPoseStatus = 0;
     int actionStatus = 0;
     int jumpStatus = 0;
 
