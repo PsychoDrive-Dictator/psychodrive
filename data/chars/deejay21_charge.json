@@ -1,0 +1,22 @@
+{
+    "1": {
+        "charge_id": 1,
+        "group_bit": 1,
+        "keep_frame": 10,
+        "ng_key_cond_check_flags": 0,
+        "ng_key_flags": 0,
+        "ok_frame": 45,
+        "ok_key_cond_check_flags": 1,
+        "ok_key_flags": 4
+    },
+    "5": {
+        "charge_id": 5,
+        "group_bit": 2,
+        "keep_frame": 12,
+        "ng_key_cond_check_flags": 0,
+        "ng_key_flags": 0,
+        "ok_frame": 40,
+        "ok_key_cond_check_flags": 1,
+        "ok_key_flags": 2
+    }
+}
