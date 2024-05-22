@@ -54,10 +54,55 @@ def checkHitParamHitStun(hitParam, left, right, expectedDiff, description):
         print(char + " " + findMoveByHitID(movesJson, hitID)[0] + " hit " + findMoveByHitID(movesJson, hitID)[1] + " (dt " + hitID + "):")
         print(description + " should be " + str(expectedDiff) + ", but is " + str(difference))
 
+def countActiveFrames(move):
+    minActive = -1
+    maxActive = -1
+    if "AttackCollisionKey" in move:
+        for key in move["AttackCollisionKey"]:
+            if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
+                attackKey = move["AttackCollisionKey"][key]
+                if attackKey["CollisionType"] == 0:
+                    if minActive == -1:
+                        minActive = attackKey["_StartFrame"]
+                    if maxActive == -1:
+                        maxActive = attackKey["_EndFrame"]
+                    minActive = min(minActive, attackKey["_StartFrame"])
+                    maxActive = max(maxActive, attackKey["_EndFrame"])
+    return minActive,maxActive
+
+def getHitInfoDict(move, hitsJson):
+    hitInfoDict = {}
+    if "AttackCollisionKey" in move:
+        for key in move["AttackCollisionKey"]:
+            if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
+                attackKey = move["AttackCollisionKey"][key]
+                if attackKey["CollisionType"] == 0 and attackKey["AttackDataListIndex"] != -1:
+                    hitEntry = hitsJson[str(attackKey["AttackDataListIndex"]).zfill(3)]
+                    hitInfoDict[attackKey["HitID"]] = hitEntry
+    return hitInfoDict
+
+def compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, paramEntry, paramDesc):
+    for hitRight in hitInfoRight:
+        for hitKey, hitValue in hitInfoRight[hitRight]["param"][paramEntry].items():
+            if hitKey != "CurveOwnID" and hitKey != "CurveTgtID":
+                if hitRight in hitInfoLeft and hitKey in hitInfoLeft[hitRight]["param"][paramEntry]:
+                    if not isinstance(hitValue, dict):
+                        if hitValue != hitInfoLeft[hitRight]["param"][paramEntry][hitKey]:
+                            print(descHeader + " hit " + str(hitRight) + " on " + paramDesc + " " + hitKey + " was " +
+                                str(hitInfoLeft[hitRight]["param"][paramEntry][hitKey]) + ", now " + str(hitValue))
+                    else:
+                        for subHitKey, subHitValue in hitInfoRight[hitRight]["param"][paramEntry][hitKey].items():
+                            if subHitValue != hitInfoLeft[hitRight]["param"][paramEntry][hitKey][subHitKey]:
+                                print(descHeader + " hit " + str(hitRight) + " on " + paramDesc + " " + hitKey + "." + subHitKey + " was " +
+                                    str(hitInfoLeft[hitRight]["param"][paramEntry][hitKey][subHitKey]) + ", now " + str(subHitValue))
+               
 
 for char in characters:
     hitsJson = json.load(open(dataPath + char + "_hit.json"))
     movesJson = json.load(open(dataPath + char + "_moves.json"))
+    charWithVersion = char + "21"
+    hits21Json = json.load(open(dataPath + charWithVersion + "_hit.json"))
+    moves21Json = json.load(open(dataPath + charWithVersion + "_moves.json"))
     # for hitID in hitsJson:
     #     hitParam = hitsJson[hitID]["param"]
     #     # check movetime vs hitstun
@@ -73,12 +118,35 @@ for char in characters:
     #     checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
     #     checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
     #     checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
-    for moveID in movesJson:
-        move = movesJson[moveID]
-        if "AttackCollisionKey" in move:
-            for key in move["AttackCollisionKey"]:
-                if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
-                    attackKey = move["AttackCollisionKey"][key]
-                    if attackKey["KindFlag"] & 67108864:
-                        print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
-                              " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]))
+    # for moveID in movesJson:
+    #     move = movesJson[moveID]
+    #     if "AttackCollisionKey" in move:
+    #         for key in move["AttackCollisionKey"]:
+    #             if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
+    #                 attackKey = move["AttackCollisionKey"][key]
+    #                 if attackKey["KindFlag"] & 67108864:
+    #                     print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
+    #                           " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]))
+    for moveID in moves21Json:
+        moveIDLeft = moveID
+        if "_Y2" in moveID:
+            moveIDLeft = moveIDLeft.replace("_Y2", "")
+        if moveIDLeft in movesJson:
+            moveLeft = movesJson[moveIDLeft]
+            moveRight = moves21Json[moveID]
+            descHeader = char + " " + moveID
+            minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
+            minActiveRight, maxActiveRight = countActiveFrames(moveRight)
+            if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
+                print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
+                      " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
+            hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
+            hitInfoRight = getHitInfoDict(moveRight, hits21Json)
+            if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
+                print(descHeader + " different hit count")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
