@@ -33,6 +33,7 @@ public:
     }
 
     std::string getCharacter() { return character; }
+    color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
     // for opponent direction
     Guy *getOpponent() { return pOpponent; }
@@ -44,10 +45,15 @@ public:
     float getPosY() {
         return posY + posOffsetY;
     }
+    int getDirection() { return direction; }
+    void switchDirection() { direction *= -1; }
 
-    void resetPosDebug( float x, float y) {
-        posX = x;
-        posY = y;
+    float getStartPosX() { return startPosX; }
+    void setStartPosX( float newPosX ) { startPosX = newPosX; }
+
+    void resetPos() {
+        posX = startPosX;
+        posY = startPosY;
 
         airborne = false;
         landed = false;
@@ -60,6 +66,10 @@ public:
         velocityY = 0.0f;
         accelX = 0.0f;
         accelY = 0.0f;
+    }
+    void setPos( float x, float y) {
+        posX = x;
+        posY = y;
     }
 
     bool logTransitions = false;
@@ -140,13 +150,13 @@ public:
         }
     }
 
-    Guy(std::string charName, float startPosX, float startPosY, int startDir, color color)
+    Guy(std::string charName, float x, float y, int startDir, color color)
     {
         const std::string charPath = "data/chars/";
         character = charName;
         name = character;
-        posX = startPosX;
-        posY = startPosY;
+        posX = startPosX = x;
+        posY = startPosY = y;
         direction = startDir;
         charColorR = color.r;
         charColorG = color.g;
@@ -279,6 +289,9 @@ private:
     float posX = 0.0f;
     float posY = 0.0f;
     int direction = 1;
+
+    float startPosX = 0.0f;
+    float startPosY = 0.0f;
 
     bool airborne = false;
     bool landed = false;

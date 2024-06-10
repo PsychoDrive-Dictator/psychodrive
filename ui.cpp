@@ -15,7 +15,8 @@ Guy *pGuyToDelete = nullptr;
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
     ImGui::Begin(windowName);
-    ImGui::Text("name %s moveset %s", pGuy->getName().c_str(), pGuy->getCharacter().c_str());
+    color col = pGuy->getColor();
+    ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "name %s moveset %s", pGuy->getName().c_str(), pGuy->getCharacter().c_str());
     ImGui::SameLine();
     std::vector<const char *> vecInputs;
     std::vector<std::string> vecInputLabels;
@@ -23,24 +24,76 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         vecInputLabels.push_back( std::to_string(i.first));
         vecInputs.push_back(vecInputLabels[vecInputLabels.size() -1].c_str());
     }
+    ImGui::SetNextItemWidth( 50.0 );
     ImGui::Combo("input", pGuy->getInputListIDPtr(), vecInputs.data(), vecInputs.size());
     *pGuy->getInputIDPtr() = atoi(vecInputLabels[*pGuy->getInputListIDPtr()].c_str());
+
+    ImGui::SameLine();
+    std::vector<const char *> vecGuyNames;
+    vecGuyNames.push_back("none");
+    std::map<int, Guy *> mapDropDownIDToGuyPtr;
+    mapDropDownIDToGuyPtr[0] = nullptr;
+    int guyID = 1, newOpponentID = 0;
+    for (auto guy : guys) {
+        if (guy == pGuy) {
+            continue;
+        }
+        vecGuyNames.push_back( guy->getName().c_str() );
+        mapDropDownIDToGuyPtr[guyID++] = guy;
+    }
+    for (auto [ i, guy ] : mapDropDownIDToGuyPtr ) {
+        if (guy == pGuy->getOpponent()) {
+            guyID = i;
+            break;
+        }
+    }
+    newOpponentID = guyID;
+     ImGui::SetNextItemWidth( 100.0 );
+    ImGui::Combo("opponent", &newOpponentID, vecGuyNames.data(), vecGuyNames.size());
+    if (newOpponentID != guyID) {
+        pGuy->setOpponent(mapDropDownIDToGuyPtr[newOpponentID]);
+    }
+
+    float startPosX = pGuy->getStartPosX();
+    float newStartPosX = startPosX;
+    ImGui::SetNextItemWidth( 250.0 );
+    ImGui::SliderFloat("##startpos", &newStartPosX, -765.0, 765.0);
+    char startPosTest[32] = {};
+    snprintf(startPosTest, sizeof(startPosTest), "%.2f", newStartPosX);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth( 100.0 );
+    ImGui::InputText("##startpostext", startPosTest, sizeof(startPosTest));
+    newStartPosX = atof(startPosTest);
+    if (newStartPosX != startPosX) {
+        pGuy->setStartPosX(newStartPosX);
+    }
     ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName().c_str());
     if (!pGuy->getProjectile()) {
         const char* states[] = { "stand", "jump", "crouch", "not you", "block", "not you", "crouch block" };
+        ImGui::SetNextItemWidth( 125.0 );
         ImGui::Combo("state", pGuy->getInputOverridePtr(), states, IM_ARRAYSIZE(states));
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth( 300.0 );
         std::vector<char *> &vecMoveList = pGuy->getMoveList();
-        ImGui::Combo("neutral action", pGuy->getNeutralMovePtr(), vecMoveList.data(), vecMoveList.size());
+        ImGui::Combo("recovery action", pGuy->getNeutralMovePtr(), vecMoveList.data(), vecMoveList.size());
     }
     ImGui::Text("crouching %i airborne %i poseStatus %i landingAdjust %i", pGuy->getCrouching(), pGuy->getAirborne(), pGuy->getforcedPoseStatus(), pGuy->getLandingAdjust());
     float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
     pGuy->getVel(velX, velY, accelX, accelY);
-    ImGui::Text("pos %f %f %f", posX, posY, pGuy->getPosX());
-    ImGui::Text("posOffset %f %f", posOffsetX, posOffsetY);
-    ImGui::Text("vel %f %f %f", velX, velY, pGuy->getHitVelX());
-    ImGui::Text("accel %f %f", accelX, accelY);
-    ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hurt %" PRIi64 , pGuy->getPushBoxes()->size(), pGuy->getHitBoxes()->size(), pGuy->getHurtBoxes()->size());
+    ImGui::Text("pos %.2f %.2f %.2f direction %i posOffset %.2f %.2f", posX, posY, pGuy->getPosX(), pGuy->getDirection(), posOffsetX, posOffsetY);
+    ImGui::Text("vel %.2f %.2f %.2f accel %.2f %.2f", velX, velY, pGuy->getHitVelX(), accelX, accelY);
+    ImGui::SameLine();
+    if ( !pGuy->getOpponent() && ImGui::Button("switch direction") ) { pGuy->switchDirection(); }
+    std::vector<HitBox> *hitBoxes = pGuy->getHitBoxes();
+    float maxXHitBox = 0.0f;
+    for (auto hitbox : *hitBoxes) {
+        float hitBoxX = hitbox.box.x + hitbox.box.w;
+        if (hitBoxX > maxXHitBox) {
+            maxXHitBox = hitBoxX;
+        }
+    }
+    ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hit extent %.2f hurt %" PRIi64 , pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox, pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i warudo %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getWarudo() );
     } else {
@@ -227,10 +280,6 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
     static int charID = rand() % charNameCount;
     static float newCharPos = randFloat();
-    ImGui::Text("start positions:");
-    ImGui::SliderFloat("##startpos1", &startPos1, -765.0, 765.0);
-    ImGui::SliderFloat("##startpos2", &startPos2, -765.0, 765.0);
-    ImGui::SameLine();
     resetpos = resetpos || ImGui::Button("reset positions (Q)");
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
