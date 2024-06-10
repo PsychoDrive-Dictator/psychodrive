@@ -23,7 +23,8 @@ characters = [
     "guile",
     "ed",
     "honda",
-    "jamie"
+    "jamie",
+    "akuma"
 ]
 
 dataPath = "./data/chars/"
@@ -98,9 +99,10 @@ def compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, paramEntry, paramDesc)
                
 
 for char in characters:
-    hitsJson = json.load(open(dataPath + char + "_hit.json"))
-    movesJson = json.load(open(dataPath + char + "_moves.json"))
-    charWithVersion = char + "21"
+    charWithVersion = char + "22"
+    hitsJson = json.load(open(dataPath + charWithVersion + "_hit.json"))
+    movesJson = json.load(open(dataPath + charWithVersion + "_moves.json"))
+    charWithVersion = char + "23"
     hits21Json = json.load(open(dataPath + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPath + charWithVersion + "_moves.json"))
     # for hitID in hitsJson:
@@ -129,8 +131,8 @@ for char in characters:
     #                           " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]))
     for moveID in moves21Json:
         moveIDLeft = moveID
-        if "_Y2" in moveID:
-            moveIDLeft = moveIDLeft.replace("_Y2", "")
+        # if "_Y2" in moveID:
+        #     moveIDLeft = moveIDLeft.replace("_Y2", "")
         if moveIDLeft in movesJson:
             moveLeft = movesJson[moveIDLeft]
             moveRight = moves21Json[moveID]

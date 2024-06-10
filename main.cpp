@@ -50,9 +50,6 @@ const char* charNames[] = {
 };
 const int charNameCount = IM_ARRAYSIZE(charNames);
 
-float startPos1 = -150.0;
-float startPos2 = 150.0;
-
 bool resetpos = false;
 
 std::vector<Guy *> guys;
@@ -170,14 +167,20 @@ int main(int argc, char**argv)
     } else {
         charNameRight = (char*)charNames[rand() % charNameCount];
     }
-    Guy *pNewGuy = new Guy(charNameLeft, startPos1, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+    Guy *pNewGuy = new Guy(charNameLeft, -150.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
     *pNewGuy->getInputIDPtr() = keyboardID;
     *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     guys.push_back(pNewGuy);
 
-
-    pNewGuy = new Guy(charNameRight, startPos2, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+    pNewGuy = new Guy(charNameRight, 150.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
     guys.push_back(pNewGuy);
+
+    int curChar = 3;
+    while (curChar < argc) {
+        pNewGuy = new Guy(argv[curChar], 0.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        guys.push_back(pNewGuy);
+        curChar++;
+    }
 
     pNewGuy->setOpponent(guys[0]);
     guys[0]->setOpponent(pNewGuy);
@@ -197,10 +200,10 @@ int main(int argc, char**argv)
             i++;
         }
         if (guys.size() >= 2) {
-            guys[0]->resetPosDebug(gameStateDump[i]["players"][0]["posX"], gameStateDump[0]["players"][0]["posY"]);
+            guys[0]->setPos(gameStateDump[i]["players"][0]["posX"], gameStateDump[0]["players"][0]["posY"]);
             *guys[0]->getInputIDPtr() = replayLeft;
             *guys[0]->getInputListIDPtr() = replayLeft;
-            guys[1]->resetPosDebug(gameStateDump[i]["players"][1]["posX"], gameStateDump[0]["players"][1]["posY"]);
+            guys[1]->setPos(gameStateDump[i]["players"][1]["posX"], gameStateDump[0]["players"][1]["posY"]);
             *guys[1]->getInputIDPtr() = replayRight;
             *guys[1]->getInputListIDPtr() = replayRight;
 
@@ -404,11 +407,10 @@ int main(int argc, char**argv)
         renderMarkersAndStuff();
 
         if (resetpos) {
-            if (guys.size() > 0 ) {
-                guys[0]->resetPosDebug(startPos1, 0.0f);
-            }
-            if (guys.size() > 1 ) {
-                guys[1]->resetPosDebug(startPos2, 0.0f);
+            uint32_t i = 0;
+            while (i < guys.size()) {
+                guys[i]->resetPos();
+                i++;
             }
         }
 
