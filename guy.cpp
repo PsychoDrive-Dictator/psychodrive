@@ -88,14 +88,18 @@ static inline void doSteerKeyOperation(float &value, float keyValue, int operati
     }
 }
 
-bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  float offsetX, float offsetY, int dir)
+bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, float offsetX, float offsetY, int dir)
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
-    if (!rectsJson.contains(pageIDString) || !rectsJson[pageIDString].contains(boxIDString)) {
+    nlohmann::json rects = rectsJson;
+    if (!rects.contains(pageIDString) || !rects[pageIDString].contains(boxIDString)) {
+        rects = commonRectsJson;
+    }
+    if (!rects.contains(pageIDString) || !rects[pageIDString].contains(boxIDString)) {
         return false;
     }
-    auto rectJson = rectsJson[pageIDString][boxIDString];
+    auto rectJson = rects[pageIDString][boxIDString];
     int xOrig = rectJson["OffsetX"];
     int yOrig = rectJson["OffsetY"];
     int xRadius = rectJson["SizeX"];
@@ -172,10 +176,6 @@ void Guy::Input(int input)
         inputBuffer.pop_back();
     }
 }
-
-nlohmann::json Guy::commonMovesJson = nullptr;
-nlohmann::json Guy::commonRectsJson = nullptr;
-nlohmann::json Guy::commonAtemiJson = nullptr;
 
 std::string Guy::getActionName(int actionID)
 {
@@ -1137,8 +1137,6 @@ void Guy::UpdateBoxes(void)
             Box rect;
             int magicHurtBoxID = 8; // i hate you magic array of boxes
 
-            auto rects = commonAction ? commonRectsJson : rectsJson;
-
             HurtBox baseBox;
             if (isArmor) {
                 baseBox.flags |= armor;
@@ -1162,7 +1160,7 @@ void Guy::UpdateBoxes(void)
                 baseBox.flags |= ground_strike_invul;
             }
             for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= head;
@@ -1170,7 +1168,7 @@ void Guy::UpdateBoxes(void)
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= body;
@@ -1178,7 +1176,7 @@ void Guy::UpdateBoxes(void)
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                if (getRect(rect, rects, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= legs;
@@ -1187,7 +1185,7 @@ void Guy::UpdateBoxes(void)
             }
 
             for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                if (getRect(rect, rects, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
                     throwBoxes.push_back(rect);
                     renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
                 }
@@ -1221,14 +1219,10 @@ void Guy::UpdateBoxes(void)
             rootOffsetY += posY + posOffsetY;
 
             Box rect;
-            auto rects = commonAction ? commonRectsJson : rectsJson;
 
-            if (getRect(rect, rects, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+            if (GetRect(rect, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
                 pushBoxes.push_back(rect);
                 renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});            
-            } else if (getRect(rect, commonRectsJson, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
-                pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});
             }
         }
     }
@@ -1843,7 +1837,6 @@ void Guy::DoHitBoxKey(const char *name)
             rootOffsetY += posY + posOffsetY;
 
             Box rect={-4096,-4096,8192,8192};
-            auto rects = commonAction ? commonRectsJson : rectsJson;
 
             for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
                 int collisionType = hitBox["CollisionType"];
@@ -1876,7 +1869,7 @@ void Guy::DoHitBoxKey(const char *name)
                     thickness = 5.0;
                 }
 
-                if ((type == domain) || getRect(rect, rects, rectListID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if ((type == domain) || GetRect(rect, rectListID, boxID,rootOffsetX, rootOffsetY,direction)) {
                     renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
 
                     int hitEntryID = hitBox["AttackDataListIndex"];

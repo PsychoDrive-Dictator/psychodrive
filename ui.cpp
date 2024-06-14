@@ -279,16 +279,21 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
     static int charID = rand() % charNameCount;
+    static int versionID = charVersionCount - 1;
     static float newCharPos = randFloat();
     resetpos = resetpos || ImGui::Button("reset positions (Q)");
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
     ImGui::ColorEdit3("##newcharcolor", newCharColor);
+    ImGui::SetNextItemWidth( 100.0 );
     ImGui::Combo("##newcharchar", &charID, charNames, charNameCount);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth( 200.0 );
+    ImGui::Combo("##newcharversion", &versionID, charVersions, charVersionCount);
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
-        Guy *pNewGuy = new Guy(charNames[charID], newCharPos, 0.0, 1, col );
+        Guy *pNewGuy = new Guy(charNames[charID], atoi(charVersions[versionID]), newCharPos, 0.0, 1, col );
         if (guys.size()) {
             pNewGuy->setOpponent(guys[0]);
             if (guys.size() == 1) {
