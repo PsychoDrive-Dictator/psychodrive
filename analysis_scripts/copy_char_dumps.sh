@@ -21,6 +21,7 @@ copy_char_dumps() {
     copy_char_file "$1" $targetcharname rects rects
     copy_char_file "$1" $targetcharname tgroups trigger_groups
     copy_char_file "$1" $targetcharname triggers triggers
+    copy_char_file "$1" $targetcharname charge charge
 }
 
 copy_char_dumps AKI aki
