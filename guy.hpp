@@ -224,6 +224,8 @@ public:
             pParent = &parent;
         }
 
+        BuildMoveList();
+
         UpdateActionData();
     }
 
@@ -252,6 +254,7 @@ private:
     int lastLogFrame = 0;
     std::deque<std::string> logQueue;
 
+    const char* FindMove(int actionID, int styleID);
     void BuildMoveList();
     std::vector<char *> vecMoveList;
     int neutralMove = 0;
@@ -284,7 +287,7 @@ private:
     static nlohmann::json commonRectsJson;
     static nlohmann::json commonAtemiJson;
 
-    std::map<int, int> mapMoveStyle;
+    std::map<std::pair<int, int>, std::string> mapMoveStyle;
 
     float posX = 0.0f;
     float posY = 0.0f;

@@ -110,6 +110,22 @@ bool getRect(Box &outBox, nlohmann::json rectsJson, int rectsPage, int boxID,  f
     return true;
 }
 
+const char* Guy::FindMove(int actionID, int styleID)
+{
+    auto mapIndex = std::make_pair(actionID, styleID);
+    if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
+        int parentStyleID = charInfoJson["Styles"][std::to_string(styleInstall)]["ParentStyleID"];
+
+        if (parentStyleID == -1) {
+            return nullptr;
+        }
+
+        return FindMove(actionID, parentStyleID);
+    } else {
+        return mapMoveStyle[mapIndex].c_str();
+    }
+}
+
 void Guy::BuildMoveList()
 {
     // for UI dropdown selector
@@ -128,7 +144,7 @@ void Guy::BuildMoveList()
         if (key.contains("_PL_StyleID")) {
             styleID = key["_PL_StyleID"];
         }
-        mapMoveStyle[actionID] = styleID;
+        mapMoveStyle[std::make_pair(actionID, styleID)] = keyID;
     }
 }
 
@@ -183,8 +199,9 @@ void Guy::UpdateActionData(void)
 
         actionJson = pOpponent->movesDictJson[actionName];
     } else {
-        bool validAction = namesJson.contains(actionIDString);
-        actionName = validAction ? namesJson[actionIDString] : "invalid";
+        const char *foundActionName = FindMove(currentAction, styleInstall);
+
+        actionName = foundActionName ? foundActionName : "invalid";
 
         if (commonMovesJson.contains(std::to_string(currentAction))) {
             actionJson = commonMovesJson[std::to_string(currentAction)];
@@ -853,8 +870,7 @@ void Guy::DoTriggers()
                 std::string actionString = key;
                 int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
 
-                // todo moves can exist in multiple styles, this map needs to be a bit smarter
-                if (mapMoveStyle[actionID] != 0 && mapMoveStyle[actionID] != styleInstall ) {
+                if (FindMove(actionID, styleInstall) == nullptr) {
                     continue;
                 }
 
