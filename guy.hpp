@@ -152,7 +152,8 @@ public:
 
     Guy(std::string charName, int charVersion, float x, float y, int startDir, color color)
     {
-        const std::string charPath = "data/chars/";
+        const std::string charPath = "data/chars/" + charName + "/";
+        const std::string commonPath = "data/chars/common/";
         character = charName;
         version = charVersion;
         name = character;
@@ -174,9 +175,9 @@ public:
         atemiJson = parseCharFile(charPath, character, version, "atemi");
         charInfoJson = parseCharFile(charPath, character, version, "charinfo");
 
-        commonMovesJson = parseCharFile(charPath, "common", version, "moves");
-        commonRectsJson = parseCharFile(charPath, "common", version, "rects");
-        commonAtemiJson = parseCharFile(charPath, "common", version, "atemi");
+        commonMovesJson = parseCharFile(commonPath, "common", version, "moves");
+        commonRectsJson = parseCharFile(commonPath, "common", version, "rects");
+        commonAtemiJson = parseCharFile(commonPath, "common", version, "atemi");
 
         Input(0);
 
