@@ -280,7 +280,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
     static int charID = rand() % charNameCount;
     static int versionID = charVersionCount - 1;
-    static float newCharPos = randFloat() * (765.0 * 2) - 765.0;
+    static float newCharPos = randFloat() * 300 - 150.0;
     resetpos = resetpos || ImGui::Button("reset positions (Q)");
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
@@ -304,7 +304,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
         newCharColor[0] = randFloat();
         newCharColor[1] = randFloat();
         newCharColor[2] = randFloat();
-        newCharPos = randFloat() * (765.0 * 2) - 765.0;
+        newCharPos = randFloat() * 300 - 150.0;
     }
     for (auto i : currentInputMap) {
         ImGui::Text("input %i %i", i.first, i.second);
