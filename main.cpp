@@ -46,9 +46,18 @@ const char* charNames[] = {
     "kimberly",
     "jamie",
     "marisa",
-    "blanka"
+    "blanka",
+    "akuma"
 };
 const int charNameCount = IM_ARRAYSIZE(charNames);
+
+const char* charVersions[] = {
+    { "19 - pre-S2" },
+    { "21 - S2 (akuma patch)" },
+    { "22 - S2 hotfix 1" },
+    { "23 - S2 hotfix 2" }
+};
+const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
 bool resetpos = false;
 
@@ -106,6 +115,37 @@ nlohmann::json parse_json_file(const std::string &fileName)
     return nlohmann::json::parse(fileText);
 }
 
+nlohmann::json parseCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName)
+{
+    std::string fileName;
+    bool foundFile = false;
+
+    // find initial version slot for passed version number
+    int versionSlot = charVersionCount - 1;
+    while (versionSlot >= 0) {
+        if (atoi(charVersions[versionSlot]) == version) {
+            break;
+        }
+        versionSlot--;
+    }
+    if (versionSlot < 0) {
+        return nullptr;
+    }
+    while (versionSlot >= 0) {
+        fileName = path + charName + std::to_string(atoi(charVersions[versionSlot])) + "_" + jsonName + ".json";
+        if (std::filesystem::exists(fileName)) {
+            foundFile = true;
+            break;
+        }
+        versionSlot--;
+    }
+    if (!foundFile) {
+        return nullptr;
+    }
+
+    return parse_json_file(fileName);
+}
+
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
 {
     
@@ -146,6 +186,20 @@ void log(std::string logLine)
     }
 }
 
+void extractCharVersion(char *cmdLine, std::string &charName, int &version)
+{
+    uint32_t i = 0;
+    while (i < strlen(cmdLine)) {
+        if (cmdLine[i] >= '0' && cmdLine[i] <= '9') {
+            version = atoi(&cmdLine[i]);
+            cmdLine[i] = 0;
+            break;
+        }
+        i++;
+    }
+    charName = cmdLine;
+}
+
 int main(int argc, char**argv)
 {
     srand(time(NULL));
@@ -154,30 +208,33 @@ int main(int argc, char**argv)
     ImGuiIO& io = ImGui::GetIO(); // why doesn't the one from initUI work? who knows
     initRenderUI();
 
-    char *charNameLeft = nullptr;
-    char *charNameRight = nullptr;
+    int maxVersion = atoi(charVersions[charVersionCount - 1]);
+
+    std::string charNameLeft = (char*)charNames[rand() % charNameCount];
+    int versionLeft = maxVersion;
+    std::string charNameRight = (char*)charNames[rand() % charNameCount];
+    int versionRight = maxVersion;
 
     if ( argc > 1 ) {
-        charNameLeft = argv[1];
-    } else {
-        charNameLeft = (char*)charNames[rand() % charNameCount];
+        extractCharVersion( argv[1], charNameLeft, versionLeft );
     }
     if ( argc > 2 ) {
-        charNameRight = argv[2];
-    } else {
-        charNameRight = (char*)charNames[rand() % charNameCount];
+        extractCharVersion( argv[2], charNameRight, versionRight );
     }
-    Guy *pNewGuy = new Guy(charNameLeft, -150.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+    Guy *pNewGuy = new Guy(charNameLeft, versionLeft, -150.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
     *pNewGuy->getInputIDPtr() = keyboardID;
     *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     guys.push_back(pNewGuy);
 
-    pNewGuy = new Guy(charNameRight, 150.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+    pNewGuy = new Guy(charNameRight, versionRight, 150.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
     guys.push_back(pNewGuy);
 
     int curChar = 3;
     while (curChar < argc) {
-        pNewGuy = new Guy(argv[curChar], 0.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        std::string charName;
+        int charVersion = maxVersion;
+        extractCharVersion( argv[curChar], charName, charVersion );
+        pNewGuy = new Guy(charName, charVersion, 0.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
         guys.push_back(pNewGuy);
         curChar++;
     }

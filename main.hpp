@@ -68,6 +68,9 @@ class Guy;
 extern const char* charNames[];
 extern const int charNameCount;
 
+extern const char* charVersions[];
+extern const int charVersionCount;
+
 extern float startPos1;
 extern float startPos2;
 
@@ -99,7 +102,8 @@ extern int hitStunAdder;
 extern uint32_t globalInputBufferLength;
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
-nlohmann::json parse_json_file(const std::string &fileName);
 std::string readFile(const std::string &fileName);
+nlohmann::json parse_json_file(const std::string &fileName);
+nlohmann::json parseCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName);
 
 bool doBoxesHit(Box box1, Box box2);

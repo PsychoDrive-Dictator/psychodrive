@@ -32,7 +32,7 @@ public:
         warudo += w;
     }
 
-    std::string getCharacter() { return character; }
+    std::string getCharacter() { return character + std::to_string(version); }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
     // for opponent direction
@@ -150,10 +150,11 @@ public:
         }
     }
 
-    Guy(std::string charName, float x, float y, int startDir, color color)
+    Guy(std::string charName, int charVersion, float x, float y, int startDir, color color)
     {
         const std::string charPath = "data/chars/";
         character = charName;
+        version = charVersion;
         name = character;
         posX = startPosX = x;
         posY = startPosY = y;
@@ -162,24 +163,20 @@ public:
         charColorG = color.g;
         charColorB = color.b;
 
-        movesDictJson = parse_json_file(charPath + character + "_moves.json");
-        rectsJson = parse_json_file(charPath + character + "_rects.json");
-        namesJson = parse_json_file(charPath + character + "_names.json");
-        triggerGroupsJson = parse_json_file(charPath + character + "_trigger_groups.json");
-        triggersJson = parse_json_file(charPath + character + "_triggers.json");
-        commandsJson = parse_json_file(charPath + character + "_commands.json");
-        chargeJson = parse_json_file(charPath + character + "_charge.json");
-        hitJson = parse_json_file(charPath + character + "_hit.json");
-        atemiJson = parse_json_file(charPath + character + "_atemi.json");
-        charInfoJson = parse_json_file(charPath + character + "_charinfo.json");
+        movesDictJson = parseCharFile(charPath, character, version, "moves");
+        rectsJson = parseCharFile(charPath, character, version, "rects");
+        namesJson = parseCharFile(charPath, character, version, "names");
+        triggerGroupsJson = parseCharFile(charPath, character, version, "trigger_groups");
+        triggersJson = parseCharFile(charPath, character, version, "triggers");
+        commandsJson = parseCharFile(charPath, character, version, "commands");
+        chargeJson = parseCharFile(charPath, character, version, "charge");
+        hitJson = parseCharFile(charPath, character, version, "hit");
+        atemiJson = parseCharFile(charPath, character, version, "atemi");
+        charInfoJson = parseCharFile(charPath, character, version, "charinfo");
 
-        static bool commonMovesInitialized = false;
-        if (!commonMovesInitialized) {
-            commonMovesJson = parse_json_file(charPath + "common_moves.json");
-            commonRectsJson = parse_json_file(charPath + "common_rects.json");
-            commonAtemiJson = parse_json_file(charPath + "common_atemi.json");
-            commonMovesInitialized = true;
-        }
+        commonMovesJson = parseCharFile(charPath, "common", version, "moves");
+        commonRectsJson = parseCharFile(charPath, "common", version, "rects");
+        commonAtemiJson = parseCharFile(charPath, "common", version, "atemi");
 
         Input(0);
 
@@ -193,6 +190,7 @@ public:
     Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
     {
         character = parent.character;
+        version = parent.version;
         name = character + "'s minion";
         direction = parent.direction;
         posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
@@ -211,6 +209,10 @@ public:
         hitJson = parent.hitJson;
         atemiJson = parent.hitJson;
         charInfoJson = parent.charInfoJson;
+
+        commonMovesJson = parent.commonMovesJson;
+        commonRectsJson = parent.commonRectsJson;
+        commonAtemiJson = parent.commonAtemiJson;
 
         pOpponent = parent.pOpponent;
 
@@ -237,6 +239,7 @@ public:
 private:
     std::string name;
     std::string character;
+    int version;
     Guy *pOpponent = nullptr;
 
     void log(bool log, std::string logLine)
@@ -254,6 +257,7 @@ private:
     int lastLogFrame = 0;
     std::deque<std::string> logQueue;
 
+    bool GetRect(Box &outBox, int rectsPage, int boxID,  float offsetX, float offsetY, int dir);
     const char* FindMove(int actionID, int styleID);
     void BuildMoveList();
     std::vector<char *> vecMoveList;
@@ -283,9 +287,9 @@ private:
     nlohmann::json atemiJson;
     nlohmann::json charInfoJson;
 
-    static nlohmann::json commonMovesJson;
-    static nlohmann::json commonRectsJson;
-    static nlohmann::json commonAtemiJson;
+    nlohmann::json commonMovesJson;
+    nlohmann::json commonRectsJson;
+    nlohmann::json commonAtemiJson;
 
     std::map<std::pair<int, int>, std::string> mapMoveStyle;
 
