@@ -1,6 +1,6 @@
 #!/bin/bash
 
-versions=("19" "20" "22" "23")
+versions=("19" "20" "21" "23")
 
 dedupe_char_file() {
     sum=blah
