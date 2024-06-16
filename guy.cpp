@@ -644,7 +644,7 @@ bool Guy::PreFrame(void)
                                     // install timer like mini-booms.................
                                     log (true, "kinda ambiguous, worth a look");
                                 }
-                            } else if (styleInstall > 0) {
+                            } else if (styleInstall > 0 && styleInstallFrames > 0) {
                                 if (param1 == 0) {
                                     styleInstallFrames = param2;
                                 } else if (param1 == 1) {
@@ -653,7 +653,7 @@ bool Guy::PreFrame(void)
                                     log(logUnknowns, "unknown operator in chara event");
                                 }
                             } else {
-                                log(true, "no style install or airborne but point deduction?");
+                                log(true, "no style install timer or airborne but point deduction?");
                             }
                         }
                         break;
