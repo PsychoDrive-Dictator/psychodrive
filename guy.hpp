@@ -260,7 +260,7 @@ private:
     std::deque<std::string> logQueue;
 
     bool GetRect(Box &outBox, int rectsPage, int boxID,  float offsetX, float offsetY, int dir);
-    const char* FindMove(int actionID, int styleID);
+    const char* FindMove(int actionID, int styleID, nlohmann::json &moveJson);
     void BuildMoveList();
     std::vector<char *> vecMoveList;
     int neutralMove = 0;
@@ -293,7 +293,7 @@ private:
     nlohmann::json commonRectsJson;
     nlohmann::json commonAtemiJson;
 
-    std::map<std::pair<int, int>, std::string> mapMoveStyle;
+    std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
 
     float posX = 0.0f;
     float posY = 0.0f;
@@ -353,7 +353,6 @@ private:
     int marginFrame = 0;
     int loopCount = 0;
     int loopPoint = 0;
-    bool commonAction = false;
     bool nextActionOpponentAction = false;
     bool opponentAction = false;
     bool hasLooped = false;
