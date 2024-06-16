@@ -2117,6 +2117,17 @@ void Guy::DoBranchKey(bool preHit = false)
 
             // do those also override if higher branchID?
             if (doBranch) {
+
+                bool keepFrame = key["_InheritFrameX"];
+
+                if (keepFrame) {
+                    // this will replay the same frame ID, is that correct?
+                    // seems needed for guile's branch to 1229, otherwise unique
+                    // isn't deducted (eventkey on frame 0)
+                    // but maybe governed by flag?
+                    branchFrame = currentFrame;
+                }
+
                 if (branchAction == currentAction && branchFrame == 0 ) {
                     log(true, "ignoring branch to frame 0? that's how jp stuff owrks dunno");
                 } else {
@@ -2134,7 +2145,7 @@ void Guy::DoBranchKey(bool preHit = false)
                 deniedLastBranch = false;
 
                 keepPlace = key["_KeepPlace"];
-                keepFrame = key["_InheritFrameX"];
+
                 break;
             } else {
                 if (branchType != 1) {
@@ -2477,12 +2488,9 @@ bool Guy::Frame(void)
             posOffsetY = 0.0f;
         }
 
-        if (!keepFrame) {
-            currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
-        }
+        currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
 
         keepPlace = false;
-        keepFrame = false;
 
         currentArmorID = -1; // uhhh
 
