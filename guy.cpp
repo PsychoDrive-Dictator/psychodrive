@@ -201,6 +201,12 @@ void Guy::UpdateActionData(void)
     } else {
         const char *foundActionName = FindMove(currentAction, styleInstall);
 
+        if (!foundActionName) {
+            log(true, "couldn't find next action, reverting to 1 - style lapsed?");
+            currentAction = 1;
+            foundActionName = FindMove(currentAction, styleInstall);
+        }
+
         actionName = foundActionName ? foundActionName : "invalid";
 
         if (commonMovesJson.contains(std::to_string(currentAction))) {
@@ -211,21 +217,17 @@ void Guy::UpdateActionData(void)
         }
     }
 
-    if (!actionFrameDataInitialized) {
-        //standing has 0 marginframe, pre-jump has -1, crouch -1..
-        auto fab = actionJson["fab"];
-        mainFrame = fab["ActionFrame"]["MainFrame"];
-        followFrame = fab["ActionFrame"]["FollowFrame"];
-        marginFrame = fab["ActionFrame"]["MarginFrame"];
-        actionFrameDuration = fab["Frame"];
-        loopPoint = fab["State"]["EndStateParam"];
-        if ( loopPoint == -1 ) {
-            loopPoint = 0;
-        }
-        loopCount = fab["State"]["LoopCount"];
-        hasLooped = false;
-        actionFrameDataInitialized = true;
+    auto fab = actionJson["fab"];
+    mainFrame = fab["ActionFrame"]["MainFrame"];
+    followFrame = fab["ActionFrame"]["FollowFrame"];
+    marginFrame = fab["ActionFrame"]["MarginFrame"];
+    actionFrameDuration = fab["Frame"];
+    loopPoint = fab["State"]["EndStateParam"];
+    if ( loopPoint == -1 ) {
+        loopPoint = 0;
     }
+    loopCount = fab["State"]["LoopCount"];
+    hasLooped = false;
 }
 
 bool Guy::PreFrame(void)
@@ -713,7 +715,7 @@ bool Guy::PreFrame(void)
                 float posOffsetY = key["PosOffset"]["y"];
 
                 // spawn new guy
-                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>());
+                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>());
                 pNewGuy->PreFrame();
                 if (pParent) {
                     pParent->minions.push_back(pNewGuy);
@@ -2495,7 +2497,6 @@ bool Guy::Frame(void)
             direction *= -1;
         }
 
-        actionFrameDataInitialized = false;
         UpdateActionData();
 
         auto inherit = actionJson["fab"]["Inherit"];
@@ -2563,13 +2564,11 @@ bool Guy::Frame(void)
         // if successful, eat this frame away and go right now
         if (nextAction != -1) {
             currentAction = nextAction;
-            actionFrameDataInitialized = false;
+            UpdateActionData();
             log (logTransitions, "nvm! current action " + std::to_string(currentAction));
             nextAction = -1;
         }
     }
-
-    UpdateActionData();
 
     // if we need landing adjust/etc during warudo, need this updated now
     prevPoseStatus = forcedPoseStatus;
