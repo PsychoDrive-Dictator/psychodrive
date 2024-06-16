@@ -225,9 +225,11 @@ void Guy::UpdateActionData(void)
     marginFrame = fab["ActionFrame"]["MarginFrame"];
     actionFrameDuration = fab["Frame"];
     loopPoint = fab["State"]["EndStateParam"];
-    if ( loopPoint == -1 ) {
-        loopPoint = 0;
-    }
+    // see deejay medium jackknife - it's possible this is generally wrong and
+    // should just be ignored for airborne moves, or something
+    // if ( loopPoint == -1 ) {
+    //     loopPoint = 0;
+    // }
     loopCount = fab["State"]["LoopCount"];
     hasLooped = false;
 }
@@ -2289,17 +2291,20 @@ bool Guy::Frame(void)
             airborne = true; // probably should get it thru statuskey?
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
-        } else if (loopCount == -1 || loopCount > 0) {
+        } else if (loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
             currentFrame = loopPoint;
             hasLooped = true;
             if (loopCount > 0) {
                 loopCount--;
             }
+        } else if (isProjectile) {
+            return false; // die
+        } else if (airborne) {
+            // freeze time at the end there, hopefully a branch will get us when we land :/
+            // should this apply in general, not just airborne?
+            currentFrame--;
         } else {
-            if (isProjectile) {
-                return false; // die
-            }
-            nextAction = 1;
+            currentAction = 1;
         }
 
         if (resetHitStunOnTransition) {
