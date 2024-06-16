@@ -130,9 +130,9 @@ public:
         outPosOffsetY = posOffsetY;
     }
     void getVel( float &outVelX, float &outVelY, float &outAccelX, float &outAccelY) {
-        outVelX = velocityX;
+        outVelX = velocityX * direction;
         outVelY = velocityY;
-        outAccelX = accelX;
+        outAccelX = accelX * direction;
         outAccelY = accelY;
     }
 

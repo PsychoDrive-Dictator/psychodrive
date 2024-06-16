@@ -514,6 +514,7 @@ int main(int argc, char**argv)
         static int lasterrorcount = replayErrors;
         if (lasterrorcount != replayErrors) {
             paused = true; // cant pause in the middle above
+            lasterrorcount = replayErrors;
         }
     }
 
