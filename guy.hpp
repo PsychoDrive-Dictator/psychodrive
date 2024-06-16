@@ -100,6 +100,8 @@ public:
         }
         return 1;
     }
+    bool getAirborne() { return getPoseStatus() == 3; }
+    bool getCrouching() { return getPoseStatus() == 2; }
     int getActionStatus() { return actionStatus; }
     int getJumpStatus() { return jumpStatus; }
     int getLandingAdjust() { return landingAdjust; }
@@ -118,8 +120,8 @@ public:
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
     std::string getActionName() { return actionName; }
-    bool getCrouching() { return crouching; }
-    bool getAirborne() { return airborne; }
+    bool getCrouchingDebug() { return crouching; }
+    bool getAirborneDebug() { return airborne; }
     float getHitVelX() { return hitVelX; }
     void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
         outPosX = posX;
