@@ -114,7 +114,7 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, float offsetX, float of
     return true;
 }
 
-const char* Guy::FindMove(int actionID, int styleID)
+const char* Guy::FindMove(int actionID, int styleID, nlohmann::json &moveJson)
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
@@ -124,9 +124,13 @@ const char* Guy::FindMove(int actionID, int styleID)
             return nullptr;
         }
 
-        return FindMove(actionID, parentStyleID);
+        return FindMove(actionID, parentStyleID, moveJson);
     } else {
-        return mapMoveStyle[mapIndex].c_str();
+        const char *moveName = mapMoveStyle[mapIndex].first.c_str();
+        bool commonMove = mapMoveStyle[mapIndex].second;
+
+        moveJson = commonMove ? commonMovesJson[moveName] : movesDictJson[moveName];
+        return moveName;
     }
 }
 
@@ -148,7 +152,17 @@ void Guy::BuildMoveList()
         if (key.contains("_PL_StyleID")) {
             styleID = key["_PL_StyleID"];
         }
-        mapMoveStyle[std::make_pair(actionID, styleID)] = keyID;
+        mapMoveStyle[std::make_pair(actionID, styleID)] = std::make_pair(keyID, false);
+    }
+
+    for (auto& [keyID, key] : commonMovesJson.items())
+    {
+        int actionID = key["fab"]["ActionID"];
+        int styleID = 0;
+        if (key.contains("_PL_StyleID")) {
+            styleID = key["_PL_StyleID"];
+        }
+        mapMoveStyle[std::make_pair(actionID, styleID)] = std::make_pair(keyID, true);
     }
 }
 
@@ -190,32 +204,22 @@ void Guy::UpdateActionData(void)
     landingAdjust = 0;
 
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
-    commonAction = false;
     actionJson = nullptr;
+    const char *foundAction = nullptr;
 
     if (opponentAction) {
-        bool validAction = pOpponent->namesJson.contains(actionIDString);
-        actionName = validAction ? pOpponent->namesJson[actionIDString] : "invalid";
-
-        actionJson = pOpponent->movesDictJson[actionName];
+        foundAction = pOpponent->FindMove(currentAction, 0, actionJson);
     } else {
-        const char *foundActionName = FindMove(currentAction, styleInstall);
-
-        if (!foundActionName) {
-            log(true, "couldn't find next action, reverting to 1 - style lapsed?");
-            currentAction = 1;
-            foundActionName = FindMove(currentAction, styleInstall);
-        }
-
-        actionName = foundActionName ? foundActionName : "invalid";
-
-        if (commonMovesJson.contains(std::to_string(currentAction))) {
-            actionJson = commonMovesJson[std::to_string(currentAction)];
-            commonAction = true;
-        } else if (movesDictJson.contains(actionName)) {
-            actionJson = movesDictJson[actionName];
-        }
+        foundAction = FindMove(currentAction, styleInstall, actionJson);
     }
+
+    if (foundAction == nullptr) {
+        log(true, "couldn't find next action, reverting to 1 - style lapsed?");
+        currentAction = 1;
+        foundAction = FindMove(currentAction, styleInstall, actionJson);
+    }
+
+    actionName = foundAction;
 
     auto fab = actionJson["fab"];
     mainFrame = fab["ActionFrame"]["MainFrame"];
@@ -872,7 +876,8 @@ void Guy::DoTriggers()
                 std::string actionString = key;
                 int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
 
-                if (FindMove(actionID, styleInstall) == nullptr) {
+                nlohmann::json moveJson = nullptr;
+                if (FindMove(actionID, styleInstall, moveJson) == nullptr) {
                     continue;
                 }
 
