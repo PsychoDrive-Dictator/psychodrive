@@ -406,6 +406,7 @@ local hijackingReplays = false
 local callMeNextFrame = nil
 
 local dumpingGameState = false
+local clearGameStateDump = false
 
 re.on_frame(function()
   if dumpPlayersNextFrame == true then
@@ -448,7 +449,9 @@ re.on_draw_ui(function()
   if imgui.button("dump game state so far") == true then
     dumpingGameState = true
   end
-
+  if imgui.button("clear game state dump") == true then
+    clearGameStateDump = true
+  end
   if imgui.button("restore training data") == true then
     local trainingManager = sdk.get_managed_singleton("app.training.TrainingManager")
     local trainingData = trainingManager and trainingManager:get_field("_tData")
@@ -924,7 +927,7 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.posY = cplayer.pos.y.v / 65536.0
   playerDump.velX = cplayer.speed.x.v / 65536.0
   playerDump.velY = cplayer.speed.y.v / 65536.0
-  playerDump.accelY = cplayer.alpha.x.v / 65536.0
+  playerDump.accelX = cplayer.alpha.x.v / 65536.0
   playerDump.accelY = cplayer.alpha.y.v / 65536.0
   playerDump.bitValue = cplayer.BitValue
   playerDump.pose = cplayer.pose_st
@@ -964,6 +967,10 @@ function(args)
     logToFile( myjson.encode(gameStateDumps), "game_state_dump.json" )
     gameStateDumps = {}
     dumpingGameState = false
+  end
+  if clearGameStateDump == true then
+    gameStateDumps = {}
+    clearGameStateDump = false
   end
 end,
 function(retval)
