@@ -188,7 +188,7 @@ public:
         health = maxHealth = 10000; // todo pull that, need to make one of the dumps contain vital_max
     }
 
-    Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction)
+    Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction, int styleID)
     {
         character = parent.character;
         version = parent.version;
@@ -218,6 +218,7 @@ public:
         pOpponent = parent.pOpponent;
 
         currentAction = startAction;
+        styleInstall = styleID;
 
         isProjectile = true;
         projHitCount = -1; // unset yet, is in the first action
@@ -356,7 +357,6 @@ private:
     bool nextActionOpponentAction = false;
     bool opponentAction = false;
     bool hasLooped = false;
-    bool actionFrameDataInitialized = false;
 
     // todo round begin action needs to set that
     int styleInstall = 0;
