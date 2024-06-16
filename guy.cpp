@@ -201,8 +201,6 @@ std::string Guy::getActionName(int actionID)
 
 void Guy::UpdateActionData(void)
 {
-    landingAdjust = 0;
-
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     actionJson = nullptr;
     const char *foundAction = nullptr;
@@ -1477,7 +1475,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 break;
             }
 
-            bool otherGuyAirborne = pOtherGuy->getPoseStatus() == 3;
+            bool otherGuyAirborne = pOtherGuy->getAirborne();
 
             if (otherGuyAirborne) {
                 hitEntryFlag |= air;
@@ -2460,6 +2458,8 @@ bool Guy::Frame(void)
         // todo scaling stuff here?
     }
 
+    bool didTransition = false;
+
     // Transition
     if ( nextAction != -1 )
     {
@@ -2499,10 +2499,6 @@ bool Guy::Frame(void)
 
         currentArmorID = -1; // uhhh
 
-        forcedPoseStatus = 0;
-        actionStatus = 0;
-        jumpStatus = 0;
-
         nextAction = -1;
         nextActionFrame = -1;
 
@@ -2522,7 +2518,8 @@ bool Guy::Frame(void)
 
         if (!isDrive && (!hitStun || blocking)) {
             // not sure about those manual checks for drive or hitstun but necessary for now
-            if (airborne) {
+            // should this use airborne status from previous or new action? currently previous
+            if (getAirborne()) {
                 accelX *= inherit["Accelaleration"]["x"].get<float>();
                 accelY *= inherit["Accelaleration"]["y"].get<float>();
                 velocityX *= inherit["Velocity"]["x"].get<float>();
@@ -2565,13 +2562,23 @@ bool Guy::Frame(void)
 
         deferredAction = 0;
         deferredActionFrame = 0;
+
+        prevPoseStatus = forcedPoseStatus;
+
+        // careful about airborne/etc checks until call do DoStatusKey() below
+        forcedPoseStatus = 0;
+        actionStatus = 0;
+        jumpStatus = 0;
+        landingAdjust = 0;
+
+        didTransition = true;
     }
 
     if (warudo == 0) {
         timeInWarudo = 0;
     }
 
-    if (canMove) {
+    if (canMove && didTransition) {
         // if we just went to idle, run triggers again
         DoTriggers();
         // if successful, eat this frame away and go right now
@@ -2584,7 +2591,9 @@ bool Guy::Frame(void)
     }
 
     // if we need landing adjust/etc during warudo, need this updated now
-    prevPoseStatus = forcedPoseStatus;
+    if (!didTransition) {
+        prevPoseStatus = forcedPoseStatus;
+    }
     DoStatusKey();
 
     return true;
