@@ -1816,7 +1816,8 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         hitAccelX = direction * destX / (float)time * 2.0 / (float)time;
         hitVelX -= hitAccelX;
     } else {
-        // keep itvel pushback from last grounded hit
+        hitVelX = 0.0f;
+        hitAccelX = 0.0f;
         velocityX = -destX / (float)destTime;
     }
 
