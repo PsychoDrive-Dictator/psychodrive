@@ -344,7 +344,6 @@ private:
 
     int currentAction = 1;
     int nextAction = -1;
-    bool didTrigger = false;
     int nextActionFrame = -1;
     bool keepPlace = false;
     bool keepFrame = false;
@@ -372,11 +371,15 @@ private:
     // hitting side
     int canHitID = -1;
     bool hitThisFrame = false;
+    bool hasBeenBlockedThisFrame = false;
     bool hitArmorThisFrame = false;
     bool hitAtemiThisFrame = false;
-    bool hasBeenBlockedThisFrame = false;
     bool punishCounterThisFrame = false;
     bool grabbedThisFrame = false;
+    bool hitThisMove = false;
+    bool hasBeenBlockedThisMove = false;
+    bool hitArmorThisMove = false;
+    bool hitAtemiThisMove = false;
 
     int warudo = 0;
     int timeInWarudo = 0;
@@ -424,8 +427,8 @@ private:
 
     std::vector<RenderBox> renderBoxes;
 
-    int deferredActionFrame = -1;
-    int deferredAction = 0;
+    int deferredTriggerAction = -1;
+    int deferredTriggerGroup = -1;
 
     bool isDrive = false;
     bool wasDrive = false;
