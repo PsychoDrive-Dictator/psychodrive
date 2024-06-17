@@ -805,10 +805,20 @@ bool Guy::PreFrame(void)
     return true;
 }
 
+struct Trigger {
+    std::string triggerName;
+    bool deferred;
+    int triggerGroup;
+};
+
 void Guy::DoTriggers()
 {
+    bool foundDeferTriggerGroup = false;
+
     if (actionJson.contains("TriggerKey"))
     {
+        std::map<int,Trigger> mapTriggers; // will sort all the valid triggers by ID
+
         for (auto& [keyID, key] : actionJson["TriggerKey"].items())
         {
             if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
@@ -821,30 +831,11 @@ void Guy::DoTriggers()
             }
 
             bool defer = !key["_NotDefer"];
-            int deferFrame = 0;
             int triggerGroup = key["TriggerGroup"];
             int condition = key["_Condition"];
 
-            if (defer) {
-                // defer just seems to activate a subsequent matching non-deferred trigger
-                // todo this can span actions, so need to rethink approach here
-                bool deferMatch = false;
-                for (auto& [matchKeyID, matchKey] : actionJson["TriggerKey"].items()) {
-                    if (matchKey.contains("_StartFrame") &&
-                        matchKey["_StartFrame"] <= key["_EndFrame"] && 
-                        matchKey["TriggerGroup"] == triggerGroup &&
-                        matchKey["_NotDefer"] == true) {
-                        condition = matchKey["_Condition"];
-                        deferFrame = matchKey["_StartFrame"];
-                        deferMatch = true;
-                        break;
-                    }
-                }
-                if (deferMatch == false) {
-                    // lots of those? hopefully not missing something - JP's 4HK
-                    //log(true, "couldn't find matching non-deferred trigger, broken trigger?");
-                    continue;
-                }
+            if (deferredTriggerGroup != -1 && triggerGroup == deferredTriggerGroup) {
+                foundDeferTriggerGroup = true;
             }
 
             // condition bits
@@ -855,268 +846,309 @@ void Guy::DoTriggers()
             // bit 10 is set almost everywhere, but unknown as of yet
             // bit 11 = on counter/atemi
             // bit 12 = on parry
+
+            // is 'this move' really broadly correct? or only for defers
+            // maybe that's what mystery bit 10 governs
             bool conditionMet = false;
-            if ( condition & (1<<0) && hitThisFrame) {
+            if ( condition & (1<<0) && hitThisMove) {
                 conditionMet = true;
             }
-            if ( condition & (1<<1) && hasBeenBlockedThisFrame) {
+            if ( condition & (1<<1) && hasBeenBlockedThisMove) {
                 conditionMet = true;
             }
             // todo don't forget to add 'not parried' there
             if ( condition & (1<<2) &&
-                (!hitThisFrame && !hasBeenBlockedThisFrame && !hitAtemiThisFrame && !hitArmorThisFrame)) {
+                (!hitThisMove && !hasBeenBlockedThisMove &&
+                 !hitAtemiThisMove && !hitArmorThisMove)) {
                 conditionMet = true;
             }
-            if ( condition & (1<<3) && hitArmorThisFrame) {
+            if ( condition & (1<<3) && hitArmorThisMove) {
                 conditionMet = true;
             }
-            if ( condition & (1<<11) && hitAtemiThisFrame) {
+            if ( condition & (1<<11) && hitAtemiThisMove) {
                 conditionMet = true;
             }
             // todo hit parry
+
+            if (defer) {
+                // we'll use the condition of the non-deferred match
+                conditionMet = true;
+            }
 
             if (!conditionMet) {
                 continue;
             }
 
+            if (deferredTriggerGroup != -1 && triggerGroup == deferredTriggerGroup && !defer) {
+                // found non-deferred triggergroup and passed condition, trigger action now
+                nextAction = deferredTriggerAction;
+
+                log(logTriggers, "did deferred trigger " + std::to_string(deferredTriggerAction));
+
+                deferredTriggerAction = -1;
+                deferredTriggerGroup = -1;
+                // don't need to run the bit at the end there, and nothing else has side-effects here
+                return;
+            }
+
             auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
-            std::deque<std::pair<std::string,std::string>> vecReverseTriggers;
             for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
             {
-                vecReverseTriggers.push_front(std::make_pair(keyID, key));
-            }
-            for (auto& [keyID, key] : vecReverseTriggers)
-            {
                 int triggerID = atoi(keyID.c_str());
-                std::string actionString = key;
-                int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
+                Trigger newTrig = { key, defer, triggerGroup };
+                // interleave all the triggers from groups in that map, sorted by ID
+                mapTriggers[triggerID] = newTrig;
+            }
+        }
 
-                nlohmann::json moveJson = nullptr;
-                if (FindMove(actionID, styleInstall, moveJson) == nullptr) {
+        // walk in reverse sorted trigger ID order
+        for (auto it = mapTriggers.rbegin(); it != mapTriggers.rend(); it++)
+        {
+            int triggerID = it->first;
+            std::string actionString = it->second.triggerName;
+            bool defer = it->second.deferred;
+            int triggerGroup = it->second.triggerGroup;
+            int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
+
+            nlohmann::json moveJson = nullptr;
+            if (FindMove(actionID, styleInstall, moveJson) == nullptr) {
+                continue;
+            }
+
+            auto triggerIDString = std::to_string(triggerID);
+            auto actionIDString = to_string_leading_zeroes(actionID, 4);
+
+            nlohmann::json trigger;
+
+            for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
+                if ( atoi(keyID.c_str()) == triggerID ) {
+                    trigger = key;
+                    break;
+                }
+            }
+
+            if (trigger["_UseUniqueParam"] == true) {
+                int op = trigger["cond_param_ope"];
+                int value = trigger["cond_param_value"];
+                if (op == 0 && value != uniqueCharge ) {
                     continue;
                 }
-
-                auto triggerIDString = std::to_string(triggerID);
-                auto actionIDString = to_string_leading_zeroes(actionID, 4);
-
-                nlohmann::json trigger;
-
-                for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
-                    if ( atoi(keyID.c_str()) == triggerID ) {
-                        trigger = key;
-                        break;
+                if (op == 5 && value > uniqueCharge ) {
+                    continue;
+                }
+            }
+            int limitShotCount = trigger["cond_limit_shot_num"];
+            if (limitShotCount) {
+                int count = 0;
+                int limitShotCategory = trigger["limit_shot_category"];
+                for ( auto minion : minions ) {
+                    if (limitShotCategory & (1 << minion->limitShotCategory)) {
+                        count++;
                     }
                 }
-
-                if (trigger["_UseUniqueParam"] == true) {
-                    int op = trigger["cond_param_ope"];
-                    int value = trigger["cond_param_value"];
-                    if (op == 0 && value != uniqueCharge ) {
-                        continue;
-                    }
-                    if (op == 5 && value > uniqueCharge ) {
-                        continue;
-                    }
+                if (count >= limitShotCount) {
+                    continue;
                 }
-                int limitShotCount = trigger["cond_limit_shot_num"];
-                if (limitShotCount) {
-                    int count = 0;
-                    int limitShotCategory = trigger["limit_shot_category"];
-                    for ( auto minion : minions ) {
-                        if (limitShotCategory & (1 << minion->limitShotCategory)) {
-                            count++;
-                        }
-                    }
-                    if (count >= limitShotCount) {
-                        continue;
-                    }
+            }
+
+            int airActionCountLimit = trigger["cond_jump_cmd_count"];
+            if (airActionCountLimit) {
+                if (airActionCounter >= airActionCountLimit) {
+                    continue;
                 }
+            }
 
-                int airActionCountLimit = trigger["cond_jump_cmd_count"];
-                if (airActionCountLimit) {
-                    if (airActionCounter >= airActionCountLimit) {
-                        continue;
-                    }
-                }
+            int vitalOp = trigger["cond_vital_ope"];
+            if (vitalOp != 0) {
+                float vitalRatio = (float)health / maxHealth * 100;
 
-                int vitalOp = trigger["cond_vital_ope"];
-                if (vitalOp != 0) {
-                    float vitalRatio = (float)health / maxHealth * 100;
-
-                    switch (vitalOp) {
-                        case 2:
-                            if (vitalRatio > trigger["cond_vital_ratio"]) {
-                                // todo figure out exact rounding rules here
-                                continue;
-                            }
-                            break;
-                        default:
-                            log(logUnknowns, "unknown vital op on trigger " + std::to_string(triggerID));
+                switch (vitalOp) {
+                    case 2:
+                        if (vitalRatio > trigger["cond_vital_ratio"]) {
+                            // todo figure out exact rounding rules here
                             continue;
-                            break;
-                    }
-                }
-
-                auto norm = trigger["norm"];
-                int commandNo = norm["command_no"];
-                uint32_t okKeyFlags = norm["ok_key_flags"];
-                uint32_t okCondFlags = norm["ok_key_cond_flags"];
-                uint32_t dcExcFlags = norm["dc_exc_flags"];
-                // condflags..
-                // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
-                // 10100000001100000: EX, so any two out of three button mask?
-                // 00100000000100000: heavy punch with one button mask
-                // 00100000001100000: normal throw, two out of two mask t
-                // 00100000010100000: taunt, 6 out of 6 in mask
-                uint32_t i = 0, initialI = 0;
-                bool initialMatch = false;
-                uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
-                if (inputBuffer.size() < initialSearch) {
-                    initialSearch = inputBuffer.size();
-                }
-                while (i < initialSearch)
-                {
-                    // guile 1112 has 0s everywhere
-                    if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
-                    {
-                        initialMatch = true;
-                    } else if (initialMatch == true) {
-                        i--;
-                        initialI = i;
-                        break; // break once initialMatch no longer true, set i on last true
-                    }
-                    i++;
-                }
-                if (initialMatch)
-                {
-                    //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
-                    if ( commandNo == -1 ) {
-                        if (defer) {
-                            deferredAction = actionID;
-                            deferredActionFrame = deferFrame;
-                        } else {
-                            nextAction = actionID;
                         }
-                        didTrigger = true;
-                        log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
-                        break; // we found our trigger walking back, blow up the whole group
+                        break;
+                    default:
+                        log(logUnknowns, "unknown vital op on trigger " + std::to_string(triggerID));
+                        continue;
+                        break;
+                }
+            }
+
+            auto norm = trigger["norm"];
+            int commandNo = norm["command_no"];
+            uint32_t okKeyFlags = norm["ok_key_flags"];
+            uint32_t okCondFlags = norm["ok_key_cond_flags"];
+            uint32_t dcExcFlags = norm["dc_exc_flags"];
+            // condflags..
+            // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
+            // 10100000001100000: EX, so any two out of three button mask?
+            // 00100000000100000: heavy punch with one button mask
+            // 00100000001100000: normal throw, two out of two mask t
+            // 00100000010100000: taunt, 6 out of 6 in mask
+            uint32_t i = 0, initialI = 0;
+            bool initialMatch = false;
+            uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
+            if (inputBuffer.size() < initialSearch) {
+                initialSearch = inputBuffer.size();
+            }
+            while (i < initialSearch)
+            {
+                // guile 1112 has 0s everywhere
+                if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
+                {
+                    initialMatch = true;
+                } else if (initialMatch == true) {
+                    i--;
+                    initialI = i;
+                    break; // break once initialMatch no longer true, set i on last true
+                }
+                i++;
+            }
+            if (initialMatch)
+            {
+                //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
+                if ( commandNo == -1 ) {
+                    if (defer) {
+                        deferredTriggerAction = actionID;
+                        deferredTriggerGroup = triggerGroup;
+                        foundDeferTriggerGroup = true;
                     } else {
-                        std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-                        auto command = commandsJson[commandNoString]["0"];
-                        int inputID = command["input_num"].get<int>() - 1;
-                        auto commandInputs = command["inputs"];
+                        nextAction = actionID;
 
-                        uint32_t inputBufferCursor = i;
+                        // assume non-deferred trigger can take precedence for now
+                        deferredTriggerAction = -1;
+                        deferredTriggerGroup = -1;
+                    }
+                    log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                    break; // we found our trigger walking back, skip all other triggers
+                } else {
+                    std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
+                    auto command = commandsJson[commandNoString]["0"];
+                    int inputID = command["input_num"].get<int>() - 1;
+                    auto commandInputs = command["inputs"];
 
-                        while (inputID >= 0 )
+                    uint32_t inputBufferCursor = i;
+
+                    while (inputID >= 0 )
+                    {
+                        auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
+                        auto inputNorm = input["normal"];
+                        uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
+                        uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
+                        int numFrames = input["frame_num"];
+                        bool match = false;
+                        int lastMatchInput = i;
+
+                        if (inputOkKeyFlags & 0x10000)
                         {
-                            auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
-                            auto inputNorm = input["normal"];
-                            uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
-                            uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
-                            int numFrames = input["frame_num"];
-                            bool match = false;
-                            int lastMatchInput = i;
-
-                            if (inputOkKeyFlags & 0x10000)
-                            {
-                                // charge release
-                                bool chargeMatch = false;
-                                nlohmann::json resourceMatch;
-                                int chargeID = inputOkKeyFlags & 0xFF;
-                                for (auto& [keyID, key] : chargeJson.items()) {
-                                    // support either charge format
-                                    if (key.contains("resource")) {
-                                        key = key["resource"];
-                                    }
-                                    if (key["charge_id"] == chargeID ) {
-                                        resourceMatch = key;
-                                        chargeMatch = true;
-                                        break;
-                                    }
+                            // charge release
+                            bool chargeMatch = false;
+                            nlohmann::json resourceMatch;
+                            int chargeID = inputOkKeyFlags & 0xFF;
+                            for (auto& [keyID, key] : chargeJson.items()) {
+                                // support either charge format
+                                if (key.contains("resource")) {
+                                    key = key["resource"];
                                 }
-
-                                if (chargeMatch) {
-                                    uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
-                                    uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
-                                    uint32_t chargeFrames = resourceMatch["ok_frame"];
-                                    uint32_t keepFrames = resourceMatch["keep_frame"];
-                                    uint32_t dirCount = 0;
-                                    uint32_t dirNotMatchCount = 0;
-                                    // count matching direction in input buffer, super naive but will work for testing
-                                    inputBufferCursor = i;
-                                    uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                                    while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
-                                    {
-                                        if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                            dirCount++;
-                                            if (dirCount >= chargeFrames) {
-                                                break;
-                                            }
-                                        } else {
-                                            dirNotMatchCount++;
-                                        }
-                                        inputBufferCursor++;
-                                    }
-
-                                    if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                        //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                                        //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-                                        break; // cancel trigger
-                                    }
-                                    //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                                    inputID--;
-                                } else {
-                                    log(true, "charge entries mismatch?");
-                                    break; // cancel trigger
+                                if (key["charge_id"] == chargeID ) {
+                                    resourceMatch = key;
+                                    chargeMatch = true;
+                                    break;
                                 }
-                            } else {
-                                while (inputBufferCursor < inputBuffer.size())
+                            }
+
+                            if (chargeMatch) {
+                                uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
+                                uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
+                                uint32_t chargeFrames = resourceMatch["ok_frame"];
+                                uint32_t keepFrames = resourceMatch["keep_frame"];
+                                uint32_t dirCount = 0;
+                                uint32_t dirNotMatchCount = 0;
+                                // count matching direction in input buffer, super naive but will work for testing
+                                inputBufferCursor = i;
+                                uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                                while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
                                 {
-                                    bool thismatch = false;
                                     if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                        int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                                        // if ( commandNo == 32 ) {
-                                        //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
-                                        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i) + " initial " + std::to_string(initialSearch));
-                                        // }
-                                        if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                            match = true;
-                                            thismatch = true;
-                                            i = inputBufferCursor;
+                                        dirCount++;
+                                        if (dirCount >= chargeFrames) {
+                                            break;
                                         }
-                                    }
-                                    if (match == true && (thismatch == false || numFrames <= 0)) {
-                                        //inputBufferCursor++;
-                                        inputID--;
-                                        break;
+                                    } else {
+                                        dirNotMatchCount++;
                                     }
                                     inputBufferCursor++;
                                 }
-                            }
 
-                            if (inputBufferCursor == inputBuffer.size()) {
-                                break;
-                            }
-                        }
-
-                        if (inputID < 0) {
-                            if (defer) {
-                                deferredAction = actionID;
-                                deferredActionFrame = deferFrame;
+                                if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
+                                    //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                                    //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+                                    break; // cancel trigger
+                                }
+                                //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+                                inputID--;
                             } else {
-                                nextAction = actionID;
+                                log(true, "charge entries mismatch?");
+                                break; // cancel trigger
                             }
-                            // try to consume the input
-                            inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
-                            didTrigger = true;
-                            log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer) + "initial I " + std::to_string(initialI));
-                            break; // we found our trigger walking back, blow up the whole group
+                        } else {
+                            while (inputBufferCursor < inputBuffer.size())
+                            {
+                                bool thismatch = false;
+                                if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                    int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                                    // if ( commandNo == 32 ) {
+                                    //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
+                                    //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i) + " initial " + std::to_string(initialSearch));
+                                    // }
+                                    if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                        match = true;
+                                        thismatch = true;
+                                        i = inputBufferCursor;
+                                    }
+                                }
+                                if (match == true && (thismatch == false || numFrames <= 0)) {
+                                    //inputBufferCursor++;
+                                    inputID--;
+                                    break;
+                                }
+                                inputBufferCursor++;
+                            }
                         }
+
+                        if (inputBufferCursor == inputBuffer.size()) {
+                            break;
+                        }
+                    }
+
+                    if (inputID < 0) {
+                        if (defer) {
+                            deferredTriggerAction = actionID;
+                            deferredTriggerGroup = triggerGroup;
+                            foundDeferTriggerGroup = true;
+                        } else {
+                            nextAction = actionID;
+
+                            // assume non-deferred trigger can take precedence for now
+                            deferredTriggerAction = -1;
+                            deferredTriggerGroup = -1;
+                        }
+                        // try to consume the input
+                        inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
+                        log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer) + " initial I " + std::to_string(initialI));
+                        break; // we found our trigger walking back, skip all other triggers
                     }
                 }
             }
         }
+    }
+
+    if (deferredTriggerGroup != -1 && !foundDeferTriggerGroup) {
+        log(logTriggers, "forgetting deferred trigger");
+        deferredTriggerGroup = -1;
+        deferredTriggerAction = -1;
     }
 }
 
@@ -1513,6 +1545,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 hitEntryFlag = block;
                 pOtherGuy->blocking = true;
                 hasBeenBlockedThisFrame = true;
+                hasBeenBlockedThisMove = true;
                 log(logHits, "block!");
             }
 
@@ -1536,6 +1569,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (hurtBox.flags & armor && hurtBox.armorID) {
                 hitArmor = true;
                 hitArmorThisFrame = true;
+                hitArmorThisMove = true;
                 auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
                 nlohmann::json atemi = nullptr;
@@ -1584,6 +1618,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 // like armor except onthing really happens beyond setting the flag
                 hitArmor = true;
                 hitAtemiThisFrame = true;
+                hitAtemiThisMove = true;
                 pOtherGuy->atemiThisFrame = true;
                 log(logHits, "atemi hit!");
             }
@@ -1622,6 +1657,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                         punishCounterThisFrame = true;
                     }
                     hitThisFrame = true;
+                    hitThisMove = true;
                 }
                 retHit = true;
                 log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
@@ -2461,19 +2497,6 @@ bool Guy::Frame(void)
         wallSplat = false;
     }
 
-    // this can be true even if canMove
-    if (deferredAction != 0 && deferredActionFrame == currentFrame) {
-        log(logTransitions, "deferred nextAction " + std::to_string(deferredAction));
-        nextAction = deferredAction;
-        didTrigger = true;
-
-        deferredActionFrame = -1;
-        deferredAction = 0;
-
-        // don't run triggers again though
-        canMove = false;
-    }
-
     if (didTrigger) {
         // todo scaling stuff here?
     }
@@ -2536,6 +2559,13 @@ bool Guy::Frame(void)
             canHitID = -1;
         }
 
+        // see if anything would inherit that
+        // probably should only reset if a trigger happened as opposed to branches
+        hitThisMove = false;
+        hasBeenBlockedThisMove = false;
+        hitArmorThisMove = false;
+        hitAtemiThisMove = false;
+
         if (!isDrive && (!hitStun || blocking)) {
             // not sure about those manual checks for drive or hitstun but necessary for now
             // should this use airborne status from previous or new action? currently previous
@@ -2579,9 +2609,6 @@ bool Guy::Frame(void)
         } else {
             wasDrive = false;
         }
-
-        deferredAction = 0;
-        deferredActionFrame = 0;
 
         prevPoseStatus = forcedPoseStatus;
 
