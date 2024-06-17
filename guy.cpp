@@ -2566,16 +2566,14 @@ bool Guy::Frame(void)
         hitArmorThisMove = false;
         hitAtemiThisMove = false;
 
-        if (!isDrive && (!hitStun || blocking)) {
-            // not sure about those manual checks for drive or hitstun but necessary for now
+        if (!hitStun || blocking) {
             // should this use airborne status from previous or new action? currently previous
-            if (getAirborne()) {
+            if (isDrive || getAirborne()) {
                 accelX *= inherit["Accelaleration"]["x"].get<float>();
                 accelY *= inherit["Accelaleration"]["y"].get<float>();
                 velocityX *= inherit["Velocity"]["x"].get<float>();
                 velocityY *= inherit["Velocity"]["y"].get<float>();
             } else {
-                // bunch of grounded normals say they inherit 1.0 x velocity, ignore when grounded :|
                 accelX = 0.0f;
                 accelY = 0.0f;
                 velocityX = 0.0f;
