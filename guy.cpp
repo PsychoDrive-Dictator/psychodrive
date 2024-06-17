@@ -1756,27 +1756,22 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         wallBounceVelY -= wallBounceAccelY;
     }
 
-    if (destTime != 0) {
-        // assume hit direction is opposite as facing for now, not sure if that's true
-        // todo pushback in corner - all destX _must_ be traveled by either side
-        if ( destX != 0) {
-            if (!airborne && !jimenBound) {
-                int time = destTime;
-                hitVelX = direction * destX * -2.0 / (float)time;
-                hitAccelX = direction * destX / (float)time * 2.0 / (float)time;
-                hitVelX -= hitAccelX;
-            } else {
-                // keep itvel pushback from last grounded hit
-                velocityX = -destX / (float)destTime;
-            }
-        }
+    // assume hit direction is opposite as facing for now, not sure if that's true
+    if (!airborne && !jimenBound) {
+        int time = destTime;
+        hitVelX = direction * destX * -2.0 / (float)time;
+        hitAccelX = direction * destX / (float)time * 2.0 / (float)time;
+        hitVelX -= hitAccelX;
+    } else {
+        // keep itvel pushback from last grounded hit
+        velocityX = -destX / (float)destTime;
+    }
 
-        if (destY != 0) {
-            velocityY = destY * 4 / (float)destTime;
-            accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
-            // i think this vel wants to apply this frame, lame workaround to get same intensity
-            velocityY -= accelY; //
-        }
+    if (destY != 0) {
+        velocityY = destY * 4 / (float)destTime;
+        accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
+        // i think this vel wants to apply this frame, lame workaround to get same intensity
+        velocityY -= accelY; //
     }
 
     // need to figure out if body or head is getting hit here later
