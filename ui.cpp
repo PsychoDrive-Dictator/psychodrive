@@ -115,7 +115,6 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Checkbox("transitions", &pGuy->logTransitions);
     auto logQueue = pGuy->getLogQueue();
     for (int i = logQueue.size() - 1; i >= 0; i--) {
-    //for (auto logLine : pGuy->getLogQueue()) {
         ImGui::Text(logQueue[i].c_str());
     }
     ImGui::End();
@@ -335,8 +334,8 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::SameLine();
     ImGui::Checkbox("force PC", &forcePunishCounter);
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / frameRate, frameRate);
-    for (auto logLine : *pLogQueue) {
-        ImGui::Text(logLine.c_str());
+    for (int i = pLogQueue->size() - 1; i >= 0; i--) {
+        ImGui::Text((*pLogQueue)[i].c_str());
     }
     ImGui::End();
 
