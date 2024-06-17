@@ -2229,8 +2229,12 @@ bool Guy::Frame(void)
         didTrigger = true;
     }
 
+    curNextAction = nextAction;
+    bool didBranch = false;
     DoBranchKey();
-
+    if (nextAction != curNextAction) {
+        didBranch = true;
+    }
     currentFrame++;
 
     if (isProjectile && canHitID >= 0) {
@@ -2240,7 +2244,9 @@ bool Guy::Frame(void)
     }
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
-    DoBranchKey(true);
+    if (!didBranch) {
+        DoBranchKey(true);
+    }
 
     if (isProjectile && projHitCount == 0) {
         return false; // die
