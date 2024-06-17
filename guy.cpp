@@ -545,7 +545,7 @@ bool Guy::PreFrame(void)
                 }
 
                 int validStyles = key["_ValidStyle"];
-                if ( !(validStyles & (1 << styleInstall)) ) {
+                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
                     continue;
                 }
 
@@ -571,6 +571,11 @@ bool Guy::PreFrame(void)
             for (auto& [keyID, key] : actionJson["EventKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                    continue;
+                }
+
+                int validStyles = key["_ValidStyle"];
+                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
                     continue;
                 }
 
@@ -715,6 +720,11 @@ bool Guy::PreFrame(void)
                     continue;
                 }
 
+                int validStyles = key["_ValidStyle"];
+                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+                    continue;
+                }
+
                 float posOffsetX = key["PosOffset"]["x"].get<float>() * direction;
                 float posOffsetY = key["PosOffset"]["y"];
 
@@ -802,6 +812,11 @@ void Guy::DoTriggers()
         for (auto& [keyID, key] : actionJson["TriggerKey"].items())
         {
             if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            int validStyles = key["_ValidStyle"];
+            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
                 continue;
             }
 
@@ -1826,6 +1841,11 @@ void Guy::DoHitBoxKey(const char *name)
         for (auto& [hitBoxID, hitBox] : actionJson[name].items())
         {
             if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            int validStyles = hitBox["_ValidStyle"];
+            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
                 continue;
             }
 
