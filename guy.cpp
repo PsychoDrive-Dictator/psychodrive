@@ -487,7 +487,7 @@ bool Guy::PreFrame(void)
         posX += (velocityX * direction);
         posY += velocityY;
 
-        if (hitVelX != 0.0f && !beenHitThisFrame) {
+        if (hitVelX != 0.0f) {
             float prevHitVelX = hitVelX;
             hitVelX += hitAccelX;
             if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
@@ -1303,6 +1303,8 @@ bool Guy::Push(Guy *pOtherGuy)
 {
     //if (warudo) return false;
     if ( !pOtherGuy ) return false;
+    // for now, maybe there's other rules
+    if (isProjectile) return false;
 
     bool hasPushed = false;
     touchedOpponent = false;
