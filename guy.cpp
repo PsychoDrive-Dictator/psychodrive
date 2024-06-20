@@ -318,11 +318,7 @@ bool Guy::PreFrame(void)
 
         float prevVelX = velocityX;
 
-        // don't apply steer for looped anims? or just velocity set?
-        // this is just a hack to have both looping working jumps but
-        // i'm sure this will be replace by something proper
-
-        if (!hasLooped && actionJson.contains("SteerKey"))
+        if (actionJson.contains("SteerKey"))
         {
             for (auto& [steerKeyID, steerKey] : actionJson["SteerKey"].items())
             {
@@ -2388,7 +2384,6 @@ bool Guy::Frame(void)
         if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             nextAction = currentAction + 3;
-            airborne = true; // probably should get it thru statuskey?
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
         } else if (loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
