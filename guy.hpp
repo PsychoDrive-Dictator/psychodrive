@@ -324,6 +324,7 @@ private:
     bool punishCounterState = false;
     bool forceKnockDownState = false;
 
+    bool offsetDoesNotPush = false;
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
     float velocityX = 0.0f;

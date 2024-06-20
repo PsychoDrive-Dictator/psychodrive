@@ -267,6 +267,7 @@ bool Guy::PreFrame(void)
     atemiThisFrame = false;
     landed = false;
     pushBackThisFrame = 0.0f;
+    offsetDoesNotPush = false;
 
     if (actionJson != nullptr)
     {
@@ -295,11 +296,20 @@ bool Guy::PreFrame(void)
 
                 for (auto& [frame, offset] : placeKey["PosList"].items()) {
                     int keyStartFrame = placeKey["_StartFrame"];
+                    int flag = placeKey["OptionFlag"];
+                    // todo there's a bunch of other flags
+                    bool curPlaceKeyDoesNotPush = flag & 1;
+                    // todo implement ratio here? check on cammy spiralarrow ex as an example
                     if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
                         if (placeKey["Axis"] == 0) {
                             posOffsetX = offset.get<float>();
                         } else if (placeKey["Axis"] == 1) {
                             posOffsetY = offset.get<float>();
+                        }
+                        // do we need to disambiguate which axis doesn't push? that'd be annoying
+                        // is vertical pushback even a thing
+                        if (curPlaceKeyDoesNotPush) {
+                            offsetDoesNotPush = true;
                         }
                     }
                 }
@@ -1332,7 +1342,7 @@ bool Guy::Push(Guy *pOtherGuy)
             pushNeeded = -pushXLeft;
         }
         float velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
-        log(logTransitions, "push needed " + std::to_string(pushNeeded) + " vel diff " + std::to_string(velDiff));
+        log(logTransitions, "push needed " + std::to_string(pushNeeded) + " vel diff " + std::to_string(velDiff) + " offset no push " + std::to_string(offsetDoesNotPush));
         // if (velDiff * pushNeeded < 0.0) {
         //     // if velDiff different sign, we can deduct it
         //     if (fabsf(velDiff) > fabsf(pushNeeded)) {
@@ -1347,7 +1357,37 @@ bool Guy::Push(Guy *pOtherGuy)
         //     pushNeeded += velDiff;
         // }
         // log(logTransitions, "push still needed " + std::to_string(pushNeeded));
+
+
         if (pushNeeded) {
+
+            // we only handle this one direction for now - let the other push witht hat logic
+            // if both have it, we currently do order-dependent handling, need to check what
+            // happens in reality (two simultaneous dashes, with and without gap)
+            if (!offsetDoesNotPush && pOpponent->offsetDoesNotPush) {
+                return false;
+            }
+
+            // does no-push-offset go against push? (different sign)
+            if (offsetDoesNotPush && posOffsetX * pushNeeded < 0.0) {
+                float absOffset = fabsf(posOffsetX);
+                float absPushNeeded = fabsf(pushNeeded);
+
+                if (absPushNeeded >= absOffset) {
+                    posOffsetX = 0.0f;
+                    absPushNeeded -= absOffset;
+                    // restore sign
+                    pushNeeded = absPushNeeded * (pushNeeded / fabsf(pushNeeded));
+                } else {
+                    pushNeeded = 0.0f;
+                    absOffset -= absPushNeeded;
+                    // restore sign
+                    posOffsetX = absOffset * (posOffsetX / fabsf(posOffsetX));
+                }
+                posX += pushNeeded;
+            }
+
+            // do regular push with any remaining pushNeeded
             posX += pushNeeded / 2.0;
             pOtherGuy->posX += -pushNeeded / 2.0;
         }
