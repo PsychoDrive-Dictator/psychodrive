@@ -325,6 +325,7 @@ private:
     bool forceKnockDownState = false;
 
     bool offsetDoesNotPush = false;
+    bool noVelNextFrame = false;
     float posOffsetX = 0.0f;
     float posOffsetY = 0.0f;
     float velocityX = 0.0f;

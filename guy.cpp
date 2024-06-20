@@ -483,8 +483,12 @@ bool Guy::PreFrame(void)
             accelX = 0.0f;
         }
 
-        posX += (velocityX * direction);
-        posY += velocityY;
+        if (!noVelNextFrame) {
+            posX += (velocityX * direction);
+            posY += velocityY;
+        } else {
+            noVelNextFrame = false;
+        }
 
         if (hitVelX != 0.0f) {
             float prevHitVelX = hitVelX;
@@ -2377,6 +2381,8 @@ bool Guy::Frame(void)
         if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             nextAction = currentAction + 3;
+            // magic that seems specific to normal jumps
+            noVelNextFrame = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
         } else if (loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
