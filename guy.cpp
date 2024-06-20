@@ -388,13 +388,6 @@ bool Guy::PreFrame(void)
                             case 4: doSteerKeyOperation(cancelAccelY, fixValue,operationType); break;
                         }
                         break;
-                    case 6:
-                        // uhhhhh
-                        if (valueType == 3 && steerKey["_EndFrame"] == currentFrame + 1 && airborne && !landed) {
-                            currentFrame--;
-                            log(logTransitions, "freezing time until landing!");
-                        }
-                        break;
                     case 13:
                         // set teleport/home target
                         if (targetType == 16) {
