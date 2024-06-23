@@ -957,12 +957,16 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.velY = cplayer.speed.y.v / 65536.0
   playerDump.accelX = cplayer.alpha.x.v / 65536.0
   playerDump.accelY = cplayer.alpha.y.v / 65536.0
+  playerDump.hitVelX = cplayer.vector_zuri.speed.v / 65536.0
+  playerDump.hitAccelX = cplayer.vector_zuri.alpha.v / 65536.0
   playerDump.bitValue = cplayer.BitValue
   playerDump.pose = cplayer.pose_st
   playerDump.hp = cplayer.vital_new
   playerDump.driveGauge = cplayer.focus_new
   playerDump.superGauge = cplayer:getSuperGauge()
   playerDump.comboCount = cplayer.combo_cnt
+  playerDump.hitStop = cplayer.hit_stop
+  playerDump.hitStun = cplayer.damage_time
   playerDump.charID = cplayer.pl_type
   local engine = cplayer.mpActParam.ActionPart._Engine
   playerDump.actionID = engine:get_ActionID()
