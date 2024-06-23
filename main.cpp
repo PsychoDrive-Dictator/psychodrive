@@ -398,8 +398,15 @@ int main(int argc, char**argv)
                         guys[i]->getVel(velX, velY, accelX, accelY);
                         compareGameState(players[i]["velX"], velX, true, desc + " vel X");
                         compareGameState(players[i]["velY"], velY, true, desc + " vel Y");
-                        //compareGameState(players[i]["accelX"], accelX, true, desc + " accel X");
+                        if (players[i].contains("accelX")) {
+                            compareGameState(players[i]["accelX"], accelX, true, desc + " accel X");
+                        }
                         compareGameState(players[i]["accelY"], accelY, true, desc + " accel Y");
+
+                        if (players[i].contains("hitVelX")) {
+                            compareGameState(players[i]["hitVelX"], guys[i]->getHitVelX(), false, desc + " hitVel X");
+                            compareGameState(players[i]["hitAccelX"], guys[i]->getHitAccelX(), false, desc + " hitAccel X");
+                        }
 
                         compareGameState(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
                         compareGameState(players[i]["actionFrame"], guys[i]->getCurrentFrame(), false, desc + " action frame");

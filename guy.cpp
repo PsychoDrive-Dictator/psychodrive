@@ -241,7 +241,7 @@ bool Guy::PreFrame(void)
         warudo--;
         // increment the frame we skipped at the beginning of warudo
         if (warudo == 0) {
-            if (!Frame()) {
+            if (!Frame(true)) {
                 delete this;
                 return false;
             }
@@ -2248,8 +2248,17 @@ void Guy::DoBranchKey(bool preHit = false)
     }
 }
 
-bool Guy::Frame(void)
+bool Guy::Frame(bool endWarudoFrame)
 {
+    // if this is the frame that was stolen from beginning warudo when it ends, don't
+    // add pending warudo yet, so we can play it out fully, in case warudo got added
+    // again just now - lots of DR cancels want one frame to play out when they add
+    // more screen freeze at the exact end of hitstop
+    if (!endWarudoFrame) {
+        warudo += pendingWarudo;
+        pendingWarudo = 0;
+    }
+
     if (warudo) {
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers

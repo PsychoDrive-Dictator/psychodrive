@@ -25,11 +25,11 @@ public:
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
     void DoTriggers();
-    bool Frame(void);
+    bool Frame(bool endWarudoFrame = false);
     std::string getActionName(int actionID);
 
     void addWarudo(int w) {
-        warudo += w;
+        pendingWarudo += w;
     }
 
     std::string getCharacter() { return character + std::to_string(version); }
@@ -123,6 +123,7 @@ public:
     bool getCrouchingDebug() { return crouching; }
     bool getAirborneDebug() { return airborne; }
     float getHitVelX() { return hitVelX; }
+    float getHitAccelX() { return hitAccelX; }
     void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
         outPosX = posX;
         outPosY = posY;
@@ -384,6 +385,7 @@ private:
     bool hitAtemiThisMove = false;
 
     int warudo = 0;
+    int pendingWarudo = 0;
     int timeInWarudo = 0;
 
     // getting hit side
