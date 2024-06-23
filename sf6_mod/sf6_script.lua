@@ -528,8 +528,8 @@ re.on_draw_ui(function()
   end
 
   if imgui.button("test player data") == true then
-    outputTable = obj_to_table(sdk.find_type_definition("gBattle"):get_field("Player"):get_data().mcPlayer[0]:getActionData())
-    logToFile( myjson.encode(outputTable) )
+    outputTable = obj_to_table(sdk.find_type_definition("gBattle"):get_field("Player"):get_data().mcPlayer[0], nil, nil, true, true)
+    logToFile( myjson.encode(outputTable), "static_player_data.json" )
   end
 
   local hijackchanged, hijackvalue = imgui.checkbox("hijack replays with replay.json", hijackingReplays)
@@ -690,13 +690,21 @@ function(retval)
 end
 )
 
-function obj_to_table(obj, staticIgnoreList, recurseCount )
+function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOnly )
   local objType = obj:get_type_definition()
   local fields = objType:get_fields()
   local out = {}
 
   if recurseCount == nil then
     recurseCount = 0
+  end
+
+  if allowStatic == nil then
+    allowStatic = false
+  end
+
+  if staticOnly == nil then
+    staticOnly = false
   end
 
   recurseCount = recurseCount + 1
@@ -714,11 +722,31 @@ function obj_to_table(obj, staticIgnoreList, recurseCount )
     local typeName = fieldType:get_name()
     if field:is_static() then
       if staticIgnoreList[name] == nil then
-        -- out[name] = field:get_data(nil)
+        if allowStatic == true then
+          if fieldType:is_a("System.Array") then
+            out[name] = {}
+            for j, element in pairs(field:get_data(nil)) do
+              -- if element:get_type_definition():is_value_type() and element:get_type_definition():get_name() ~= "Guid" and element:get_type_definition():get_name() ~= "nBattle.DMG_DATA" then
+              --   newElem = obj_to_table(element, staticIgnoreList, recurseCount, false, false)
+              --   for elemFieldName, elemFieldValue in pairs(newElem) do
+              --     -- should only be one non-static element remaining in there for valuetype..
+              --     out[name][string.format("%02d",j)] = elemFieldValue
+              --     break
+              --   end
+              -- else
+                out[name][string.format("%02d",j)] = obj_to_table(element, staticIgnoreList, recurseCount, allowStatic, false)
+                out[name][string.format("%02d",j)]["_type"] = element:get_type_definition():get_name()
+                out[name][string.format("%02d",j)]["_was_valuetype"] = element:get_type_definition():is_value_type()
+              -- end
+            end
+          else
+            out[name] = field:get_data(nil)
+          end
+        end
         -- maybe need to hash on name and value both?
-        staticIgnoreList[name] = out[name]
+        --staticIgnoreList[name] = out[name]
       end
-    else
+    elseif staticOnly == false then
       local value = obj:get_field(name)
       if sdk.is_managed_object(value) and value:get_type_definition():is_a("System.Array") then
         out[name] = {}
@@ -726,14 +754,14 @@ function obj_to_table(obj, staticIgnoreList, recurseCount )
         for j, element in ipairs(value:get_elements()) do
 
           if element:get_type_definition():is_value_type() and element:get_type_definition():get_name() ~= "Guid" then
-            newElem = obj_to_table(element, staticIgnoreList, recurseCount)
+            newElem = obj_to_table(element, staticIgnoreList, recurseCount, allowStatic, staticOnly)
             for elemFieldName, elemFieldValue in pairs(newElem) do
               -- should only be one non-static element remaining in there for valuetype..
               table.insert( out[name], elemFieldValue )
               break
             end
           else
-            table.insert( out[name], obj_to_table(element, staticIgnoreList, recurseCount) )
+            table.insert( out[name], obj_to_table(element, staticIgnoreList, recurseCount, allowStatic, staticOnly) )
           end
         end
       elseif typeName == "Guid" then
@@ -741,7 +769,7 @@ function obj_to_table(obj, staticIgnoreList, recurseCount )
       elseif sdk.is_managed_object(value) then
         -- logToFile("managed field " .. name .. " type " .. typeName )
         -- recurse
-        out[name] = obj_to_table(value, staticIgnoreList, recurseCount)
+        out[name] = obj_to_table(value, staticIgnoreList, recurseCount, allowStatic, staticOnly)
       else
         -- catch-all for any directly castable valueType
         out[name] = value
@@ -932,6 +960,10 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.bitValue = cplayer.BitValue
   playerDump.pose = cplayer.pose_st
   playerDump.hp = cplayer.vital_new
+  playerDump.driveGauge = cplayer.focus_new
+  playerDump.superGauge = cplayer:getSuperGauge()
+  playerDump.comboCount = cplayer.combo_cnt
+  playerDump.charID = cplayer.pl_type
   local engine = cplayer.mpActParam.ActionPart._Engine
   playerDump.actionID = engine:get_ActionID()
   playerDump.actionFrame = tonumber(engine:get_ActionFrame():call("ToString()"))
@@ -1001,134 +1033,3 @@ end
 --   end
 -- end
 -- )
-
--- those two don't work
--- function testReplay()
---   logToFile( "test replay" )
---   local newBattleReplayData = sdk.create_instance("app.BattleReplayData")
---   newBattleReplayData:add_ref()
-
---   loadReplay("replay_1700631593.json", newBattleReplayData)
-
---   local battleReplayDataManager = sdk.get_managed_singleton("app.BattleReplayDataManager")
---   battleReplayDataManager:call("AddReplayData(app.BattleReplayData, System.String, app.network.api.HatoClientAPI.Component.CommonReplayInfo)",  newBattleReplayData, nil, nil )
-
---   --testingReplay = false
--- end
-
--- function launchReplay()
-
---   local battleReplayDataManager = sdk.get_managed_singleton("app.BattleReplayDataManager")
---   battleReplayDataManager:call("RequestReplayFlow(System.Boolean)", true)
---   battleReplayDataManager:call("RequestReplayFlow(System.Boolean)", false)
--- end
-
--- local disable_setProfileHook = false
--- local SetProfile_profileName = nil;
--- local SetProfile_profile = nil;
--- local SetProfile_side = nil;
-
--- sdk.hook(sdk.find_type_definition("app.UIBattleHud_ProfileName"):get_method("SetProfile"),
--- function(args)
---   if disable_setProfileHook == false then
---     SetProfile_profileName = sdk.to_managed_object(args[2])
---     SetProfile_profile = sdk.to_managed_object(args[3])
---     SetProfile_side = sdk.to_int64(args[4])
-
---     callMeNextFrame = setProfile_callback
---   end
-
---   logToFile( "SetProfile " .. tostring(SetProfile_profile) .. " " .. tostring(SetProfile_side) .. " hooking " .. tostring(not disable_setProfileHook) )
--- end,
--- function(retval)
--- end)
-
--- -- don't work either
--- function setProfile_callback()
---   if SetProfile_profileName ~= nil then
---     local newProfileArg = sdk.create_instance("app.battle.FighterProfileDesc")
---     newProfileArg:add_ref()
---     newProfileArg:set_field("FighterName", "test")
---     newProfileArg:set_field("ShortId", 123)
---     newProfileArg:set_field("AccountId", "test")
---     newProfileArg:set_field("PlatformId", 5)
-    
-
---     SetProfile_profileName:call("SetProfile(app.battle.FighterProfileDesc, System.Int32)", newProfileArg, 0)
---     SetProfile_profileName:call("ActivateBattleHud()")
---     SetProfile_profileName:call("ActivateHud()")
---     SetProfile_profileName:call("Enable_Show()")
---     SetProfile_profileName:call("RequestShow()")
---     SetProfile_profileName:call("SetTopInvisibleFlag(System.Boolean)", false)
---     SetProfile_profileName:call("UpdateTopDisp()")
---     SetProfile_profileName:call("EnableUpdate()")
---     SetProfile_profileName:call("ForceDispProfileData()")
---     SetProfile_profileName:call("RequestSetManualHide(System.Boolean)", false)
---       local manager = SetProfile_profileName:call("get_Manager()")
---     manager:call("SetAllManualInvisible(System.Boolean)", false)
---     -- UpdateVisibleFighterParts(app.FighterStatusPartsData)
-
---     local profilePanel = SetProfile_profileName:get_field("mProfilePanel")
---     for i, element in ipairs(profilePanel:get_elements()) do
---       element:call("SetProfile(app.battle.FighterProfileDesc, System.Int32)", newProfileArg, 0)
---       local textName = element:get_field("mTextName")
---       if textName ~= nil then
---         textName:call("set_Message(System.String)", "test")
---         textName:call("set_Visible(System.Boolean)", true)
---       end
---     end
---     SetProfile_profileName:call("ActivateBattleHud()")
-
---     SetProfile_profileName = nil
---   end
---   callMeNextFrame = nil
--- end
-
--- sdk.hook(sdk.find_type_definition("app.UIBattleHud_PlayerName"):get_method("ActivateBattleHud"),
--- function (args)
---   local playerName = sdk.to_managed_object(args[2])
---   local textName = playerName:get_field("mTextName")
---   for i, element in ipairs(textName:get_elements()) do
---     element:call("set_Message(System.String)", "test")
---     element:call("set_Visible(System.Boolean)", true)
---   end
---   playerName:call("Enable_Show()")
---   playerName:call("RequestShow()")
---   playerName:call("SetTopInvisibleFlag(System.Boolean)", false)
---   playerName:call("UpdateTopDisp()")
---   playerName:call("EnableUpdate()")
---   playerName:call("ForceDispProfileData()")
---   playerName:call("RequestSetManualHide(System.Boolean)", false)
---   --textName:call("set_Message(System.String)", "test")
---   --this:set_field("mTextName", "test")
--- end,
--- function (retval)
--- end)
-
--- sdk.hook(sdk.find_type_definition("app.UIBattleHud_AccountInfo"):get_method("ActivateBattleHud"),
--- function (args)
---   local accountInfo = sdk.to_managed_object(args[2])
---   accountInfo:call("Enable_Show()")
---   accountInfo:call("RequestShow()")
---   accountInfo:call("SetTopInvisibleFlag(System.Boolean)", false)
---   accountInfo:call("UpdateTopDisp()")
---   accountInfo:call("EnableUpdate()")
---   accountInfo:call("ForceDispProfileData()")
---   accountInfo:call("RequestSetManualHide(System.Boolean)", false)
---   local accountInfoParts = accountInfo:get_field("mAccountInfoParts")
---   for i, element in ipairs(accountInfoParts:get_elements()) do
---     element:call("SetVisibleLP(System.Boolean)", true)
---     element:get_field("mValueLP"):call("set_Message(System.String)", "test")
---     element:call("SetVisibleAll(System.Boolean)", true)
---     element:call("SetVisibleName(System.Boolean)", true)
---     element:call("SetVisible(System.Boolean)", true)
---     element:call("Update()")
---   end
---   accountInfo:call("Enable_Show()")
---   accountInfo:call("RequestShow()")
---   accountInfo:call("SetTopInvisibleFlag(System.Boolean)", false)
---   accountInfo:call("UpdateTopDisp()")
---   accountInfo:call("EnableUpdate()")
--- end,
--- function (retval)
--- end)
