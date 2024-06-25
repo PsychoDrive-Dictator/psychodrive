@@ -3,6 +3,7 @@
 #include <string>
 #include <deque>
 #include "json.hpp"
+#include "fixed.hpp"
 
 enum hitentryflags {
     crouch = 1,
@@ -15,10 +16,10 @@ enum hitentryflags {
 };
 
 struct Box {
-    float x;
-    float y;
-    float w;
-    float h;
+    Fixed x;
+    Fixed y;
+    Fixed w;
+    Fixed h;
 };
 
 enum hitBoxType {

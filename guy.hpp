@@ -7,6 +7,7 @@
 #include "main.hpp"
 #include "render.hpp"
 #include "input.hpp"
+#include "fixed.hpp"
 
 class Guy {
 public:
@@ -39,17 +40,17 @@ public:
     Guy *getOpponent() { return pOpponent; }
     Guy *getParent() { return pParent; }
     std::vector<Guy*> &getMinions() { return minions; }
-    float getPosX() {
+    Fixed getPosX() {
         return posX + (posOffsetX*direction);
     }
-    float getPosY() {
+    Fixed getPosY() {
         return posY + posOffsetY;
     }
-    int getDirection() { return direction; }
-    void switchDirection() { direction *= -1; }
+    int getDirection() { return direction.i(); }
+    void switchDirection() { direction = direction * Fixed(-1); }
 
-    float getStartPosX() { return startPosX; }
-    void setStartPosX( float newPosX ) { startPosX = newPosX; }
+    Fixed getStartPosX() { return startPosX; }
+    void setStartPosX( Fixed newPosX ) { startPosX = newPosX; }
 
     void resetPos() {
         posX = startPosX;
@@ -67,7 +68,7 @@ public:
         accelX = 0.0f;
         accelY = 0.0f;
     }
-    void setPos( float x, float y) {
+    void setPos( Fixed x, Fixed y) {
         posX = x;
         posY = y;
     }
@@ -122,15 +123,15 @@ public:
     std::string getActionName() { return actionName; }
     bool getCrouchingDebug() { return crouching; }
     bool getAirborneDebug() { return airborne; }
-    float getHitVelX() { return hitVelX; }
-    float getHitAccelX() { return hitAccelX; }
-    void getPosDebug( float &outPosX, float &outPosY, float &outPosOffsetX, float &outPosOffsetY) {
+    Fixed getHitVelX() { return hitVelX; }
+    Fixed getHitAccelX() { return hitAccelX; }
+    void getPosDebug( Fixed &outPosX, Fixed &outPosY, Fixed &outPosOffsetX, Fixed &outPosOffsetY) {
         outPosX = posX;
         outPosY = posY;
         outPosOffsetX = posOffsetX;
         outPosOffsetY = posOffsetY;
     }
-    void getVel( float &outVelX, float &outVelY, float &outAccelX, float &outAccelY) {
+    void getVel( Fixed &outVelX, Fixed &outVelY, Fixed &outAccelX, Fixed &outAccelY) {
         outVelX = velocityX * direction;
         outVelY = velocityY;
         outAccelX = accelX * direction;
@@ -153,7 +154,7 @@ public:
         }
     }
 
-    Guy(std::string charName, int charVersion, float x, float y, int startDir, color color)
+    Guy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
     {
         const std::string charPath = "data/chars/" + charName + "/";
         const std::string commonPath = "data/chars/common/";
@@ -191,7 +192,7 @@ public:
         health = maxHealth = 10000; // todo pull that, need to make one of the dumps contain vital_max
     }
 
-    Guy(Guy &parent, float posOffsetX, float posOffsetY, int startAction, int styleID)
+    Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID)
     {
         character = parent.character;
         version = parent.version;
@@ -262,7 +263,7 @@ private:
     int lastLogFrame = 0;
     std::deque<std::string> logQueue;
 
-    bool GetRect(Box &outBox, int rectsPage, int boxID,  float offsetX, float offsetY, int dir);
+    bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
     const char* FindMove(int actionID, int styleID, nlohmann::json &moveJson);
     void BuildMoveList();
     std::vector<char *> vecMoveList;
@@ -298,12 +299,12 @@ private:
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
 
-    float posX = 0.0f;
-    float posY = 0.0f;
-    int direction = 1;
+    Fixed posX;
+    Fixed posY;
+    Fixed direction = Fixed(1);
 
-    float startPosX = 0.0f;
-    float startPosY = 0.0f;
+    Fixed startPosX;
+    Fixed startPosY;
 
     bool airborne = false;
     bool landed = false;
@@ -327,20 +328,20 @@ private:
 
     bool offsetDoesNotPush = false;
     bool noVelNextFrame = false;
-    float posOffsetX = 0.0f;
-    float posOffsetY = 0.0f;
-    float velocityX = 0.0f;
-    float velocityY = 0.0f;
-    float accelX = 0.0f;
-    float accelY = 0.0f;
+    Fixed posOffsetX;
+    Fixed posOffsetY;
+    Fixed velocityX;
+    Fixed velocityY;
+    Fixed accelX;
+    Fixed accelY;
 
-    float cancelVelocityX = 0.0f;
-    float cancelVelocityY = 0.0f;
-    float cancelAccelX = 0.0f;
-    float cancelAccelY = 0.0f;
+    Fixed cancelVelocityX;
+    Fixed cancelVelocityY;
+    Fixed cancelAccelX;
+    Fixed cancelAccelY;
 
-    float homeTargetX = 0.0;
-    float homeTargetY = 0.0;
+    Fixed homeTargetX;
+    Fixed homeTargetY;
 
     int maxHealth;
     int health;
@@ -393,9 +394,9 @@ private:
     int hitStun = 0;
     bool resetHitStunOnLand = false;
     bool resetHitStunOnTransition = false;
-    float hitVelX = 0.0f;
-    float hitAccelX = 0.0f;
-    float pushBackThisFrame = 0.0f;
+    Fixed hitVelX;
+    Fixed hitAccelX;
+    Fixed pushBackThisFrame;
     bool noCounterPush = false;
     bool beenHitThisFrame = false;
     int comboHits = 0;
@@ -405,16 +406,16 @@ private:
     bool isDown = false;
     int knockDownFrames = 0;
     bool groundBounce = false;
-    float groundBounceVelX = 0.0f;
-    float groundBounceVelY = 0.0f;
-    float groundBounceAccelX = 0.0f;
-    float groundBounceAccelY = 0.0f;
+    Fixed groundBounceVelX;
+    Fixed groundBounceVelY;
+    Fixed groundBounceAccelX;
+    Fixed groundBounceAccelY;
     bool wallBounce = false;
     bool wallSplat = false;
-    float wallBounceVelX = 0.0f;
-    float wallBounceVelY = 0.0f;
-    float wallBounceAccelX = 0.0f;
-    float wallBounceAccelY = 0.0f;
+    Fixed wallBounceVelX;
+    Fixed wallBounceVelY;
+    Fixed wallBounceAccelX;
+    Fixed wallBounceAccelY;
     bool wallStopped = false;
     int wallStopFrames = 0;
     int currentArmorID = -1;

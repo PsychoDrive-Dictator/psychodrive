@@ -54,7 +54,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         pGuy->setOpponent(mapDropDownIDToGuyPtr[newOpponentID]);
     }
 
-    float startPosX = pGuy->getStartPosX();
+    float startPosX = pGuy->getStartPosX().f();
     float newStartPosX = startPosX;
     ImGui::SetNextItemWidth( 250.0 );
     ImGui::SliderFloat("##startpos", &newStartPosX, -765.0, 765.0);
@@ -65,7 +65,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::InputText("##startpostext", startPosTest, sizeof(startPosTest));
     newStartPosX = atof(startPosTest);
     if (newStartPosX != startPosX) {
-        pGuy->setStartPosX(newStartPosX);
+        pGuy->setStartPosX(Fixed(newStartPosX));
     }
     ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName().c_str());
     if (!pGuy->getProjectile()) {
@@ -78,22 +78,24 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         ImGui::Combo("recovery action", pGuy->getNeutralMovePtr(), vecMoveList.data(), vecMoveList.size());
     }
     ImGui::Text("crouching %i airborne %i poseStatus %i landingAdjust %i", pGuy->getCrouchingDebug(), pGuy->getAirborneDebug(), pGuy->getforcedPoseStatus(), pGuy->getLandingAdjust());
-    float posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
+    Fixed posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
     pGuy->getVel(velX, velY, accelX, accelY);
-    ImGui::Text("pos %.2f %.2f %.2f direction %i posOffset %.2f %.2f", posX, posY, pGuy->getPosX(), pGuy->getDirection(), posOffsetX, posOffsetY);
-    ImGui::Text("vel %.2f %.2f %.2f accel %.2f %.2f", velX, velY, pGuy->getHitVelX(), accelX, accelY);
-    ImGui::SameLine();
-    if ( !pGuy->getOpponent() && ImGui::Button("switch direction") ) { pGuy->switchDirection(); }
+    ImGui::Text("pos %.2f %.2f %.2f direction %i posOffset %.2f %.2f", posX.f(), posY.f(), pGuy->getPosX().f(), pGuy->getDirection(), posOffsetX.f(), posOffsetY.f());
+    ImGui::Text("vel %f %f %f accel %f %f %f", velX.f(), velY.f(), pGuy->getHitVelX().f(), accelX.f(), accelY.f(), pGuy->getHitAccelX().f());
+    if ( !pGuy->getOpponent() ) {
+        ImGui::SameLine();
+        if ( ImGui::Button("switch direction") ) { pGuy->switchDirection(); }
+    }
     std::vector<HitBox> *hitBoxes = pGuy->getHitBoxes();
-    float maxXHitBox = 0.0f;
+    Fixed maxXHitBox = 0.0f;
     for (auto hitbox : *hitBoxes) {
-        float hitBoxX = hitbox.box.x + hitbox.box.w;
+        Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
         if (hitBoxX > maxXHitBox) {
             maxXHitBox = hitBoxX;
         }
     }
-    ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hit extent %.2f hurt %" PRIi64 , pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox, pGuy->getHurtBoxes()->size());
+    ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hit extent %.2f hurt %" PRIi64 , pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox.f(), pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i warudo %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getWarudo() );
     } else {
@@ -292,7 +294,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
-        Guy *pNewGuy = new Guy(charNames[charID], atoi(charVersions[versionID]), newCharPos, 0.0, 1, col );
+        Guy *pNewGuy = new Guy(charNames[charID], atoi(charVersions[versionID]), Fixed(newCharPos), Fixed(0.0f), 1, col );
         if (guys.size()) {
             pNewGuy->setOpponent(guys[0]);
             if (guys.size() == 1) {

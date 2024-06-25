@@ -205,9 +205,9 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( box.x-driveOffset, box.y-driveOffset, box.w+driveOffset*2, box.h+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,1.0);
+        drawBox( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,1.0);
     }
-    drawBox( box.x, box.y, box.w, box.h,thickness,col.r,col.g,col.b,1.0);
+    drawBox( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,1.0);
 }
 
 float zoom = 500.0;
@@ -264,8 +264,8 @@ void renderMarkersAndStuff(void)
     glUniform1i(loc_isgrid, 2);
     for (uint32_t i = 0; i < vecMarkers.size(); i++)
     {
-        float hitMarkPosX = vecMarkers[i].pOrigin->getPosX() + vecMarkers[i].x;
-        float hitMarkPosY = vecMarkers[i].pOrigin->getPosY() + vecMarkers[i].y;
+        float hitMarkPosX = vecMarkers[i].pOrigin->getPosX().f() + vecMarkers[i].x;
+        float hitMarkPosY = vecMarkers[i].pOrigin->getPosY().f() + vecMarkers[i].y;
         int progress = vecMarkers[i].radius + vecMarkers[i].time + 4;
         color col = {0.9, 0.4, 0.3};
         float alpha = 0.9;
