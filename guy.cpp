@@ -13,11 +13,11 @@
 #include "render.hpp"
 #include <string>
 
-void parseRootOffset( nlohmann::json& keyJson, float&offsetX, float& offsetY)
+void parseRootOffset( nlohmann::json& keyJson, Fixed&offsetX, Fixed& offsetY)
 {
     if ( keyJson.contains("RootOffset") && keyJson["RootOffset"].contains("X") && keyJson["RootOffset"].contains("Y") ) {
-        offsetX = keyJson["RootOffset"]["X"].get<int>();
-        offsetY = keyJson["RootOffset"]["Y"].get<int>();
+        offsetX = Fixed(keyJson["RootOffset"]["X"].get<int>());
+        offsetY = Fixed(keyJson["RootOffset"]["Y"].get<int>());
     }
 }
 
@@ -74,21 +74,21 @@ static inline float fixedToFloat(int fixed)
     return decimalPart + integerPart;
 }
 
-static inline void doSteerKeyOperation(float &value, float keyValue, int operationType)
+static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
 {
     switch (operationType) {
         case 1: // set
         value = keyValue;
         break;
         case 2: // add ?
-        value += keyValue;
+        value = value + keyValue;
         break;
         default:
         log("Uknown steer keyoperation!");
     }
 }
 
-bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, float offsetX, float offsetY, int dir)
+bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed offsetY, int dir)
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
@@ -106,10 +106,10 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, float offsetX, float of
     int yRadius = rectJson["SizeY"];
     xOrig *= dir;
 
-    outBox.x = xOrig - xRadius + offsetX;
-    outBox.y = yOrig - yRadius + offsetY;
-    outBox.w = xRadius * 2;
-    outBox.h = yRadius * 2;
+    outBox.x = Fixed(xOrig - xRadius) + offsetX;
+    outBox.y = Fixed(yOrig - yRadius) + offsetY;
+    outBox.w = Fixed(xRadius * 2);
+    outBox.h = Fixed(yRadius * 2);
 
     return true;
 }
@@ -284,7 +284,7 @@ bool Guy::PreFrame(void)
             noPush = false; // might be overridden below
         }
 
-        float prevPosY = getPosY();
+        Fixed prevPosY = getPosY();
 
         if (actionJson.contains("PlaceKey"))
         {
@@ -302,9 +302,9 @@ bool Guy::PreFrame(void)
                     // todo implement ratio here? check on cammy spiralarrow ex as an example
                     if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
                         if (placeKey["Axis"] == 0) {
-                            posOffsetX = offset.get<float>();
+                            posOffsetX = Fixed(offset.get<double>());
                         } else if (placeKey["Axis"] == 1) {
-                            posOffsetY = offset.get<float>();
+                            posOffsetY = Fixed(offset.get<double>());
                         }
                         // do we need to disambiguate which axis doesn't push? that'd be annoying
                         // is vertical pushback even a thing
@@ -316,7 +316,7 @@ bool Guy::PreFrame(void)
             }
         }
 
-        float prevVelX = velocityX;
+        Fixed prevVelX = velocityX;
 
         if (actionJson.contains("SteerKey"))
         {
@@ -328,9 +328,9 @@ bool Guy::PreFrame(void)
 
                 int operationType = steerKey["OperationType"];
                 int valueType = steerKey["ValueType"];
-                float fixValue = steerKey["FixValue"];
-                float targetOffsetX = steerKey["FixTargetOffsetX"];
-                float targetOffsetY = steerKey["FixTargetOffsetY"];
+                Fixed fixValue = Fixed(steerKey["FixValue"].get<double>());
+                Fixed targetOffsetX = Fixed(steerKey["FixTargetOffsetX"].get<double>());
+                Fixed targetOffsetY = Fixed(steerKey["FixTargetOffsetY"].get<double>());
                 int shotCategory = steerKey["_ShotCategory"];
                 int targetType = steerKey["TarType"];
                 int calcValueFrame = steerKey["CalcValueFrame"];
@@ -408,7 +408,7 @@ bool Guy::PreFrame(void)
                         } else if (targetType == 4) {
                             // to opponent
                             if (pOpponent) {
-                                homeTargetX = pOpponent->getPosX() + targetOffsetX * -pOpponent->direction;
+                                homeTargetX = pOpponent->getPosX() + targetOffsetX * pOpponent->direction * Fixed(-1);
                                 homeTargetY = pOpponent->getPosY() + targetOffsetY;
                             }
                         } else {
@@ -417,7 +417,7 @@ bool Guy::PreFrame(void)
                         break;
                     case 15:
                         // teleport/lerp position?
-                        if (fixValue == 0.0 && calcValueFrame == 1) {
+                        if (fixValue == Fixed(0) && calcValueFrame == 1) {
                             if (multiValueType & 1) {
                                 posX = homeTargetX;
                             }
@@ -446,7 +446,7 @@ bool Guy::PreFrame(void)
 
                 int operationType = steerKey["OperationType"];
                 int valueType = steerKey["ValueType"];
-                float fixValue = steerKey["FixValue"];
+                Fixed fixValue = Fixed(steerKey["FixValue"].get<double>());
 
                 switch (valueType) {
                     case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
@@ -457,19 +457,19 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if ( (velocityX * prevVelX) < 0.0f || (accelX != 0.0f && velocityX == 0.0f) ) {
+        if ( (velocityX * prevVelX) < Fixed(0) || (accelX != Fixed(0) && velocityX == Fixed(0)) ) {
             // sign change?
-            velocityX = 0.0f;
-            accelX = 0.0f;
+            velocityX = 0;
+            accelX = 0;
         }
 
         prevVelX = velocityX;
-        float prevVelY = velocityY;
+        Fixed prevVelY = velocityY;
 
-        velocityX += accelX;
-        velocityY += accelY;
+        velocityX = velocityX + accelX;
+        velocityY = velocityY + accelY;
 
-        if ((velocityY * prevVelY) < 0.0f || (accelY != 0.0f && velocityY == 0.0f)) {
+        if ((velocityY * prevVelY) < Fixed(0) || (accelY != Fixed(0) && velocityY == Fixed(0))) {
             startsFalling = true;
         } else {
             startsFalling = false;
@@ -477,35 +477,35 @@ bool Guy::PreFrame(void)
 
         // log(std::to_string(currentAction) + " " + std::to_string(prevVelX) + " " + std::to_string(velocityX));
 
-        if ( (velocityX * prevVelX) < 0.0f || (accelX != 0.0f && velocityX == 0.0f) ) {
+        if ( (velocityX * prevVelX) < Fixed(0) || (accelX != Fixed(0) && velocityX == Fixed(0)) ) {
             // sign change?
-            velocityX = 0.0f;
-            accelX = 0.0f;
+            velocityX = Fixed(0);
+            accelX = Fixed(0);
         }
 
         if (!noVelNextFrame) {
-            posX += (velocityX * direction);
-            posY += velocityY;
+            posX = posX + (velocityX * direction);
+            posY = posY + velocityY;
         } else {
             noVelNextFrame = false;
         }
 
-        if (hitVelX != 0.0f) {
-            float prevHitVelX = hitVelX;
-            hitVelX += hitAccelX;
-            if ((hitVelX * prevHitVelX) < 0.0f || (hitAccelX != 0.0f && hitVelX == 0.0f)) {
-                hitAccelX = 0.0f;
-                hitVelX = 0.0f;
-            }
-
-            posX += hitVelX;
+        if (hitVelX != Fixed(0)) {
+            posX = posX + hitVelX;
             pushBackThisFrame = hitVelX;
+
+            Fixed prevHitVelX = hitVelX;
+            hitVelX = hitVelX + hitAccelX;
+            if ((hitVelX * prevHitVelX) < Fixed(0) || (hitAccelX != Fixed(0)&& hitVelX == Fixed(0))) {
+                hitAccelX = Fixed(0);
+                hitVelX = Fixed(0);
+            }
         }
 
-        if (prevPosY == 0.0f && getPosY() > 0.0f) {
+        if (prevPosY == Fixed(0) && getPosY() > Fixed(0)) {
             airborne = true; // i think we should go by statusKey instead?
         }
-        if (prevPosY > 0.0f && getPosY() - landingAdjust == 0.0f) {
+        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0)) {
             airborne = false;
             landed = true;
         }
@@ -593,16 +593,18 @@ bool Guy::PreFrame(void)
                 {
                     case 0:
                         {
-                            float posOffset = param1;
-                            float steerForward = fixedToFloat(param2);
-                            float steerBackward = fixedToFloat(param3);
+                            Fixed posOffset = Fixed((int)param1);
+                            Fixed steerForward;
+                            steerForward.data = param2;
+                            Fixed steerBackward;
+                            steerBackward.data = param3;
 
-                            if (posOffset) {
+                            if (posOffset != Fixed(0)) {
                                 bool selfOffset = key["_IsOWNER_SELF_OFFSET"];
                                 bool opponentOffset = key["_IsOWNER_RIVAL_OFFSET"];
 
                                 if (selfOffset) {
-                                    posX += posOffset * direction;
+                                    posX = posX + posOffset * direction;
                                 } else if (opponentOffset) {
                                     if (pOpponent) {
                                         posX = pOpponent->getPosX() + posOffset * direction;
@@ -613,10 +615,10 @@ bool Guy::PreFrame(void)
                             }
 
                             if (currentInput & FORWARD) {
-                                posX += steerForward;
+                                posX = posX + steerForward;
                                 //log(true, "steerForward " + std::to_string(steerForward));
                             } else if (currentInput & BACK) {
-                                posX += steerBackward;
+                                posX = posX + steerBackward;
                                 //log(true, "steerBackward " + std::to_string(steerBackward));
                             }
                         }
@@ -728,8 +730,8 @@ bool Guy::PreFrame(void)
                     continue;
                 }
 
-                float posOffsetX = key["PosOffset"]["x"].get<float>() * direction;
-                float posOffsetY = key["PosOffset"]["y"];
+                Fixed posOffsetX = Fixed(key["PosOffset"]["x"].get<double>()) * direction;
+                Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
 
                 // spawn new guy
                 Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>());
@@ -1184,11 +1186,11 @@ void Guy::UpdateBoxes(void)
             int immune = hurtBox["Immune"];
             int typeFlags = hurtBox["TypeFlag"];
 
-            float rootOffsetX = 0;
-            float rootOffsetY = 0;
+            Fixed rootOffsetX = Fixed(0);
+            Fixed rootOffsetY = Fixed(0);
             parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-            rootOffsetY += posY + posOffsetY;
+            rootOffsetY = rootOffsetY + posY + posOffsetY;
 
 
             Box rect;
@@ -1217,7 +1219,7 @@ void Guy::UpdateBoxes(void)
                 baseBox.flags |= ground_strike_invul;
             }
             for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= head;
@@ -1225,7 +1227,7 @@ void Guy::UpdateBoxes(void)
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= body;
@@ -1233,7 +1235,7 @@ void Guy::UpdateBoxes(void)
                 }
             }
             for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= legs;
@@ -1242,7 +1244,7 @@ void Guy::UpdateBoxes(void)
             }
 
             for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                if (GetRect(rect, 7, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if (GetRect(rect, 7, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     throwBoxes.push_back(rect);
                     renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
                 }
@@ -1269,15 +1271,15 @@ void Guy::UpdateBoxes(void)
             if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
                 continue;
             }
-            float rootOffsetX = 0;
-            float rootOffsetY = 0;
+            Fixed rootOffsetX = Fixed(0);
+            Fixed rootOffsetY = Fixed(0);
             parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-            rootOffsetY += posY + posOffsetY;
+            rootOffsetY = rootOffsetY + posY + posOffsetY;
 
             Box rect;
 
-            if (GetRect(rect, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction)) {
+            if (GetRect(rect, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction.i())) {
                 pushBoxes.push_back(rect);
                 renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});            
             }
@@ -1289,8 +1291,10 @@ void Guy::UpdateBoxes(void)
 }
 
 void Guy::Render(void) {
-    float x = posX + (posOffsetX * direction);
-    float y = posY + posOffsetY;
+    Fixed fixedX = posX + (posOffsetX * direction);
+    Fixed fixedY = posY + posOffsetY;
+    float x = fixedX.f();
+    float y = fixedY.f();
 
     for (auto box : renderBoxes) {
         drawHitBox(box.box,box.thickness,box.col,box.drive,box.parry,box.di);
@@ -1311,8 +1315,8 @@ bool Guy::Push(Guy *pOtherGuy)
 
     bool hasPushed = false;
     touchedOpponent = false;
-    float pushXLeft = 0;
-    float pushXRight = 0;
+    Fixed pushXLeft = 0;
+    Fixed pushXRight = 0;
     for (auto pushbox : pushBoxes ) {
 
         if (noPush) break;
@@ -1320,22 +1324,22 @@ bool Guy::Push(Guy *pOtherGuy)
         for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
-                pushXLeft = fmaxf(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
-                pushXRight = fminf(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
+                pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
+                pushXRight = fixMin(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
                 hasPushed = true;
             }
         }
     }
 
     if ( hasPushed ) {
-        pushXLeft = fmaxf(0.0, pushXLeft);
-        pushXRight = fminf(0.0, pushXRight);
-        float pushNeeded = -pushXRight;
-        if (fabsf(pushXLeft) < fabsf(pushXRight)) {
+        pushXLeft = fixMax(Fixed(0), pushXLeft);
+        pushXRight = fixMin(Fixed(0), pushXRight);
+        Fixed pushNeeded = -pushXRight;
+        if (fixAbs(pushXLeft) < fixAbs(pushXRight)) {
             pushNeeded = -pushXLeft;
         }
-        float velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
-        log(logTransitions, "push needed " + std::to_string(pushNeeded) + " vel diff " + std::to_string(velDiff) + " offset no push " + std::to_string(offsetDoesNotPush));
+        Fixed velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
+        log(logTransitions, "push needed " + std::to_string(pushNeeded.f()) + " vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string(offsetDoesNotPush));
         // if (velDiff * pushNeeded < 0.0) {
         //     // if velDiff different sign, we can deduct it
         //     if (fabsf(velDiff) > fabsf(pushNeeded)) {
@@ -1352,7 +1356,7 @@ bool Guy::Push(Guy *pOtherGuy)
         // log(logTransitions, "push still needed " + std::to_string(pushNeeded));
 
 
-        if (pushNeeded) {
+        if (pushNeeded != Fixed(0)) {
 
             // we only handle this one direction for now - let the other push witht hat logic
             // if both have it, we currently do order-dependent handling, need to check what
@@ -1362,27 +1366,27 @@ bool Guy::Push(Guy *pOtherGuy)
             }
 
             // does no-push-offset go against push? (different sign)
-            if (offsetDoesNotPush && posOffsetX * pushNeeded < 0.0) {
-                float absOffset = fabsf(posOffsetX);
-                float absPushNeeded = fabsf(pushNeeded);
+            if (offsetDoesNotPush && posOffsetX * pushNeeded < Fixed(0)) {
+                 Fixed absOffset = fixAbs(posOffsetX);
+                Fixed absPushNeeded = fixAbs(pushNeeded);
 
-                if (absPushNeeded >= absOffset) {
-                    posOffsetX = 0.0f;
+                if (absPushNeeded > absOffset) {
+                    posOffsetX = Fixed(0);
                     absPushNeeded -= absOffset;
                     // restore sign
-                    pushNeeded = absPushNeeded * (pushNeeded / fabsf(pushNeeded));
+                    pushNeeded = absPushNeeded * (pushNeeded / fixAbs(pushNeeded));
                 } else {
-                    pushNeeded = 0.0f;
+                    pushNeeded = Fixed(0);
                     absOffset -= absPushNeeded;
                     // restore sign
-                    posOffsetX = absOffset * (posOffsetX / fabsf(posOffsetX));
+                    posOffsetX = absOffset * (posOffsetX / fixAbs(posOffsetX));
                 }
                 posX += pushNeeded;
             }
 
             // do regular push with any remaining pushNeeded
-            posX += pushNeeded / 2.0;
-            pOtherGuy->posX += -pushNeeded / 2.0;
+            posX = posX + (pushNeeded / Fixed(2));
+            pOtherGuy->posX = pOtherGuy->posX + (pushNeeded / Fixed(-2));
         }
 
         touchedOpponent = true; // could be touching anyone really but can fix later
@@ -1398,18 +1402,18 @@ bool Guy::Push(Guy *pOtherGuy)
 bool Guy::WorldPhysics(void)
 {
     bool hasPushed = false;
-    float pushX = 0;
-    float pushY = 0;
+    Fixed pushX = 0;
+    Fixed pushY = 0;
     bool floorpush = false;
     touchedWall = false;
 
-    const float wallDistance = 765.0;
-    const float maxPlayerDistance = 490.0;
+    const Fixed wallDistance = Fixed(765.0f);
+    const Fixed maxPlayerDistance = Fixed(490.0f);
 
     if (!noPush) {
         // Floor
 
-        if (posY - landingAdjust < 0) {
+        if (posY - Fixed(landingAdjust) < 0) {
             //log("floorpush pos");
             pushY = -posY;
             floorpush = true;
@@ -1418,7 +1422,7 @@ bool Guy::WorldPhysics(void)
 
         // Walls
 
-        float x = getPosX();
+        Fixed x = getPosX();
         if (x < -wallDistance ) {
             pushX = -(x - -wallDistance);
             touchedWall = true;
@@ -1430,16 +1434,16 @@ bool Guy::WorldPhysics(void)
             hasPushed = true;
         }
 
-        if (pOpponent && velocityX) {
-            float opX = pOpponent->getPosX();
-            if (fabsf(opX - x) > maxPlayerDistance) {
-                int directionToOpponent = (int)(opX - x) / abs((int)(opX - x));
+        if (pOpponent && velocityX != Fixed(0)) {
+            Fixed opX = pOpponent->getPosX();
+            if (fixAbs(opX - x) > maxPlayerDistance) {
+                Fixed directionToOpponent = (opX - x) / fixAbs(opX - x);
                 // if moving away from opponent, obey virtual wall
                 if (directionToOpponent == direction) {
                     touchedWall = true;
                     hasPushed = true;
 
-                    pushX = (fabsf(opX - x) - maxPlayerDistance) * direction;
+                    pushX = (fixAbs(opX - x) - maxPlayerDistance) * direction;
                 }
             }
         }
@@ -1450,11 +1454,11 @@ bool Guy::WorldPhysics(void)
     bool forceLanding = airborne && prevPoseStatus == 3 && forcedPoseStatus > 0 && forcedPoseStatus < 3;
     if (forceLanding || (airborne && floorpush && velocityY < 0))
     {
-        pushY = 0.0f;
-        velocityX = 0.0f;
-        velocityY = 0.0f;
-        accelX = 0.0f;
-        accelY = 0.0f;
+        pushY = Fixed(0);
+        velocityX = Fixed(0);
+        velocityY = Fixed(0);
+        accelX = Fixed(0);
+        accelY = Fixed(0);
 
         airborne = false;
 
@@ -1484,10 +1488,10 @@ bool Guy::WorldPhysics(void)
         posX += pushX;
         posY += pushY;
 
-        if (pushBackThisFrame != 0.0f && pushX != 0 && pushX * pushBackThisFrame < 0.0f) {
+        if (pushBackThisFrame != Fixed(0) && pushX != Fixed(0) && pushX * pushBackThisFrame < Fixed(0)) {
             // some pushback went into the wall, it needs to go into opponent
             if (pAttacker && !pAttacker->noPush && !noCounterPush) {
-                pAttacker->posX += fmaxf(pushX, pushBackThisFrame * -1.0f);
+                pAttacker->posX += fixMax(pushX, pushBackThisFrame * Fixed(-1));
                 pAttacker->UpdateBoxes();
             }
         }
@@ -1499,8 +1503,8 @@ bool Guy::WorldPhysics(void)
         // don't update hitboxes before setting posY, the current frame
         // or the box will be too high up as we're still on the falling box
         // see heave donky into lp dp
-        posY = 0.0f;
-        posOffsetY = 0.0f;
+        posY = Fixed(0);
+        posOffsetY = Fixed(0);
     }
 
     return hasPushed;
@@ -1665,11 +1669,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     addWarudo(hitStopSelf+1);
                 }
 
-                float hitMarkerOffsetX = hitbox.box.x - pOtherGuy->getPosX();
-                if (direction > 0) {
+                Fixed hitMarkerOffsetX = hitbox.box.x - pOtherGuy->getPosX();
+                if (direction > Fixed(0)) {
                     hitMarkerOffsetX += hitbox.box.w;
                 }
-                float hitMarkerOffsetY = hitbox.box.y+hitbox.box.h/2 - pOtherGuy->posY;
+                Fixed hitMarkerOffsetY = hitbox.box.y+hitbox.box.h/Fixed(2) - pOtherGuy->posY;
                 int hitMarkerType = 1;
                 float hitMarkerRadius = 25.0f;
                 if (hasBeenBlockedThisFrame) {
@@ -1678,7 +1682,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (hitEntryFlag & punish_counter) {
                     hitMarkerRadius = 35.0f;
                 }
-                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
+                addHitMarker({hitMarkerOffsetX.f(),hitMarkerOffsetY.f(),hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
 
                 pOtherGuy->pAttacker = this;
 
@@ -1809,12 +1813,12 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         int floorDestY = hitEffect["FloorDest"]["y"];
 
         groundBounce = true;
-        groundBounceVelX = -floorDestX / (float)floorTime;
-        groundBounceAccelX = floorDestX / 2.0 / (float)floorTime * 2.0 / (float)floorTime;
+        groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
+        groundBounceAccelX = Fixed(floorDestX / 4) / Fixed(floorTime * floorTime);
         groundBounceVelX -= groundBounceAccelX;
 
-        groundBounceVelY = floorDestY * 4.0 / (float)floorTime;
-        groundBounceAccelY = floorDestY * -4.0 / (float)floorTime * 2.0 / (float)floorTime;
+        groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
+        groundBounceAccelY = Fixed(floorDestY * -8) / Fixed(floorTime * floorTime);
         groundBounceVelY -= groundBounceAccelY;
     } else {
         groundBounce = false;
@@ -1833,30 +1837,29 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         wallStopFrames = hitEffect["WallStop"];
 
         wallBounce = true;
-        wallBounceVelX = -wallDestX / (float)wallTime;
+        wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
         //wallBounceAccelX = -direction * wallDestX / 2.0 / (float)wallTime * 2.0 / (float)wallTime;
         //wallBounceVelX -= wallBounceAccelX;
 
-        wallBounceVelY = wallDestY * 4.0 / (float)wallTime;
-        wallBounceAccelY = wallDestY * -4.0 / (float)wallTime * 2.0 / (float)wallTime;
+        wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
+        wallBounceAccelY = Fixed(wallDestY * -8) / Fixed(wallTime * wallTime);
         wallBounceVelY -= wallBounceAccelY;
     }
 
     // assume hit direction is opposite as facing for now, not sure if that's true
     if (!airborne && !jimenBound) {
-        int time = destTime;
-        hitVelX = direction * destX * -2.0 / (float)time;
-        hitAccelX = direction * destX / (float)time * 2.0 / (float)time;
-        hitVelX -= hitAccelX;
+        hitVelX = Fixed(direction.i() * destX * -2) / Fixed(destTime);
+        hitAccelX = Fixed(direction.i() * destX * 2) / Fixed(destTime * destTime);
+        hitAccelX.data += direction.i(); // wtf
     } else {
-        hitVelX = 0.0f;
-        hitAccelX = 0.0f;
-        velocityX = -destX / (float)destTime;
+        hitVelX = Fixed(0);
+        hitAccelX = Fixed(0);
+        velocityX = Fixed(-destX) / Fixed(destTime);
     }
 
     if (destY != 0) {
-        velocityY = destY * 4 / (float)destTime;
-        accelY = destY * -4 / (float)destTime * 2.0 / (float)destTime;
+        velocityY = Fixed(destY * 4) / Fixed(destTime);
+        accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
         // i think this vel wants to apply this frame, lame workaround to get same intensity
         velocityY -= accelY; //
     }
@@ -1889,7 +1892,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
             if ( crouching ) {
                 nextAction = 213;
             }
-            if ((airborne || posY > 0.0) && destY != 0 ) {
+            if ((airborne || posY > Fixed(0)) && destY != 0 ) {
 
                 if (destY > destX) {
                     nextAction = 251; // 90
@@ -1924,8 +1927,8 @@ void Guy::DoHitBoxKey(const char *name)
             bool isOther = strcmp(name, "OtherCollisionKey") == 0;
             //bool isUnique = strcmp(name, "UniqueCollisionKey") == 0;
 
-            float rootOffsetX = 0;
-            float rootOffsetY = 0;
+            Fixed rootOffsetX = 0;
+            Fixed rootOffsetY = 0;
             parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY += posY + posOffsetY;
@@ -1963,7 +1966,7 @@ void Guy::DoHitBoxKey(const char *name)
                     thickness = 5.0;
                 }
 
-                if ((type == domain) || GetRect(rect, rectListID, boxID,rootOffsetX, rootOffsetY,direction)) {
+                if ((type == domain) || GetRect(rect, rectListID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
 
                     int hitEntryID = hitBox["AttackDataListIndex"];
@@ -2116,23 +2119,23 @@ void Guy::DoBranchKey(bool preHit = false)
                         int offsetX = branchParam1 & 0xFFFF;
                         if (offsetX > 0x8000) offsetX = -(0xFFFF - offsetX);
 
-                        offsetX *= -pOpponent->direction;
+                        offsetX *= -pOpponent->direction.i();
 
                         int offsetY = (branchParam1 & 0xFFFF0000) >> 16;
                         if (offsetY > 0x8000) offsetY = -(0xFFFF - offsetY);
 
                         // and?
                         if (branchParam0 == 0 &&
-                            (std::abs(pOpponent->getPosX() - offsetX - getPosX()) < distX &&
-                            std::abs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
+                            (fixAbs(pOpponent->getPosX() - offsetX - getPosX()) < distX &&
+                            fixAbs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
                             doBranch = true;
                         }
 
                         // or? no idea
                         // there's also branchParam3 that's 0 or 1 - they're both called AREA_ALL?
                         if (branchParam0 == 1 &&
-                            (std::abs(pOpponent->getPosX() - offsetX - getPosX()) < distX ||
-                            std::abs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
+                            (fixAbs(pOpponent->getPosX() - offsetX - getPosX()) < distX ||
+                            fixAbs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
                             doBranch = true;
                         }
                     }
@@ -2315,10 +2318,10 @@ bool Guy::Frame(bool endWarudoFrame)
 
     if ((wallBounce || wallSplat) && touchedWall) {
         wallStopped = wallBounce || airborne;
-        velocityX = 0.0;
-        velocityY = 0.0;
-        accelX = 0.0;
-        accelY = 0.0f;
+        velocityX = Fixed(0);
+        velocityY = Fixed(0);
+        accelX = Fixed(0);
+        accelY = Fixed(0);
         if (wallSplat) {
             if (airborne) {
                 nextAction = 285;
@@ -2342,7 +2345,8 @@ bool Guy::Frame(bool endWarudoFrame)
             if (wallSplat) {
                 nextAction = 287;
                 wallSplat = false;
-                accelY = -0.6;
+                // todo ??
+                accelY = Fixed(-0.6f);
             } else {
                 nextAction = 235; // combo/bounce state
 
@@ -2582,10 +2586,10 @@ bool Guy::Frame(bool endWarudoFrame)
 
         if (!keepPlace) {
             // commit current place offset
-            posX += (posOffsetX * direction);
-            posOffsetX = 0.0f;
-            posY += posOffsetY;
-            posOffsetY = 0.0f;
+            posX = posX + (posOffsetX * direction);
+            posOffsetX = Fixed(0);
+            posY = posY + posOffsetY;
+            posOffsetY = Fixed(0);
         }
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
@@ -2598,7 +2602,7 @@ bool Guy::Frame(bool endWarudoFrame)
         nextActionFrame = -1;
 
         if (turnaround) {
-            direction *= -1;
+            direction = direction * Fixed(-1);
         }
 
         UpdateActionData();
@@ -2621,36 +2625,36 @@ bool Guy::Frame(bool endWarudoFrame)
         if (!hitStun || blocking) {
             // should this use airborne status from previous or new action? currently previous
             if (isDrive || getAirborne()) {
-                accelX *= inherit["Accelaleration"]["x"].get<float>();
-                accelY *= inherit["Accelaleration"]["y"].get<float>();
-                velocityX *= inherit["Velocity"]["x"].get<float>();
-                velocityY *= inherit["Velocity"]["y"].get<float>();
+                accelX = accelX * Fixed(inherit["Accelaleration"]["x"].get<double>());
+                accelY = accelY * Fixed(inherit["Accelaleration"]["y"].get<double>());
+                velocityX = velocityX * Fixed(inherit["Velocity"]["x"].get<double>());
+                velocityY = velocityY * Fixed(inherit["Velocity"]["y"].get<double>());
             } else {
-                accelX = 0.0f;
-                accelY = 0.0f;
-                velocityX = 0.0f;
-                velocityY = 0.0f;
+                accelX = Fixed(0);
+                accelY = Fixed(0);
+                velocityX = Fixed(0);
+                velocityY = Fixed(0);
             }
         }
 
         if (didTrigger) {
-            if (cancelAccelX) {
+            if (cancelAccelX != Fixed(0)) {
                 accelX = cancelAccelX;
             }
-            if (cancelAccelY) {
+            if (cancelAccelY != Fixed(0)) {
                 accelY = cancelAccelY;
             }
-            if (cancelVelocityX) {
+            if (cancelVelocityX != Fixed(0)) {
                 velocityX = cancelVelocityX;
             }
-            if (cancelVelocityY) {
+            if (cancelVelocityY != Fixed(0)) {
                 velocityY = cancelVelocityY;
             }
         }
-        cancelAccelX = 0.0;
-        cancelAccelY = 0.0;
-        cancelVelocityX = 0.0;
-        cancelVelocityY = 0.0;
+        cancelAccelX = Fixed(0);
+        cancelAccelY = Fixed(0);
+        cancelVelocityX = Fixed(0);
+        cancelVelocityY = Fixed(0);
 
         if (isDrive == true) {
             isDrive = false;

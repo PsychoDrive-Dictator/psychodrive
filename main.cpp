@@ -81,21 +81,22 @@ int gameStateFrame = 0;
 int firstGameStateFrame = 0;
 int replayErrors = 0;
 
-void compareGameState( float dumpValue, float realValue, bool fatal, std::string description )
+void compareGameStateFixed( Fixed dumpValue, Fixed realValue, bool fatal, std::string description )
 {
-    float valueDiff = realValue - dumpValue;
-    const float epsilon = 0.01;
 
-    if (fabsf(valueDiff) > epsilon)
+    if (dumpValue != realValue)
     {
-        log("replay error: " + description + " dump: " + std::to_string(dumpValue) + " real: " + std::to_string(realValue) + " diff: " + std::to_string(valueDiff));
+        float valueDiff = realValue.f() - dumpValue.f();
+        std::string dumpValueStr = std::to_string(dumpValue.data) + " / " + std::to_string(dumpValue.f());
+        std::string simValueStr = std::to_string(realValue.data) + " / " + std::to_string(realValue.f());
+        log("replay error: " + description + " dump: " + dumpValueStr + " sim: " + simValueStr + " diff: " + std::to_string(valueDiff));
         if (fatal) {
             replayErrors++;
         }
     }
 }
 
-void compareGameState( int dumpValue, int realValue, bool fatal, std::string description )
+void compareGameStateInt( int64_t dumpValue, int64_t realValue, bool fatal, std::string description )
 {
     if (dumpValue != realValue)
     {
@@ -247,12 +248,12 @@ int main(int argc, char**argv)
     if ( argc > 2 ) {
         extractCharVersion( argv[2], charNameRight, versionRight );
     }
-    Guy *pNewGuy = new Guy(charNameLeft, versionLeft, -150.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+    Guy *pNewGuy = new Guy(charNameLeft, versionLeft, Fixed(-150.0f), Fixed(0.0f), 1, {randFloat(), randFloat(), randFloat()} );
     *pNewGuy->getInputIDPtr() = keyboardID;
     *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     guys.push_back(pNewGuy);
 
-    pNewGuy = new Guy(charNameRight, versionRight, 150.0, 0.0, -1, {randFloat(), randFloat(), randFloat()} );
+    pNewGuy = new Guy(charNameRight, versionRight, Fixed(150.0f), Fixed(0.0f), -1, {randFloat(), randFloat(), randFloat()} );
     guys.push_back(pNewGuy);
 
     int curChar = 3;
@@ -260,7 +261,7 @@ int main(int argc, char**argv)
         std::string charName;
         int charVersion = maxVersion;
         extractCharVersion( argv[curChar], charName, charVersion );
-        pNewGuy = new Guy(charName, charVersion, 0.0, 0.0, 1, {randFloat(), randFloat(), randFloat()} );
+        pNewGuy = new Guy(charName, charVersion, Fixed(0), Fixed(0), 1, {randFloat(), randFloat(), randFloat()} );
         guys.push_back(pNewGuy);
         curChar++;
     }
@@ -283,10 +284,10 @@ int main(int argc, char**argv)
             i++;
         }
         if (guys.size() >= 2) {
-            guys[0]->setPos(gameStateDump[i]["players"][0]["posX"], gameStateDump[0]["players"][0]["posY"]);
+            guys[0]->setPos(Fixed(gameStateDump[i]["players"][0]["posX"].get<double>()), Fixed(gameStateDump[0]["players"][0]["posY"].get<float>()));
             *guys[0]->getInputIDPtr() = replayLeft;
             *guys[0]->getInputListIDPtr() = replayLeft;
-            guys[1]->setPos(gameStateDump[i]["players"][1]["posX"], gameStateDump[0]["players"][1]["posY"]);
+            guys[1]->setPos(Fixed(gameStateDump[i]["players"][1]["posX"].get<double>()), Fixed(gameStateDump[0]["players"][1]["posY"].get<float>()));
             *guys[1]->getInputIDPtr() = replayRight;
             *guys[1]->getInputListIDPtr() = replayRight;
 
@@ -392,24 +393,24 @@ int main(int argc, char**argv)
                     int i = 0;
                     while (i < 2) {
                         std::string desc = "player " + std::to_string(i);
-                        compareGameState(players[i]["posX"], guys[i]->getPosX(), true, desc + " pos X");
-                        compareGameState(players[i]["posY"], guys[i]->getPosY(), true, desc + " pos Y");
-                        float velX, velY, accelX, accelY;
+                        compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), true, desc + " pos X");
+                        compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), true, desc + " pos Y");
+                        Fixed velX, velY, accelX, accelY;
                         guys[i]->getVel(velX, velY, accelX, accelY);
-                        compareGameState(players[i]["velX"], velX, true, desc + " vel X");
-                        compareGameState(players[i]["velY"], velY, true, desc + " vel Y");
+                        compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, true, desc + " vel X");
+                        compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, true, desc + " vel Y");
                         if (players[i].contains("accelX")) {
-                            compareGameState(players[i]["accelX"], accelX, true, desc + " accel X");
+                            compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, true, desc + " accel X");
                         }
-                        compareGameState(players[i]["accelY"], accelY, true, desc + " accel Y");
+                        compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, true, desc + " accel Y");
 
                         if (players[i].contains("hitVelX")) {
-                            compareGameState(players[i]["hitVelX"], guys[i]->getHitVelX(), false, desc + " hitVel X");
-                            compareGameState(players[i]["hitAccelX"], guys[i]->getHitAccelX(), false, desc + " hitAccel X");
+                            compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), true, desc + " hitAccel X");
+                            compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), true, desc + " hitAccel X");
                         }
 
-                        compareGameState(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
-                        compareGameState(players[i]["actionFrame"], guys[i]->getCurrentFrame(), false, desc + " action frame");
+                        compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
+                        compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), false, desc + " action frame");
 
                         i++;
                     }
@@ -468,12 +469,12 @@ int main(int argc, char**argv)
 
         // find camera position if we have 2 guys
         if (guys.size() >= 2) {
-            float distGuys = fabs( guys[1]->getPosX() - guys[0]->getPosX() );
+            float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
             distGuys += 50.0; // account for some buffer behind
             float angleRad = 90 - (fov / 2.0);
             angleRad *= (M_PI / 360.0);
             zoom = distGuys / 2.0 / tanf( angleRad );
-            translateX = (guys[1]->getPosX() + guys[0]->getPosX()) / 2.0;
+            translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
             zoom = fmax(zoom, 360.0);
             translateX = fmin(translateX, 550.0);
             translateX = fmax(translateX, -550.0);
