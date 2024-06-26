@@ -1,0 +1,317 @@
+juri ATK_2LK(3) was active from 4-6 now active from 4-7
+juri ATK_2LK(4) hit 0 on hit DmgValue was 200, now 100
+juri ATK_2LK(4) hit 0 on hit FocusOwn was 250, now 62
+juri ATK_2LK(4) hit 0 on hit JuggleLimit was 0, now 10
+juri ATK_2LK(4) hit 0 on hit SuperOwn was 300, now 0
+juri ATK_2LK(4) hit 0 on hit SuperTgt was 210, now 0
+juri ATK_2LK(4) hit 0 on block FocusOwn was 250, now 62
+juri ATK_2LK(4) hit 0 on block FocusTgt was -500, now -125
+juri ATK_2LK(4) hit 0 on block JuggleLimit was 0, now 10
+juri ATK_2LK(4) hit 0 on block SuperOwn was 150, now 0
+juri ATK_2LK(4) hit 0 on block SuperTgt was 75, now 0
+juri ATK_2LK(4) hit 0 on air hit DmgType was 10, now 11
+juri ATK_2LK(4) hit 0 on air hit DmgValue was 200, now 100
+juri ATK_2LK(4) hit 0 on air hit FocusOwn was 250, now 62
+juri ATK_2LK(4) hit 0 on air hit JuggleLimit was 0, now 10
+juri ATK_2LK(4) hit 0 on air hit MoveType was 12, now 13
+juri ATK_2LK(4) hit 0 on air hit SuperOwn was 300, now 0
+juri ATK_2LK(4) hit 0 on air hit SuperTgt was 210, now 0
+juri ATK_2LK(4) hit 0 on burnout block FocusOwn was 250, now 62
+juri ATK_2LK(4) hit 0 on burnout block FocusTgt was 500, now 125
+juri ATK_2LK(4) hit 0 on burnout block JuggleLimit was 0, now 10
+juri ATK_2LK(4) hit 0 on burnout block SuperOwn was 150, now 0
+juri ATK_2LK(4) hit 0 on burnout block SuperTgt was 75, now 0
+juri ATK_2LK(4) hit 0 on counter DmgValue was 240, now 120
+juri ATK_2LK(4) hit 0 on counter FocusOwn was 250, now 62
+juri ATK_2LK(4) hit 0 on counter JuggleLimit was 0, now 10
+juri ATK_2LK(4) hit 0 on counter SuperOwn was 300, now 0
+juri ATK_2LK(4) hit 0 on counter SuperTgt was 210, now 0
+juri ATK_2LK(4) hit 0 on punish counter DmgValue was 240, now 120
+juri ATK_2LK(4) hit 0 on punish counter FocusOwn was 250, now 62
+juri ATK_2LK(4) hit 0 on punish counter FocusTgt was -2000, now -500
+juri ATK_2LK(4) hit 0 on punish counter JuggleLimit was 0, now 10
+juri ATK_2LK(4) hit 0 on punish counter SuperOwn was 300, now 0
+juri ATK_2LK(4) hit 0 on punish counter SuperTgt was 210, now 0
+juri ATK_2LK(5) hit 0 on hit DmgValue was 100, now 200
+juri ATK_2LK(5) hit 0 on hit FocusOwn was 62, now 250
+juri ATK_2LK(5) hit 0 on hit JuggleLimit was 10, now 0
+juri ATK_2LK(5) hit 0 on hit SuperOwn was 0, now 300
+juri ATK_2LK(5) hit 0 on hit SuperTgt was 0, now 210
+juri ATK_2LK(5) hit 0 on block FocusOwn was 62, now 250
+juri ATK_2LK(5) hit 0 on block FocusTgt was -125, now -500
+juri ATK_2LK(5) hit 0 on block JuggleLimit was 10, now 0
+juri ATK_2LK(5) hit 0 on block SuperOwn was 0, now 150
+juri ATK_2LK(5) hit 0 on block SuperTgt was 0, now 75
+juri ATK_2LK(5) hit 0 on air hit DmgType was 11, now 10
+juri ATK_2LK(5) hit 0 on air hit DmgValue was 100, now 200
+juri ATK_2LK(5) hit 0 on air hit FocusOwn was 62, now 250
+juri ATK_2LK(5) hit 0 on air hit JuggleLimit was 10, now 0
+juri ATK_2LK(5) hit 0 on air hit MoveType was 13, now 12
+juri ATK_2LK(5) hit 0 on air hit SuperOwn was 0, now 300
+juri ATK_2LK(5) hit 0 on air hit SuperTgt was 0, now 210
+juri ATK_2LK(5) hit 0 on burnout block FocusOwn was 62, now 250
+juri ATK_2LK(5) hit 0 on burnout block FocusTgt was 125, now 500
+juri ATK_2LK(5) hit 0 on burnout block JuggleLimit was 10, now 0
+juri ATK_2LK(5) hit 0 on burnout block SuperOwn was 0, now 150
+juri ATK_2LK(5) hit 0 on burnout block SuperTgt was 0, now 75
+juri ATK_2LK(5) hit 0 on counter DmgValue was 120, now 240
+juri ATK_2LK(5) hit 0 on counter FocusOwn was 62, now 250
+juri ATK_2LK(5) hit 0 on counter JuggleLimit was 10, now 0
+juri ATK_2LK(5) hit 0 on counter SuperOwn was 0, now 300
+juri ATK_2LK(5) hit 0 on counter SuperTgt was 0, now 210
+juri ATK_2LK(5) hit 0 on punish counter DmgValue was 120, now 240
+juri ATK_2LK(5) hit 0 on punish counter FocusOwn was 62, now 250
+juri ATK_2LK(5) hit 0 on punish counter FocusTgt was -500, now -2000
+juri ATK_2LK(5) hit 0 on punish counter JuggleLimit was 10, now 0
+juri ATK_2LK(5) hit 0 on punish counter SuperOwn was 0, now 300
+juri ATK_2LK(5) hit 0 on punish counter SuperTgt was 0, now 210
+juri ATK_2LP(4) hit 0 on hit DmgValue was 300, now 100
+juri ATK_2LP(4) hit 0 on hit FocusOwn was 250, now 62
+juri ATK_2LP(4) hit 0 on hit JuggleLimit was 0, now 10
+juri ATK_2LP(4) hit 0 on hit SuperOwn was 300, now 0
+juri ATK_2LP(4) hit 0 on hit SuperTgt was 210, now 0
+juri ATK_2LP(4) hit 0 on block FocusOwn was 250, now 62
+juri ATK_2LP(4) hit 0 on block FocusTgt was -500, now -125
+juri ATK_2LP(4) hit 0 on block JuggleLimit was 0, now 10
+juri ATK_2LP(4) hit 0 on block SuperOwn was 150, now 0
+juri ATK_2LP(4) hit 0 on block SuperTgt was 75, now 0
+juri ATK_2LP(4) hit 0 on air hit DmgType was 10, now 11
+juri ATK_2LP(4) hit 0 on air hit DmgValue was 300, now 100
+juri ATK_2LP(4) hit 0 on air hit FocusOwn was 250, now 62
+juri ATK_2LP(4) hit 0 on air hit JuggleLimit was 0, now 10
+juri ATK_2LP(4) hit 0 on air hit MoveType was 12, now 13
+juri ATK_2LP(4) hit 0 on air hit SuperOwn was 300, now 0
+juri ATK_2LP(4) hit 0 on air hit SuperTgt was 210, now 0
+juri ATK_2LP(4) hit 0 on burnout block FocusOwn was 250, now 62
+juri ATK_2LP(4) hit 0 on burnout block FocusTgt was 250, now 62
+juri ATK_2LP(4) hit 0 on burnout block JuggleLimit was 0, now 10
+juri ATK_2LP(4) hit 0 on burnout block SuperOwn was 150, now 0
+juri ATK_2LP(4) hit 0 on burnout block SuperTgt was 75, now 0
+juri ATK_2LP(4) hit 0 on counter DmgValue was 360, now 120
+juri ATK_2LP(4) hit 0 on counter FocusOwn was 250, now 62
+juri ATK_2LP(4) hit 0 on counter JuggleLimit was 0, now 10
+juri ATK_2LP(4) hit 0 on counter SuperOwn was 300, now 0
+juri ATK_2LP(4) hit 0 on counter SuperTgt was 210, now 0
+juri ATK_2LP(4) hit 0 on punish counter DmgValue was 360, now 120
+juri ATK_2LP(4) hit 0 on punish counter FocusOwn was 250, now 62
+juri ATK_2LP(4) hit 0 on punish counter FocusTgt was -2000, now -500
+juri ATK_2LP(4) hit 0 on punish counter JuggleLimit was 0, now 10
+juri ATK_2LP(4) hit 0 on punish counter SuperOwn was 300, now 0
+juri ATK_2LP(4) hit 0 on punish counter SuperTgt was 210, now 0
+juri ATK_2LP(5) hit 0 on hit DmgValue was 100, now 300
+juri ATK_2LP(5) hit 0 on hit FocusOwn was 62, now 250
+juri ATK_2LP(5) hit 0 on hit JuggleLimit was 10, now 0
+juri ATK_2LP(5) hit 0 on hit SuperOwn was 0, now 300
+juri ATK_2LP(5) hit 0 on hit SuperTgt was 0, now 210
+juri ATK_2LP(5) hit 0 on block FocusOwn was 62, now 250
+juri ATK_2LP(5) hit 0 on block FocusTgt was -125, now -500
+juri ATK_2LP(5) hit 0 on block JuggleLimit was 10, now 0
+juri ATK_2LP(5) hit 0 on block SuperOwn was 0, now 150
+juri ATK_2LP(5) hit 0 on block SuperTgt was 0, now 75
+juri ATK_2LP(5) hit 0 on air hit DmgType was 11, now 10
+juri ATK_2LP(5) hit 0 on air hit DmgValue was 100, now 300
+juri ATK_2LP(5) hit 0 on air hit FocusOwn was 62, now 250
+juri ATK_2LP(5) hit 0 on air hit JuggleLimit was 10, now 0
+juri ATK_2LP(5) hit 0 on air hit MoveType was 13, now 12
+juri ATK_2LP(5) hit 0 on air hit SuperOwn was 0, now 300
+juri ATK_2LP(5) hit 0 on air hit SuperTgt was 0, now 210
+juri ATK_2LP(5) hit 0 on burnout block FocusOwn was 62, now 250
+juri ATK_2LP(5) hit 0 on burnout block FocusTgt was 62, now 250
+juri ATK_2LP(5) hit 0 on burnout block JuggleLimit was 10, now 0
+juri ATK_2LP(5) hit 0 on burnout block SuperOwn was 0, now 150
+juri ATK_2LP(5) hit 0 on burnout block SuperTgt was 0, now 75
+juri ATK_2LP(5) hit 0 on counter DmgValue was 120, now 360
+juri ATK_2LP(5) hit 0 on counter FocusOwn was 62, now 250
+juri ATK_2LP(5) hit 0 on counter JuggleLimit was 10, now 0
+juri ATK_2LP(5) hit 0 on counter SuperOwn was 0, now 300
+juri ATK_2LP(5) hit 0 on counter SuperTgt was 0, now 210
+juri ATK_2LP(5) hit 0 on punish counter DmgValue was 120, now 360
+juri ATK_2LP(5) hit 0 on punish counter FocusOwn was 62, now 250
+juri ATK_2LP(5) hit 0 on punish counter FocusTgt was -500, now -2000
+juri ATK_2LP(5) hit 0 on punish counter JuggleLimit was 10, now 0
+juri ATK_2LP(5) hit 0 on punish counter SuperOwn was 0, now 300
+juri ATK_2LP(5) hit 0 on punish counter SuperTgt was 0, now 210
+jamie SAA1_BREAKIN_DRK hit -1 on hit DriveNorm was 3800, now 5000
+jamie SAA1_BREAKIN_DRK hit -1 on block FocusTgt was -700, now -1000
+jamie SAA1_BREAKIN_DRK hit -1 on air hit DriveNorm was 3800, now 5000
+jamie SAA1_BREAKIN_DRK hit -1 on burnout block FocusTgt was 350, now 500
+jamie SAA1_BREAKIN_DRK(1) hit -1 on hit DriveNorm was 3800, now 5000
+jamie SAA1_BREAKIN_DRK(1) hit -1 on block FocusTgt was -700, now -1000
+jamie SAA1_BREAKIN_DRK(1) hit -1 on air hit DriveNorm was 3800, now 5000
+jamie SAA1_BREAKIN_DRK(1) hit -1 on burnout block FocusTgt was 350, now 500
+jamie SAA1_BREAKIN_Y2 hit 13 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 0 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 1 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 2 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 3 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 4 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 5 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 6 on hit DriveNorm was 900, now 1500
+jamie SAA1_BREAKIN_Y2 hit 7 on hit DriveNorm was 900, now 1500
+jamie SAA1_BREAKIN_Y2 hit 8 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 9 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 10 on hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 13 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 0 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 1 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 2 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 3 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 4 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 5 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 6 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 7 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 8 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 9 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 10 on block FocusTgt was -200, now -150
+jamie SAA1_BREAKIN_Y2 hit 11 on block FocusTgt was -300, now -700
+jamie SAA1_BREAKIN_Y2 hit 13 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 0 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 1 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 2 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 3 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 4 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 5 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 6 on air hit DriveNorm was 900, now 1500
+jamie SAA1_BREAKIN_Y2 hit 7 on air hit DriveNorm was 900, now 1500
+jamie SAA1_BREAKIN_Y2 hit 8 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 9 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 10 on air hit DriveNorm was 1800, now 1500
+jamie SAA1_BREAKIN_Y2 hit 13 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 0 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 1 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 2 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 3 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 4 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 5 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 6 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 7 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 8 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 9 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 10 on burnout block FocusTgt was 100, now 75
+jamie SAA1_BREAKIN_Y2 hit 11 on burnout block FocusTgt was 150, now 350
+akuma SPA_HYAKKI_GORASEN_MISS hit 0 on hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 1 on hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 2 on hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 3 on hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 4 on hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 0 on air hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 1 on air hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 2 on air hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 3 on air hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 4 on air hit DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 0 on counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 1 on counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 2 on counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 3 on counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 4 on counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 0 on punish counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 1 on punish counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 2 on punish counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 3 on punish counter DriveJust was 2000, now 65535
+akuma SPA_HYAKKI_GORASEN_MISS hit 4 on punish counter DriveJust was 2000, now 65535
+akuma SPA_SYORYU_H_START hit 0 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 1 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 2 on hit DriveJust was 4000, now 65535
+akuma SPA_SYORYU_H_START hit 0 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 1 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 2 on air hit DriveJust was 4000, now 65535
+akuma SPA_SYORYU_H_START hit 0 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 1 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 2 on counter DriveJust was 4000, now 65535
+akuma SPA_SYORYU_H_START hit 0 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 1 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START hit 2 on punish counter DriveJust was 4000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 0 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 1 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 2 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 0 on block DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 1 on block DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 2 on block DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 0 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 1 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 2 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 0 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 1 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 2 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 0 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 1 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(1) hit 2 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 0 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 1 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 2 on hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 0 on block DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 1 on block DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 2 on block DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 0 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 1 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 2 on air hit DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 0 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 1 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 2 on counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 0 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 1 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_H_START(2) hit 2 on punish counter DriveJust was 3000, now 65535
+akuma SPA_SYORYU_START(1) hit 0 on hit DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 1 on hit DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 0 on air hit DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 1 on air hit DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 0 on counter DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 1 on counter DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 0 on punish counter DriveJust was 5000, now 65535
+akuma SPA_SYORYU_START(1) hit 1 on punish counter DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 0 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 1 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 2 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 3 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 4 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 0 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 1 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 2 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 3 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 4 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 0 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 1 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 2 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 3 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 4 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 0 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 1 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 2 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 3 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_AIR_END(1) hit 4 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 2 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 3 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 2 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 3 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 2 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 3 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 2 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_EX hit 3 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 1 on hit DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 2 on hit DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 1 on air hit DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 2 on air hit DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 1 on counter DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 2 on counter DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 1 on punish counter DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END hit 2 on punish counter DriveJust was 5000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 1 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 2 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 3 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 4 on hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 1 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 2 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 3 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 4 on air hit DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 1 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 2 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 3 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 4 on counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 1 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 2 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 3 on punish counter DriveJust was 2000, now 65535
+akuma SPA_TATSUMAKI_M_END(1) hit 4 on punish counter DriveJust was 2000, now 65535
