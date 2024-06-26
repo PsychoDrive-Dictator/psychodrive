@@ -24,7 +24,8 @@ characters = [
     "ed",
     "honda",
     "jamie",
-    "akuma"
+    "akuma",
+    "bison"
 ]
 
 dataPath = "./data/chars/"
@@ -99,12 +100,13 @@ def compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, paramEntry, paramDesc)
                
 
 for char in characters:
+    dataPathWithChar = dataPath + char + "/"
     charWithVersion = char + "22"
-    hitsJson = json.load(open(dataPath + charWithVersion + "_hit.json"))
-    movesJson = json.load(open(dataPath + charWithVersion + "_moves.json"))
+    hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
+    movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     charWithVersion = char + "23"
-    hits21Json = json.load(open(dataPath + charWithVersion + "_hit.json"))
-    moves21Json = json.load(open(dataPath + charWithVersion + "_moves.json"))
+    hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
+    moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     # for hitID in hitsJson:
     #     hitParam = hitsJson[hitID]["param"]
     #     # check movetime vs hitstun
