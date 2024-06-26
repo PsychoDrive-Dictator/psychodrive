@@ -4,11 +4,14 @@ versions=("19" "20" "21" "22" "23")
 
 dedupe_char_file() {
     sum=blah
+    lastfile=blah
     for ver in ${versions[@]}; do
         filename=data/chars/$1/"$1""$ver"_$2.json
         if [ ! -f $filename ]; then
+            ln -s $lastfile $filename
             continue
         fi
+        lastfile="$1""$ver"_$2.json
         newsum=$(md5sum $filename | cut -d' ' -f1)
         woulddelete=false
         if [ $newsum == $sum ]; then
