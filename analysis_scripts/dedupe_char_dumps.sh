@@ -16,7 +16,7 @@ dedupe_char_file() {
         fi
         echo $filename $newsum $woulddelete
         if [ $woulddelete == true ]; then
-            echo git rm $filename
+            git rm $filename
         fi
         sum=$newsum
     done
