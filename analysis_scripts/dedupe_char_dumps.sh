@@ -1,11 +1,11 @@
 #!/bin/bash
 
-versions=("19" "20" "21" "22")
+versions=("19" "20" "21" "22" "23")
 
 dedupe_char_file() {
     sum=blah
     for ver in ${versions[@]}; do
-        filename=data/chars/"$1""$ver"_$2.json
+        filename=data/chars/$1/"$1""$ver"_$2.json
         if [ ! -f $filename ]; then
             continue
         fi
@@ -16,7 +16,7 @@ dedupe_char_file() {
         fi
         echo $filename $newsum $woulddelete
         if [ $woulddelete == true ]; then
-            git rm $filename
+            echo git rm $filename
         fi
         sum=$newsum
     done
@@ -37,6 +37,7 @@ dedupe_char_dumps() {
 
 dedupe_char_dumps aki
 dedupe_char_dumps akuma
+dedupe_char_dumps bison
 dedupe_char_dumps blanka
 dedupe_char_dumps cammy
 dedupe_char_dumps chunli

@@ -4,14 +4,14 @@ version=23
 
 copy_char_file() {
     src="MMDK/PlayerData/$1/$1 $3.json"
-    target=~/src/psychodrive/data/chars/$2_$4.json
+    target=~/src/psychodrive/data/chars/$2/"$2""$version"_$4.json
     echo cp "$src" $target
     cp "$src" $target
     dos2unix $target
 }
 
 copy_char_dumps() {
-    targetcharname=$2$version
+    targetcharname=$2
     copy_char_file "$1" $targetcharname atemi atemi
     copy_char_file "$1" $targetcharname CharInfo charinfo
     copy_char_file "$1" $targetcharname commands commands
@@ -41,6 +41,7 @@ copy_char_dumps Ken ken
 copy_char_dumps Kimberly kimberly
 copy_char_dumps Lily lily
 copy_char_dumps Luke luke
+copy_char_dumps 'M. Bison' bison
 copy_char_dumps Manon manon
 copy_char_dumps Marisa marisa
 copy_char_dumps Rashid rashid
