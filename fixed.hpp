@@ -7,22 +7,22 @@ const float epsilon = 0.000001;
 
 class Fixed {
 public:
-    Fixed(float in) {
+    Fixed(float in, bool allowApproximate = false) {
         float input = in * 65536.0f;
         float rounded = std::round(input);
         float diff = fabsf(rounded - input);
-        if (diff > epsilon) {
+        if (diff > epsilon && !allowApproximate) {
             abort();
         }
 
         data = (int64_t)rounded;
     }
 
-    Fixed(double in) {
+    Fixed(double in, bool allowApproximate = false) {
         double input = in * 65536.0f;
         double rounded = std::round(input);
         double diff = fabsf(rounded - input);
-        if (diff > epsilon) {
+        if (diff > epsilon && !allowApproximate) {
             abort();
         }
 

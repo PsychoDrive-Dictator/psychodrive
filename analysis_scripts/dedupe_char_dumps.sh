@@ -5,13 +5,19 @@ versions=("19" "20" "21" "22" "23")
 dedupe_char_file() {
     sum=blah
     lastfile=blah
+    lastfile_processed=blah
     for ver in ${versions[@]}; do
         filename=data/chars/$1/"$1""$ver"_$2.json
-        if [ ! -f $filename ]; then
-            ln -s $lastfile $filename
+        filename_processed=data/chars/$1/"$1""$ver"_$2_processed.json
+        if [ ! -f $filename ] || [ -L $filename ]; then
+            if [ ! -L $filename ] && [ $lastfile != "blah" ]; then
+                ln -s $lastfile $filename
+                # ln -s $lastfile_processed $filename_processed
+            fi
             continue
         fi
         lastfile="$1""$ver"_$2.json
+        lastfile_processed="$1""$ver"_$2_processed.json
         newsum=$(md5sum $filename | cut -d' ' -f1)
         woulddelete=false
         if [ $newsum == $sum ]; then
@@ -22,6 +28,10 @@ dedupe_char_file() {
             git rm $filename
         fi
         sum=$newsum
+
+        # if [ $2 == "moves" ]; then
+        #     jq 'walk(if type == "object" then del(._ComboMember, .PhyCoeff, ._p01_CHARA_RESET_CONDITION, ._p02_CHARA_RESET_CONDITION) else . end)' < $filename > $filename_processed
+        # fi
     done
 }
 

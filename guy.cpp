@@ -1297,7 +1297,7 @@ void Guy::Render(void) {
     float y = fixedY.f();
 
     for (auto box : renderBoxes) {
-        drawHitBox(box.box,box.thickness,box.col,box.drive,box.parry,box.di);
+        drawHitBox(box.box,1,box.col,box.drive,box.parry,box.di);
     }
 
     float radius = 16.5;
