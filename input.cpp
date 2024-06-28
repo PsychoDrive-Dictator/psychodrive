@@ -96,6 +96,12 @@ void updateInputs(void)
                 case SDLK_0:
                     oneframe = true;
                     break;
+                case SDLK_F3:
+                    thickboxes = !thickboxes;
+                    break;
+                case SDLK_F4:
+                    renderPositionAnchors = !renderPositionAnchors;
+                    break;
                 case SDLK_r:
                     recordingInput = !recordingInput;
                     if (recordingInput == true) {
