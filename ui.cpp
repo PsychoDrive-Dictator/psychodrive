@@ -65,7 +65,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::InputText("##startpostext", startPosTest, sizeof(startPosTest));
     newStartPosX = atof(startPosTest);
     if (newStartPosX != startPosX) {
-        pGuy->setStartPosX(Fixed(newStartPosX));
+        pGuy->setStartPosX(Fixed(newStartPosX, true));
     }
     ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName().c_str());
     if (!pGuy->getProjectile()) {
@@ -294,7 +294,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
-        Guy *pNewGuy = new Guy(charNames[charID], atoi(charVersions[versionID]), Fixed(newCharPos), Fixed(0.0f), 1, col );
+        Guy *pNewGuy = new Guy(charNames[charID], atoi(charVersions[versionID]), Fixed(newCharPos, true), Fixed(0.0f), 1, col );
         if (guys.size()) {
             pNewGuy->setOpponent(guys[0]);
             if (guys.size() == 1) {
