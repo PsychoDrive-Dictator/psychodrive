@@ -33,6 +33,8 @@ struct HitMarker {
     int maxtime;
 };
 
+extern bool thickboxes;
+extern bool renderPositionAnchors;
 extern float zoom;
 extern float fov;
 extern int translateX;

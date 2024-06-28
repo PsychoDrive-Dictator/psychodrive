@@ -210,6 +210,8 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
     drawBox( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,1.0);
 }
 
+bool thickboxes = false;
+bool renderPositionAnchors = true;
 float zoom = 500.0;
 float fov = 50.0;
 int translateX = 0.0;

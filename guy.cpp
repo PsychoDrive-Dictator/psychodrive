@@ -1297,13 +1297,15 @@ void Guy::Render(void) {
     float y = fixedY.f();
 
     for (auto box : renderBoxes) {
-        drawHitBox(box.box,1,box.col,box.drive,box.parry,box.di);
+        drawHitBox(box.box,thickboxes?box.thickness:1,box.col,box.drive,box.parry,box.di);
     }
 
-    float radius = 16.5;
-    drawBox(x-radius/2,y-radius/2,radius,radius,radius,1.0,1.0,1.0,1.0);
-    radius = 15;
-    drawBox(x-radius/2,y-radius/2,radius,radius,radius,charColorR,charColorG,charColorB,1.0);
+    if (renderPositionAnchors) {
+        float radius = 16.5;
+        drawBox(x-radius/2,y-radius/2,radius,radius,radius,1.0,1.0,1.0,1.0);
+        radius = 15;
+        drawBox(x-radius/2,y-radius/2,radius,radius,radius,charColorR,charColorG,charColorB,1.0);
+    }
 }
 
 bool Guy::Push(Guy *pOtherGuy)
