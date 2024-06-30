@@ -66,14 +66,6 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
     return false;
 }
 
-static inline float fixedToFloat(int fixed)
-{
-    short integerPart = (fixed & 0xFFFF0000) >> 16;
-    float decimalPart = (fixed & 0xFFFF)/(float)0xFFFF;
-
-    return decimalPart + integerPart;
-}
-
 static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
 {
     switch (operationType) {
