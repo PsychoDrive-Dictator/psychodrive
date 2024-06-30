@@ -8,12 +8,6 @@
 
 class Guy;
 
-struct color {
-    float r;
-    float g;
-    float b;
-};
-
 struct RenderBox {
     Box box;
     float thickness = 10.0;

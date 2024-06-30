@@ -1,4 +1,5 @@
 #include "imgui_neo_sequencer.h"
+#include "implot.h"
 
 #include "guy.hpp"
 #include "ui.hpp"
@@ -90,6 +91,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     std::vector<HitBox> *hitBoxes = pGuy->getHitBoxes();
     Fixed maxXHitBox = 0.0f;
     for (auto hitbox : *hitBoxes) {
+        if (hitbox.type != hitBoxType::hit) continue;
         Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
         if (hitBoxX > maxXHitBox) {
             maxXHitBox = hitBoxX;
@@ -163,6 +165,25 @@ void timelineToInputBuffer(std::deque<int> &inputBuffer)
         }
         i++;
     }
+}
+
+void drawHitboxExtentPlotWindow()
+{
+    if (vecPlotEntries.size() == 0) return;
+
+    ImGui::Begin("Data Analysis Window");
+    if (ImPlot::BeginPlot("Drive Normals Hitbox Ranges", ImVec2(-1,-1))) {
+        ImPlot::SetupAxis(ImAxis_X1, "Frame", ImPlotAxisFlags_AutoFit);  
+        ImPlot::SetupAxis(ImAxis_Y1, "Range", ImPlotAxisFlags_AutoFit);  
+        unsigned int i = 0;
+        while (i < vecPlotEntries.size()) {
+            ImPlot::SetNextLineStyle(ImVec4(vecPlotEntries[i].col.r, vecPlotEntries[i].col.g, vecPlotEntries[i].col.b, 1), 3.0f);
+            ImPlot::PlotLine(vecPlotEntries[i].strName.c_str(), vecPlotEntries[i].hitBoxRangePlotX.data(), vecPlotEntries[i].hitBoxRangePlotY.data(), vecPlotEntries[i].hitBoxRangePlotX.size());
+            i++;
+        }
+        ImPlot::EndPlot();
+    }
+    ImGui::End();
 }
 
 void drawInputEditor()
@@ -281,7 +302,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
     static int charID = rand() % charNameCount;
     static int versionID = charVersionCount - 1;
-    static float newCharPos = randFloat() * 300 - 150.0;
+    static float newCharPos = 0.0;
     resetpos = resetpos || ImGui::Button("reset positions (Q)");
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
@@ -300,12 +321,15 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
             if (guys.size() == 1) {
                 guys[0]->setOpponent(pNewGuy);
             }
+        } else {
+            *pNewGuy->getInputIDPtr() = keyboardID;
+            *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
         }
         guys.push_back(pNewGuy);
         newCharColor[0] = randFloat();
         newCharColor[1] = randFloat();
         newCharColor[2] = randFloat();
-        newCharPos = randFloat() * 300 - 150.0;
+        //newCharPos = randFloat() * 300 - 150.0;
     }
     for (auto i : currentInputMap) {
         ImGui::Text("input %i %i", i.first, i.second);
@@ -371,6 +395,8 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
 
     drawInputEditor();
 
+    drawHitboxExtentPlotWindow();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -379,6 +405,7 @@ ImGuiIO& initUI(void)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
@@ -392,5 +419,6 @@ void destroyUI(void)
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }

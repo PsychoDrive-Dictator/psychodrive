@@ -121,6 +121,7 @@ public:
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
     std::string getActionName() { return actionName; }
+    bool getIsDrive() { return isDrive; }
     bool getCrouchingDebug() { return crouching; }
     bool getAirborneDebug() { return airborne; }
     Fixed getHitVelX() { return hitVelX; }

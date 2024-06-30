@@ -56,6 +56,12 @@ struct HurtBox {
     int armorID = 0;
 };
 
+struct color {
+    float r;
+    float g;
+    float b;
+};
+
 static inline float randFloat()
 {
     float ret = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -91,6 +97,18 @@ extern int recordingStartFrame;
 extern bool playingBackInput;
 extern std::deque<int> playBackInputBuffer;
 extern int playBackFrame;
+
+extern std::vector<float> hitBoxRangePlotX;
+extern std::vector<float> hitBoxRangePlotY;
+
+struct normalRangePlotEntry {
+    std::vector<float> hitBoxRangePlotX;
+    std::vector<float> hitBoxRangePlotY;
+    std::string strName;
+    color col;
+};
+
+extern std::vector<normalRangePlotEntry> vecPlotEntries;
 
 extern bool deleteInputs;
 

@@ -50,12 +50,12 @@ dedupe_char_dumps() {
 
 dedupe_char_dumps aki
 dedupe_char_dumps akuma
-dedupe_char_dumps bison
 dedupe_char_dumps blanka
 dedupe_char_dumps cammy
 dedupe_char_dumps chunli
 dedupe_char_dumps deejay
 dedupe_char_dumps dhalsim
+dedupe_char_dumps dictator
 dedupe_char_dumps ed
 dedupe_char_dumps honda
 dedupe_char_dumps guile

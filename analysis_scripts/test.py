@@ -25,7 +25,7 @@ characters = [
     "honda",
     "jamie",
     "akuma",
-    "bison"
+    "dictator"
 ]
 
 dataPath = "./data/chars/"
