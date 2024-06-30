@@ -47,7 +47,8 @@ const char* charNames[] = {
     "jamie",
     "marisa",
     "blanka",
-    "akuma"
+    "akuma",
+    "dictator"
 };
 const int charNameCount = IM_ARRAYSIZE(charNames);
 
@@ -56,7 +57,7 @@ const char* charVersions[] = {
     { "20 - S2 (akuma patch)" },
     { "21 - S2 hotfix 1" },
     { "22 - S2 hotfix 2" },
-    { "23 - S2 (bison patch)" }
+    { "23 - S2 (dictator patch)" }
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
@@ -81,6 +82,12 @@ bool replayingGameState = false;
 int gameStateFrame = 0;
 int firstGameStateFrame = 0;
 int replayErrors = 0;
+
+std::vector<normalRangePlotEntry> vecPlotEntries;
+int curPlotEntryID = -1;
+int curPlotEntryStartFrame = 0;
+int curPlotEntryNormalStartFrame = 0;
+int curPlotActionID = 0;
 
 void compareGameStateFixed( Fixed dumpValue, Fixed realValue, bool fatal, std::string description )
 {
@@ -380,6 +387,51 @@ int main(int argc, char**argv)
             }
             for (auto guy : everyone) {
                 guy->CheckHit(guy->getOpponent());
+            }
+
+            static bool hasAddedData = false;
+            // update plot range if we're doing that
+            if (guys.size() > 0 ) {
+                if (curPlotActionID == 0 && guys[0]->getIsDrive() == true)
+                {
+                    curPlotEntryStartFrame = globalFrameCount;
+                    curPlotActionID = guys[0]->getCurrentAction();
+                    vecPlotEntries.push_back({});
+                    curPlotEntryID++;
+                }
+                if (curPlotActionID != 0 && guys[0]->getCurrentAction() != 1 && guys[0]->getIsDrive() == false)
+                {
+                    if (curPlotEntryNormalStartFrame == 0) {
+                        curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
+                    }
+                    std::vector<HitBox> *hitBoxes = guys[0]->getHitBoxes();
+                    Fixed maxXHitBox = Fixed(0);
+                    for (auto hitbox : *hitBoxes) {
+                        if (hitbox.type != hitBoxType::hit) continue;
+                        Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
+                        if (hitBoxX > maxXHitBox) {
+                            maxXHitBox = hitBoxX;
+                        }
+                    }
+                    // find a better solution for two-hitting normals
+                    // if (maxXHitBox != Fixed(0)) {
+                    //     hasAddedData = true;
+                    // }
+                    if (maxXHitBox != Fixed(0) || hasAddedData) {
+                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(globalFrameCount - curPlotEntryStartFrame);
+                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
+                    }
+                    if (vecPlotEntries[curPlotEntryID].strName == "") {
+                        vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName() + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
+                        vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
+                    }
+                }
+                if (curPlotActionID != 0 && guys[0]->getCurrentAction() == 1) {
+                    hasAddedData = false;
+                    curPlotActionID = 0;
+                    curPlotEntryStartFrame = 0;
+                    curPlotEntryNormalStartFrame = 0;
+                }
             }
         }
 

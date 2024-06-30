@@ -19,6 +19,9 @@ project_source_files = [
   'imgui/imgui_demo.cpp',
   'imgui_neo_sequencer.cpp',
   'imgui_neo_internal.cpp',
+  'implot.cpp',
+  'implot_demo.cpp',
+  'implot_items.cpp',
   'imgui/backends/imgui_impl_sdl2.cpp',
   'imgui/backends/imgui_impl_opengl3.cpp',
 ]

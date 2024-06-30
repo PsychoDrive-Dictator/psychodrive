@@ -41,7 +41,7 @@ copy_char_dumps Ken ken
 copy_char_dumps Kimberly kimberly
 copy_char_dumps Lily lily
 copy_char_dumps Luke luke
-copy_char_dumps 'M. Bison' bison
+copy_char_dumps 'M. Bison' dictator
 copy_char_dumps Manon manon
 copy_char_dumps Marisa marisa
 copy_char_dumps Rashid rashid
