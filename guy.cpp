@@ -449,9 +449,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if ( (velocityX * prevVelX) < Fixed(0) || (accelX != Fixed(0) && velocityX == Fixed(0)) ) {
-            // sign change?
-            velocityX = 0;
+        if ( (accelX != Fixed(0) && prevVelX != Fixed(0) && velocityX == Fixed(0)) ) {
+            // if a steerkey just set speed to 0 and there was accel, it seems to want to clear accel
+            // to stop movement - see back accel for eg. drive rush normals
             accelX = 0;
         }
 
