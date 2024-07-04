@@ -989,6 +989,10 @@ function(args)
     frameDump.playTimer = sRound.play_timer
     frameDump.playTimerMS = sRound.play_timer_ms
 
+    local sGame = gBattle:get_field("Game"):get_data(nil)
+
+    frameDump.stageTimer = sGame.stage_timer
+
     frameDump.players = {}
     local sPlayer = gBattle:get_field("Player"):get_data(nil)
     local cPlayer = sPlayer.mcPlayer
