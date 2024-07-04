@@ -2519,7 +2519,8 @@ bool Guy::Frame(bool endWarudoFrame)
             }
         }
 
-        if ( nextAction == -1 && ((currentInput & 0xF) == 0) ) { // only do that if we're not post-margin for correctness
+        // todo only do that if we're not post-margin for correctness
+        if ((currentInput & 0xF) == 0) {
             nextAction = 1;
         }
 
