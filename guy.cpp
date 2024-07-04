@@ -2467,7 +2467,8 @@ bool Guy::Frame(bool endWarudoFrame)
     if (nextAction != -1 ) {
         actionCheckCanMove = nextAction;
     }
-    crouching = actionCheckCanMove == 4 || actionCheckCanMove == 5;
+    // todo is action 6 ok here? try a dump fo akuma zanku and trying to move immediately on landing
+    crouching = actionCheckCanMove == 4 || actionCheckCanMove == 5 || actionCheckCanMove == 6;
     bool movingForward = actionCheckCanMove == 9 || actionCheckCanMove == 10 || actionCheckCanMove == 11;
     bool movingBackward = actionCheckCanMove == 13 || actionCheckCanMove == 14 || actionCheckCanMove == 15;
     if (actionCheckCanMove == 1 || actionCheckCanMove == 2 || actionCheckCanMove == 4 || //stands, crouch
