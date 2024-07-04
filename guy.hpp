@@ -316,6 +316,7 @@ private:
     bool blocking = false;
     bool bounced = false;
     bool wallbounced = false;
+    bool didPush = false;
 
     int landingAdjust = 0;
     int prevPoseStatus = 0;

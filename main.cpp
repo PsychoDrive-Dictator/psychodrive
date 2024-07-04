@@ -69,6 +69,7 @@ bool done = false;
 bool paused = false;
 bool oneframe = false;
 int globalFrameCount = 0;
+int replayFrameNumber = 0;
 
 bool recordingInput = false;
 std::vector<int> recordedInput;
@@ -304,6 +305,10 @@ int main(int argc, char**argv)
             replayingGameState = true;
             currentInputMap[replayLeft] = 0;
             currentInputMap[replayRight] = 0;
+
+            if (gameStateDump[i].contains("stageTimer")) {
+                replayFrameNumber = gameStateDump[i]["stageTimer"];
+            }
         }
     }
 
@@ -480,6 +485,7 @@ int main(int argc, char**argv)
                     replayingGameState = false;
                     gameStateFrame = 0;
                     firstGameStateFrame = 0;
+                    replayFrameNumber = 0;
                     log("game replay finished, errors: " + std::to_string(replayErrors));
                 } else {
                     int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
@@ -491,6 +497,10 @@ int main(int argc, char**argv)
                         int inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
                         inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
                         currentInputMap[replayRight] = inputRight;
+                    }
+
+                    if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
+                        replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
                     }
                 }
             } else {

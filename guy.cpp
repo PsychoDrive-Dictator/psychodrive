@@ -1303,6 +1303,7 @@ void Guy::Render(void) {
 bool Guy::Push(Guy *pOtherGuy)
 {
     //if (warudo) return false;
+    if (didPush) return false;
     if ( !pOtherGuy ) return false;
     // for now, maybe there's other rules
     if (isProjectile) return false;
@@ -1333,7 +1334,7 @@ bool Guy::Push(Guy *pOtherGuy)
             pushNeeded = -pushXLeft;
         }
         Fixed velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
-        log(logTransitions, "push needed " + std::to_string(pushNeeded.f()) + " vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string(offsetDoesNotPush));
+        log(logTransitions, "push needed " + std::to_string(pushNeeded.data) + " vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string(offsetDoesNotPush));
         // if (velDiff * pushNeeded < 0.0) {
         //     // if velDiff different sign, we can deduct it
         //     if (fabsf(velDiff) > fabsf(pushNeeded)) {
@@ -1378,9 +1379,29 @@ bool Guy::Push(Guy *pOtherGuy)
                 posX += pushNeeded;
             }
 
+            Fixed halfPushNeeded = pushNeeded / Fixed(2);
+
             // do regular push with any remaining pushNeeded
-            posX = posX + (pushNeeded / Fixed(2));
-            pOtherGuy->posX = pOtherGuy->posX + (pushNeeded / Fixed(-2));
+            posX = posX + halfPushNeeded;
+            pOtherGuy->posX = pOtherGuy->posX - halfPushNeeded;
+
+            int fixedRemainder = pushNeeded.data - halfPushNeeded.data * 2;
+            int frameNumber = globalFrameCount;
+            if (replayFrameNumber != 0) {
+                frameNumber = replayFrameNumber;
+            }
+
+            //log(logTransitions, "fixedRemainder " + std::to_string(fixedRemainder) + " frameNum " +  std::to_string(frameNumber) + " " + getCharacter());
+
+            // give remainder to either player depending on frame count
+            if (frameNumber & 1) {
+                posX.data += fixedRemainder;
+            } else {
+                pOtherGuy->posX.data += fixedRemainder;
+            }
+
+            didPush = true;
+            pOtherGuy->didPush = true;
         }
 
         touchedOpponent = true; // could be touching anyone really but can fix later
@@ -1400,6 +1421,7 @@ bool Guy::WorldPhysics(void)
     Fixed pushY = 0;
     bool floorpush = false;
     touchedWall = false;
+    didPush = false;
 
     const Fixed wallDistance = Fixed(765.0f);
     const Fixed maxPlayerDistance = Fixed(490.0f);
@@ -1844,7 +1866,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     if (!airborne && !jimenBound) {
         hitVelX = Fixed(direction.i() * destX * -2) / Fixed(destTime);
         hitAccelX = Fixed(direction.i() * destX * 2) / Fixed(destTime * destTime);
-        hitAccelX.data += direction.i(); // wtf
+        hitAccelX.data += direction.i(); // there seems to be a bias of 1 raw units
     } else {
         hitVelX = Fixed(0);
         hitAccelX = Fixed(0);
