@@ -345,7 +345,7 @@ bool Guy::PreFrame(void)
                     case 10:
                         if (operationType == 9 || operationType == 10) {
                             // home to target
-                            if (targetType != 1) {
+                            if (targetType != 0) {
                                 log(logUnknowns, "unknown home target type");
                                 continue;
                             } else if (!pOpponent) {
@@ -2185,16 +2185,16 @@ void Guy::DoBranchKey(bool preHit = false)
 
                         // and?
                         if (branchParam0 == 0 &&
-                            (fixAbs(pOpponent->getPosX() - offsetX - getPosX()) < distX &&
-                            fixAbs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
+                            (fixAbs(pOpponent->getPosX() - Fixed(offsetX) - getPosX()) < Fixed(distX) &&
+                            fixAbs(pOpponent->getPosY() - Fixed(offsetY) - getPosY()) < Fixed(distY))) {
                             doBranch = true;
                         }
 
                         // or? no idea
                         // there's also branchParam3 that's 0 or 1 - they're both called AREA_ALL?
                         if (branchParam0 == 1 &&
-                            (fixAbs(pOpponent->getPosX() - offsetX - getPosX()) < distX ||
-                            fixAbs(pOpponent->getPosY() - offsetY - getPosY()) < distY)) {
+                            (fixAbs(pOpponent->getPosX() - Fixed(offsetX) - getPosX()) < Fixed(distX) ||
+                            fixAbs(pOpponent->getPosY() - Fixed(offsetY) - getPosY()) < Fixed(distY))) {
                             doBranch = true;
                         }
                     }
