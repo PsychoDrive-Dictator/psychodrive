@@ -144,7 +144,8 @@ void Guy::BuildMoveList()
         if (key.contains("_PL_StyleID")) {
             styleID = key["_PL_StyleID"];
         }
-        mapMoveStyle[std::make_pair(actionID, styleID)] = std::make_pair(keyID, false);
+        auto mapIndex = std::make_pair(actionID, styleID);
+        mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
     }
 
     for (auto& [keyID, key] : commonMovesJson.items())
@@ -154,7 +155,10 @@ void Guy::BuildMoveList()
         if (key.contains("_PL_StyleID")) {
             styleID = key["_PL_StyleID"];
         }
-        mapMoveStyle[std::make_pair(actionID, styleID)] = std::make_pair(keyID, true);
+        auto mapIndex = std::make_pair(actionID, styleID);
+        if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
+            mapMoveStyle[mapIndex] = std::make_pair(keyID, true);
+        }
     }
 }
 
@@ -228,6 +232,12 @@ void Guy::UpdateActionData(void)
 
 bool Guy::PreFrame(void)
 {
+    // todo check if it also counts down in screen freeze..
+    // if it doesn't we might need to have two kinds of warudos
+    if (debuffTimer > 0 ) {
+        debuffTimer--;
+    }
+
     if (warudo > 0) {
         timeInWarudo++;
         warudo--;
@@ -324,7 +334,7 @@ bool Guy::PreFrame(void)
                 Fixed targetOffsetX = Fixed(steerKey["FixTargetOffsetX"].get<double>());
                 Fixed targetOffsetY = Fixed(steerKey["FixTargetOffsetY"].get<double>());
                 int shotCategory = steerKey["_ShotCategory"];
-                int targetType = steerKey["TarType"];
+                int targetType = steerKey["TargetType"];
                 int calcValueFrame = steerKey["CalcValueFrame"];
                 int multiValueType = steerKey["MultiValueType"];
 
@@ -382,7 +392,7 @@ bool Guy::PreFrame(void)
                         break;
                     case 13:
                         // set teleport/home target
-                        if (targetType == 16) {
+                        if (targetType == 4) {
                             // to projectile
                             bool minionFound = false;
                             for ( auto minion : minions ) {
@@ -397,7 +407,7 @@ bool Guy::PreFrame(void)
                             if (!minionFound) {
                                 log(true, "minion to teleport not found");
                             }
-                        } else if (targetType == 4) {
+                        } else if (targetType == 2 || targetType == 14) {
                             // to opponent
                             if (pOpponent) {
                                 homeTargetX = pOpponent->getPosX() + targetOffsetX * pOpponent->direction * Fixed(-1);
@@ -726,7 +736,7 @@ bool Guy::PreFrame(void)
                 Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
 
                 // spawn new guy
-                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>());
+                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
                 pNewGuy->PreFrame();
                 if (pParent) {
                     pParent->minions.push_back(pNewGuy);
@@ -1719,6 +1729,21 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     }
                     hitThisFrame = true;
                     hitThisMove = true;
+
+                    int dmgKind = hitEntry["DmgKind"];
+
+                    if (dmgKind == 11) {
+                        // psycho mine spawner guy - style 0 probably OK unconditionally?
+                        int actionID = 592; // IMM_VEGA_BOMB - should we find by name instead?
+                        Guy *pNewGuy = new Guy(*this, Fixed(0), Fixed(0), actionID, 0, false);
+                        pNewGuy->PreFrame();
+                        if (pParent) {
+                            pParent->minions.push_back(pNewGuy);
+                        } else {
+                            minions.push_back(pNewGuy);
+                        }
+                        pNewGuy->Frame(); // he should be dead after that
+                    }
                 }
                 retHit = true;
                 log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
@@ -1753,6 +1778,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     bool kabeBound = hitEffect["_kabe_bound"];
     bool kabeTataki = hitEffect["_kabe_tataki"];
     int hitStopTarget = hitEffect["HitStopTarget"];
+    int dmgKind = hitEffect["DmgKind"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
     if (isDrive) {
@@ -1928,6 +1954,13 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     }
 
     noCounterPush = noZu;
+
+    // fire/elec/psychopower effect
+    // the two that seem to matter for gameplay are 9 for poison and 11 for mine
+    if (dmgKind == 11) {
+        debuffTimer = 300;
+    }
+
     return true;
 }
 
@@ -2446,8 +2479,8 @@ bool Guy::Frame(bool endWarudoFrame)
             if (loopCount > 0) {
                 loopCount--;
             }
-        } else if (isProjectile) {
-            return false; // die
+        } else if (pParent) {
+            return false; // die if minion at end of script
         } else if (airborne) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
