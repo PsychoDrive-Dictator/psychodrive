@@ -1534,7 +1534,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
     bool retHit = false;
     for (auto hitbox : hitBoxes ) {
-        if (hitbox.type != domain && hitbox.hitID < canHitID) {
+        if (hitbox.type != domain && ((1<<hitbox.hitID) & canHitID)) {
             continue;
         }
         if (hitbox.type == proximity_guard || hitbox.type == destroy_projectile) {
@@ -1707,7 +1707,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     grabbedThisFrame = true;
                 }
 
-                canHitID = hitbox.hitID + 1;
+                canHitID |= 1 << hitbox.hitID;
+
                 if (!pOtherGuy->blocking && !hitArmor) {
                     if (hitEntryFlag & punish_counter) {
                         punishCounterThisFrame = true;
@@ -1992,6 +1993,9 @@ void Guy::DoHitBoxKey(const char *name)
 
                     int hitEntryID = hitBox["AttackDataListIndex"];
                     int hitID = hitBox["HitID"];
+                    if (hitID < 0) {
+                        hitID = 15; // overflow, that's the highest hit bit AFAIK
+                    }
                     if (hitEntryID != -1) {
                         hitBoxes.push_back({rect,type,hitEntryID,hitID});
                     }
@@ -2032,7 +2036,7 @@ void Guy::DoBranchKey(bool preHit = false)
                     }
                     break;
                 case 2:
-                    if (canHitID >= 0) { // has hit ever this move.. not sure if right
+                    if (canHitID) { // has hit ever this move.. not sure if right
                         doBranch = true;
                     }
                     break;
@@ -2043,7 +2047,7 @@ void Guy::DoBranchKey(bool preHit = false)
                     break;
                 case 5: // swing.. not hit?
                     // todo not always right - JP's 4HK has some extra condition to get into (2)
-                    if (!preHit && canHitID == -1) {
+                    if (!preHit && canHitID == 0) {
                         doBranch = true;
                     }
                     break;
@@ -2324,7 +2328,7 @@ bool Guy::Frame(bool endWarudoFrame)
     if (isProjectile && canHitID >= 0) {
         projHitCount--;
         //log("proj hitcount " + std::to_string(projHitCount));
-        canHitID = -1; // re-arm, all projectile hitboxes seem to have hitID 0
+        canHitID = 0; // re-arm, all projectile hitboxes seem to have hitID 0
     }
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
@@ -2652,7 +2656,7 @@ bool Guy::Frame(bool endWarudoFrame)
         bool inheritHitID = inherit["_HitID"]; 
 
         if (!inheritHitID) {
-            canHitID = -1;
+            canHitID = 0;
         }
 
         // see if anything would inherit that
