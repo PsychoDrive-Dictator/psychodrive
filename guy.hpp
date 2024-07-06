@@ -375,7 +375,7 @@ private:
     std::deque<int> inputBuffer;
 
     // hitting side
-    int canHitID = -1;
+    int canHitID = 0;
     bool hitThisFrame = false;
     bool hasBeenBlockedThisFrame = false;
     bool hitArmorThisFrame = false;
