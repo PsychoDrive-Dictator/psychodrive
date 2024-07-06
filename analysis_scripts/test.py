@@ -124,16 +124,28 @@ for char in characters:
     #     checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
 
     # find hitboxes with certain flags
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "AttackCollisionKey" in move:
+    #         for key in move["AttackCollisionKey"]:
+    #             if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
+    #                 attackKey = move["AttackCollisionKey"][key]
+    #                 if attackKey["Condition"] & 2048:
+    #                     print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
+    #                           " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
+    #                           " condition " + str(attackKey["Condition"]))
+
+    # find certain branches
     for moveID in moves21Json:
         move = moves21Json[moveID]
-        if "AttackCollisionKey" in move:
-            for key in move["AttackCollisionKey"]:
-                if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
-                    attackKey = move["AttackCollisionKey"][key]
-                    if attackKey["Condition"] & 2048:
-                        print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
-                              " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
-                              " condition " + str(attackKey["Condition"]))
+        if "BranchKey" in move:
+            for key in move["BranchKey"]:
+                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+                    branchKey = move["BranchKey"][key]
+                    if branchKey["Type"] == 37:
+                        print(char + " " + moveID + " hit catch branch params " + str(branchKey["Param00"]) +
+                              " " + str(branchKey["Param01"]))
+
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
     #     # if "_Y2" in moveID:

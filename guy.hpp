@@ -383,6 +383,8 @@ private:
     bool punishCounterThisFrame = false;
     bool grabbedThisFrame = false;
     bool hitThisMove = false;
+    bool hitCounterThisMove = false;
+    bool hitPunishCounterThisMove = false;
     bool hasBeenBlockedThisMove = false;
     bool hitArmorThisMove = false;
     bool hitAtemiThisMove = false;

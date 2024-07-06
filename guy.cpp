@@ -840,14 +840,15 @@ void Guy::DoTriggers()
             // bit 1 = on block
             // bit 2 = on whiff
             // bit 3 = on armor
-            // bit 10 is set almost everywhere, but unknown as of yet
+            // bit 10 is set almost everywhere, but unknown as of yet (PP?)
             // bit 11 = on counter/atemi
             // bit 12 = on parry
 
             // is 'this move' really broadly correct? or only for defers
             // maybe that's what mystery bit 10 governs
             bool conditionMet = false;
-            if ( condition & (1<<0) && hitThisMove) {
+            bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
+            if ( condition & (1<<0) && anyHitThisMove) {
                 conditionMet = true;
             }
             if ( condition & (1<<1) && hasBeenBlockedThisMove) {
@@ -855,7 +856,7 @@ void Guy::DoTriggers()
             }
             // todo don't forget to add 'not parried' there
             if ( condition & (1<<2) &&
-                (!hitThisMove && !hasBeenBlockedThisMove &&
+                (!anyHitThisMove && !hasBeenBlockedThisMove &&
                  !hitAtemiThisMove && !hitArmorThisMove)) {
                 conditionMet = true;
             }
@@ -1707,9 +1708,13 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
 
                 canHitID = hitbox.hitID + 1;
-                if (!pOtherGuy->blocking) {
-                    if (!hitArmor && hitEntryFlag & punish_counter) {
+                if (!pOtherGuy->blocking && !hitArmor) {
+                    if (hitEntryFlag & punish_counter) {
                         punishCounterThisFrame = true;
+                        hitPunishCounterThisMove = true;
+                    }
+                    if (hitEntryFlag & counter) {
+                        hitCounterThisMove = true;
                     }
                     hitThisFrame = true;
                     hitThisMove = true;
@@ -2123,6 +2128,7 @@ void Guy::DoBranchKey(bool preHit = false)
                 case 37:
                     // Hit catch vs just hit.. is this one "ever hit" and the other 'hit this frame'?
                     // or the opposite...?
+                    // todo what if you hit armor? are there condition bits here?
                     if (hitThisFrame) {
                         doBranch = true;
                     }
@@ -2204,14 +2210,30 @@ void Guy::DoBranchKey(bool preHit = false)
                         }
                     }
                     break;
-                case 54:
-                    // that isn't right? DIs don't go to (2) on contact
-                    // there's probably a flag that says touch a specific hitbox
-                    // but it works to turn it into counter after armor..
-                    // param0 is 7 ot 32..
-                    if (branchParam0 == 7 && touchedOpponent) {
+                case 54: // touch, but really 'hit' with condition flags..
+                    // branchParam1 set on some moves but unclear if used
+                    if (branchParam0 == 0) {
+                        branchParam0 = 255;
+                    }
+                    if (branchParam0 & (1<<0) && hitThisMove) {
                         doBranch = true;
                     }
+                    if (branchParam0 & (1<<1) && hitCounterThisMove) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 & (1<<2) && hitPunishCounterThisMove) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 & (1<<3) && hasBeenBlockedThisMove) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 & (1<<4) && hitAtemiThisMove) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 & (1<<5) && hitArmorThisMove) {
+                        doBranch = true;
+                    }
+                    // todo 6 and 7 parry and PP
                     break;
                 case 63:
                     // what's the difference between this and 20?
@@ -2636,6 +2658,8 @@ bool Guy::Frame(bool endWarudoFrame)
         // see if anything would inherit that
         // probably should only reset if a trigger happened as opposed to branches
         hitThisMove = false;
+        hitCounterThisMove = false;
+        hitPunishCounterThisMove = false;
         hasBeenBlockedThisMove = false;
         hitArmorThisMove = false;
         hitAtemiThisMove = false;
