@@ -85,6 +85,7 @@ public:
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     int getUniqueParam() { return uniqueCharge; }
+    int getDebuffTimer() { return debuffTimer; }
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
     std::string getName() { return name; }
@@ -193,7 +194,7 @@ public:
         health = maxHealth = 10000; // todo pull that, need to make one of the dumps contain vital_max
     }
 
-    Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID)
+    Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)
     {
         character = parent.character;
         version = parent.version;
@@ -225,7 +226,7 @@ public:
         currentAction = startAction;
         styleInstall = styleID;
 
-        isProjectile = true;
+        isProjectile = isProj;
         projHitCount = -1; // unset yet, is in the first action
         if (parent.pParent) {
             pParent = parent.pParent;
@@ -448,6 +449,8 @@ private:
 
     int uniqueCharge = 0;
     bool uniqueTimer = false;
+
+    int debuffTimer = 0;
 
     std::string actionName;
     nlohmann::json actionJson;

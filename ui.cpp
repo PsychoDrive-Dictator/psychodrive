@@ -101,7 +101,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i warudo %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getWarudo() );
     } else {
-        ImGui::Text("health %i unique %i style %i install %i", pGuy->getHealth(), pGuy->getUniqueParam(), pGuy->getStyle(), pGuy->getInstallFrames());
+        ImGui::Text("health %i unique %i debuff %i style %i install %i", pGuy->getHealth(), pGuy->getUniqueParam(), pGuy->getDebuffTimer(), pGuy->getStyle(), pGuy->getInstallFrames());
         ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i warudo %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getWarudo());
     }
     if ( ImGui::Button("destroy") ) { pGuyToDelete = pGuy; }
