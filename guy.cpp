@@ -2388,7 +2388,7 @@ bool Guy::Frame(bool endWarudoFrame)
                 nextAction = 287;
                 wallSplat = false;
                 // todo ??
-                accelY = Fixed(-0.6f);
+                accelY = Fixed(-0.6f, true);
             } else {
                 nextAction = 235; // combo/bounce state
 
