@@ -136,26 +136,27 @@ for char in characters:
     #                           " condition " + str(attackKey["Condition"]))
 
     # find certain branches
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "BranchKey" in move:
-    #         for key in move["BranchKey"]:
-    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-    #                 branchKey = move["BranchKey"][key]
-    #                 if branchKey["Type"] == 16:
-    #                     print(char + " " + moveID + " SIDE branch params " + str(branchKey["Param00"]) +
-    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]))
-
-    # find certain StatusKey Side bits
     for moveID in moves21Json:
         move = moves21Json[moveID]
-        if "StatusKey" in move:
-            for key in move["StatusKey"]:
-                if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
-                    statusKey = move["StatusKey"][key]
-                    if statusKey["Side"] & 1:
-                        print(char + " " + moveID + " StatusKey Side bit 0 frames " + str(statusKey["_StartFrame"]) +
-                              "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
+        if "BranchKey" in move:
+            for key in move["BranchKey"]:
+                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+                    branchKey = move["BranchKey"][key]
+                    if branchKey["Type"] == 12:
+                        print(char + " " + moveID + " HEIGHT branch params " + str(branchKey["Param00"]) +
+                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+
+    # find certain StatusKey Side bits
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "StatusKey" in move:
+    #         for key in move["StatusKey"]:
+    #             if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
+    #                 statusKey = move["StatusKey"][key]
+    #                 if statusKey["Side"] & 1:
+    #                     print(char + " " + moveID + " StatusKey Side bit 0 frames " + str(statusKey["_StartFrame"]) +
+    #                           "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
 
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
