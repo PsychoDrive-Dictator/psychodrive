@@ -234,8 +234,10 @@ bool Guy::PreFrame(void)
 {
     // todo check if it also counts down in screen freeze..
     // if it doesn't we might need to have two kinds of warudos
-    if (debuffTimer > 0 ) {
-        debuffTimer--;
+    if (!warudoIsFreeze || !warudo) {
+        if (debuffTimer > 0 ) {
+            debuffTimer--;
+        }
     }
 
     if (warudo > 0) {
@@ -247,6 +249,7 @@ bool Guy::PreFrame(void)
                 delete this;
                 return false;
             }
+            warudoIsFreeze = false;
         }
     }
     if (warudo > 0) {
@@ -781,7 +784,7 @@ bool Guy::PreFrame(void)
                     // we might need to introduce more careful matching
                     tokiToTomare = false;
                     if (pOpponent ) {
-                        pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1);
+                        pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
                     }
                 }
             }
@@ -1636,6 +1639,15 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
             std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
             auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+
+            bool bombBurst = hitEntry["_bomb_burst"];
+
+            // if bomb burst and found a bomb, use the next hit ID instead 
+            if (bombBurst && pOpponent->debuffTimer) {
+                hitIDString = to_string_leading_zeroes(hitbox.hitEntryID + 1, 3);
+                hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+            }
+
             int destX = hitEntry["MoveDest"]["x"];
             int destY = hitEntry["MoveDest"]["y"];
             int hitHitStun = hitEntry["HitStun"];
@@ -1758,6 +1770,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                         }
                         pNewGuy->Frame(); // he should be dead after that
                     }
+
+                    if (bombBurst) {
+                        pOtherGuy->debuffTimer = 0;
+                    }
                 }
                 retHit = true;
                 log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
@@ -1788,7 +1804,6 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     int floorTime = hitEffect["FloorTime"];
     int downTime = hitEffect["DownTime"];
     bool noZu = hitEffect["_no_zu"];
-    bool bombBurst = hitEffect["_bomb_burst"];
     bool jimenBound = hitEffect["_jimen_bound"];
     bool kabeBound = hitEffect["_kabe_bound"];
     bool kabeTataki = hitEffect["_kabe_tataki"];
@@ -1922,10 +1937,15 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         }
 
         if (destY != 0) {
-            velocityY = Fixed(destY * 4) / Fixed(destTime);
-            accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
-            // i think this vel wants to apply this frame, lame workaround to get same intensity
-            velocityY -= accelY; //
+            if (destY > 0) {
+                velocityY = Fixed(destY * 4) / Fixed(destTime);
+                accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
+                // i think this vel wants to apply this frame, lame workaround to get same intensity
+                velocityY -= accelY; //
+            } else {
+                velocityY = Fixed(destY) / Fixed(destTime);
+                accelY = Fixed(0);
+            }
         }
     }
 
@@ -1976,10 +1996,6 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     // the two that seem to matter for gameplay are 9 for poison and 11 for mine
     if (dmgKind == 11) {
         debuffTimer = 300;
-    }
-
-    if (bombBurst) {
-        debuffTimer = 0;
     }
 
     return true;
@@ -2094,11 +2110,25 @@ void Guy::DoBranchKey(bool preHit = false)
                     if (canHitID) { // has hit ever this move.. not sure if right
                         doBranch = true;
                     }
+
+                    // only run that branch after the frame bump, eg. don't immediately branch
+                    // on the same-frame hit, see bombed backfist combo (2) hit/guard branch 
+                    if (!preHit) {
+                        doBranch = false;
+                    }
+
                     break;
                 case 4:
                     if (hasBeenBlockedThisFrame) { // just this frame.. enough?
                         doBranch = true;
                     }
+
+                    // only run that branch after the frame bump, eg. don't immediately branch
+                    // on the same-frame hit, see bombed backfist combo (2) hit/guard branch 
+                    if (!preHit) {
+                        doBranch = false;
+                    }
+
                     break;
                 case 5: // swing.. not hit?
                     // todo not always right - JP's 4HK has some extra condition to get into (2)
@@ -2331,6 +2361,13 @@ void Guy::DoBranchKey(bool preHit = false)
                         doBranch = true;
                     }
                     // todo 6 and 7 parry and PP
+
+                    // only run that branch after the frame bump, eg. don't immediately branch
+                    // on the same-frame hit, see backfist combo touch branch wanting to be
+                    // frame 13 after hitstop is done
+                    if (!preHit) {
+                        doBranch = false;
+                    }
                     break;
                 case 63:
                     // what's the difference between this and 20?
