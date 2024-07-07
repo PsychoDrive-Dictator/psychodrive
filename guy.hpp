@@ -280,6 +280,7 @@ private:
     std::vector<Guy*> minions;
     bool isProjectile = false;
     int projHitCount = 0;
+    bool die = false;
     int limitShotCategory = -1;
     bool noPush = false;
     Guy *pParent = nullptr;
