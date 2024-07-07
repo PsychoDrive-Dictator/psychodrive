@@ -29,8 +29,9 @@ public:
     bool Frame(bool endWarudoFrame = false);
     std::string getActionName(int actionID);
 
-    void addWarudo(int w) {
+    void addWarudo(int w, bool isFreeze = false) {
         pendingWarudo += w;
+        warudoIsFreeze = isFreeze;
     }
 
     std::string getCharacter() { return character + std::to_string(version); }
@@ -394,6 +395,7 @@ private:
     int warudo = 0;
     int pendingWarudo = 0;
     int timeInWarudo = 0;
+    bool warudoIsFreeze = false;
 
     // getting hit side
     Guy *pAttacker = nullptr;
