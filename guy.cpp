@@ -273,10 +273,15 @@ bool Guy::PreFrame(void)
 
     if (actionJson != nullptr)
     {
-        if (isProjectile) {
+        if (isProjectile && actionJson.contains("pdata")) {
             auto pdataJson = actionJson["pdata"];
             if (projHitCount == -1) {
                 projHitCount = pdataJson["HitCount"];
+                if (projHitCount == 0) {
+                    // stuff that starts at hitcount 0 is probably meant to die some other way
+                    // todo implement lifetime, ranges, etc
+                    projHitCount = -1;
+                }
                 // log("initial hitcount " + std::to_string(projHitCount));
             }
 
@@ -728,20 +733,29 @@ bool Guy::PreFrame(void)
                 }
 
                 int validStyles = key["_ValidStyle"];
+                int operation = key["Operation"];
+                
                 if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
                     continue;
                 }
 
-                Fixed posOffsetX = Fixed(key["PosOffset"]["x"].get<double>()) * direction;
-                Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
-
-                // spawn new guy
-                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
-                pNewGuy->PreFrame();
-                if (pParent) {
-                    pParent->minions.push_back(pNewGuy);
+                if (operation == 2) {
+                    if (pParent == nullptr) {
+                        log(logUnknowns, "shotkey despawn but no parent?");
+                    }
+                    die = true;
                 } else {
-                    minions.push_back(pNewGuy);
+                    Fixed posOffsetX = Fixed(key["PosOffset"]["x"].get<double>()) * direction;
+                    Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
+
+                    // spawn new guy
+                    Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
+                    pNewGuy->PreFrame();
+                    if (pParent) {
+                        pParent->minions.push_back(pNewGuy);
+                    } else {
+                        minions.push_back(pNewGuy);
+                    }
                 }
             }
         }
@@ -1774,6 +1788,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     int floorTime = hitEffect["FloorTime"];
     int downTime = hitEffect["DownTime"];
     bool noZu = hitEffect["_no_zu"];
+    bool bombBurst = hitEffect["_bomb_burst"];
     bool jimenBound = hitEffect["_jimen_bound"];
     bool kabeBound = hitEffect["_kabe_bound"];
     bool kabeTataki = hitEffect["_kabe_tataki"];
@@ -1895,21 +1910,23 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     }
 
     // assume hit direction is opposite as facing for now, not sure if that's true
-    if (!airborne && !jimenBound) {
-        hitVelX = Fixed(direction.i() * destX * -2) / Fixed(destTime);
-        hitAccelX = Fixed(direction.i() * destX * 2) / Fixed(destTime * destTime);
-        hitAccelX.data += direction.i(); // there seems to be a bias of 1 raw units
-    } else {
-        hitVelX = Fixed(0);
-        hitAccelX = Fixed(0);
-        velocityX = Fixed(-destX) / Fixed(destTime);
-    }
+    if (destTime != 0) {
+        if (!airborne && !jimenBound) {
+            hitVelX = Fixed(direction.i() * destX * -2) / Fixed(destTime);
+            hitAccelX = Fixed(direction.i() * destX * 2) / Fixed(destTime * destTime);
+            hitAccelX.data += direction.i(); // there seems to be a bias of 1 raw units
+        } else {
+            hitVelX = Fixed(0);
+            hitAccelX = Fixed(0);
+            velocityX = Fixed(-destX) / Fixed(destTime);
+        }
 
-    if (destY != 0) {
-        velocityY = Fixed(destY * 4) / Fixed(destTime);
-        accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
-        // i think this vel wants to apply this frame, lame workaround to get same intensity
-        velocityY -= accelY; //
+        if (destY != 0) {
+            velocityY = Fixed(destY * 4) / Fixed(destTime);
+            accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
+            // i think this vel wants to apply this frame, lame workaround to get same intensity
+            velocityY -= accelY; //
+        }
     }
 
     // need to figure out if body or head is getting hit here later
@@ -1959,6 +1976,10 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     // the two that seem to matter for gameplay are 9 for poison and 11 for mine
     if (dmgKind == 11) {
         debuffTimer = 300;
+    }
+
+    if (bombBurst) {
+        debuffTimer = 0;
     }
 
     return true;
@@ -2054,6 +2075,7 @@ void Guy::DoBranchKey(bool preHit = false)
             int64_t branchParam1 = key["Param01"];
             int64_t branchParam2 = key["Param02"];
             int64_t branchParam3 = key["Param03"];
+            int64_t branchParam4 = key["Param04"];
             int branchAction = key["Action"];
             int branchFrame = key["ActionFrame"];
 
@@ -2215,18 +2237,56 @@ void Guy::DoBranchKey(bool preHit = false)
                 case 47: // todo incapacitated
                     break;
                 case 49: // status, used for at least hitstun - see jp sa3
-                    // param0 = who's status - 0, self, 1 opponent, 2 "hit target", 3 owner
-                    if (branchParam0 == 1 && branchParam3 == 1) {
-                        // just matching branch in SAA_LV3_START(1) for now
-                        if (pOpponent && pOpponent->hitStun) {
-                            doBranch = true;
+                    {
+                        // param0 = who's status - 0, self, 1 opponent, 2 "hit target", 3 owner
+                        Guy *pGuy = nullptr;
+                        if (branchParam0 == 0) {
+                            pGuy = this;
+                        } else if (branchParam0 == 1 || branchParam0 == 2) {
+                            // what's the delineation between opponent and hit target here?
+                            pGuy = pOpponent;
+                        } else if (branchParam0 == 3) {
+                            pGuy = pParent;
                         }
-                    } else if (branchParam0 == 1) {
-                        if (pOpponent && branchParam1 & (1 << (pOpponent->getPoseStatus() - 1))) {
-                            doBranch = true;
+                        if (pGuy == nullptr) {
+                            log(true, "that status branch not gonna work");
+                        } else {
+                            if (branchParam3 == 1) {
+                                // just matching branch in jp SAA_LV3_START(1) for now
+                                if (pGuy->hitStun) {
+                                    doBranch = true;
+                                }
+                            } else {
+                                log(logUnknowns, "unknown sort of status branch param3");
+                            }
+                            if (branchParam1) {
+                                if (branchParam1 & (1 << (pGuy->getPoseStatus() - 1))) {
+                                    doBranch = true;
+                                }
+                            }
+                            if (branchParam4 & 8) {
+                                if (pGuy->debuffTimer > 0) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam4 & 2048) {
+                                // bomb is gone/deleted
+                                if (pGuy->debuffTimer == 0) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam4 & 4096) {
+                                // debuff runs out on its own (bomb auto-explode)
+                                if (pGuy->debuffTimer == 1) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam4 & 8192) {
+                                // debuffed this frame? (bomb is replaced)
+                                if (pGuy->debuffTimer == 300) {
+                                    doBranch = true;
+                                }
+                            } else {
+                                log(logUnknowns, "unknown sort of status branch param4");
+                            }
                         }
-                    } else {
-                        log(logUnknowns, "unknown sort of status branch");
                     }
                     break;
                 case 52: // shot count
@@ -2371,6 +2431,10 @@ bool Guy::Frame(bool endWarudoFrame)
 
     if (isProjectile && projHitCount == 0) {
         return false; // die
+    }
+
+    if (die) {
+        return false;
     }
 
     if (landed) {
