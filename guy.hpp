@@ -50,6 +50,18 @@ public:
     int getDirection() { return direction.i(); }
     void switchDirection() { direction = direction * Fixed(-1); }
 
+    bool needsTurnaround() {
+        bool turnaround = false;
+        if (pOpponent) {
+            if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
+                turnaround = true;
+            } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
+                turnaround = true;
+            }
+        }
+        return turnaround;
+    }
+
     Fixed getStartPosX() { return startPosX; }
     void setStartPosX( Fixed newPosX ) { startPosX = newPosX; }
 

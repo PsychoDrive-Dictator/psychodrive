@@ -164,7 +164,7 @@ void Guy::BuildMoveList()
 
 void Guy::Input(int input)
 {
-    if (direction < 0) {
+    if (direction.i() < 0) {
         int newMask = 0;
         if (input & BACK) {
             newMask |= FORWARD;
@@ -2156,6 +2156,20 @@ void Guy::DoBranchKey(bool preHit = false)
                         doBranch = true;
                     }
                     break;
+                case 16: // side
+                    if (branchParam0 == 1 && !needsTurnaround()) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 == 2 && needsTurnaround()) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 == 3 && direction.i() > 0) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 == 4 && direction.i() < 0) {
+                        doBranch = true;
+                    }
+                    break;
                 case 18:
                     if ((branchParam0 == -2147483647) && (branchParam1 == 2)) {
                         // sign change on vel? used for transitioning between rise and fall
@@ -2685,13 +2699,7 @@ bool Guy::Frame(bool endWarudoFrame)
             nextAction = 1;
         }
 
-        if (pOpponent) {
-            if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
-                turnaround = true;
-            } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
-                turnaround = true;
-            }
-        }
+        turnaround = needsTurnaround();
     }
 
     if (canMove && comboHits && nextAction == 1 && neutralMove != 0) {
@@ -2780,7 +2788,7 @@ bool Guy::Frame(bool endWarudoFrame)
         nextActionFrame = -1;
 
         if (turnaround) {
-            direction = direction * Fixed(-1);
+            switchDirection();
         }
 
         UpdateActionData();
