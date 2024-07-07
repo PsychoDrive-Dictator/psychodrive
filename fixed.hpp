@@ -33,6 +33,10 @@ public:
         data = in << 16;
     }
 
+    Fixed(int64_t in) {
+        data = in << 16;
+    }
+
     Fixed() {
         data = 0;
     }
@@ -61,8 +65,24 @@ public:
         return false;
     }
 
+    bool operator <= (const Fixed& rhs) {
+        if (data <= rhs.data) {
+            return true;
+        }
+
+        return false;
+    }
+
     bool operator > (const Fixed& rhs) {
         if (data > rhs.data) {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool operator >= (const Fixed& rhs) {
+        if (data >= rhs.data) {
             return true;
         }
 

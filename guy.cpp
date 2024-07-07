@@ -2146,6 +2146,34 @@ void Guy::DoBranchKey(bool preHit = false)
                         log(true, "that branch not gonna work");
                     }
                     break;
+                case 12: // height
+                    {
+                        // param0 = whose height - 0 owner immediate, 1 target immediate, 2 target offset (?)
+                        // would the offset go in param 3 maybe
+                        Guy *pGuy = nullptr;
+                        if (branchParam0 == 0) {
+                            pGuy = this;
+                        } else if (branchParam0 == 1) {
+                            pGuy = pOpponent;
+                        }
+                        if (pGuy == nullptr) {
+                            log(true, "that height branch not gonna work");
+                        } else {
+                            if (branchParam1 == 1 && pGuy->getPosY() < Fixed(branchParam2)) {
+                                doBranch = true;
+                            }
+                            if (branchParam1 == 2 && pGuy->getPosY() <= Fixed(branchParam2)) {
+                                doBranch = true;
+                            }
+                            if (branchParam1 == 3 && pGuy->getPosY() > Fixed(branchParam2)) {
+                                doBranch = true;
+                            }
+                            if (branchParam1 == 4 && pGuy->getPosY() >= Fixed(branchParam2)) {
+                                doBranch = true;
+                            }
+                        }
+                    }
+                    break;
                 case 13:
                     if (!airborne) { // it's technically landed, but like heavy buttslam checks one frame
                         doBranch = true;
