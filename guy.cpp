@@ -2491,9 +2491,11 @@ bool Guy::Frame(bool endWarudoFrame)
 
     curNextAction = nextAction;
     bool didBranch = false;
-    DoBranchKey();
-    if (nextAction != curNextAction) {
-        didBranch = true;
+    if (!didTrigger) {
+        DoBranchKey();
+        if (nextAction != curNextAction) {
+            didBranch = true;
+        }
     }
     currentFrame++;
 
@@ -2504,7 +2506,7 @@ bool Guy::Frame(bool endWarudoFrame)
     }
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
-    if (!didBranch) {
+    if (!didTrigger && !didBranch) {
         DoBranchKey(true);
     }
 
