@@ -136,16 +136,16 @@ for char in characters:
     #                           " condition " + str(attackKey["Condition"]))
 
     # find certain branches
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "BranchKey" in move:
-            for key in move["BranchKey"]:
-                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-                    branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 12:
-                        print(char + " " + moveID + " HEIGHT branch params " + str(branchKey["Param00"]) +
-                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "BranchKey" in move:
+    #         for key in move["BranchKey"]:
+    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+    #                 branchKey = move["BranchKey"][key]
+    #                 if branchKey["Type"] == 12:
+    #                     print(char + " " + moveID + " HEIGHT branch params " + str(branchKey["Param00"]) +
+    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find certain StatusKey Side bits
     # for moveID in moves21Json:
@@ -157,6 +157,18 @@ for char in characters:
     #                 if statusKey["Side"] & 1:
     #                     print(char + " " + moveID + " StatusKey Side bit 0 frames " + str(statusKey["_StartFrame"]) +
     #                           "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
+
+    # find certain SwitchKey OperationFlag bits
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "SwitchKey" in move:
+            for key in move["SwitchKey"]:
+                if isinstance(move["SwitchKey"][key], dict) and "OperationFlag" in move["SwitchKey"][key]:
+                    switchKey = move["SwitchKey"][key]
+                    if switchKey["OperationFlag"] != 0:
+                        print(char + " " + moveID + " switchkey OperationFlag " +
+                        str(switchKey["OperationFlag"]) + " frames " + str(switchKey["_StartFrame"]) +
+                        "-" + str(switchKey["_EndFrame"]))
 
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
