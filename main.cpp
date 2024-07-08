@@ -318,6 +318,8 @@ int main(int argc, char**argv)
     currentInputMap[keyboardID] = 0;
     currentInputMap[recordingID] = 0;
 
+    std::vector<Guy *> vecGuysToDelete;
+
     while (!done)
     {
         const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -337,9 +339,10 @@ int main(int argc, char**argv)
         }
 
         bool hasInput = true;
+        bool runFrame = oneframe || !paused;
 
         if (playingBackInput) {
-            if (oneframe || !paused) {
+            if (runFrame) {
                 if (playBackFrame >= (int)playBackInputBuffer.size()) {
                     playingBackInput = false;
                     playBackFrame = 0;
@@ -354,6 +357,13 @@ int main(int argc, char**argv)
 
         std::vector<Guy *> everyone;
 
+        if (runFrame) {
+            for (auto guy : vecGuysToDelete) {
+                delete guy;
+            }
+            vecGuysToDelete.clear();
+        }
+
         for (auto guy : guys) {
             everyone.push_back(guy);
             for ( auto minion : guy->getMinions() ) {
@@ -362,7 +372,7 @@ int main(int argc, char**argv)
         }
 
         int frameGuyCount = 0;
-        if (oneframe || !paused) {
+        if (runFrame) {
             for (auto guy : everyone) {
                 if (guy->PreFrame()) {
                     frameGuyCount++;
@@ -383,7 +393,7 @@ int main(int argc, char**argv)
             globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
         }
 
-        if (oneframe || !paused) {
+        if (runFrame) {
             for (auto guy : everyone) {
                 guy->WorldPhysics();
             }
@@ -441,7 +451,7 @@ int main(int argc, char**argv)
         }
 
         if (replayingGameState) {
-            if (oneframe || !paused) {
+            if (runFrame) {
                 static bool firstFrame = true;
                 int targetDumpFrame = gameStateFrame - firstGameStateFrame;
                 if (firstFrame) {
@@ -479,7 +489,7 @@ int main(int argc, char**argv)
         }
 
         if (replayingGameState) {
-            if (oneframe || !paused) {
+            if (runFrame) {
                 int targetDumpFrame = gameStateFrame - firstGameStateFrame;
                 if (targetDumpFrame >= (int)gameStateDump.size()) {
                     replayingGameState = false;
@@ -518,12 +528,12 @@ int main(int argc, char**argv)
             }
         }
 
-        if (oneframe || !paused) { 
+        if (runFrame) {
             for (auto guy : everyone) {
                 bool die = !guy->Frame();
 
                 if (die) {
-                    delete guy;
+                    vecGuysToDelete.push_back(guy);
                 }
             }
         }
@@ -547,15 +557,6 @@ int main(int argc, char**argv)
         setRenderState(clearColor, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 
         renderUI(io.Framerate, &logQueue);
-
-        // gather everyone again in case of deletions in Frame
-        everyone.clear(); 
-        for (auto guy : guys) {
-            everyone.push_back(guy);
-            for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
-            }
-        }
 
         for (auto guy : everyone) {
             guy->Render();
