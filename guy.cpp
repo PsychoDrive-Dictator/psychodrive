@@ -625,10 +625,10 @@ bool Guy::PreFrame(void)
                             }
 
                             if (currentInput & FORWARD) {
-                                posX = posX + steerForward;
+                                posX += steerForward * direction;
                                 //log(true, "steerForward " + std::to_string(steerForward));
                             } else if (currentInput & BACK) {
-                                posX = posX + steerBackward;
+                                posX += steerBackward * direction;
                                 //log(true, "steerBackward " + std::to_string(steerBackward));
                             }
                         }
