@@ -2825,7 +2825,12 @@ bool Guy::Frame(bool endWarudoFrame)
 
         auto inherit = actionJson["fab"]["Inherit"];
 
-        bool inheritHitID = inherit["_HitID"]; 
+        bool inheritHitID = inherit["_HitID"];
+        // see eg. 2MP into light crusher - light crusher has inherit hitID true..
+        // assuming it's supposed to be for branches only
+        if (didTrigger) {
+            inheritHitID = false;
+        }
 
         if (!inheritHitID) {
             canHitID = 0;
@@ -2833,6 +2838,7 @@ bool Guy::Frame(bool endWarudoFrame)
 
         // see if anything would inherit that
         // probably should only reset if a trigger happened as opposed to branches
+        // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch
         hitThisMove = false;
         hitCounterThisMove = false;
         hitPunishCounterThisMove = false;
