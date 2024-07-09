@@ -1840,6 +1840,10 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         destY = 0;
     }
 
+    if (jimenBound && !airborne) {
+        jimenBound = false;
+    }
+
     // if going airborne, start counting juggle
     if (!airborne && destY != 0) {
         if (juggleCounter == 0) {
