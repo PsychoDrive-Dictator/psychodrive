@@ -427,8 +427,8 @@ bool Guy::PreFrame(void)
                                         break;
                                     }
                                 }
-                            } else if (targetType == 2 || targetType == 5 || targetType == 14) {
-                                // to opponent (5 is hit target.. different?)
+                            } else if (targetType == 2 || targetType == 5 || targetType == 6 || targetType == 14) {
+                                // to opponent (5 is hit target, 6 is grab target)
                                 // todo 14 is middle of opponent's collision box?
                                 pGuy = pOpponent;
                             }
@@ -1900,7 +1900,7 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
         forceKnockDown = true;
     }
 
-    if (jimenBound) {
+    if (jimenBound && floorTime) {
         int floorDestX = hitEffect["FloorDest"]["x"];
         int floorDestY = hitEffect["FloorDest"]["y"];
 
@@ -1918,14 +1918,14 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
 
     wallSplat = false;
     wallBounce = false;
+    int wallTime = hitEffect["WallTime"];
     if (kabeTataki) {
         // this can happen even if you block! blocked DI
         wallSplat = true;
         wallStopFrames = hitEffect["WallStop"];
-    } else if (kabeBound) {
+    } else if (kabeBound && wallTime) {
         int wallDestX = hitEffect["WallDest"]["x"];
         int wallDestY = hitEffect["WallDest"]["y"];
-        int wallTime = hitEffect["WallTime"];
         wallStopFrames = hitEffect["WallStop"];
 
         wallBounce = true;
