@@ -400,42 +400,43 @@ bool Guy::PreFrame(void)
                         break;
                     case 13:
                         // set teleport/home target
-                        if (targetType == 4) {
-                            // to projectile
-                            bool minionFound = false;
-                            for ( auto minion : minions ) {
-                                if (shotCategory & (1 << minion->limitShotCategory)) {
-                                    minionFound = true;
-                                    homeTargetX = minion->getPosX() + targetOffsetX * minion->direction;
-                                    homeTargetY = minion->getPosY() + targetOffsetY;
-
-                                    break;
+                        {
+                            Guy *pGuy = nullptr;
+                            if (targetType == 0) {
+                                pGuy = this;
+                            } else if (targetType == 1) {
+                                pGuy = pParent;
+                            } else if (targetType == 4) {
+                                // todo supposed to be nearest matching projectile?
+                                for ( auto minion : minions ) {
+                                    if (shotCategory & (1 << minion->limitShotCategory)) {
+                                        pGuy = minion;
+                                        break;
+                                    }
                                 }
+                            } else if (targetType == 2 || targetType == 5 || targetType == 14) {
+                                // to opponent (5 is hit target.. different?)
+                                // todo 14 is middle of opponent's collision box?
+                                pGuy = pOpponent;
                             }
-                            if (!minionFound) {
-                                log(true, "minion to teleport not found");
+                            if (pGuy) {
+                                homeTargetX = pGuy->getPosX() + targetOffsetX * pGuy->direction * Fixed(-1);
+                                homeTargetY = pGuy->getPosY() + targetOffsetY;
+                            } else {
+                                log(logUnknowns, "unknown/not found set teleport/home target");
                             }
-                        } else if (targetType == 2 || targetType == 14) {
-                            // to opponent
-                            if (pOpponent) {
-                                homeTargetX = pOpponent->getPosX() + targetOffsetX * pOpponent->direction * Fixed(-1);
-                                homeTargetY = pOpponent->getPosY() + targetOffsetY;
-                            }
-                        } else {
-                            log(logUnknowns, "unknown set teleport/home target");
                         }
                         break;
                     case 15:
                         // teleport/lerp position?
-                        if (fixValue == Fixed(0) && calcValueFrame == 1) {
-                            if (multiValueType & 1) {
-                                posX = homeTargetX;
-                            }
-                            if (multiValueType & 2) {
-                                posY = homeTargetY;
-                            }
-                        } else {
-                            log(logUnknowns, "unsupported teleport/lerp, only instant for now");
+                        if (calcValueFrame == 0) {
+                            calcValueFrame = 1;
+                        }
+                        if (multiValueType & 1) {
+                            velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame);
+                        }
+                        if (multiValueType & 2) {
+                            velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
                         }
                         break;
                     default:
