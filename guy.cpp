@@ -69,14 +69,25 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
 static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
 {
     switch (operationType) {
+        case 4: // set sign.. ??
+            if (value < Fixed(0)) {
+                keyValue = -keyValue;
+            }
+            [[fallthrough]];
         case 1: // set
-        value = keyValue;
-        break;
+            value = keyValue;
+            break;
+        case 5: // add sign.. ??
+            if (value < Fixed(0)) {
+                keyValue = -keyValue;
+            }
+            [[fallthrough]];
         case 2: // add ?
-        value = value + keyValue;
-        break;
+            value = value + keyValue;
+            break;
         default:
-        log("Uknown steer keyoperation!");
+            log("Uknown steer keyoperation!");
+            break;
     }
 }
 
@@ -349,6 +360,8 @@ bool Guy::PreFrame(void)
                 switch (operationType) {
                     case 1:
                     case 2:
+                    case 4:
+                    case 5:
                     case 9:
                     case 10:
                         if (operationType == 9 || operationType == 10) {
