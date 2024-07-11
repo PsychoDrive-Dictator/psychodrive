@@ -2854,15 +2854,17 @@ bool Guy::Frame(bool endWarudoFrame)
             canHitID = 0;
         }
 
-        // see if anything would inherit that
-        // probably should only reset if a trigger happened as opposed to branches
-        // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch
-        hitThisMove = false;
-        hitCounterThisMove = false;
-        hitPunishCounterThisMove = false;
-        hasBeenBlockedThisMove = false;
-        hitArmorThisMove = false;
-        hitAtemiThisMove = false;
+        // only reset on doing a trigger - skull diver trigger is on hit, but the hit
+        // happens on a prior script, and it doesn't have inherit HitInfo, so it's not that
+        // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch, check what that's about
+        if (didTrigger) {
+            hitThisMove = false;
+            hitCounterThisMove = false;
+            hitPunishCounterThisMove = false;
+            hasBeenBlockedThisMove = false;
+            hitArmorThisMove = false;
+            hitAtemiThisMove = false;
+        }
 
         if (!hitStun || blocking) {
             // should this use airborne status from previous or new action? currently previous
