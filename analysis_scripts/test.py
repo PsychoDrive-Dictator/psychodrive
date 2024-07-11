@@ -154,7 +154,7 @@ for char in characters:
             for key in move["StatusKey"]:
                 if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
                     statusKey = move["StatusKey"][key]
-                    if statusKey["Side"] == 4:
+                    if statusKey["Side"] == 1:
                         print(char + " " + moveID + " StatusKey Side " + str(statusKey["Side"]) + " frames " + str(statusKey["_StartFrame"]) +
                               "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
 

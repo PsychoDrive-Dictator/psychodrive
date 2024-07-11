@@ -2961,6 +2961,17 @@ void Guy::DoStatusKey(void)
             forcedPoseStatus = key["PoseStatus"];
             actionStatus = key["ActionStatus"];
             jumpStatus = key["JumpStatus"];
+
+            int sideOperation = key["Side"];
+
+            switch (sideOperation) {
+                case 0:
+                default:
+                    break;
+                case 3:
+                    switchDirection();
+                    break;
+            }
         }
     }
 }
