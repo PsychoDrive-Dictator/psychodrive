@@ -431,6 +431,8 @@ local obj_to_table
 local table_to_managed_object
 local logToFile
 
+local typeToDump
+
 re.on_draw_ui(function()
   imgui.spacing()
 	imgui.text()
@@ -526,10 +528,11 @@ re.on_draw_ui(function()
     --local reversalData = trainingSnapshot and trainingSnapshot:get_field("_ReversalData")
     --managed_object_to_json( reversalData, "test_reversal_setting.json")
   end
-
-  if imgui.button("test player data") == true then
-    outputTable = obj_to_table(sdk.find_type_definition("gBattle"):get_field("Player"):get_data().mcPlayer[0], nil, nil, true, true)
-    logToFile( myjson.encode(outputTable), "static_player_data.json" )
+  local changed
+  changed, typeToDump = imgui.input_text("type to dump", typeToDump)
+  if imgui.button("dump type") == true then
+    outputTable = obj_to_table(sdk.find_type_definition(typeToDump), nil, nil, true, true)
+    logToFile( myjson.encode(outputTable), typeToDump .. ".json" )
   end
 
   local hijackchanged, hijackvalue = imgui.checkbox("hijack replays with replay.json", hijackingReplays)
@@ -690,9 +693,14 @@ function(retval)
 end
 )
 
-function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOnly )
-  local objType = obj:get_type_definition()
-  local fields = objType:get_fields()
+function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOnly, isType )
+  local fields
+  if isType ~= nil then
+    local objType = obj:get_type_definition()
+    fields = objType:get_fields()
+  else
+    fields = obj:get_fields()
+  end
   local out = {}
 
   if recurseCount == nil then
