@@ -2968,6 +2968,11 @@ void Guy::DoStatusKey(void)
                 case 0:
                 default:
                     break;
+                case 1:
+                    if (needsTurnaround()) {
+                        switchDirection();
+                    }
+                    break;
                 case 3:
                     switchDirection();
                     break;
