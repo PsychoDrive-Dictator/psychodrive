@@ -324,6 +324,7 @@ private:
 
     bool airborne = false;
     bool landed = false;
+    bool forceLanding = false;
     bool touchedWall = false;
     bool touchedOpponent = false;
     bool startsFalling = false;
