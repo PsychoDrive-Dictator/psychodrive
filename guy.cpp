@@ -560,6 +560,13 @@ bool Guy::PreFrame(void)
                 if (flag & 0x2) {
                     counterState = true;
                 }
+
+                int operation = key["OperationFlag"];
+
+                if (operation & 1) {
+                    log (logTransitions, "force landing op");
+                    forceLanding = true;
+                }
             }
         }
 
@@ -1460,7 +1467,6 @@ bool Guy::WorldPhysics(void)
 {
     bool hasPushed = false;
     Fixed pushX = 0;
-    Fixed pushY = 0;
     bool floorpush = false;
     touchedWall = false;
     didPush = false;
@@ -1473,7 +1479,6 @@ bool Guy::WorldPhysics(void)
 
         if (getPosY() - Fixed(landingAdjust) < 0) {
             //log("floorpush pos");
-            pushY = -getPosY();
             floorpush = true;
             hasPushed = true;
         }
@@ -1509,10 +1514,8 @@ bool Guy::WorldPhysics(void)
 
     // if we're going up (like jsut getting hit), we're not landing,
     // just being helped off the ground - see heavy donkey into lp dp
-    bool forceLanding = airborne && prevPoseStatus == 3 && forcedPoseStatus > 0 && forcedPoseStatus < 3;
     if (forceLanding || (airborne && floorpush && velocityY < 0))
     {
-        pushY = Fixed(0);
         velocityX = Fixed(0);
         velocityY = Fixed(0);
         accelX = Fixed(0);
@@ -1544,7 +1547,6 @@ bool Guy::WorldPhysics(void)
 
     if ( hasPushed ) {
         posX += pushX;
-        posY += pushY;
 
         if (pushBackThisFrame != Fixed(0) && pushX != Fixed(0) && pushX * pushBackThisFrame < Fixed(0)) {
             // some pushback went into the wall, it needs to go into opponent
@@ -1557,13 +1559,15 @@ bool Guy::WorldPhysics(void)
         UpdateBoxes();
     }
 
-    if (landed || forceLanding || bounced) {
+    if (landed || forceLanding || bounced || floorpush) {
         // don't update hitboxes before setting posY, the current frame
         // or the box will be too high up as we're still on the falling box
         // see heave donky into lp dp
         posY = Fixed(0);
         posOffsetY = Fixed(0);
     }
+
+    forceLanding = false;
 
     return hasPushed;
 }
