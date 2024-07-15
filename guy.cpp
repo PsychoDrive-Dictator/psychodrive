@@ -827,6 +827,8 @@ bool Guy::PreFrame(void)
                     if (pOpponent) {
                         pOpponent->nextAction = param01;
                         pOpponent->nextActionOpponentAction = true;
+                        pOpponent->locked = true;
+                        pOpponent->hitStun = 50000;
                         // test
                         pOpponent->direction = direction;
                         pOpponent->posX = posX;
@@ -837,6 +839,8 @@ bool Guy::PreFrame(void)
                     std::string hitIDString = to_string_leading_zeroes(param02, 3);
                     auto hitEntry = hitJson[hitIDString]["common"]["0"]; // going by crowd wisdom there
                     if (pOpponent) {
+                        pOpponent->hitStun = 0;
+                        pOpponent->locked = false;
                         pOpponent->ApplyHitEffect(hitEntry, false, true, false, false);
                     }
                 }
@@ -1652,6 +1656,14 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
             if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
                 // a grab would whiff if opponent is in blockstun
+                continue;
+            }
+
+            if ((hitbox.type == domain && !pOtherGuy->locked) ||
+                (hitbox.type != domain && pOtherGuy->locked)) {
+                // only domain when locked and domain only when locked
+                // todo check if that's right, eg. see if jp can still combo out of grab
+                // proabbly yes because it's actually the unlock juggle he comboes from?
                 continue;
             }
 
@@ -2663,11 +2675,15 @@ bool Guy::Frame(bool endWarudoFrame)
     }
 
     // first hitstun countdown happens on the same "frame" as hit, before hitstop
+    // todo that's no longer true, we play that frame after hitstop?
     if (hitStun > 0)
     {
         hitStun--;
         if (hitStun == 0)
         {
+            // todo need to decouple hitstun 0 from progressing to the next script
+            // damage and juggle states' scripts' speed need to be scaled to naturally
+            // end at the same time at hitstun?
             nextAction = 1;
 
             if (forceKnockDown) {

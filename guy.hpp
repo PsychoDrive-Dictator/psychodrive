@@ -378,6 +378,7 @@ private:
     int loopPoint = 0;
     bool nextActionOpponentAction = false;
     bool opponentAction = false;
+    bool locked = false;
     bool hasLooped = false;
 
     // todo round begin action needs to set that
