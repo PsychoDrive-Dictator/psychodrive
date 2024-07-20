@@ -39,6 +39,7 @@ const char* charNames[] = {
     "rashid",
     "aki",
     "chunli",
+    "juri",
     "lily",
     "deejay",
     "cammy",
