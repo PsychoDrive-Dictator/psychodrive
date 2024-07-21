@@ -183,20 +183,20 @@ public:
         charColorG = color.g;
         charColorB = color.b;
 
-        movesDictJson = parseCharFile(charPath, character, version, "moves");
-        rectsJson = parseCharFile(charPath, character, version, "rects");
-        namesJson = parseCharFile(charPath, character, version, "names");
-        triggerGroupsJson = parseCharFile(charPath, character, version, "trigger_groups");
-        triggersJson = parseCharFile(charPath, character, version, "triggers");
-        commandsJson = parseCharFile(charPath, character, version, "commands");
-        chargeJson = parseCharFile(charPath, character, version, "charge");
-        hitJson = parseCharFile(charPath, character, version, "hit");
-        atemiJson = parseCharFile(charPath, character, version, "atemi");
-        charInfoJson = parseCharFile(charPath, character, version, "charinfo");
+        pMovesDictJson = loadCharFile(charPath, character, version, "moves");
+        pRectsJson = loadCharFile(charPath, character, version, "rects");
+        pNamesJson = loadCharFile(charPath, character, version, "names");
+        pTriggerGroupsJson = loadCharFile(charPath, character, version, "trigger_groups");
+        pTriggersJson = loadCharFile(charPath, character, version, "triggers");
+        pCommandsJson = loadCharFile(charPath, character, version, "commands");
+        pChargeJson = loadCharFile(charPath, character, version, "charge");
+        pHitJson = loadCharFile(charPath, character, version, "hit");
+        pAtemiJson = loadCharFile(charPath, character, version, "atemi");
+        pCharInfoJson = loadCharFile(charPath, character, version, "charinfo");
 
-        commonMovesJson = parseCharFile(commonPath, "common", version, "moves");
-        commonRectsJson = parseCharFile(commonPath, "common", version, "rects");
-        commonAtemiJson = parseCharFile(commonPath, "common", version, "atemi");
+        pCommonMovesJson = loadCharFile(commonPath, "common", version, "moves");
+        pCommonRectsJson = loadCharFile(commonPath, "common", version, "rects");
+        pCommonAtemiJson = loadCharFile(commonPath, "common", version, "atemi");
 
         Input(0);
 
@@ -219,20 +219,20 @@ public:
         charColorG = parent.charColorG;
         charColorB = parent.charColorB;
 
-        movesDictJson = parent.movesDictJson;
-        rectsJson = parent.rectsJson;
-        namesJson = parent.namesJson;
-        triggerGroupsJson = parent.triggerGroupsJson;
-        triggersJson = parent.triggersJson;
-        commandsJson = parent.commandsJson;
-        chargeJson = parent.chargeJson;
-        hitJson = parent.hitJson;
-        atemiJson = parent.hitJson;
-        charInfoJson = parent.charInfoJson;
+        pMovesDictJson = parent.pMovesDictJson;
+        pRectsJson = parent.pRectsJson;
+        pNamesJson = parent.pNamesJson;
+        pTriggerGroupsJson = parent.pTriggerGroupsJson;
+        pTriggersJson = parent.pTriggersJson;
+        pCommandsJson = parent.pCommandsJson;
+        pChargeJson = parent.pChargeJson;
+        pHitJson = parent.pHitJson;
+        pAtemiJson = parent.pAtemiJson;
+        pCharInfoJson = parent.pCharInfoJson;
 
-        commonMovesJson = parent.commonMovesJson;
-        commonRectsJson = parent.commonRectsJson;
-        commonAtemiJson = parent.commonAtemiJson;
+        pCommonMovesJson = parent.pCommonMovesJson;
+        pCommonRectsJson = parent.pCommonRectsJson;
+        pCommonAtemiJson = parent.pCommonAtemiJson;
 
         pOpponent = parent.pOpponent;
 
@@ -298,20 +298,20 @@ private:
     bool noPush = false;
     Guy *pParent = nullptr;
 
-    nlohmann::json movesDictJson;
-    nlohmann::json rectsJson;
-    nlohmann::json namesJson;
-    nlohmann::json triggerGroupsJson;
-    nlohmann::json triggersJson;
-    nlohmann::json commandsJson;
-    nlohmann::json chargeJson;
-    nlohmann::json hitJson;
-    nlohmann::json atemiJson;
-    nlohmann::json charInfoJson;
+    nlohmann::json *pMovesDictJson;
+    nlohmann::json *pRectsJson;
+    nlohmann::json *pNamesJson;
+    nlohmann::json *pTriggerGroupsJson;
+    nlohmann::json *pTriggersJson;
+    nlohmann::json *pCommandsJson;
+    nlohmann::json *pChargeJson;
+    nlohmann::json *pHitJson;
+    nlohmann::json *pAtemiJson;
+    nlohmann::json *pCharInfoJson;
 
-    nlohmann::json commonMovesJson;
-    nlohmann::json commonRectsJson;
-    nlohmann::json commonAtemiJson;
+    nlohmann::json *pCommonMovesJson;
+    nlohmann::json *pCommonRectsJson;
+    nlohmann::json *pCommonAtemiJson;
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
 
