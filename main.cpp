@@ -152,7 +152,7 @@ nlohmann::json parse_json_file(const std::string &fileName)
     return nlohmann::json::parse(fileText);
 }
 
-nlohmann::json parseCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName)
+nlohmann::json *loadCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName)
 {
     std::string fileName;
     bool foundFile = false;
@@ -180,7 +180,13 @@ nlohmann::json parseCharFile(const std::string &path, const std::string &charNam
         return nullptr;
     }
 
-    return parse_json_file(fileName);
+    static std::unordered_map<std::string, nlohmann::json> mapCharFileLoader;
+
+    if (mapCharFileLoader.find(fileName) == mapCharFileLoader.end()) {
+        mapCharFileLoader[fileName] = parse_json_file(fileName);
+    }
+
+    return &mapCharFileLoader[fileName];
 }
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length)

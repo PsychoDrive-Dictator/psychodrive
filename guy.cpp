@@ -95,9 +95,9 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
-    nlohmann::json *pRects = &rectsJson;
+    nlohmann::json *pRects = pRectsJson;
     if (!pRects->contains(pageIDString) || !(*pRects)[pageIDString].contains(boxIDString)) {
-        pRects = &commonRectsJson;
+        pRects = pCommonRectsJson;
     }
     if (!pRects->contains(pageIDString) || !(*pRects)[pageIDString].contains(boxIDString)) {
         return false;
@@ -121,7 +121,7 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
-        int parentStyleID = charInfoJson["Styles"][std::to_string(styleInstall)]["ParentStyleID"];
+        int parentStyleID = (*pCharInfoJson)["Styles"][std::to_string(styleInstall)]["ParentStyleID"];
 
         if (parentStyleID == -1) {
             return nullptr;
@@ -132,7 +132,7 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
         const char *moveName = mapMoveStyle[mapIndex].first.c_str();
         bool commonMove = mapMoveStyle[mapIndex].second;
 
-        *ppMoveJson = commonMove ? &commonMovesJson[moveName] : &movesDictJson[moveName];
+        *ppMoveJson = commonMove ? &(*pCommonMovesJson)[moveName] : &(*pMovesDictJson)[moveName];
         return moveName;
     }
 }
@@ -142,13 +142,13 @@ void Guy::BuildMoveList()
     // for UI dropdown selector
     vecMoveList.push_back(strdup("1 no action (obey input)"));
     auto triggerGroupString = to_string_leading_zeroes(0, 3);
-    for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
+    for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
     {
         std::string actionString = key;
         vecMoveList.push_back(strdup(actionString.c_str()));
     }
 
-    for (auto& [keyID, key] : movesDictJson.items())
+    for (auto& [keyID, key] : pMovesDictJson->items())
     {
         int actionID = key["fab"]["ActionID"];
         int styleID = 0;
@@ -159,7 +159,7 @@ void Guy::BuildMoveList()
         mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
     }
 
-    for (auto& [keyID, key] : commonMovesJson.items())
+    for (auto& [keyID, key] : pCommonMovesJson->items())
     {
         int actionID = key["fab"]["ActionID"];
         int styleID = 0;
@@ -201,8 +201,8 @@ void Guy::Input(int input)
 std::string Guy::getActionName(int actionID)
 {
     auto actionIDString = to_string_leading_zeroes(actionID, 4);
-    bool validAction = namesJson.contains(actionIDString);
-    std::string ret = validAction ? namesJson[actionIDString] : "invalid";
+    bool validAction = pNamesJson->contains(actionIDString);
+    std::string ret = validAction ? (*pNamesJson)[actionIDString] : "invalid";
     return ret;
 }
 
@@ -837,7 +837,7 @@ bool Guy::PreFrame(void)
                 } else if (type == 2) {
                     // apply hit DT param 02
                     std::string hitIDString = to_string_leading_zeroes(param02, 3);
-                    nlohmann::json *pHitEntry = &hitJson[hitIDString]["common"]["0"]; // going by crowd wisdom there
+                    nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"]; // going by crowd wisdom there
                     if (pOpponent) {
                         pOpponent->hitStun = 0;
                         pOpponent->locked = false;
@@ -942,7 +942,7 @@ void Guy::DoTriggers()
             }
 
             auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
-            for (auto& [keyID, key] : triggerGroupsJson[triggerGroupString].items())
+            for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
             {
                 int triggerID = atoi(keyID.c_str());
                 Trigger newTrig = { key, defer, triggerGroup };
@@ -970,7 +970,7 @@ void Guy::DoTriggers()
 
             nlohmann::json *pTrigger = nullptr;
 
-            for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
+            for (auto& [keyID, key] : (*pTriggersJson)[actionIDString].items()) {
                 if ( atoi(keyID.c_str()) == triggerID ) {
                     pTrigger = &key;
                     break;
@@ -1075,7 +1075,7 @@ void Guy::DoTriggers()
                     break; // we found our trigger walking back, skip all other triggers
                 } else {
                     std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-                    nlohmann::json *pCommand = &commandsJson[commandNoString]["0"];
+                    nlohmann::json *pCommand = &(*pCommandsJson)[commandNoString]["0"];
                     int inputID = (*pCommand)["input_num"].get<int>() - 1;
                     nlohmann::json *pInputs = &(*pCommand)["inputs"];
 
@@ -1097,7 +1097,7 @@ void Guy::DoTriggers()
                             bool chargeMatch = false;
                             nlohmann::json *pResourceMatch;
                             int chargeID = inputOkKeyFlags & 0xFF;
-                            for (auto& [keyID, key] : chargeJson.items()) {
+                            for (auto& [keyID, key] : pChargeJson->items()) {
                                 // support either charge format
                                 if (key.contains("resource")) {
                                     key = key["resource"];
@@ -1668,7 +1668,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             }
 
             std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
-            nlohmann::json *pHitEntry = &hitJson[hitIDString]["param"][hitEntryFlagString];
+            nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
 
             bool bombBurst = false;
 
@@ -1680,7 +1680,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             // if bomb burst and found a bomb, use the next hit ID instead 
             if (bombBurst && pOpponent->debuffTimer) {
                 hitIDString = to_string_leading_zeroes(hitbox.hitEntryID + 1, 3);
-                pHitEntry = &hitJson[hitIDString]["param"][hitEntryFlagString];
+                pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
             }
 
             int destX = (*pHitEntry)["MoveDest"]["x"];
@@ -1700,10 +1700,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
                 nlohmann::json *pAtemi = nullptr;
-                if (pOtherGuy->atemiJson.contains(atemiIDString)) {
-                    pAtemi = &pOtherGuy->atemiJson[atemiIDString];
-                } else if (commonAtemiJson.contains(atemiIDString)) {
-                    pAtemi = &commonAtemiJson[atemiIDString];
+                if (pOtherGuy->pAtemiJson->contains(atemiIDString)) {
+                    pAtemi = &(*pOtherGuy->pAtemiJson)[atemiIDString];
+                } else if (pCommonAtemiJson->contains(atemiIDString)) {
+                    pAtemi = &(*pCommonAtemiJson)[atemiIDString];
                 } else {
                     log(true, "atemi not found!!");
                     break;
@@ -2565,8 +2565,8 @@ bool Guy::Frame(bool endWarudoFrame)
         if ( airActionCounter ) {
             airActionCounter = 0;
         }
-        if (charInfoJson.contains("Styles")) {
-            nlohmann::json *pStyleJson = &charInfoJson["Styles"][std::to_string(styleInstall)];
+        if (pCharInfoJson->contains("Styles")) {
+            nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
             if ((*pStyleJson)["StyleData"]["State"]["TerminateState"] == 0x3ff1fffffff) {
                 // that apparently means landing... figure out deeper meaning later
                 // go to parent or go to 0? :/
