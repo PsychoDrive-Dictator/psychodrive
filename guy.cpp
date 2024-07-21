@@ -95,18 +95,18 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
     std::string boxIDString = to_string_leading_zeroes(boxID, 3);
-    nlohmann::json rects = rectsJson;
-    if (!rects.contains(pageIDString) || !rects[pageIDString].contains(boxIDString)) {
-        rects = commonRectsJson;
+    nlohmann::json *pRects = &rectsJson;
+    if (!pRects->contains(pageIDString) || !(*pRects)[pageIDString].contains(boxIDString)) {
+        pRects = &commonRectsJson;
     }
-    if (!rects.contains(pageIDString) || !rects[pageIDString].contains(boxIDString)) {
+    if (!pRects->contains(pageIDString) || !(*pRects)[pageIDString].contains(boxIDString)) {
         return false;
     }
-    auto rectJson = rects[pageIDString][boxIDString];
-    int xOrig = rectJson["OffsetX"];
-    int yOrig = rectJson["OffsetY"];
-    int xRadius = rectJson["SizeX"];
-    int yRadius = rectJson["SizeY"];
+    nlohmann::json *pRect = &(*pRects)[pageIDString][boxIDString];
+    int xOrig = (*pRect)["OffsetX"];
+    int yOrig = (*pRect)["OffsetY"];
+    int xRadius = (*pRect)["SizeX"];
+    int yRadius = (*pRect)["SizeY"];
     xOrig *= dir;
 
     outBox.x = Fixed(xOrig - xRadius) + offsetX;
@@ -117,7 +117,7 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
     return true;
 }
 
-const char* Guy::FindMove(int actionID, int styleID, nlohmann::json &moveJson)
+const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson)
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
@@ -127,12 +127,12 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json &moveJson)
             return nullptr;
         }
 
-        return FindMove(actionID, parentStyleID, moveJson);
+        return FindMove(actionID, parentStyleID, ppMoveJson);
     } else {
         const char *moveName = mapMoveStyle[mapIndex].first.c_str();
         bool commonMove = mapMoveStyle[mapIndex].second;
 
-        moveJson = commonMove ? commonMovesJson[moveName] : movesDictJson[moveName];
+        *ppMoveJson = commonMove ? &commonMovesJson[moveName] : &movesDictJson[moveName];
         return moveName;
     }
 }
@@ -209,35 +209,35 @@ std::string Guy::getActionName(int actionID)
 void Guy::UpdateActionData(void)
 {
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
-    actionJson = nullptr;
+    pActionJson = nullptr;
     const char *foundAction = nullptr;
 
     if (opponentAction) {
-        foundAction = pOpponent->FindMove(currentAction, 0, actionJson);
+        foundAction = pOpponent->FindMove(currentAction, 0, &pActionJson);
     } else {
-        foundAction = FindMove(currentAction, styleInstall, actionJson);
+        foundAction = FindMove(currentAction, styleInstall, &pActionJson);
     }
 
     if (foundAction == nullptr) {
         log(true, "couldn't find next action, reverting to 1 - style lapsed?");
         currentAction = 1;
-        foundAction = FindMove(currentAction, styleInstall, actionJson);
+        foundAction = FindMove(currentAction, styleInstall, &pActionJson);
     }
 
     actionName = foundAction;
 
-    auto fab = actionJson["fab"];
-    mainFrame = fab["ActionFrame"]["MainFrame"];
-    followFrame = fab["ActionFrame"]["FollowFrame"];
-    marginFrame = fab["ActionFrame"]["MarginFrame"];
-    actionFrameDuration = fab["Frame"];
-    loopPoint = fab["State"]["EndStateParam"];
+    nlohmann::json *pFab = &(*pActionJson)["fab"];
+    mainFrame = (*pFab)["ActionFrame"]["MainFrame"];
+    followFrame = (*pFab)["ActionFrame"]["FollowFrame"];
+    marginFrame = (*pFab)["ActionFrame"]["MarginFrame"];
+    actionFrameDuration = (*pFab)["Frame"];
+    loopPoint = (*pFab)["State"]["EndStateParam"];
     // see deejay medium jackknife - it's possible this is generally wrong and
     // should just be ignored for airborne moves, or something
     // if ( loopPoint == -1 ) {
     //     loopPoint = 0;
     // }
-    loopCount = fab["State"]["LoopCount"];
+    loopCount = (*pFab)["State"]["LoopCount"];
     hasLooped = false;
 }
 
@@ -285,12 +285,12 @@ bool Guy::PreFrame(void)
     pushBackThisFrame = 0.0f;
     offsetDoesNotPush = false;
 
-    if (actionJson != nullptr)
+    if (pActionJson != nullptr)
     {
-        if (isProjectile && actionJson.contains("pdata")) {
-            auto pdataJson = actionJson["pdata"];
+        if (isProjectile && pActionJson->contains("pdata")) {
+            nlohmann::json *pProjData = &(*pActionJson)["pdata"];
             if (projHitCount == -1) {
-                projHitCount = pdataJson["HitCount"];
+                projHitCount = (*pProjData)["HitCount"];
                 if (projHitCount == 0) {
                     // stuff that starts at hitcount 0 is probably meant to die some other way
                     // todo implement lifetime, ranges, etc
@@ -299,17 +299,17 @@ bool Guy::PreFrame(void)
                 // log("initial hitcount " + std::to_string(projHitCount));
             }
 
-            limitShotCategory = pdataJson["Category"];
-            noPush = pdataJson["_NoPush"];
+            limitShotCategory = (*pProjData)["Category"];
+            noPush = (*pProjData)["_NoPush"];
         } else {
             noPush = false; // might be overridden below
         }
 
         Fixed prevPosY = getPosY();
 
-        if (actionJson.contains("PlaceKey"))
+        if (pActionJson->contains("PlaceKey"))
         {
-            for (auto& [placeKeyID, placeKey] : actionJson["PlaceKey"].items())
+            for (auto& [placeKeyID, placeKey] : (*pActionJson)["PlaceKey"].items())
             {
                 if ( !placeKey.contains("_StartFrame") || placeKey["_StartFrame"] > currentFrame || placeKey["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -339,9 +339,9 @@ bool Guy::PreFrame(void)
 
         Fixed prevVelX = velocityX;
 
-        if (actionJson.contains("SteerKey"))
+        if (pActionJson->contains("SteerKey"))
         {
-            for (auto& [steerKeyID, steerKey] : actionJson["SteerKey"].items())
+            for (auto& [steerKeyID, steerKey] : (*pActionJson)["SteerKey"].items())
             {
                 if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -460,9 +460,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (wasDrive && actionJson.contains("DriveSteerKey"))
+        if (wasDrive && pActionJson->contains("DriveSteerKey"))
         {
-            for (auto& [steerKeyID, steerKey] : actionJson["DriveSteerKey"].items())
+            for (auto& [steerKeyID, steerKey] : (*pActionJson)["DriveSteerKey"].items())
             {
                 if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -538,9 +538,9 @@ bool Guy::PreFrame(void)
         punishCounterState = false;
         forceKnockDownState = false;
 
-        if (actionJson.contains("SwitchKey"))
+        if (pActionJson->contains("SwitchKey"))
         {
-            for (auto& [keyID, key] : actionJson["SwitchKey"].items())
+            for (auto& [keyID, key] : (*pActionJson)["SwitchKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -570,9 +570,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (actionJson.contains("ExtSwitchKey"))
+        if (pActionJson->contains("ExtSwitchKey"))
         {
-            for (auto& [keyID, key] : actionJson["ExtSwitchKey"].items())
+            for (auto& [keyID, key] : (*pActionJson)["ExtSwitchKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -600,9 +600,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (actionJson.contains("EventKey"))
+        if (pActionJson->contains("EventKey"))
         {
-            for (auto& [keyID, key] : actionJson["EventKey"].items())
+            for (auto& [keyID, key] : (*pActionJson)["EventKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -748,9 +748,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (actionJson.contains("ShotKey"))
+        if (pActionJson->contains("ShotKey"))
         {
-            for (auto& [keyID, key] : actionJson["ShotKey"].items())
+            for (auto& [keyID, key] : (*pActionJson)["ShotKey"].items())
             {
                 if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                     continue;
@@ -784,10 +784,10 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (actionJson.contains("WorldKey"))
+        if (pActionJson->contains("WorldKey"))
         {
             bool tokiToTomare = false;
-            for (auto& [keyID, key] : actionJson["WorldKey"].items())
+            for (auto& [keyID, key] : (*pActionJson)["WorldKey"].items())
             {
                 if ( !tokiToTomare && (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame)) {
                     continue;
@@ -811,9 +811,9 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (actionJson.contains("LockKey"))
+        if (pActionJson->contains("LockKey"))
         {
-            for (auto& [keyID, key] : actionJson["LockKey"].items())
+            for (auto& [keyID, key] : (*pActionJson)["LockKey"].items())
             {
                 if (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame) {
                     continue;
@@ -837,11 +837,11 @@ bool Guy::PreFrame(void)
                 } else if (type == 2) {
                     // apply hit DT param 02
                     std::string hitIDString = to_string_leading_zeroes(param02, 3);
-                    auto hitEntry = hitJson[hitIDString]["common"]["0"]; // going by crowd wisdom there
+                    nlohmann::json *pHitEntry = &hitJson[hitIDString]["common"]["0"]; // going by crowd wisdom there
                     if (pOpponent) {
                         pOpponent->hitStun = 0;
                         pOpponent->locked = false;
-                        pOpponent->ApplyHitEffect(hitEntry, false, true, false, false);
+                        pOpponent->ApplyHitEffect(pHitEntry, false, true, false, false);
                     }
                 }
             }
@@ -864,11 +864,11 @@ void Guy::DoTriggers()
 {
     bool foundDeferTriggerGroup = false;
 
-    if (actionJson.contains("TriggerKey"))
+    if (pActionJson->contains("TriggerKey"))
     {
         std::map<int,Trigger> mapTriggers; // will sort all the valid triggers by ID
 
-        for (auto& [keyID, key] : actionJson["TriggerKey"].items())
+        for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
         {
             if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                 continue;
@@ -960,26 +960,26 @@ void Guy::DoTriggers()
             int triggerGroup = it->second.triggerGroup;
             int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
 
-            nlohmann::json moveJson = nullptr;
-            if (FindMove(actionID, styleInstall, moveJson) == nullptr) {
+            nlohmann::json *pMoveJson = nullptr;
+            if (FindMove(actionID, styleInstall, &pMoveJson) == nullptr) {
                 continue;
             }
 
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-            nlohmann::json trigger;
+            nlohmann::json *pTrigger = nullptr;
 
             for (auto& [keyID, key] : triggersJson[actionIDString].items()) {
                 if ( atoi(keyID.c_str()) == triggerID ) {
-                    trigger = key;
+                    pTrigger = &key;
                     break;
                 }
             }
 
-            if (trigger["_UseUniqueParam"] == true) {
-                int op = trigger["cond_param_ope"];
-                int value = trigger["cond_param_value"];
+            if ((*pTrigger)["_UseUniqueParam"] == true) {
+                int op = (*pTrigger)["cond_param_ope"];
+                int value = (*pTrigger)["cond_param_value"];
                 if (op == 0 && value != uniqueCharge ) {
                     continue;
                 }
@@ -987,10 +987,10 @@ void Guy::DoTriggers()
                     continue;
                 }
             }
-            int limitShotCount = trigger["cond_limit_shot_num"];
+            int limitShotCount = (*pTrigger)["cond_limit_shot_num"];
             if (limitShotCount) {
                 int count = 0;
-                int limitShotCategory = trigger["limit_shot_category"];
+                int limitShotCategory = (*pTrigger)["limit_shot_category"];
                 for ( auto minion : minions ) {
                     if (limitShotCategory & (1 << minion->limitShotCategory)) {
                         count++;
@@ -1001,20 +1001,20 @@ void Guy::DoTriggers()
                 }
             }
 
-            int airActionCountLimit = trigger["cond_jump_cmd_count"];
+            int airActionCountLimit = (*pTrigger)["cond_jump_cmd_count"];
             if (airActionCountLimit) {
                 if (airActionCounter >= airActionCountLimit) {
                     continue;
                 }
             }
 
-            int vitalOp = trigger["cond_vital_ope"];
+            int vitalOp = (*pTrigger)["cond_vital_ope"];
             if (vitalOp != 0) {
                 float vitalRatio = (float)health / maxHealth * 100;
 
                 switch (vitalOp) {
                     case 2:
-                        if (vitalRatio > trigger["cond_vital_ratio"]) {
+                        if (vitalRatio > (*pTrigger)["cond_vital_ratio"]) {
                             // todo figure out exact rounding rules here
                             continue;
                         }
@@ -1026,11 +1026,11 @@ void Guy::DoTriggers()
                 }
             }
 
-            auto norm = trigger["norm"];
-            int commandNo = norm["command_no"];
-            uint32_t okKeyFlags = norm["ok_key_flags"];
-            uint32_t okCondFlags = norm["ok_key_cond_flags"];
-            uint32_t dcExcFlags = norm["dc_exc_flags"];
+            nlohmann::json *pNorm = &(*pTrigger)["norm"];
+            int commandNo = (*pNorm)["command_no"];
+            uint32_t okKeyFlags = (*pNorm)["ok_key_flags"];
+            uint32_t okCondFlags = (*pNorm)["ok_key_cond_flags"];
+            uint32_t dcExcFlags = (*pNorm)["dc_exc_flags"];
             // condflags..
             // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
             // 10100000001100000: EX, so any two out of three button mask?
@@ -1075,19 +1075,19 @@ void Guy::DoTriggers()
                     break; // we found our trigger walking back, skip all other triggers
                 } else {
                     std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-                    auto command = commandsJson[commandNoString]["0"];
-                    int inputID = command["input_num"].get<int>() - 1;
-                    auto commandInputs = command["inputs"];
+                    nlohmann::json *pCommand = &commandsJson[commandNoString]["0"];
+                    int inputID = (*pCommand)["input_num"].get<int>() - 1;
+                    nlohmann::json *pInputs = &(*pCommand)["inputs"];
 
                     uint32_t inputBufferCursor = i;
 
                     while (inputID >= 0 )
                     {
-                        auto input = commandInputs[to_string_leading_zeroes(inputID, 2)];
-                        auto inputNorm = input["normal"];
-                        uint32_t inputOkKeyFlags = inputNorm["ok_key_flags"];
-                        uint32_t inputOkCondFlags = inputNorm["ok_key_cond_check_flags"];
-                        int numFrames = input["frame_num"];
+                        nlohmann::json *pInput = &(*pInputs)[to_string_leading_zeroes(inputID, 2)];
+                        nlohmann::json *pInputNorm = &(*pInput)["normal"];
+                        uint32_t inputOkKeyFlags = (*pInputNorm)["ok_key_flags"];
+                        uint32_t inputOkCondFlags = (*pInputNorm)["ok_key_cond_check_flags"];
+                        int numFrames = (*pInput)["frame_num"];
                         bool match = false;
                         int lastMatchInput = i;
 
@@ -1095,7 +1095,7 @@ void Guy::DoTriggers()
                         {
                             // charge release
                             bool chargeMatch = false;
-                            nlohmann::json resourceMatch;
+                            nlohmann::json *pResourceMatch;
                             int chargeID = inputOkKeyFlags & 0xFF;
                             for (auto& [keyID, key] : chargeJson.items()) {
                                 // support either charge format
@@ -1103,17 +1103,17 @@ void Guy::DoTriggers()
                                     key = key["resource"];
                                 }
                                 if (key["charge_id"] == chargeID ) {
-                                    resourceMatch = key;
+                                    pResourceMatch = &key;
                                     chargeMatch = true;
                                     break;
                                 }
                             }
 
                             if (chargeMatch) {
-                                uint32_t inputOkKeyFlags = resourceMatch["ok_key_flags"];
-                                uint32_t inputOkCondFlags = resourceMatch["ok_key_cond_check_flags"];
-                                uint32_t chargeFrames = resourceMatch["ok_frame"];
-                                uint32_t keepFrames = resourceMatch["keep_frame"];
+                                uint32_t inputOkKeyFlags = (*pResourceMatch)["ok_key_flags"];
+                                uint32_t inputOkCondFlags = (*pResourceMatch)["ok_key_cond_check_flags"];
+                                uint32_t chargeFrames = (*pResourceMatch)["ok_frame"];
+                                uint32_t keepFrames = (*pResourceMatch)["keep_frame"];
                                 uint32_t dirCount = 0;
                                 uint32_t dirNotMatchCount = 0;
                                 // count matching direction in input buffer, super naive but will work for testing
@@ -1210,7 +1210,7 @@ void Guy::UpdateBoxes(void)
     renderBoxes.clear();
     throwBoxes.clear();
 
-    if (actionJson.contains("DamageCollisionKey"))
+    if (pActionJson->contains("DamageCollisionKey"))
     {
         bool drive = isDrive || wasDrive;
         bool parry = currentAction >= 480 && currentAction <= 489;
@@ -1219,7 +1219,7 @@ void Guy::UpdateBoxes(void)
 
         std::deque<HurtBox> newHurtBoxes;
 
-        for (auto& [hurtBoxID, hurtBox] : actionJson["DamageCollisionKey"].items())
+        for (auto& [hurtBoxID, hurtBox] : (*pActionJson)["DamageCollisionKey"].items())
         {
             if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
                 continue;
@@ -1309,9 +1309,9 @@ void Guy::UpdateBoxes(void)
             }
         }
     }
-    if (actionJson.contains("PushCollisionKey"))
+    if (pActionJson->contains("PushCollisionKey"))
     {
-        for (auto& [pushBoxID, pushBox] : actionJson["PushCollisionKey"].items())
+        for (auto& [pushBoxID, pushBox] : (*pActionJson)["PushCollisionKey"].items())
         {
             if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
                 continue;
@@ -1668,23 +1668,23 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             }
 
             std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
-            auto hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+            nlohmann::json *pHitEntry = &hitJson[hitIDString]["param"][hitEntryFlagString];
 
-            bool bombBurst = hitEntry["_bomb_burst"];
+            bool bombBurst = (*pHitEntry)["_bomb_burst"];
 
             // if bomb burst and found a bomb, use the next hit ID instead 
             if (bombBurst && pOpponent->debuffTimer) {
                 hitIDString = to_string_leading_zeroes(hitbox.hitEntryID + 1, 3);
-                hitEntry = hitJson[hitIDString]["param"][hitEntryFlagString];
+                pHitEntry = &hitJson[hitIDString]["param"][hitEntryFlagString];
             }
 
-            int destX = hitEntry["MoveDest"]["x"];
-            int destY = hitEntry["MoveDest"]["y"];
-            int hitHitStun = hitEntry["HitStun"];
-            int dmgType = hitEntry["DmgType"];
-            int moveType = hitEntry["MoveType"];
-            int attr0 = hitEntry["Attr0"];
-            int hitMark = hitEntry["Hitmark"];
+            int destX = (*pHitEntry)["MoveDest"]["x"];
+            int destY = (*pHitEntry)["MoveDest"]["y"];
+            int hitHitStun = (*pHitEntry)["HitStun"];
+            int dmgType = (*pHitEntry)["DmgType"];
+            int moveType = (*pHitEntry)["MoveType"];
+            int attr0 = (*pHitEntry)["Attr0"];
+            int hitMark = (*pHitEntry)["Hitmark"];
             // we're hitting for sure after this point (modulo juggle), side effects
 
             bool hitArmor = false;
@@ -1694,23 +1694,23 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 hitArmorThisMove = true;
                 auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
-                nlohmann::json atemi = nullptr;
+                nlohmann::json *pAtemi = nullptr;
                 if (pOtherGuy->atemiJson.contains(atemiIDString)) {
-                    atemi = pOtherGuy->atemiJson[atemiIDString];
+                    pAtemi = &pOtherGuy->atemiJson[atemiIDString];
                 } else if (commonAtemiJson.contains(atemiIDString)) {
-                    atemi = commonAtemiJson[atemiIDString];
+                    pAtemi = &commonAtemiJson[atemiIDString];
                 } else {
                     log(true, "atemi not found!!");
                     break;
                 }
 
-                int armorHitStopHitted = atemi["TargetStop"];
-                int armorHitStopHitter = atemi["OwnerStop"];
-                int armorBreakHitStopHitted = atemi["TargetStopShell"]; // ??
-                int armorBreakHitStopHitter = atemi["OwnerStopShell"];
+                int armorHitStopHitted = (*pAtemi)["TargetStop"];
+                int armorHitStopHitter = (*pAtemi)["OwnerStop"];
+                int armorBreakHitStopHitted = (*pAtemi)["TargetStopShell"]; // ??
+                int armorBreakHitStopHitter = (*pAtemi)["OwnerStopShell"];
 
                 if (pOtherGuy->currentArmorID != hurtBox.armorID) {
-                    pOtherGuy->armorHitsLeft = atemi["ResistLimit"].get<int>() + 1;
+                    pOtherGuy->armorHitsLeft = (*pAtemi)["ResistLimit"].get<int>() + 1;
                     pOtherGuy->currentArmorID = hurtBox.armorID;
                 }
                 if ( pOtherGuy->currentArmorID == hurtBox.armorID ) {
@@ -1746,8 +1746,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             }
 
             // not hitstun for initial grab hit as we dont want to recover during the lock
-            if ( hitArmor || pOtherGuy->ApplyHitEffect(hitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
-                int hitStopSelf = hitEntry["HitStopOwner"];
+            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
+                int hitStopSelf = (*pHitEntry)["HitStopOwner"];
                 if ( !hitArmor && hitStopSelf ) {
                     addWarudo(hitStopSelf+1);
                 }
@@ -1786,7 +1786,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     hitThisFrame = true;
                     hitThisMove = true;
 
-                    int dmgKind = hitEntry["DmgKind"];
+                    int dmgKind = (*pHitEntry)["DmgKind"];
 
                     if (dmgKind == 11) {
                         // psycho mine spawner guy - style 0 probably OK unconditionally?
@@ -1819,26 +1819,26 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     return retHit;
 }
 
-bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain)
+bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain)
 {
-    int juggleFirst = hitEffect["Juggle1st"];
-    int juggleAdd = hitEffect["JuggleAdd"];
-    int juggleLimit = hitEffect["JuggleLimit"];
-    int hitEntryHitStun = hitEffect["HitStun"];
-    int destX = hitEffect["MoveDest"]["x"];
-    int destY = hitEffect["MoveDest"]["y"];
-    int destTime = hitEffect["MoveTime"];
-    int dmgValue = hitEffect["DmgValue"];
-    int dmgType = hitEffect["DmgType"];
-    int moveType = hitEffect["MoveType"];
-    int floorTime = hitEffect["FloorTime"];
-    int downTime = hitEffect["DownTime"];
-    bool noZu = hitEffect["_no_zu"];
-    bool jimenBound = hitEffect["_jimen_bound"];
-    bool kabeBound = hitEffect["_kabe_bound"];
-    bool kabeTataki = hitEffect["_kabe_tataki"];
-    int hitStopTarget = hitEffect["HitStopTarget"];
-    int dmgKind = hitEffect["DmgKind"];
+    int juggleFirst = (*pHitEffect)["Juggle1st"];
+    int juggleAdd = (*pHitEffect)["JuggleAdd"];
+    int juggleLimit = (*pHitEffect)["JuggleLimit"];
+    int hitEntryHitStun = (*pHitEffect)["HitStun"];
+    int destX = (*pHitEffect)["MoveDest"]["x"];
+    int destY = (*pHitEffect)["MoveDest"]["y"];
+    int destTime = (*pHitEffect)["MoveTime"];
+    int dmgValue = (*pHitEffect)["DmgValue"];
+    int dmgType = (*pHitEffect)["DmgType"];
+    int moveType = (*pHitEffect)["MoveType"];
+    int floorTime = (*pHitEffect)["FloorTime"];
+    int downTime = (*pHitEffect)["DownTime"];
+    bool noZu = (*pHitEffect)["_no_zu"];
+    bool jimenBound = (*pHitEffect)["_jimen_bound"];
+    bool kabeBound = (*pHitEffect)["_kabe_bound"];
+    bool kabeTataki = (*pHitEffect)["_kabe_tataki"];
+    int hitStopTarget = (*pHitEffect)["HitStopTarget"];
+    int dmgKind = (*pHitEffect)["DmgKind"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
     if (isDrive) {
@@ -1921,8 +1921,8 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
     }
 
     if (jimenBound && floorTime) {
-        int floorDestX = hitEffect["FloorDest"]["x"];
-        int floorDestY = hitEffect["FloorDest"]["y"];
+        int floorDestX = (*pHitEffect)["FloorDest"]["x"];
+        int floorDestY = (*pHitEffect)["FloorDest"]["y"];
 
         groundBounce = true;
         groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
@@ -1938,15 +1938,15 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
 
     wallSplat = false;
     wallBounce = false;
-    int wallTime = hitEffect["WallTime"];
+    int wallTime = (*pHitEffect)["WallTime"];
     if (kabeTataki) {
         // this can happen even if you block! blocked DI
         wallSplat = true;
-        wallStopFrames = hitEffect["WallStop"];
+        wallStopFrames = (*pHitEffect)["WallStop"];
     } else if (kabeBound && wallTime) {
-        int wallDestX = hitEffect["WallDest"]["x"];
-        int wallDestY = hitEffect["WallDest"]["y"];
-        wallStopFrames = hitEffect["WallStop"];
+        int wallDestX = (*pHitEffect)["WallDest"]["x"];
+        int wallDestY = (*pHitEffect)["WallDest"]["y"];
+        wallStopFrames = (*pHitEffect)["WallStop"];
 
         wallBounce = true;
         wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
@@ -2037,9 +2037,9 @@ bool Guy::ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitS
 
 void Guy::DoHitBoxKey(const char *name)
 {
-    if (actionJson.contains(name))
+    if (pActionJson->contains(name))
     {
-        for (auto& [hitBoxID, hitBox] : actionJson[name].items())
+        for (auto& [hitBoxID, hitBox] : (*pActionJson)[name].items())
         {
             if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
                 continue;
@@ -2111,9 +2111,9 @@ void Guy::DoHitBoxKey(const char *name)
 
 void Guy::DoBranchKey(bool preHit = false)
 {
-    if (actionJson != nullptr && actionJson.contains("BranchKey"))
+    if (pActionJson != nullptr && pActionJson->contains("BranchKey"))
     {
-        for (auto& [keyID, key] : actionJson["BranchKey"].items())
+        for (auto& [keyID, key] : (*pActionJson)["BranchKey"].items())
         {
             if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                 continue;
@@ -2561,11 +2561,11 @@ bool Guy::Frame(bool endWarudoFrame)
             airActionCounter = 0;
         }
         if (charInfoJson.contains("Styles")) {
-            auto styleJson = charInfoJson["Styles"][std::to_string(styleInstall)];
-            if (styleJson["StyleData"]["State"]["TerminateState"] == 0x3ff1fffffff) {
+            nlohmann::json *pStyleJson = &charInfoJson["Styles"][std::to_string(styleInstall)];
+            if ((*pStyleJson)["StyleData"]["State"]["TerminateState"] == 0x3ff1fffffff) {
                 // that apparently means landing... figure out deeper meaning later
                 // go to parent or go to 0? :/
-                styleInstall = styleJson["ParentStyleID"];
+                styleInstall = (*pStyleJson)["ParentStyleID"];
             }
         }
     }
@@ -2861,9 +2861,9 @@ bool Guy::Frame(bool endWarudoFrame)
 
         UpdateActionData();
 
-        auto inherit = actionJson["fab"]["Inherit"];
+        nlohmann::json *pInherit = &(*pActionJson)["fab"]["Inherit"];
 
-        bool inheritHitID = inherit["_HitID"];
+        bool inheritHitID = (*pInherit)["_HitID"];
         // see eg. 2MP into light crusher - light crusher has inherit hitID true..
         // assuming it's supposed to be for branches only
         if (didTrigger) {
@@ -2889,10 +2889,10 @@ bool Guy::Frame(bool endWarudoFrame)
         if (!hitStun || blocking) {
             // should this use airborne status from previous or new action? currently previous
             if (isDrive || getAirborne()) {
-                accelX = accelX * Fixed(inherit["Accelaleration"]["x"].get<double>());
-                accelY = accelY * Fixed(inherit["Accelaleration"]["y"].get<double>());
-                velocityX = velocityX * Fixed(inherit["Velocity"]["x"].get<double>());
-                velocityY = velocityY * Fixed(inherit["Velocity"]["y"].get<double>());
+                accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
+                accelY = accelY * Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
+                velocityX = velocityX * Fixed((*pInherit)["Velocity"]["x"].get<double>());
+                velocityY = velocityY * Fixed((*pInherit)["Velocity"]["y"].get<double>());
             } else {
                 accelX = Fixed(0);
                 accelY = Fixed(0);
@@ -2966,9 +2966,9 @@ bool Guy::Frame(bool endWarudoFrame)
 
 void Guy::DoStatusKey(void)
 {
-    if (actionJson.contains("StatusKey"))
+    if (pActionJson->contains("StatusKey"))
     {
-        for (auto& [keyID, key] : actionJson["StatusKey"].items())
+        for (auto& [keyID, key] : (*pActionJson)["StatusKey"].items())
         {
             if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
                 continue;

@@ -21,7 +21,7 @@ public:
     void UpdateBoxes(void);
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
-    bool ApplyHitEffect(nlohmann::json hitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
+    bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
     void DoBranchKey(bool preHit);
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
@@ -279,7 +279,7 @@ private:
     std::deque<std::string> logQueue;
 
     bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
-    const char* FindMove(int actionID, int styleID, nlohmann::json &moveJson);
+    const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson);
     void BuildMoveList();
     std::vector<char *> vecMoveList;
     int neutralMove = 0;
@@ -470,5 +470,5 @@ private:
     int debuffTimer = 0;
 
     std::string actionName;
-    nlohmann::json actionJson;
+    nlohmann::json *pActionJson;
 };
