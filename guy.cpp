@@ -1670,7 +1670,12 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
             nlohmann::json *pHitEntry = &hitJson[hitIDString]["param"][hitEntryFlagString];
 
-            bool bombBurst = (*pHitEntry)["_bomb_burst"];
+            bool bombBurst = false;
+
+            // back compat with old versions, this wasn't there before
+            if (pHitEntry->contains("_bomb_burst")) {
+                bombBurst = (*pHitEntry)["_bomb_burst"];
+            }
 
             // if bomb burst and found a bomb, use the next hit ID instead 
             if (bombBurst && pOpponent->debuffTimer) {
