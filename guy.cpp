@@ -1039,7 +1039,8 @@ void Guy::DoTriggers()
             // 00100000010100000: taunt, 6 out of 6 in mask
             uint32_t i = 0, initialI = 0;
             bool initialMatch = false;
-            uint32_t initialSearch = globalInputBufferLength + timeInWarudo;
+            // current frame + buffer
+            uint32_t initialSearch = 1 + globalInputBufferLength + timeInWarudo;
             if (inputBuffer.size() < initialSearch) {
                 initialSearch = inputBuffer.size();
             }
