@@ -505,7 +505,7 @@ re.on_draw_ui(function()
 
     local reversalFighterData = reversalFighterDataList[fighterIDRight]
     local recordFighterData = recordFighterDataList[fighterIDRight]
-    outputTable = {}
+    local outputTable = {}
     outputTable["ReversalFighterData"] = obj_to_table(reversalFighterData)
     outputTable["RecordFighterData"] = obj_to_table(recordFighterData)
     logToFile( myjson.encode(outputTable), "test_reversal_settings.json" )
@@ -531,10 +531,30 @@ re.on_draw_ui(function()
   local changed
   changed, typeToDump = imgui.input_text("type to dump", typeToDump)
   if imgui.button("dump type") == true then
-    outputTable = obj_to_table(sdk.find_type_definition(typeToDump), nil, nil, true, true)
+    local outputTable = obj_to_table(sdk.find_type_definition(typeToDump), nil, nil, true, true)
     logToFile( myjson.encode(outputTable), typeToDump .. ".json" )
   end
 
+  if imgui.button("dump test assist") == true then
+    local astCmb = sdk.find_type_definition("gBattle"):get_field("Command"):get_data(nil).mpBCMResource[0].pAstCmb
+    -- local tableOut = {}
+    -- for j, element in ipairs(astCmb:get_elements()) do
+    --   table.insert( tableOut, obj_to_table(element))
+    -- end
+    -- local outputTable = obj_to_table(astCmb)
+    -- logToFile( myjson.encode(outputTable), "test.json" )
+
+    local size = astCmb.RecipeData:get_Count()
+    local i = 0
+    local tableOut = {}
+    while i < size do
+      local item = astCmb.RecipeData:get_Item(i)
+      table.insert( tableOut, obj_to_table(item))
+      i = i + 1
+    end
+    logToFile( myjson.encode(tableOut), "test.json" )
+  end
+  
   local hijackchanged, hijackvalue = imgui.checkbox("hijack replays with replay.json", hijackingReplays)
   hijackingReplays = hijackvalue
 
@@ -695,7 +715,7 @@ end
 
 function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOnly, isType )
   local fields
-  if isType ~= nil then
+  if isType == nil then
     local objType = obj:get_type_definition()
     fields = objType:get_fields()
   else

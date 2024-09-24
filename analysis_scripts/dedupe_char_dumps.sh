@@ -1,6 +1,6 @@
 #!/bin/bash
 
-versions=("19" "20" "21" "22" "23")
+versions=("19" "20" "21" "22" "23" "24")
 
 dedupe_char_file() {
     sum=blah
@@ -26,6 +26,7 @@ dedupe_char_file() {
         echo $filename $newsum $woulddelete
         if [ $woulddelete == true ]; then
             git rm $filename
+            rm $filename
         fi
         sum=$newsum
 
@@ -70,4 +71,5 @@ dedupe_char_dumps manon
 dedupe_char_dumps marisa
 dedupe_char_dumps rashid
 dedupe_char_dumps ryu
+dedupe_char_dumps terry
 dedupe_char_dumps zangief
