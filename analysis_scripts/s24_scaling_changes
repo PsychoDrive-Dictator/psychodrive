@@ -1,0 +1,19 @@
+luke ATK_5MP(1) InstScaling was 10 , now -1
+kimberly _995 PROJ ComboScaling was 20 , now -1
+kimberly _995 PROJ _StartScaling was 20 , now 10
+kimberly _996 PROJ ComboScaling was 20 , now -1
+kimberly _996 PROJ _StartScaling was 20 , now 10
+zangief ATK_6HP ComboScaling was -1 , now 20
+zangief ATK_6HP _StartScaling was -1 , now 25
+zangief ATK_6HP(1) ComboScaling was -1 , now 20
+zangief ATK_6HP(1) _StartScaling was -1 , now 25
+jp _1013 PROJ InstScaling was 25 , now 10
+jp _1014 PROJ InstScaling was 25 , now 10
+jp _1019 PROJ InstScaling was 25 , now 10
+jp _1020 PROJ InstScaling was 25 , now 10
+jp _1023 PROJ InstScaling was 25 , now 10
+jp _1024 PROJ InstScaling was 25 , now 10
+jp _1026 PROJ InstScaling was 25 , now 10
+jp _1027 PROJ InstScaling was 25 , now 10
+deejay ATK_LP_MK _StartScaling was -1 , now 20
+deejay SPA_5_Joschool_2_wanningmoon _StartScaling was -1 , now 30

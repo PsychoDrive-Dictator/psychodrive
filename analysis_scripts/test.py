@@ -98,6 +98,11 @@ def compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, paramEntry, paramDesc)
                             if subHitValue != hitInfoLeft[hitRight]["param"][paramEntry][hitKey][subHitKey]:
                                 print(descHeader + " hit " + str(hitRight) + " on " + paramDesc + " " + hitKey + "." + subHitKey + " was " +
                                     str(hitInfoLeft[hitRight]["param"][paramEntry][hitKey][subHitKey]) + ", now " + str(subHitValue))
+
+def compareScaling(moveLeft, moveRight, scalingString, descHeader):
+    if "fab" in moveLeft:
+        if moveLeft["fab"]["Combo"][scalingString] != moveRight["fab"]["Combo"][scalingString]:
+            print(descHeader + " " + scalingString + " was " + str(moveLeft["fab"]["Combo"][scalingString]), ", now " + str(moveRight["fab"]["Combo"][scalingString])) 
                
 
 for char in characters:
@@ -194,3 +199,6 @@ for char in characters:
             compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
             compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
             compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
+            compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
+            compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
+            compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)
