@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=23
+version=24
 
 copy_char_file() {
     src="MMDK/PlayerData/$1/$1 $3.json"
@@ -46,4 +46,5 @@ copy_char_dumps Manon manon
 copy_char_dumps Marisa marisa
 copy_char_dumps Rashid rashid
 copy_char_dumps Ryu ryu
+copy_char_dumps Terry terry
 copy_char_dumps Zangief zangief

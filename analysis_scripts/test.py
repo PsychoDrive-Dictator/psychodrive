@@ -25,7 +25,8 @@ characters = [
     "honda",
     "jamie",
     "akuma",
-    "dictator"
+    "dictator",
+#    "terry"
 ]
 
 dataPath = "./data/chars/"
@@ -101,10 +102,10 @@ def compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, paramEntry, paramDesc)
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    # charWithVersion = char + "22"
-    # hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
-    # movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     charWithVersion = char + "23"
+    hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
+    movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
+    charWithVersion = char + "24"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     # for hitID in hitsJson:
@@ -148,15 +149,15 @@ for char in characters:
     #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find certain StatusKey Side bits
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "StatusKey" in move:
-            for key in move["StatusKey"]:
-                if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
-                    statusKey = move["StatusKey"][key]
-                    if statusKey["Side"] == 1:
-                        print(char + " " + moveID + " StatusKey Side " + str(statusKey["Side"]) + " frames " + str(statusKey["_StartFrame"]) +
-                              "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "StatusKey" in move:
+    #         for key in move["StatusKey"]:
+    #             if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
+    #                 statusKey = move["StatusKey"][key]
+    #                 if statusKey["Side"] == 1:
+    #                     print(char + " " + moveID + " StatusKey Side " + str(statusKey["Side"]) + " frames " + str(statusKey["_StartFrame"]) +
+    #                           "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
 
     # find certain SwitchKey OperationFlag bits
     # for moveID in moves21Json:
@@ -170,26 +171,26 @@ for char in characters:
     #                     str(switchKey["OperationFlag"]) + " frames " + str(switchKey["_StartFrame"]) +
     #                     "-" + str(switchKey["_EndFrame"]))
 
-    # for moveID in moves21Json:
-    #     moveIDLeft = moveID
-    #     # if "_Y2" in moveID:
-    #     #     moveIDLeft = moveIDLeft.replace("_Y2", "")
-    #     if moveIDLeft in movesJson:
-    #         moveLeft = movesJson[moveIDLeft]
-    #         moveRight = moves21Json[moveID]
-    #         descHeader = char + " " + moveID
-    #         minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
-    #         minActiveRight, maxActiveRight = countActiveFrames(moveRight)
-    #         if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
-    #             print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
-    #                   " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
-    #         hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
-    #         hitInfoRight = getHitInfoDict(moveRight, hits21Json)
-    #         if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
-    #             print(descHeader + " different hit count")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
+    for moveID in moves21Json:
+        moveIDLeft = moveID
+        # if "_Y2" in moveID:
+        #     moveIDLeft = moveIDLeft.replace("_Y2", "")
+        if moveIDLeft in movesJson:
+            moveLeft = movesJson[moveIDLeft]
+            moveRight = moves21Json[moveID]
+            descHeader = char + " " + moveID
+            minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
+            minActiveRight, maxActiveRight = countActiveFrames(moveRight)
+            if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
+                print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
+                      " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
+            hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
+            hitInfoRight = getHitInfoDict(moveRight, hits21Json)
+            if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
+                print(descHeader + " different hit count")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
