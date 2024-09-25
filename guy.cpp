@@ -1641,6 +1641,12 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
+            Guy *pHitFlagTarget = this;
+            if (isProjectile && pActionJson->contains("pdata") &&
+                (*pActionJson)["pdata"]["_HitFlagToPlayer"] == true && pParent) {
+                pHitFlagTarget = pParent;
+            }
+
             if (otherGuyAirborne) {
                 hitEntryFlag |= air;
             }
@@ -1659,8 +1665,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (pOtherGuy->blocking || otherGuyCanBlock) {
                 hitEntryFlag = block;
                 pOtherGuy->blocking = true;
-                hasBeenBlockedThisFrame = true;
-                hasBeenBlockedThisMove = true;
+                pHitFlagTarget->hasBeenBlockedThisFrame = true;
+                pHitFlagTarget->hasBeenBlockedThisMove = true;
                 log(logHits, "block!");
             }
 
@@ -1705,8 +1711,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             bool hitArmor = false;
             if (hurtBox.flags & armor && hurtBox.armorID) {
                 hitArmor = true;
-                hitArmorThisFrame = true;
-                hitArmorThisMove = true;
+                pHitFlagTarget->hitArmorThisFrame = true;
+                pHitFlagTarget->hitArmorThisMove = true;
                 auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
                 nlohmann::json *pAtemi = nullptr;
@@ -1754,8 +1760,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (hurtBox.flags & atemi) {
                 // like armor except onthing really happens beyond setting the flag
                 hitArmor = true;
-                hitAtemiThisFrame = true;
-                hitAtemiThisMove = true;
+                pHitFlagTarget->hitAtemiThisFrame = true;
+                pHitFlagTarget->hitAtemiThisMove = true;
                 pOtherGuy->atemiThisFrame = true;
                 log(logHits, "atemi hit!");
             }
@@ -1785,21 +1791,21 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pOtherGuy->pAttacker = this;
 
                 if (isGrab) {
-                    grabbedThisFrame = true;
+                    pHitFlagTarget->grabbedThisFrame = true;
                 }
 
                 canHitID |= 1 << hitbox.hitID;
 
                 if (!pOtherGuy->blocking && !hitArmor) {
                     if (hitEntryFlag & punish_counter) {
-                        punishCounterThisFrame = true;
-                        hitPunishCounterThisMove = true;
+                        pHitFlagTarget->punishCounterThisFrame = true;
+                        pHitFlagTarget->hitPunishCounterThisMove = true;
                     }
                     if (hitEntryFlag & counter) {
-                        hitCounterThisMove = true;
+                        pHitFlagTarget->hitCounterThisMove = true;
                     }
-                    hitThisFrame = true;
-                    hitThisMove = true;
+                    pHitFlagTarget->hitThisFrame = true;
+                    pHitFlagTarget->hitThisMove = true;
 
                     int dmgKind = (*pHitEntry)["DmgKind"];
 
