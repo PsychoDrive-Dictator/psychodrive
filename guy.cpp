@@ -2348,6 +2348,13 @@ void Guy::DoBranchKey(bool preHit = false)
                         }
                     }
                     break;
+                // case 42: // shot hit - broken, no known working use yet - probably should be on the proj itself like 45 below
+                //     for ( auto minion : minions ) {
+                //         if (minion->hitThisFrame) { // this frame? this move? no params observed
+                //             doBranch = true;
+                //         }
+                //     }
+                //     break;
                 case 45:
                     if (isProjectile && projHitCount == 0 ) {
                         // log("hitcount=0 branch");
