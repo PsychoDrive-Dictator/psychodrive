@@ -11,7 +11,7 @@ project_source_files = [
   'ui.cpp',
   'input.cpp',
   'render.cpp',
-  'gl3w.c',
+  #'gl3w.c',
   'imgui/imgui.cpp',
   'imgui/imgui_draw.cpp',
   'imgui/imgui_widgets.cpp',
@@ -49,6 +49,9 @@ if meson.is_cross_build()
   add_global_link_arguments('-Wl,-Bstatic', language : 'cpp')
   add_global_link_arguments('-lstdc++', language : 'cpp')
   add_global_link_arguments('-lpthread', language : 'cpp')
+  add_global_link_arguments('-sMAX_WEBGL_VERSION=2', language : 'cpp')
+  add_global_link_arguments('-sFORCE_FILESYSTEM', language : 'cpp')
+  add_global_link_arguments('-sALLOW_MEMORY_GROWTH', language : 'cpp')
 endif
 
 # ===================================================================
