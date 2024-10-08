@@ -1,4 +1,10 @@
-#include <gl3w.h>
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#define GLSL_VER "#version 300 es"
+#else
+#include "gl3w.h"
+#define GLSL_VER "#version 330"
+#endif
 
 #include "render.hpp"
 #include "ui.hpp"
@@ -13,14 +19,14 @@ GLuint vbo;
 GLuint vao;
 GLuint program;
 
-const GLuint loc_attrib = 0;
-const GLuint loc_view = 0;
-const GLuint loc_proj = 1;
-const GLuint loc_size = 2;
-const GLuint loc_offset = 3;
-const GLuint loc_color = 4;
-const GLuint loc_isgrid = 5;
-const GLuint loc_progress = 6;
+GLuint loc_attrib;
+GLuint loc_view;
+GLuint loc_proj;
+GLuint loc_size;
+GLuint loc_offset;
+GLuint loc_color;
+GLuint loc_isgrid;
+GLuint loc_progress;
 
 void crossProduct( float *a, float *b, float *res) {
  
@@ -221,7 +227,9 @@ static GLuint
 compile_shader(GLenum type, const GLchar *source)
 {
     GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, NULL);
+    std::string strShaderSource = std::string(GLSL_VER) + "\n\n" + std::string(source);
+    const char *pSrcString = strShaderSource.c_str();
+    glShaderSource(shader, 1, &pSrcString, NULL);
     glCompileShader(shader);
     GLint param;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &param);
@@ -330,10 +338,15 @@ SDL_Window* initWindowRender()
         return nullptr;
     }
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+#ifdef __EMSCRIPTEN__
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#endif
 
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4);
@@ -352,15 +365,25 @@ SDL_Window* initWindowRender()
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_GL_SetSwapInterval(0);
 
+#ifndef __EMSCRIPTEN__
     if (gl3wInit()) {
         fprintf(stderr, "gl3w: failed to initialize\n");
         exit(EXIT_FAILURE);
     }
+#endif
 
     /* Compile and link OpenGL program */
-    GLuint vert = compile_shader(GL_VERTEX_SHADER, readFile("data/shaders/vert.glsl").c_str());
-    GLuint frag = compile_shader(GL_FRAGMENT_SHADER, readFile("data/shaders/frag.glsl").c_str());
+    GLuint vert = compile_shader(GL_VERTEX_SHADER, readFile("./data/shaders/vert.glsl").c_str());
+    GLuint frag = compile_shader(GL_FRAGMENT_SHADER, readFile("./data/shaders/frag.glsl").c_str());
     program = link_program(vert, frag);
+    loc_attrib = glGetAttribLocation(program, "in_pos");
+    loc_view = glGetUniformLocation(program, "view");
+    loc_proj = glGetUniformLocation(program, "proj");
+    loc_size = glGetUniformLocation(program, "size");
+    loc_offset = glGetUniformLocation(program, "offset");
+    loc_color = glGetUniformLocation(program, "in_color");
+    loc_isgrid = glGetUniformLocation(program, "isGrid");
+    loc_progress = glGetUniformLocation(program, "progress");
     glDeleteShader(frag);
     glDeleteShader(vert);
 
@@ -384,9 +407,8 @@ SDL_Window* initWindowRender()
 
 void initRenderUI(void)
 {
-    const char* glsl_version = "#version 330";
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGui_ImplOpenGL3_Init(GLSL_VER);
 }
 
 void destroyRender(void)
