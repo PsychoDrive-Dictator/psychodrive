@@ -1,0 +1,14 @@
+[binaries]
+c = 'emcc'
+cpp = 'em++'
+ar = 'emar'
+strip = 'emstrip'
+pkgconfig = ['emmake', 'env', 'PKG_CONFIG_PATH=/home/misyl/emsdk/lib/pkgconfig', 'pkg-config']
+cmake = ['emmake', 'cmake']
+sdl2-config = ['emconfigure', 'sdl2-config']
+
+[host_machine]
+system = 'wasm'
+cpu_family = 'wasm'
+cpu = 'wasm'
+endian = 'little'

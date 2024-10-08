@@ -1,12 +1,10 @@
-#version 330
-#extension GL_ARB_explicit_uniform_location : require
+precision mediump float;
 
-
-layout(location = 2) uniform vec3 size;
-layout(location = 3) uniform vec3 offset;
-layout(location = 4) uniform vec4 in_color;
-layout(location = 5) uniform int isGrid;
-layout(location = 6) uniform int progress;
+uniform vec3 size;
+uniform vec3 offset;
+uniform vec4 in_color;
+uniform int isGrid;
+uniform int progress;
 
 const float distedge = 0.5;
 const float feather = 0.5;
@@ -29,7 +27,7 @@ float edge(float dist)
         return boxalpha;
     }
     float ret = (dist - distedge) / feather; // mapped to 0..1
-    ret *= boxalpha - 1; // 0..boxalpha-1
+    ret *= boxalpha - 1.0; // 0..boxalpha-1
     ret = 1.0 + ret; // 1..boxalpha
     return ret;
 }
@@ -52,7 +50,7 @@ void main() {
     if (isGrid == 1) {
         float edgealpha = boxalpha;
         color = vec4(0.1,0.1,0.1,1.0);
-        const float divisor = 765 / 8.0;
+        const float divisor = 765.0 / 8.0;
         if (mod(abs(vertex_pos.x), divisor) < 5.0 ||
             (vertex_pos.y > 0.0 && mod(abs(vertex_pos.y), divisor) < 5.0) ||
             (mod(abs(vertex_pos.z), divisor) < 5.0)) {
@@ -66,8 +64,8 @@ void main() {
     }
 
     if (isGrid == 2) {
-        float distFromCenter = length(vertex_pos.xyz - (offset + size/2));
-        if (distFromCenter < progress) {
+        float distFromCenter = length(vertex_pos.xyz - (offset + size/2.0));
+        if (distFromCenter < float(progress)) {
             color = in_color;
         } else {
             color = vec4(0.0,0.0,0.0,0.0);

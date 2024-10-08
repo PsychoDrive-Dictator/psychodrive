@@ -1,3 +1,7 @@
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string>
@@ -245,12 +249,303 @@ void extractCharVersion(char *cmdLine, std::string &charName, int &version)
     charName = cmdLine;
 }
 
+uint32_t frameStartTime;
+std::vector<Guy *> vecGuysToDelete;
+nlohmann::json gameStateDump;
+ImGuiIO *io;
+SDL_Window *sdlwindow;
+
+static void mainloop(void)
+{
+    if (done) {
+        // save timeline buffer to disk
+        timelineToInputBuffer(playBackInputBuffer);
+        nlohmann::json jsonInput(playBackInputBuffer);
+        writeFile("timeline.json", nlohmann::to_string(jsonInput));
+
+        for (auto guy : guys)
+        {
+            delete guy;
+        }
+        guys.clear();
+
+        destroyUI();
+        destroyRender();
+
+#ifdef __EMSCRIPTEN__
+        emscripten_cancel_main_loop();
+#else
+        exit(0);
+#endif
+    }
+
+    const float desiredFrameTimeMS = 1000.0 / 60.0f;
+    uint32_t currentTime = SDL_GetTicks();
+    if ((limitRate || (!playingBackInput && !replayingGameState)) && currentTime - frameStartTime < desiredFrameTimeMS) {
+        const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
+        usleep(timeToSleepMS * 1000 - 100);
+    }
+    frameStartTime = SDL_GetTicks();
+
+    globalFrameCount++;
+
+    updateInputs();
+
+    if (recordingInput) {
+        recordedInput.push_back(currentInputMap[keyboardID]);
+    }
+
+    bool hasInput = true;
+    bool runFrame = oneframe || !paused;
+
+    if (playingBackInput) {
+        if (runFrame) {
+            if (playBackFrame >= (int)playBackInputBuffer.size()) {
+                playingBackInput = false;
+                playBackFrame = 0;
+            } else {
+                currentInputMap[recordingID] = playBackInputBuffer[playBackFrame++];
+                //log ("input from playback! " + std::to_string(currentInput));
+            }
+        } else {
+            hasInput = false;
+        }
+    }
+
+    std::vector<Guy *> everyone;
+
+    if (runFrame) {
+        for (auto guy : vecGuysToDelete) {
+            delete guy;
+        }
+        vecGuysToDelete.clear();
+    }
+
+    for (auto guy : guys) {
+        everyone.push_back(guy);
+        for ( auto minion : guy->getMinions() ) {
+            everyone.push_back(minion);
+        }
+    }
+
+    int frameGuyCount = 0;
+    if (runFrame) {
+        for (auto guy : everyone) {
+            if (guy->PreFrame()) {
+                frameGuyCount++;
+            }
+        }
+    }
+
+    // gather everyone again in case of deletions/additions in PreFrame
+    everyone.clear(); 
+    for (auto guy : guys) {
+        everyone.push_back(guy);
+        for ( auto minion : guy->getMinions() ) {
+            everyone.push_back(minion);
+        }
+    }
+
+    if (frameGuyCount == 0) {
+        globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
+    }
+
+    if (runFrame) {
+        for (auto guy : everyone) {
+            guy->WorldPhysics();
+        }
+        for (auto guy : everyone) {
+            guy->Push(guy->getOpponent());
+        }
+        for (auto guy : everyone) {
+            guy->CheckHit(guy->getOpponent());
+        }
+
+        static bool hasAddedData = false;
+        // update plot range if we're doing that
+        if (guys.size() > 0 ) {
+            if (curPlotActionID == 0 && guys[0]->getIsDrive() == true)
+            {
+                curPlotEntryStartFrame = globalFrameCount;
+                curPlotActionID = guys[0]->getCurrentAction();
+                vecPlotEntries.push_back({});
+                curPlotEntryID++;
+            }
+            if (curPlotActionID != 0 && guys[0]->getCurrentAction() != 1 && guys[0]->getIsDrive() == false)
+            {
+                if (curPlotEntryNormalStartFrame == 0) {
+                    curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
+                }
+                std::vector<HitBox> *hitBoxes = guys[0]->getHitBoxes();
+                Fixed maxXHitBox = Fixed(0);
+                for (auto hitbox : *hitBoxes) {
+                    if (hitbox.type != hitBoxType::hit) continue;
+                    Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
+                    if (hitBoxX > maxXHitBox) {
+                        maxXHitBox = hitBoxX;
+                    }
+                }
+                // find a better solution for two-hitting normals
+                // if (maxXHitBox != Fixed(0)) {
+                //     hasAddedData = true;
+                // }
+                if (maxXHitBox != Fixed(0) || hasAddedData) {
+                    vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(globalFrameCount - curPlotEntryStartFrame);
+                    vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
+                }
+                if (vecPlotEntries[curPlotEntryID].strName == "") {
+                    vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName() + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
+                    vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
+                }
+            }
+            if (curPlotActionID != 0 && guys[0]->getCurrentAction() == 1) {
+                hasAddedData = false;
+                curPlotActionID = 0;
+                curPlotEntryStartFrame = 0;
+                curPlotEntryNormalStartFrame = 0;
+            }
+        }
+    }
+
+    if (replayingGameState) {
+        if (runFrame) {
+            static bool firstFrame = true;
+            int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+            if (firstFrame) {
+                firstFrame = false;
+            } else {
+                auto players = gameStateDump[targetDumpFrame]["players"];
+                int i = 0;
+                while (i < 2) {
+                    std::string desc = "player " + std::to_string(i);
+                    compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), true, desc + " pos X");
+                    compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), true, desc + " pos Y");
+                    Fixed velX, velY, accelX, accelY;
+                    guys[i]->getVel(velX, velY, accelX, accelY);
+                    compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, true, desc + " vel X");
+                    compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, true, desc + " vel Y");
+                    if (players[i].contains("accelX")) {
+                        compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, true, desc + " accel X");
+                    }
+                    compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, true, desc + " accel Y");
+
+                    if (players[i].contains("hitVelX")) {
+                        compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), true, desc + " hitAccel X");
+                        compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), true, desc + " hitAccel X");
+                    }
+
+                    compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
+                    compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), false, desc + " action frame");
+
+                    i++;
+                }
+
+                gameStateFrame++;
+            }
+        }
+    }
+
+    if (replayingGameState) {
+        if (runFrame) {
+            int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+            if (targetDumpFrame >= (int)gameStateDump.size()) {
+                replayingGameState = false;
+                gameStateFrame = 0;
+                firstGameStateFrame = 0;
+                replayFrameNumber = 0;
+                log("game replay finished, errors: " + std::to_string(replayErrors));
+            } else {
+                int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
+                inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
+                currentInputMap[replayLeft] = inputLeft;
+
+                // training dumps don't have input for player 2
+                if (gameStateDump[targetDumpFrame]["players"][1].contains("currentInput")) {
+                    int inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
+                    inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
+                    currentInputMap[replayRight] = inputRight;
+                }
+
+                if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
+                    replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
+                }
+            }
+        } else {
+            hasInput = false;
+        }
+    }
+
+    for (auto guy : guys) {
+        if ( hasInput ) {
+            int input = 0;
+            if (currentInputMap.count(*guy->getInputIDPtr())) {
+                input = currentInputMap[*guy->getInputIDPtr()];
+            }
+            guy->Input( input );
+        }
+    }
+
+    if (runFrame) {
+        for (auto guy : everyone) {
+            bool die = !guy->Frame();
+
+            if (die) {
+                vecGuysToDelete.push_back(guy);
+            }
+        }
+    }
+
+    color clearColor = {0.0,0.0,0.0};
+
+    // find camera position if we have 2 guys
+    if (guys.size() >= 2) {
+        float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
+        distGuys += 50.0; // account for some buffer behind
+        float angleRad = 90 - (fov / 2.0);
+        angleRad *= (M_PI / 360.0);
+        zoom = distGuys / 2.0 / tanf( angleRad );
+        translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
+        zoom = fmax(zoom, 360.0);
+        translateX = fmin(translateX, 550.0);
+        translateX = fmax(translateX, -550.0);
+        //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
+    }
+
+    setRenderState(clearColor, 1920, 1080);
+
+    renderUI(io->Framerate, &logQueue);
+
+    for (auto guy : everyone) {
+        guy->Render();
+    }
+
+    renderMarkersAndStuff();
+
+    if (resetpos) {
+        uint32_t i = 0;
+        while (i < guys.size()) {
+            guys[i]->resetPos();
+            i++;
+        }
+    }
+
+    SDL_GL_SwapWindow(sdlwindow);
+
+    resetpos = false;
+    oneframe = false;
+    static int lasterrorcount = replayErrors;
+    if (lasterrorcount != replayErrors) {
+        paused = true; // cant pause in the middle above
+        lasterrorcount = replayErrors;
+    }
+}   
+
 int main(int argc, char**argv)
 {
     srand(time(NULL));
-    auto window = initWindowRender();
+    sdlwindow = initWindowRender();
     initUI();
-    ImGuiIO& io = ImGui::GetIO(); // why doesn't the one from initUI work? who knows
+    io = &ImGui::GetIO(); // why doesn't the one from initUI work? who knows
     initRenderUI();
 
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
@@ -292,7 +587,7 @@ int main(int argc, char**argv)
         recordedInput = inputTimeline.get<std::vector<int>>();
     }
 
-    nlohmann::json gameStateDump = parse_json_file("game_state_dump.json");
+    gameStateDump = parse_json_file("game_state_dump.json");
     if (gameStateDump != nullptr) {
         int i = 0;
         while (i < (int)gameStateDump.size()) {
@@ -321,290 +616,17 @@ int main(int argc, char**argv)
         }
     }
 
-    uint32_t frameStartTime = SDL_GetTicks();
+    frameStartTime = SDL_GetTicks();
 
     currentInputMap[nullInputID] = 0;
     currentInputMap[keyboardID] = 0;
     currentInputMap[recordingID] = 0;
 
-    std::vector<Guy *> vecGuysToDelete;
-
-    while (!done)
-    {
-        const float desiredFrameTimeMS = 1000.0 / 60.0f;
-        uint32_t currentTime = SDL_GetTicks();
-        if ((limitRate || (!playingBackInput && !replayingGameState)) && currentTime - frameStartTime < desiredFrameTimeMS) {
-            const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
-            usleep(timeToSleepMS * 1000 - 100);
-        }
-        frameStartTime = SDL_GetTicks();
-
-        globalFrameCount++;
-
-        updateInputs();
-
-        if (recordingInput) {
-            recordedInput.push_back(currentInputMap[keyboardID]);
-        }
-
-        bool hasInput = true;
-        bool runFrame = oneframe || !paused;
-
-        if (playingBackInput) {
-            if (runFrame) {
-                if (playBackFrame >= (int)playBackInputBuffer.size()) {
-                    playingBackInput = false;
-                    playBackFrame = 0;
-                } else {
-                    currentInputMap[recordingID] = playBackInputBuffer[playBackFrame++];
-                    //log ("input from playback! " + std::to_string(currentInput));
-                }
-            } else {
-                hasInput = false;
-            }
-        }
-
-        std::vector<Guy *> everyone;
-
-        if (runFrame) {
-            for (auto guy : vecGuysToDelete) {
-                delete guy;
-            }
-            vecGuysToDelete.clear();
-        }
-
-        for (auto guy : guys) {
-            everyone.push_back(guy);
-            for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
-            }
-        }
-
-        int frameGuyCount = 0;
-        if (runFrame) {
-            for (auto guy : everyone) {
-                if (guy->PreFrame()) {
-                    frameGuyCount++;
-                }
-            }
-        }
-
-        // gather everyone again in case of deletions/additions in PreFrame
-        everyone.clear(); 
-        for (auto guy : guys) {
-            everyone.push_back(guy);
-            for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
-            }
-        }
-
-        if (frameGuyCount == 0) {
-            globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
-        }
-
-        if (runFrame) {
-            for (auto guy : everyone) {
-                guy->WorldPhysics();
-            }
-            for (auto guy : everyone) {
-                guy->Push(guy->getOpponent());
-            }
-            for (auto guy : everyone) {
-                guy->CheckHit(guy->getOpponent());
-            }
-
-            static bool hasAddedData = false;
-            // update plot range if we're doing that
-            if (guys.size() > 0 ) {
-                if (curPlotActionID == 0 && guys[0]->getIsDrive() == true)
-                {
-                    curPlotEntryStartFrame = globalFrameCount;
-                    curPlotActionID = guys[0]->getCurrentAction();
-                    vecPlotEntries.push_back({});
-                    curPlotEntryID++;
-                }
-                if (curPlotActionID != 0 && guys[0]->getCurrentAction() != 1 && guys[0]->getIsDrive() == false)
-                {
-                    if (curPlotEntryNormalStartFrame == 0) {
-                        curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
-                    }
-                    std::vector<HitBox> *hitBoxes = guys[0]->getHitBoxes();
-                    Fixed maxXHitBox = Fixed(0);
-                    for (auto hitbox : *hitBoxes) {
-                        if (hitbox.type != hitBoxType::hit) continue;
-                        Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
-                        if (hitBoxX > maxXHitBox) {
-                            maxXHitBox = hitBoxX;
-                        }
-                    }
-                    // find a better solution for two-hitting normals
-                    // if (maxXHitBox != Fixed(0)) {
-                    //     hasAddedData = true;
-                    // }
-                    if (maxXHitBox != Fixed(0) || hasAddedData) {
-                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(globalFrameCount - curPlotEntryStartFrame);
-                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
-                    }
-                    if (vecPlotEntries[curPlotEntryID].strName == "") {
-                        vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName() + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
-                        vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
-                    }
-                }
-                if (curPlotActionID != 0 && guys[0]->getCurrentAction() == 1) {
-                    hasAddedData = false;
-                    curPlotActionID = 0;
-                    curPlotEntryStartFrame = 0;
-                    curPlotEntryNormalStartFrame = 0;
-                }
-            }
-        }
-
-        if (replayingGameState) {
-            if (runFrame) {
-                static bool firstFrame = true;
-                int targetDumpFrame = gameStateFrame - firstGameStateFrame;
-                if (firstFrame) {
-                    firstFrame = false;
-                } else {
-                    auto players = gameStateDump[targetDumpFrame]["players"];
-                    int i = 0;
-                    while (i < 2) {
-                        std::string desc = "player " + std::to_string(i);
-                        compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), true, desc + " pos X");
-                        compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), true, desc + " pos Y");
-                        Fixed velX, velY, accelX, accelY;
-                        guys[i]->getVel(velX, velY, accelX, accelY);
-                        compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, true, desc + " vel X");
-                        compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, true, desc + " vel Y");
-                        if (players[i].contains("accelX")) {
-                            compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, true, desc + " accel X");
-                        }
-                        compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, true, desc + " accel Y");
-
-                        if (players[i].contains("hitVelX")) {
-                            compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), true, desc + " hitAccel X");
-                            compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), true, desc + " hitAccel X");
-                        }
-
-                        compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
-                        compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), false, desc + " action frame");
-
-                        i++;
-                    }
-
-                    gameStateFrame++;
-                }
-            }
-        }
-
-        if (replayingGameState) {
-            if (runFrame) {
-                int targetDumpFrame = gameStateFrame - firstGameStateFrame;
-                if (targetDumpFrame >= (int)gameStateDump.size()) {
-                    replayingGameState = false;
-                    gameStateFrame = 0;
-                    firstGameStateFrame = 0;
-                    replayFrameNumber = 0;
-                    log("game replay finished, errors: " + std::to_string(replayErrors));
-                } else {
-                    int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
-                    inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
-                    currentInputMap[replayLeft] = inputLeft;
-
-                    // training dumps don't have input for player 2
-                    if (gameStateDump[targetDumpFrame]["players"][1].contains("currentInput")) {
-                        int inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
-                        inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
-                        currentInputMap[replayRight] = inputRight;
-                    }
-
-                    if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
-                        replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
-                    }
-                }
-            } else {
-                hasInput = false;
-            }
-        }
-
-        for (auto guy : guys) {
-            if ( hasInput ) {
-                int input = 0;
-                if (currentInputMap.count(*guy->getInputIDPtr())) {
-                    input = currentInputMap[*guy->getInputIDPtr()];
-                }
-                guy->Input( input );
-            }
-        }
-
-        if (runFrame) {
-            for (auto guy : everyone) {
-                bool die = !guy->Frame();
-
-                if (die) {
-                    vecGuysToDelete.push_back(guy);
-                }
-            }
-        }
-
-        color clearColor = {0.0,0.0,0.0};
-
-        // find camera position if we have 2 guys
-        if (guys.size() >= 2) {
-            float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
-            distGuys += 50.0; // account for some buffer behind
-            float angleRad = 90 - (fov / 2.0);
-            angleRad *= (M_PI / 360.0);
-            zoom = distGuys / 2.0 / tanf( angleRad );
-            translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
-            zoom = fmax(zoom, 360.0);
-            translateX = fmin(translateX, 550.0);
-            translateX = fmax(translateX, -550.0);
-            //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
-        }
-
-        setRenderState(clearColor, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-
-        renderUI(io.Framerate, &logQueue);
-
-        for (auto guy : everyone) {
-            guy->Render();
-        }
-
-        renderMarkersAndStuff();
-
-        if (resetpos) {
-            uint32_t i = 0;
-            while (i < guys.size()) {
-                guys[i]->resetPos();
-                i++;
-            }
-        }
-
-        SDL_GL_SwapWindow(window);
-
-        resetpos = false;
-        oneframe = false;
-        static int lasterrorcount = replayErrors;
-        if (lasterrorcount != replayErrors) {
-            paused = true; // cant pause in the middle above
-            lasterrorcount = replayErrors;
-        }
-    }
-
-    // save timeline buffer to disk
-    timelineToInputBuffer(playBackInputBuffer);
-    nlohmann::json jsonInput(playBackInputBuffer);
-    writeFile("timeline.json", nlohmann::to_string(jsonInput));
-
-    for (auto guy : guys)
-    {
-        delete guy;
-    }
-    guys.clear();
-
-    destroyUI();
-    destroyRender();
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(mainloop, 0, 1);
+#else
+    while (1) { mainloop(); }
+#endif
 
     return 0;
 }
