@@ -1,7 +1,7 @@
 project(
   'psychodrive',
   ['c','cpp'],
-  version : '0.0.1',
+  version : run_command('git', 'describe').stdout().strip(),
   default_options : ['warning_level=3']
 )
 
@@ -82,4 +82,5 @@ project_target = executable(
   include_directories : include_dirs,
   install : true,
   c_args : build_args,
+  cpp_args : build_args,
 )
