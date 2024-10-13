@@ -12,6 +12,7 @@
 #include <chrono>
 #include <thread>
 #include <bitset>
+#include <unordered_set>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -72,6 +73,95 @@ const int charVersionCount = IM_ARRAYSIZE(charVersions);
 bool resetpos = false;
 
 std::vector<Guy *> guys;
+
+std::unordered_set<std::string> setCharsLoaded;
+
+struct guyCreateInfo_t {
+    std::string charName;
+    int charVersion;
+    Fixed x;
+    Fixed y;
+    int startDir;
+    color col;
+};
+
+std::vector<guyCreateInfo_t> vecDeferredCreateGuys;
+bool newCharLoaded = false;
+
+void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
+{
+    Guy *pNewGuy = new Guy(charName, charVersion, x, y, startDir, color);
+
+    if (guys.size()) {
+        pNewGuy->setOpponent(guys[0]);
+        if (guys.size() == 1) {
+            guys[0]->setOpponent(pNewGuy);
+        }
+    } else {
+        *pNewGuy->getInputIDPtr() = keyboardID;
+        *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
+    }
+    guys.push_back(pNewGuy);
+}
+
+void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
+{
+#ifdef __EMSCRIPTEN__
+    if (setCharsLoaded.find(charName) == setCharsLoaded.end()) {
+        log("downloading " + std::string(charName));
+
+        vecDeferredCreateGuys.push_back({charName,charVersion,x,y,startDir,color});
+
+        EM_ASM({
+            var script = document.createElement('script');
+            var charName = UTF8ToString($0);
+            script.onload = function () {
+                Module.ccall('jsCharLoadCallback',
+                null,
+                ['string'],
+                [charName]);
+            };
+            script.src = './psychodrive_char_' + charName + '.js';
+            script.async = true;
+
+            document.head.appendChild(script);
+        }, charName.c_str());
+    } else {
+        createGuyNow(charName, charVersion, x, y, startDir, color);
+    }
+#else
+    createGuyNow(charName, charVersion, x, y, startDir, color);
+#endif
+}
+
+void doDeferredCreateGuys(void)
+{
+    std::vector<guyCreateInfo_t> vecDeferredNotDoneYet;
+    if (newCharLoaded) {
+        for (auto deferredCreate : vecDeferredCreateGuys) {
+            if (setCharsLoaded.find(deferredCreate.charName) != setCharsLoaded.end()) {
+                createGuyNow(deferredCreate.charName, deferredCreate.charVersion, deferredCreate.x, deferredCreate.y, deferredCreate.startDir, deferredCreate.col);
+            } else {
+                vecDeferredNotDoneYet.push_back(deferredCreate);
+            }
+        }
+        vecDeferredCreateGuys = vecDeferredNotDoneYet;
+        newCharLoaded = false;
+    }
+}
+
+extern "C" {
+
+void jsCharLoadCallback(char *charName)
+{
+    log(std::string(charName) + " download complete");
+    if (setCharsLoaded.find(charName) == setCharsLoaded.end()) {
+        setCharsLoaded.insert(charName);
+        newCharLoaded = true;
+    }
+}
+
+}
 
 bool done = false;
 bool paused = false;
@@ -285,6 +375,15 @@ bool doBoxesHit(Box box1, Box box2)
  
 std::deque<std::string> logQueue;
 
+extern "C" {
+
+void jsLog(char *logLine)
+{
+    log("JS:" + std::string(logLine));
+}
+
+}
+
 void log(std::string logLine)
 {
     logQueue.push_back(logLine);
@@ -336,6 +435,8 @@ static void mainloop(void)
         exit(0);
 #endif
     }
+
+    doDeferredCreateGuys();
 
     const float desiredFrameTimeMS = 1000.0 / 60.0f;
     uint32_t currentTime = SDL_GetTicks();
@@ -619,26 +720,17 @@ int main(int argc, char**argv)
     if ( argc > 2 ) {
         extractCharVersion( argv[2], charNameRight, versionRight );
     }
-    Guy *pNewGuy = new Guy(charNameLeft, versionLeft, Fixed(-150.0f), Fixed(0.0f), 1, {randFloat(), randFloat(), randFloat()} );
-    *pNewGuy->getInputIDPtr() = keyboardID;
-    *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
-    guys.push_back(pNewGuy);
-
-    pNewGuy = new Guy(charNameRight, versionRight, Fixed(150.0f), Fixed(0.0f), -1, {randFloat(), randFloat(), randFloat()} );
-    guys.push_back(pNewGuy);
+    createGuy(charNameLeft, versionLeft, Fixed(-150.0f), Fixed(0.0f), 1, {randFloat(), randFloat(), randFloat()} );
+    createGuy(charNameRight, versionRight, Fixed(150.0f), Fixed(0.0f), -1, {randFloat(), randFloat(), randFloat()} );
 
     int curChar = 3;
     while (curChar < argc) {
         std::string charName;
         int charVersion = maxVersion;
         extractCharVersion( argv[curChar], charName, charVersion );
-        pNewGuy = new Guy(charName, charVersion, Fixed(0), Fixed(0), 1, {randFloat(), randFloat(), randFloat()} );
-        guys.push_back(pNewGuy);
+        createGuy(charName, charVersion, Fixed(0), Fixed(0), 1, {randFloat(), randFloat(), randFloat()} );
         curChar++;
     }
-
-    pNewGuy->setOpponent(guys[0]);
-    guys[0]->setOpponent(pNewGuy);
 
     nlohmann::json inputTimeline = parse_json_file("timeline.json");
     if (inputTimeline != nullptr) {
