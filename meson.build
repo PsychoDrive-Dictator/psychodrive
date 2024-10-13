@@ -39,6 +39,8 @@ include_dirs = [
   include_directories('imgui/backends'),
 ]
 
+bindist_dir = meson.current_build_dir() + '/' + meson.project_name() + '-' + meson.project_version()
+
 compiler = meson.get_compiler('c', native : false)
 compiler_id = compiler.get_id()
 target_os = host_machine.system()
@@ -54,6 +56,8 @@ if compiler_id == 'gcc' and target_os == 'windows'
   add_global_link_arguments('-Wl,-Bstatic', language : 'cpp')
   add_global_link_arguments('-lstdc++', language : 'cpp')
   add_global_link_arguments('-lpthread', language : 'cpp')
+
+  install_data('SDL2.dll', install_dir: bindist_dir)
 endif
 
 if compiler_id == 'emscripten'
@@ -61,6 +65,8 @@ if compiler_id == 'emscripten'
   add_global_link_arguments('-sMAX_WEBGL_VERSION=2', language : 'cpp')
   add_global_link_arguments('-sFORCE_FILESYSTEM', language : 'cpp')
   add_global_link_arguments('-sALLOW_MEMORY_GROWTH', language : 'cpp')
+
+  install_data('psychodrive.html', install_dir: bindist_dir)
 else
   project_source_files += 'gl3w.c'
 endif
@@ -81,7 +87,12 @@ project_target = executable(
   project_source_files,
   dependencies: project_dependencies,
   include_directories : include_dirs,
-  install : true,
   c_args : build_args,
   cpp_args : build_args,
+  install : true,
+  install_dir: bindist_dir,
 )
+
+message(project_target.full_path())
+
+meson.add_install_script('meson_package_data.sh', bindist_dir, compiler_id)
