@@ -315,17 +315,8 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
-        Guy *pNewGuy = new Guy(charNames[charID], atoi(charVersions[versionID]), Fixed(newCharPos, true), Fixed(0.0f), 1, col );
-        if (guys.size()) {
-            pNewGuy->setOpponent(guys[0]);
-            if (guys.size() == 1) {
-                guys[0]->setOpponent(pNewGuy);
-            }
-        } else {
-            *pNewGuy->getInputIDPtr() = keyboardID;
-            *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
-        }
-        guys.push_back(pNewGuy);
+        createGuy(charNames[charID], atoi(charVersions[versionID]), Fixed(newCharPos, true), Fixed(0.0f), 1, col );
+
         newCharColor[0] = randFloat();
         newCharColor[1] = randFloat();
         newCharColor[2] = randFloat();

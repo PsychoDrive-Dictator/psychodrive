@@ -124,6 +124,7 @@
           statusElement.innerHTML = text;
         },
         totalDependencies: 0,
+        // arguments: ['ryu', 'akuma'],
         monitorRunDependencies: (left) => {
           this.totalDependencies = Math.max(this.totalDependencies, left);
           Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
@@ -139,6 +140,7 @@
       };
     </script>
     <script type="text/javascript" src="./psychodrive_files.js"></script>
+    <script type="text/javascript" src="./psychodrive_char_common.js"></script>
     <script type="text/javascript" src="./psychodrive.js"></script>
   </body>
 </html>
