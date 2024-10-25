@@ -1,6 +1,7 @@
 #ifdef __EMSCRIPTEN__
 #include <GLES3/gl3.h>
 #define GLSL_VER "#version 300 es"
+#include <emscripten/html5.h>
 #else
 #include "gl3w.h"
 #define GLSL_VER "#version 330"
@@ -313,6 +314,11 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     glEnable(GL_BLEND);
     //glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+#ifdef __EMSCRIPTEN__
+    emscripten_get_canvas_element_size("#canvas", &sizeX, &sizeY);
+#endif
+
     glViewport(0, 0, sizeX, sizeY);
     buildProjectionMatrix(50.0, (float)sizeX / (float)sizeY, 1.0, 1000.0);
     setCamera(translateX, translateY, zoom, translateX, translateY, -1000.0);
@@ -358,7 +364,14 @@ SDL_Window* initWindowRender()
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     std::string strWindowTitle = "Psycho Drive " + std::string(STRINGIZE_VALUE_OF(PROJECT_VERSION));
-    window = SDL_CreateWindow(strWindowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, window_flags);
+
+    int w = 1920, h = 1080;
+
+#ifdef __EMSCRIPTEN__
+    emscripten_get_canvas_element_size("#canvas", &w, &h);
+#endif
+
+    window = SDL_CreateWindow(strWindowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, window_flags);
     if (window == nullptr)
     {
         printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
