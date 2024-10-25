@@ -670,7 +670,11 @@ static void mainloop(void)
         //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
     }
 
-    setRenderState(clearColor, 1920, 1080);
+
+    int sizeX, sizeY;
+    SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);\
+    
+    setRenderState(clearColor, sizeX, sizeY);
 
     renderUI(io->Framerate, &logQueue);
 
