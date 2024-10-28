@@ -108,10 +108,18 @@ void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int star
 {
 #ifdef __EMSCRIPTEN__
     if (setCharsLoaded.find(charName) == setCharsLoaded.end()) {
-        log("downloading " + std::string(charName));
+        bool needDownload = true;
+        for (auto deferred : vecDeferredCreateGuys) {
+            if (deferred.charName == charName)
+                needDownload = false;
+        }
 
         vecDeferredCreateGuys.push_back({charName,charVersion,x,y,startDir,color});
 
+        if (!needDownload)
+            return;
+
+        log("downloading " + std::string(charName));
         EM_ASM({
             var script = document.createElement('script');
             var charName = UTF8ToString($0);
