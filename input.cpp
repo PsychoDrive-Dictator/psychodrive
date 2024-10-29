@@ -102,6 +102,9 @@ void updateInputs(void)
                 case SDLK_F4:
                     renderPositionAnchors = !renderPositionAnchors;
                     break;
+                case SDLK_F5:
+                    lockCamera = !lockCamera;
+                    break;
                 case SDLK_r:
                     recordingInput = !recordingInput;
                     if (recordingInput == true) {

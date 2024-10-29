@@ -176,6 +176,7 @@ bool paused = false;
 bool oneframe = false;
 int globalFrameCount = 0;
 int replayFrameNumber = 0;
+bool lockCamera = true;
 
 bool recordingInput = false;
 std::vector<int> recordedInput;
@@ -664,24 +665,32 @@ static void mainloop(void)
 
     color clearColor = {0.0,0.0,0.0};
 
+    int sizeX, sizeY;
+    SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);
+    
     // find camera position if we have 2 guys
-    if (guys.size() >= 2) {
-        float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
-        distGuys += 50.0; // account for some buffer behind
-        float angleRad = 90 - (fov / 2.0);
-        angleRad *= (M_PI / 360.0);
-        zoom = distGuys / 2.0 / tanf( angleRad );
+    if (lockCamera && guys.size() >= 2) {
         translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
-        zoom = fmax(zoom, 360.0);
         translateX = fmin(translateX, 550.0);
         translateX = fmax(translateX, -550.0);
-        //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
+
+        // first find required camera distance to have both guys in view horizontally
+        float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
+        distGuys += 200.0; // account for some buffer behind
+        float angleRad = fov / 2.0 * M_PI / 180.0;
+        // zoom is adjacent edge, equals opposite over tan(ang)
+        float zoomToFitGuys = distGuys / 2.0 / tanf( angleRad );
+
+        float vertFovRad = 2.0 * atanf( tanf( ( fov * M_PI / 180.0 ) / 2.0 ) * ((float)sizeY / (float)sizeX) );
+        // we want to see a point 25 units below the chars to clearly see their feet
+        float zoomToFitFloor = (translateY + 25.0) / tanf( vertFovRad / 2.0 );
+
+        zoom = fmax( zoomToFitGuys, zoomToFitFloor );
+        zoom = fmax( zoom, 250.0f );
     }
-
-
-    int sizeX, sizeY;
-    SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);\
     
+    //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
+
     setRenderState(clearColor, sizeX, sizeY);
 
     renderUI(io->Framerate, &logQueue);
