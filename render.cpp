@@ -84,18 +84,19 @@ void setTranslationMatrix(float *mat, float x, float y, float z) {
     mat[14] = z;
 }
  
-void buildProjectionMatrix(float fov, float ratio, float nearP, float farP) {
- 
-    float f = 1.0f / tan (fov * (M_PI / 360.0));
- 
+void buildProjectionMatrix(float fov, float ratio, float nearP, float farP)
+{
+    float tangent = tan(fov/2 * M_PI / 180.0); // tangent of half fovX
+    float right = nearP * tangent; // half width of near plane
+    float top = right / ratio; // half height of near plane
+
     setIdentityMatrix(projMatrix,4);
- 
-    projMatrix[0] = f / ratio;
-    projMatrix[1 * 4 + 1] = f;
-    projMatrix[2 * 4 + 2] = (farP + nearP) / (nearP - farP);
-    projMatrix[3 * 4 + 2] = (2.0f * farP * nearP) / (nearP - farP);
-    projMatrix[2 * 4 + 3] = -1.0f;
-    projMatrix[3 * 4 + 3] = 0.0f;
+    projMatrix[0] = nearP / right;
+    projMatrix[5] = nearP / top;
+    projMatrix[10] = -(farP + nearP) / (farP - nearP);
+    projMatrix[11] = -1.0;
+    projMatrix[14] = -(2.0 * farP * nearP) / (farP - nearP);
+    projMatrix[15] = 0.0;
 }
  
 void setCamera(float posX, float posY, float posZ,
@@ -145,19 +146,19 @@ void setCamera(float posX, float posY, float posZ,
 
 const float cube[] = {
     // front
-    0.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 1.0, 0.0,
-    0.0, 0.0, 0.0,
-    1.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    // back
     0.0, 0.0, 1.0,
     1.0, 0.0, 1.0,
     1.0, 1.0, 1.0,
     0.0, 0.0, 1.0,
     1.0, 1.0, 1.0,
     0.0, 1.0, 1.0,
+    // back
+    0.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    1.0, 1.0, 0.0,
+    0.0, 0.0, 0.0,
+    1.0, 1.0, 0.0,
+    0.0, 1.0, 0.0,
     // bottom
     0.0, 0.0, 0.0,
     1.0, 0.0, 0.0,
@@ -188,14 +189,16 @@ const float cube[] = {
     1.0, 1.0, 1.0,
 };
 
-void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b, float a)
+void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront /*= false*/ )
 {
     glUniform3f(loc_size, w, h, thickness);
     glUniform3f(loc_offset, x, y, -thickness/2.0);
     glUniform4f(loc_color, r, g, b, a);
 
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, IM_ARRAYSIZE(cube) / 3);
+    GLint first = noFront ? 6 : 0;
+    GLsizei count = IM_ARRAYSIZE(cube) / 3 - first;
+    glDrawArrays(GL_TRIANGLES, first, count);
 }
 
 void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
@@ -223,7 +226,7 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
 bool thickboxes = false;
 bool renderPositionAnchors = true;
 float zoom = 500.0;
-float fov = 50.0;
+float fov = 80.0;
 int translateX = 0.0;
 int translateY = 150.0;
 
@@ -320,9 +323,8 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
 #endif
 
     glViewport(0, 0, sizeX, sizeY);
-    buildProjectionMatrix(50.0, (float)sizeX / (float)sizeY, 1.0, 1000.0);
+    buildProjectionMatrix(fov, (float)sizeX / (float)sizeY, 1.0, 3000.0);
     setCamera(translateX, translateY, zoom, translateX, translateY, -1000.0);
-
 
     glUseProgram(program);
 
@@ -331,7 +333,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
 
     // render stage
     glUniform1i(loc_isgrid, 1);
-    drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0);
+    drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0, true);
     glUniform1i(loc_isgrid, 0);
 }
 

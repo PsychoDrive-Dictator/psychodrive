@@ -36,7 +36,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY);
 void addHitMarker(HitMarker newMarker);
 void renderMarkersAndStuff(void);
 void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ );
-void drawBox(float x, float y, float w, float h, float thickness, float r, float g, float b, float a);
+void drawBox(float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront = false);
 void drawQuad(float x, float y, float w, float h, float r, float g, float b, float a);
 void drawLoop(float x, float y, float w, float h, float r, float g, float b, float a);
 SDL_Window* initWindowRender(void);
