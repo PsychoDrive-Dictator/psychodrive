@@ -2,8 +2,8 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width; initial-scale=0.75; maximum-scale=0.75; minimum-scale=0.75; user-scalable=0;"/>
+    <meta http-equiv="Content-Type" content="text/html, charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.75, maximum-scale=0.75, minimum-scale=0.75, user-scalable=0"/>
     <title>Psycho Drive</title>
     <style>
       body {
@@ -13,24 +13,112 @@
         margin: 0;
         background-color: black;
       }
-      .psycho_canvas {border: 0px none;background-color: black; width: 100%;height: 100%;}
+      .psycho_canvas {
+        border: 0px none;
+        background-color: black;
+        width: 100%;
+        height: 100%;
+      }
+      #dropdown_bg {
+        position: fixed;
+        height: 100dvh;
+        width: 100dvw;
+        left: 0;
+        top: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #dropdown_container {
+        width: max-content;
+        height: max-content;
+        max-height: 100dvh;
+        overflow-y: scroll;
+        background: rgb(36, 36, 36);
+      }
+      .dropdown_hidden {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 100ms linear, visibility 100ms linear;
+      }
+      .dropdown_item {
+        padding: 15px;
+        padding-right: 50px;
+        color: white;
+        border-width: 0 0 1px 0;
+        border-color: #3e3e3e;
+        border-style: solid;
+        font-family: Sans-Serif;
+      }
+      .dropdown_item:last-child {
+        border-style: none;
+      }
+      .dropdown_item_selected {
+        background: rgb(104, 104, 104);
+      }
     </style>
   </head>
   <body>
     <canvas class="psycho_canvas" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+    <div id="dropdown_bg" class="dropdown_hidden" onclick="hideDropDown()">
+      <div id="dropdown_container"></div>
+    </div>
     <script type='text/javascript'>
       var Module = {
         canvas: (() => {
           var canvas = document.getElementById('canvas');
 
-          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
-          // application robust, you may want to override this behavior before shipping!
-          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
           canvas.addEventListener("webglcontextlost", (e) => { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
 
           return canvas;
         })(),
       };
+
+      var curOptionID = 0;
+      var selectedElem = null;
+      function showDropDown() {
+        const drop = document.getElementById("dropdown_bg");
+        drop.classList.remove("dropdown_hidden");
+        selectedElem.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+      }
+      function hideDropDown() {
+        const drop = document.getElementById("dropdown_bg");
+        drop.classList.add("dropdown_hidden");
+        curOptionID = 0;
+      }
+      function addDropDownOption(text, selected) {
+        newDiv = document.createElement("div");
+        newContent = document.createTextNode(text);
+        newDiv.appendChild(newContent);
+        newDiv.classList.add("dropdown_item");
+        if (selected == 1) {
+          newDiv.classList.add("dropdown_item_selected");
+          selectedElem = newDiv;
+        }
+
+        const drop = document.getElementById("dropdown_bg");
+        var optionID = curOptionID;
+
+        newDiv.addEventListener('click', function() {
+          Module.ccall('jsModalDropDownSelection',null,['number'],[optionID]);
+          const drop_container = document.getElementById("dropdown_container");
+          for (const child of drop_container.children) {
+            child.classList.remove("dropdown_item_selected");
+          }
+          this.classList.add("dropdown_item_selected");
+          hideDropDown();
+        });
+
+        const drop_container = document.getElementById("dropdown_container");
+        if (curOptionID == 0) {
+          while (drop_container.firstChild) {
+            drop_container.removeChild(drop_container.lastChild);
+          }
+        }
+        drop_container.appendChild(newDiv);
+        curOptionID++;
+      }
     </script>
     <script type="text/javascript" src="./psychodrive_files.js"></script>
     <script type="text/javascript" src="./psychodrive_char_common.js"></script>

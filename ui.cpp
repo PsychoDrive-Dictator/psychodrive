@@ -1,3 +1,7 @@
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include "imgui_neo_sequencer.h"
 #include "implot.h"
 
@@ -11,7 +15,95 @@
 #include <string>
 #include <unordered_map>
 
+#include "imgui/imgui_internal.h"
+
+bool desktopUI = true;
+
 Guy *pGuyToDelete = nullptr;
+
+int mobileDropDownOption = -1;
+ImGuiID curDropDownID = -1;
+
+extern "C" {
+
+void jsModalDropDownSelection(int selectionID)
+{
+    mobileDropDownOption = selectionID;
+}
+
+}
+
+void modalDropDown(const char *label, int *pSelection, std::vector<const char *> vecOptions, int nFixedWidth = 0)
+{
+    int ret = -1;
+    int selectedOption = *pSelection;
+
+    if (desktopUI) {
+        if (nFixedWidth != 0)
+            ImGui::SetNextItemWidth(nFixedWidth);
+        if (ImGui::BeginCombo(label, vecOptions[selectedOption])) {
+            int i = 0;
+            for (auto option : vecOptions) {
+                const bool selected = selectedOption == i;
+                if (ImGui::Selectable(option, selected))
+                    ret = i;
+                if (selected)
+                    ImGui::SetItemDefaultFocus();
+                i++;
+            }
+            ImGui::EndCombo();
+        }
+    } else {
+#ifdef __EMSCRIPTEN__
+        std::string strButtonID = std::string(vecOptions[selectedOption]) + "##mobilemodaldropdown_" + label;
+        bool showingDropDown = false;
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+        if (ImGui::Button(strButtonID.c_str(), ImVec2(nFixedWidth, 0))) {
+            showingDropDown = true;
+        }
+        ImGui::PopStyleVar();
+        if (label[0] != '#') {
+            ImGui::SameLine();
+            ImGui::Text(label);
+        }
+
+        if (showingDropDown) {
+            mobileDropDownOption = -1;
+            curDropDownID = ImGui::GetCurrentWindow()->GetID(label);
+            int i = 0;
+            for (auto option : vecOptions) {
+                int32_t selected = 0;
+                if (selectedOption == i)
+                    selected = 1;
+                EM_ASM({
+                    var option = UTF8ToString($0);
+                    var selected = $1;
+                    addDropDownOption(option, selected);
+                }, option, selected);
+                i++;
+            }
+            EM_ASM(
+                showDropDown();
+            );
+        }
+
+        if (curDropDownID == ImGui::GetCurrentWindow()->GetID(label) && mobileDropDownOption != -1)
+            ret = mobileDropDownOption;
+#endif
+    }
+
+    if (ret != -1)
+        *pSelection = ret;
+}
+
+void modalDropDown(const char *label, int *pSelection, const char** ppOptions, int nOptions, int nFixedWidth = 0)
+{
+    std::vector<const char *> vecOptions;
+    for (int i = 0; i < nOptions; i++) {
+        vecOptions.push_back(ppOptions[i]);
+    }
+    modalDropDown(label, pSelection, vecOptions, nFixedWidth);
+}
 
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
@@ -25,8 +117,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         vecInputLabels.push_back( std::to_string(i.first));
         vecInputs.push_back(vecInputLabels[vecInputLabels.size() -1].c_str());
     }
-    ImGui::SetNextItemWidth( 50.0 );
-    ImGui::Combo("input", pGuy->getInputListIDPtr(), vecInputs.data(), vecInputs.size());
+    modalDropDown("input", pGuy->getInputListIDPtr(), vecInputs, 50);
     *pGuy->getInputIDPtr() = atoi(vecInputLabels[*pGuy->getInputListIDPtr()].c_str());
 
     ImGui::SameLine();
@@ -49,8 +140,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         }
     }
     newOpponentID = guyID;
-     ImGui::SetNextItemWidth( 100.0 );
-    ImGui::Combo("opponent", &newOpponentID, vecGuyNames.data(), vecGuyNames.size());
+    modalDropDown("opponent", &newOpponentID, vecGuyNames, 100);
     if (newOpponentID != guyID) {
         pGuy->setOpponent(mapDropDownIDToGuyPtr[newOpponentID]);
     }
@@ -71,12 +161,10 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName().c_str());
     if (!pGuy->getProjectile()) {
         const char* states[] = { "stand", "jump", "crouch", "not you", "block", "not you", "crouch block" };
-        ImGui::SetNextItemWidth( 125.0 );
-        ImGui::Combo("state", pGuy->getInputOverridePtr(), states, IM_ARRAYSIZE(states));
+        modalDropDown("state", pGuy->getInputOverridePtr(), states, IM_ARRAYSIZE(states), 125);
         ImGui::SameLine();
-        ImGui::SetNextItemWidth( 300.0 );
-        std::vector<char *> &vecMoveList = pGuy->getMoveList();
-        ImGui::Combo("recovery action", pGuy->getNeutralMovePtr(), vecMoveList.data(), vecMoveList.size());
+        std::vector<const char *> &vecMoveList = pGuy->getMoveList();
+        modalDropDown("recovery action", pGuy->getNeutralMovePtr(), vecMoveList, 300);
     }
     ImGui::Text("crouching %i airborne %i poseStatus %i landingAdjust %i", pGuy->getCrouchingDebug(), pGuy->getAirborneDebug(), pGuy->getforcedPoseStatus(), pGuy->getLandingAdjust());
     Fixed posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
@@ -307,11 +395,9 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
     ImGui::ColorEdit3("##newcharcolor", newCharColor);
-    ImGui::SetNextItemWidth( 100.0 );
-    ImGui::Combo("##newcharchar", &charID, charNames, charNameCount);
+    modalDropDown("##newcharchar", &charID, charNames, charNameCount, 100);
     ImGui::SameLine();
-    ImGui::SetNextItemWidth( 200.0 );
-    ImGui::Combo("##newcharversion", &versionID, charVersions, charVersionCount);
+    modalDropDown("##newcharversion", &versionID, charVersions, charVersionCount, 200);
     ImGui::SameLine();
     if ( ImGui::Button("new guy") ) {
         color col = {newCharColor[0], newCharColor[1], newCharColor[2]};
@@ -394,6 +480,10 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
 
 ImGuiIO& initUI(void)
 {
+#ifdef __EMSCRIPTEN__
+    desktopUI = false;
+#endif
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImPlot::CreateContext();

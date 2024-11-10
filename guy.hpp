@@ -252,7 +252,7 @@ public:
         UpdateActionData();
     }
 
-    std::vector<char *> &getMoveList() { return vecMoveList; }
+    std::vector<const char *> &getMoveList() { return vecMoveList; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
     int *getInputIDPtr() { return &inputID; }
@@ -281,7 +281,7 @@ private:
     bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
     const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson);
     void BuildMoveList();
-    std::vector<char *> vecMoveList;
+    std::vector<const char *> vecMoveList;
     int neutralMove = 0;
 
     int inputOverride = 0;
