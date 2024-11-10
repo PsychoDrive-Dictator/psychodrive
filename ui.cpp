@@ -115,7 +115,9 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     std::vector<std::string> vecInputLabels;
     for (auto i : currentInputMap) {
         vecInputLabels.push_back( std::to_string(i.first));
-        vecInputs.push_back(vecInputLabels[vecInputLabels.size() -1].c_str());
+    }
+    for (auto& i : vecInputLabels) {
+        vecInputs.push_back(i.c_str());
     }
     modalDropDown("input", pGuy->getInputListIDPtr(), vecInputs, 50);
     *pGuy->getInputIDPtr() = atoi(vecInputLabels[*pGuy->getInputListIDPtr()].c_str());
