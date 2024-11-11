@@ -232,11 +232,9 @@ void Guy::UpdateActionData(void)
     marginFrame = (*pFab)["ActionFrame"]["MarginFrame"];
     actionFrameDuration = (*pFab)["Frame"];
     loopPoint = (*pFab)["State"]["EndStateParam"];
-    // see deejay medium jackknife - it's possible this is generally wrong and
-    // should just be ignored for airborne moves, or something
-    // if ( loopPoint == -1 ) {
-    //     loopPoint = 0;
-    // }
+    if ( loopPoint == -1 ) {
+        loopPoint = 0;
+    }
     loopCount = (*pFab)["State"]["LoopCount"];
     hasLooped = false;
 }
@@ -2681,7 +2679,7 @@ bool Guy::Frame(bool endWarudoFrame)
             noVelNextFrame = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
-        } else if (loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
+        } else if (!getAirborne() && loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
             currentFrame = loopPoint;
             hasLooped = true;
             if (loopCount > 0) {
