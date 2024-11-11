@@ -61,12 +61,12 @@ const char* charNames[] = {
 const int charNameCount = IM_ARRAYSIZE(charNames);
 
 const char* charVersions[] = {
-    { "19 - pre-S2" },
-    { "20 - S2 (akuma patch)" },
-    { "21 - S2 hotfix 1" },
-    { "22 - S2 hotfix 2" },
-    { "23 - S2 (dictator patch)" },
-    { "24 - S2 (terry patch)" }
+    "19 - pre-S2",
+    "20 - S2 (akuma patch)",
+    "21 - S2 hotfix 1",
+    "22 - S2 hotfix 2",
+    "23 - S2 (dictator patch)",
+    "24 - S2 (terry patch)"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 

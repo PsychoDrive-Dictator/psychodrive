@@ -1116,7 +1116,7 @@ void Guy::DoTriggers()
                                 uint32_t chargeFrames = (*pResourceMatch)["ok_frame"];
                                 uint32_t keepFrames = (*pResourceMatch)["keep_frame"];
                                 uint32_t dirCount = 0;
-                                uint32_t dirNotMatchCount = 0;
+                                // uint32_t dirNotMatchCount = 0;
                                 // count matching direction in input buffer, super naive but will work for testing
                                 inputBufferCursor = i;
                                 uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
@@ -1127,9 +1127,10 @@ void Guy::DoTriggers()
                                         if (dirCount >= chargeFrames) {
                                             break;
                                         }
-                                    } else {
-                                        dirNotMatchCount++;
                                     }
+                                    // else {
+                                    //     dirNotMatchCount++;
+                                    // }
                                     inputBufferCursor++;
                                 }
 

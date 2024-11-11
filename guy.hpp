@@ -331,7 +331,6 @@ private:
     bool crouching = false;
     bool blocking = false;
     bool bounced = false;
-    bool wallbounced = false;
     bool didPush = false;
 
     int landingAdjust = 0;
