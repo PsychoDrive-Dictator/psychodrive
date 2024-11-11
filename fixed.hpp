@@ -21,7 +21,7 @@ public:
     Fixed(double in, bool allowApproximate = false) {
         double input = in * 65536.0f;
         double rounded = std::round(input);
-        double diff = fabsf(rounded - input);
+        double diff = fabs(rounded - input);
         if (diff > epsilon && !allowApproximate) {
             abort();
         }
@@ -148,7 +148,7 @@ public:
     }
 
     float f() { return data / 65536.0f; }
-    float i() { return data >> 16; }
+    int i() { return data >> 16; }
 
     friend Fixed fixAbs( Fixed fix ) {
         if (fix.data < 0) {

@@ -64,7 +64,7 @@ void modalDropDown(const char *label, int *pSelection, std::vector<const char *>
         ImGui::PopStyleVar();
         if (label[0] != '#') {
             ImGui::SameLine();
-            ImGui::Text(label);
+            ImGui::Text("%s", label);
         }
 
         if (showingDropDown) {
@@ -82,9 +82,9 @@ void modalDropDown(const char *label, int *pSelection, std::vector<const char *>
                 }, option, selected);
                 i++;
             }
-            EM_ASM(
+            EM_ASM({
                 showDropDown();
-            );
+            }, 0);
         }
 
         if (curDropDownID == ImGui::GetCurrentWindow()->GetID(label) && mobileDropDownOption != -1)
@@ -187,7 +187,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
             maxXHitBox = hitBoxX;
         }
     }
-    ImGui::Text("push %" PRIi64 " hit %" PRIi64 " hit extent %.2f hurt %" PRIi64 , pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox.f(), pGuy->getHurtBoxes()->size());
+    ImGui::Text("push %zd hit %zd hit extent %.2f hurt %zd", pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox.f(), pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i warudo %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getWarudo() );
     } else {
@@ -209,7 +209,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Checkbox("transitions", &pGuy->logTransitions);
     auto logQueue = pGuy->getLogQueue();
     for (int i = logQueue.size() - 1; i >= 0; i--) {
-        ImGui::Text(logQueue[i].c_str());
+        ImGui::Text("%s", logQueue[i].c_str());
     }
     ImGui::End();
 
@@ -440,7 +440,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::Checkbox("force PC", &forcePunishCounter);
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / frameRate, frameRate);
     for (int i = pLogQueue->size() - 1; i >= 0; i--) {
-        ImGui::Text((*pLogQueue)[i].c_str());
+        ImGui::Text("%s", (*pLogQueue)[i].c_str());
     }
     ImGui::End();
 

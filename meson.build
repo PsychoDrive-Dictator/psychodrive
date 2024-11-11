@@ -62,6 +62,7 @@ endif
 
 if compiler_id == 'emscripten'
   message('emscripten path')
+  add_global_arguments('-Wno-dollar-in-identifier-extension', language : 'cpp')
   add_global_link_arguments('-sMAX_WEBGL_VERSION=2', language : 'cpp')
   add_global_link_arguments('-sFORCE_FILESYSTEM', language : 'cpp')
   add_global_link_arguments('-sALLOW_MEMORY_GROWTH', language : 'cpp')
