@@ -36,6 +36,7 @@ public:
         warudoIsFreeze = isFreeze;
     }
 
+    int getVersion() { return version; }
     std::string getCharacter() { return character + std::to_string(version); }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
@@ -202,6 +203,8 @@ public:
         }
     }
 
+    Guy(void) {}
+
     Guy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
     {
         const std::string charPath = "data/chars/" + charName + "/";
@@ -291,10 +294,14 @@ public:
     }
 
     std::vector<const char *> &getMoveList() { return vecMoveList; }
+    std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
+    std::map<std::pair<int, int>, std::pair<std::string, bool>> &getMapMoveStyle() { return mapMoveStyle; }
+    std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
     int *getInputIDPtr() { return &inputID; }
     int *getInputListIDPtr() { return &inputListID; }
+    const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson = nullptr);
 private:
     void UpdateActionData(void);
     void UpdateBoxes(void);
@@ -403,7 +410,6 @@ private:
     std::deque<std::string> logQueue;
 
     bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
-    const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson);
     void BuildMoveList();
     std::vector<const char *> vecMoveList;
     int neutralMove = 0;
@@ -599,6 +605,9 @@ private:
     std::vector<RenderBox> renderBoxes;
 
     std::set<int> setDeferredTriggerIDs;
+
+    std::set<std::pair<int,int>> frameTriggers;
+    std::pair<int, int> forcedTrigger;
 
     bool isDrive = false;
     bool wasDrive = false;

@@ -18,6 +18,7 @@
 #include <string>
 
 #include <cmath>
+#include <numbers>
 
 nlohmann::json staticPlayer;
 bool staticPlayerLoaded = false;
@@ -181,7 +182,9 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
         const char *moveName = mapMoveStyle[mapIndex].first.c_str();
         bool commonMove = mapMoveStyle[mapIndex].second;
 
-        *ppMoveJson = commonMove ? &(*pCommonMovesJson)[moveName] : &(*pMovesDictJson)[moveName];
+        if (ppMoveJson) {
+            *ppMoveJson = commonMove ? &(*pCommonMovesJson)[moveName] : &(*pMovesDictJson)[moveName];
+        }
         return moveName;
     }
 }
@@ -1330,6 +1333,14 @@ void Guy::DoTriggers(int fluffFrameBias)
                 continue;
             }
 
+            bool forceTrigger = false;
+
+            if (forcedTrigger == std::make_pair(actionID, styleInstall)) {
+                forceTrigger = true;
+            }
+
+            frameTriggers.insert(std::make_pair(actionID, styleInstall));
+
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
@@ -1366,7 +1377,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                 if (it->second.hasAntiNormal) {
                     break;
                 }
-            } else if (CheckTriggerCommand(pTrigger, initialI)) {
+            } else if (forceTrigger || CheckTriggerCommand(pTrigger, initialI)) {
                 log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " +
                     std::to_string(it->second.hasDeferred) + " normal " + std::to_string(it->second.hasNormal) +
                     + " antinormal " + std::to_string(it->second.hasAntiNormal));
@@ -2478,7 +2489,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     nextAction = 280;
                 } else {
                     // generic angle-based launch
-                    float angle = std::fmod(std::atan2(destY,destX)/M_PI*180.0,360);
+                    float angle = std::fmod(std::atan2(destY,destX)/std::numbers::pi*180.0,360);
                     //log(logHits, "launch angle " + std::to_string(angle));
 
                     if (angle >= 57.5) {
@@ -3037,6 +3048,8 @@ bool Guy::Frame(bool endWarudoFrame)
         // we'll re-run it in PreFrame
         return true;
     }
+
+    frameTriggers.clear();
 
     bool doTriggers = true;
     bool a,b,c;

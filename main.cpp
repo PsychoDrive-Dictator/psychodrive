@@ -13,6 +13,7 @@
 #include <thread>
 #include <bitset>
 #include <unordered_set>
+#include <numbers>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -27,6 +28,9 @@
 #include "input.hpp"
 #include "render.hpp"
 
+
+EGameMode gameMode = Training;
+
 bool forceCounter = false;
 bool forcePunishCounter = false;
 int hitStunAdder = 0;
@@ -39,6 +43,7 @@ struct charEntry {
 
 std::vector<charEntry> charEntries;
 std::vector<const char *> charNames;
+std::vector<const char *> charNiceNames;
 
 void makeCharEntries(void)
 {
@@ -71,6 +76,7 @@ void makeCharEntries(void)
 
     for (charEntry entry : charEntries ) {
         charNames.push_back(entry.name);
+        charNiceNames.push_back(entry.niceName);
     }
 }
 
@@ -86,16 +92,16 @@ const char *getCharNameFromID(int charID)
 }
 
 const char* charVersions[] = {
-    "19 - pre-S2",
-    "20 - S2 (akuma patch)",
-    "21 - S2 hotfix 1",
-    "22 - S2 hotfix 2",
-    "23 - S2 (dictator patch)",
-    "24 - S2 (terry patch)",
-    "25 - S2 (dec balance patch)",
-    "26 - S2 (mai patch)",
-    "30 - S3 (elena patch+hotfix1)",
-    "31 - S3 hotfix 2"
+    "19 - S1 February Update",
+    "20 - S2 Akuma Update",
+    "21 - S2 Hotfix 1",
+    "22 - S2 Hotfix 2",
+    "23 - S2 M. Bison Update",
+    "24 - S2 Terry Update",
+    "25 - S2 December Update",
+    "26 - S2 Mai Update",
+    "30 - S3 Elena Update + Hotfix 1",
+    "31 - S3 Hotfix 2"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
@@ -104,6 +110,7 @@ bool resetpos = false;
 std::vector<Guy *> guys;
 
 std::unordered_set<std::string> setCharsLoaded;
+std::unordered_set<std::string> setCharsStarted;
 
 struct guyCreateInfo_t {
     std::string charName;
@@ -126,11 +133,48 @@ void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int s
         if (guys.size() == 1) {
             guys[0]->setOpponent(pNewGuy);
         }
-    } else {
+    } else if (gameMode == Training) {
         *pNewGuy->getInputIDPtr() = keyboardID;
         *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     }
     guys.push_back(pNewGuy);
+}
+
+bool isCharLoaded(std::string charName)
+{
+#ifdef __EMSCRIPTEN__
+    return setCharsLoaded.find(charName) != setCharsLoaded.end();
+#else
+    return true;
+#endif
+}
+
+void requestCharDownload(std::string charName)
+{
+#ifdef __EMSCRIPTEN__
+    if (isCharLoaded(charName)) {
+        return;
+    }
+    if (setCharsStarted.find(charName) != setCharsStarted.end()) {
+        return;
+    }
+    log("downloading " + std::string(charName));
+    setCharsStarted.insert(charName);
+    EM_ASM({
+        var script = document.createElement('script');
+        var charName = UTF8ToString($0);
+        script.onload = function () {
+            Module.ccall('jsCharLoadCallback',
+            null,
+            ['string'],
+            [charName]);
+        };
+        script.src = './psychodrive_char_' + charName + '.js';
+        script.async = true;
+
+        document.head.appendChild(script);
+    }, charName.c_str());
+#endif
 }
 
 void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
@@ -148,21 +192,7 @@ void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int star
         if (!needDownload)
             return;
 
-        log("downloading " + std::string(charName));
-        EM_ASM({
-            var script = document.createElement('script');
-            var charName = UTF8ToString($0);
-            script.onload = function () {
-                Module.ccall('jsCharLoadCallback',
-                null,
-                ['string'],
-                [charName]);
-            };
-            script.src = './psychodrive_char_' + charName + '.js';
-            script.async = true;
-
-            document.head.appendChild(script);
-        }, charName.c_str());
+        requestCharDownload(charName);
     } else {
         createGuyNow(charName, charVersion, x, y, startDir, color);
     }
@@ -456,6 +486,7 @@ std::vector<Guy *> vecGuysToDelete;
 nlohmann::json gameStateDump;
 ImGuiIO *io;
 SDL_Window *sdlwindow;
+color clearColor = {0.0,0.0,0.0};
 
 static void mainloop(void)
 {
@@ -481,6 +512,16 @@ static void mainloop(void)
 #endif
     }
 
+    // if (gameMode == MoveViewer || gameMode == ComboMaker || gameMode == MoveComparison) {
+    //     if (leftCharUIChanged && (guys.size() == 0 || *guys[0]->getName() != charNames[leftCharUI] || guys[0]->getVersion() != atoi(charVersions[leftCharUIVersion]))) {
+    //         while (guys.size()) {
+    //             delete guys[0];
+    //         }
+    //         createGuy(charNames[leftCharUI], atoi(charVersions[leftCharUIVersion]), Fixed(0.0f), Fixed(0.0f), 1, {0.78f, 0.098f, 0.318f} );
+    //         leftCharUIChanged = false;
+    //     }
+    // }
+
     doDeferredCreateGuys();
 
     const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -498,283 +539,324 @@ static void mainloop(void)
 
     updateInputs(sizeX, sizeY);
 
-    if (recordingInput) {
-        recordedInput.push_back(currentInputMap[keyboardID]);
-    }
+    if (gameMode != Training) {
 
-    bool hasInput = true;
-    bool runFrame = oneframe || !paused;
+        if (simInputsChanged && isCharLoaded(charNames[leftCharController.character])) {
+            simController.NewSim();
 
-    if (playingBackInput) {
-        if (runFrame) {
-            if (playBackFrame >= (int)playBackInputBuffer.size()) {
-                playingBackInput = false;
-                playBackFrame = 0;
-            } else {
-                currentInputMap[recordingID] = playBackInputBuffer[playBackFrame++];
-                //log ("input from playback! " + std::to_string(currentInput));
-            }
-        } else {
-            hasInput = false;
-        }
-    }
+            simController.pSim->CreateGuyFromCharController(leftCharController);
 
-    std::vector<Guy *> everyone;
-
-    if (runFrame) {
-        for (auto guy : vecGuysToDelete) {
-            delete guy;
-        }
-        vecGuysToDelete.clear();
-    }
-
-    for (auto guy : guys) {
-        everyone.push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
-            everyone.push_back(minion);
-        }
-    }
-
-    int frameGuyCount = 0;
-    if (runFrame) {
-        for (auto guy : everyone) {
-            if (guy->PreFrame()) {
-                frameGuyCount++;
-            }
-        }
-    }
-
-    // gather everyone again in case of deletions/additions in PreFrame
-    everyone.clear();
-    for (auto guy : guys) {
-        everyone.push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
-            everyone.push_back(minion);
-        }
-    }
-
-    if (!replayingGameState && frameGuyCount == 0) {
-        globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
-    }
-
-    if (replayingGameState && !runFrame) {
-        globalFrameCount--;
-    }
-
-    if (runFrame) {
-        for (auto guy : everyone) {
-            guy->WorldPhysics();
-        }
-        for (auto guy : everyone) {
-            guy->Push(guy->getOpponent());
-        }
-        for (auto guy : everyone) {
-            guy->CheckHit(guy->getOpponent());
-        }
-
-        static bool hasAddedData = false;
-        // update plot range if we're doing that
-        if (guys.size() > 0 ) {
-            if (curPlotActionID == 0 && guys[0]->getIsDrive() == true)
-            {
-                curPlotEntryStartFrame = globalFrameCount;
-                curPlotActionID = guys[0]->getCurrentAction();
-                vecPlotEntries.push_back({});
-                curPlotEntryID++;
-            }
-            if (curPlotActionID != 0 && guys[0]->getCurrentAction() != 1 && guys[0]->getIsDrive() == false)
-            {
-                if (curPlotEntryNormalStartFrame == 0) {
-                    curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
+            int frameCount = 0;
+            while (frameCount < 50) {
+                if (leftCharController.timelineTriggers.find(frameCount) != leftCharController.timelineTriggers.end()) {
+                    simController.pSim->simGuys[0]->getForcedTrigger() = leftCharController.timelineTriggers[frameCount];
+                } else {
+                    simController.pSim->simGuys[0]->getForcedTrigger() = std::make_pair(0,0);
                 }
-                std::vector<HitBox> *hitBoxes = guys[0]->getHitBoxes();
-                Fixed maxXHitBox = Fixed(0);
-                for (auto hitbox : *hitBoxes) {
-                    if (hitbox.type != hitBoxType::hit) continue;
-                    Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
-                    if (hitBoxX > maxXHitBox) {
-                        maxXHitBox = hitBoxX;
+                simController.pSim->AdvanceFrame();
+                frameCount++;
+            }
+
+            simInputsChanged = false;
+        } else if (simInputsChanged && !isCharLoaded(charNames[leftCharController.character])) {
+            requestCharDownload(charNames[leftCharController.character]);
+        }
+
+        setRenderState(clearColor, sizeX, sizeY);
+
+        if (!simInputsChanged) {
+            simController.pSim->stateRecording[simController.scrubberFrame].vecGuyState[0]->Render();
+        }
+
+    } else {
+
+        if (recordingInput) {
+            recordedInput.push_back(currentInputMap[keyboardID]);
+        }
+
+        bool hasInput = true;
+        bool runFrame = oneframe || !paused;
+
+        if (playingBackInput) {
+            if (runFrame) {
+                if (playBackFrame >= (int)playBackInputBuffer.size()) {
+                    playingBackInput = false;
+                    playBackFrame = 0;
+                } else {
+                    currentInputMap[recordingID] = playBackInputBuffer[playBackFrame++];
+                    //log ("input from playback! " + std::to_string(currentInput));
+                }
+            } else {
+                hasInput = false;
+            }
+        }
+
+        std::vector<Guy *> everyone;
+
+        if (runFrame) {
+            for (auto guy : vecGuysToDelete) {
+                delete guy;
+            }
+            vecGuysToDelete.clear();
+        }
+
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+
+        int frameGuyCount = 0;
+        if (runFrame) {
+            for (auto guy : everyone) {
+                if (guy->PreFrame()) {
+                    frameGuyCount++;
+                }
+            }
+        }
+
+        // gather everyone again in case of deletions/additions in PreFrame
+        everyone.clear();
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+
+        if (!replayingGameState && frameGuyCount == 0) {
+            globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
+        }
+
+        if (replayingGameState && !runFrame) {
+            globalFrameCount--;
+        }
+
+        if (runFrame) {
+            for (auto guy : everyone) {
+                guy->WorldPhysics();
+            }
+            for (auto guy : everyone) {
+                guy->Push(guy->getOpponent());
+            }
+            for (auto guy : everyone) {
+                guy->CheckHit(guy->getOpponent());
+            }
+
+            static bool hasAddedData = false;
+            // update plot range if we're doing that
+            if (guys.size() > 0 ) {
+                if (curPlotActionID == 0 && guys[0]->getIsDrive() == true)
+                {
+                    curPlotEntryStartFrame = globalFrameCount;
+                    curPlotActionID = guys[0]->getCurrentAction();
+                    vecPlotEntries.push_back({});
+                    curPlotEntryID++;
+                }
+                if (curPlotActionID != 0 && guys[0]->getCurrentAction() != 1 && guys[0]->getIsDrive() == false)
+                {
+                    if (curPlotEntryNormalStartFrame == 0) {
+                        curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
+                    }
+                    std::vector<HitBox> *hitBoxes = guys[0]->getHitBoxes();
+                    Fixed maxXHitBox = Fixed(0);
+                    for (auto hitbox : *hitBoxes) {
+                        if (hitbox.type != hitBoxType::hit) continue;
+                        Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
+                        if (hitBoxX > maxXHitBox) {
+                            maxXHitBox = hitBoxX;
+                        }
+                    }
+                    // find a better solution for two-hitting normals
+                    // if (maxXHitBox != Fixed(0)) {
+                    //     hasAddedData = true;
+                    // }
+                    if (maxXHitBox != Fixed(0) || hasAddedData) {
+                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(globalFrameCount - curPlotEntryStartFrame);
+                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
+                    }
+                    if (vecPlotEntries[curPlotEntryID].strName == "") {
+                        vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName() + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
+                        vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
                     }
                 }
-                // find a better solution for two-hitting normals
-                // if (maxXHitBox != Fixed(0)) {
-                //     hasAddedData = true;
-                // }
-                if (maxXHitBox != Fixed(0) || hasAddedData) {
-                    vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(globalFrameCount - curPlotEntryStartFrame);
-                    vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
+                if (curPlotActionID != 0 && guys[0]->getCurrentAction() == 1) {
+                    hasAddedData = false;
+                    curPlotActionID = 0;
+                    curPlotEntryStartFrame = 0;
+                    curPlotEntryNormalStartFrame = 0;
                 }
-                if (vecPlotEntries[curPlotEntryID].strName == "") {
-                    vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName() + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
-                    vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
-                }
-            }
-            if (curPlotActionID != 0 && guys[0]->getCurrentAction() == 1) {
-                hasAddedData = false;
-                curPlotActionID = 0;
-                curPlotEntryStartFrame = 0;
-                curPlotEntryNormalStartFrame = 0;
             }
         }
-    }
 
-    if (replayingGameState) {
-        if (runFrame) {
-            static bool firstFrame = true;
-            int targetDumpFrame = gameStateFrame - firstGameStateFrame;
-            if (firstFrame) {
-                firstFrame = false;
-            } else {
-                auto players = gameStateDump[targetDumpFrame]["players"];
-                int i = 0;
-                while (i < 2) {
-                    std::string desc = "player " + std::to_string(i);
-                    compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), Simulation::ePos, desc + " pos X");
-                    compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), Simulation::ePos, desc + " pos Y");
-                    Fixed velX, velY, accelX, accelY;
-                    guys[i]->getVel(velX, velY, accelX, accelY);
-                    compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, Simulation::eVel, desc + " vel X");
-                    compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, Simulation::eVel, desc + " vel Y");
-                    if (players[i].contains("accelX")) {
-                        compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, Simulation::eAccel, desc + " accel X");
-                    }
-                    compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, Simulation::eAccel, desc + " accel Y");
+        if (replayingGameState) {
+            if (runFrame) {
+                static bool firstFrame = true;
+                int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+                if (firstFrame) {
+                    firstFrame = false;
+                } else {
+                    auto players = gameStateDump[targetDumpFrame]["players"];
+                    int i = 0;
+                    while (i < 2) {
+                        std::string desc = "player " + std::to_string(i);
+                        compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), Simulation::ePos, desc + " pos X");
+                        compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), Simulation::ePos, desc + " pos Y");
+                        Fixed velX, velY, accelX, accelY;
+                        guys[i]->getVel(velX, velY, accelX, accelY);
+                        compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, Simulation::eVel, desc + " vel X");
+                        compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, Simulation::eVel, desc + " vel Y");
+                        if (players[i].contains("accelX")) {
+                            compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, Simulation::eAccel, desc + " accel X");
+                        }
+                        compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, Simulation::eAccel, desc + " accel Y");
 
-                    if (players[i].contains("hitVelX")) {
-                        compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), Simulation::eHitVel, desc + " hitVel X");
-                        compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), Simulation::eHitAccel, desc + " hitAccel X");
+                        if (players[i].contains("hitVelX")) {
+                            compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), Simulation::eHitVel, desc + " hitVel X");
+                            compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), Simulation::eHitAccel, desc + " hitAccel X");
+                        }
+
+                        compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), Simulation::eActionID, desc + " action ID");
+                        compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), Simulation::eActionFrame, desc + " action frame");
+
+                        // swap players here, we track combo hits on the opponent
+                        compareGameStateInt(players[i]["comboCount"], guys[!i]->getComboHits(), Simulation::eComboCount, desc + " combo");
+
+                        compareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, guys[i]->getDirection(), Simulation::eDirection, desc + " direction");
+
+                        i++;
                     }
 
-                    compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), Simulation::eActionID, desc + " action ID");
-                    compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), Simulation::eActionFrame, desc + " action frame");
-
-                    // swap players here, we track combo hits on the opponent
-                    compareGameStateInt(players[i]["comboCount"], guys[!i]->getComboHits(), Simulation::eComboCount, desc + " combo");
-
-                    compareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, guys[i]->getDirection(), Simulation::eDirection, desc + " direction");
-
-                    i++;
+                    gameStateFrame++;
                 }
-
-                gameStateFrame++;
             }
         }
-    }
 
-    if (replayingGameState) {
-        if (runFrame) {
-            int targetDumpFrame = gameStateFrame - firstGameStateFrame;
-            if (targetDumpFrame >= (int)gameStateDump.size()) {
-                replayingGameState = false;
-                gameStateFrame = 0;
-                firstGameStateFrame = 0;
-                replayFrameNumber = 0;
-                log("game replay finished, errors: " + std::to_string(replayErrors));
+        if (replayingGameState) {
+            if (runFrame) {
+                int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+                if (targetDumpFrame >= (int)gameStateDump.size()) {
+                    replayingGameState = false;
+                    gameStateFrame = 0;
+                    firstGameStateFrame = 0;
+                    replayFrameNumber = 0;
+                    log("game replay finished, errors: " + std::to_string(replayErrors));
+                } else {
+                    int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
+                    inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
+                    currentInputMap[replayLeft] = inputLeft;
+
+                    // training dumps don't have input for player 2
+                    if (gameStateDump[targetDumpFrame]["players"][1].contains("currentInput")) {
+                        int inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
+                        inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
+                        currentInputMap[replayRight] = inputRight;
+                    }
+
+                    if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
+                        replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
+                    }
+                }
             } else {
-                int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
-                inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
-                currentInputMap[replayLeft] = inputLeft;
+                hasInput = false;
+            }
+        }
 
-                // training dumps don't have input for player 2
-                if (gameStateDump[targetDumpFrame]["players"][1].contains("currentInput")) {
-                    int inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
-                    inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
-                    currentInputMap[replayRight] = inputRight;
+        for (auto guy : guys) {
+            if ( hasInput ) {
+                int input = 0;
+                if (currentInputMap.count(*guy->getInputIDPtr())) {
+                    input = currentInputMap[*guy->getInputIDPtr()];
                 }
+                guy->Input( input );
+            }
+        }
 
-                if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
-                    replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
+        if (runFrame) {
+            for (auto guy : everyone) {
+                bool die = !guy->Frame();
+
+                if (die) {
+                    vecGuysToDelete.push_back(guy);
                 }
             }
-        } else {
-            hasInput = false;
         }
-    }
 
-    for (auto guy : guys) {
-        if ( hasInput ) {
-            int input = 0;
-            if (currentInputMap.count(*guy->getInputIDPtr())) {
-                input = currentInputMap[*guy->getInputIDPtr()];
+        // find camera position if we have 2 guys
+        if (lockCamera && guys.size() >= 2) {
+            translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
+            translateX = fmin(translateX, 550.0);
+            translateX = fmax(translateX, -550.0);
+
+            // first find required camera distance to have both guys in view horizontally
+            float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
+            distGuys += 200.0; // account for some buffer behind
+            float angleRad = fov / 2.0 * std::numbers::pi / 180.0;
+            // zoom is adjacent edge, equals opposite over tan(ang)
+            float zoomToFitGuys = distGuys / 2.0 / tanf( angleRad );
+
+            float vertFovRad = 2.0 * atanf( tanf( ( fov * std::numbers::pi / 180.0 ) / 2.0 ) * ((float)sizeY / (float)sizeX) );
+            // we want to see a point 25 units below the chars to clearly see their feet
+            float zoomToFitFloor = (translateY + 25.0) / tanf( vertFovRad / 2.0 );
+
+            zoom = fmax( zoomToFitGuys, zoomToFitFloor );
+            zoom = fmax( zoom, 250.0f );
+        }
+        
+        //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
+
+        // gather everyone again in case of deletions/additions in renderUI
+        everyone.clear(); 
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
             }
-            guy->Input( input );
         }
-    }
 
-    if (runFrame) {
+        // gather everyone again in case of deletions/additions in renderUI
+        everyone.clear();
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+
+        setRenderState(clearColor, sizeX, sizeY);
+
         for (auto guy : everyone) {
-            bool die = !guy->Frame();
+            guy->Render();
+        }
 
-            if (die) {
-                vecGuysToDelete.push_back(guy);
+        if (resetpos) {
+            uint32_t i = 0;
+            while (i < guys.size()) {
+                guys[i]->resetPos();
+                i++;
             }
         }
-    }
 
-    color clearColor = {0.0,0.0,0.0};
-
-    // find camera position if we have 2 guys
-    if (lockCamera && guys.size() >= 2) {
-        translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
-        translateX = fmin(translateX, 550.0);
-        translateX = fmax(translateX, -550.0);
-
-        // first find required camera distance to have both guys in view horizontally
-        float distGuys = fabs( guys[1]->getPosX().f() - guys[0]->getPosX().f() );
-        distGuys += 200.0; // account for some buffer behind
-        float angleRad = fov / 2.0 * M_PI / 180.0;
-        // zoom is adjacent edge, equals opposite over tan(ang)
-        float zoomToFitGuys = distGuys / 2.0 / tanf( angleRad );
-
-        float vertFovRad = 2.0 * atanf( tanf( ( fov * M_PI / 180.0 ) / 2.0 ) * ((float)sizeY / (float)sizeX) );
-        // we want to see a point 25 units below the chars to clearly see their feet
-        float zoomToFitFloor = (translateY + 25.0) / tanf( vertFovRad / 2.0 );
-
-        zoom = fmax( zoomToFitGuys, zoomToFitFloor );
-        zoom = fmax( zoom, 250.0f );
-    }
-    
-    //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
-
-    setRenderState(clearColor, sizeX, sizeY);
-
-    renderUI(io->Framerate, &logQueue);
-
-    // gather everyone again in case of deletions/additions in renderUI
-    everyone.clear();
-    for (auto guy : guys) {
-        everyone.push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
-            everyone.push_back(minion);
+        resetpos = false;
+        oneframe = false;
+        static int lasterrorcount = replayErrors;
+        if (lasterrorcount != replayErrors) {
+            paused = true; // cant pause in the middle above
+            lasterrorcount = replayErrors;
         }
-    }
 
-    for (auto guy : everyone) {
-        guy->Render();
     }
 
     renderMarkersAndStuff();
 
+
+    renderUI(io->Framerate, &logQueue, sizeX, sizeY);
+
     setScreenSpaceRenderState(sizeX, sizeY);
     renderTouchControls(sizeX, sizeY);
 
-    if (resetpos) {
-        uint32_t i = 0;
-        while (i < guys.size()) {
-            guys[i]->resetPos();
-            i++;
-        }
-    }
-
     SDL_GL_SwapWindow(sdlwindow);
-
-    resetpos = false;
-    oneframe = false;
-    static int lasterrorcount = replayErrors;
-    if (lasterrorcount != replayErrors) {
-        paused = true; // cant pause in the middle above
-        lasterrorcount = replayErrors;
-    }
 }
 
 int main(int argc, char**argv)
@@ -819,8 +901,10 @@ int main(int argc, char**argv)
     initRenderUI();
 
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
-
-    if (loadingDump == false) {
+    if (argc > 1)
+        gameMode = Training;
+    
+    if (gameMode == Training && loadingDump == false) {
         std::string charNameLeft = (char*)charNames[rand() % charNames.size()];
         int versionLeft = maxVersion;
         std::string charNameRight = (char*)charNames[rand() % charNames.size()];

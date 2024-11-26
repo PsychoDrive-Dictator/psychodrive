@@ -6,10 +6,17 @@
 #include "fixed.hpp"
 #include "main.hpp"
 
+class CharacterUIController;
+
+struct FrameState {
+    std::vector<Guy *> vecGuyState;
+};
+
 class Simulation {
 public:
     void CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color);
     void CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int version);
+    void CreateGuyFromCharController(CharacterUIController &controller);
 
     bool SetupFromGameDump(std::string dumpPath, int version);
 
@@ -42,4 +49,7 @@ public:
     int gameStateFrame = 0;
     int firstGameStateFrame = 0;
     int replayErrors = 0;
+
+    bool recordingState = false;
+    std::vector<FrameState> stateRecording;
 };

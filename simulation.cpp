@@ -1,5 +1,6 @@
 #include "simulation.hpp"
 #include "guy.hpp"
+#include "ui.hpp"
 
 void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
@@ -28,6 +29,16 @@ void Simulation::CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int versi
 
     CreateGuy(charName, version, posX, posY, charDirection, charColor);
 }
+
+void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
+{
+    std::string charName = charNames[controller.character];
+    color charColor = {randFloat(), randFloat(), randFloat()};
+
+    int version = atoi(charVersions[controller.charVersion]);
+    CreateGuy(charName, version, Fixed(0), Fixed(0), 1, charColor);
+}
+
 
 bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
 {
@@ -236,5 +247,13 @@ void Simulation::AdvanceFrame(void)
         if (die) {
             vecGuysToDelete.push_back(guy);
         }
+    }
+
+    if (recordingState) {
+        FrameState newFrame = {};
+        Guy *pGuy = new Guy;
+        *pGuy = *simGuys[0];
+        newFrame.vecGuyState.push_back(pGuy);
+        stateRecording.push_back(newFrame);
     }
 }

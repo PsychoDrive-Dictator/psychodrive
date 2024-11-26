@@ -7,6 +7,8 @@
 #define GLSL_VER "#version 330"
 #endif
 
+#include <numbers>
+
 #include "render.hpp"
 #include "ui.hpp"
 #include "guy.hpp"
@@ -86,7 +88,7 @@ void setTranslationMatrix(float *mat, float x, float y, float z) {
  
 void buildProjectionMatrix(float fov, float ratio, float nearP, float farP)
 {
-    float tangent = tan(fov/2 * M_PI / 180.0); // tangent of half fovX
+    float tangent = tan(fov/2 * std::numbers::pi / 180.0); // tangent of half fovX
     float right = nearP * tangent; // half width of near plane
     float top = right / ratio; // half height of near plane
 

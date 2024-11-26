@@ -17,12 +17,22 @@
 
 #include "imgui/imgui_internal.h"
 
-bool desktopUI = true;
+#include "font_droidsans.hpp"
+
+bool webWidgets = false;
+
+ImFont *font = nullptr;
 
 Guy *pGuyToDelete = nullptr;
 
 int mobileDropDownOption = -1;
 ImGuiID curDropDownID = -1;
+
+ SimulationController simController;
+
+CharacterUIController leftCharController;
+CharacterUIController rightCharController;
+bool simInputsChanged = true;
 
 extern "C" {
 
@@ -33,12 +43,13 @@ void jsModalDropDownSelection(int selectionID)
 
 }
 
-void modalDropDown(const char *label, int *pSelection, std::vector<const char *> vecOptions, int nFixedWidth = 0)
+bool modalDropDown(const char *label, int *pSelection, std::vector<const char *> vecOptions, int nFixedWidth = 0)
 {
-    int ret = -1;
+    bool ret = false;
+    int result = -1;
     int selectedOption = *pSelection;
 
-    if (desktopUI) {
+    if (!webWidgets) {
         if (nFixedWidth != 0)
             ImGui::SetNextItemWidth(nFixedWidth);
         if (ImGui::BeginCombo(label, vecOptions[selectedOption])) {
@@ -46,7 +57,7 @@ void modalDropDown(const char *label, int *pSelection, std::vector<const char *>
             for (auto option : vecOptions) {
                 const bool selected = selectedOption == i;
                 if (ImGui::Selectable(option, selected))
-                    ret = i;
+                    result = i;
                 if (selected)
                     ImGui::SetItemDefaultFocus();
                 i++;
@@ -87,27 +98,47 @@ void modalDropDown(const char *label, int *pSelection, std::vector<const char *>
             }, 0);
         }
 
-        if (curDropDownID == ImGui::GetCurrentWindow()->GetID(label) && mobileDropDownOption != -1)
-            ret = mobileDropDownOption;
+        if (curDropDownID == ImGui::GetCurrentWindow()->GetID(label) && mobileDropDownOption != -1) {
+            result = mobileDropDownOption;
+            curDropDownID = -1;
+        }
 #endif
     }
 
-    if (ret != -1)
-        *pSelection = ret;
+    if (result != -1) {
+        if (result != selectedOption)
+            ret = true;
+
+        *pSelection = result;
+    }
+
+    return ret;
 }
 
-void modalDropDown(const char *label, int *pSelection, const char** ppOptions, int nOptions, int nFixedWidth = 0)
+bool modalDropDown(const char *label, int *pSelection, std::vector<std::string> vecOptions, int nFixedWidth = 0)
+{
+    std::vector<const char *> vecActualOptions;
+
+    for (auto& i : vecOptions) {
+        vecActualOptions.push_back(i.c_str());
+    }
+    return modalDropDown(label, pSelection, vecActualOptions, nFixedWidth);
+}
+
+
+bool modalDropDown(const char *label, int *pSelection, const char** ppOptions, int nOptions, int nFixedWidth = 0)
 {
     std::vector<const char *> vecOptions;
     for (int i = 0; i < nOptions; i++) {
         vecOptions.push_back(ppOptions[i]);
     }
-    modalDropDown(label, pSelection, vecOptions, nFixedWidth);
+    return modalDropDown(label, pSelection, vecOptions, nFixedWidth);
 }
 
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
     ImGui::Begin(windowName);
+    ImGui::PushFont(font);
     color col = pGuy->getColor();
     ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "name %s moveset %s", pGuy->getName()->c_str(), pGuy->getCharacter().c_str());
     ImGui::SameLine();
@@ -211,6 +242,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     for (int i = logQueue.size() - 1; i >= 0; i--) {
         ImGui::Text("%s", logQueue[i].c_str());
     }
+    ImGui::PopFont();
     ImGui::End();
 
     int minionID = 1;
@@ -383,12 +415,13 @@ void drawInputEditor()
     ImGui::End();
 }
 
-void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
+void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("PsychoDrive", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+    ImGui::PushFont(font);
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
     static int charID = rand() % charNames.size();
     static int versionID = charVersionCount - 1;
@@ -442,6 +475,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     for (int i = pLogQueue->size() - 1; i >= 0; i--) {
         ImGui::Text("%s", (*pLogQueue)[i].c_str());
     }
+    ImGui::PopFont();
     ImGui::End();
 
     pGuyToDelete = nullptr;
@@ -452,22 +486,6 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     }
 
     if (pGuyToDelete) {
-        if (pGuyToDelete->getParent()) {
-            std::vector<Guy *> &vec = pGuyToDelete->getParent()->getMinions();
-            vec.erase(std::remove(vec.begin(), vec.end(), pGuyToDelete), vec.end());
-        } else {
-            guys.erase(std::remove(guys.begin(), guys.end(), pGuyToDelete), guys.end());
-        }
-        for (auto guy : guys) {
-            if (guy->getOpponent() == pGuyToDelete) {
-                guy->setOpponent(nullptr);
-            }
-            for (auto minion : guy->getMinions()) {
-                if (minion->getOpponent() == pGuyToDelete) {
-                    minion->setOpponent(nullptr);
-                }
-            }
-        }
         delete pGuyToDelete;
         pGuyToDelete = nullptr;
     }
@@ -475,6 +493,89 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     drawInputEditor();
 
     drawHitboxExtentPlotWindow();
+}
+
+void CharacterUIController::RenderUI(void)
+{
+    ImGui::SetNextWindowPos(ImVec2(rightSide ? 800 : 0, 0));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    const char *pWindowName = rightSide ? "PsychoDrive Right Char Easy Panel" : "PsychoDrive Left Char Easy Panel";
+
+    ImGui::Begin(pWindowName, nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+    if (modalDropDown("##char", &character, charNiceNames, 100)) {
+        simInputsChanged = true;
+        changed = true;
+        timelineTriggers.clear();
+    }
+    ImGui::SameLine();
+    if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 200)) {
+        simInputsChanged = true;
+        changed = true;
+        timelineTriggers.clear();
+    }
+    if (simController.scrubberFrame < (int)simController.pSim->stateRecording.size()) {
+        int charID = rightSide ? 1 : 0;
+        Guy *pGuy = simController.pSim->stateRecording[simController.scrubberFrame].vecGuyState[charID];
+        if (pGuy->getFrameTriggers().size()) {
+            vecTriggerDropDownLabels.clear();
+            vecTriggers.clear();
+            vecTriggerDropDownLabels.push_back("Available Triggers");
+            for (auto &trigger : pGuy->getFrameTriggers()) {
+                vecTriggerDropDownLabels.push_back(pGuy->FindMove(trigger.first, trigger.second));
+                vecTriggers.push_back(trigger);
+            }
+            if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 300)) {
+                if (pendingTriggerAdd != 0) {
+                    std::erase_if(timelineTriggers, [](const auto& item) {
+                        auto const& [key, value] = item;
+                        return (key >= simController.scrubberFrame);
+                    });
+                    timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
+                    simInputsChanged = true;
+                    changed = true;
+                    pendingTriggerAdd = 0;
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+}
+
+void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
+{
+    if (gameMode == Training) {
+        renderAdvancedUI(frameRate, pLogQueue, sizeX, sizeY);
+    }
+    
+    // Mode selector button
+    int modeSelectorSize = 200;
+    ImGui::SetNextWindowPos(ImVec2((sizeX - modeSelectorSize) * 0.5f - ImGui::GetStyle().WindowPadding.x, 0));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    ImGui::Begin("PsychoDrive Top Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+    const char* modes[] = { "Training", "Move Viewer" };//, "Move Comparison", "Combo Maker" };
+    if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), modeSelectorSize)) {
+        simInputsChanged = true;
+    }
+    ImGui::End();
+
+    if (gameMode == MoveViewer || gameMode == ComboMaker) {
+        leftCharController.RenderUI();
+
+        ImGui::SetNextWindowPos(ImVec2(10, sizeY - 50));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+        
+        int simFrameCount = simController.pSim->stateRecording.size();
+        if (simFrameCount) {
+            ImGui::SetNextItemWidth(sizeX - 40);
+            ImGui::SliderInt("##framedump", &simController.scrubberFrame, 0, simFrameCount - 1);
+        }
+        ImGui::End();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -482,8 +583,11 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
 
 ImGuiIO& initUI(void)
 {
+    int fontSize = 20;
 #ifdef __EMSCRIPTEN__
-    desktopUI = false;
+    webWidgets = true;
+    gameMode = MoveViewer;
+    fontSize = 28;
 #endif
 
     IMGUI_CHECKVERSION();
@@ -495,6 +599,26 @@ ImGuiIO& initUI(void)
 
     ImGui::StyleColorsDark();
 
+    font = io.Fonts->AddFontFromMemoryCompressedTTF(
+        Droid_Sans_compressed_data, Droid_Sans_compressed_size, fontSize
+    );
+
+    ImGui::GetStyle().TabRounding = 4.0f;
+    ImGui::GetStyle().FrameRounding = 4.0f;
+    ImGui::GetStyle().GrabRounding = 4.0f;
+    ImGui::GetStyle().WindowRounding = 4.0f;
+    ImGui::GetStyle().PopupRounding = 4.0f;
+
+    ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.00f);
+
+    rightCharController.rightSide = true;
+    leftCharController.character = 1;
+    rightCharController.character = 2;
+    leftCharController.charVersion = charVersionCount - 1;
+    rightCharController.charVersion = charVersionCount - 1;
+
+    simController.NewSim();
+
     return io;
 }
 
@@ -504,4 +628,20 @@ void destroyUI(void)
     ImGui_ImplSDL2_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
+}
+
+void SimulationController::NewSim(void)
+{
+    if (pSim != nullptr) {
+        delete pSim;
+        pSim = nullptr;
+    }
+
+    pSim = new Simulation;
+
+    if (pSim == nullptr) {
+        abort();
+    }
+
+    pSim->recordingState = true;
 }

@@ -430,26 +430,28 @@ void updateInputs(int sizeX, int sizeY)
         }
         if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERMOTION || event.type == SDL_FINGERUP)
         {
-            if (!touchControls) {
+            if (!touchControls && gameMode == Training) {
                 touchControls = true;
                 initTouchControls();
             }
 
-            if (event.type == SDL_FINGERUP) {
-                event.tfinger.x = -1.0f;
-                event.tfinger.y = -1.0f;
+            if (touchControls) {
+                if (event.type == SDL_FINGERUP) {
+                    event.tfinger.x = -1.0f;
+                    event.tfinger.y = -1.0f;
 
-                if (event.tfinger.fingerId == directionFinger) {
-                    directionFingerUp = true;
+                    if (event.tfinger.fingerId == directionFinger) {
+                        directionFingerUp = true;
+                    }
                 }
-            }
-            FingerState state = { event.tfinger.x, event.tfinger.y };
-            mapFingerPositions[event.tfinger.fingerId] = state;
-            //log("stickyfingerz " + std::to_string(event.tfinger.fingerId) + " " + std::to_string(event.tfinger.x) + " " + std::to_string(event.tfinger.y));
+                FingerState state = { event.tfinger.x, event.tfinger.y };
+                mapFingerPositions[event.tfinger.fingerId] = state;
+                //log("stickyfingerz " + std::to_string(event.tfinger.fingerId) + " " + std::to_string(event.tfinger.x) + " " + std::to_string(event.tfinger.y));
 
-            if (event.type == SDL_FINGERDOWN && event.tfinger.y > 0.5 && event.tfinger.x < 0.5) {
-                directionFinger = event.tfinger.fingerId;
-                vecTouchPads.push_back(TouchPad(event.tfinger.x, event.tfinger.y, 25.0 / sizeX, keyboardID));
+                if (event.type == SDL_FINGERDOWN && event.tfinger.y > 0.5 && event.tfinger.x < 0.5) {
+                    directionFinger = event.tfinger.fingerId;
+                    vecTouchPads.push_back(TouchPad(event.tfinger.x, event.tfinger.y, 25.0 / sizeX, keyboardID));
+                }
             }
         }
         static bool mouseLeftPressed = false;

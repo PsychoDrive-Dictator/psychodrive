@@ -5,6 +5,13 @@
 #include "json.hpp"
 #include "fixed.hpp"
 
+enum EGameMode {
+    Training = 0,
+    MoveViewer,
+    MoveComparison,
+    ComboMaker
+};
+
 enum hitentryflags {
     crouch = 1,
     air = 2,
@@ -73,7 +80,10 @@ void log(std::string logLine);
 
 class Guy;
 
+extern EGameMode gameMode;
+
 extern std::vector<const char *> charNames;
+extern std::vector<const char *> charNiceNames;
 
 const char *getCharNameFromID(int charID);
 
