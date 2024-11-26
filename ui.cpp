@@ -17,12 +17,16 @@
 
 #include "imgui/imgui_internal.h"
 
-bool desktopUI = true;
+bool webWidgets = false;
 
 Guy *pGuyToDelete = nullptr;
 
 int mobileDropDownOption = -1;
 ImGuiID curDropDownID = -1;
+
+int leftCharUI;
+int leftCharUIVersion;
+bool leftCharUIChanged;
 
 extern "C" {
 
@@ -33,12 +37,13 @@ void jsModalDropDownSelection(int selectionID)
 
 }
 
-void modalDropDown(const char *label, int *pSelection, std::vector<const char *> vecOptions, int nFixedWidth = 0)
+bool modalDropDown(const char *label, int *pSelection, std::vector<const char *> vecOptions, int nFixedWidth = 0)
 {
-    int ret = -1;
+    bool ret = false;
+    int result = -1;
     int selectedOption = *pSelection;
 
-    if (desktopUI) {
+    if (!webWidgets) {
         if (nFixedWidth != 0)
             ImGui::SetNextItemWidth(nFixedWidth);
         if (ImGui::BeginCombo(label, vecOptions[selectedOption])) {
@@ -46,7 +51,7 @@ void modalDropDown(const char *label, int *pSelection, std::vector<const char *>
             for (auto option : vecOptions) {
                 const bool selected = selectedOption == i;
                 if (ImGui::Selectable(option, selected))
-                    ret = i;
+                    result = i;
                 if (selected)
                     ImGui::SetItemDefaultFocus();
                 i++;
@@ -88,21 +93,27 @@ void modalDropDown(const char *label, int *pSelection, std::vector<const char *>
         }
 
         if (curDropDownID == ImGui::GetCurrentWindow()->GetID(label) && mobileDropDownOption != -1)
-            ret = mobileDropDownOption;
+            result = mobileDropDownOption;
 #endif
     }
 
-    if (ret != -1)
-        *pSelection = ret;
+    if (result != -1) {
+        if (result != selectedOption)
+            ret = true;
+
+        *pSelection = result;
+    }
+
+    return ret;
 }
 
-void modalDropDown(const char *label, int *pSelection, const char** ppOptions, int nOptions, int nFixedWidth = 0)
+bool modalDropDown(const char *label, int *pSelection, const char** ppOptions, int nOptions, int nFixedWidth = 0)
 {
     std::vector<const char *> vecOptions;
     for (int i = 0; i < nOptions; i++) {
         vecOptions.push_back(ppOptions[i]);
     }
-    modalDropDown(label, pSelection, vecOptions, nFixedWidth);
+    return modalDropDown(label, pSelection, vecOptions, nFixedWidth);
 }
 
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
@@ -383,7 +394,7 @@ void drawInputEditor()
     ImGui::End();
 }
 
-void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
+void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
@@ -452,22 +463,6 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     }
 
     if (pGuyToDelete) {
-        if (pGuyToDelete->getParent()) {
-            std::vector<Guy *> &vec = pGuyToDelete->getParent()->getMinions();
-            vec.erase(std::remove(vec.begin(), vec.end(), pGuyToDelete), vec.end());
-        } else {
-            guys.erase(std::remove(guys.begin(), guys.end(), pGuyToDelete), guys.end());
-        }
-        for (auto guy : guys) {
-            if (guy->getOpponent() == pGuyToDelete) {
-                guy->setOpponent(nullptr);
-            }
-            for (auto minion : guy->getMinions()) {
-                if (minion->getOpponent() == pGuyToDelete) {
-                    minion->setOpponent(nullptr);
-                }
-            }
-        }
         delete pGuyToDelete;
         pGuyToDelete = nullptr;
     }
@@ -475,6 +470,53 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     drawInputEditor();
 
     drawHitboxExtentPlotWindow();
+}
+
+void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
+{
+    if (gameMode == Training) {
+        renderAdvancedUI(frameRate, pLogQueue, sizeX, sizeY);
+    }
+    
+    // Mode selector button
+    ImGui::SetNextWindowPos(ImVec2((sizeX - 150.0f) * 0.5f - ImGui::GetStyle().WindowPadding.x, 0));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    ImGui::Begin("PsychoDrive Top Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+    const char* modes[] = { "Training", "Move Viewer" };//, "Move Comparison", "Combo Maker" };
+    if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), 150)) {
+        leftCharUIChanged = true;
+    }
+    ImGui::End();
+
+    if (gameMode == MoveViewer || gameMode == ComboMaker) {
+        // Left char panel
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::Begin("PsychoDrive Left Char Easy Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+        if (modalDropDown("##leftchar", &leftCharUI, charNames, charNameCount, 100))
+            leftCharUIChanged = true;
+        ImGui::SameLine();
+        if (modalDropDown("##leftcharversion", &leftCharUIVersion, charVersions, charVersionCount, 200))
+            leftCharUIChanged = true;
+        if (guys.size()) {
+            std::vector<const char *> &vecMoveList = guys[0]->getMoveList();
+            modalDropDown("recovery action", guys[0]->getNeutralMovePtr(), vecMoveList, 300);
+        }
+        ImGui::End();
+
+        ImGui::SetNextWindowPos(ImVec2(10, sizeY - 50));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+        if (guyRecording.size()) {
+            ImGui::SetNextItemWidth(sizeX - 40);
+            ImGui::SliderInt("##framedump", &guyDumpFrame, 0, guyRecording.size() - 1);
+            paused = ImGui::IsItemActive();
+        }
+        ImGui::End();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -483,7 +525,8 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
 ImGuiIO& initUI(void)
 {
 #ifdef __EMSCRIPTEN__
-    desktopUI = false;
+    webWidgets = true;
+    gameMode = MoveViewer;
 #endif
 
     IMGUI_CHECKVERSION();

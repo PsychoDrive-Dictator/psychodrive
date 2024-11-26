@@ -5,6 +5,13 @@
 #include "json.hpp"
 #include "fixed.hpp"
 
+enum EGameMode {
+    Training = 0,
+    MoveViewer,
+    MoveComparison,
+    ComboMaker
+};
+
 enum hitentryflags {
     crouch = 1,
     air = 2,
@@ -72,6 +79,8 @@ void log(std::string logLine);
 
 class Guy;
 
+extern EGameMode gameMode;
+
 extern const char* charNames[];
 extern const int charNameCount;
 
@@ -111,6 +120,9 @@ struct normalRangePlotEntry {
 };
 
 extern std::vector<normalRangePlotEntry> vecPlotEntries;
+
+extern std::vector<Guy> guyRecording;
+extern int guyDumpFrame;
 
 extern bool deleteInputs;
 

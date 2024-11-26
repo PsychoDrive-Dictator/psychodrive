@@ -34,6 +34,8 @@ public:
         warudoIsFreeze = isFreeze;
     }
 
+    std::string getName() { return name; }
+    int getVersion() { return version; }
     std::string getCharacter() { return character + std::to_string(version); }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
@@ -101,7 +103,6 @@ public:
     int getDebuffTimer() { return debuffTimer; }
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
-    std::string getName() { return name; }
     int getforcedPoseStatus() { return forcedPoseStatus; }
     int getPoseStatus() {
         if (forcedPoseStatus) {
@@ -166,6 +167,16 @@ public:
         } else {
             const auto it = std::remove(guys.begin(), guys.end(), this);
             guys.erase(it, guys.end());
+        }
+        for (auto guy : guys) {
+            if (guy->getOpponent() == this) {
+                guy->setOpponent(nullptr);
+            }
+            for (auto minion : guy->getMinions()) {
+                if (minion->getOpponent() == this) {
+                    minion->setOpponent(nullptr);
+                }
+            }
         }
     }
 
