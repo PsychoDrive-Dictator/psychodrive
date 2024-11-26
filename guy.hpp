@@ -36,6 +36,7 @@ public:
         warudoIsFreeze = isFreeze;
     }
 
+    int getVersion() { return version; }
     std::string getCharacter() { return character + std::to_string(version); }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }

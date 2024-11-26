@@ -27,6 +27,8 @@
 #include "input.hpp"
 #include "render.hpp"
 
+EGameMode gameMode = Training;
+
 bool forceCounter = false;
 bool forcePunishCounter = false;
 int hitStunAdder = 0;
@@ -126,7 +128,7 @@ void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int s
         if (guys.size() == 1) {
             guys[0]->setOpponent(pNewGuy);
         }
-    } else {
+    } else if (gameMode == Training) {
         *pNewGuy->getInputIDPtr() = keyboardID;
         *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     }
@@ -226,6 +228,9 @@ int curPlotEntryID = -1;
 int curPlotEntryStartFrame = 0;
 int curPlotEntryNormalStartFrame = 0;
 int curPlotActionID = 0;
+
+std::vector<Guy> guyRecording;
+int guyDumpFrame = 0;
 
 void compareGameStateFixed( Fixed dumpValue, Fixed realValue, int errorKind, std::string description )
 {
@@ -481,6 +486,16 @@ static void mainloop(void)
 #endif
     }
 
+    if (gameMode == MoveViewer || gameMode == ComboMaker || gameMode == MoveComparison) {
+        if (leftCharUIChanged && (guys.size() == 0 || *guys[0]->getName() != charNames[leftCharUI] || guys[0]->getVersion() != atoi(charVersions[leftCharUIVersion]))) {
+            while (guys.size()) {
+                delete guys[0];
+            }
+            createGuy(charNames[leftCharUI], atoi(charVersions[leftCharUIVersion]), Fixed(0.0f), Fixed(0.0f), 1, {0.78f, 0.098f, 0.318f} );
+            leftCharUIChanged = false;
+        }
+    }
+
     doDeferredCreateGuys();
 
     const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -692,6 +707,22 @@ static void mainloop(void)
         }
     }
 
+    static bool startedStateDump = false;
+    static bool finishedStateDump = false;
+    if (guys.size()) {
+        if (!finishedStateDump && guys[0]->getCurrentAction() != 1) {
+            guyRecording.push_back(*guys[0]);
+            startedStateDump = true;
+        }
+        if (startedStateDump && guys[0]->getCurrentAction() == 1) {
+            finishedStateDump = true;
+        }
+    }
+
+    if (paused && guyDumpFrame != 0) {
+        *guys[0] = guyRecording[guyDumpFrame];
+    }
+
     for (auto guy : guys) {
         if ( hasInput ) {
             int input = 0;
@@ -739,7 +770,16 @@ static void mainloop(void)
 
     setRenderState(clearColor, sizeX, sizeY);
 
-    renderUI(io->Framerate, &logQueue);
+    renderUI(io->Framerate, &logQueue, sizeX, sizeY);
+
+    // gather everyone again in case of deletions/additions in renderUI
+    everyone.clear(); 
+    for (auto guy : guys) {
+        everyone.push_back(guy);
+        for ( auto minion : guy->getMinions() ) {
+            everyone.push_back(minion);
+        }
+    }
 
     // gather everyone again in case of deletions/additions in renderUI
     everyone.clear();
@@ -820,8 +860,13 @@ int main(int argc, char**argv)
     initRenderUI();
 
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
+    if (argc > 1)
+        gameMode = Training;
 
-    if (loadingDump == false) {
+
+    leftCharUIVersion = charVersionCount - 1;
+    
+    if (gameMode == Training || loadingDump == false) {
         std::string charNameLeft = (char*)charNames[rand() % charNames.size()];
         int versionLeft = maxVersion;
         std::string charNameRight = (char*)charNames[rand() % charNames.size()];
