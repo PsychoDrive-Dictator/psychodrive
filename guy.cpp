@@ -524,12 +524,16 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (prevPosY == Fixed(0) && getPosY() > Fixed(0)) {
-            airborne = true; // i think we should go by statusKey instead?
-        }
-        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0)) {
-            airborne = false;
-            landed = true;
+        // projectiles are either airborne or not based on pdata
+        // if done on movement, psycho mine becomes airborne when it starts tracking player and stops looping
+        if (!isProjectile) {
+            if (prevPosY == Fixed(0) && getPosY() > Fixed(0)) {
+                airborne = true; // i think we should go by statusKey instead?
+            }
+            if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0)) {
+                airborne = false;
+                landed = true;
+            }
         }
 
         counterState = false;
