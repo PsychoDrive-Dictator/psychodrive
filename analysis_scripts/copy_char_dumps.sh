@@ -1,9 +1,9 @@
 #!/bin/bash
 
-version=24
+version=25
 
 copy_char_file() {
-    src="MMDK/PlayerData/$1/$1 $3.json"
+    src="PlayerData/$1/$1 $3.json"
     target=~/src/psychodrive/data/chars/$2/"$2""$version"_$4.json
     echo cp "$src" $target
     cp "$src" $target
@@ -13,7 +13,7 @@ copy_char_file() {
 copy_char_dumps() {
     targetcharname=$2
     copy_char_file "$1" $targetcharname atemi atemi
-    copy_char_file "$1" $targetcharname CharInfo charinfo
+    copy_char_file "$1" $targetcharname char_info charinfo
     copy_char_file "$1" $targetcharname commands commands
     copy_char_file "$1" $targetcharname HIT_DT hit
     copy_char_file "$1" $targetcharname moves_dict moves
@@ -22,6 +22,7 @@ copy_char_dumps() {
     copy_char_file "$1" $targetcharname tgroups trigger_groups
     copy_char_file "$1" $targetcharname triggers triggers
     copy_char_file "$1" $targetcharname charge charge
+    copy_char_file "$1" $targetcharname assist_combo assist
 }
 
 copy_char_dumps AKI aki
@@ -41,7 +42,7 @@ copy_char_dumps Ken ken
 copy_char_dumps Kimberly kimberly
 copy_char_dumps Lily lily
 copy_char_dumps Luke luke
-copy_char_dumps 'M. Bison' dictator
+copy_char_dumps 'M Bison' dictator
 copy_char_dumps Manon manon
 copy_char_dumps Marisa marisa
 copy_char_dumps Rashid rashid
