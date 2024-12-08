@@ -2165,26 +2165,14 @@ void Guy::DoBranchKey(bool preHit = false)
                     }
                     break;
                 case 2:
-                    if (canHitID) { // has hit ever this move.. not sure if right
+                    if (hitThisMove) { // has hit ever this move.. not sure if right
                         doBranch = true;
-                    }
-
-                    // only run that branch after the frame bump, eg. don't immediately branch
-                    // on the same-frame hit, see bombed backfist combo (2) hit/guard branch 
-                    if (!preHit) {
-                        doBranch = false;
                     }
 
                     break;
                 case 4:
-                    if (hasBeenBlockedThisFrame) { // just this frame.. enough?
+                    if (hasBeenBlockedThisMove) { // just this frame.. enough?
                         doBranch = true;
-                    }
-
-                    // only run that branch after the frame bump, eg. don't immediately branch
-                    // on the same-frame hit, see bombed backfist combo (2) hit/guard branch 
-                    if (!preHit) {
-                        doBranch = false;
                     }
 
                     break;
