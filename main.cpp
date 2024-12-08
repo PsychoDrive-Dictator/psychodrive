@@ -66,7 +66,8 @@ const char* charVersions[] = {
     "21 - S2 hotfix 1",
     "22 - S2 hotfix 2",
     "23 - S2 (dictator patch)",
-    "24 - S2 (terry patch)"
+    "24 - S2 (terry patch)",
+    "25 - S2 (dec balance patch)"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 

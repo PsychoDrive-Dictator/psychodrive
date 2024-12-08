@@ -1,0 +1,982 @@
+ryu ATK_3HK hit 0 on hit JuggleLimit was 0, now 1
+ryu ATK_3HK hit 0 on block JuggleLimit was 0, now 1
+ryu ATK_3HK hit 0 on air hit JuggleLimit was 0, now 1
+ryu ATK_3HK hit 0 on burnout block JuggleLimit was 0, now 1
+ryu ATK_3HK hit 0 on counter JuggleLimit was 0, now 1
+ryu ATK_3HK hit 0 on punish counter JuggleLimit was 0, now 1
+ryu ATK_4HK hit 0 on hit FocusOwn was 750, now 1500
+ryu ATK_4HK hit 1 on hit FocusOwn was 750, now 2000
+ryu ATK_4HK hit 0 on block FocusOwn was 750, now 1500
+ryu ATK_4HK hit 1 on block FocusOwn was 750, now 2000
+ryu ATK_4HK hit 0 on air hit FocusOwn was 750, now 1500
+ryu ATK_4HK hit 1 on air hit FocusOwn was 750, now 2000
+ryu ATK_4HK hit 0 on burnout block FocusOwn was 750, now 1500
+ryu ATK_4HK hit 1 on burnout block FocusOwn was 750, now 2000
+ryu ATK_4HK hit 0 on counter FocusOwn was 750, now 1500
+ryu ATK_4HK hit 1 on counter FocusOwn was 750, now 2000
+ryu ATK_4HK hit 0 on punish counter FocusOwn was 750, now 1500
+ryu ATK_4HK hit 1 on punish counter FocusOwn was 750, now 2000
+ryu SAA_SHINSYORYU was active from 226-227 now active from -1--1
+ryu SPA_HADOSHO(2) PROJ hit 0 on hit DmgValue was 900, now 1100
+ryu SPA_HADOSHO(2) PROJ hit 0 on air hit DmgValue was 900, now 1100
+ryu SPA_HADOSHO(2) PROJ hit 0 on burnout block DmgValue was 225, now 275
+ryu SPA_HADOSHO(2) PROJ hit 0 on counter DmgValue was 1080, now 1320
+ryu SPA_HADOSHO(2) PROJ hit 0 on punish counter DmgValue was 1080, now 1320
+ryu SPA_SOKUTOU_L(3) was active from 28-37 now active from 26-35
+ryu SPA_SOKUTOU_L(3) hit 0 on hit DownTime was 10, now 9
+ryu SPA_SOKUTOU_L(3) hit 0 on block DownTime was 10, now 9
+ryu SPA_SOKUTOU_L(3) hit 0 on block FocusTgt was -8000, now -10000
+ryu SPA_SOKUTOU_L(3) hit 0 on block HitStun was 20, now 21
+ryu SPA_SOKUTOU_L(3) hit 0 on block MoveTime was 20, now 21
+ryu SPA_SOKUTOU_L(3) hit 0 on air hit DownTime was 10, now 9
+ryu SPA_SOKUTOU_L(3) hit 0 on burnout block DownTime was 10, now 9
+ryu SPA_SOKUTOU_L(3) hit 0 on burnout block FocusTgt was 4000, now 5000
+ryu SPA_SOKUTOU_L(3) hit 0 on burnout block HitStun was 24, now 25
+ryu SPA_SOKUTOU_L(3) hit 0 on burnout block MoveTime was 24, now 25
+ryu SPA_SOKUTOU_L(3) hit 0 on counter DownTime was 10, now 9
+luke ATK_2MK_TC hit 0 on hit HitStun was 29, now 30
+luke ATK_2MK_TC hit 0 on hit MoveTime was 29, now 30
+luke ATK_2MK_TC hit 0 on counter HitStun was 31, now 32
+luke ATK_2MK_TC hit 0 on counter MoveTime was 31, now 32
+luke ATK_2MK_TC hit 0 on punish counter HitStun was 33, now 34
+luke ATK_2MK_TC hit 0 on punish counter MoveTime was 33, now 34
+luke ATK_5HK hit 0 on hit FocusOwn was 3000, now 4000
+luke ATK_5HK hit 0 on block FocusOwn was 3000, now 4000
+luke ATK_5HK hit 0 on air hit FocusOwn was 3000, now 4000
+luke ATK_5HK hit 0 on burnout block FocusOwn was 3000, now 4000
+luke ATK_5HK hit 0 on counter FocusOwn was 3000, now 4000
+luke ATK_5HK hit 0 on punish counter FocusOwn was 3000, now 4000
+luke ATK_6HP hit 0 on hit MoveDest.x was 30, now 20
+luke ATK_6HP hit 0 on counter MoveDest.x was 30, now 20
+luke ATK_6HP hit 0 on punish counter MoveDest.x was 30, now 20
+luke ATK_6HP(1) hit 0 on hit MoveDest.x was 30, now 20
+luke ATK_6HP(1) hit 0 on counter MoveDest.x was 30, now 20
+luke ATK_6HP(1) hit 0 on punish counter MoveDest.x was 30, now 20
+luke SAA_Ereser hit 0 on air hit FloorDest.x was 100, now 90
+luke SAA_Ereser hit 0 on air hit MoveDest.x was 20, now 10
+luke SPA_MOROTE_M(3) hit 0 on hit MoveDest.x was 80, now 70
+luke SPA_MOROTE_M(3) hit 0 on block HitStun was 20, now 22
+luke SPA_MOROTE_M(3) hit 0 on block MoveTime was 20, now 22
+luke SPA_MOROTE_M(3) hit 0 on burnout block HitStun was 24, now 26
+luke SPA_MOROTE_M(3) hit 0 on burnout block MoveTime was 24, now 26
+luke SPA_MOROTE_M(3) hit 0 on counter MoveDest.x was 80, now 70
+luke SPA_MOROTE_M(3) hit 0 on punish counter MoveDest.x was 80, now 70
+kimberly ATK_2LK hit 0 on hit HitStun was 12, now 14
+kimberly ATK_2LK hit 0 on hit MoveTime was 12, now 14
+kimberly ATK_2LK hit 0 on counter HitStun was 14, now 16
+kimberly ATK_2LK hit 0 on counter MoveTime was 14, now 16
+kimberly ATK_2LK hit 0 on punish counter HitStun was 16, now 18
+kimberly ATK_2LK hit 0 on punish counter MoveTime was 16, now 18
+kimberly ATK_2LK(1) hit 0 on hit HitStun was 12, now 14
+kimberly ATK_2LK(1) hit 0 on hit MoveTime was 12, now 14
+kimberly ATK_2LK(1) hit 0 on counter HitStun was 14, now 16
+kimberly ATK_2LK(1) hit 0 on counter MoveTime was 14, now 16
+kimberly ATK_2LK(1) hit 0 on punish counter HitStun was 16, now 18
+kimberly ATK_2LK(1) hit 0 on punish counter MoveTime was 16, now 18
+kimberly ATK_2LK(2) hit 0 on hit HitStun was 12, now 14
+kimberly ATK_2LK(2) hit 0 on hit MoveTime was 12, now 14
+kimberly ATK_2LK(2) hit 0 on counter HitStun was 14, now 16
+kimberly ATK_2LK(2) hit 0 on counter MoveTime was 14, now 16
+kimberly ATK_2LK(2) hit 0 on punish counter HitStun was 16, now 18
+kimberly ATK_2LK(2) hit 0 on punish counter MoveTime was 16, now 18
+kimberly ATK_2LK(3) hit 0 on hit HitStun was 12, now 14
+kimberly ATK_2LK(3) hit 0 on hit MoveTime was 12, now 14
+kimberly ATK_2LK(3) hit 0 on counter HitStun was 14, now 16
+kimberly ATK_2LK(3) hit 0 on counter MoveTime was 14, now 16
+kimberly ATK_2LK(3) hit 0 on punish counter HitStun was 16, now 18
+kimberly ATK_2LK(3) hit 0 on punish counter MoveTime was 16, now 18
+kimberly ATK_2LK(4) hit 0 on hit HitStun was 12, now 14
+kimberly ATK_2LK(4) hit 0 on hit MoveTime was 12, now 14
+kimberly ATK_2LK(4) hit 0 on counter HitStun was 14, now 16
+kimberly ATK_2LK(4) hit 0 on counter MoveTime was 14, now 16
+kimberly ATK_2LK(4) hit 0 on punish counter HitStun was 16, now 18
+kimberly ATK_2LK(4) hit 0 on punish counter MoveTime was 16, now 18
+kimberly ATK_2LK(5) hit 0 on hit HitStun was 12, now 14
+kimberly ATK_2LK(5) hit 0 on hit MoveTime was 12, now 14
+kimberly ATK_2LK(5) hit 0 on counter HitStun was 14, now 16
+kimberly ATK_2LK(5) hit 0 on counter MoveTime was 14, now 16
+kimberly ATK_2LK(5) hit 0 on punish counter HitStun was 16, now 18
+kimberly ATK_2LK(5) hit 0 on punish counter MoveTime was 16, now 18
+kimberly ATK_2LP hit 0 on block HitStun was 8, now 9
+kimberly ATK_2LP hit 0 on block MoveTime was 8, now 9
+kimberly ATK_2LP hit 0 on burnout block HitStun was 12, now 13
+kimberly ATK_2LP hit 0 on burnout block MoveTime was 12, now 13
+kimberly ATK_2LP(1) hit 0 on block HitStun was 8, now 9
+kimberly ATK_2LP(1) hit 0 on block MoveTime was 8, now 9
+kimberly ATK_2LP(1) hit 0 on burnout block HitStun was 12, now 13
+kimberly ATK_2LP(1) hit 0 on burnout block MoveTime was 12, now 13
+kimberly ATK_2LP(2) hit 0 on block HitStun was 8, now 9
+kimberly ATK_2LP(2) hit 0 on block MoveTime was 8, now 9
+kimberly ATK_2LP(2) hit 0 on burnout block HitStun was 12, now 13
+kimberly ATK_2LP(2) hit 0 on burnout block MoveTime was 12, now 13
+kimberly ATK_2LP(3) hit 0 on block HitStun was 8, now 9
+kimberly ATK_2LP(3) hit 0 on block MoveTime was 8, now 9
+kimberly ATK_2LP(3) hit 0 on burnout block HitStun was 12, now 13
+kimberly ATK_2LP(3) hit 0 on burnout block MoveTime was 12, now 13
+kimberly ATK_2LP_B hit 0 on block HitStun was 8, now 9
+kimberly ATK_2LP_B hit 0 on block MoveTime was 8, now 9
+kimberly ATK_2LP_B hit 0 on burnout block HitStun was 12, now 13
+kimberly ATK_2LP_B hit 0 on burnout block MoveTime was 12, now 13
+kimberly ATK_2LP_B(1) hit 0 on block HitStun was 8, now 9
+kimberly ATK_2LP_B(1) hit 0 on block MoveTime was 8, now 9
+kimberly ATK_2LP_B(1) hit 0 on burnout block HitStun was 12, now 13
+kimberly ATK_2LP_B(1) hit 0 on burnout block MoveTime was 12, now 13
+kimberly ATK_6HK hit 0 on hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK hit 0 on block FocusOwn was 1200, now 3000
+kimberly ATK_6HK hit 0 on air hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK hit 0 on burnout block FocusOwn was 1200, now 3000
+kimberly ATK_6HK hit 0 on counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK hit 0 on punish counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK(1) hit 0 on hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK(1) hit 0 on block FocusOwn was 1200, now 3000
+kimberly ATK_6HK(1) hit 0 on air hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK(1) hit 0 on burnout block FocusOwn was 1200, now 3000
+kimberly ATK_6HK(1) hit 0 on counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK(1) hit 0 on punish counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK(2) hit 0 on hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK(2) hit 0 on block FocusOwn was 1200, now 3000
+kimberly ATK_6HK(2) hit 0 on air hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK(2) hit 0 on burnout block FocusOwn was 1200, now 3000
+kimberly ATK_6HK(2) hit 0 on counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK(2) hit 0 on punish counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK(3) hit 0 on hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK(3) hit 0 on block FocusOwn was 1200, now 3000
+kimberly ATK_6HK(3) hit 0 on air hit FocusOwn was 1200, now 3000
+kimberly ATK_6HK(3) hit 0 on burnout block FocusOwn was 1200, now 3000
+kimberly ATK_6HK(3) hit 0 on counter FocusOwn was 1200, now 3000
+kimberly ATK_6HK(3) hit 0 on punish counter FocusOwn was 1200, now 3000
+kimberly SAA_Lv2_START(2) was active from 12-30 now active from -1--1
+kimberly SAA_Lv2_START(2) different hit count
+kimberly SPA_ChargeChop_L_START hit 0 on hit DmgVari was 2, now 1
+kimberly SPA_ChargeChop_L_START hit 0 on hit MoveDest.x was 45, now 42
+kimberly SPA_ChargeChop_L_START hit 0 on block HitStun was 19, now 20
+kimberly SPA_ChargeChop_L_START hit 0 on block MoveTime was 19, now 20
+kimberly SPA_ChargeChop_L_START hit 0 on burnout block HitStun was 23, now 24
+kimberly SPA_ChargeChop_L_START hit 0 on burnout block MoveTime was 23, now 24
+kimberly SPA_ChargeChop_L_START hit 0 on counter DmgVari was 2, now 1
+kimberly SPA_ChargeChop_L_START hit 0 on counter MoveDest.x was 45, now 42
+kimberly SPA_ChargeChop_L_START hit 0 on punish counter DmgVari was 2, now 1
+kimberly SPA_ChargeChop_L_START hit 0 on punish counter MoveDest.x was 45, now 42
+kimberly SPA_ChargeChop_L_START(3) hit 0 on hit DmgVari was 2, now 1
+kimberly SPA_ChargeChop_L_START(3) hit 0 on hit MoveDest.x was 45, now 42
+kimberly SPA_ChargeChop_L_START(3) hit 0 on block HitStun was 19, now 20
+kimberly SPA_ChargeChop_L_START(3) hit 0 on block MoveTime was 19, now 20
+kimberly SPA_ChargeChop_L_START(3) hit 0 on burnout block HitStun was 23, now 24
+kimberly SPA_ChargeChop_L_START(3) hit 0 on burnout block MoveTime was 23, now 24
+kimberly SPA_ChargeChop_L_START(3) hit 0 on counter DmgVari was 2, now 1
+kimberly SPA_ChargeChop_L_START(3) hit 0 on counter MoveDest.x was 45, now 42
+kimberly SPA_ChargeChop_L_START(3) hit 0 on punish counter DmgVari was 2, now 1
+kimberly SPA_ChargeChop_L_START(3) hit 0 on punish counter MoveDest.x was 45, now 42
+kimberly SPA_Hayagake_Jump was active from 7-17 now active from 5-15
+kimberly SPA_Hayagake_Jump hit 0 on air hit DownTime was 10, now 11
+kimberly SPA_Hayagake_Jump(1) was active from 7-17 now active from 5-15
+kimberly SPA_Hayagake_Jump(2) was active from 7-17 now active from 5-15
+kimberly SPA_Hayagake_Jump(2) hit 0 on air hit DownTime was 10, now 11
+kimberly SPA_Hayagake_Jump(3) was active from 7-17 now active from 5-15
+kimberly SPA_Hayagake_Jump_Kick_EX hit 0 on hit MoveDest.x was 90, now 50
+kimberly SPA_Hayagake_Jump_Kick_EX hit 0 on air hit MoveDest.x was 90, now 92
+kimberly SPA_Hayagake_Jump_Kick_EX hit 0 on counter MoveDest.x was 90, now 50
+kimberly SPA_Hayagake_Jump_Kick_EX hit 0 on punish counter MoveDest.x was 90, now 50
+kimberly SPA_Hayagake_Jump_Kick_EX_2 hit 0 on air hit MoveDest.x was 150, now 160
+kimberly SPA_Hayagake_Jump_Kick_Start hit 0 on air hit DownTime was 13, now 14
+chunli ATK_5HP hit 0 on hit FocusOwn was 3000, now 4000
+chunli ATK_5HP hit 0 on block FocusOwn was 3000, now 4000
+chunli ATK_5HP hit 0 on air hit FocusOwn was 3000, now 4000
+chunli ATK_5HP hit 0 on burnout block FocusOwn was 3000, now 4000
+chunli ATK_5HP hit 0 on counter FocusOwn was 3000, now 4000
+chunli ATK_5HP hit 0 on punish counter FocusOwn was 3000, now 4000
+chunli ATK_S_MK hit 0 on hit HitStun was 22, now 24
+chunli ATK_S_MK hit 0 on hit MoveTime was 22, now 24
+chunli ATK_S_MK hit 0 on counter HitStun was 24, now 26
+chunli ATK_S_MK hit 0 on counter MoveTime was 24, now 26
+chunli ATK_S_MK hit 0 on punish counter HitStun was 26, now 28
+chunli ATK_S_MK hit 0 on punish counter MoveTime was 26, now 28
+chunli ATK_S_MP was active from 10-17 now active from 6-17
+chunli ATK_S_MP hit 0 on hit FocusOwn was 500, now 2000
+chunli ATK_S_MP hit 0 on block FocusOwn was 500, now 2000
+chunli ATK_S_MP hit 0 on air hit FocusOwn was 500, now 2000
+chunli ATK_S_MP hit 0 on burnout block FocusOwn was 500, now 2000
+chunli ATK_S_MP hit 0 on counter FocusOwn was 500, now 2000
+chunli ATK_S_MP hit 0 on punish counter FocusOwn was 500, now 2000
+chunli SPA_SPIN_END(2) was active from 20-65 now active from 19-64
+manon ATK_5HK hit 0 on punish counter HitStun was 46, now 43
+manon ATK_5HK hit 0 on punish counter MoveTime was 46, now 43
+manon ATK_5MP_MK hit 0 on hit FocusOwn was 1000, now 2500
+manon ATK_5MP_MK hit 0 on block FocusOwn was 1000, now 2500
+manon ATK_5MP_MK hit 0 on air hit FocusOwn was 1000, now 2500
+manon ATK_5MP_MK hit 0 on burnout block FocusOwn was 1000, now 2500
+manon ATK_5MP_MK hit 0 on counter FocusOwn was 1000, now 2500
+manon ATK_5MP_MK hit 0 on punish counter FocusOwn was 1000, now 2500
+manon SPA_02_HIGH hit 0 on hit FocusOwn was 2000, now 3000
+manon SPA_02_HIGH hit 0 on block FocusOwn was 2000, now 3000
+manon SPA_02_HIGH hit 0 on air hit FocusOwn was 2000, now 3000
+manon SPA_02_HIGH hit 0 on burnout block FocusOwn was 2000, now 3000
+manon SPA_02_HIGH hit 0 on counter FocusOwn was 2000, now 3000
+manon SPA_02_HIGH hit 0 on punish counter FocusOwn was 2000, now 3000
+manon SPA_04_GF hit 0 on hit MoveDest.x was 175, now 165
+manon SPA_04_GF hit 0 on counter MoveDest.x was 175, now 165
+zangief ATK_22MK hit 0 on hit FocusOwn was 1000, now 1500
+zangief ATK_22MK hit 0 on block FocusOwn was 1000, now 1500
+zangief ATK_22MK hit 0 on air hit FocusOwn was 1000, now 1500
+zangief ATK_22MK hit 0 on burnout block FocusOwn was 1000, now 1500
+zangief ATK_22MK hit 0 on counter FocusOwn was 1000, now 1500
+zangief ATK_22MK hit 0 on punish counter FocusOwn was 1000, now 1500
+zangief ATK_22MK_END hit 0 on hit FocusOwn was 1000, now 1500
+zangief ATK_22MK_END hit 0 on block FocusOwn was 1000, now 1500
+zangief ATK_22MK_END hit 0 on air hit FocusOwn was 1000, now 1500
+zangief ATK_22MK_END hit 0 on burnout block FocusOwn was 1000, now 1500
+zangief ATK_22MK_END hit 0 on counter FocusOwn was 1000, now 1500
+zangief ATK_22MK_END hit 0 on punish counter FocusOwn was 1000, now 1500
+zangief ATK_22MK_TC hit 0 on hit FocusOwn was 1000, now 1500
+zangief ATK_22MK_TC hit 0 on block FocusOwn was 1000, now 1500
+zangief ATK_22MK_TC hit 0 on air hit FocusOwn was 1000, now 1500
+zangief ATK_22MK_TC hit 0 on burnout block FocusOwn was 1000, now 1500
+zangief ATK_22MK_TC hit 0 on counter FocusOwn was 1000, now 1500
+zangief ATK_22MK_TC hit 0 on punish counter FocusOwn was 1000, now 1500
+jp ATK_5MP hit 0 on hit FocusOwn was 2000, now 3000
+jp ATK_5MP hit 0 on block FocusOwn was 2000, now 3000
+jp ATK_5MP hit 0 on air hit FocusOwn was 2000, now 3000
+jp ATK_5MP hit 0 on burnout block FocusOwn was 2000, now 3000
+jp ATK_5MP hit 0 on counter FocusOwn was 2000, now 3000
+jp ATK_5MP hit 0 on punish counter FocusOwn was 2000, now 3000
+dhalsim ATK_2HP hit 0 on hit FocusOwn was 2500, now 3500
+dhalsim ATK_2HP hit 0 on block FocusOwn was 2500, now 3500
+dhalsim ATK_2HP hit 0 on air hit FocusOwn was 2500, now 3500
+dhalsim ATK_2HP hit 0 on burnout block FocusOwn was 2500, now 3500
+dhalsim ATK_2HP hit 0 on counter FocusOwn was 2500, now 3500
+dhalsim ATK_2HP hit 0 on punish counter FocusOwn was 2500, now 3500
+dhalsim ATK_5HP hit 0 on hit FocusOwn was 2500, now 4000
+dhalsim ATK_5HP hit 0 on block FocusOwn was 2500, now 4000
+dhalsim ATK_5HP hit 0 on air hit FocusOwn was 2500, now 4000
+dhalsim ATK_5HP hit 0 on burnout block FocusOwn was 2500, now 4000
+dhalsim ATK_5HP hit 0 on counter FocusOwn was 2500, now 4000
+dhalsim ATK_5HP hit 0 on punish counter FocusOwn was 2500, now 4000
+cammy ATK_2HK hit 0 on block MoveDest.x was 40, now 32
+cammy ATK_2HK hit 0 on burnout block MoveDest.x was 40, now 32
+cammy ATK_2HK(1) hit 0 on block MoveDest.x was 40, now 32
+cammy ATK_2HK(1) hit 0 on burnout block MoveDest.x was 40, now 32
+cammy SPA_CANNONSPIKE_AIR(6) different hit count
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on hit JuggleAdd was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on hit JuggleLimit was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on block JuggleAdd was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on block JuggleLimit was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on air hit JuggleAdd was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on air hit JuggleLimit was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on burnout block JuggleAdd was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on burnout block JuggleLimit was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on counter JuggleAdd was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on counter JuggleLimit was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on punish counter JuggleAdd was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(6) hit 0 on punish counter JuggleLimit was 40, now 10
+cammy SPA_CANNONSPIKE_AIR(7) was active from -1--1 now active from 3-11
+cammy SPA_CANNONSPIKE_AIR(7) different hit count
+cammy SPA_CANNONSPIKE_AIR(8) was active from -1--1 now active from 9-17
+cammy SPA_CANNONSPIKE_AIR(8) different hit count
+cammy SPA_CANNONSTRIKE hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR(1) hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR(1) hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR(1) hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR(1) hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR(1) hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_AIR(1) hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_H_AIR hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_H_AIR hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_H_AIR hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_H_AIR hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_H_AIR hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_H_AIR hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR(1) hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR(1) hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR(1) hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR(1) hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR(1) hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_L_AIR(1) hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR hit 0 on punish counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR(1) hit 0 on hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR(1) hit 0 on block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR(1) hit 0 on air hit FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR(1) hit 0 on burnout block FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR(1) hit 0 on counter FocusOwn was 1000, now 2500
+cammy SPA_CANNONSTRIKE_M_AIR(1) hit 0 on punish counter FocusOwn was 1000, now 2500
+ken ATK_2HK hit 0 on block MoveDest.x was 40, now 25
+ken ATK_2HK hit 0 on burnout block MoveDest.x was 40, now 25
+ken ATK_MK_FUMIKOMI hit 0 on hit FocusOwn was 2000, now 3000
+ken ATK_MK_FUMIKOMI hit 0 on block FocusOwn was 2000, now 3000
+ken ATK_MK_FUMIKOMI hit 0 on air hit FocusOwn was 2000, now 3000
+ken ATK_MK_FUMIKOMI hit 0 on burnout block FocusOwn was 2000, now 3000
+ken ATK_MK_FUMIKOMI hit 0 on counter FocusOwn was 2000, now 3000
+ken ATK_MK_FUMIKOMI hit 0 on punish counter FocusOwn was 2000, now 3000
+ken ATK_MK_FUMIKOMI _StartScaling was -1 , now 20
+ken SAA_RYUBI_HIT hit -1 on hit DownTime was 20, now 3
+ken SAA_RYUBI_HIT hit -1 on hit HitStun was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on hit MoveTime was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on block DownTime was 20, now 3
+ken SAA_RYUBI_HIT hit -1 on air hit DownTime was 20, now 3
+ken SAA_RYUBI_HIT hit -1 on air hit HitStun was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on air hit MoveTime was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on burnout block DownTime was 20, now 3
+ken SAA_RYUBI_HIT hit -1 on counter DownTime was 20, now 3
+ken SAA_RYUBI_HIT hit -1 on counter HitStun was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on counter MoveTime was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on punish counter DownTime was 20, now 3
+ken SAA_RYUBI_HIT hit -1 on punish counter HitStun was 40, now 32
+ken SAA_RYUBI_HIT hit -1 on punish counter MoveTime was 40, now 32
+ken SPA_JINRAI_1(2) hit 0 on hit FocusOwn was 2000, now 3000
+ken SPA_JINRAI_1(2) hit 0 on block FocusOwn was 2000, now 3000
+ken SPA_JINRAI_1(2) hit 0 on air hit FocusOwn was 2000, now 3000
+ken SPA_JINRAI_1(2) hit 0 on burnout block FocusOwn was 2000, now 3000
+ken SPA_JINRAI_1(2) hit 0 on counter FocusOwn was 2000, now 3000
+ken SPA_JINRAI_1(2) hit 0 on punish counter FocusOwn was 2000, now 3000
+ken SPA_SYORYU_START_FUNJIN hit 5 on hit HitStun was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on hit MoveDest.y was 370, now 300
+ken SPA_SYORYU_START_FUNJIN hit 5 on hit MoveTime was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on air hit HitStun was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on air hit MoveDest.y was 370, now 300
+ken SPA_SYORYU_START_FUNJIN hit 5 on air hit MoveTime was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on counter HitStun was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on counter MoveDest.y was 370, now 300
+ken SPA_SYORYU_START_FUNJIN hit 5 on counter MoveTime was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on punish counter HitStun was 45, now 38
+ken SPA_SYORYU_START_FUNJIN hit 5 on punish counter MoveDest.y was 370, now 300
+ken SPA_SYORYU_START_FUNJIN hit 5 on punish counter MoveTime was 45, now 38
+deejay ATK_82LK hit 0 on hit FocusOwn was 500, now 2000
+deejay ATK_82LK hit 0 on block FocusOwn was 500, now 2000
+deejay ATK_82LK hit 0 on air hit FocusOwn was 500, now 2000
+deejay ATK_82LK hit 0 on burnout block FocusOwn was 500, now 2000
+deejay ATK_82LK hit 0 on counter FocusOwn was 500, now 2000
+deejay ATK_82LK hit 0 on punish counter FocusOwn was 500, now 2000
+deejay ATK_82LK(1) hit 0 on hit FocusOwn was 500, now 2000
+deejay ATK_82LK(1) hit 0 on block FocusOwn was 500, now 2000
+deejay ATK_82LK(1) hit 0 on air hit FocusOwn was 500, now 2000
+deejay ATK_82LK(1) hit 0 on burnout block FocusOwn was 500, now 2000
+deejay ATK_82LK(1) hit 0 on counter FocusOwn was 500, now 2000
+deejay ATK_82LK(1) hit 0 on punish counter FocusOwn was 500, now 2000
+deejay SPA_5_Joschool_2_wanningmoon hit 0 on punish counter FloorDest.y was 40, now 60
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on hit Juggle1st was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on hit JuggleAdd was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on block Juggle1st was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on block JuggleAdd was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on air hit Juggle1st was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on air hit JuggleAdd was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on burnout block Juggle1st was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on burnout block JuggleAdd was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on counter Juggle1st was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on counter JuggleAdd was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on punish counter Juggle1st was 14, now 4
+deejay SPA_5_Joschool_2_wanningmoon(1) hit 0 on punish counter JuggleAdd was 14, now 4
+lily ATK_2LP hit 0 on hit HitStun was 16, now 17
+lily ATK_2LP hit 0 on hit MoveTime was 16, now 17
+lily ATK_2LP hit 0 on counter HitStun was 18, now 19
+lily ATK_2LP hit 0 on counter MoveTime was 18, now 19
+lily ATK_2LP hit 0 on punish counter HitStun was 20, now 21
+lily ATK_2LP hit 0 on punish counter MoveTime was 20, now 21
+lily ATK_2LP_B hit 0 on hit HitStun was 16, now 17
+lily ATK_2LP_B hit 0 on hit MoveTime was 16, now 17
+lily ATK_2LP_B hit 0 on counter HitStun was 18, now 19
+lily ATK_2LP_B hit 0 on counter MoveTime was 18, now 19
+lily ATK_2LP_B hit 0 on punish counter HitStun was 20, now 21
+lily ATK_2LP_B hit 0 on punish counter MoveTime was 20, now 21
+lily ATK_2LP_C hit 0 on hit HitStun was 16, now 17
+lily ATK_2LP_C hit 0 on hit MoveTime was 16, now 17
+lily ATK_2LP_C hit 0 on counter HitStun was 18, now 19
+lily ATK_2LP_C hit 0 on counter MoveTime was 18, now 19
+lily ATK_2LP_C hit 0 on punish counter HitStun was 20, now 21
+lily ATK_2LP_C hit 0 on punish counter MoveTime was 20, now 21
+lily ATK_6MP hit 0 on hit FocusOwn was 2000, now 3000
+lily ATK_6MP hit 0 on hit HitStun was 27, now 28
+lily ATK_6MP hit 0 on hit JuggleLimit was 0, now 1
+lily ATK_6MP hit 0 on hit MoveDest.x was 70, now 80
+lily ATK_6MP hit 0 on hit MoveTime was 27, now 28
+lily ATK_6MP hit 0 on block FocusOwn was 2000, now 3000
+lily ATK_6MP hit 0 on block JuggleLimit was 0, now 1
+lily ATK_6MP hit 0 on air hit FocusOwn was 2000, now 3000
+lily ATK_6MP hit 0 on air hit JuggleLimit was 0, now 1
+lily ATK_6MP hit 0 on burnout block FocusOwn was 2000, now 3000
+lily ATK_6MP hit 0 on burnout block JuggleLimit was 0, now 1
+lily ATK_6MP hit 0 on counter FocusOwn was 2000, now 3000
+lily ATK_6MP hit 0 on counter HitStun was 29, now 30
+lily ATK_6MP hit 0 on counter JuggleLimit was 0, now 1
+lily ATK_6MP hit 0 on counter MoveDest.x was 70, now 80
+lily ATK_6MP hit 0 on counter MoveTime was 29, now 30
+lily ATK_6MP hit 0 on punish counter FocusOwn was 2000, now 3000
+lily ATK_6MP hit 0 on punish counter HitStun was 31, now 32
+lily ATK_6MP hit 0 on punish counter JuggleLimit was 0, now 1
+lily ATK_6MP hit 0 on punish counter MoveDest.x was 70, now 80
+lily ATK_6MP hit 0 on punish counter MoveTime was 31, now 32
+lily ATK_6MP_TC1 hit 0 on hit JuggleLimit was 1, now 2
+lily ATK_6MP_TC1 hit 0 on block JuggleLimit was 1, now 2
+lily ATK_6MP_TC1 hit 0 on air hit JuggleLimit was 1, now 2
+lily ATK_6MP_TC1 hit 0 on burnout block JuggleLimit was 1, now 2
+lily ATK_6MP_TC1 hit 0 on counter JuggleLimit was 1, now 2
+lily ATK_6MP_TC1 hit 0 on punish counter JuggleLimit was 1, now 2
+lily ATK_6MP_TC2 hit 0 on hit DmgValue was 500, now 800
+lily ATK_6MP_TC2 hit 0 on air hit DmgValue was 500, now 800
+lily ATK_6MP_TC2 hit 0 on counter DmgValue was 600, now 960
+lily ATK_6MP_TC2 hit 0 on punish counter DmgValue was 600, now 960
+lily SPA_TomahawkBuster_Wind hit 1 on hit HitStun was 38, now 45
+lily SPA_TomahawkBuster_Wind hit 1 on hit MoveDest.x was 173, now 170
+lily SPA_TomahawkBuster_Wind hit 1 on hit MoveTime was 38, now 45
+lily SPA_TomahawkBuster_Wind hit 1 on counter HitStun was 38, now 45
+lily SPA_TomahawkBuster_Wind hit 1 on counter MoveDest.x was 173, now 170
+lily SPA_TomahawkBuster_Wind hit 1 on counter MoveTime was 38, now 45
+lily SPA_TomahawkBuster_Wind hit 1 on punish counter HitStun was 38, now 45
+lily SPA_TomahawkBuster_Wind hit 1 on punish counter MoveDest.x was 173, now 170
+lily SPA_TomahawkBuster_Wind hit 1 on punish counter MoveTime was 38, now 45
+lily SPA_TomahawkBuster_Wind(1) hit 1 on hit HitStun was 43, now 50
+lily SPA_TomahawkBuster_Wind(1) hit 1 on hit MoveTime was 43, now 50
+lily SPA_TomahawkBuster_Wind(1) hit 1 on counter HitStun was 43, now 50
+lily SPA_TomahawkBuster_Wind(1) hit 1 on counter MoveTime was 43, now 50
+lily SPA_TomahawkBuster_Wind(1) hit 1 on punish counter HitStun was 43, now 50
+lily SPA_TomahawkBuster_Wind(1) hit 1 on punish counter MoveTime was 43, now 50
+lily SPA_TomahawkBuster_Wind(2) hit 1 on hit HitStun was 47, now 52
+lily SPA_TomahawkBuster_Wind(2) hit 1 on hit MoveTime was 47, now 52
+lily SPA_TomahawkBuster_Wind(2) hit 1 on counter HitStun was 47, now 52
+lily SPA_TomahawkBuster_Wind(2) hit 1 on counter MoveTime was 47, now 52
+lily SPA_TomahawkBuster_Wind(2) hit 1 on punish counter HitStun was 47, now 52
+lily SPA_TomahawkBuster_Wind(2) hit 1 on punish counter MoveTime was 47, now 52
+aki ATK_5HP hit 0 on hit FocusOwn was 2000, now 3000
+aki ATK_5HP hit 0 on block FocusOwn was 2000, now 3000
+aki ATK_5HP hit 0 on air hit FocusOwn was 2000, now 3000
+aki ATK_5HP hit 0 on burnout block FocusOwn was 2000, now 3000
+aki ATK_5HP hit 0 on counter FocusOwn was 2000, now 3000
+aki ATK_5HP hit 0 on punish counter FocusOwn was 2000, now 3000
+aki SPA_Kyosyutotu(2) hit 3 on air hit FloorTime was 25, now 26
+aki SPA_Kyosyutotu(2) hit 3 on air hit HitStun was 13, now 14
+aki SPA_Kyosyutotu(2) hit 3 on air hit MoveTime was 13, now 14
+rashid ATK_5HK hit 0 on hit FocusOwn was 3000, now 4000
+rashid ATK_5HK hit 0 on block FocusOwn was 3000, now 4000
+rashid ATK_5HK hit 0 on air hit FocusOwn was 3000, now 4000
+rashid ATK_5HK hit 0 on burnout block FocusOwn was 3000, now 4000
+rashid ATK_5HK hit 0 on counter FocusOwn was 3000, now 4000
+rashid ATK_5HK hit 0 on punish counter FocusOwn was 3000, now 4000
+rashid SPA_BACKUP_G _StartScaling was -1 , now 20
+rashid SPA_SPINING_MIXER_EX_AIR hit 2 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 3 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 4 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 5 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 6 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 7 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on hit HitStun was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on hit MoveDest.x was 190, now 120
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on hit MoveDest.y was 180, now 150
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on hit MoveTime was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 2 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 3 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 4 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 5 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 6 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 7 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 2 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 3 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 4 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 5 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 6 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 7 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on air hit HitStun was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on air hit MoveDest.x was 190, now 120
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on air hit MoveDest.y was 180, now 150
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on air hit MoveTime was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 2 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 3 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 4 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 5 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 6 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 7 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 2 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 3 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 4 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 5 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 6 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 7 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on counter HitStun was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on counter MoveDest.x was 190, now 120
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on counter MoveDest.y was 180, now 150
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on counter MoveTime was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 2 on punish counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 3 on punish counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 4 on punish counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 5 on punish counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 6 on punish counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 7 on punish counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on punish counter HitStun was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on punish counter MoveDest.x was 190, now 120
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on punish counter MoveDest.y was 180, now 150
+rashid SPA_SPINING_MIXER_EX_AIR hit 8 on punish counter MoveTime was 40, now 31
+rashid SPA_SPINING_MIXER_EX_AIR(1) hit -1 on hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR(1) hit -1 on block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR(1) hit -1 on air hit DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR(1) hit -1 on burnout block DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR(1) hit -1 on counter DownTime was 1, now 8
+rashid SPA_SPINING_MIXER_EX_AIR(1) hit -1 on punish counter DownTime was 1, now 8
+blanka ATK_2HP hit 0 on hit FocusOwn was 3000, now 4000
+blanka ATK_2HP hit 0 on block FocusOwn was 3000, now 4000
+blanka ATK_2HP hit 0 on air hit FocusOwn was 3000, now 4000
+blanka ATK_2HP hit 0 on burnout block FocusOwn was 3000, now 4000
+blanka ATK_2HP hit 0 on counter FocusOwn was 3000, now 4000
+blanka ATK_2HP hit 0 on punish counter FocusOwn was 3000, now 4000
+blanka ATK_2HP(1) hit 0 on hit FocusOwn was 3000, now 4000
+blanka ATK_2HP(1) hit 0 on block FocusOwn was 3000, now 4000
+blanka ATK_2HP(1) hit 0 on air hit FocusOwn was 3000, now 4000
+blanka ATK_2HP(1) hit 0 on burnout block FocusOwn was 3000, now 4000
+blanka ATK_2HP(1) hit 0 on counter FocusOwn was 3000, now 4000
+blanka ATK_2HP(1) hit 0 on punish counter FocusOwn was 3000, now 4000
+blanka ATK_5HP hit 0 on hit DownTime was 13, now 15
+blanka ATK_5HP hit 0 on block DownTime was 13, now 15
+blanka ATK_5HP hit 0 on air hit DownTime was 9, now 14
+blanka ATK_5HP hit 0 on burnout block DownTime was 13, now 15
+blanka ATK_5HP hit 0 on counter DownTime was 13, now 15
+blanka ATK_5HP(1) hit 0 on hit DownTime was 13, now 15
+blanka ATK_5HP(1) hit 0 on block DownTime was 13, now 15
+blanka ATK_5HP(1) hit 0 on air hit DownTime was 9, now 14
+blanka ATK_5HP(1) hit 0 on burnout block DownTime was 13, now 15
+blanka ATK_5HP(1) hit 0 on counter DownTime was 13, now 15
+blanka ATK_6MK hit 1 on hit MoveDest.y was 90, now 0
+blanka ATK_6MK hit 0 on air hit DmgType was 10, now 11
+blanka ATK_6MK hit 0 on air hit HitStun was 24, now 10
+blanka ATK_6MK hit 0 on air hit MoveDest.x was 100, now 30
+blanka ATK_6MK hit 0 on air hit MoveDest.y was 80, now 10
+blanka ATK_6MK hit 0 on air hit MoveTime was 24, now 10
+blanka ATK_6MK hit 0 on air hit MoveType was 12, now 13
+blanka ATK_6MK hit 1 on air hit Attr0 was 0, now 1
+blanka ATK_6MK hit 1 on air hit HitStun was 26, now 25
+blanka ATK_6MK hit 1 on air hit MoveDest.x was 70, now 100
+blanka ATK_6MK hit 1 on air hit MoveDest.y was 90, now 70
+blanka ATK_6MK hit 1 on air hit MoveTime was 26, now 25
+blanka ATK_6MK hit 1 on air hit _no_zu was False, now True
+blanka ATK_6MK hit 1 on counter MoveDest.y was 90, now 0
+blanka ATK_6MK hit 1 on punish counter MoveDest.y was 90, now 0
+juri ATK_4HK hit 0 on hit FocusOwn was 750, now 1500
+juri ATK_4HK hit 1 on hit FocusOwn was 750, now 2000
+juri ATK_4HK hit 0 on block DriveNorm was 65535, now 5000
+juri ATK_4HK hit 0 on block FocusOwn was 750, now 1500
+juri ATK_4HK hit 1 on block DriveNorm was 65535, now 5000
+juri ATK_4HK hit 1 on block FocusOwn was 750, now 2000
+juri ATK_4HK hit 0 on air hit FocusOwn was 750, now 1500
+juri ATK_4HK hit 1 on air hit FocusOwn was 750, now 2000
+juri ATK_4HK hit 0 on burnout block DriveNorm was 65535, now 5000
+juri ATK_4HK hit 0 on burnout block FocusOwn was 750, now 1500
+juri ATK_4HK hit 1 on burnout block DriveNorm was 65535, now 5000
+juri ATK_4HK hit 1 on burnout block FocusOwn was 750, now 2000
+juri ATK_4HK hit 0 on counter FocusOwn was 750, now 1500
+juri ATK_4HK hit 1 on counter FocusOwn was 750, now 2000
+juri ATK_4HK hit 0 on punish counter FocusOwn was 750, now 1500
+juri ATK_4HK hit 1 on punish counter FocusOwn was 750, now 2000
+juri ATK_4HK(1) hit 0 on hit FocusOwn was 188, now 375
+juri ATK_4HK(1) hit 1 on hit FocusOwn was 187, now 500
+juri ATK_4HK(1) hit 0 on block DriveNorm was 65535, now 5000
+juri ATK_4HK(1) hit 0 on block FocusOwn was 188, now 375
+juri ATK_4HK(1) hit 1 on block DriveNorm was 65535, now 5000
+juri ATK_4HK(1) hit 1 on block FocusOwn was 187, now 500
+juri ATK_4HK(1) hit 0 on air hit FocusOwn was 188, now 375
+juri ATK_4HK(1) hit 1 on air hit FocusOwn was 187, now 500
+juri ATK_4HK(1) hit 0 on burnout block DriveNorm was 65535, now 5000
+juri ATK_4HK(1) hit 0 on burnout block FocusOwn was 188, now 375
+juri ATK_4HK(1) hit 1 on burnout block DriveNorm was 65535, now 5000
+juri ATK_4HK(1) hit 1 on burnout block FocusOwn was 187, now 500
+juri ATK_4HK(1) hit 0 on counter FocusOwn was 188, now 375
+juri ATK_4HK(1) hit 1 on counter FocusOwn was 187, now 500
+juri ATK_4HK(1) hit 0 on punish counter FocusOwn was 188, now 375
+juri ATK_4HK(1) hit 1 on punish counter FocusOwn was 187, now 500
+juri ATK_4HK(2) hit 0 on hit FocusOwn was 750, now 1500
+juri ATK_4HK(2) hit 1 on hit FocusOwn was 750, now 2000
+juri ATK_4HK(2) hit 0 on block DriveNorm was 65535, now 5000
+juri ATK_4HK(2) hit 0 on block FocusOwn was 750, now 1500
+juri ATK_4HK(2) hit 1 on block DriveNorm was 65535, now 5000
+juri ATK_4HK(2) hit 1 on block FocusOwn was 750, now 2000
+juri ATK_4HK(2) hit 0 on air hit FocusOwn was 750, now 1500
+juri ATK_4HK(2) hit 1 on air hit FocusOwn was 750, now 2000
+juri ATK_4HK(2) hit 0 on burnout block DriveNorm was 65535, now 5000
+juri ATK_4HK(2) hit 0 on burnout block FocusOwn was 750, now 1500
+juri ATK_4HK(2) hit 1 on burnout block DriveNorm was 65535, now 5000
+juri ATK_4HK(2) hit 1 on burnout block FocusOwn was 750, now 2000
+juri ATK_4HK(2) hit 0 on counter FocusOwn was 750, now 1500
+juri ATK_4HK(2) hit 1 on counter FocusOwn was 750, now 2000
+juri ATK_4HK(2) hit 0 on punish counter FocusOwn was 750, now 1500
+juri ATK_4HK(2) hit 1 on punish counter FocusOwn was 750, now 2000
+juri ATK_5HK hit 0 on hit FocusOwn was 3000, now 4000
+juri ATK_5HK hit 0 on block FocusOwn was 3000, now 4000
+juri ATK_5HK hit 0 on air hit FocusOwn was 3000, now 4000
+juri ATK_5HK hit 0 on burnout block FocusOwn was 3000, now 4000
+juri ATK_5HK hit 0 on counter FocusOwn was 3000, now 4000
+juri ATK_5HK hit 0 on punish counter FocusOwn was 3000, now 4000
+juri ATK_5HK(1) hit 0 on hit FocusOwn was 750, now 1000
+juri ATK_5HK(1) hit 0 on block FocusOwn was 750, now 1000
+juri ATK_5HK(1) hit 0 on air hit FocusOwn was 750, now 1000
+juri ATK_5HK(1) hit 0 on burnout block FocusOwn was 750, now 1000
+juri ATK_5HK(1) hit 0 on counter FocusOwn was 750, now 1000
+juri ATK_5HK(1) hit 0 on punish counter FocusOwn was 750, now 1000
+juri ATK_5HK(2) hit 0 on hit FocusOwn was 3000, now 4000
+juri ATK_5HK(2) hit 0 on block FocusOwn was 3000, now 4000
+juri ATK_5HK(2) hit 0 on air hit FocusOwn was 3000, now 4000
+juri ATK_5HK(2) hit 0 on burnout block FocusOwn was 3000, now 4000
+juri ATK_5HK(2) hit 0 on counter FocusOwn was 3000, now 4000
+juri ATK_5HK(2) hit 0 on punish counter FocusOwn was 3000, now 4000
+juri SPA_FUHA_S(3) was active from 24-28 now active from 24-29
+juri SPA_FUHA_S(4) was active from 24-28 now active from 24-29
+juri SPA_FUHA_S(5) was active from 24-28 now active from 24-29
+juri SPA_FUHA_S(6) was active from 24-28 now active from 24-29
+marisa ATK_2HP hit 1 on punish counter HitStun was 40, now 46
+marisa ATK_2HP hit 1 on punish counter MoveDest.y was 170, now 185
+marisa ATK_2HP hit 1 on punish counter MoveTime was 40, now 46
+marisa ATK_2HP(1) hit 1 on punish counter HitStun was 46, now 52
+marisa ATK_2HP(1) hit 1 on punish counter MoveDest.y was 185, now 240
+marisa ATK_2HP(1) hit 1 on punish counter MoveTime was 46, now 52
+marisa ATK_3HP_B hit 1 on hit DmgType was 3, now 4
+marisa ATK_3HP_B hit 1 on hit DownTime was 8, now 18
+marisa ATK_3HP_B hit 1 on hit MoveType was 71, now 74
+marisa ATK_3HP_B hit 1 on block DownTime was 8, now 18
+marisa ATK_3HP_B hit 1 on air hit DownTime was 8, now 18
+marisa ATK_3HP_B hit 1 on burnout block DownTime was 8, now 18
+marisa ATK_3HP_B hit 1 on counter DmgType was 3, now 4
+marisa ATK_3HP_B hit 1 on counter DownTime was 8, now 18
+marisa ATK_3HP_B hit 1 on counter MoveType was 71, now 74
+marisa ATK_3HP_B hit 1 on punish counter DmgType was 3, now 4
+marisa ATK_3HP_B hit 1 on punish counter DownTime was 8, now 18
+marisa ATK_3HP_B hit 1 on punish counter MoveType was 71, now 74
+marisa ATK_5HP(1) hit 0 on air hit MoveDest.x was 130, now 100
+marisa ATK_5HP(2) hit 0 on air hit MoveDest.x was 130, now 100
+marisa ATK_5HP_B hit 0 on hit JuggleLimit was 1, now 2
+marisa ATK_5HP_B hit 0 on block JuggleLimit was 1, now 2
+marisa ATK_5HP_B hit 0 on air hit JuggleLimit was 1, now 2
+marisa ATK_5HP_B hit 0 on burnout block JuggleLimit was 1, now 2
+marisa ATK_5HP_B hit 0 on counter JuggleLimit was 1, now 2
+marisa ATK_6HK(1) hit 0 on block MoveDest.x was 80, now 40
+marisa ATK_6HK(1) hit 0 on burnout block MoveDest.x was 80, now 40
+marisa SPA_Gradius_MAXHIT_B was active from 27-30 now active from 27-33
+marisa SPA_Gradius_MAXHIT_B(2) was active from 27-30 now active from 27-33
+marisa SPA_Phalanx was active from 24-27 now active from 24-30
+marisa SPA_Phalanx hit 0 on hit FocusOwn was 2000, now 3000
+marisa SPA_Phalanx hit 0 on block FocusOwn was 2000, now 3000
+marisa SPA_Phalanx hit 0 on air hit FocusOwn was 2000, now 3000
+marisa SPA_Phalanx hit 0 on burnout block FocusOwn was 2000, now 3000
+marisa SPA_Phalanx hit 0 on counter FocusOwn was 2000, now 3000
+marisa SPA_Phalanx hit 0 on punish counter FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(1) was active from 27-30 now active from 27-33
+marisa SPA_Phalanx(1) hit 0 on hit FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(1) hit 0 on block FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(1) hit 0 on air hit FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(1) hit 0 on burnout block FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(1) hit 0 on counter FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(1) hit 0 on punish counter FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(2) was active from 31-34 now active from 31-37
+marisa SPA_Phalanx(2) hit 0 on hit FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(2) hit 0 on block FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(2) hit 0 on air hit FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(2) hit 0 on burnout block FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(2) hit 0 on counter FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(2) hit 0 on punish counter FocusOwn was 2000, now 3000
+marisa SPA_Phalanx(3) was active from 27-30 now active from 27-33
+guile ATK_6HP hit 0 on hit FocusOwn was 3000, now 5000
+guile ATK_6HP hit 0 on block FocusOwn was 3000, now 5000
+guile ATK_6HP hit 0 on air hit FocusOwn was 3000, now 5000
+guile ATK_6HP hit 0 on burnout block FocusOwn was 3000, now 5000
+guile ATK_6HP hit 0 on counter FocusOwn was 3000, now 5000
+guile ATK_6HP hit 0 on punish counter FocusOwn was 3000, now 5000
+ed ATK_2LK hit 0 on block HitStun was 9, now 10
+ed ATK_2LK hit 0 on block MoveTime was 9, now 10
+ed ATK_2LK hit 0 on burnout block HitStun was 13, now 14
+ed ATK_2LK hit 0 on burnout block MoveTime was 13, now 14
+ed ATK_6HP hit 0 on hit FocusOwn was 3000, now 4000
+ed ATK_6HP hit 0 on block FocusOwn was 3000, now 4000
+ed ATK_6HP hit 0 on air hit FocusOwn was 3000, now 4000
+ed ATK_6HP hit 0 on burnout block FocusOwn was 3000, now 4000
+ed ATK_6HP hit 0 on counter FocusOwn was 3000, now 4000
+ed ATK_6HP hit 0 on punish counter FocusOwn was 3000, now 4000
+ed SPA_PsychoCombination_EX_Guard was active from 7-9 now active from 6-8
+ed SPA_PsychoCombination_EX_Guard hit 0 on block MoveDest.x was 20, now 8
+ed SPA_PsychoCombination_EX_Guard hit 0 on burnout block MoveDest.x was 20, now 8
+honda ATK_5HP hit 0 on hit HitStun was 25, now 27
+honda ATK_5HP hit 0 on hit MoveTime was 25, now 27
+honda ATK_5HP hit 0 on counter HitStun was 27, now 29
+honda ATK_5HP hit 0 on counter MoveTime was 27, now 29
+honda ATK_5HP(1) hit 0 on hit HitStun was 25, now 27
+honda ATK_5HP(1) hit 0 on hit MoveTime was 25, now 27
+honda ATK_5HP(1) hit 0 on counter HitStun was 27, now 29
+honda ATK_5HP(1) hit 0 on counter MoveTime was 27, now 29
+honda SPA_SUMOSTEP_5TC hit 0 on hit FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on hit MoveDest.x was 51, now 50
+honda SPA_SUMOSTEP_5TC hit 1 on hit FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on block FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on block MoveDest.x was 50, now 70
+honda SPA_SUMOSTEP_5TC hit 1 on block FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 1 on block MoveDest.x was 50, now 70
+honda SPA_SUMOSTEP_5TC hit 0 on air hit FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 1 on air hit FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on burnout block FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on burnout block MoveDest.x was 50, now 70
+honda SPA_SUMOSTEP_5TC hit 1 on burnout block FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 1 on burnout block MoveDest.x was 50, now 70
+honda SPA_SUMOSTEP_5TC hit 0 on counter FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on counter MoveDest.x was 51, now 50
+honda SPA_SUMOSTEP_5TC hit 1 on counter FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on punish counter FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC hit 0 on punish counter MoveDest.x was 51, now 50
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter FocusOwn was 1000, now 2000
+honda SPA_SUMOSTEP_5TC(1) hit 1 on hit MoveDest.x was 65, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on hit MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC(1) hit 0 on block MoveDest.x was 50, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on block HitStun was 22, now 23
+honda SPA_SUMOSTEP_5TC(1) hit 1 on block MoveDest.x was 80, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on block MoveTime was 22, now 23
+honda SPA_SUMOSTEP_5TC(1) hit 0 on burnout block MoveDest.x was 50, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on burnout block HitStun was 26, now 27
+honda SPA_SUMOSTEP_5TC(1) hit 1 on burnout block MoveDest.x was 80, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on burnout block MoveTime was 26, now 27
+honda SPA_SUMOSTEP_5TC(1) hit 1 on counter MoveDest.x was 65, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on counter MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC(1) hit 1 on punish counter MoveDest.x was 65, now 40
+honda SPA_SUMOSTEP_5TC(1) hit 1 on punish counter MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC(2) hit 1 on hit MoveDest.x was 65, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on hit MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC(2) hit 0 on block MoveDest.x was 50, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on block HitStun was 22, now 23
+honda SPA_SUMOSTEP_5TC(2) hit 1 on block MoveDest.x was 80, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on block MoveTime was 22, now 23
+honda SPA_SUMOSTEP_5TC(2) hit 0 on burnout block MoveDest.x was 50, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on burnout block HitStun was 26, now 27
+honda SPA_SUMOSTEP_5TC(2) hit 1 on burnout block MoveDest.x was 80, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on burnout block MoveTime was 26, now 27
+honda SPA_SUMOSTEP_5TC(2) hit 1 on counter MoveDest.x was 65, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on counter MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC(2) hit 1 on punish counter MoveDest.x was 65, now 40
+honda SPA_SUMOSTEP_5TC(2) hit 1 on punish counter MoveDest.y was 50, now 0
+jamie ATK_2HK hit 1 on block MoveDest.x was 50, now 35
+jamie ATK_2HK hit 1 on burnout block MoveDest.x was 50, now 35
+jamie ATK_8HK hit 1 on air hit DmgType was 10, now 11
+jamie ATK_8HK hit 1 on air hit HitStun was 21, now 23
+jamie ATK_8HK hit 1 on air hit MoveDest.x was 110, now 100
+jamie ATK_8HK hit 1 on air hit MoveDest.y was 40, now 60
+jamie ATK_8HK hit 1 on air hit MoveTime was 21, now 23
+jamie ATK_8HK hit 1 on air hit MoveType was 12, now 13
+jamie SPA2_EX_P(3) hit 0 on air hit HitStun was 12, now 14
+jamie SPA2_EX_P(3) hit 0 on air hit MoveTime was 12, now 14
+akuma ATK_2HK hit 0 on block MoveDest.x was 30, now 25
+akuma ATK_2HK hit 0 on burnout block MoveDest.x was 30, now 25
+akuma ATK_92MK hit 0 on hit FocusOwn was 2000, now 3000
+akuma ATK_92MK hit 0 on block FocusOwn was 2000, now 3000
+akuma ATK_92MK hit 0 on air hit FocusOwn was 2000, now 3000
+akuma ATK_92MK hit 0 on burnout block FocusOwn was 2000, now 3000
+akuma ATK_92MK hit 0 on counter FocusOwn was 2000, now 3000
+akuma ATK_92MK hit 0 on punish counter FocusOwn was 2000, now 3000
+akuma ATK_92MK_LAND hit 0 on hit FocusOwn was 2000, now 3000
+akuma ATK_92MK_LAND hit 0 on block FocusOwn was 2000, now 3000
+akuma ATK_92MK_LAND hit 0 on air hit FocusOwn was 2000, now 3000
+akuma ATK_92MK_LAND hit 0 on burnout block FocusOwn was 2000, now 3000
+akuma ATK_92MK_LAND hit 0 on counter FocusOwn was 2000, now 3000
+akuma ATK_92MK_LAND hit 0 on punish counter FocusOwn was 2000, now 3000
+akuma SPA_MISOGI_LAND hit -1 on hit DmgValue was 900, now 700
+akuma SPA_MISOGI_LAND hit -1 on air hit DmgValue was 900, now 700
+akuma SPA_MISOGI_LAND hit -1 on burnout block DmgValue was 225, now 175
+akuma SPA_MISOGI_LAND hit -1 on counter DmgValue was 1080, now 840
+akuma SPA_MISOGI_LAND hit -1 on punish counter DmgValue was 1080, now 840
+akuma SPA_TATSUMAKI_EX hit 4 on air hit DownTime was 10, now 11
+dictator ATK_2HK hit 0 on block HitStun was 18, now 17
+dictator ATK_2HK hit 0 on block MoveTime was 18, now 17
+dictator ATK_2HK hit 0 on burnout block HitStun was 22, now 21
+dictator ATK_2HK hit 0 on burnout block MoveTime was 22, now 21
+dictator ATK_4HK hit 1 on block FocusTgt was -5000, now -3000
+dictator ATK_4HK hit 1 on burnout block FocusTgt was 2500, now 1500
+dictator SPA_DOUBLE_KNEEPRESS_EX ComboScaling was -1 , now 20
+dictator SPA_PSYCHO_CRUSHER_EX_Loop hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(1) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(1) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(1) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(2) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(2) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(2) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(3) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(3) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(3) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(4) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(4) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(4) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(5) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(5) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(5) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(6) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(6) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(6) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(7) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(7) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(7) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(8) hit 1 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(8) hit 2 on block FocusTgt was -4000, now -2000
+dictator SPA_PSYCHO_CRUSHER_EX_Loop(8) hit 1 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_START hit 0 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_START hit 0 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_START(1) hit 0 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_START(1) hit 0 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_EX_START(2) hit 0 on block FocusTgt was -3000, now -1500
+dictator SPA_PSYCHO_CRUSHER_EX_START(2) hit 0 on burnout block FocusTgt was 1500, now 750
+dictator SPA_PSYCHO_CRUSHER_Loop(10) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(10) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(10) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(10) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(10) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(10) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(11) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(11) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(11) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(11) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(11) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(11) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(12) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(12) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(12) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(12) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(12) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(12) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(13) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(13) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(13) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(13) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(13) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(13) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(14) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(14) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(14) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(14) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(14) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(14) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(2) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(2) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(2) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(2) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(2) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(2) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(3) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(3) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(3) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(3) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(3) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(3) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(4) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(4) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(4) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(4) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(4) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(4) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(5) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(5) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(5) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(5) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(5) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(5) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_Loop(9) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(9) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(9) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(9) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(9) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_Loop(9) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(3) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(3) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(3) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(3) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(3) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(3) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(4) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(4) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(4) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(4) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(4) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(4) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(5) hit 1 on hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(5) hit 1 on block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(5) hit 1 on air hit FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(5) hit 1 on burnout block FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(5) hit 1 on counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(5) hit 1 on punish counter FocusOwn was 2500, now 3500
+dictator SPA_PSYCHO_CRUSHER_START(6) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(6) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(6) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(6) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(6) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(6) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(7) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(7) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(7) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(7) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(7) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(7) hit 1 on punish counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(8) hit 1 on hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(8) hit 1 on block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(8) hit 1 on air hit FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(8) hit 1 on burnout block FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(8) hit 1 on counter FocusOwn was 3000, now 5000
+dictator SPA_PSYCHO_CRUSHER_START(8) hit 1 on punish counter FocusOwn was 3000, now 5000
+terry ATK_2MP hit 0 on hit MoveDest.x was 50, now 40
+terry ATK_2MP hit 0 on counter MoveDest.x was 50, now 40
+terry ATK_2MP hit 0 on punish counter MoveDest.x was 50, now 40
+terry ATK_2MP(1) hit 0 on hit MoveDest.x was 50, now 40
+terry ATK_2MP(1) hit 0 on counter MoveDest.x was 50, now 40
+terry ATK_2MP(1) hit 0 on punish counter MoveDest.x was 50, now 40
+terry ATK_2MP(2) hit 0 on hit MoveDest.x was 50, now 40
+terry ATK_2MP(2) hit 0 on counter MoveDest.x was 50, now 40
+terry ATK_2MP(2) hit 0 on punish counter MoveDest.x was 50, now 40
+terry ATK_SPA_SP2_M hit 1 on block FocusTgt was -2000, now -2500
+terry ATK_SPA_SP2_M hit 1 on burnout block FocusTgt was 1000, now 1250
+terry ATK_SPA_SP2_M(1) hit 0 on hit HitStun was 27, now 23
+terry ATK_SPA_SP2_M(1) hit 0 on hit MoveTime was 27, now 23
+terry ATK_SPA_SP2_M(1) hit 1 on hit HitStun was 21, now 23
+terry ATK_SPA_SP2_M(1) hit 1 on hit MoveTime was 21, now 23
+terry ATK_SPA_SP2_M(1) hit 0 on block FocusTgt was -2500, now -3500
+terry ATK_SPA_SP2_M(1) hit 1 on block FocusTgt was -2500, now -3500
+terry ATK_SPA_SP2_M(1) hit 0 on burnout block FocusTgt was 1250, now 1750
+terry ATK_SPA_SP2_M(1) hit 1 on burnout block FocusTgt was 1250, now 1750
+terry ATK_SPA_SP2_M(1) hit 0 on counter Attr1 was 0, now 64
+terry ATK_SPA_SP2_M(1) hit 0 on counter DmgType was 3, now 4
+terry ATK_SPA_SP2_M(1) hit 0 on counter HitStun was 29, now 25
+terry ATK_SPA_SP2_M(1) hit 0 on counter MoveDest.x was 20, now 30
+terry ATK_SPA_SP2_M(1) hit 0 on counter MoveTime was 29, now 25
+terry ATK_SPA_SP2_M(1) hit 0 on counter MoveType was 71, now 74
+terry ATK_SPA_SP2_M(1) hit 0 on counter _no_rolling was False, now True
+terry ATK_SPA_SP2_M(1) hit 1 on counter Attr1 was 0, now 64
+terry ATK_SPA_SP2_M(1) hit 1 on counter DmgType was 3, now 4
+terry ATK_SPA_SP2_M(1) hit 1 on counter HitStun was 23, now 25
+terry ATK_SPA_SP2_M(1) hit 1 on counter MoveDest.x was 20, now 30
+terry ATK_SPA_SP2_M(1) hit 1 on counter MoveTime was 23, now 25
+terry ATK_SPA_SP2_M(1) hit 1 on counter MoveType was 71, now 74
+terry ATK_SPA_SP2_M(1) hit 1 on counter _no_rolling was False, now True
+terry ATK_SPA_SP2_M(2) hit 4 on hit FocusOwn was 2000, now 3000
+terry ATK_SPA_SP2_M(2) hit 4 on block DriveNorm was 65535, now 5000
+terry ATK_SPA_SP2_M(2) hit 4 on block FocusOwn was 2000, now 3000
+terry ATK_SPA_SP2_M(2) hit 4 on block FocusTgt was -2000, now -3000
+terry ATK_SPA_SP2_M(2) hit 4 on air hit FocusOwn was 2000, now 3000
+terry ATK_SPA_SP2_M(2) hit 4 on burnout block DriveNorm was 65535, now 5000
+terry ATK_SPA_SP2_M(2) hit 4 on burnout block FocusOwn was 2000, now 3000
+terry ATK_SPA_SP2_M(2) hit 4 on burnout block FocusTgt was 1000, now 1500
+terry ATK_SPA_SP2_M(2) hit 4 on counter FocusOwn was 2000, now 3000
+terry ATK_SPA_SP2_M(2) hit 4 on punish counter FocusOwn was 2000, now 3000
+terry ATK_SPA_SP2_M(3) hit 0 on air hit FloorDest.x was 50, now 40
+terry ATK_SPA_SP2_M(3) hit 0 on air hit MoveDest.x was 15, now 10
+terry SPA_SP3_H(1) hit 0 on block FocusTgt was -6000, now -8000
+terry SPA_SP3_H(1) hit 0 on air hit HitStun was 16, now 15
+terry SPA_SP3_H(1) hit 0 on air hit MoveDest.x was 200, now 165
+terry SPA_SP3_H(1) hit 0 on air hit MoveDest.y was 40, now 27
+terry SPA_SP3_H(1) hit 0 on air hit MoveTime was 16, now 15
+terry SPA_SP3_H(1) hit 0 on burnout block FocusTgt was 3000, now 4000
+terry SPA_SP3_H(1) hit 0 on punish counter BoundDest was 100, now 120
