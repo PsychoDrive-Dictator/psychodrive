@@ -9,7 +9,7 @@ uniform int progress;
 const float distedge = 0.5;
 const float feather = 0.5;
 
-const float boxalpha = 0.2;
+float boxalpha = 0.2;
 
 in vec4 vertex_pos;
 out vec4 color;
@@ -45,7 +45,7 @@ float grid(float dist)
 
 void main() {
     color = in_color;
-    //color.a = 0.2
+    boxalpha = color.a;
 
     if (isGrid == 1) {
         float edgealpha = boxalpha;

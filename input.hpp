@@ -36,4 +36,6 @@ enum InputID
 extern std::map<int, int> currentInputMap;
 
 int addPressBits(int curInput, int prevInput);
-void updateInputs(void);
+void updateInputs(int sizeX, int sizeY);
+void initTouchControls(void);
+void renderTouchControls(int sizeX, int sizeY);

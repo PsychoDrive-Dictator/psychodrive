@@ -8,6 +8,10 @@
 #include <thread>
 #include <bitset>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/html5.h>
+#endif
+
 #include "guy.hpp"
 #include "main.hpp"
 #include "render.hpp"
@@ -1360,9 +1364,9 @@ void Guy::Render(void) {
 
     if (renderPositionAnchors) {
         float radius = 16.5;
-        drawBox(x-radius/2,y-radius/2,radius,radius,radius,1.0,1.0,1.0,1.0);
+        drawBox(x-radius/2,y-radius/2,radius,radius,radius,1.0,1.0,1.0,0.2);
         radius = 15;
-        drawBox(x-radius/2,y-radius/2,radius,radius,radius,charColorR,charColorG,charColorB,1.0);
+        drawBox(x-radius/2,y-radius/2,radius,radius,radius,charColorR,charColorG,charColorB,0.2);
     }
 }
 
@@ -1895,6 +1899,9 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
 
     if (hitStopTarget) {
         addWarudo(hitStopTarget+1);
+#ifdef __EMSCRIPTEN__
+        emscripten_vibrate(hitStopTarget*2);
+#endif
     }
 
     if (isDrive) {

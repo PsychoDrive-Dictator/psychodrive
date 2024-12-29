@@ -218,9 +218,9 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,1.0);
+        drawBox( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,0.2);
     }
-    drawBox( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,1.0);
+    drawBox( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,0.2);
 }
 
 bool thickboxes = false;
@@ -304,6 +304,7 @@ void renderMarkersAndStuff(void)
     if (markerToDelete != -1) {
         vecMarkers.erase(vecMarkers.begin()+markerToDelete);
     }
+    glUniform1i(loc_isgrid, 0);
 }
 
 void setRenderState(color clearColor, int sizeX, int sizeY)
@@ -335,6 +336,23 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     glUniform1i(loc_isgrid, 1);
     drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0, true);
     glUniform1i(loc_isgrid, 0);
+}
+
+void setScreenSpaceRenderState(int sizeX, int sizeY)
+{
+    setIdentityMatrix(projMatrix,4);
+
+    projMatrix[0] = 2.0 / sizeX;
+    projMatrix[5] = 2.0 / -sizeY;
+    projMatrix[10] = 0.1;
+    projMatrix[12] = -1.0;
+    projMatrix[13] = 1.0;
+    projMatrix[14] = 0.0;
+
+    setIdentityMatrix(viewMatrix,4);
+
+    glUniformMatrix4fv(loc_proj, 1, false, projMatrix);
+    glUniformMatrix4fv(loc_view, 1, false, viewMatrix);
 }
 
 SDL_Window* initWindowRender()

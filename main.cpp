@@ -458,7 +458,10 @@ static void mainloop(void)
 
     globalFrameCount++;
 
-    updateInputs();
+    int sizeX, sizeY;
+    SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);
+
+    updateInputs(sizeX, sizeY);
 
     if (recordingInput) {
         recordedInput.push_back(currentInputMap[keyboardID]);
@@ -666,9 +669,6 @@ static void mainloop(void)
 
     color clearColor = {0.0,0.0,0.0};
 
-    int sizeX, sizeY;
-    SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);
-    
     // find camera position if we have 2 guys
     if (lockCamera && guys.size() >= 2) {
         translateX = (guys[1]->getPosX().f() + guys[0]->getPosX().f()) / 2.0f;
@@ -702,6 +702,9 @@ static void mainloop(void)
 
     renderMarkersAndStuff();
 
+    setScreenSpaceRenderState(sizeX, sizeY);
+    renderTouchControls(sizeX, sizeY);
+
     if (resetpos) {
         uint32_t i = 0;
         while (i < guys.size()) {
@@ -728,6 +731,8 @@ int main(int argc, char**argv)
     initUI();
     io = &ImGui::GetIO(); // why doesn't the one from initUI work? who knows
     initRenderUI();
+
+    initTouchControls();
 
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
 
