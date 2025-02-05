@@ -12,7 +12,7 @@ copy_char_file() {
 
 copy_char_dumps() {
     targetcharname=$2
-    copy_char_file "$1" $targetcharname atemi atemi
+    copy_char_file "$1" $targetcharname Atemi atemi
     copy_char_file "$1" $targetcharname char_info charinfo
     copy_char_file "$1" $targetcharname commands commands
     copy_char_file "$1" $targetcharname HIT_DT hit

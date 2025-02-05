@@ -26,7 +26,8 @@ characters = [
     "jamie",
     "akuma",
     "dictator",
-    "terry"
+    "terry",
+    "mai"
 ]
 
 dataPath = "./data/chars/"
@@ -107,10 +108,10 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    charWithVersion = char + "24"
+    charWithVersion = char + "25"
     hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "25"
+    charWithVersion = char + "26"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     # for hitID in hitsJson:
