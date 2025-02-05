@@ -56,7 +56,8 @@ const char* charNames[] = {
     "blanka",
     "akuma",
     "dictator",
-    "terry"
+    "terry",
+    "mai"
 };
 const int charNameCount = IM_ARRAYSIZE(charNames);
 
@@ -67,7 +68,8 @@ const char* charVersions[] = {
     "22 - S2 hotfix 2",
     "23 - S2 (dictator patch)",
     "24 - S2 (terry patch)",
-    "25 - S2 (dec balance patch)"
+    "25 - S2 (dec balance patch)",
+    "26 - S2 (mai patch)"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 

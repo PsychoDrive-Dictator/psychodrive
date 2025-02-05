@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=25
+version=26
 
 copy_char_file() {
     src="PlayerData/$1/$1 $3.json"
@@ -43,6 +43,7 @@ copy_char_dumps Kimberly kimberly
 copy_char_dumps Lily lily
 copy_char_dumps Luke luke
 copy_char_dumps 'M Bison' dictator
+copy_char_dumps Mai mai
 copy_char_dumps Manon manon
 copy_char_dumps Marisa marisa
 copy_char_dumps Rashid rashid
