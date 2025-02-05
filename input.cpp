@@ -36,7 +36,7 @@ public:
             if (input > 8 && active == false)
                 currentInputMap[inputSlot] |= input << 6;
             active = true;
-        } else {
+        } else if (active == true) {
             currentInputMap[inputSlot] &= ~input;
             active = false;
         }
