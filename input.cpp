@@ -11,6 +11,8 @@
 
 std::map<int, int> currentInputMap;
 
+bool touchControls = false;
+
 struct FingerState {
     float x;
     float y;
@@ -415,6 +417,11 @@ void updateInputs(int sizeX, int sizeY)
         }
         if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERMOTION || event.type == SDL_FINGERUP)
         {
+            if (!touchControls) {
+                touchControls = true;
+                initTouchControls();
+            }
+
             if (event.type == SDL_FINGERUP) {
                 event.tfinger.x = -1.0f;
                 event.tfinger.y = -1.0f;
