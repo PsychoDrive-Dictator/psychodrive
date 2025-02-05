@@ -299,6 +299,9 @@ bool Guy::PreFrame(void)
                     projHitCount = -1;
                 }
                 // log("initial hitcount " + std::to_string(projHitCount));
+
+                // one-time initialize stuff - right now projHitCount == -1 is a fine spot
+                airborne = (*pProjData)["_AirStatus"];
             }
 
             limitShotCategory = (*pProjData)["Category"];
@@ -528,16 +531,16 @@ bool Guy::PreFrame(void)
             }
         }
 
-        // projectiles are either airborne or not based on pdata
-        // if done on movement, psycho mine becomes airborne when it starts tracking player and stops looping
         if (!isProjectile) {
+            // if done on movement, psycho mine becomes airborne when it starts tracking player and stops looping
             if (prevPosY == Fixed(0) && getPosY() > Fixed(0)) {
                 airborne = true; // i think we should go by statusKey instead?
             }
-            if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0)) {
-                airborne = false;
-                landed = true;
-            }
+        }
+        // let projectiles land though - akuma air fb and mai charged fan bounce
+        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0)) {
+            airborne = false;
+            landed = true;
         }
 
         counterState = false;
@@ -1648,10 +1651,14 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
-            Guy *pHitFlagTarget = this;
+            bool hitFlagToParent = false;
             if (isProjectile && pActionJson->contains("pdata") &&
                 (*pActionJson)["pdata"]["_HitFlagToPlayer"] == true && pParent) {
-                pHitFlagTarget = pParent;
+                // either this means "to both" - current code or touch branch checks different
+                // flags - mai charged fan has a touch branch on the proj but sets this flag
+                // also used by double geyser where the player has a trigger condition
+                // todo checking touch branch on player would disambiguate
+                hitFlagToParent = true;
             }
 
             if (otherGuyAirborne) {
@@ -1672,8 +1679,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (pOtherGuy->blocking || otherGuyCanBlock) {
                 hitEntryFlag = block;
                 pOtherGuy->blocking = true;
-                pHitFlagTarget->hasBeenBlockedThisFrame = true;
-                pHitFlagTarget->hasBeenBlockedThisMove = true;
+                hasBeenBlockedThisFrame = true;
+                if (hitFlagToParent) pParent->hasBeenBlockedThisFrame = true;
+                hasBeenBlockedThisMove = true;
+                if (hitFlagToParent) pParent->hasBeenBlockedThisMove = true;
                 log(logHits, "block!");
             }
 
@@ -1718,8 +1727,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             bool hitArmor = false;
             if (hurtBox.flags & armor && hurtBox.armorID) {
                 hitArmor = true;
-                pHitFlagTarget->hitArmorThisFrame = true;
-                pHitFlagTarget->hitArmorThisMove = true;
+                hitArmorThisFrame = true;
+                if (hitFlagToParent) pParent->hitArmorThisFrame = true;
+                hitArmorThisMove = true;
+                if (hitFlagToParent) pParent->hitArmorThisMove = true;
                 auto atemiIDString = std::to_string(hurtBox.armorID);
                 // need to pull from opponents atemi here or put in opponent method
                 nlohmann::json *pAtemi = nullptr;
@@ -1767,8 +1778,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (hurtBox.flags & atemi) {
                 // like armor except onthing really happens beyond setting the flag
                 hitArmor = true;
-                pHitFlagTarget->hitAtemiThisFrame = true;
-                pHitFlagTarget->hitAtemiThisMove = true;
+                hitAtemiThisFrame = true;
+                if (hitFlagToParent) pParent->hitAtemiThisFrame = true;
+                hitAtemiThisMove = true;
+                if (hitFlagToParent) pParent->hitAtemiThisMove = true;
                 pOtherGuy->atemiThisFrame = true;
                 log(logHits, "atemi hit!");
             }
@@ -1798,21 +1811,27 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pOtherGuy->pAttacker = this;
 
                 if (isGrab) {
-                    pHitFlagTarget->grabbedThisFrame = true;
+                    grabbedThisFrame = true;
+                    if (hitFlagToParent) pParent->grabbedThisFrame = true;
                 }
 
                 canHitID |= 1 << hitbox.hitID;
 
                 if (!pOtherGuy->blocking && !hitArmor) {
                     if (hitEntryFlag & punish_counter) {
-                        pHitFlagTarget->punishCounterThisFrame = true;
-                        pHitFlagTarget->hitPunishCounterThisMove = true;
+                        punishCounterThisFrame = true;
+                        if (hitFlagToParent) pParent->punishCounterThisFrame = true;
+                        hitPunishCounterThisMove = true;
+                        if (hitFlagToParent) pParent->hitPunishCounterThisMove = true;
                     }
                     if (hitEntryFlag & counter) {
-                        pHitFlagTarget->hitCounterThisMove = true;
+                        hitCounterThisMove = true;
+                        if (hitFlagToParent) pParent->hitCounterThisMove = true;
                     }
-                    pHitFlagTarget->hitThisFrame = true;
-                    pHitFlagTarget->hitThisMove = true;
+                    hitThisFrame = true;
+                    if (hitFlagToParent) pParent->hitThisFrame = true;
+                    hitThisMove = true;
+                    if (hitFlagToParent) pParent->hitThisMove = true;
 
                     int dmgKind = (*pHitEntry)["DmgKind"];
 
@@ -2356,8 +2375,6 @@ void Guy::DoBranchKey(bool preHit = false)
                 case 45:
                     if (isProjectile && projHitCount == 0 ) {
                         // log("hitcount=0 branch");
-                        // branch action will reset hitcount?
-                        projHitCount = -1;
                         doBranch = true;
                     }
                     break;
@@ -2484,7 +2501,6 @@ void Guy::DoBranchKey(bool preHit = false)
                     break;
             }
 
-            // do those also override if higher branchID?
             if (doBranch) {
 
                 bool keepFrame = key["_InheritFrameX"];
@@ -2515,7 +2531,14 @@ void Guy::DoBranchKey(bool preHit = false)
 
                 keepPlace = key["_KeepPlace"];
 
-                break;
+                if (isProjectile && projHitCount == 0 ) {
+                    // take new hitcount from branch action's pdata
+                    // not just for hitcountzero branch, see also mai's charged fan
+                    projHitCount = -1;
+                }
+
+                // FALL THROUGH - there might be another branch that works later for this frame
+                // it should take precedence - see mai's charged fan projectile
             } else {
                 if (branchType != 1) {
                     deniedLastBranch = true;
