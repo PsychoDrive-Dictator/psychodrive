@@ -734,8 +734,6 @@ int main(int argc, char**argv)
     io = &ImGui::GetIO(); // why doesn't the one from initUI work? who knows
     initRenderUI();
 
-    initTouchControls();
-
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
 
     std::string charNameLeft = (char*)charNames[rand() % charNameCount];
