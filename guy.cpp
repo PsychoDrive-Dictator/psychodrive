@@ -289,9 +289,8 @@ bool Guy::PreFrame(void)
 
     if (pActionJson != nullptr)
     {
-        if (isProjectile && pActionJson->contains("pdata")) {
+        if (isProjectile && !projDataInitialized && pActionJson->contains("pdata")) {
             nlohmann::json *pProjData = &(*pActionJson)["pdata"];
-            if (projHitCount == -1) {
                 projHitCount = (*pProjData)["HitCount"];
                 if (projHitCount == 0) {
                     // stuff that starts at hitcount 0 is probably meant to die some other way
@@ -300,13 +299,21 @@ bool Guy::PreFrame(void)
                 }
                 // log("initial hitcount " + std::to_string(projHitCount));
 
-                // one-time initialize stuff - right now projHitCount == -1 is a fine spot
                 airborne = (*pProjData)["_AirStatus"];
-            }
 
-            limitShotCategory = (*pProjData)["Category"];
-            noPush = (*pProjData)["_NoPush"];
+                limitShotCategory = (*pProjData)["Category"];
+                noPush = (*pProjData)["_NoPush"];
+                projLifeTime = (*pProjData)["LifeTime"];
+
+                if (projLifeTime <= 0) {
+                    projLifeTime = 360;
+                }
+
+                projLifeTime--;
+
+                projDataInitialized = true;
         } else {
+            // todo there's a status bit for this?
             noPush = false; // might be overridden below
         }
 
@@ -2597,6 +2604,13 @@ bool Guy::Frame(bool endWarudoFrame)
         return false; // die
     }
 
+    if (isProjectile) {
+        projLifeTime--;
+        if (projLifeTime <= 0) {
+            return false;
+        }
+    }
+
     if (die) {
         return false;
     }
@@ -2975,6 +2989,10 @@ bool Guy::Frame(bool endWarudoFrame)
             wasDrive = true;
         } else {
             wasDrive = false;
+        }
+
+        if (isProjectile) {
+            projDataInitialized = false;
         }
 
         prevPoseStatus = forcedPoseStatus;

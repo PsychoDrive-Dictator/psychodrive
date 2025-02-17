@@ -293,6 +293,8 @@ private:
     std::vector<Guy*> minions;
     bool isProjectile = false;
     int projHitCount = 0;
+    int projLifeTime = 0;
+    bool projDataInitialized = false;
     bool die = false;
     int limitShotCategory = -1;
     bool noPush = false;
