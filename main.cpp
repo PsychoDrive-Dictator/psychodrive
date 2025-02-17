@@ -512,7 +512,7 @@ static void mainloop(void)
     }
 
     // gather everyone again in case of deletions/additions in PreFrame
-    everyone.clear(); 
+    everyone.clear();
     for (auto guy : guys) {
         everyone.push_back(guy);
         for ( auto minion : guy->getMinions() ) {
@@ -697,6 +697,15 @@ static void mainloop(void)
     setRenderState(clearColor, sizeX, sizeY);
 
     renderUI(io->Framerate, &logQueue);
+
+    // gather everyone again in case of deletions/additions in renderUI
+    everyone.clear();
+    for (auto guy : guys) {
+        everyone.push_back(guy);
+        for ( auto minion : guy->getMinions() ) {
+            everyone.push_back(minion);
+        }
+    }
 
     for (auto guy : everyone) {
         guy->Render();
