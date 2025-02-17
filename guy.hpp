@@ -101,7 +101,7 @@ public:
     int getDebuffTimer() { return debuffTimer; }
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
-    std::string getName() { return name; }
+    std::string *getName() { return &name; }
     int getforcedPoseStatus() { return forcedPoseStatus; }
     int getPoseStatus() {
         if (forcedPoseStatus) {

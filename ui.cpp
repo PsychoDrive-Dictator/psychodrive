@@ -109,7 +109,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
     ImGui::Begin(windowName);
     color col = pGuy->getColor();
-    ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "name %s moveset %s", pGuy->getName().c_str(), pGuy->getCharacter().c_str());
+    ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "name %s moveset %s", pGuy->getName()->c_str(), pGuy->getCharacter().c_str());
     ImGui::SameLine();
     std::vector<const char *> vecInputs;
     std::vector<std::string> vecInputLabels;
@@ -132,7 +132,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         if (guy == pGuy) {
             continue;
         }
-        vecGuyNames.push_back( guy->getName().c_str() );
+        vecGuyNames.push_back( guy->getName()->c_str() );
         mapDropDownIDToGuyPtr[guyID++] = guy;
     }
     for (auto [ i, guy ] : mapDropDownIDToGuyPtr ) {
