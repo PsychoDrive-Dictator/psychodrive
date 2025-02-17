@@ -2701,15 +2701,15 @@ bool Guy::Frame(bool endWarudoFrame)
             noVelNextFrame = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
-        } else if (!getAirborne() && loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
+        } else if (!getAirborne() && !isProjectile && loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
             currentFrame = loopPoint;
             hasLooped = true;
             if (loopCount > 0) {
                 loopCount--;
             }
-        } else if (pParent) {
+        } else if ((isProjectile && loopCount == 0) || (pParent && !isProjectile)) {
             return false; // die if minion at end of script
-        } else if (airborne) {
+        } else if (airborne || (isProjectile && loopCount == -1)) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
             currentFrame--;
