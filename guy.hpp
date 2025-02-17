@@ -154,6 +154,8 @@ public:
     }
 
     ~Guy() {
+        // todo stop leaking strdup from BuildMoveList
+
         for (auto minion : minions) {
             delete minion;
         }
@@ -166,6 +168,22 @@ public:
         } else {
             const auto it = std::remove(guys.begin(), guys.end(), this);
             guys.erase(it, guys.end());
+        }
+
+        std::vector<Guy *> everyone;
+        for (auto guy : guys) {
+            everyone.push_back(guy);
+            for ( auto minion : guy->getMinions() ) {
+                everyone.push_back(minion);
+            }
+        }
+        for (auto guy : everyone) {
+            if (guy->pOpponent == this) {
+                guy->pOpponent = nullptr;
+            }
+            if (guy->pAttacker == this) {
+                guy->pAttacker = nullptr;
+            }
         }
     }
 
