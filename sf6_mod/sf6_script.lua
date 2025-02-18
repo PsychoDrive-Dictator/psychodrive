@@ -531,7 +531,7 @@ re.on_draw_ui(function()
   local changed
   changed, typeToDump = imgui.input_text("type to dump", typeToDump)
   if imgui.button("dump type") == true then
-    local outputTable = obj_to_table(sdk.find_type_definition(typeToDump), nil, nil, true, true)
+    local outputTable = obj_to_table(sdk.find_type_definition(typeToDump), nil, nil, true, true, true)
     logToFile( myjson.encode(outputTable), typeToDump .. ".json" )
   end
 
