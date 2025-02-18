@@ -125,7 +125,7 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
-        int parentStyleID = (*pCharInfoJson)["Styles"][std::to_string(styleInstall)]["ParentStyleID"];
+        int parentStyleID = (*pCharInfoJson)["Styles"][std::to_string(styleID)]["ParentStyleID"];
 
         if (parentStyleID == -1) {
             return nullptr;
