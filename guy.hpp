@@ -92,12 +92,23 @@ public:
     bool logHits = false;
     bool logBranches = false;
 
+    static const int uniqueParamCount = 5;
+
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
     int getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
-    int getUniqueParam() { return uniqueCharge; }
+    std::string getUniqueParam() {
+        std::string ret;
+        for ( int i = 0; i < uniqueParamCount; i++) {
+            ret += std::to_string(uniqueParam[i]);
+            if (i < uniqueParamCount - 1) {
+                ret += ",";
+            }
+        }
+        return ret;
+    }
     int getDebuffTimer() { return debuffTimer; }
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
@@ -483,8 +494,9 @@ private:
     float charColorG = 1.0;
     float charColorB = 1.0;
 
-    int uniqueCharge = 0;
+    int uniqueParam[uniqueParamCount] = { 0 };
     bool uniqueTimer = false;
+    int uniqueTimerCount = 0;
 
     int debuffTimer = 0;
 

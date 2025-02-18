@@ -271,7 +271,7 @@ bool Guy::PreFrame(void)
 
     if (uniqueTimer) {
         // might not be in the right spot, adjust if falling out of yoga float too early/late
-        uniqueCharge++;
+        uniqueTimerCount++;
     }
 
     hitThisFrame = false;
@@ -721,23 +721,20 @@ bool Guy::PreFrame(void)
                         }
                         break;
                     case 7:
-                        // honda spirit buff, param345 are 1
-                        // mini sonic break, 234 are 1, 5 is 3
-                        // maaaaaybe
                         if (param3 == 0) { // set
-                            uniqueCharge = param4;
-                            // dhalsim unique timer, only one that doesn't have this set?
                             bool isParam = key["_IsUNIQUE_UNIQUE_PARAM"];
-                            if (!isParam) {
+                            if (isParam) {
+                                uniqueParam[param2] = param4;
+                            } else {
+                                // dhalsim unique timer, only one that doesn't have this set?
                                 // if it's not a param, clearly it's a timer :harold:
                                 uniqueTimer = true;
+                                uniqueTimerCount = param4;
                             }
-                        } else if (param3 == 1) { //add?
-                            uniqueCharge += param4;
-                            // this feels like a horrible workaround but so far works for
-                            // everything - without it honda hands can charge to 2/3/4 and break
-                            if (param2 == 0 && uniqueCharge > param5) {
-                                uniqueCharge = param5;
+                        } else if (param3 == 1) { //add
+                            // param5 appears to be the limit
+                            if (uniqueParam[param2] != param5) {
+                                uniqueParam[param2] += param4;
                             }
                         }
                         break;
@@ -993,13 +990,38 @@ void Guy::DoTriggers()
                 }
             }
 
-            if ((*pTrigger)["_UseUniqueParam"] == true) {
+            int paramID = (*pTrigger)["cond_param_id"];
+            if ((*pTrigger)["_UseUniqueParam"] == true && paramID >= 0 && paramID < Guy::uniqueParamCount) {
                 int op = (*pTrigger)["cond_param_ope"];
                 int value = (*pTrigger)["cond_param_value"];
-                if (op == 0 && value != uniqueCharge ) {
-                    continue;
+                bool allowTrigger = false;
+                switch (op) {
+                    case 0:
+                        if (value == uniqueParam[paramID]) allowTrigger = true;
+                        break;
+                    case 1:
+                        if (value != uniqueParam[paramID]) allowTrigger = true;
+                        break;
+                    case 2:
+                        if (uniqueParam[paramID] < value) allowTrigger = true;
+                        break;
+                    case 3:
+                        if (uniqueParam[paramID] <= value) allowTrigger = true;
+                        break;
+                    case 4:
+                        if (uniqueParam[paramID] > value) allowTrigger = true;
+                        break;
+                    case 5:
+                        if (uniqueParam[paramID] >= value) allowTrigger = true;
+                        break;
+                    // supposedly AND - unused as of yet?
+                    // case 6:
+                    //     if (uniqueParam[paramID] & value) allowTrigger = true;
+                    //     break;                }
+                    default:
+                        break;
                 }
-                if (op == 5 && value > uniqueCharge ) {
+                if (!allowTrigger) {
                     continue;
                 }
             }
@@ -2308,17 +2330,39 @@ void Guy::DoBranchKey(bool preHit = false)
                     }
                     break;
                 case 29: // unique param
-                    if ((branchParam1 == 0 && uniqueCharge == branchParam3) ||
-                        (branchParam1 == 1 && uniqueCharge > branchParam3)) {
-                        //param 1 can be one.. greater or equals? not sure
-                        // honda spirit, guile puncher
-                        // probably how jamie drinks work too? not sure yet
-                        doBranch = true;
+                    if (branchParam1 >= 0 && branchParam1 < Guy::uniqueParamCount) {
+                        int paramValue = uniqueParam[branchParam1];
+                        switch (branchParam2) {
+                            case 0:
+                                if (branchParam3 == paramValue) doBranch = true;
+                                break;
+                            case 1:
+                                if (branchParam3 != paramValue) doBranch = true;
+                                break;
+                            case 2:
+                                if (paramValue < branchParam3) doBranch = true;
+                                break;
+                            case 3:
+                                if (paramValue <= branchParam3) doBranch = true;
+                                break;
+                            case 4:
+                                if (paramValue > branchParam3) doBranch = true;
+                                break;
+                            case 5:
+                                if (paramValue >= branchParam3) doBranch = true;
+                                break;
+                            // supposedly AND - unused as of yet?
+                            // case 6:
+                            //     if (paramValue & value) allowTrigger = true;
+                            //     break;                }
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case 30: // unique timer
                     if (uniqueTimer) {
-                        if (uniqueCharge == branchParam2) {
+                        if (uniqueTimerCount == branchParam2) {
                             doBranch = true;
                             uniqueTimer = false;
                         }
