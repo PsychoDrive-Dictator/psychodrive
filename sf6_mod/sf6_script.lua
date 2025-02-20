@@ -454,6 +454,18 @@ re.on_draw_ui(function()
   if imgui.button("clear game state dump") == true then
     clearGameStateDump = true
   end
+  if imgui.button("change training char") == true then
+    local trainingManager = sdk.get_managed_singleton("app.training.TrainingManager")
+    local battleCore = trainingManager:call("get_BattleCore()")
+    local FighterDescs = battleCore:get_field("_FighterDescs")
+    FighterDescs[0].FighterId = 26
+    logToFile(FighterDescs[1].FighterId)
+    trainingManager:SetFighter(FighterDescs[0], FighterDescs[1])
+    trainingManager:RequestTrainingFlow(false)
+    -- trainingManager:Apply(true)
+    -- trainingManager:_Apply()
+  end
+
   if imgui.button("restore training data") == true then
     local trainingManager = sdk.get_managed_singleton("app.training.TrainingManager")
     local trainingData = trainingManager and trainingManager:get_field("_tData")
