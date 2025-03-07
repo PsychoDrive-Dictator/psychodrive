@@ -732,9 +732,13 @@ bool Guy::PreFrame(void)
                                 uniqueTimerCount = param4;
                             }
                         } else if (param3 == 1) { //add
+                            uniqueParam[param2] += param4;
                             // param5 appears to be the limit
-                            if (uniqueParam[param2] != param5) {
-                                uniqueParam[param2] += param4;
+                            if (param4 > 0 && uniqueParam[param2] > param5) {
+                                uniqueParam[param2] = param5;
+                            }
+                            if (param4 < 0 && uniqueParam[param2] < param5) {
+                                uniqueParam[param2] = param5;
                             }
                         }
                         break;
