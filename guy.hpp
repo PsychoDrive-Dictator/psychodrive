@@ -14,18 +14,11 @@ public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
 
     void Input(int input);
-    void UpdateActionData(void);
     bool PreFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
-    void UpdateBoxes(void);
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
-    bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
-    void DoBranchKey(bool preHit);
-    void DoHitBoxKey(const char *name);
-    void DoStatusKey();
-    void DoTriggers();
     bool Frame(bool endWarudoFrame = false);
     std::string getActionName(int actionID);
 
@@ -49,18 +42,6 @@ public:
     }
     int getDirection() { return direction.i(); }
     void switchDirection() { direction = direction * Fixed(-1); }
-
-    bool needsTurnaround() {
-        bool turnaround = false;
-        if (pOpponent) {
-            if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
-                turnaround = true;
-            } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
-                turnaround = true;
-            }
-        }
-        return turnaround;
-    }
 
     Fixed getStartPosX() { return startPosX; }
     void setStartPosX( Fixed newPosX ) { startPosX = newPosX; }
@@ -287,6 +268,27 @@ public:
     int *getInputIDPtr() { return &inputID; }
     int *getInputListIDPtr() { return &inputListID; }
 private:
+    void UpdateActionData(void);
+    void UpdateBoxes(void);
+    bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
+    void ExecuteTrigger(nlohmann::json *pTrigger);
+    void DoBranchKey(bool preHit);
+    void DoHitBoxKey(const char *name);
+    void DoStatusKey();
+    void DoTriggers();
+
+    bool needsTurnaround() {
+        bool turnaround = false;
+        if (pOpponent) {
+            if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
+                turnaround = true;
+            } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
+                turnaround = true;
+            }
+        }
+        return turnaround;
+    }
+
     std::string name;
     std::string character;
     int version;
@@ -363,6 +365,8 @@ private:
     bool blocking = false;
     bool bounced = false;
     bool didPush = false;
+    bool jumped = false;
+    int jumpDirection = 0;
 
     int landingAdjust = 0;
     int prevPoseStatus = 0;
@@ -484,7 +488,7 @@ private:
 
     std::vector<RenderBox> renderBoxes;
 
-    int deferredTriggerAction = -1;
+    nlohmann::json *pDeferredTrigger = nullptr;
     int deferredTriggerGroup = -1;
 
     bool isDrive = false;

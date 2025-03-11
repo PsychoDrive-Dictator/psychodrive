@@ -877,6 +877,25 @@ struct Trigger {
     int triggerGroup;
 };
 
+void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
+{
+    nextAction = (*pTrigger)["action_id"];
+    // apply condition flags BCM.TRIGGER.TAG.NEW_ID.json to make jamie jump cancel divekick work
+    uint64_t flags = (*pTrigger)["category_flags"];
+
+    if (flags & (1ULL<<26)) {
+        jumped = true;
+
+        if (flags & (1ULL<<46)) {
+            jumpDirection = 1;
+        } else if (flags & (1ULL<<47)) {
+            jumpDirection = -1;
+        } else {
+            jumpDirection = 0;
+        }
+    }
+}
+
 void Guy::DoTriggers()
 {
     bool foundDeferTriggerGroup = false;
@@ -946,13 +965,48 @@ void Guy::DoTriggers()
                 continue;
             }
 
+            int state = key["_State"];
+            bool checkingState = false;
+            bool stateMatch = false;
+            if (state & (1<<18)) {
+                checkingState = true;
+                if (jumped && jumpDirection == 0) {
+                    stateMatch = true;
+                }
+            }
+            if (state & (1<<19)) {
+                checkingState = true;
+                if (jumped && jumpDirection == 1) {
+                    stateMatch = true;
+                }
+            }
+            if (state & (1<<20)) {
+                checkingState = true;
+                if (jumped && jumpDirection == -1) {
+                    stateMatch = true;
+                }
+            }
+            // if (!!(state & (1<<4)) == jumped) {
+            //     stateMatch = true;
+            // }
+
+            if (defer) {
+                // we'll use the condition of the non-deferred match
+                stateMatch = true;
+            }
+
+            if (checkingState && !stateMatch) {
+                continue;
+            }
+
             if (deferredTriggerGroup != -1 && triggerGroup == deferredTriggerGroup && !defer) {
                 // found non-deferred triggergroup and passed condition, trigger action now
-                nextAction = deferredTriggerAction;
+                ExecuteTrigger(pDeferredTrigger);
 
-                log(logTriggers, "did deferred trigger " + std::to_string(deferredTriggerAction));
+                int triggerActionID = (*pDeferredTrigger)["action_id"];
+                log(logTriggers, "did deferred trigger " + std::to_string(triggerActionID));
 
-                deferredTriggerAction = -1;
+                pDeferredTrigger = nullptr;
                 deferredTriggerGroup = -1;
                 // don't need to run the bit at the end there, and nothing else has side-effects here
                 return;
@@ -1101,21 +1155,11 @@ void Guy::DoTriggers()
             }
             if (initialMatch)
             {
+                bool commandOK = false;
                 //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
                 if ( commandNo == -1 ) {
-                    if (defer) {
-                        deferredTriggerAction = actionID;
-                        deferredTriggerGroup = triggerGroup;
-                        foundDeferTriggerGroup = true;
-                    } else {
-                        nextAction = actionID;
-
-                        // assume non-deferred trigger can take precedence for now
-                        deferredTriggerAction = -1;
-                        deferredTriggerGroup = -1;
-                    }
-                    log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
-                    break; // we found our trigger walking back, skip all other triggers
+                    // simple single-input command, initial match is enough
+                    commandOK = true;
                 } else {
                     std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
                     nlohmann::json *pCommand = &(*pCommandsJson)[commandNoString]["0"];
@@ -1227,31 +1271,41 @@ void Guy::DoTriggers()
                     }
 
                     if (inputID < 0) {
-                        if (defer) {
-                            deferredTriggerAction = actionID;
-                            deferredTriggerGroup = triggerGroup;
-                            foundDeferTriggerGroup = true;
-                        } else {
-                            nextAction = actionID;
-
-                            // assume non-deferred trigger can take precedence for now
-                            deferredTriggerAction = -1;
-                            deferredTriggerGroup = -1;
-                        }
-                        // try to consume the input
-                        inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
-                        log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer) + " initial I " + std::to_string(initialI));
-                        break; // we found our trigger walking back, skip all other triggers
+                        // ran out of matched inputs, command is OK
+                        commandOK = true;
                     }
+                }
+
+                if (commandOK) {
+                    if (defer) {
+                        // queue the deferred trigger
+                        pDeferredTrigger = pTrigger;
+                        deferredTriggerGroup = triggerGroup;
+                        // don't immediately forget it at the end there
+                        foundDeferTriggerGroup = true;
+                    } else {
+                        ExecuteTrigger(pTrigger);
+
+                        // assume non-deferred trigger can take precedence for now
+                        pDeferredTrigger = nullptr;
+                        deferredTriggerGroup = -1;
+                    }
+
+                    // try to consume the input - todo this doesn't nab the edge flag?
+                    inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
+
+                    log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
+                    break; // we found our trigger walking back, skip all other triggers
                 }
             }
         }
     }
 
     if (deferredTriggerGroup != -1 && !foundDeferTriggerGroup) {
+        // some deferred trigger groups seem to be dangling and to not have a matching non-defer
         log(logTriggers, "forgetting deferred trigger");
+        pDeferredTrigger = nullptr;
         deferredTriggerGroup = -1;
-        deferredTriggerAction = -1;
     }
 }
 
@@ -2845,12 +2899,21 @@ bool Guy::Frame(bool endWarudoFrame)
     // Process movement if any
     if ( canMove )
     {
+        // reset status - recovered control to neutral
+        jumped = false;
+
         if ( currentInput & 1 ) {
+
+            jumped = true;
+
             if ( currentInput & 4 ) {
+                jumpDirection = -1;
                 nextAction = 35; // BAS_JUMP_B_START
             } else if ( currentInput & 8 ) {
+                jumpDirection = 1;
                 nextAction = 34; // BAS_JUMP_F_START
             } else {
+                jumpDirection = 0;
                 nextAction = 33; // BAS_JUMP_N_START
             }
         } else if ( currentInput & 2 ) {
