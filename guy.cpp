@@ -1291,8 +1291,8 @@ void Guy::DoTriggers()
                         deferredTriggerGroup = -1;
                     }
 
-                    // try to consume the input - todo this doesn't nab the edge flag?
-                    inputBuffer[initialI] &= ~(okKeyFlags+dcExcFlags);
+                    // consume the input by removing matching edge bits from matched initial input
+                    inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
 
                     log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
                     break; // we found our trigger walking back, skip all other triggers
