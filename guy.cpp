@@ -1122,6 +1122,45 @@ void Guy::DoTriggers()
                 }
             }
 
+            bool checkingRange = false;
+            bool rangeCheckMatch = true;
+            int rangeCondition = (*pTrigger)["cond_range"];
+            Fixed rangeParam = Fixed((*pTrigger)["cond_range_param"].get<double>());
+
+            if (rangeCondition) {
+                checkingRange = true;
+            }
+
+            switch (rangeCondition) {
+                case 3:
+                case 4:
+                case 5:
+                    if (getPosY() < rangeParam) {
+                        rangeCheckMatch = false;
+                    }
+                    if (rangeCondition == 4 && velocityY < Fixed(0)) {
+                        // rnage check on the way up? waive if going down
+                        rangeCheckMatch = true;
+                    }
+                    if (rangeCondition == 5 && velocityY > Fixed(0)) {
+                        // rnage check on the way down? waive if going up
+                        rangeCheckMatch = true;
+                    }
+                    break;
+                default:
+                    log(logUnknowns, "unimplemented range cond " + std::to_string(rangeCondition));
+                    break;
+                case 0:
+                    break;
+            }
+
+            if (checkingRange && !rangeCheckMatch) {
+                continue;
+            }
+
+            // todo should we check range and vital op on early cancels or on the non-deferred one?
+            // should test with CA and a big early cancel window while health is ticking from poison
+
             nlohmann::json *pNorm = &(*pTrigger)["norm"];
             int commandNo = (*pNorm)["command_no"];
             uint32_t okKeyFlags = (*pNorm)["ok_key_flags"];
