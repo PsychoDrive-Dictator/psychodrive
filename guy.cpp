@@ -1158,6 +1158,11 @@ void Guy::DoTriggers()
                 continue;
             }
 
+            int stateCondition = (*pTrigger)["cond_owner_state_flags"];
+            if (stateCondition && !(stateCondition & (1 << (getPoseStatus() - 1)))) {
+                continue;
+            }
+
             // todo should we check range and vital op on early cancels or on the non-deferred one?
             // should test with CA and a big early cancel window while health is ticking from poison
 
