@@ -3,6 +3,7 @@
 #include "json.hpp"
 #include <deque>
 #include <string>
+#include <set>
 
 #include "main.hpp"
 #include "render.hpp"
@@ -275,7 +276,7 @@ private:
     void ExecuteTrigger(nlohmann::json *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
     bool CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID);
-    bool CheckTriggerCommand(nlohmann::json *pTrigger);
+    bool CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI);
     void DoTriggers();
 
     void DoBranchKey(bool preHit);
@@ -493,9 +494,7 @@ private:
 
     std::vector<RenderBox> renderBoxes;
 
-    nlohmann::json *pDeferredTrigger = nullptr;
-    int deferredTriggerGroup = -1;
-    std::vector<int> vecDeferredTriggerIDs;
+    std::set<int> setDeferredTriggerIDs;
 
     bool isDrive = false;
     bool wasDrive = false;

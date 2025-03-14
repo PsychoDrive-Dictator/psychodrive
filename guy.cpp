@@ -1080,7 +1080,7 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
     return true;
 }
 
-bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger)
+bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
 {
     nlohmann::json *pNorm = &(*pTrigger)["norm"];
     int commandNo = (*pNorm)["command_no"];
@@ -1093,7 +1093,8 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger)
     // 00100000000100000: heavy punch with one button mask
     // 00100000001100000: normal throw, two out of two mask t
     // 00100000010100000: taunt, 6 out of 6 in mask
-    uint32_t i = 0, initialI = 0;
+    uint32_t i = 0;
+    initialI = 0;
     bool initialMatch = false;
     // current frame + buffer - todo globalInputBuffer -> preceding_time?
     uint32_t initialSearch = 1 + globalInputBufferLength + timeInWarudo;
@@ -1239,19 +1240,19 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger)
     return false;
 }
 
-struct Trigger {
+struct TriggerListEntry {
     std::string triggerName;
-    bool deferred;
-    int triggerGroup;
+    bool hasNormal;
+    bool hasDeferred;
+    bool hasAntiNormal;
 };
 
 void Guy::DoTriggers()
 {
-    bool foundDeferTriggerGroup = false;
-
+    std::set<int> keptDeferredTriggerIDs;
     if (pActionJson->contains("TriggerKey"))
     {
-        std::map<int,Trigger> mapTriggers; // will sort all the valid triggers by ID
+        std::map<int,TriggerListEntry> mapTriggers; // will sort all the valid triggers by ID
 
         for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
         {
@@ -1266,39 +1267,33 @@ void Guy::DoTriggers()
 
             // todo _Input for modern vs. classic
 
-            bool defer = !key["_NotDefer"];
+            int other = key["_Other"];
+            bool defer = other & 1<<6;
             int triggerGroup = key["TriggerGroup"];
             int condition = key["_Condition"];
             int state = key["_State"];
 
-            if (deferredTriggerGroup != -1 && triggerGroup == deferredTriggerGroup) {
-                foundDeferTriggerGroup = true;
-            }
-
             if (!defer && !CheckTriggerGroupConditions(condition, state)) {
                 continue;
-            }
-
-            if (deferredTriggerGroup != -1 && triggerGroup == deferredTriggerGroup && !defer) {
-                // found non-deferred triggergroup and passed condition, trigger action now
-                ExecuteTrigger(pDeferredTrigger);
-
-                int triggerActionID = (*pDeferredTrigger)["action_id"];
-                log(logTriggers, "did deferred trigger " + std::to_string(triggerActionID));
-
-                pDeferredTrigger = nullptr;
-                deferredTriggerGroup = -1;
-                // don't need to run the bit at the end there, and nothing else has side-effects here
-                return;
             }
 
             auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
             for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
             {
                 int triggerID = atoi(keyID.c_str());
-                Trigger newTrig = { key, defer, triggerGroup };
-                // interleave all the triggers from groups in that map, sorted by ID
-                mapTriggers[triggerID] = newTrig;
+                if (mapTriggers.find(triggerID) == mapTriggers.end()) {
+                    TriggerListEntry newTrig = { key, false, false, false };
+                    mapTriggers[triggerID] = newTrig;
+                }
+                if (!defer) {
+                    mapTriggers[triggerID].hasNormal = true;
+                }
+                if (defer) {
+                    mapTriggers[triggerID].hasDeferred = true;
+                }
+                if (other & 1<<17) {
+                    mapTriggers[triggerID].hasAntiNormal = true;
+                }
             }
         }
 
@@ -1307,8 +1302,6 @@ void Guy::DoTriggers()
         {
             int triggerID = it->first;
             std::string actionString = it->second.triggerName;
-            bool defer = it->second.deferred;
-            int triggerGroup = it->second.triggerGroup;
             int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
 
             nlohmann::json *pMoveJson = nullptr;
@@ -1328,43 +1321,64 @@ void Guy::DoTriggers()
                 }
             }
 
-            if (!CheckTriggerConditions(pTrigger, triggerID)) {
-                continue;
-            }
+            uint32_t initialI = 0;
 
-            if (CheckTriggerCommand(pTrigger)) {
-                if (defer) {
-                    // queue the deferred trigger
-                    pDeferredTrigger = pTrigger;
-                    deferredTriggerGroup = triggerGroup;
-                    // don't immediately forget it at the end there
-                    foundDeferTriggerGroup = true;
-                } else {
+            if (setDeferredTriggerIDs.find(triggerID) != setDeferredTriggerIDs.end()) {
+                // check deferred trigger activation
+                if (it->second.hasNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+                    log(logTriggers, "did deferred trigger " + std::to_string(actionID));
+
                     ExecuteTrigger(pTrigger);
 
-                    // assume non-deferred trigger can take precedence for now
-                    pDeferredTrigger = nullptr;
-                    deferredTriggerGroup = -1;
+                    // skip further triggers and cancel any delayed triggers
+                    setDeferredTriggerIDs.clear();
+                    keptDeferredTriggerIDs.clear();
+                    break;
                 }
 
-                // consume the input by removing matching edge bits from matched initial input
-                // todo figure out if that's needed
-                // we cant always consume or you couldn't defer eg. SA3 + CA for later check
-                // you'd think buffer length just takes care of this, check chains after rework rework
-                // inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+                // carry forward
+                if (it->second.hasDeferred) {
+                    keptDeferredTriggerIDs.insert(triggerID);
+                }
 
-                log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " + std::to_string(defer));
-                break; // we found our trigger walking back, skip all other triggers
+                // skip further triggers
+                if (it->second.hasAntiNormal) {
+                    break;
+                }
+            } else if (CheckTriggerCommand(pTrigger, initialI)) {
+                log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " +
+                    std::to_string(it->second.hasDeferred) + " normal " + std::to_string(it->second.hasNormal) +
+                    + " antinormal " + std::to_string(it->second.hasAntiNormal));
+                if (it->second.hasDeferred) {
+                    // queue the deferred trigger
+                    setDeferredTriggerIDs.insert(triggerID);
+                    keptDeferredTriggerIDs.insert(triggerID);
+                }
+
+                if (it->second.hasNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+                    ExecuteTrigger(pTrigger);
+
+                    // consume the input by removing matching edge bits from matched initial input
+                    // otherwise chains trigger off of one input since the cancel window starts
+                    // before input buffer ends
+                    int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
+                    inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+
+                    // skip further triggers and cancel any delayed triggers
+                    setDeferredTriggerIDs.clear();
+                    keptDeferredTriggerIDs.clear();
+                    break;
+                }
             }
         }
     }
 
-    if (deferredTriggerGroup != -1 && !foundDeferTriggerGroup) {
-        // some deferred trigger groups seem to be dangling and to not have a matching non-defer
-        log(logTriggers, "forgetting deferred trigger");
-        pDeferredTrigger = nullptr;
-        deferredTriggerGroup = -1;
+    for (int id : setDeferredTriggerIDs) {
+        if (keptDeferredTriggerIDs.find(id) == keptDeferredTriggerIDs.end()) {
+            log(logTriggers, "forgetting deferred trigger " + std::to_string(id));
+        }
     }
+    setDeferredTriggerIDs = keptDeferredTriggerIDs;
 }
 
 void Guy::UpdateBoxes(void)
