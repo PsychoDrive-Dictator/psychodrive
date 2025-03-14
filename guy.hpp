@@ -271,11 +271,16 @@ private:
     void UpdateActionData(void);
     void UpdateBoxes(void);
     bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
+
     void ExecuteTrigger(nlohmann::json *pTrigger);
+    bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
+    bool CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID);
+    bool CheckTriggerCommand(nlohmann::json *pTrigger);
+    void DoTriggers();
+
     void DoBranchKey(bool preHit);
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
-    void DoTriggers();
 
     bool needsTurnaround() {
         bool turnaround = false;
@@ -490,6 +495,7 @@ private:
 
     nlohmann::json *pDeferredTrigger = nullptr;
     int deferredTriggerGroup = -1;
+    std::vector<int> vecDeferredTriggerIDs;
 
     bool isDrive = false;
     bool wasDrive = false;
