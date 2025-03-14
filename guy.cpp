@@ -2878,13 +2878,32 @@ bool Guy::Frame(bool endWarudoFrame)
         nextAction = currentAction - 21;
     }
 
+    if (currentAction == 33 && jumpDirection == 0 && currentInput & 1 ) {
+        // one opportunity to adjust neutral jump direction during prejump
+        if (currentInput & 4) {
+            jumpDirection = -1;
+        } else if (currentInput & 8) {
+            jumpDirection = 1;
+        }
+    }
+
     bool recovered = false;
 
     if (currentFrame >= actionFrameDuration && nextAction == -1)
     {
         if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
-            nextAction = currentAction + 3;
+            if ( currentAction == 33) {
+                if (jumpDirection == 0) {
+                    nextAction = 36;
+                } else if (jumpDirection == 1) {
+                    nextAction = 37;
+                } else {
+                    nextAction = 38;
+                }
+            } else {
+                nextAction = currentAction + 3;
+            }
             // magic that seems specific to normal jumps
             noVelNextFrame = true;
         } else if (currentAction == 5) {
