@@ -377,7 +377,7 @@ bool Guy::PreFrame(void)
                     case 9:
                     case 10:
                         if (operationType == 9 || operationType == 10) {
-                            // home to target
+                            // set with min/max from target?
                             if (targetType != 0) {
                                 log(logUnknowns, "unknown home target type");
                                 continue;
@@ -386,6 +386,15 @@ bool Guy::PreFrame(void)
                                 continue;
                             }
                             if (valueType == 0) {
+                                // todo is it direction of guy or target?
+                                // todo ignore mirroring?
+                                if (direction < Fixed(0)) {
+                                    if (operationType == 9) {
+                                        operationType = 10;
+                                    } else {
+                                        operationType = 9;
+                                    }
+                                }
                                 if (operationType == 9 && getPosX() < homeTargetX) {
                                     continue;
                                 }
@@ -445,7 +454,7 @@ bool Guy::PreFrame(void)
                                 pGuy = pOpponent;
                             }
                             if (pGuy) {
-                                homeTargetX = pGuy->getPosX() + targetOffsetX * pGuy->direction * Fixed(-1);
+                                homeTargetX = pGuy->getPosX() + (targetOffsetX * pGuy->direction * Fixed(-1));
                                 homeTargetY = pGuy->getPosY() + targetOffsetY;
                             } else {
                                 log(logUnknowns, "unknown/not found set teleport/home target");
@@ -458,7 +467,7 @@ bool Guy::PreFrame(void)
                             calcValueFrame = 1;
                         }
                         if (multiValueType & 1) {
-                            velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame);
+                            velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame) * direction;
                         }
                         if (multiValueType & 2) {
                             velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
