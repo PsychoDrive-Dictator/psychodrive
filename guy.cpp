@@ -815,7 +815,7 @@ bool Guy::PreFrame(void)
             bool tokiToTomare = false;
             for (auto& [keyID, key] : (*pActionJson)["WorldKey"].items())
             {
-                if ( !tokiToTomare && (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame)) {
+                if ( !key.contains("_StartFrame") || (!tokiToTomare && ( key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame))) {
                     continue;
                 }
 
@@ -829,6 +829,8 @@ bool Guy::PreFrame(void)
                 if (tokiToTomare && key["Type"] == 5) {
                     // if we find a move with two shuffled pairs of those
                     // we might need to introduce more careful matching
+                    // todo actions can branch while warudo is on into another warudo block
+                    // like guile's fk cancel into sa3 - will need a warudo toggle state i suppose
                     tokiToTomare = false;
                     if (pOpponent ) {
                         pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
