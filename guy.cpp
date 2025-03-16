@@ -2551,6 +2551,7 @@ void Guy::DoBranchKey(bool preHit = false)
                             //     if (paramValue & value) allowTrigger = true;
                             //     break;                }
                             default:
+                                log(logUnknowns, "unhandled unique param operator");
                                 break;
                         }
                     }
@@ -2692,12 +2693,34 @@ void Guy::DoBranchKey(bool preHit = false)
                                 count++;
                             }
                         }
-                        // same operators as uniqueparam maybe? is that like standard?
-                        if (branchParam1 == 5 && count >= branchParam2) {
-                            doBranch = true;
-                        }
-                        if (branchParam1 == 3 && count <= branchParam2) {
-                            doBranch = true;
+                        // same operators as uniqueparam? is that like standard?
+                        // uncomment if we see the others and confirm that works
+                        switch (branchParam1) {
+                            // case 0:
+                            //     if (branchParam3 == paramValue) doBranch = true;
+                            //     break;
+                            // case 1:
+                            //     if (branchParam3 != paramValue) doBranch = true;
+                            //     break;
+                            // case 2:
+                            //     if (paramValue < branchParam3) doBranch = true;
+                            //     break;
+                            case 3:
+                                if (count <= branchParam2) doBranch = true;
+                                break;
+                            // case 4:
+                            //     if (paramValue > branchParam3) doBranch = true;
+                            //     break;
+                            case 5:
+                                if (count >= branchParam2) doBranch = true;
+                                break;
+                            // supposedly AND - unused as of yet?
+                            // case 6:
+                            //     if (paramValue & value) allowTrigger = true;
+                            //     break;                }
+                            default:
+                                log(logUnknowns, "unhandled shot count operator");
+                                break;
                         }
                     }
                     break;
