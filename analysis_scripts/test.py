@@ -143,16 +143,16 @@ for char in characters:
     #                           " condition " + str(attackKey["Condition"]))
 
     # find certain branches
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "BranchKey" in move:
-    #         for key in move["BranchKey"]:
-    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-    #                 branchKey = move["BranchKey"][key]
-    #                 if branchKey["Type"] == 29:
-    #                     print(char + " " + moveID + " UNIQUE branch params " + str(branchKey["Param00"]) +
-    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "BranchKey" in move:
+            for key in move["BranchKey"]:
+                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+                    branchKey = move["BranchKey"][key]
+                    if branchKey["Type"] == 52:
+                        print(char + " " + moveID + " SHOT branch params " + str(branchKey["Param00"]) +
+                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find certain StatusKey Side bits
     # for moveID in moves21Json:
@@ -178,21 +178,21 @@ for char in characters:
     #                     "-" + str(switchKey["_EndFrame"]))
 
     # find SwitchKey timer stop bits
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "SwitchKey" in move:
-            for key in move["SwitchKey"]:
-                if isinstance(move["SwitchKey"][key], dict) and "_SystemBit" in move["SwitchKey"][key]:
-                    switchKey = move["SwitchKey"][key]
-                    if switchKey["_SystemBit"] & 4096:
-                        moveDuration = move["fab"]["ActionFrame"]["MarginFrame"]
-                        if moveDuration == -1:
-                            moveDuration = move["fab"]["Frame"]
-                        mismatch = ""
-                        if moveDuration != switchKey["_EndFrame"]:
-                            mismatch = " (end frame mismatch!)"
-                        print(char + " " + moveID + " (" + str(moveDuration) + " frames) timer stop frames " + str(switchKey["_StartFrame"]) +
-                        "-" + str(switchKey["_EndFrame"]) + mismatch)
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "SwitchKey" in move:
+    #         for key in move["SwitchKey"]:
+    #             if isinstance(move["SwitchKey"][key], dict) and "_SystemBit" in move["SwitchKey"][key]:
+    #                 switchKey = move["SwitchKey"][key]
+    #                 if switchKey["_SystemBit"] & 4096:
+    #                     moveDuration = move["fab"]["ActionFrame"]["MarginFrame"]
+    #                     if moveDuration == -1:
+    #                         moveDuration = move["fab"]["Frame"]
+    #                     mismatch = ""
+    #                     if moveDuration != switchKey["_EndFrame"]:
+    #                         mismatch = " (end frame mismatch!)"
+    #                     print(char + " " + moveID + " (" + str(moveDuration) + " frames) timer stop frames " + str(switchKey["_StartFrame"]) +
+    #                     "-" + str(switchKey["_EndFrame"]) + mismatch)
 
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
