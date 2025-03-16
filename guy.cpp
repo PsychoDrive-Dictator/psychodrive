@@ -1559,12 +1559,41 @@ bool Guy::Push(Guy *pOtherGuy)
     }
 
     if ( hasPushed ) {
-        pushXLeft = fixMax(Fixed(0), pushXLeft);
-        pushXRight = fixMin(Fixed(0), pushXRight);
-        Fixed pushNeeded = -pushXRight;
-        if (fixAbs(pushXLeft) < fixAbs(pushXRight)) {
+        //log(logTransitions, "pushXLeft " + std::to_string(pushXLeft.f()) + "pushXRight " + std::to_string(pushXRight.f()));
+        // pushXLeft = fixMax(Fixed(0), pushXLeft);
+        // pushXRight = fixMin(Fixed(0), pushXRight);
+
+        // todo if you move fast enough to completely move through someone without ever touching them
+        // it still needs to push apparently and there's no side-switch in that situation
+
+        Fixed pushNeeded = Fixed(0);
+        if (getPosX() < pOpponent->getPosX()) {
             pushNeeded = -pushXLeft;
         }
+        if (getPosX() > pOpponent->getPosX()) {
+            pushNeeded = -pushXRight;
+        }
+        if (getPosX() == pOpponent->getPosX() && direction > Fixed(0)) {
+            pushNeeded = -pushXLeft;
+        }
+        if (getPosX() == pOpponent->getPosX() && direction < Fixed(0)) {
+            pushNeeded = -pushXRight;
+        }
+        // if (fixAbs(pushXLeft) < fixAbs(pushXRight)) {
+        //     pushNeeded = -pushXLeft;
+        // }
+        // if (onLeftWall() && !pOpponent->onLeftWall()) {
+        //     pushNeeded = -pushXLeft;
+        // }
+        // if (!onLeftWall() && pOpponent->onLeftWall()) {
+        //     pushNeeded = -pushXRight;
+        // }
+        // if (onRightWall() && !pOpponent->onRightWall()) {
+        //     pushNeeded = -pushXRight;
+        // }
+        // if (!onRightWall() && pOpponent->onRightWall()) {
+        //     pushNeeded = -pushXLeft;
+        // }
         Fixed velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
         log(logTransitions, "push needed " + std::to_string(pushNeeded.data) + " vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string(offsetDoesNotPush));
         // if (velDiff * pushNeeded < 0.0) {
@@ -1632,6 +1661,29 @@ bool Guy::Push(Guy *pOtherGuy)
                 pOtherGuy->posX.data += fixedRemainder;
             }
 
+            // both are in contact now, slide back/forth appropriately if anyone got pushed into a wall
+            Fixed wallDiff = Fixed(0);
+            if (getPosX() < -wallDistance) {
+                wallDiff = -wallDistance;
+                wallDiff -= getPosX();
+            }
+            if (getPosX() > wallDistance) {
+                wallDiff = wallDistance;
+                wallDiff -= getPosX();
+            }
+            if (pOtherGuy->getPosX() < -wallDistance) {
+                wallDiff = -wallDistance;
+                wallDiff -= pOtherGuy->getPosX();
+            }
+            if (pOtherGuy->getPosX() > wallDistance) {
+                wallDiff = wallDistance;
+                wallDiff -= pOtherGuy->getPosX();
+            }
+            if (wallDiff != Fixed(0)) {
+                posX += wallDiff;
+                pOtherGuy->posX += wallDiff;
+            }
+
             didPush = true;
             pOtherGuy->didPush = true;
         }
@@ -1653,9 +1705,6 @@ bool Guy::WorldPhysics(void)
     bool floorpush = false;
     touchedWall = false;
     didPush = false;
-
-    const Fixed wallDistance = Fixed(765.0f);
-    const Fixed maxPlayerDistance = Fixed(490.0f);
 
     if (!noPush) {
         // Floor

@@ -10,6 +10,9 @@
 #include "input.hpp"
 #include "fixed.hpp"
 
+const Fixed wallDistance = Fixed(765.0f);
+const Fixed maxPlayerDistance = Fixed(490.0f);
+
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
@@ -282,6 +285,9 @@ private:
     void DoBranchKey(bool preHit);
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
+
+    bool onLeftWall() { return getPosX() == -wallDistance; }
+    bool onRightWall() { return getPosX() == wallDistance; }
 
     bool needsTurnaround() {
         bool turnaround = false;
