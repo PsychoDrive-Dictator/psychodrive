@@ -2378,6 +2378,8 @@ void Guy::DoHitBoxKey(const char *name)
 
 void Guy::DoBranchKey(bool preHit = false)
 {
+    int maxBranchType = -1;
+
     if (pActionJson != nullptr && pActionJson->contains("BranchKey"))
     {
         for (auto& [keyID, key] : (*pActionJson)["BranchKey"].items())
@@ -2395,6 +2397,11 @@ void Guy::DoBranchKey(bool preHit = false)
             int64_t branchParam4 = key["Param04"];
             int branchAction = key["Action"];
             int branchFrame = key["ActionFrame"];
+
+            if (branchType <= maxBranchType) {
+                // todo high priority field maybe overrides that?
+                continue;
+            }
 
             switch (branchType) {
                 case 0: // always?
@@ -2685,12 +2692,11 @@ void Guy::DoBranchKey(bool preHit = false)
                                 count++;
                             }
                         }
-                        if (branchParam1 == 5 && count == branchParam2) {
-                            // equals certain count?
+                        // same operators as uniqueparam maybe? is that like standard?
+                        if (branchParam1 == 5 && count >= branchParam2) {
                             doBranch = true;
                         }
-                        if (branchParam1 == 3 && count == branchParam2) {
-                            // same? strict equals? aaa
+                        if (branchParam1 == 3 && count <= branchParam2) {
                             doBranch = true;
                         }
                     }
@@ -2752,32 +2758,33 @@ void Guy::DoBranchKey(bool preHit = false)
                     branchFrame = currentFrame;
                 }
 
-                if (branchAction == currentAction && branchFrame == 0 ) {
-                    log(true, "ignoring branch to frame 0? that's how jp stuff owrks dunno");
+                if (branchAction == currentAction && keepFrame) {
+                    log(true, "noop branch - branch type inhibit?");
                 } else {
-                    if (branchFrame != 0 && branchAction == currentAction) {
+                    if (branchAction == currentAction) {
                         // unclear where we'll hit it so not sure if we need to offset yet
-                        log(true, "if this happens check we're not off by 1");
+                        // todo we should probably defer setting currentFrame to frame jump?
+                        log(true, "branch to other frame of same action - todo check we're not off by 1");
                         currentFrame = branchFrame;
                     } else {
                         log(logBranches, "branching to action " + std::to_string(branchAction));
                         nextAction = branchAction;
                         nextActionFrame = branchFrame;
                     }
-                }
+                    deniedLastBranch = false;
 
-                deniedLastBranch = false;
+                    keepPlace = key["_KeepPlace"];
 
-                keepPlace = key["_KeepPlace"];
-
-                if (isProjectile && projHitCount == 0 ) {
-                    // take new hitcount from branch action's pdata
-                    // not just for hitcountzero branch, see also mai's charged fan
-                    projHitCount = -1;
+                    if (isProjectile && projHitCount == 0 ) {
+                        // take new hitcount from branch action's pdata
+                        // not just for hitcountzero branch, see also mai's charged fan
+                        projHitCount = -1;
+                    }
                 }
 
                 // FALL THROUGH - there might be another branch that works later for this frame
-                // it should take precedence - see mai's charged fan projectile
+                // it should take precedence (if branchType higher?) - see mai's charged fan projectile
+                maxBranchType = branchType;
             } else {
                 if (branchType != 1) {
                     deniedLastBranch = true;

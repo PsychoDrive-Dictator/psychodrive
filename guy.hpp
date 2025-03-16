@@ -311,7 +311,7 @@ private:
         if (!log) return;
         std::string frameDiff = to_string_leading_zeroes(globalFrameCount - lastLogFrame, 3);
         std::string curFrame = to_string_leading_zeroes(currentFrame, 3);
-        logQueue.push_back(frameDiff + " " + curFrame + " " + logLine);
+        logQueue.push_back(std::to_string(currentAction) + ":" + curFrame + "(+" + frameDiff + ") " + logLine);
         if (logQueue.size() > 15) {
             logQueue.pop_front();
         }
