@@ -286,6 +286,14 @@ private:
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
 
+    void DoEventKey(nlohmann::json *pAction, int frameID);
+    void DoShotKey(nlohmann::json *pAction, int frameID);
+
+    void DoInstantAction(int actionID);
+
+    void ChangeStyle(int newStyleID);
+    void ExitStyle();
+
     bool onLeftWall() { return getPosX() == -wallDistance; }
     bool onRightWall() { return getPosX() == wallDistance; }
 
