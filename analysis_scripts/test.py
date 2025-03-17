@@ -143,16 +143,24 @@ for char in characters:
     #                           " condition " + str(attackKey["Condition"]))
 
     # find certain branches
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "BranchKey" in move:
+    #         for key in move["BranchKey"]:
+    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+    #                 branchKey = move["BranchKey"][key]
+    #                 if branchKey["Type"] == 52:
+    #                     print(char + " " + moveID + " SHOT branch params " + str(branchKey["Param00"]) +
+    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+
+    # find all key types in IMM_ actions
     for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "BranchKey" in move:
-            for key in move["BranchKey"]:
-                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-                    branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 52:
-                        print(char + " " + moveID + " SHOT branch params " + str(branchKey["Param00"]) +
-                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+        if "IMM_" in moveID:
+            move = moves21Json[moveID]
+            for key in move:
+                if "Key" in key:
+                    print(char + " " + moveID + " " + key)
 
     # find certain StatusKey Side bits
     # for moveID in moves21Json:

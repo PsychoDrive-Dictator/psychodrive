@@ -625,140 +625,7 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (pActionJson->contains("EventKey"))
-        {
-            for (auto& [keyID, key] : (*pActionJson)["EventKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int validStyles = key["_ValidStyle"];
-                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                    continue;
-                }
-
-                int eventType = key["Type"];
-                int64_t param1 = key["Param01"];
-                int64_t param2 = key["Param02"];
-                int64_t param3 = key["Param03"];
-                int64_t param4 = key["Param04"];
-                int64_t param5 = key["Param05"];
-
-                switch (eventType)
-                {
-                    case 0:
-                        {
-                            Fixed posOffset = Fixed((int)param1);
-                            Fixed steerForward;
-                            steerForward.data = param2;
-                            Fixed steerBackward;
-                            steerBackward.data = param3;
-
-                            if (posOffset != Fixed(0)) {
-                                bool selfOffset = key["_IsOWNER_SELF_OFFSET"];
-                                bool opponentOffset = key["_IsOWNER_RIVAL_OFFSET"];
-
-                                if (selfOffset) {
-                                    posX = posX + posOffset * direction;
-                                } else if (opponentOffset) {
-                                    if (pOpponent) {
-                                        posX = pOpponent->getPosX() + posOffset * direction;
-                                    }
-                                } else {
-                                    log(logUnknowns, "unimplemented owner offset");
-                                }
-                            }
-
-                            if (currentInput & FORWARD) {
-                                posX += steerForward * direction;
-                                //log(true, "steerForward " + std::to_string(steerForward));
-                            } else if (currentInput & BACK) {
-                                posX += steerBackward * direction;
-                                //log(true, "steerBackward " + std::to_string(steerBackward));
-                            }
-                        }
-                        break;
-                    case 1:
-                        log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
-                        break;
-                    case 2:
-                        if (key["_IsCHARA_STYLE_CHANGE"]) {
-                            if (param1 == 0) { // 0 is set, 1 is add? look at jamie
-                                // todo wire up Style TerminateState
-                                styleInstall = param2;
-                            } else if (param1 == 1) {
-                                styleInstall += param2;
-                            } else {
-                                log(logUnknowns, "unknown operator in chara event style change");
-                            }
-                            if (param3 == 1) {
-                                styleInstallFrames = param4;
-                            }
-                        } else if (key["_IsCHARA_GAUGE_ADD"]) {
-                            // todo - see walk forward, etc - param1 is type of bar? 4 for drive
-                        } else {
-                            if (airborne) {
-                                if (param1 == 0) {
-                                    airActionCounter = param2;
-                                } else if (param1 == 1) {
-                                    airActionCounter += param2;
-                                } else {
-                                    log(logUnknowns, "unknown operator in chara event");
-                                }
-                                if (airActionCounter < 0) {
-                                    airActionCounter = 0;
-                                }
-                                if (styleInstallFrames > 0) {
-                                    // i can't find a flag that differentiates those 2 EventKeys
-                                    // so it must be airbrone vs not but i refuse to believe it
-                                    // it would mean you couldn't have an air attack that deducts
-                                    // install timer like mini-booms.................
-                                    log (true, "kinda ambiguous, worth a look");
-                                }
-                            } else if (styleInstall > 0 && styleInstallFrames > 0) {
-                                if (param1 == 0) {
-                                    styleInstallFrames = param2;
-                                } else if (param1 == 1) {
-                                    styleInstallFrames += param2;
-                                } else {
-                                    log(logUnknowns, "unknown operator in chara event");
-                                }
-                            } else {
-                                log(true, "no style install timer or airborne but point deduction?");
-                            }
-                        }
-                        break;
-                    case 7:
-                        if (param3 == 0) { // set
-                            bool isParam = key["_IsUNIQUE_UNIQUE_PARAM"];
-                            if (isParam) {
-                                uniqueParam[param2] = param4;
-                            } else {
-                                // dhalsim unique timer, only one that doesn't have this set?
-                                // if it's not a param, clearly it's a timer :harold:
-                                uniqueTimer = true;
-                                uniqueTimerCount = param4;
-                            }
-                        } else if (param3 == 1) { //add
-                            uniqueParam[param2] += param4;
-                            // param5 appears to be the limit
-                            if (param4 > 0 && uniqueParam[param2] > param5) {
-                                uniqueParam[param2] = param5;
-                            }
-                            if (param4 < 0 && uniqueParam[param2] < param5) {
-                                uniqueParam[param2] = param5;
-                            }
-                        }
-                        break;
-                    default:
-                        log(logUnknowns, "unhandled event, type " + std::to_string(eventType));
-                    case 11:
-                    case 5: //those are kinda everywhere, esp 11
-                        break;
-                }
-            }
-        }
+        DoEventKey(pActionJson, currentFrame);
 
         if (countingDownInstall && styleInstallFrames) {
             styleInstallFrames--;
@@ -769,46 +636,11 @@ bool Guy::PreFrame(void)
             }
 
             if (styleInstallFrames == 0) {
-                // todo should go to parent?
-                styleInstall = 0;
+                ExitStyle();
             }
         }
 
-        if (pActionJson->contains("ShotKey"))
-        {
-            for (auto& [keyID, key] : (*pActionJson)["ShotKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int validStyles = key["_ValidStyle"];
-                int operation = key["Operation"];
-                
-                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                    continue;
-                }
-
-                if (operation == 2) {
-                    if (pParent == nullptr) {
-                        log(logUnknowns, "shotkey despawn but no parent?");
-                    }
-                    die = true;
-                } else {
-                    Fixed posOffsetX = Fixed(key["PosOffset"]["x"].get<double>()) * direction;
-                    Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
-
-                    // spawn new guy
-                    Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
-                    pNewGuy->PreFrame();
-                    if (pParent) {
-                        pParent->minions.push_back(pNewGuy);
-                    } else {
-                        minions.push_back(pNewGuy);
-                    }
-                }
-            }
-        }
+        DoShotKey(pActionJson, currentFrame);
 
         if (pActionJson->contains("WorldKey"))
         {
@@ -2055,16 +1887,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     int dmgKind = (*pHitEntry)["DmgKind"];
 
                     if (dmgKind == 11) {
-                        // psycho mine spawner guy - style 0 probably OK unconditionally?
-                        int actionID = 592; // IMM_VEGA_BOMB - should we find by name instead?
-                        Guy *pNewGuy = new Guy(*this, Fixed(0), Fixed(0), actionID, 0, false);
-                        pNewGuy->PreFrame();
-                        if (pParent) {
-                            pParent->minions.push_back(pNewGuy);
-                        } else {
-                            minions.push_back(pNewGuy);
-                        }
-                        pNewGuy->Frame(); // he should be dead after that
+                        DoInstantAction(592); // IMM_VEGA_BOMB
                     }
 
                     if (bombBurst) {
@@ -2880,6 +2703,7 @@ bool Guy::Frame(bool endWarudoFrame)
     }
 
     if (landed) {
+        DoInstantAction(587); // IMM_LANDING - after style thing below or before?
         if ( resetHitStunOnLand ) {
             hitStun = 1;
             resetHitStunOnLand = false;
@@ -2891,8 +2715,7 @@ bool Guy::Frame(bool endWarudoFrame)
             nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
             if ((*pStyleJson)["StyleData"]["State"]["TerminateState"] == 0x3ff1fffffff) {
                 // that apparently means landing... figure out deeper meaning later
-                // go to parent or go to 0? :/
-                styleInstall = (*pStyleJson)["ParentStyleID"];
+                ExitStyle();
             }
         }
     }
@@ -3357,5 +3180,225 @@ void Guy::DoStatusKey(void)
                     break;
             }
         }
+    }
+}
+
+void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
+{
+    if (pAction->contains("EventKey"))
+    {
+        for (auto& [keyID, key] : (*pAction)["EventKey"].items())
+        {
+            if ( !key.contains("_StartFrame") || key["_StartFrame"] > frameID || key["_EndFrame"] <= frameID ) {
+                continue;
+            }
+
+            int validStyles = key["_ValidStyle"];
+            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+                continue;
+            }
+
+            int eventType = key["Type"];
+            int64_t param1 = key["Param01"];
+            int64_t param2 = key["Param02"];
+            int64_t param3 = key["Param03"];
+            int64_t param4 = key["Param04"];
+            int64_t param5 = key["Param05"];
+
+            switch (eventType)
+            {
+                case 0:
+                    {
+                        Fixed posOffset = Fixed((int)param1);
+                        Fixed steerForward;
+                        steerForward.data = param2;
+                        Fixed steerBackward;
+                        steerBackward.data = param3;
+
+                        if (posOffset != Fixed(0)) {
+                            bool selfOffset = key["_IsOWNER_SELF_OFFSET"];
+                            bool opponentOffset = key["_IsOWNER_RIVAL_OFFSET"];
+
+                            if (selfOffset) {
+                                posX = posX + posOffset * direction;
+                            } else if (opponentOffset) {
+                                if (pOpponent) {
+                                    posX = pOpponent->getPosX() + posOffset * direction;
+                                }
+                            } else {
+                                log(logUnknowns, "unimplemented owner offset");
+                            }
+                        }
+
+                        if (currentInput & FORWARD) {
+                            posX += steerForward * direction;
+                            //log(true, "steerForward " + std::to_string(steerForward));
+                        } else if (currentInput & BACK) {
+                            posX += steerBackward * direction;
+                            //log(true, "steerBackward " + std::to_string(steerBackward));
+                        }
+                    }
+                    break;
+                case 1:
+                    log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
+                    break;
+                case 2:
+                    if (key["_IsCHARA_STYLE_CHANGE"]) {
+                        if (param1 == 0) { // 0 is set, 1 is add? look at jamie
+                            // todo wire up Style TerminateState
+                            ChangeStyle(param2);
+                        } else if (param1 == 1) {
+                            ChangeStyle(styleInstall + param2);
+                        } else {
+                            log(logUnknowns, "unknown operator in chara event style change");
+                        }
+                        if (param3 == 1) {
+                            styleInstallFrames = param4;
+                        }
+                    } else if (key["_IsCHARA_GAUGE_ADD"]) {
+                        // todo - see walk forward, etc - param1 is type of bar? 4 for drive
+                    } else {
+                        if (airborne) {
+                            if (param1 == 0) {
+                                airActionCounter = param2;
+                            } else if (param1 == 1) {
+                                airActionCounter += param2;
+                            } else {
+                                log(logUnknowns, "unknown operator in chara event");
+                            }
+                            if (airActionCounter < 0) {
+                                airActionCounter = 0;
+                            }
+                            if (styleInstallFrames > 0) {
+                                // i can't find a flag that differentiates those 2 EventKeys
+                                // so it must be airbrone vs not but i refuse to believe it
+                                // it would mean you couldn't have an air attack that deducts
+                                // install timer like mini-booms.................
+                                log (true, "kinda ambiguous, worth a look");
+                            }
+                        } else if (styleInstall > 0 && styleInstallFrames > 0) {
+                            if (param1 == 0) {
+                                styleInstallFrames = param2;
+                            } else if (param1 == 1) {
+                                styleInstallFrames += param2;
+                            } else {
+                                log(logUnknowns, "unknown operator in chara event");
+                            }
+                        } else {
+                            log(true, "no style install timer or airborne but point deduction?");
+                        }
+                    }
+                    break;
+                case 7:
+                    if (param3 == 0) { // set
+                        bool isParam = key["_IsUNIQUE_UNIQUE_PARAM"];
+                        if (isParam) {
+                            uniqueParam[param2] = param4;
+                        } else {
+                            // dhalsim unique timer, only one that doesn't have this set?
+                            // if it's not a param, clearly it's a timer :harold:
+                            uniqueTimer = true;
+                            uniqueTimerCount = param4;
+                        }
+                    } else if (param3 == 1) { //add
+                        uniqueParam[param2] += param4;
+                        // param5 appears to be the limit
+                        if (param4 > 0 && uniqueParam[param2] > param5) {
+                            uniqueParam[param2] = param5;
+                        }
+                        if (param4 < 0 && uniqueParam[param2] < param5) {
+                            uniqueParam[param2] = param5;
+                        }
+                    }
+                    break;
+                default:
+                    log(logUnknowns, "unhandled event, type " + std::to_string(eventType));
+                case 11:
+                case 5: //those are kinda everywhere, esp 11
+                    break;
+            }
+        }
+    }
+}
+
+void Guy::DoShotKey(nlohmann::json *pAction, int frameID)
+{
+    if (pAction->contains("ShotKey"))
+    {
+        for (auto& [keyID, key] : (*pAction)["ShotKey"].items())
+        {
+            if ( !key.contains("_StartFrame") || key["_StartFrame"] > frameID || key["_EndFrame"] <= frameID ) {
+                continue;
+            }
+
+            int validStyles = key["_ValidStyle"];
+            int operation = key["Operation"];
+
+            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+                continue;
+            }
+
+            if (operation == 2) {
+                if (pParent == nullptr) {
+                    log(logUnknowns, "shotkey despawn but no parent?");
+                }
+                die = true;
+            } else {
+                Fixed posOffsetX = Fixed(key["PosOffset"]["x"].get<double>()) * direction;
+                Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
+
+                // spawn new guy
+                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
+                pNewGuy->PreFrame();
+                if (pParent) {
+                    pParent->minions.push_back(pNewGuy);
+                } else {
+                    minions.push_back(pNewGuy);
+                }
+            }
+        }
+    }
+}
+
+void Guy::DoInstantAction(int actionID)
+{
+    nlohmann::json *pInstantAction = nullptr;
+    FindMove(actionID, styleInstall, &pInstantAction);
+    if (pInstantAction) {
+        // only ones i've seen used in those kinds of actions so far
+        DoEventKey(pInstantAction, 0);
+        DoShotKey(pInstantAction, 0);
+    } else {
+        log(true, "couldn't find instant action " + std::to_string(actionID));
+    }
+}
+
+void Guy::ChangeStyle(int newStyleID) {
+    // todo exit action from previous style?
+    styleInstall = newStyleID;
+    nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
+    int enterActionID = (*pStyleJson)["StyleData"]["Action"]["Start"]["Action"];
+    int enterActionStyle = (*pStyleJson)["StyleData"]["Action"]["Start"]["Style"];
+
+    if (enterActionID != -1) {
+        DoInstantAction(enterActionID);
+    }
+    if (enterActionStyle != -1 && enterActionStyle != newStyleID) {
+        styleInstall = enterActionStyle; // not sure if correct - like jamie's exit action naming a diff style
+    }
+}
+
+void Guy::ExitStyle() {
+    nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
+    int exitActionID = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Action"];
+    int exitActionStyle = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Style"];
+
+    if (exitActionID != -1) {
+        DoInstantAction(exitActionID);
+    }
+    if (exitActionStyle != -1 && exitActionStyle != styleInstall) {
+        styleInstall = exitActionStyle;
+    } else {
+        styleInstall = (*pStyleJson)["ParentStyleID"];
     }
 }
