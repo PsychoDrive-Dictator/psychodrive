@@ -3158,35 +3158,54 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
             switch (eventType)
             {
                 case 0:
-                    {
-                        Fixed posOffset = Fixed((int)param1);
-                        Fixed steerForward;
-                        steerForward.data = param2;
-                        Fixed steerBackward;
-                        steerBackward.data = param3;
+                    switch (eventID) {
+                        case 3:
+                        case 4:
+                        case 5:
+                        {
+                            Fixed posOffset = Fixed((int)param1);
+                            Guy *pOffsetGuy = nullptr;
 
-                        if (posOffset != Fixed(0)) {
-                            bool selfOffset = key["_IsOWNER_SELF_OFFSET"];
-                            bool opponentOffset = key["_IsOWNER_RIVAL_OFFSET"];
-
-                            if (selfOffset) {
-                                posX = posX + posOffset * direction;
-                            } else if (opponentOffset) {
-                                if (pOpponent) {
-                                    posX = pOpponent->getPosX() + posOffset * direction;
-                                }
-                            } else {
-                                log(logUnknowns, "unimplemented owner offset");
+                            if (eventID == 3) {
+                                pOffsetGuy = this;
                             }
+                            if (eventID == 4) {
+                                pOffsetGuy = pParent;
+                            }
+                            if (eventID == 5) {
+                                pOffsetGuy = pOpponent;
+                            }
+                            if (pOffsetGuy) {
+                                posX = pOffsetGuy->getPosX() + posOffset * direction;
+                            } else {
+                                log(true, "offset broken");
+                            }
+                            if (param2 || param3 || param4 || param5 ) {
+                                log(logUnknowns, "unknown offset param");
+                            }
+                            break;
                         }
+                        case 49:
+                        {
+                            Fixed steerForward;
+                            steerForward.data = param2;
+                            Fixed steerBackward;
+                            steerBackward.data = param3;
 
-                        if (currentInput & FORWARD) {
-                            posX += steerForward * direction;
-                            //log(true, "steerForward " + std::to_string(steerForward));
-                        } else if (currentInput & BACK) {
-                            posX += steerBackward * direction;
-                            //log(true, "steerBackward " + std::to_string(steerBackward));
+                            if (currentInput & FORWARD) {
+                                posX += steerForward * direction;
+                            } else if (currentInput & BACK) {
+                                posX += steerBackward * direction;
+                            }
+                            if (param1 != 0) {
+                                // todo there's rightward and upward/etc too
+                                log(logUnknowns, "unimplemented move steer direction");
+                            }
+                            break;
                         }
+                        default:
+                            log(logUnknowns, "unknown owner event id " + std::to_string(eventID));
+                            break;
                     }
                     break;
                 case 1:
