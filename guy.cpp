@@ -95,6 +95,38 @@ static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operati
     }
 }
 
+bool Guy::conditionOperator(int op, int operand, int threshold, std::string desc)
+{
+    switch (op) {
+        case 0:
+            if (threshold == operand) return true;
+            break;
+        case 1:
+            if (threshold != operand) return true;
+            break;
+        case 2:
+            if (operand < threshold) return true;
+            break;
+        case 3:
+            if (operand <= threshold) return true;
+            break;
+        case 4:
+            if (operand > threshold) return true;
+            break;
+        case 5:
+            if (operand >= threshold) return true;
+            break;
+        // supposedly AND - unused as of yet?
+        // case 6:
+        //     if  (operand & threshold) return true;
+        //     break;
+        default:
+            log(logUnknowns, "unhandled " + desc + " operator");
+            break;
+    }
+    return false;
+}
+
 bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed offsetY, int dir)
 {
     std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
@@ -809,34 +841,8 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
     if ((*pTrigger)["_UseUniqueParam"] == true && paramID >= 0 && paramID < Guy::uniqueParamCount) {
         int op = (*pTrigger)["cond_param_ope"];
         int value = (*pTrigger)["cond_param_value"];
-        bool allowTrigger = false;
-        switch (op) {
-            case 0:
-                if (value == uniqueParam[paramID]) allowTrigger = true;
-                break;
-            case 1:
-                if (value != uniqueParam[paramID]) allowTrigger = true;
-                break;
-            case 2:
-                if (uniqueParam[paramID] < value) allowTrigger = true;
-                break;
-            case 3:
-                if (uniqueParam[paramID] <= value) allowTrigger = true;
-                break;
-            case 4:
-                if (uniqueParam[paramID] > value) allowTrigger = true;
-                break;
-            case 5:
-                if (uniqueParam[paramID] >= value) allowTrigger = true;
-                break;
-            // supposedly AND - unused as of yet?
-            // case 6:
-            //     if (uniqueParam[paramID] & value) allowTrigger = true;
-            //     break;                }
-            default:
-                break;
-        }
-        if (!allowTrigger) {
+
+        if (!conditionOperator(op, uniqueParam[paramID], value, "trigger unique param")) {
             return false;
         }
     }
@@ -2351,47 +2357,18 @@ void Guy::DoBranchKey(bool preHit = false)
                     break;
                 case 29: // unique param
                     if (branchParam1 >= 0 && branchParam1 < Guy::uniqueParamCount) {
-                        int paramValue = uniqueParam[branchParam1];
-                        switch (branchParam2) {
-                            case 0:
-                                if (branchParam3 == paramValue) doBranch = true;
-                                break;
-                            case 1:
-                                if (branchParam3 != paramValue) doBranch = true;
-                                break;
-                            case 2:
-                                if (paramValue < branchParam3) doBranch = true;
-                                break;
-                            case 3:
-                                if (paramValue <= branchParam3) doBranch = true;
-                                break;
-                            case 4:
-                                if (paramValue > branchParam3) doBranch = true;
-                                break;
-                            case 5:
-                                if (paramValue >= branchParam3) doBranch = true;
-                                break;
-                            // supposedly AND - unused as of yet?
-                            // case 6:
-                            //     if (paramValue & value) allowTrigger = true;
-                            //     break;                }
-                            default:
-                                log(logUnknowns, "unhandled unique param operator");
-                                break;
-                        }
+                        doBranch = conditionOperator(branchParam2, uniqueParam[branchParam1], branchParam3, "unique param");
                     }
                     break;
                 case 30: // unique timer
                     if (uniqueTimer) {
-                        if (uniqueTimerCount == branchParam2) {
+                        if (conditionOperator(branchParam1, uniqueTimerCount, branchParam2, "unique timer")) {
                             doBranch = true;
+                            // probably incorrect but would keep counting up forever for dhalsim
                             uniqueTimer = false;
                         }
                     } else {
                         log(logUnknowns, "unique timer branch not in timer?");
-                    }
-                    if (branchParam1 != 5) {
-                        log(logUnknowns, "unique timer branch param unknown");
                     }
                     break;
                 case 31: // todo loop count
@@ -2518,35 +2495,7 @@ void Guy::DoBranchKey(bool preHit = false)
                                 count++;
                             }
                         }
-                        // same operators as uniqueparam? is that like standard?
-                        // uncomment if we see the others and confirm that works
-                        switch (branchParam1) {
-                            // case 0:
-                            //     if (branchParam3 == paramValue) doBranch = true;
-                            //     break;
-                            // case 1:
-                            //     if (branchParam3 != paramValue) doBranch = true;
-                            //     break;
-                            // case 2:
-                            //     if (paramValue < branchParam3) doBranch = true;
-                            //     break;
-                            case 3:
-                                if (count <= branchParam2) doBranch = true;
-                                break;
-                            // case 4:
-                            //     if (paramValue > branchParam3) doBranch = true;
-                            //     break;
-                            case 5:
-                                if (count >= branchParam2) doBranch = true;
-                                break;
-                            // supposedly AND - unused as of yet?
-                            // case 6:
-                            //     if (paramValue & value) allowTrigger = true;
-                            //     break;                }
-                            default:
-                                log(logUnknowns, "unhandled shot count operator");
-                                break;
-                        }
+                        doBranch = conditionOperator(branchParam1, count, branchParam2, "shot count");
                     }
                     break;
                 case 54: // touch, but really 'hit' with condition flags..

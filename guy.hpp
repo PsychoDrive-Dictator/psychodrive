@@ -298,6 +298,8 @@ private:
     bool onLeftWall() { return getPosX() == -wallDistance; }
     bool onRightWall() { return getPosX() == wallDistance; }
 
+    bool conditionOperator(int op, int operand, int threshold, std::string desc);
+
     bool needsTurnaround() {
         bool turnaround = false;
         if (pOpponent) {
