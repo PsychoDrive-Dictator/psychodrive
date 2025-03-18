@@ -3199,6 +3199,7 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
             }
 
             int eventType = key["Type"];
+            int eventID = key["ID"];
             int64_t param1 = key["Param01"];
             int64_t param2 = key["Param02"];
             int64_t param3 = key["Param03"];
@@ -3240,81 +3241,86 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
                     }
                     break;
                 case 1:
-                    log(logUnknowns, "mystery system event 1, flags " + std::to_string(param1));
+                    log(logUnknowns, "system event, id " + std::to_string(eventID));
                     break;
                 case 2:
-                    if (key["_IsCHARA_STYLE_CHANGE"]) {
-                        if (param1 == 0) { // 0 is set, 1 is add? look at jamie
-                            // todo wire up Style TerminateState
-                            ChangeStyle(param2);
-                        } else if (param1 == 1) {
-                            ChangeStyle(styleInstall + param2);
-                        } else {
-                            log(logUnknowns, "unknown operator in chara event style change");
-                        }
-                        if (param3 == 1) {
-                            styleInstallFrames = param4;
-                        }
-                    } else if (key["_IsCHARA_GAUGE_ADD"]) {
-                        // todo - see walk forward, etc - param1 is type of bar? 4 for drive
-                    } else {
-                        if (airborne) {
+                    switch (eventID) {
+                        case 26: // style change
+                            if (param1 == 0) {
+                                ChangeStyle(param2);
+                            } else if (param1 == 1) {
+                                ChangeStyle(styleInstall + param2);
+                            } else {
+                                log(logUnknowns, "unknown operator in chara event style change");
+                            }
+                            if (param3 == 1) {
+                                styleInstallFrames = param4;
+                            }
+                            break;
+                        case 41: // air action counter
                             if (param1 == 0) {
                                 airActionCounter = param2;
                             } else if (param1 == 1) {
                                 airActionCounter += param2;
                             } else {
-                                log(logUnknowns, "unknown operator in chara event");
+                                log(logUnknowns, "unknown operator in chara event air action counter");
                             }
                             if (airActionCounter < 0) {
                                 airActionCounter = 0;
                             }
-                            if (styleInstallFrames > 0) {
-                                // i can't find a flag that differentiates those 2 EventKeys
-                                // so it must be airbrone vs not but i refuse to believe it
-                                // it would mean you couldn't have an air attack that deducts
-                                // install timer like mini-booms.................
-                                log (true, "kinda ambiguous, worth a look");
-                            }
-                        } else if (styleInstall > 0 && styleInstallFrames > 0) {
+                            break;
+                        case 50: // style install timer
                             if (param1 == 0) {
                                 styleInstallFrames = param2;
                             } else if (param1 == 1) {
                                 styleInstallFrames += param2;
                             } else {
-                                log(logUnknowns, "unknown operator in chara event");
+                                log(logUnknowns, "unknown operator in chara event style install timer");
                             }
-                        } else {
-                            log(true, "no style install timer or airborne but point deduction?");
-                        }
+                            break;
+                        default:
+                            log(logUnknowns, "unknown chara event id " + std::to_string(eventID));
+                            break;
+                        case 36:
+                            // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
+                            break;
                     }
                     break;
                 case 7:
-                    if (param3 == 0) { // set
-                        bool isParam = key["_IsUNIQUE_UNIQUE_PARAM"];
-                        if (isParam) {
-                            uniqueParam[param2] = param4;
-                        } else {
-                            // dhalsim unique timer, only one that doesn't have this set?
-                            // if it's not a param, clearly it's a timer :harold:
-                            uniqueTimer = true;
-                            uniqueTimerCount = param4;
-                        }
-                    } else if (param3 == 1) { //add
-                        uniqueParam[param2] += param4;
-                        // param5 appears to be the limit
-                        if (param4 > 0 && uniqueParam[param2] > param5) {
-                            uniqueParam[param2] = param5;
-                        }
-                        if (param4 < 0 && uniqueParam[param2] < param5) {
-                            uniqueParam[param2] = param5;
-                        }
+                    switch (eventID) {
+                        case 60: // unique param
+                            if (param3 == 0) {
+                                uniqueParam[param2] = param4;
+                            } else if (param3 == 1) { 
+                                uniqueParam[param2] += param4;
+                                // param5 appears to be the limit
+                                if (param4 > 0 && uniqueParam[param2] > param5) {
+                                    uniqueParam[param2] = param5;
+                                }
+                                if (param4 < 0 && uniqueParam[param2] < param5) {
+                                    uniqueParam[param2] = param5;
+                                }
+                            } else {
+                                log(logUnknowns, "unknown operator in chara event unique param");
+                            }
+                            break;
+                        case 62: // unique timer
+                            if (param3 == 0) { // set??
+                                uniqueTimer = true;
+                                uniqueTimerCount = param4;
+                            } else {
+                                log(logUnknowns, "unknown operator in chara event unique timer");
+                            }
+                            break;
+                        default:
+                            log(logUnknowns, "unknown unique event id " + std::to_string(eventID));
+                            break;
                     }
                     break;
                 default:
-                    log(logUnknowns, "unhandled event, type " + std::to_string(eventType));
-                case 11:
-                case 5: //those are kinda everywhere, esp 11
+                    log(logUnknowns, "unhandled event, type " + std::to_string(eventType) + " id " + std::to_string(eventID));
+                case 11: // commentary
+                case 5: // camera
                     break;
             }
         }
