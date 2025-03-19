@@ -417,6 +417,7 @@ private:
 
     Fixed homeTargetX;
     Fixed homeTargetY;
+    int homeTargetType;
 
     int maxHealth;
     int health;
