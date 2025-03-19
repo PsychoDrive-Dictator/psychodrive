@@ -1044,7 +1044,7 @@ function(args)
     table.insert(gameStateDumps, frameDump)
   end
   if dumpingGameState == true then
-    logToFile( myjson.encode(gameStateDumps), "game_state_dump.json" )
+    logToFile( myjson.encode(gameStateDumps), "game_state_dump_" .. tostring(os.time()) .. ".json" )
     gameStateDumps = {}
     dumpingGameState = false
   end
@@ -1052,6 +1052,15 @@ function(args)
     gameStateDumps = {}
     clearGameStateDump = false
   end
+end,
+function(retval)
+  return retval
+end
+)
+
+sdk.hook(sdk.find_type_definition("app.training.TrainingManager"):get_method("BattleStart"),
+function(args)
+  dumpingGameState = true
 end,
 function(retval)
   return retval

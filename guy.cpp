@@ -400,6 +400,7 @@ bool Guy::PreFrame(void)
                 int targetType = steerKey["TargetType"];
                 int calcValueFrame = steerKey["CalcValueFrame"];
                 int multiValueType = steerKey["MultiValueType"];
+                int param = steerKey["Param"];
 
                 switch (operationType) {
                     case 1:
@@ -411,7 +412,7 @@ bool Guy::PreFrame(void)
                         if (operationType == 9 || operationType == 10) {
                             // set with min/max from target?
                             if (targetType != 0) {
-                                log(logUnknowns, "unknown home target type");
+                                log(logUnknowns, "unknown home target type " + std::to_string(targetType));
                                 continue;
                             } else if (!pOpponent) {
                                 log(true, "can't home to opponent, no opponent");
@@ -488,21 +489,42 @@ bool Guy::PreFrame(void)
                             if (pGuy) {
                                 homeTargetX = pGuy->getPosX() + (targetOffsetX * pGuy->direction * Fixed(-1));
                                 homeTargetY = pGuy->getPosY() + targetOffsetY;
+                            } else if (targetType == 13) {
+                                homeTargetY = targetOffsetY;
+                                if (targetOffsetX != Fixed(0)) {
+                                    log(logUnknowns, "don't know what to do with target X offset in ease to ground");
+                                }
                             } else {
-                                log(logUnknowns, "unknown/not found set teleport/home target");
+                                log(logUnknowns, "unknown/not found set teleport/home target type " + std::to_string(targetType));
+                            }
+                            homeTargetType = targetType;
+
+                            if (param != 0) {
+                                log(logUnknowns, "unknown param in set home target " + std::to_string(param));
                             }
                         }
                         break;
                     case 15:
-                        // teleport/lerp position?
+                        // teleport/lerp position
                         if (calcValueFrame == 0) {
                             calcValueFrame = 1;
                         }
-                        if (multiValueType & 1) {
-                            velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame) * direction;
-                        }
-                        if (multiValueType & 2) {
-                            velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
+                        if (homeTargetType == 13) {
+                            // ease to ground over n frames - is multiValueType used for this?
+                            // if (velocityY <= Fixed(0) || calcValueFrame < 2) {
+                            //     log(logUnknowns, "unhandled case for ease to ground? vely " + std::to_string(velocityY.f()) + " t " + std::to_string(calcValueFrame));
+                            // } else
+                            {
+                                // backsolve for acceleration over time. t-1 for first term makes it line up?
+                                accelY = Fixed(-2) * (getPosY() + velocityY * Fixed(calcValueFrame - 1) - homeTargetY) / Fixed(calcValueFrame * calcValueFrame);
+                            }
+                        } else {
+                            if (multiValueType & 1) {
+                                velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame) * direction;
+                            }
+                            if (multiValueType & 2) {
+                                velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
+                            }
                         }
                         break;
                     default:

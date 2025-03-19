@@ -155,12 +155,12 @@ for char in characters:
     #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
-    for moveID in moves21Json:
-        if "IMM_" in moveID:
-            move = moves21Json[moveID]
-            for key in move:
-                if "Key" in key:
-                    print(char + " " + moveID + " " + key)
+    # for moveID in moves21Json:
+    #     if "IMM_" in moveID:
+    #         move = moves21Json[moveID]
+    #         for key in move:
+    #             if "Key" in key:
+    #                 print(char + " " + moveID + " " + key)
 
     # find certain StatusKey Side bits
     # for moveID in moves21Json:
@@ -201,6 +201,21 @@ for char in characters:
     #                         mismatch = " (end frame mismatch!)"
     #                     print(char + " " + moveID + " (" + str(moveDuration) + " frames) timer stop frames " + str(switchKey["_StartFrame"]) +
     #                     "-" + str(switchKey["_EndFrame"]) + mismatch)
+
+    # find certain SteerKey target types 
+    nextSteerKey = 0
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "SteerKey" in move:
+            for key in move["SteerKey"]:
+                if isinstance(move["SteerKey"][key], dict) and "TargetType" in move["SteerKey"][key]:
+                    steerKey = move["SteerKey"][key]
+                    # if nextSteerKey == 1:
+                    #     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["OperationType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["MultiValueType"]))
+                    #     nextSteerKey = 0
+                    if steerKey["OperationType"] == 14:
+                        nextSteerKey = 1
+                        print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["TargetType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["ValueType"]))
 
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
