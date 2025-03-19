@@ -407,51 +407,27 @@ bool Guy::PreFrame(void)
                     case 2:
                     case 4:
                     case 5:
-                    case 9:
-                    case 10:
-                        if (operationType == 9 || operationType == 10) {
-                            // set with min/max from target?
-                            if (targetType != 0) {
-                                log(logUnknowns, "unknown home target type " + std::to_string(targetType));
-                                continue;
-                            } else if (!pOpponent) {
-                                log(true, "can't home to opponent, no opponent");
-                                continue;
-                            }
-                            if (valueType == 0) {
-                                // todo is it direction of guy or target?
-                                // todo ignore mirroring?
-                                if (direction < Fixed(0)) {
-                                    if (operationType == 9) {
-                                        operationType = 10;
-                                    } else {
-                                        operationType = 9;
-                                    }
-                                }
-                                if (operationType == 9 && getPosX() < homeTargetX) {
-                                    continue;
-                                }
-                                if (operationType == 10 && getPosX() > homeTargetX) {
-                                    continue;
-                                }
-                            }
-                            if (valueType == 1) {
-                                if (operationType == 9 && getPosY() < homeTargetY) {
-                                    continue;
-                                }
-                                if (operationType == 10 && getPosY() > homeTargetY) {
-                                    continue;
-                                }
-                            }
-                            // todo CalcValueFrame? is it only recompute every N frames?
-                            // fall through to normal set operaiton below after those checks
-                            operationType = 1;
-                        }
                         switch (valueType) {
                             case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
                             case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
                             case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
                             case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                        }
+                        break;
+                    case 9:
+                        switch (valueType) {
+                            case 0: if (velocityX < fixValue) velocityX = fixValue; break;
+                            case 1: if (velocityY < fixValue) velocityY = fixValue; break;
+                            case 3: if (accelX < fixValue) accelX = fixValue; break;
+                            case 4: if (accelY < fixValue) accelY = fixValue; break;
+                        }
+                        break;
+                    case 10:
+                        switch (valueType) {
+                            case 0: if (velocityX > fixValue) velocityX = fixValue; break;
+                            case 1: if (velocityY > fixValue) velocityY = fixValue; break;
+                            case 3: if (accelX > fixValue) accelX = fixValue; break;
+                            case 4: if (accelY > fixValue) accelY = fixValue; break;
                         }
                         break;
                     case 12:
@@ -561,6 +537,7 @@ bool Guy::PreFrame(void)
             // to stop movement - see back accel for eg. drive rush normals
             accelX = 0;
         }
+        // todo same with Y?
 
         prevVelX = velocityX;
         Fixed prevVelY = velocityY;
