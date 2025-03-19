@@ -2547,11 +2547,14 @@ void Guy::DoBranchKey(bool preHit = false)
                 bool keepFrame = key["_InheritFrameX"];
 
                 if (keepFrame) {
-                    // this will replay the same frame ID, is that correct?
-                    // seems needed for guile's branch to 1229, otherwise unique
+                    // condition seems needed for guile's branch to 1229, otherwise unique
                     // isn't deducted (eventkey on frame 0)
-                    // but maybe governed by flag?
-                    branchFrame = currentFrame;
+                    // possible this is depending of type of branch and when in the frame it happens
+                    if (currentFrame == 0) {
+                        branchFrame = currentFrame;
+                    } else {
+                        branchFrame = currentFrame + 1;
+                    }
                 }
 
                 if (branchAction == currentAction && keepFrame) {
