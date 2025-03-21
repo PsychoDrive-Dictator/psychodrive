@@ -1557,7 +1557,7 @@ bool Guy::WorldPhysics(void)
     if (!noPush) {
         // Floor
 
-        if (getPosY() - Fixed(landingAdjust) < 0) {
+        if (getPosY() - Fixed(landingAdjust) < 1) {
             //log("floorpush pos");
             floorpush = true;
             hasPushed = true;
