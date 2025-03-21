@@ -1042,6 +1042,9 @@ function(args)
     dumpPlayer(playerDump, cPlayer[1])
     table.insert(frameDump.players, playerDump)
     table.insert(gameStateDumps, frameDump)
+    -- if cPlayer[1].mpActParam.ActionPart._Engine:get_ActionID() == 239 then
+    --   logToFile( "posY " .. cPlayer[1].pos.y.v / 65536.0 .. " frame " .. cPlayer[1].mpActParam.ActionPart._Engine:get_ActionFrame():call("ToString()") )
+    -- end
   end
   if dumpingGameState == true then
     logToFile( myjson.encode(gameStateDumps), "game_state_dump_" .. tostring(os.time()) .. ".json" )
