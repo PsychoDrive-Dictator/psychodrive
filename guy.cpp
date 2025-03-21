@@ -1382,7 +1382,7 @@ void Guy::Render(void) {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
-    //if (warudo) return false;
+    if (warudo) return false;
     if (didPush) return false;
     if ( !pOtherGuy ) return false;
     // for now, maybe there's other rules
