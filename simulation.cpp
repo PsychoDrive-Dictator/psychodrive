@@ -180,13 +180,21 @@ void Simulation::AdvanceFrame(void)
             Log("game replay finished, errors: " + std::to_string(replayErrors));
         } else {
             int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
-            inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
+            int prevInputLeft = 0;
+            if (targetDumpFrame > 0) {
+                prevInputLeft = gameStateDump[targetDumpFrame-1]["players"][0]["currentInput"];
+            }
+            inputLeft = addPressBits( inputLeft, prevInputLeft );
 
             int inputRight = 0;
             // training dumps don't have input for player 2
             if (gameStateDump[targetDumpFrame]["players"][1].contains("currentInput")) {
                 inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
-                inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
+                int prevInputRight = 0;
+                if (targetDumpFrame > 0) {
+                    prevInputRight = gameStateDump[targetDumpFrame-1]["players"][1]["currentInput"];
+                }
+                inputRight = addPressBits( inputRight, prevInputRight );
             }
 
             simGuys[0]->Input(inputLeft);
