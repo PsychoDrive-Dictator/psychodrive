@@ -9,6 +9,7 @@
 #include "render.hpp"
 #include "input.hpp"
 #include "fixed.hpp"
+#include "simulation.hpp"
 
 const Fixed wallDistance = Fixed(765.0f);
 const Fixed maxPlayerDistance = Fixed(490.0f);
@@ -16,6 +17,7 @@ const Fixed maxPlayerDistance = Fixed(490.0f);
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
+    void setSim(Simulation *sim) { pSim = sim; }
 
     void Input(int input);
     bool PreFrame(void);
@@ -529,4 +531,6 @@ private:
 
     std::string actionName;
     nlohmann::json *pActionJson;
+
+    Simulation *pSim = nullptr;
 };

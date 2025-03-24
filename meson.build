@@ -7,6 +7,7 @@ project(
 
 project_source_files = [
   'main.cpp',
+  'simulation.cpp',
   'guy.cpp',
   'ui.cpp',
   'input.cpp',
