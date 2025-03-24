@@ -72,8 +72,9 @@ void log(std::string logLine);
 
 class Guy;
 
-extern const char* charNames[];
-extern const int charNameCount;
+extern std::vector<const char *> charNames;
+
+const char *getCharNameFromID(int charID);
 
 extern const char* charVersions[];
 extern const int charVersionCount;

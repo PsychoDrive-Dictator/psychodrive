@@ -1499,6 +1499,9 @@ bool Guy::Push(Guy *pOtherGuy)
             if (replayFrameNumber != 0) {
                 frameNumber = replayFrameNumber;
             }
+            if (pSim) {
+                frameNumber = pSim->frameCounter;
+            }
 
             //log(logTransitions, "fixedRemainder " + std::to_string(fixedRemainder) + " frameNum " +  std::to_string(frameNumber) + " " + getCharacter());
 

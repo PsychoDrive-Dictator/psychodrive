@@ -390,14 +390,14 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::Begin("PsychoDrive", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
-    static int charID = rand() % charNameCount;
+    static int charID = rand() % charNames.size();
     static int versionID = charVersionCount - 1;
     static float newCharPos = 0.0;
     resetpos = resetpos || ImGui::Button("reset positions (Q)");
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
     ImGui::ColorEdit3("##newcharcolor", newCharColor);
-    modalDropDown("##newcharchar", &charID, charNames, charNameCount, 100);
+    modalDropDown("##newcharchar", &charID, charNames.data(), charNames.size(), 100);
     ImGui::SameLine();
     modalDropDown("##newcharversion", &versionID, charVersions, charVersionCount, 200);
     ImGui::SameLine();

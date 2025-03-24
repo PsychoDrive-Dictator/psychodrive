@@ -20,6 +20,7 @@
 #include "json.hpp"
 #include "zip.h"
 
+#include "simulation.hpp"
 #include "guy.hpp"
 #include "main.hpp"
 #include "ui.hpp"
@@ -32,34 +33,58 @@ int hitStunAdder = 0;
 
 uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
 
-const char* charNames[] = {
-    "ryu",
-    "ken",
-    "luke",
-    "honda",
-    "zangief",
-    "manon",
-    "ed",
-    "jp",
-    "guile",
-    "rashid",
-    "aki",
-    "chunli",
-    "juri",
-    "lily",
-    "deejay",
-    "cammy",
-    "dhalsim",
-    "kimberly",
-    "jamie",
-    "marisa",
-    "blanka",
-    "akuma",
-    "dictator",
-    "terry",
-    "mai"
+struct charEntry {
+    int charID;
+    const char *name;
+    const char *niceName;
 };
-const int charNameCount = IM_ARRAYSIZE(charNames);
+
+std::vector<charEntry> charEntries;
+std::vector<const char *> charNames;
+
+void makeCharEntries(void)
+{
+    charEntries.push_back({1, "ryu", "Ryu"});
+    charEntries.push_back({2, "luke", "Luke"});
+    charEntries.push_back({3, "kimberly", "Kimberly"});
+    charEntries.push_back({4, "chunli", "Chun-Li"});
+    charEntries.push_back({5, "manon", "Manon"});
+    charEntries.push_back({6, "zangief", "Zangief"});
+    charEntries.push_back({7, "jp", "JP"});
+    charEntries.push_back({8, "dhalsim", "Dhalsim"});
+    charEntries.push_back({9, "cammy", "Cammy"});
+    charEntries.push_back({10, "ken", "Ken"});
+    charEntries.push_back({11, "deejay", "Dee Jay"});
+    charEntries.push_back({12, "lily", "Lily"});
+    charEntries.push_back({13, "aki", "A.K.I."});
+    charEntries.push_back({14, "rashid", "Rashid"});
+    charEntries.push_back({15, "blanka", "Blanka"});
+    charEntries.push_back({16, "juri", "Juri"});
+    charEntries.push_back({17, "marisa", "Marisa"});
+    charEntries.push_back({18, "guile", "Guile"});
+    charEntries.push_back({19, "ed", "Ed"});
+    charEntries.push_back({20, "honda", "E. Honda"});
+    charEntries.push_back({21, "jamie", "Jamie"});
+    charEntries.push_back({22, "akuma", "Akuma"});
+    charEntries.push_back({26, "dictator", "M. Bison"});
+    charEntries.push_back({27, "terry", "Terry"});
+    charEntries.push_back({28, "mai", "Mai"});
+
+    for (charEntry entry : charEntries ) {
+        charNames.push_back(entry.name);
+    }
+}
+
+const char *getCharNameFromID(int charID)
+{
+    for (charEntry entry : charEntries ) {
+        if (entry.charID == charID) {
+            return entry.name;
+        }
+    }
+
+    return nullptr;
+}
 
 const char* charVersions[] = {
     "19 - pre-S2",
@@ -202,7 +227,6 @@ int curPlotActionID = 0;
 
 void compareGameStateFixed( Fixed dumpValue, Fixed realValue, bool fatal, std::string description )
 {
-
     if (dumpValue != realValue)
     {
         float valueDiff = realValue.f() - dumpValue.f();
@@ -733,11 +757,25 @@ static void mainloop(void)
         paused = true; // cant pause in the middle above
         lasterrorcount = replayErrors;
     }
-}   
+}
 
 int main(int argc, char**argv)
 {
     srand(time(NULL));
+    makeCharEntries();
+
+    if ( argc > 2 && std::string(argv[1]) == "rundump") {
+        Simulation dumpSim;
+        dumpSim.SetupFromGameDump(argv[2]);
+
+        while (true) {
+            dumpSim.AdvanceFrame();
+            if (dumpSim.replayingGameStateDump == false) {
+                exit(0);
+            }
+        }
+    }
+
     sdlwindow = initWindowRender();
     initUI();
     io = &ImGui::GetIO(); // why doesn't the one from initUI work? who knows
@@ -745,9 +783,9 @@ int main(int argc, char**argv)
 
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
 
-    std::string charNameLeft = (char*)charNames[rand() % charNameCount];
+    std::string charNameLeft = (char*)charNames[rand() % charNames.size()];
     int versionLeft = maxVersion;
-    std::string charNameRight = (char*)charNames[rand() % charNameCount];
+    std::string charNameRight = (char*)charNames[rand() % charNames.size()];
     int versionRight = maxVersion;
 
     if ( argc > 1 ) {
