@@ -17,21 +17,19 @@ void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed
     simGuys.push_back(pNewGuy);
 }
 
-void Simulation::CreateGuyFromDumpedPlayer(nlohmann::json &playerJson)
+void Simulation::CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int version)
 {
     std::string charName = getCharNameFromID(playerJson["charID"]);
-    // todo currently max version, read from test file or something
-    int charVersion = atoi(charVersions[charVersionCount - 1]);
     Fixed posX = Fixed(playerJson["posX"].get<double>());
     Fixed posY = Fixed(playerJson["posY"].get<double>());
     int bitValue = playerJson["bitValue"];
     int charDirection = (bitValue & 1<<7) ? 1 : -1;
     color charColor = {randFloat(), randFloat(), randFloat()};
 
-    CreateGuy(charName, charVersion, posX, posY, charDirection, charColor);
+    CreateGuy(charName, version, posX, posY, charDirection, charColor);
 }
 
-bool Simulation::SetupFromGameDump(std::string dumpPath)
+bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
 {
     gameStateDump = parse_json_file(dumpPath);
     if (gameStateDump == nullptr) {
@@ -46,9 +44,14 @@ bool Simulation::SetupFromGameDump(std::string dumpPath)
         i++;
     }
 
+    if (version == -1) {
+        // fall back to latest
+        version = atoi(charVersions[charVersionCount - 1]);
+    }
+
     nlohmann::json &players = gameStateDump[i]["players"];
-    CreateGuyFromDumpedPlayer(players[0]);
-    CreateGuyFromDumpedPlayer(players[1]);
+    CreateGuyFromDumpedPlayer(players[0], version);
+    CreateGuyFromDumpedPlayer(players[1], version);
 
     gameStateFrame = gameStateDump[i]["frameCount"];
     firstGameStateFrame = gameStateFrame;
@@ -62,28 +65,30 @@ bool Simulation::SetupFromGameDump(std::string dumpPath)
     return true;
 }
 
-void Simulation::CompareGameStateFixed( Fixed dumpValue, Fixed realValue, bool fatal, std::string description )
+void Simulation::CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description )
 {
     if (dumpValue != realValue)
     {
         float valueDiff = realValue.f() - dumpValue.f();
+        uint64_t valueDiffData = realValue.data - dumpValue.data;
         std::string dumpValueStr = std::to_string(dumpValue.data) + " / " + std::to_string(dumpValue.f());
         std::string simValueStr = std::to_string(realValue.data) + " / " + std::to_string(realValue.f());
-        Log("replay error: " + description + " dump: " + dumpValueStr + " sim: " + simValueStr + " diff: " + std::to_string(valueDiff));
-        if (fatal) {
-            replayErrors++;
-        }
+        std::string diffStr = std::to_string(valueDiffData) + " / " + std::to_string(valueDiff);
+        std::string headerStr = "E;" + std::to_string(player) + ";" + std::to_string(frame) + ";" + std::to_string(errorType) + ";";
+        Log(headerStr + description + " dump: " + dumpValueStr + " sim: " + simValueStr + " diff: " + diffStr);
+
+        replayErrors++;
     }
 }
 
-void Simulation::CompareGameStateInt( int64_t dumpValue, int64_t realValue, bool fatal, std::string description )
+void Simulation::CompareGameStateInt( int64_t dumpValue, int64_t realValue, int player, int frame, ErrorType errorType, std::string description )
 {
     if (dumpValue != realValue)
     {
-        Log("replay error: " + description + " dump: " + std::to_string(dumpValue) + " real: " + std::to_string(realValue));
-        if (fatal) {
-            replayErrors++;
-        }
+        std::string headerStr = "E;" + std::to_string(player) + ";" + std::to_string(frame) + ";" + std::to_string(errorType) + ";";
+        Log(headerStr + description + " dump: " + std::to_string(dumpValue) + " sim: " + std::to_string(realValue));
+
+        replayErrors++;
     }
 }
 
@@ -146,24 +151,24 @@ void Simulation::AdvanceFrame(void)
             int i = 0;
             while (i < 2) {
                 std::string desc = "player " + std::to_string(i);
-                CompareGameStateFixed(Fixed(players[i]["posX"].get<double>()), simGuys[i]->getPosX(), true, desc + " pos X");
-                CompareGameStateFixed(Fixed(players[i]["posY"].get<double>()), simGuys[i]->getPosY(), true, desc + " pos Y");
+                CompareGameStateFixed(Fixed(players[i]["posX"].get<double>()), simGuys[i]->getPosX(), i, targetDumpFrame, ePos, desc + " pos X");
+                CompareGameStateFixed(Fixed(players[i]["posY"].get<double>()), simGuys[i]->getPosY(), i, targetDumpFrame, ePos, desc + " pos Y");
                 Fixed velX, velY, accelX, accelY;
                 simGuys[i]->getVel(velX, velY, accelX, accelY);
-                CompareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, true, desc + " vel X");
-                CompareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, true, desc + " vel Y");
+                CompareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, i, targetDumpFrame, eVel, desc + " vel X");
+                CompareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, i, targetDumpFrame, eVel, desc + " vel Y");
                 if (players[i].contains("accelX")) {
-                    CompareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, true, desc + " accel X");
+                    CompareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, i, targetDumpFrame, eAccel, desc + " accel X");
                 }
-                CompareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, true, desc + " accel Y");
+                CompareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, i, targetDumpFrame, eAccel, desc + " accel Y");
 
                 if (players[i].contains("hitVelX")) {
-                    CompareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), simGuys[i]->getHitVelX(), true, desc + " hitAccel X");
-                    CompareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), simGuys[i]->getHitAccelX(), true, desc + " hitAccel X");
+                    CompareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), simGuys[i]->getHitVelX(), i, targetDumpFrame, eHitVel, desc + " hitAccel X");
+                    CompareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), simGuys[i]->getHitAccelX(), i, targetDumpFrame, eHitAccel, desc + " hitAccel X");
                 }
 
-                CompareGameStateInt(players[i]["actionID"], simGuys[i]->getCurrentAction(), false, desc + " action ID");
-                CompareGameStateInt(players[i]["actionFrame"], simGuys[i]->getCurrentFrame(), false, desc + " action frame");
+                CompareGameStateInt(players[i]["actionID"], simGuys[i]->getCurrentAction(), i, targetDumpFrame, eActionID, desc + " action ID");
+                CompareGameStateInt(players[i]["actionFrame"], simGuys[i]->getCurrentFrame(), i, targetDumpFrame, eActionFrame, desc + " action frame");
 
                 i++;
             }
@@ -177,7 +182,7 @@ void Simulation::AdvanceFrame(void)
             gameStateFrame = 0;
             firstGameStateFrame = 0;
             frameCounter = 0;
-            Log("game replay finished, errors: " + std::to_string(replayErrors));
+            Log("F;game replay finished, errors: " + std::to_string(replayErrors));
         } else {
             int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
             int prevInputLeft = 0;
