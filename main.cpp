@@ -316,12 +316,8 @@ bool charFileExists(const std::string &path, const std::string &charName, const 
     return false;
 }
 
-nlohmann::json *loadCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName)
+int findCharVersionSlot(int version)
 {
-    std::string charFileName;
-    bool foundFile = false;
-
-    // find initial version slot for passed version number
     int versionSlot = charVersionCount - 1;
     while (versionSlot >= 0) {
         if (atoi(charVersions[versionSlot]) == version) {
@@ -329,6 +325,17 @@ nlohmann::json *loadCharFile(const std::string &path, const std::string &charNam
         }
         versionSlot--;
     }
+
+    return versionSlot;
+}
+
+nlohmann::json *loadCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName)
+{
+    std::string charFileName;
+    bool foundFile = false;
+
+    // find initial version slot for passed version number
+    int versionSlot = findCharVersionSlot(version);
     if (versionSlot < 0) {
         return nullptr;
     }
@@ -766,7 +773,11 @@ int main(int argc, char**argv)
 
     if ( argc > 2 && std::string(argv[1]) == "rundump") {
         Simulation dumpSim;
-        dumpSim.SetupFromGameDump(argv[2]);
+        int version = -1;
+        if ( argc > 3 ) {
+            version = atoi(argv[3]);
+        }
+        dumpSim.SetupFromGameDump(argv[2], version);
 
         while (true) {
             dumpSim.AdvanceFrame();

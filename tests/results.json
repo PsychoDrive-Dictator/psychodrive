@@ -1,0 +1,632 @@
+[
+    {
+        "testName": "bison26_bison26_jumps.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 6,
+                "firstFrame": 362,
+                "lastFrame": 494
+            },
+            {
+                "count": 3,
+                "firstFrame": 362,
+                "lastFrame": 494
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 303,
+                "firstFrame": 0,
+                "lastFrame": 599
+            },
+            {
+                "count": 929,
+                "firstFrame": 0,
+                "lastFrame": 599
+            }
+        ]
+    },
+    {
+        "testName": "bison26_bison26_push.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 556,
+                "firstFrame": 52,
+                "lastFrame": 741
+            },
+            {
+                "count": 1445,
+                "firstFrame": 0,
+                "lastFrame": 803
+            }
+        ]
+    },
+    {
+        "testName": "bison26_bison26_push_normals.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 3590,
+                "firstFrame": 828,
+                "lastFrame": 2628
+            },
+            {
+                "count": 14,
+                "firstFrame": 828,
+                "lastFrame": 1375
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 38,
+                "firstFrame": 1859,
+                "lastFrame": 1973
+            },
+            {
+                "count": 60,
+                "firstFrame": 1849,
+                "lastFrame": 1973
+            },
+            {
+                "count": 2037,
+                "firstFrame": 350,
+                "lastFrame": 2512
+            },
+            {
+                "count": 3872,
+                "firstFrame": 0,
+                "lastFrame": 2628
+            }
+        ]
+    },
+    {
+        "testName": "cammy26_air_throw.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 687,
+                "firstFrame": 3,
+                "lastFrame": 308
+            },
+            {
+                "count": 428,
+                "firstFrame": 2,
+                "lastFrame": 308
+            },
+            {
+                "count": 191,
+                "firstFrame": 2,
+                "lastFrame": 304
+            },
+            {
+                "count": 26,
+                "firstFrame": 167,
+                "lastFrame": 192
+            },
+            {
+                "count": 26,
+                "firstFrame": 167,
+                "lastFrame": 192
+            },
+            {
+                "count": 259,
+                "firstFrame": 2,
+                "lastFrame": 304
+            },
+            {
+                "count": 569,
+                "firstFrame": 0,
+                "lastFrame": 308
+            }
+        ]
+    },
+    {
+        "testName": "cammy26_bison26_air_throw.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 503,
+                "firstFrame": 156,
+                "lastFrame": 354
+            },
+            {
+                "count": 226,
+                "firstFrame": 156,
+                "lastFrame": 270
+            },
+            {
+                "count": 129,
+                "firstFrame": 156,
+                "lastFrame": 233
+            },
+            {
+                "count": 26,
+                "firstFrame": 206,
+                "lastFrame": 231
+            },
+            {
+                "count": 26,
+                "firstFrame": 206,
+                "lastFrame": 231
+            },
+            {
+                "count": 343,
+                "firstFrame": 34,
+                "lastFrame": 354
+            },
+            {
+                "count": 634,
+                "firstFrame": 0,
+                "lastFrame": 354
+            }
+        ]
+    },
+    {
+        "testName": "cammy26_bison26_ex_rev_edge.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 296,
+                "firstFrame": 148,
+                "lastFrame": 354
+            },
+            {
+                "count": 180,
+                "firstFrame": 148,
+                "lastFrame": 237
+            },
+            {
+                "count": 88,
+                "firstFrame": 150,
+                "lastFrame": 237
+            },
+            {
+                "count": 24,
+                "firstFrame": 194,
+                "lastFrame": 234
+            },
+            {
+                "count": 24,
+                "firstFrame": 194,
+                "lastFrame": 234
+            },
+            {
+                "count": 260,
+                "firstFrame": 39,
+                "lastFrame": 281
+            },
+            {
+                "count": 647,
+                "firstFrame": 0,
+                "lastFrame": 354
+            }
+        ]
+    },
+    {
+        "testName": "cammy26_bison26_h_spiral_arrow.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 209,
+                "firstFrame": 159,
+                "lastFrame": 339
+            },
+            {
+                "count": 91,
+                "firstFrame": 145,
+                "lastFrame": 212
+            },
+            {
+                "count": 77,
+                "firstFrame": 145,
+                "lastFrame": 212
+            },
+            {
+                "count": 39,
+                "firstFrame": 145,
+                "lastFrame": 183
+            },
+            {
+                "count": 39,
+                "firstFrame": 145,
+                "lastFrame": 183
+            },
+            {
+                "count": 284,
+                "firstFrame": 0,
+                "lastFrame": 239
+            },
+            {
+                "count": 577,
+                "firstFrame": 0,
+                "lastFrame": 339
+            }
+        ]
+    },
+    {
+        "testName": "dict_dict_light_backfist_heavy_backfist.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 793,
+                "firstFrame": 348,
+                "lastFrame": 736
+            },
+            {
+                "count": 144,
+                "firstFrame": 358,
+                "lastFrame": 582
+            },
+            {
+                "count": 102,
+                "firstFrame": 358,
+                "lastFrame": 582
+            },
+            {
+                "count": 90,
+                "firstFrame": 358,
+                "lastFrame": 577
+            },
+            {
+                "count": 90,
+                "firstFrame": 358,
+                "lastFrame": 577
+            },
+            {
+                "count": 319,
+                "firstFrame": 289,
+                "lastFrame": 661
+            },
+            {
+                "count": 1279,
+                "firstFrame": 0,
+                "lastFrame": 736
+            }
+        ]
+    },
+    {
+        "testName": "guile26_bison26_driverushpush.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 298,
+                "firstFrame": 142,
+                "lastFrame": 290
+            },
+            {
+                "count": 2,
+                "firstFrame": 142,
+                "lastFrame": 143
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 379,
+                "firstFrame": 0,
+                "lastFrame": 284
+            },
+            {
+                "count": 504,
+                "firstFrame": 0,
+                "lastFrame": 290
+            }
+        ]
+    },
+    {
+        "testName": "guile26_bison26_driverushpushhit.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 325,
+                "firstFrame": 0,
+                "lastFrame": 435
+            },
+            {
+                "count": 936,
+                "firstFrame": 0,
+                "lastFrame": 595
+            }
+        ]
+    },
+    {
+        "testName": "guile26_bison26_solidpuncher_simple_sequence.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 429,
+                "firstFrame": 404,
+                "lastFrame": 620
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 89,
+                "firstFrame": 395,
+                "lastFrame": 492
+            },
+            {
+                "count": 74,
+                "firstFrame": 395,
+                "lastFrame": 492
+            },
+            {
+                "count": 104,
+                "firstFrame": 154,
+                "lastFrame": 509
+            },
+            {
+                "count": 979,
+                "firstFrame": 0,
+                "lastFrame": 620
+            }
+        ]
+    },
+    {
+        "testName": "guile26_bison26_solidpuncher_simple_sequence2.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 524,
+                "firstFrame": 367,
+                "lastFrame": 629
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 42,
+                "firstFrame": 372,
+                "lastFrame": 432
+            },
+            {
+                "count": 4,
+                "firstFrame": 372,
+                "lastFrame": 432
+            },
+            {
+                "count": 176,
+                "firstFrame": 47,
+                "lastFrame": 469
+            },
+            {
+                "count": 981,
+                "firstFrame": 0,
+                "lastFrame": 629
+            }
+        ]
+    },
+    {
+        "testName": "guile_jp_66_hit_guile_combo.json",
+        "testVersion": "23",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2906,
+                "firstFrame": 58,
+                "lastFrame": 2270
+            },
+            {
+                "count": 117,
+                "firstFrame": 507,
+                "lastFrame": 1841
+            },
+            {
+                "count": 18,
+                "firstFrame": 513,
+                "lastFrame": 1841
+            },
+            {
+                "count": 1324,
+                "firstFrame": 44,
+                "lastFrame": 2137
+            },
+            {
+                "count": 1307,
+                "firstFrame": 44,
+                "lastFrame": 2137
+            },
+            {
+                "count": 1527,
+                "firstFrame": 0,
+                "lastFrame": 2270
+            },
+            {
+                "count": 2470,
+                "firstFrame": 0,
+                "lastFrame": 2270
+            }
+        ]
+    },
+    {
+        "testName": "light_spiralarrow.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 137,
+                "firstFrame": 106,
+                "lastFrame": 242
+            },
+            {
+                "count": 33,
+                "firstFrame": 127,
+                "lastFrame": 159
+            },
+            {
+                "count": 33,
+                "firstFrame": 127,
+                "lastFrame": 159
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 33,
+                "firstFrame": 127,
+                "lastFrame": 159
+            },
+            {
+                "count": 432,
+                "firstFrame": 0,
+                "lastFrame": 242
+            }
+        ]
+    },
+    {
+        "testName": "pushphysics_new_luke_ryu.json",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 184,
+                "firstFrame": 127,
+                "lastFrame": 581
+            },
+            {
+                "count": 1145,
+                "firstFrame": 0,
+                "lastFrame": 732
+            }
+        ]
+    }
+]
