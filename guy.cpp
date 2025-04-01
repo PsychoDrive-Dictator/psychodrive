@@ -3356,8 +3356,12 @@ void Guy::ChangeStyle(int newStyleID) {
     // todo exit action from previous style?
     styleInstall = newStyleID;
     nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
-    int enterActionID = (*pStyleJson)["StyleData"]["Action"]["Start"]["Action"];
-    int enterActionStyle = (*pStyleJson)["StyleData"]["Action"]["Start"]["Style"];
+    int enterActionID = -1;
+    int enterActionStyle = -1;
+    if ((*pStyleJson)["StyleData"].contains("Action")) {
+        enterActionID = (*pStyleJson)["StyleData"]["Action"]["Start"]["Action"];
+        enterActionStyle = (*pStyleJson)["StyleData"]["Action"]["Start"]["Style"];
+    }
 
     if (enterActionID != -1) {
         DoInstantAction(enterActionID);
@@ -3369,8 +3373,12 @@ void Guy::ChangeStyle(int newStyleID) {
 
 void Guy::ExitStyle() {
     nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
-    int exitActionID = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Action"];
-    int exitActionStyle = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Style"];
+    int exitActionID = -1;
+    int exitActionStyle = -1;
+    if ((*pStyleJson)["StyleData"].contains("Action")) {
+        exitActionID = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Action"];
+        exitActionStyle = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Style"];
+    }
 
     if (exitActionID != -1) {
         DoInstantAction(exitActionID);
