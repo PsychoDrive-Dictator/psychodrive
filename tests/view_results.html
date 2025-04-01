@@ -4,6 +4,7 @@
   <script src="new_results.json"></script>
   <script type="text/javascript">
     function formatError(error) {
+      if (error == null) return '-';
       if (error.count == 0) return '0';
       return error.count + ' (' + error.firstFrame + '-' + error.lastFrame + ')';
     }
@@ -32,13 +33,16 @@
         testNameCell.appendChild(nameText);
 
         for (var error = 0; error < newResult.errorTypes.length; error++) {
+          curError = curMatchingResult ? curMatchingResult.errorTypes[error] : null;
+          newError = newResult.errorTypes[error];
+
           curCell = curResultRow.insertCell();
-          curTextContent = curMatchingResult ? formatError(curMatchingResult.errorTypes[error]) : "-";
+          curTextContent = formatError(curError);
           text = document.createTextNode(curTextContent);
           curCell.appendChild(text);
 
           newCell = newResultRow.insertCell();
-          newTextContent = formatError(newResult.errorTypes[error]);
+          newTextContent = formatError(newError);
           text = document.createTextNode(newTextContent);
           newCell.appendChild(text);
 
@@ -51,6 +55,18 @@
 
             newCell.parentNode.removeChild(newCell);
           }
+          if (curError) {
+            if (newError.count > curError.count) {
+              newCell.classList.add("newErrors");
+            }
+            if (newError.count < curError.count) {
+              newCell.classList.add("fixedErrors");
+            }
+            if (newError.count == curError.count &&
+              (newError.firstFrame != curError.firstFrame || newError.lastFrame != curError.lastFrame)) {
+                newCell.classList.add("movedErrors");
+            }
+          }
         }
       }
     }
@@ -59,16 +75,27 @@
   <style>
     body {
       background-color: rgb(51, 51, 51);
+      font-family: sans-serif;
     }
     table, td, th {
       color:rgb(255, 255, 255);
       border: 1px solid white;
       border-collapse: collapse;
       padding: 5px;
+      font-size: 14px;
     }
 
     .complete {
       background-color: rgb(0, 60, 40);
+    }
+    .newErrors {
+      background-color: rgb(179, 0, 0);
+    }
+    .fixedErrors {
+      background-color: green;
+    }
+    .movedErrors {
+      background-color: rgb(138, 138, 0);
     }
   </style>
 </head>
@@ -78,7 +105,7 @@
       <thead>
         <tr>
           <th scope="col">Test</th>
-          <th scope="col">CharVersion</th>
+          <th scope="col">Version</th>
           <th scope="col">Pos</th>
           <th scope="col">Vel</th>
           <th scope="col">Accel</th>
