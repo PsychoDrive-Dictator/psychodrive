@@ -1,6 +1,7 @@
+var currentResults =
 [
     {
-        "testName": "bison26_bison26_jumps.json",
+        "testName": "bison26_bison26_jumps",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -42,7 +43,7 @@
         ]
     },
     {
-        "testName": "bison26_bison26_push.json",
+        "testName": "bison26_bison26_push",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -84,7 +85,7 @@
         ]
     },
     {
-        "testName": "bison26_bison26_push_normals.json",
+        "testName": "bison26_bison26_push_normals",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -126,7 +127,7 @@
         ]
     },
     {
-        "testName": "cammy26_air_throw.json",
+        "testName": "cammy26_air_throw",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -168,7 +169,7 @@
         ]
     },
     {
-        "testName": "cammy26_bison26_air_throw.json",
+        "testName": "cammy26_bison26_air_throw",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -210,7 +211,7 @@
         ]
     },
     {
-        "testName": "cammy26_bison26_ex_rev_edge.json",
+        "testName": "cammy26_bison26_ex_rev_edge",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -252,7 +253,7 @@
         ]
     },
     {
-        "testName": "cammy26_bison26_h_spiral_arrow.json",
+        "testName": "cammy26_bison26_h_spiral_arrow",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -294,7 +295,7 @@
         ]
     },
     {
-        "testName": "dict_dict_light_backfist_heavy_backfist.json",
+        "testName": "dict_dict_light_backfist_heavy_backfist",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -336,7 +337,7 @@
         ]
     },
     {
-        "testName": "guile26_bison26_driverushpush.json",
+        "testName": "guile26_bison26_driverushpush",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -378,7 +379,7 @@
         ]
     },
     {
-        "testName": "guile26_bison26_driverushpushhit.json",
+        "testName": "guile26_bison26_driverushpushhit",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -420,7 +421,7 @@
         ]
     },
     {
-        "testName": "guile26_bison26_solidpuncher_simple_sequence.json",
+        "testName": "guile26_bison26_solidpuncher_simple_sequence",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -462,7 +463,7 @@
         ]
     },
     {
-        "testName": "guile26_bison26_solidpuncher_simple_sequence2.json",
+        "testName": "guile26_bison26_solidpuncher_simple_sequence2",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -504,7 +505,7 @@
         ]
     },
     {
-        "testName": "guile_jp_66_hit_guile_combo.json",
+        "testName": "guile_jp_66_hit_guile_combo",
         "testVersion": "23",
         "finished": true,
         "errorTypes": [
@@ -546,7 +547,7 @@
         ]
     },
     {
-        "testName": "light_spiralarrow.json",
+        "testName": "light_spiralarrow",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
@@ -588,7 +589,7 @@
         ]
     },
     {
-        "testName": "pushphysics_new_luke_ryu.json",
+        "testName": "pushphysics_new_luke_ryu",
         "testVersion": "26",
         "finished": true,
         "errorTypes": [
