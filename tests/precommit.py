@@ -4,6 +4,8 @@ import os
 import subprocess
 
 scriptPath = os.path.abspath(__file__)
+if os.path.islink(scriptPath):
+    scriptPath = os.path.realpath(scriptPath)
 scriptDir = os.path.dirname(scriptPath)
 
 runTestsPath = os.path.join(scriptDir, "run_tests.py")
