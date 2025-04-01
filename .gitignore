@@ -1,0 +1,8 @@
+.vscode
+SDL2.dll
+compile_commands.json
+imgui.ini
+psychodrive
+psychodrive.exe
+tests/new_results.json
+timeline.json
