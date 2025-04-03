@@ -900,12 +900,12 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
             if (getPosY() < rangeParam) {
                 rangeCheckMatch = false;
             }
-            if (rangeCondition == 4 && velocityY < Fixed(0)) {
-                // rnage check on the way up? waive if going down
+            if (rangeCondition == 4 && !(velocityY > Fixed(0))) {
+                // rnage check on the way up? waive if not going up
                 rangeCheckMatch = true;
             }
-            if (rangeCondition == 5 && velocityY > Fixed(0)) {
-                // rnage check on the way down? waive if going up
+            if (rangeCondition == 5 && !(velocityY < Fixed(0))) {
+                // rnage check on the way down? waive if not going down
                 rangeCheckMatch = true;
             }
             break;

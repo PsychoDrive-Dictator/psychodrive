@@ -337,6 +337,48 @@ var currentResults =
         ]
     },
     {
+        "testName": "gsdump_26_air_normal_timing_limits",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 3760,
+                "firstFrame": 178,
+                "lastFrame": 2364
+            },
+            {
+                "count": 47,
+                "firstFrame": 181,
+                "lastFrame": 2098
+            },
+            {
+                "count": 47,
+                "firstFrame": 181,
+                "lastFrame": 2098
+            },
+            {
+                "count": 38,
+                "firstFrame": 815,
+                "lastFrame": 852
+            },
+            {
+                "count": 38,
+                "firstFrame": 815,
+                "lastFrame": 852
+            },
+            {
+                "count": 827,
+                "firstFrame": 177,
+                "lastFrame": 2324
+            },
+            {
+                "count": 3771,
+                "firstFrame": 0,
+                "lastFrame": 2364
+            }
+        ]
+    },
+    {
         "testName": "gsdump_26_cammy_instant_divekick",
         "testVersion": "26",
         "finished": true,
