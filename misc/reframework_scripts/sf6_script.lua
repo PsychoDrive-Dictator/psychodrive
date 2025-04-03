@@ -406,7 +406,10 @@ local hijackingReplays = false
 local callMeNextFrame = nil
 
 local dumpingGameState = false
+local dumpOnGameReset = false
+local saveGameStateDump = false
 local clearGameStateDump = false
+local gameStateDumpName
 
 re.on_frame(function()
   if dumpPlayersNextFrame == true then
@@ -439,7 +442,7 @@ re.on_draw_ui(function()
 	imgui.same_line()
 	imgui.begin_rect()
 
-  imgui.text_colored(logtext, 0xFFE94800)
+  imgui.text_colored(logtext, 0xFFFFFF00)
 
   -- if imgui.button("test replay") == true then
   --   testReplayNextFrame = true
@@ -448,8 +451,16 @@ re.on_draw_ui(function()
   --   launchReplayNextFrame = true
   -- end
 
-  if imgui.button("dump game state so far") == true then
-    dumpingGameState = true
+  local changed
+  changed, dumpingGameState = imgui.checkbox("dump game state", dumpingGameState)
+  if changed == true and dumpingGameState == false then
+    clearGameStateDump = true
+  end
+  changed, dumpOnGameReset = imgui.checkbox("dump on game reset", dumpOnGameReset)
+  changed, gameStateDumpName = imgui.input_text("dump name", gameStateDumpName)
+
+  if imgui.button("save game state dump") == true then
+    saveGameStateDump = true
   end
   if imgui.button("clear game state dump") == true then
     clearGameStateDump = true
@@ -1014,12 +1025,15 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.currentInput = cplayer.pl_input_new
 end
 
+local curVersion = "26"
+
 sdk.hook(sdk.find_type_definition("app.BattleFlow"):get_method("UpdateFrameEnd()"),
 function(args)
   gBattle = sdk.find_type_definition("gBattle")
-  if gBattle then
+  if gBattle and dumpingGameState then
     local frameDump = {}
     frameDump.frameCount = framecount
+    logtext = "dumping frame " .. tostring(framecount)
     framecount = framecount + 1
     local playerDumps = {}
     local playerDump = {}
@@ -1046,13 +1060,18 @@ function(args)
     --   logToFile( "posY " .. cPlayer[1].pos.y.v / 65536.0 .. " frame " .. cPlayer[1].mpActParam.ActionPart._Engine:get_ActionFrame():call("ToString()") )
     -- end
   end
-  if dumpingGameState == true then
-    logToFile( myjson.encode(gameStateDumps), "game_state_dump_" .. tostring(os.time()) .. ".json" )
-    gameStateDumps = {}
-    dumpingGameState = false
+  if saveGameStateDump == true then
+    local saveName = tostring(os.time())
+    if gameStateDumpName ~= "" then
+      saveName = gameStateDumpName
+    end
+    logToFile( myjson.encode(gameStateDumps), "gsdump_" .. curVersion .. "_" .. saveName .. ".json" )
+    clearGameStateDump = true
+    saveGameStateDump = false
   end
   if clearGameStateDump == true then
     gameStateDumps = {}
+    framecount = 0
     clearGameStateDump = false
   end
 end,
@@ -1063,7 +1082,10 @@ end
 
 sdk.hook(sdk.find_type_definition("app.training.TrainingManager"):get_method("BattleStart"),
 function(args)
-  dumpingGameState = true
+  if dumpOnGameReset == true then
+    saveGameStateDump = true
+  end
+  clearGameStateDump = true
 end,
 function(retval)
   return retval

@@ -57,7 +57,7 @@ for test in tests:
     testPath = test['filePath']
     charVersion = test['charVersion']
     print('running test', testPath, charVersion)
-    result = subprocess.run([psychodrivePath, 'rundump', testPath, charVersion], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run([psychodrivePath, 'run_dump', testPath, charVersion], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     newTestResult = {}
     newTestResult['testName'] = test['name']
     newTestResult['testVersion'] = charVersion

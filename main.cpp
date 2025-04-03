@@ -771,7 +771,11 @@ int main(int argc, char**argv)
     srand(time(NULL));
     makeCharEntries();
 
-    if ( argc > 2 && std::string(argv[1]) == "rundump") {
+    bool loadingDump = false;
+    std::string strDumpLoadPath;
+    int dumpVersion = -1;
+
+    if ( argc > 2 && std::string(argv[1]) == "run_dump") {
         Simulation dumpSim;
         int version = -1;
         if ( argc > 3 ) {
@@ -787,6 +791,14 @@ int main(int argc, char**argv)
         }
     }
 
+    if ( argc > 2 && std::string(argv[1]) == "load_dump") {
+        strDumpLoadPath = argv[2];
+        loadingDump = true;
+        if (argc > 3) {
+            dumpVersion = atoi(argv[3]);
+        }
+    }
+
     sdlwindow = initWindowRender();
     initUI();
     io = &ImGui::GetIO(); // why doesn't the one from initUI work? who knows
@@ -794,27 +806,29 @@ int main(int argc, char**argv)
 
     int maxVersion = atoi(charVersions[charVersionCount - 1]);
 
-    std::string charNameLeft = (char*)charNames[rand() % charNames.size()];
-    int versionLeft = maxVersion;
-    std::string charNameRight = (char*)charNames[rand() % charNames.size()];
-    int versionRight = maxVersion;
+    if (loadingDump == false) {
+        std::string charNameLeft = (char*)charNames[rand() % charNames.size()];
+        int versionLeft = maxVersion;
+        std::string charNameRight = (char*)charNames[rand() % charNames.size()];
+        int versionRight = maxVersion;
 
-    if ( argc > 1 ) {
-        extractCharVersion( argv[1], charNameLeft, versionLeft );
-    }
-    if ( argc > 2 ) {
-        extractCharVersion( argv[2], charNameRight, versionRight );
-    }
-    createGuy(charNameLeft, versionLeft, Fixed(-150.0f), Fixed(0.0f), 1, {randFloat(), randFloat(), randFloat()} );
-    createGuy(charNameRight, versionRight, Fixed(150.0f), Fixed(0.0f), -1, {randFloat(), randFloat(), randFloat()} );
+        if ( argc > 1 ) {
+            extractCharVersion( argv[1], charNameLeft, versionLeft );
+        }
+        if ( argc > 2 ) {
+            extractCharVersion( argv[2], charNameRight, versionRight );
+        }
+        createGuy(charNameLeft, versionLeft, Fixed(-150.0f), Fixed(0.0f), 1, {randFloat(), randFloat(), randFloat()} );
+        createGuy(charNameRight, versionRight, Fixed(150.0f), Fixed(0.0f), -1, {randFloat(), randFloat(), randFloat()} );
 
-    int curChar = 3;
-    while (curChar < argc) {
-        std::string charName;
-        int charVersion = maxVersion;
-        extractCharVersion( argv[curChar], charName, charVersion );
-        createGuy(charName, charVersion, Fixed(0), Fixed(0), 1, {randFloat(), randFloat(), randFloat()} );
-        curChar++;
+        int curChar = 3;
+        while (curChar < argc) {
+            std::string charName;
+            int charVersion = maxVersion;
+            extractCharVersion( argv[curChar], charName, charVersion );
+            createGuy(charName, charVersion, Fixed(0), Fixed(0), 1, {randFloat(), randFloat(), randFloat()} );
+            curChar++;
+        }
     }
 
     nlohmann::json inputTimeline = parse_json_file("timeline.json");
@@ -822,7 +836,10 @@ int main(int argc, char**argv)
         recordedInput = inputTimeline.get<std::vector<int>>();
     }
 
-    gameStateDump = parse_json_file("game_state_dump.json");
+    gameStateDump = nullptr;
+    if (loadingDump) {
+        gameStateDump = parse_json_file(strDumpLoadPath);
+    }
     if (gameStateDump != nullptr) {
         int i = 0;
         while (i < (int)gameStateDump.size()) {
@@ -831,24 +848,45 @@ int main(int argc, char**argv)
             }
             i++;
         }
-        if (guys.size() >= 2) {
-            guys[0]->setPos(Fixed(gameStateDump[i]["players"][0]["posX"].get<double>()), Fixed(gameStateDump[0]["players"][0]["posY"].get<float>()));
-            *guys[0]->getInputIDPtr() = replayLeft;
-            *guys[0]->getInputListIDPtr() = replayLeft;
-            guys[1]->setPos(Fixed(gameStateDump[i]["players"][1]["posX"].get<double>()), Fixed(gameStateDump[0]["players"][1]["posY"].get<float>()));
-            *guys[1]->getInputIDPtr() = replayRight;
-            *guys[1]->getInputListIDPtr() = replayRight;
-
-            gameStateFrame = gameStateDump[i]["frameCount"];
-            firstGameStateFrame = gameStateFrame;
-            replayingGameState = true;
-            currentInputMap[replayLeft] = 0;
-            currentInputMap[replayRight] = 0;
-
-            if (gameStateDump[i].contains("stageTimer")) {
-                replayFrameNumber = gameStateDump[i]["stageTimer"];
-            }
+        if (dumpVersion == -1) {
+            // fall back to latest
+            dumpVersion = maxVersion;
         }
+        int playerID = 0;
+        while (playerID < 2) {
+            nlohmann::json &playerJson = gameStateDump[i]["players"][playerID];
+            std::string charName = getCharNameFromID(playerJson["charID"]);
+            Fixed posX = Fixed(playerJson["posX"].get<double>());
+            Fixed posY = Fixed(playerJson["posY"].get<double>());
+            int bitValue = playerJson["bitValue"];
+            int charDirection = (bitValue & 1<<7) ? 1 : -1;
+            color charColor = {randFloat(), randFloat(), randFloat()};
+            createGuy(charName, dumpVersion, posX, posY, charDirection, charColor );
+            playerID++;
+        }
+
+        while (guys.size() < 2) {
+            usleep(200 * 1000);
+            doDeferredCreateGuys();
+        }
+
+        *guys[0]->getInputIDPtr() = replayLeft;
+        *guys[0]->getInputListIDPtr() = replayLeft;
+        *guys[1]->getInputIDPtr() = replayRight;
+        *guys[1]->getInputListIDPtr() = replayRight;
+
+        gameStateFrame = gameStateDump[i]["frameCount"];
+        firstGameStateFrame = gameStateFrame;
+        replayingGameState = true;
+        currentInputMap[replayLeft] = 0;
+        currentInputMap[replayRight] = 0;
+
+        if (gameStateDump[i].contains("stageTimer")) {
+            replayFrameNumber = gameStateDump[i]["stageTimer"];
+        }
+    } else if (loadingDump) {
+        fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());
+        exit(1);
     }
 
     frameStartTime = SDL_GetTicks();
