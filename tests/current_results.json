@@ -337,6 +337,48 @@ var currentResults =
         ]
     },
     {
+        "testName": "gsdump_26_cammy_instant_divekick",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2797,
+                "firstFrame": 125,
+                "lastFrame": 1680
+            },
+            {
+                "count": 305,
+                "firstFrame": 125,
+                "lastFrame": 1520
+            },
+            {
+                "count": 138,
+                "firstFrame": 125,
+                "lastFrame": 1460
+            },
+            {
+                "count": 207,
+                "firstFrame": 579,
+                "lastFrame": 1520
+            },
+            {
+                "count": 123,
+                "firstFrame": 579,
+                "lastFrame": 1520
+            },
+            {
+                "count": 769,
+                "firstFrame": 34,
+                "lastFrame": 1594
+            },
+            {
+                "count": 2290,
+                "firstFrame": 0,
+                "lastFrame": 1680
+            }
+        ]
+    },
+    {
         "testName": "guile26_bison26_driverushpush",
         "testVersion": "26",
         "finished": true,
