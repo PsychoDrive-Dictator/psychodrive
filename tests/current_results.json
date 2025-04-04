@@ -589,6 +589,48 @@ var currentResults =
         ]
     },
     {
+        "testName": "guile_fierce_drc_combo",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 360,
+                "firstFrame": 234,
+                "lastFrame": 547
+            },
+            {
+                "count": 82,
+                "firstFrame": 282,
+                "lastFrame": 345
+            },
+            {
+                "count": 64,
+                "firstFrame": 282,
+                "lastFrame": 345
+            },
+            {
+                "count": 76,
+                "firstFrame": 233,
+                "lastFrame": 341
+            },
+            {
+                "count": 88,
+                "firstFrame": 221,
+                "lastFrame": 341
+            },
+            {
+                "count": 219,
+                "firstFrame": 97,
+                "lastFrame": 396
+            },
+            {
+                "count": 782,
+                "firstFrame": 0,
+                "lastFrame": 547
+            }
+        ]
+    },
+    {
         "testName": "guile_jp_66_hit_guile_combo",
         "testVersion": "23",
         "finished": true,
@@ -627,6 +669,48 @@ var currentResults =
                 "count": 2470,
                 "firstFrame": 0,
                 "lastFrame": 2270
+            }
+        ]
+    },
+    {
+        "testName": "honda_buffed_ex_hands_loop",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 814,
+                "firstFrame": 0,
+                "lastFrame": 907
+            },
+            {
+                "count": 332,
+                "firstFrame": 404,
+                "lastFrame": 772
+            },
+            {
+                "count": 57,
+                "firstFrame": 446,
+                "lastFrame": 772
+            },
+            {
+                "count": 366,
+                "firstFrame": 209,
+                "lastFrame": 655
+            },
+            {
+                "count": 617,
+                "firstFrame": 209,
+                "lastFrame": 907
+            },
+            {
+                "count": 850,
+                "firstFrame": 41,
+                "lastFrame": 863
+            },
+            {
+                "count": 1368,
+                "firstFrame": 0,
+                "lastFrame": 907
             }
         ]
     },
