@@ -2063,7 +2063,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         if (!airborne && !jimenBound) {
             hitVelX = Fixed(direction.i() * destX * -2) / Fixed(destTime);
             hitAccelX = Fixed(direction.i() * destX * 2) / Fixed(destTime * destTime);
-            hitAccelX.data += direction.i(); // there seems to be a bias of 1 raw units
+            if (hitAccelX.data & 65535) hitAccelX.data += direction.i(); // there seems to be a bias of 1 raw units
         } else {
             hitVelX = Fixed(0);
             hitAccelX = Fixed(0);
@@ -2074,6 +2074,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             if (destY > 0) {
                 velocityY = Fixed(destY * 4) / Fixed(destTime);
                 accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
+                if (accelY.data & 65535) accelY.data -= 1; // bias is only for the accels?
                 // i think this vel wants to apply this frame, lame workaround to get same intensity
                 velocityY -= accelY; //
             } else {
