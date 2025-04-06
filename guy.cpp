@@ -1612,6 +1612,11 @@ bool Guy::WorldPhysics(void)
         if (!forceLanding || forceKnockDown) {
             landed = true;
         }
+        if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
+            currentAction = currentAction + 3; // generic landing, immediate transition
+            currentFrame = 0;
+            UpdateActionData();
+        }
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
 
@@ -2914,11 +2919,11 @@ bool Guy::Frame(bool endWarudoFrame)
     }
 
     if (landed && nextAction == -1) {
-        if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
-            nextAction = currentAction + 3; // generic landing
-        }
+        // if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
+        //     nextAction = currentAction + 3; // generic landing
+        // }
 
-        // better assume the script has something in mind for landing :/
+        // better4 assume the script has something in mind for landing :/
 
         if (hitStun) {
             nextAction = 350; // being down? dunno
