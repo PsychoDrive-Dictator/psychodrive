@@ -297,6 +297,35 @@ private:
     void ChangeStyle(int newStyleID);
     void ExitStyle();
 
+    bool canMove(bool &isCrouching, bool &forward, bool &backward) {
+        bool ret = false;
+        int actionCheckCanMove = currentAction;
+        if (nextAction != -1 ) {
+            actionCheckCanMove = nextAction;
+        }
+        // todo is action 6 ok here? try a dump fo akuma zanku and trying to move immediately on landing
+        isCrouching = actionCheckCanMove == 4 || actionCheckCanMove == 5 || actionCheckCanMove == 6;
+        forward = actionCheckCanMove == 9 || actionCheckCanMove == 10 || actionCheckCanMove == 11;
+        backward = actionCheckCanMove == 13 || actionCheckCanMove == 14 || actionCheckCanMove == 15;
+        if (actionCheckCanMove == 1 || actionCheckCanMove == 2 || actionCheckCanMove == 4 || //stands, crouch
+            forward || backward || isCrouching) {
+            ret = true;
+        }
+
+        if ((marginFrame != -1 && currentFrame >= marginFrame) && nextAction == -1 ) {
+            ret = true;
+        }
+
+        if (airborne || posY > 0.0f) {
+            ret = false;
+        }
+        if (hitStun) {
+            ret = false;
+        }
+
+        return ret;
+    }
+
     bool onLeftWall() { return getPosX() == -wallDistance; }
     bool onRightWall() { return getPosX() == wallDistance; }
 
