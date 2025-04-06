@@ -2619,9 +2619,19 @@ bool Guy::Frame(bool endWarudoFrame)
         // we'll re-run it in PreFrame
         return true;
     }
+
+    bool doTriggers = true;
+    bool a,b,c;
+    if (canMove(a,b,c) && (currentInput & 1)) {
+        // jump will take precedence below, don't do ground triggers
+        doTriggers = false;
+    }
+
     int curNextAction = nextAction;
     bool didTrigger = false;
-    DoTriggers();
+    if (doTriggers) {
+        DoTriggers();
+    }
     if (nextAction != curNextAction) {
         didTrigger = true;
     }
@@ -2833,35 +2843,14 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    bool canMove = false;
-    int actionCheckCanMove = currentAction;
-    if (nextAction != -1 ) {
-        actionCheckCanMove = nextAction;
-    }
-    // todo is action 6 ok here? try a dump fo akuma zanku and trying to move immediately on landing
-    crouching = actionCheckCanMove == 4 || actionCheckCanMove == 5 || actionCheckCanMove == 6;
-    bool movingForward = actionCheckCanMove == 9 || actionCheckCanMove == 10 || actionCheckCanMove == 11;
-    bool movingBackward = actionCheckCanMove == 13 || actionCheckCanMove == 14 || actionCheckCanMove == 15;
-    if (actionCheckCanMove == 1 || actionCheckCanMove == 2 || actionCheckCanMove == 4 || //stands, crouch
-        movingForward || movingBackward || crouching) {
-        canMove = true;
-    }
-
-    if ((marginFrame != -1 && currentFrame >= marginFrame) && nextAction == -1 ) {
-        canMove = true;
-    }
-
-    if (airborne || posY > 0.0f) {
-        canMove = false;
-    }
-    if (hitStun) {
-        canMove = false;
-    }
+    bool movingForward = false;
+    bool movingBackward = false;
+    bool canMoveNow = canMove(crouching, movingForward, movingBackward);
     
     bool turnaround = false;
 
     // Process movement if any
-    if ( canMove )
+    if ( canMoveNow )
     {
         // reset status - recovered control to neutral
         jumped = false;
@@ -2908,7 +2897,7 @@ bool Guy::Frame(bool endWarudoFrame)
         turnaround = needsTurnaround();
     }
 
-    if (canMove && comboHits && nextAction == 1 && neutralMove != 0) {
+    if (canMoveNow && comboHits && nextAction == 1 && neutralMove != 0) {
         std::string moveString = vecMoveList[neutralMove];
         int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
         nextAction = actionID;
@@ -2930,7 +2919,7 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    if (recovered || (canMove && comboHits)) {
+    if (recovered || (canMoveNow && comboHits)) {
         int advantage = globalFrameCount - pOpponent->recoveryTiming;
         std::string message = "recovered! adv " + std::to_string(advantage);
         if ( comboHits) {
@@ -3085,7 +3074,7 @@ bool Guy::Frame(bool endWarudoFrame)
         timeInWarudo = 0;
     }
 
-    if (canMove && didTransition) {
+    if (canMoveNow && didTransition) {
         // if we just went to idle, run triggers again
         DoTriggers();
         // if successful, eat this frame away and go right now
