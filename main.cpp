@@ -627,16 +627,16 @@ static void mainloop(void)
                     compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), true, desc + " pos Y");
                     Fixed velX, velY, accelX, accelY;
                     guys[i]->getVel(velX, velY, accelX, accelY);
-                    compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, true, desc + " vel X");
-                    compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, true, desc + " vel Y");
+                    compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, false, desc + " vel X");
+                    compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, false, desc + " vel Y");
                     if (players[i].contains("accelX")) {
-                        compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, true, desc + " accel X");
+                        compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, false, desc + " accel X");
                     }
-                    compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, true, desc + " accel Y");
+                    compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, false, desc + " accel Y");
 
                     if (players[i].contains("hitVelX")) {
-                        compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), true, desc + " hitAccel X");
-                        compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), true, desc + " hitAccel X");
+                        compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), false, desc + " hitAccel X");
+                        compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), false, desc + " hitAccel X");
                     }
 
                     compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
