@@ -25,6 +25,13 @@
         testNameCell = curResultRow.insertCell();
         testNameCell.rowSpan = 2;
         nameText = document.createTextNode(newResult.testName);
+
+        testNameCell.addEventListener('click', function() {
+          const copyText = './psychodrive load_dump ./tests/dumps/' + newResult.testVersion + '/' + newResult.testName + '.json';
+          navigator.clipboard.writeText(copyText);
+          console.log(copyText);
+        } );
+        
         testNameCell.appendChild(nameText);
 
         testNameCell = curResultRow.insertCell();
