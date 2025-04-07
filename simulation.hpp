@@ -20,7 +20,8 @@ public:
         eHitVel,
         eHitAccel,
         eActionID,
-        eActionFrame
+        eActionFrame,
+        eComboCount
     };
 
     void CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description );

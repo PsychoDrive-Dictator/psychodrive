@@ -621,8 +621,8 @@ static void mainloop(void)
                 int i = 0;
                 while (i < 2) {
                     std::string desc = "player " + std::to_string(i);
-                    compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), true, desc + " pos X");
-                    compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), true, desc + " pos Y");
+                    compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), false, desc + " pos X");
+                    compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), false, desc + " pos Y");
                     Fixed velX, velY, accelX, accelY;
                     guys[i]->getVel(velX, velY, accelX, accelY);
                     compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, false, desc + " vel X");
@@ -639,6 +639,10 @@ static void mainloop(void)
 
                     compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), false, desc + " action ID");
                     compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), false, desc + " action frame");
+
+                    // swap players here, we track combo hits on the opponent
+                    compareGameStateInt(players[i]["comboCount"], guys[!i]->getComboHits(), true, desc + " combo");
+
 
                     i++;
                 }
