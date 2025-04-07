@@ -847,6 +847,100 @@ var currentResults =
         ]
     },
     {
+        "testName": "jp_departure",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 4273,
+                "firstFrame": 389,
+                "lastFrame": 2367
+            },
+            {
+                "count": 809,
+                "firstFrame": 175,
+                "lastFrame": 2202
+            },
+            {
+                "count": 235,
+                "firstFrame": 175,
+                "lastFrame": 2202
+            },
+            {
+                "count": 424,
+                "firstFrame": 394,
+                "lastFrame": 2195
+            },
+            {
+                "count": 424,
+                "firstFrame": 394,
+                "lastFrame": 2195
+            },
+            {
+                "count": 989,
+                "firstFrame": 135,
+                "lastFrame": 2234
+            },
+            {
+                "count": 2190,
+                "firstFrame": 319,
+                "lastFrame": 2367
+            },
+            {
+                "count": 253,
+                "firstFrame": 441,
+                "lastFrame": 2202
+            }
+        ]
+    },
+    {
+        "testName": "jp_ex_amnesia_corner_double_ghost",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1186,
+                "firstFrame": 143,
+                "lastFrame": 653
+            },
+            {
+                "count": 414,
+                "firstFrame": 244,
+                "lastFrame": 524
+            },
+            {
+                "count": 197,
+                "firstFrame": 244,
+                "lastFrame": 524
+            },
+            {
+                "count": 282,
+                "firstFrame": 223,
+                "lastFrame": 517
+            },
+            {
+                "count": 282,
+                "firstFrame": 223,
+                "lastFrame": 517
+            },
+            {
+                "count": 698,
+                "firstFrame": 131,
+                "lastFrame": 653
+            },
+            {
+                "count": 932,
+                "firstFrame": 143,
+                "lastFrame": 653
+            },
+            {
+                "count": 276,
+                "firstFrame": 223,
+                "lastFrame": 526
+            }
+        ]
+    },
+    {
         "testName": "kimberly_tp",
         "testVersion": "26",
         "finished": true,
