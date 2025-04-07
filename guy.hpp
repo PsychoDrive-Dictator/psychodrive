@@ -47,7 +47,20 @@ public:
         return posY + posOffsetY;
     }
     int getDirection() { return direction.i(); }
-    void switchDirection() { direction = direction * Fixed(-1); }
+    void switchDirection() {
+        direction = direction * Fixed(-1);
+
+        // swap l/r in current input
+        int newMask = 0;
+        if (currentInput & BACK) {
+            newMask |= FORWARD;
+        }
+        if (currentInput & FORWARD) {
+            newMask |= BACK;
+        }
+        currentInput &= ~(FORWARD+BACK);
+        currentInput |= newMask;
+    }
 
     Fixed getStartPosX() { return startPosX; }
     void setStartPosX( Fixed newPosX ) { startPosX = newPosX; }
@@ -283,7 +296,7 @@ private:
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
     bool CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID);
     bool CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI);
-    void DoTriggers();
+    void DoTriggers(int fluffFrameBias = 0);
 
     void DoBranchKey(bool preHit);
     void DoHitBoxKey(const char *name);
@@ -297,22 +310,31 @@ private:
     void ChangeStyle(int newStyleID);
     void ExitStyle();
 
-    bool canMove(bool &isCrouching, bool &forward, bool &backward) {
+    bool fluffFrames(int frameBias = 0) {
+        if ((marginFrame != -1 && (currentFrame + frameBias) >= marginFrame) && nextAction == -1 ) {
+            return true;
+        }
+        return false;
+    }
+
+    bool canMove(bool &isCrouching, bool &forward, bool &backward, int frameBias = 0) {
         bool ret = false;
         int actionCheckCanMove = currentAction;
         if (nextAction != -1 ) {
             actionCheckCanMove = nextAction;
         }
         // todo is action 6 ok here? try a dump fo akuma zanku and trying to move immediately on landing
-        isCrouching = actionCheckCanMove == 4 || actionCheckCanMove == 5 || actionCheckCanMove == 6;
-        forward = actionCheckCanMove == 9 || actionCheckCanMove == 10 || actionCheckCanMove == 11;
-        backward = actionCheckCanMove == 13 || actionCheckCanMove == 14 || actionCheckCanMove == 15;
-        if (actionCheckCanMove == 1 || actionCheckCanMove == 2 || actionCheckCanMove == 4 || //stands, crouch
-            forward || backward || isCrouching) {
+        bool isStanding = actionCheckCanMove == 1 || actionCheckCanMove == 2;
+        isCrouching = actionCheckCanMove == 4 || actionCheckCanMove == 5;
+        forward = actionCheckCanMove == 9 || actionCheckCanMove == 10;
+        backward = actionCheckCanMove == 13 || actionCheckCanMove == 14;
+        if (isStanding || isCrouching || actionCheckCanMove == 6 ||
+            forward || actionCheckCanMove == 11 ||
+            backward || actionCheckCanMove == 15) {
             ret = true;
         }
 
-        if ((marginFrame != -1 && currentFrame >= marginFrame) && nextAction == -1 ) {
+        if (fluffFrames(frameBias)) {
             ret = true;
         }
 

@@ -241,7 +241,7 @@ void compareGameStateInt( int64_t dumpValue, int64_t realValue, bool fatal, std:
 {
     if (dumpValue != realValue)
     {
-        log("replay error: " + description + " dump: " + std::to_string(dumpValue) + " real: " + std::to_string(realValue));
+        log("replay error: " + description + " dump: " + std::to_string(dumpValue) + " sim: " + std::to_string(realValue));
         if (fatal) {
             replayErrors++;
         }
@@ -549,8 +549,12 @@ static void mainloop(void)
         }
     }
 
-    if (frameGuyCount == 0) {
+    if (!replayingGameState && frameGuyCount == 0) {
         globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
+    }
+
+    if (replayingGameState && !runFrame) {
+        globalFrameCount--;
     }
 
     if (runFrame) {
@@ -621,8 +625,8 @@ static void mainloop(void)
                 int i = 0;
                 while (i < 2) {
                     std::string desc = "player " + std::to_string(i);
-                    compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), false, desc + " pos X");
-                    compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), false, desc + " pos Y");
+                    compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), true, desc + " pos X");
+                    compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), true, desc + " pos Y");
                     Fixed velX, velY, accelX, accelY;
                     guys[i]->getVel(velX, velY, accelX, accelY);
                     compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, false, desc + " vel X");
@@ -882,6 +886,8 @@ int main(int argc, char**argv)
         replayingGameState = true;
         currentInputMap[replayLeft] = 0;
         currentInputMap[replayRight] = 0;
+
+        globalFrameCount = firstGameStateFrame;
 
         if (gameStateDump[i].contains("stageTimer")) {
             replayFrameNumber = gameStateDump[i]["stageTimer"];

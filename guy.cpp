@@ -1096,7 +1096,7 @@ struct TriggerListEntry {
     bool hasAntiNormal;
 };
 
-void Guy::DoTriggers()
+void Guy::DoTriggers(int fluffFrameBias)
 {
     std::set<int> keptDeferredTriggerIDs;
     if (pActionJson->contains("TriggerKey"))
@@ -1142,6 +1142,17 @@ void Guy::DoTriggers()
                 }
                 if (other & 1<<17) {
                     mapTriggers[triggerID].hasAntiNormal = true;
+                }
+            }
+        }
+
+        if (fluffFrames(fluffFrameBias)) {
+            // add trigger group 0 in fluff frames
+            for (auto& [keyID, key] : (*pTriggerGroupsJson)[to_string_leading_zeroes(0, 3)].items()) {
+                int triggerID = atoi(keyID.c_str());
+                if (mapTriggers.find(triggerID) == mapTriggers.end()) {
+                    TriggerListEntry newTrig = { key, true, false, false };
+                    mapTriggers[triggerID] = newTrig;
                 }
             }
         }
@@ -2625,7 +2636,7 @@ bool Guy::Frame(bool endWarudoFrame)
 
     bool doTriggers = true;
     bool a,b,c;
-    if (canMove(a,b,c) && (currentInput & 1)) {
+    if (canMove(a,b,c, 1) && (currentInput & 1)) {
         // jump will take precedence below, don't do ground triggers
         doTriggers = false;
     }
@@ -2633,7 +2644,7 @@ bool Guy::Frame(bool endWarudoFrame)
     int curNextAction = nextAction;
     bool didTrigger = false;
     if (doTriggers) {
-        DoTriggers();
+        DoTriggers(1);
     }
     if (nextAction != curNextAction) {
         didTrigger = true;
@@ -2807,7 +2818,7 @@ bool Guy::Frame(bool endWarudoFrame)
             // should this apply in general, not just airborne?
             currentFrame--;
         } else {
-            currentAction = 1;
+            nextAction = 1;
         }
 
         if (resetHitStunOnTransition) {
@@ -2859,22 +2870,38 @@ bool Guy::Frame(bool endWarudoFrame)
     {
         // reset status - recovered control to neutral
         jumped = false;
+        turnaround = needsTurnaround();
 
-        if ( currentInput & 1 ) {
+        int moveInput = currentInput;
+
+        if (turnaround) {
+            // swap l/r in current input
+            int newMask = 0;
+            if (moveInput & BACK) {
+                newMask |= FORWARD;
+            }
+            if (moveInput & FORWARD) {
+                newMask |= BACK;
+            }
+            moveInput &= ~(FORWARD+BACK);
+            moveInput |= newMask;
+        }
+
+        if ( moveInput & 1 ) {
 
             jumped = true;
 
-            if ( currentInput & 4 ) {
+            if ( moveInput & 4 ) {
                 jumpDirection = -1;
                 nextAction = 35; // BAS_JUMP_B_START
-            } else if ( currentInput & 8 ) {
+            } else if ( moveInput & 8 ) {
                 jumpDirection = 1;
                 nextAction = 34; // BAS_JUMP_F_START
             } else {
                 jumpDirection = 0;
                 nextAction = 33; // BAS_JUMP_N_START
             }
-        } else if ( currentInput & 2 ) {
+        } else if ( moveInput & 2 ) {
             if ( !crouching ) {
                 crouching = true;
                 if (forcedPoseStatus == 2) {
@@ -2883,23 +2910,27 @@ bool Guy::Frame(bool endWarudoFrame)
                     nextAction = 5; // BAS_STD_CRH
                 }
             }
-        } else {
-            // if ((currentInput & (32+256)) == 32+256) {
+        } else if ( moveInput & 4 || moveInput & 8 ) {
+            // if ((moveInput & (32+256)) == 32+256) {
             //     nextAction = 480; // DPA_STD_START
             // } else
-             if ( currentInput & 4 && !movingBackward ) {
+            if ( moveInput & 4 && !movingBackward ) {
                 nextAction = 13; // BAS_BACKWARD_START
-            } else if ( currentInput & 8 && !movingForward) {
+            }
+            if ( moveInput & 8 && !movingForward) {
                 nextAction = 9; // BAS_FORWARD_START
             }
+        } else {
+            if ( !(moveInput & 4) && movingBackward ) {
+                nextAction = 15; // BAS_BACKWARD_END
+            }
+            if ( !(moveInput & 8) && movingForward ) {
+                nextAction = 11; // BAS_FORWARD_END
+            }
+            if ( !(moveInput & 2) && crouching ) {
+                nextAction = 6;
+            }
         }
-
-        // todo only do that if we're not post-margin for correctness
-        if ((currentInput & 0xF) == 0) {
-            nextAction = 1;
-        }
-
-        turnaround = needsTurnaround();
     }
 
     if (canMoveNow && wasHit && nextAction == 1 && neutralMove != 0) {
