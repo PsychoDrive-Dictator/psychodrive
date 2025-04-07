@@ -2833,6 +2833,7 @@ bool Guy::Frame(bool endWarudoFrame)
                     nextAction = 330;
                     isDown = true;
                 } else {
+                    // todo apparently this counts as recovery for eg. resetting combo count
                     nextAction = 340;
                     isDown = false;
                     forceKnockDown = false;
