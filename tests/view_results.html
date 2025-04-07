@@ -26,10 +26,11 @@
         testNameCell.rowSpan = 2;
         nameText = document.createTextNode(newResult.testName);
 
+        var copyText = './psychodrive load_dump ./tests/dumps/' + newResult.testVersion + '/' + newResult.testName + '.json';
+        copyText += ' ' + newResult.testVersion;
+
         testNameCell.addEventListener('click', function() {
-          const copyText = './psychodrive load_dump ./tests/dumps/' + newResult.testVersion + '/' + newResult.testName + '.json';
           navigator.clipboard.writeText(copyText);
-          console.log(copyText);
         } );
         
         testNameCell.appendChild(nameText);
@@ -52,6 +53,16 @@
           newTextContent = formatError(newError);
           text = document.createTextNode(newTextContent);
           newCell.appendChild(text);
+
+          const cellCopyText = copyText + ' ' + error;
+
+          curCell.addEventListener('click', function() {
+            navigator.clipboard.writeText(cellCopyText);
+          } );
+
+          newCell.addEventListener('click', function() {
+            navigator.clipboard.writeText(cellCopyText);
+          } );
 
           if (curTextContent == newTextContent) {
             if (curTextContent == '0') {
