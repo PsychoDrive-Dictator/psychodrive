@@ -2131,15 +2131,14 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             if ( crouching ) {
                 nextAction = 213;
             }
-            if ((airborne || posY > Fixed(0)) && destY != 0 ) {
-
-                if (destY > destX) {
-                    nextAction = 251; // 90
-                } else if (destX > destY * 2.5) {
-                    nextAction = 253; // 00
-                } else {
-                    nextAction = 252; // 45
-                }
+        }
+        if ((getAirborne() || posY > Fixed(0)) && destY != 0 ) {
+            if (destY > destX) {
+                nextAction = 251; // 90
+            } else if (destX > destY * 2.5) {
+                nextAction = 253; // 00
+            } else {
+                nextAction = 252; // 45
             }
         }
     }
@@ -2769,11 +2768,6 @@ bool Guy::Frame(bool endWarudoFrame)
         bounced = false;
     }
 
-    if (currentAction >= 251 && currentAction <= 253 && nextAction == -1)
-    {
-        nextAction = currentAction - 21;
-    }
-
     if (currentAction == 33 && jumpDirection == 0 && currentInput & 1 ) {
         // one opportunity to adjust neutral jump direction during prejump
         if (currentInput & 4) {
@@ -2787,7 +2781,9 @@ bool Guy::Frame(bool endWarudoFrame)
 
     if (currentFrame >= actionFrameDuration && nextAction == -1)
     {
-        if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
+        if (currentAction >= 251 && currentAction <= 253) {
+            nextAction = currentAction - 21;
+        } else if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             if ( currentAction == 33) {
                 if (jumpDirection == 0) {
