@@ -53,6 +53,20 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
     CreateGuyFromDumpedPlayer(players[0], version);
     CreateGuyFromDumpedPlayer(players[1], version);
 
+    int playerID = 0;
+    while (playerID < 2) {
+        nlohmann::json &playerJson = players[playerID];
+        int actionID = playerJson["actionID"];
+        int actionFrame = playerJson["actionFrame"];
+        if (actionID == 17) {
+            // guile66hit combo has p2 in mid-dash and we don't capture posoffset
+            actionID = 1;
+            actionFrame = 0;
+        }
+        simGuys[playerID]->setAction(actionID, actionFrame - 1);
+        playerID++;
+    }
+
     gameStateFrame = gameStateDump[i]["frameCount"];
     firstGameStateFrame = gameStateFrame;
 

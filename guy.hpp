@@ -146,6 +146,12 @@ public:
 
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
+    void setAction(int actionID, int actionFrame) {
+        currentAction = actionID;
+        currentFrame = actionFrame;
+        UpdateActionData();
+        UpdateBoxes();
+    }
     std::string getActionName() { return actionName; }
     bool getIsDrive() { return isDrive; }
     bool getCrouchingDebug() { return crouching; }
