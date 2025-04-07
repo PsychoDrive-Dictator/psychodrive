@@ -63,6 +63,12 @@ for test in tests:
     newTestResult['testVersion'] = charVersion
     newTestResult['finished'] = False
     newTestResult['errorTypes'] = []
+    while 8 > len(newTestResult['errorTypes']):
+        emptyErrorType = {}
+        emptyErrorType['count'] = 0
+        emptyErrorType['firstFrame'] = -1
+        emptyErrorType['lastFrame'] = -1
+        newTestResult['errorTypes'].append(emptyErrorType)
 
     for line in result.stderr.splitlines():
         errorLine = line.split(';')
