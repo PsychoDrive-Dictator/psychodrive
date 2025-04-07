@@ -880,6 +880,20 @@ int main(int argc, char**argv)
             doDeferredCreateGuys();
         }
 
+        playerID = 0;
+        while (playerID < 2) {
+            nlohmann::json &playerJson = gameStateDump[i]["players"][playerID];
+            int actionID = playerJson["actionID"];
+            int actionFrame = playerJson["actionFrame"];
+            if (actionID == 17) {
+                // guile66hit combo has p2 in mid-dash and we don't capture posoffset
+                actionID = 1;
+                actionFrame = 0;
+            }
+            guys[playerID]->setAction(actionID, actionFrame - 1);
+            playerID++;
+        }
+
         *guys[0]->getInputIDPtr() = replayLeft;
         *guys[0]->getInputListIDPtr() = replayLeft;
         *guys[1]->getInputIDPtr() = replayRight;
