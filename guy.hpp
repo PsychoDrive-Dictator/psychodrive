@@ -513,6 +513,8 @@ private:
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;
+    bool wasHit = false;
+    bool resetComboCount = false;
     bool forceKnockDown = false;
     bool isDown = false;
     int knockDownFrames = 0;

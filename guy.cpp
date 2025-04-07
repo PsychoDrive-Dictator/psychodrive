@@ -2016,6 +2016,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
     if (!blocking && applyHit) {
         beenHitThisFrame = true;
         comboHits++;
+        wasHit = true;
     }
 
     if (applyHitStun) {
@@ -2838,7 +2839,7 @@ bool Guy::Frame(bool endWarudoFrame)
                     isDown = false;
                     forceKnockDown = false;
 
-                    recovered = true;
+                    resetComboCount = true;
                 }
             } else {
                 blocking = false;
@@ -2901,7 +2902,7 @@ bool Guy::Frame(bool endWarudoFrame)
         turnaround = needsTurnaround();
     }
 
-    if (canMoveNow && comboHits && nextAction == 1 && neutralMove != 0) {
+    if (canMoveNow && wasHit && nextAction == 1 && neutralMove != 0) {
         std::string moveString = vecMoveList[neutralMove];
         int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
         nextAction = actionID;
@@ -2923,19 +2924,27 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    if (recovered || (canMoveNow && comboHits)) {
+    if (recovered || (canMoveNow && comboHits) || resetComboCount) {
+        if ( comboHits) {
+            log(true, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+        }
+        comboDamage = 0;
+        comboHits = 0;
+        resetComboCount = false;
+    }
+
+    if (recovered || (canMoveNow && wasHit)) {
         int advantage = globalFrameCount - pOpponent->recoveryTiming;
         std::string message = "recovered! adv " + std::to_string(advantage);
-        if ( comboHits) {
-            message += " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage);
-        }
         log(true, message );
-        comboHits = 0;
+
         juggleCounter = 0;
-        comboDamage = 0;
+
         pAttacker = nullptr;
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
+
+        wasHit = false;
     }
 
     if (didTrigger) {
