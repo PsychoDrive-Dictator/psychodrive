@@ -121,8 +121,6 @@ extern bool forceCounter;
 extern bool forcePunishCounter;
 extern int hitStunAdder;
 
-extern uint32_t globalInputBufferLength;
-
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 std::string readFile(const std::string &fileName);
 nlohmann::json parse_json_file(const std::string &fileName);

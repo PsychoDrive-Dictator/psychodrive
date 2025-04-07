@@ -31,8 +31,6 @@ bool forceCounter = false;
 bool forcePunishCounter = false;
 int hitStunAdder = 0;
 
-uint32_t globalInputBufferLength = 4; // 4 frames of input buffering
-
 struct charEntry {
     int charID;
     const char *name;
@@ -635,7 +633,7 @@ static void mainloop(void)
                     compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, false, desc + " accel Y");
 
                     if (players[i].contains("hitVelX")) {
-                        compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), false, desc + " hitAccel X");
+                        compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), false, desc + " hitVel X");
                         compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), false, desc + " hitAccel X");
                     }
 

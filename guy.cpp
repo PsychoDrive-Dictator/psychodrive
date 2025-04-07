@@ -935,6 +935,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     uint32_t okKeyFlags = (*pNorm)["ok_key_flags"];
     uint32_t okCondFlags = (*pNorm)["ok_key_cond_flags"];
     uint32_t dcExcFlags = (*pNorm)["dc_exc_flags"];
+    int precedingTime = (*pNorm)["preceding_time"];
     // condflags..
     // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
     // 10100000001100000: EX, so any two out of three button mask?
@@ -944,8 +945,8 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     uint32_t i = 0;
     initialI = 0;
     bool initialMatch = false;
-    // current frame + buffer - todo globalInputBuffer -> preceding_time?
-    uint32_t initialSearch = 1 + globalInputBufferLength + timeInWarudo;
+    // current frame + buffer
+    uint32_t initialSearch = 1 + precedingTime + timeInWarudo;
     if (inputBuffer.size() < initialSearch) {
         initialSearch = inputBuffer.size();
     }
