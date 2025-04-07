@@ -1600,9 +1600,7 @@ bool Guy::WorldPhysics(void)
     // just being helped off the ground - see heavy donkey into lp dp
     if (forceLanding || (airborne && floorpush && velocityY < 0))
     {
-        velocityX = Fixed(0);
         velocityY = Fixed(0);
-        accelX = Fixed(0);
         accelY = Fixed(0);
 
         airborne = false;
@@ -1617,6 +1615,9 @@ bool Guy::WorldPhysics(void)
             currentAction = currentAction + 3; // generic landing, immediate transition
             currentFrame = 0;
             UpdateActionData();
+
+            velocityX = Fixed(0);
+            accelX = Fixed(0);
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
