@@ -3120,9 +3120,12 @@ bool Guy::Frame(bool endWarudoFrame)
         timeInWarudo = 0;
     }
 
-    DoBranchKey(true);
-
-    if (canMoveNow && nextAction == -1) {
+    // if just did a trigger, give the first frame an opportunity ot branch
+    // eg. honda's buffed fierce doesn't play its regular frame 0
+    // but departure inner scripts don't want to do that
+    if (didTrigger) {
+        DoBranchKey(true);
+    } else if (canMoveNow && nextAction == -1) {
         // if we just went to idle, run triggers again
         DoTriggers();
     }
