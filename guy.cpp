@@ -294,6 +294,8 @@ bool Guy::PreFrame(void)
                 delete this;
                 return false;
             }
+            // if eg. landingadjust changed during warudo
+            WorldPhysics();
             warudoIsFreeze = false;
         }
     }
@@ -1666,6 +1668,11 @@ bool Guy::WorldPhysics(void)
         // see heave donky into lp dp
         posY = Fixed(0);
         posOffsetY = Fixed(0);
+
+        // the frame you land is supposed to instantly turn into 330
+        if (resetHitStunOnLand) {
+            Frame();
+        }
     }
 
     forceLanding = false;
