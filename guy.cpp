@@ -2250,6 +2250,7 @@ void Guy::DoBranchKey(bool preHit = false)
             int64_t branchParam4 = key["Param04"];
             int branchAction = key["Action"];
             int branchFrame = key["ActionFrame"];
+            bool keepFrame = key["_InheritFrameX"];
 
             if (branchType <= maxBranchType) {
                 // todo high priority field maybe overrides that?
@@ -2268,7 +2269,7 @@ void Guy::DoBranchKey(bool preHit = false)
                     }
                     break;
                 case 2:
-                    if (hitThisMove) { // has hit ever this move.. not sure if right
+                    if (!preHit && hitThisFrame) { // has hit ever this move.. not sure if right
                         doBranch = true;
                     }
 
@@ -2566,8 +2567,6 @@ void Guy::DoBranchKey(bool preHit = false)
             }
 
             if (doBranch) {
-
-                bool keepFrame = key["_InheritFrameX"];
 
                 if (keepFrame) {
                     // condition seems needed for guile's branch to 1229, otherwise unique
@@ -3123,7 +3122,6 @@ bool Guy::Frame(bool endWarudoFrame)
     if (canMoveNow && didTransition) {
         // if we just went to idle, run triggers again
         DoTriggers();
-
     }
 
     // if successful, eat this frame away and go right now
