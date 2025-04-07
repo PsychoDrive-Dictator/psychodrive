@@ -698,7 +698,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 715,
+                "count": 701,
                 "firstFrame": 0,
                 "lastFrame": 907
             },
@@ -713,28 +713,28 @@ var currentResults =
                 "lastFrame": 772
             },
             {
-                "count": 349,
+                "count": 353,
                 "firstFrame": 223,
                 "lastFrame": 655
             },
             {
-                "count": 358,
+                "count": 363,
                 "firstFrame": 223,
                 "lastFrame": 655
             },
             {
-                "count": 782,
+                "count": 780,
                 "firstFrame": 92,
                 "lastFrame": 863
             },
             {
-                "count": 1000,
+                "count": 936,
                 "firstFrame": 209,
                 "lastFrame": 907
             },
             {
-                "count": 354,
-                "firstFrame": 328,
+                "count": 122,
+                "firstFrame": 561,
                 "lastFrame": 800
             }
         ]

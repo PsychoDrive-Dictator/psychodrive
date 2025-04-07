@@ -3119,7 +3119,7 @@ bool Guy::Frame(bool endWarudoFrame)
 
     DoBranchKey(true);
 
-    if (canMoveNow && didTransition) {
+    if (canMoveNow && nextAction == -1) {
         // if we just went to idle, run triggers again
         DoTriggers();
     }
@@ -3127,6 +3127,8 @@ bool Guy::Frame(bool endWarudoFrame)
     // if successful, eat this frame away and go right now
     if (nextAction != -1) {
         currentAction = nextAction;
+        currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
+        nextActionFrame = -1;
         UpdateActionData();
         log (logTransitions, "nvm! current action " + std::to_string(currentAction));
         nextAction = -1;
