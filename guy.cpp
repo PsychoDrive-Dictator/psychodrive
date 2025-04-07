@@ -3118,16 +3118,20 @@ bool Guy::Frame(bool endWarudoFrame)
         timeInWarudo = 0;
     }
 
+    DoBranchKey(true);
+
     if (canMoveNow && didTransition) {
         // if we just went to idle, run triggers again
         DoTriggers();
-        // if successful, eat this frame away and go right now
-        if (nextAction != -1) {
-            currentAction = nextAction;
-            UpdateActionData();
-            log (logTransitions, "nvm! current action " + std::to_string(currentAction));
-            nextAction = -1;
-        }
+
+    }
+
+    // if successful, eat this frame away and go right now
+    if (nextAction != -1) {
+        currentAction = nextAction;
+        UpdateActionData();
+        log (logTransitions, "nvm! current action " + std::to_string(currentAction));
+        nextAction = -1;
     }
 
     // if we need landing adjust/etc during warudo, need this updated now
