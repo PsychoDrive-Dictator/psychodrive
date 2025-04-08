@@ -335,43 +335,43 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 788,
-                "firstFrame": 348,
+                "count": 155,
+                "firstFrame": 582,
                 "lastFrame": 736
             },
             {
-                "count": 82,
-                "firstFrame": 358,
-                "lastFrame": 582
+                "count": 139,
+                "firstFrame": 359,
+                "lastFrame": 583
             },
             {
-                "count": 6,
-                "firstFrame": 358,
-                "lastFrame": 582
+                "count": 1,
+                "firstFrame": 395,
+                "lastFrame": 395
             },
             {
-                "count": 90,
-                "firstFrame": 358,
+                "count": 88,
+                "firstFrame": 359,
                 "lastFrame": 577
             },
             {
-                "count": 90,
-                "firstFrame": 358,
+                "count": 88,
+                "firstFrame": 359,
                 "lastFrame": 577
             },
             {
-                "count": 81,
+                "count": 79,
                 "firstFrame": 347,
-                "lastFrame": 661
+                "lastFrame": 626
             },
             {
-                "count": 596,
+                "count": 340,
                 "firstFrame": 347,
                 "lastFrame": 736
             },
             {
-                "count": 80,
-                "firstFrame": 358,
+                "count": 77,
+                "firstFrame": 396,
                 "lastFrame": 584
             }
         ]
