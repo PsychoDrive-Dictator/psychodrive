@@ -1867,6 +1867,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 hitAtemiThisMove = true;
                 if (hitFlagToParent) pParent->hitAtemiThisMove = true;
                 pOtherGuy->atemiThisFrame = true;
+
+                // is that hardcoded on atemi? not sure if the number is right
+                addWarudo(13+1);
+                pOtherGuy->addWarudo(13+1);
+
                 log(logHits, "atemi hit!");
             }
 
@@ -2986,6 +2991,14 @@ bool Guy::Frame(bool endWarudoFrame)
 
     bool didTransition = false;
 
+    if (!didTrigger && canMoveNow && nextAction == -1) {
+        // can run deferred trigger if going into fluff frames now
+        DoTriggers();
+        if (nextAction != -1) {
+            didTrigger = true;
+        }
+    }
+
     // Transition
     if ( nextAction != -1 )
     {
@@ -3125,8 +3138,7 @@ bool Guy::Frame(bool endWarudoFrame)
     // but departure inner scripts don't want to do that
     if (didTrigger) {
         DoBranchKey(true);
-    } else if (canMoveNow && nextAction == -1) {
-        // if we just went to idle, run triggers again
+    } else if (didTransition && canMoveNow && nextAction == -1) {
         DoTriggers();
     }
 
