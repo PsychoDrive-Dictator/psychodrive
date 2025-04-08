@@ -33,6 +33,19 @@ enum InputID
 	firstJoystickID = 10,
 };
 
+static inline int invertDirection(int input) {
+	int newMask = 0;
+	if (input & BACK) {
+		newMask |= FORWARD;
+	}
+	if (input & FORWARD) {
+		newMask |= BACK;
+	}
+	input &= ~(FORWARD+BACK);
+	input |= newMask;
+	return input;
+}
+
 extern std::map<int, int> currentInputMap;
 
 int addPressBits(int curInput, int prevInput);
