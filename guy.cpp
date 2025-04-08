@@ -2557,12 +2557,7 @@ void Guy::DoBranchKey(bool preHit = false)
                     }
                     // todo 6 and 7 parry and PP
 
-                    // only run that branch after the frame bump, eg. don't immediately branch
-                    // on the same-frame hit, see backfist combo touch branch wanting to be
-                    // frame 13 after hitstop is done
-                    if (!preHit) {
-                        doBranch = false;
-                    }
+                    // backfist needs this working post-bump too
                     break;
                 case 63:
                     // what's the difference between this and 20?
