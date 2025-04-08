@@ -28,13 +28,21 @@ void parseRootOffset( nlohmann::json& keyJson, Fixed&offsetX, Fixed& offsetY)
     }
 }
 
-bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0 )
+bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
     if (dcExcFlags != 0 ) {
         if ((dcExcFlags & input) != dcExcFlags) {
             return false;
         }
+    }
+
+    if (ngCondFlags & 2) {
+        if ((input & 0xF) == (ngKeyFlags & 0xF)) {
+            return false;
+        }
+    } else if (ngKeyFlags & input) {
+        return false;
     }
 
     // commands can have only exc/inc flags?
@@ -215,15 +223,7 @@ void Guy::BuildMoveList()
 void Guy::Input(int input)
 {
     if (direction.i() < 0) {
-        int newMask = 0;
-        if (input & BACK) {
-            newMask |= FORWARD;
-        }
-        if (input & FORWARD) {
-            newMask |= BACK;
-        }
-        input &= ~(FORWARD+BACK);
-        input |= newMask;
+        input = invertDirection(input);
     }
     if (input == 0 && inputOverride != 0) {
         input = inputOverride;
@@ -231,9 +231,11 @@ void Guy::Input(int input)
     currentInput = input;
 
     inputBuffer.push_front(input);
+    directionBuffer.push_front(direction.i());
     // how much is too much?
     if (inputBuffer.size() > 200) {
         inputBuffer.pop_back();
+        directionBuffer.pop_back();
     }
 }
 
@@ -939,6 +941,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     int commandNo = (*pNorm)["command_no"];
     uint32_t okKeyFlags = (*pNorm)["ok_key_flags"];
     uint32_t okCondFlags = (*pNorm)["ok_key_cond_flags"];
+    uint32_t ngKeyFlags = (*pNorm)["ng_key_flags"];
     uint32_t dcExcFlags = (*pNorm)["dc_exc_flags"];
     int precedingTime = (*pNorm)["preceding_time"];
     // condflags..
@@ -958,7 +961,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     while (i < initialSearch)
     {
         // guile 1112 has 0s everywhere
-        if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags))
+        if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, ngKeyFlags))
         {
             initialMatch = true;
         } else if (initialMatch == true) {
@@ -976,117 +979,146 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
             return true;
         } else {
             std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-            nlohmann::json *pCommand = &(*pCommandsJson)[commandNoString]["0"];
-            int inputID = (*pCommand)["input_num"].get<int>() - 1;
-            nlohmann::json *pInputs = &(*pCommand)["inputs"];
+            for (auto& [keyID, key] : (*pCommandsJson)[commandNoString].items()) {
+                nlohmann::json *pCommand = &key;
+                int inputID = (*pCommand)["input_num"].get<int>() - 1;
+                nlohmann::json *pInputs = &(*pCommand)["inputs"];
 
-            uint32_t inputBufferCursor = i;
+                uint32_t inputBufferCursor = i;
+                bool fail = false;
 
-            while (inputID >= 0 )
-            {
-                nlohmann::json *pInput = &(*pInputs)[to_string_leading_zeroes(inputID, 2)];
-                nlohmann::json *pInputNorm = &(*pInput)["normal"];
-                uint32_t inputOkKeyFlags = (*pInputNorm)["ok_key_flags"];
-                uint32_t inputOkCondFlags = (*pInputNorm)["ok_key_cond_check_flags"];
-                int numFrames = (*pInput)["frame_num"];
-                bool match = false;
-                int lastMatchInput = i;
-
-                if (inputOkKeyFlags & 0x10000)
+                while (inputID >= 0 )
                 {
-                    // charge release
-                    bool chargeMatch = false;
-                    nlohmann::json *pResourceMatch;
-                    int chargeID = inputOkKeyFlags & 0xFF;
-                    for (auto& [keyID, key] : pChargeJson->items()) {
-                        // support either charge format
-                        if (key.contains("resource")) {
-                            key = key["resource"];
-                        }
-                        if (key["charge_id"] == chargeID ) {
-                            pResourceMatch = &key;
-                            chargeMatch = true;
-                            break;
-                        }
-                    }
+                    nlohmann::json *pInput = &(*pInputs)[to_string_leading_zeroes(inputID, 2)];
+                    nlohmann::json *pInputNorm = &(*pInput)["normal"];
+                    uint32_t inputOkKeyFlags = (*pInputNorm)["ok_key_flags"];
+                    uint32_t inputOkCondFlags = (*pInputNorm)["ok_key_cond_check_flags"];
+                    uint32_t inputNgKeyFlags = (*pInputNorm)["ng_key_flags"];
+                    uint32_t inputNgCondFlags = (*pInputNorm)["ng_key_cond_check_flags"];
+                    int numFrames = (*pInput)["frame_num"];
+                    bool match = false;
+                    int lastMatchInput = i;
 
-                    if (chargeMatch) {
-                        uint32_t inputOkKeyFlags = (*pResourceMatch)["ok_key_flags"];
-                        uint32_t inputOkCondFlags = (*pResourceMatch)["ok_key_cond_check_flags"];
-                        uint32_t chargeFrames = (*pResourceMatch)["ok_frame"];
-                        uint32_t keepFrames = (*pResourceMatch)["keep_frame"];
-                        uint32_t dirCount = 0;
-                        // uint32_t dirNotMatchCount = 0;
-                        // count matching direction in input buffer, super naive but will work for testing
-                        inputBufferCursor = i;
-                        uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                        while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                    if (inputOkKeyFlags & 0x10000)
+                    {
+                        // charge release
+                        bool chargeMatch = false;
+                        nlohmann::json *pResourceMatch;
+                        int chargeID = inputOkKeyFlags & 0xFF;
+                        for (auto& [keyID, key] : pChargeJson->items()) {
+                            // support either charge format
+                            if (key.contains("resource")) {
+                                key = key["resource"];
+                            }
+                            if (key["charge_id"] == chargeID ) {
+                                pResourceMatch = &key;
+                                chargeMatch = true;
+                                break;
+                            }
+                        }
+
+                        if (chargeMatch) {
+                            uint32_t inputOkKeyFlags = (*pResourceMatch)["ok_key_flags"];
+                            uint32_t inputOkCondFlags = (*pResourceMatch)["ok_key_cond_check_flags"];
+                            uint32_t chargeFrames = (*pResourceMatch)["ok_frame"];
+                            uint32_t keepFrames = (*pResourceMatch)["keep_frame"];
+                            uint32_t dirCount = 0;
+                            // uint32_t dirNotMatchCount = 0;
+                            // count matching direction in input buffer, super naive but will work for testing
+                            inputBufferCursor = i;
+                            uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                            while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                            {
+                                if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                    dirCount++;
+                                    if (dirCount >= chargeFrames) {
+                                        break;
+                                    }
+                                }
+                                // else {
+                                //     dirNotMatchCount++;
+                                // }
+                                inputBufferCursor++;
+                            }
+
+                            if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
+                                //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                                //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+                                break; // cancel trigger
+                            }
+                            //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+                            inputID--;
+                        } else {
+                            log(true, "charge entries mismatch?");
+                            break; // cancel trigger
+                        }
+                    } else {
+                        while (inputBufferCursor < inputBuffer.size())
                         {
-                            if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                dirCount++;
-                                if (dirCount >= chargeFrames) {
+                            bool thismatch = false;
+
+                            int bufferInput = inputBuffer[inputBufferCursor];
+                            int bufferDirection = directionBuffer[inputBufferCursor];
+
+                            if (direction.i() != bufferDirection) {
+                                bufferInput = invertDirection(bufferInput);
+                            }
+
+                            if (inputNgCondFlags & 2) {
+                                if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
+                                    fail = true;
                                     break;
                                 }
+                            } else if (inputNgKeyFlags & bufferInput) {
+                                fail = true;
+                                break;
                             }
-                            // else {
-                            //     dirNotMatchCount++;
+                            if (matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+                                int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                                if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                    match = true;
+                                    thismatch = true;
+                                    i = inputBufferCursor;
+                                }
+                            }
+                            // if ( commandNo == 7 ) {
+                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
+                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " match " + std::to_string(thismatch) + " buffer " + std::to_string(bufferInput));
                             // }
+                            if (match == true && (thismatch == false || numFrames <= 0)) {
+                                //inputBufferCursor++;
+                                inputID--;
+                                break;
+                            }
                             inputBufferCursor++;
                         }
 
-                        if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-                            break; // cancel trigger
-                        }
-                        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                        inputID--;
-                    } else {
-                        log(true, "charge entries mismatch?");
-                        break; // cancel trigger
-                    }
-                } else {
-                    while (inputBufferCursor < inputBuffer.size())
-                    {
-                        bool thismatch = false;
-                        if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                            int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                            // if ( commandNo == 32 ) {
-                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) + " spaceSinceLastInput needed " + std::to_string(numFrames) + " found " + std::to_string(spaceSinceLastInput) +
-                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " i " + std::to_string(i) + " initial " + std::to_string(initialSearch));
+                        if (fail) {
+                            // if ( commandNo == 7 ) {
+                            //     log("fail " + std::to_string(inputBuffer[inputBufferCursor]));
                             // }
-                            if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                match = true;
-                                thismatch = true;
-                                i = inputBufferCursor;
-                            }
-                        }
-                        if (match == true && (thismatch == false || numFrames <= 0)) {
-                            //inputBufferCursor++;
-                            inputID--;
                             break;
                         }
-                        inputBufferCursor++;
+                    }
+
+                    if (inputBufferCursor == inputBuffer.size()) {
+                        // corner case - if we run out of buffer but had matched the input, finalize
+                        // the match now or the trigger won't work - this can happen if you eg. have
+                        // a dash input immediately at the beginning of a replay since the last match
+                        // is a neutral input, it keeps matching all the way to the beginning of the
+                        // buffer
+                        if (match == true) {
+                            inputID--;
+                        }
+
+                        break;
                     }
                 }
 
-                if (inputBufferCursor == inputBuffer.size()) {
-                    // corner case - if we run out of buffer but had matched the input, finalize
-                    // the match now or the trigger won't work - this can happen if you eg. have
-                    // a dash input immediately at the beginning of a replay since the last match
-                    // is a neutral input, it keeps matching all the way to the beginning of the
-                    // buffer
-                    if (match == true) {
-                        inputID--;
-                    }
-
-                    break;
+                if (inputID < 0) {
+                    // ran out of matched inputs, command is OK
+                    return true;
                 }
-            }
-
-            if (inputID < 0) {
-                // ran out of matched inputs, command is OK
-                return true;
             }
         }
     }
@@ -2911,16 +2943,7 @@ bool Guy::Frame(bool endWarudoFrame)
         int moveInput = currentInput;
 
         if (turnaround) {
-            // swap l/r in current input
-            int newMask = 0;
-            if (moveInput & BACK) {
-                newMask |= FORWARD;
-            }
-            if (moveInput & FORWARD) {
-                newMask |= BACK;
-            }
-            moveInput &= ~(FORWARD+BACK);
-            moveInput |= newMask;
+            moveInput = invertDirection(moveInput);
         }
 
         if ( moveInput & 1 ) {

@@ -54,15 +54,7 @@ public:
         direction = direction * Fixed(-1);
 
         // swap l/r in current input
-        int newMask = 0;
-        if (currentInput & BACK) {
-            newMask |= FORWARD;
-        }
-        if (currentInput & FORWARD) {
-            newMask |= BACK;
-        }
-        currentInput &= ~(FORWARD+BACK);
-        currentInput |= newMask;
+        currentInput = invertDirection(currentInput);
     }
 
     Fixed getStartPosX() { return startPosX; }
@@ -515,6 +507,7 @@ private:
 
     int currentInput = 0;
     std::deque<int> inputBuffer;
+    std::deque<int> directionBuffer;
 
     // hitting side
     int canHitID = 0;
