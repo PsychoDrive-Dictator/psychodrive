@@ -984,7 +984,8 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
                 int inputID = (*pCommand)["input_num"].get<int>() - 1;
                 nlohmann::json *pInputs = &(*pCommand)["inputs"];
 
-                uint32_t inputBufferCursor = i;
+                uint32_t inputBufferCursor = initialI;
+                i = initialI;
                 bool fail = false;
 
                 while (inputID >= 0 )
