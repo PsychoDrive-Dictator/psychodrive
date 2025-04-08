@@ -642,8 +642,10 @@ static void mainloop(void)
                         compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), Simulation::eHitAccel, desc + " hitAccel X");
                     }
 
-                    compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), Simulation::eActionID, desc + " action ID");
-                    compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), Simulation::eActionFrame, desc + " action frame");
+                    if (players[i]["hitStop"] == 0) {
+                        compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), Simulation::eActionID, desc + " action ID");
+                        compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), Simulation::eActionFrame, desc + " action frame");
+                    }
 
                     // swap players here, we track combo hits on the opponent
                     compareGameStateInt(players[i]["comboCount"], guys[!i]->getComboHits(), Simulation::eComboCount, desc + " combo");

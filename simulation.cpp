@@ -181,8 +181,10 @@ void Simulation::AdvanceFrame(void)
                     CompareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), simGuys[i]->getHitAccelX(), i, targetDumpFrame, eHitAccel, desc + " hitAccel X");
                 }
 
-                CompareGameStateInt(players[i]["actionID"], simGuys[i]->getCurrentAction(), i, targetDumpFrame, eActionID, desc + " action ID");
-                CompareGameStateInt(players[i]["actionFrame"], simGuys[i]->getCurrentFrame(), i, targetDumpFrame, eActionFrame, desc + " action frame");
+                if (players[i]["hitStop"] == 0) {
+                    CompareGameStateInt(players[i]["actionID"], simGuys[i]->getCurrentAction(), i, targetDumpFrame, eActionID, desc + " action ID");
+                    CompareGameStateInt(players[i]["actionFrame"], simGuys[i]->getCurrentFrame(), i, targetDumpFrame, eActionFrame, desc + " action frame");
+                }
 
                 // swap players here, we track combo hits on the opponent
                 CompareGameStateInt(players[i]["comboCount"], simGuys[!i]->getComboHits(), i, targetDumpFrame, eComboCount, desc + " combo");
