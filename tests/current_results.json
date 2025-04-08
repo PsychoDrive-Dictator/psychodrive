@@ -1035,6 +1035,53 @@ var currentResults =
         ]
     },
     {
+        "testName": "mai_charged_fan",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2905,
+                "firstFrame": 202,
+                "lastFrame": 2165
+            },
+            {
+                "count": 2,
+                "firstFrame": 1225,
+                "lastFrame": 1226
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 629,
+                "firstFrame": 193,
+                "lastFrame": 1988
+            },
+            {
+                "count": 443,
+                "firstFrame": 193,
+                "lastFrame": 1988
+            },
+            {
+                "count": 999,
+                "firstFrame": 139,
+                "lastFrame": 2165
+            },
+            {
+                "count": 1990,
+                "firstFrame": 139,
+                "lastFrame": 2165
+            },
+            {
+                "count": 462,
+                "firstFrame": 193,
+                "lastFrame": 1978
+            }
+        ]
+    },
+    {
         "testName": "pushphysics_new_luke_ryu",
         "testVersion": "26",
         "finished": true,
