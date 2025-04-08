@@ -26,8 +26,7 @@
         testNameCell.rowSpan = 2;
         nameText = document.createTextNode(newResult.testName);
 
-        var copyText = './psychodrive load_dump ./tests/dumps/' + newResult.testVersion + '/' + newResult.testName + '.json';
-        copyText += ' ' + newResult.testVersion;
+        const copyText = './psychodrive load_dump ./tests/dumps/' + newResult.testVersion + '/' + newResult.testName + '.json ' + newResult.testVersion;
 
         testNameCell.addEventListener('click', function() {
           navigator.clipboard.writeText(copyText);
