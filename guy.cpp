@@ -2698,7 +2698,8 @@ bool Guy::Frame(bool endWarudoFrame)
     }
     currentFrame++;
 
-    if (isProjectile && canHitID != 0) {
+    // if we just branched we're about to reset pdata, avoid killing proj here
+    if (isProjectile && !didBranch && canHitID != 0) {
         projHitCount--;
         //log("proj hitcount " + std::to_string(projHitCount));
         canHitID = 0; // re-arm, all projectile hitboxes seem to have hitID 0
