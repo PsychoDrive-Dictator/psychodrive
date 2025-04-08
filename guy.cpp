@@ -1876,7 +1876,12 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             }
 
             // not hitstun for initial grab hit as we dont want to recover during the lock
-            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, !isGrab, !isGrab, wasDrive, hitbox.type == domain) ) {
+            bool applyHit = !isGrab;
+            if (hitbox.type == direct_damage) {
+                // don't count in combos/etc, just apply DT
+                applyHit = false;
+            }
+            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, applyHit, applyHit, wasDrive, hitbox.type == domain) ) {
                 int hitStopSelf = (*pHitEntry)["HitStopOwner"];
                 if ( !hitArmor && hitStopSelf ) {
                     addWarudo(hitStopSelf+1);
@@ -1948,6 +1953,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
 bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain)
 {
+    int comboAdd = (*pHitEffect)["ComboAdd"];
     int juggleFirst = (*pHitEffect)["Juggle1st"];
     int juggleAdd = (*pHitEffect)["JuggleAdd"];
     int juggleLimit = (*pHitEffect)["JuggleLimit"];
@@ -2038,7 +2044,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
 
     if (!blocking && applyHit) {
         beenHitThisFrame = true;
-        comboHits++;
+        comboHits += comboAdd;
         wasHit = true;
     }
 
@@ -2203,6 +2209,8 @@ void Guy::DoHitBoxKey(const char *name)
                     } else if (collisionType == 10) {
                         collisionColor = {0.0,1.0,0.5};
                         type = destroy_projectile;
+                    } else if (collisionType == 11) {
+                        type = direct_damage;
                     }
                     rectListID = 9;
                 } else {
