@@ -335,19 +335,19 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 155,
-                "firstFrame": 582,
-                "lastFrame": 736
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 139,
+                "count": 138,
                 "firstFrame": 359,
-                "lastFrame": 583
+                "lastFrame": 582
             },
             {
-                "count": 1,
+                "count": 2,
                 "firstFrame": 395,
-                "lastFrame": 395
+                "lastFrame": 582
             },
             {
                 "count": 88,
@@ -360,17 +360,17 @@ var currentResults =
                 "lastFrame": 577
             },
             {
-                "count": 79,
+                "count": 42,
                 "firstFrame": 347,
                 "lastFrame": 626
             },
             {
-                "count": 340,
+                "count": 339,
                 "firstFrame": 347,
                 "lastFrame": 736
             },
             {
-                "count": 3,
+                "count": 4,
                 "firstFrame": 396,
                 "lastFrame": 584
             }
