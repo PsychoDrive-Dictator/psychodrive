@@ -17,6 +17,9 @@
 #include "render.hpp"
 #include <string>
 
+nlohmann::json staticPlayer;
+bool staticPlayerLoaded = false;
+
 void parseRootOffset( nlohmann::json& keyJson, Fixed&offsetX, Fixed& offsetY)
 {
     if ( keyJson.contains("RootOffset") && keyJson["RootOffset"].contains("X") && keyJson["RootOffset"].contains("Y") ) {
@@ -2052,6 +2055,8 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         hitStun = hitEntryHitStun + hitStunAdder;
     }
 
+    //int origPoseStatus = getPoseStatus() - 1;
+
     if (destY > 0 ) {
         airborne = true;
         forceKnockDown = true;
@@ -2130,6 +2135,20 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         }
     } else {
         //if (dmgType & 3) { // crumple? :/
+
+        // haven't found a situation where dm_info_tbl helped as-is yet
+        // bool foundAirborne = false;
+        // std::string moveTypeString = to_string_leading_zeroes(moveType, 2);
+        // if (staticPlayer["dm_info_tbl"].contains(moveTypeString)) {
+        //     nlohmann::json &dmEntryJson = staticPlayer["dm_info_tbl"][moveTypeString];
+        //     int dmType = dmEntryJson["type"];
+        //     int dmPose = dmEntryJson["pose"];
+        //     int dmActID = dmEntryJson["actID"];
+        //     if (dmActID != -1 && dmType == dmgType && (dmPose == 255 || dmPose == origPoseStatus)) {
+        //         if (dmPose == 2) foundAirborne = true;
+        //         nextAction = dmActID;
+        //     }
+
         if (moveType == 13) { // set on wall bounce
             nextAction = 232;
         } else if (moveType == 11) {
@@ -2143,7 +2162,9 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             // if (airborne) {
             //     nextAction = 255;
             // }
-        } else {
+        }
+
+        else {
             // HH / 202 if head?
             nextAction = 205; // HIT_MM, not sure how to pick which
             if ( crouching ) {
@@ -2158,6 +2179,10 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             } else {
                 nextAction = 252; // 45
             }
+        }
+        // those apply even for airborne/launch
+        if (moveType == 17) {
+            nextAction = 282;
         }
     }
 

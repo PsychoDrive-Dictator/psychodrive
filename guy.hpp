@@ -14,6 +14,9 @@
 const Fixed wallDistance = Fixed(765.0f);
 const Fixed maxPlayerDistance = Fixed(490.0f);
 
+extern nlohmann::json staticPlayer;
+extern bool staticPlayerLoaded;
+
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
@@ -218,6 +221,11 @@ public:
         charColorR = color.r;
         charColorG = color.g;
         charColorB = color.b;
+
+        if (!staticPlayerLoaded) {
+            staticPlayer = parse_json_file("data/chars/static_player.json");
+            staticPlayerLoaded = true;
+        }
 
         pMovesDictJson = loadCharFile(charPath, character, version, "moves");
         pRectsJson = loadCharFile(charPath, character, version, "rects");
