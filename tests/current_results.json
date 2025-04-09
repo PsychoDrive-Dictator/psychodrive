@@ -1268,5 +1268,52 @@ var currentResults =
                 "lastFrame": -1
             }
         ]
+    },
+    {
+        "testName": "zangief_rotate_motions_grabs",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 4609,
+                "firstFrame": 330,
+                "lastFrame": 2557
+            },
+            {
+                "count": 694,
+                "firstFrame": 233,
+                "lastFrame": 2334
+            },
+            {
+                "count": 42,
+                "firstFrame": 233,
+                "lastFrame": 2186
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 3120,
+                "firstFrame": 196,
+                "lastFrame": 2485
+            },
+            {
+                "count": 3877,
+                "firstFrame": 196,
+                "lastFrame": 2557
+            },
+            {
+                "count": 840,
+                "firstFrame": 415,
+                "lastFrame": 2402
+            }
+        ]
     }
 ]

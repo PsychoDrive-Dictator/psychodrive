@@ -991,6 +991,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
                 while (inputID >= 0 )
                 {
                     nlohmann::json *pInput = &(*pInputs)[to_string_leading_zeroes(inputID, 2)];
+                    int inputType = (*pInput)["type"];
                     nlohmann::json *pInputNorm = &(*pInput)["normal"];
                     uint32_t inputOkKeyFlags = (*pInputNorm)["ok_key_flags"];
                     uint32_t inputOkCondFlags = (*pInputNorm)["ok_key_cond_check_flags"];
@@ -1000,12 +1001,42 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
                     bool match = false;
                     int lastMatchInput = i;
 
-                    if (inputOkKeyFlags & 0x10000)
-                    {
+                    if (inputType == 2) {
+                        // rotate
+                        int pointsNeeded = (*pInput)["rotate"]["point"];
+                        uint32_t searchArea = inputBufferCursor + numFrames * 2; // todo, i think that's best case
+                        int curAngle = 0;
+                        int pointsForward = 0;
+                        int pointsBackwards = 0;
+                        while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                        {
+                            int bufferInput = inputBuffer[inputBufferCursor];
+                            int targetAngle = inputAngle(bufferInput);
+                            if (targetAngle) {
+                                if (curAngle == 0) {
+                                    curAngle = targetAngle;
+                                }
+                                int diff = angleDiff(curAngle, targetAngle);
+                                //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
+                                if (diff >= 90 && diff < 180) {
+                                    pointsForward++;
+                                    curAngle = targetAngle;
+                                }
+                                if (diff <= -90 && diff > -180) {
+                                    pointsBackwards++;
+                                    curAngle = targetAngle;
+                                }
+                            }
+                            inputBufferCursor++;
+                        }
+                        if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
+                            inputID--;
+                        }
+                    } else if (inputType == 1) {
                         // charge release
                         bool chargeMatch = false;
                         nlohmann::json *pResourceMatch;
-                        int chargeID = inputOkKeyFlags & 0xFF;
+                        int chargeID = (*pInput)["charge"]["id"];
                         for (auto& [keyID, key] : pChargeJson->items()) {
                             // support either charge format
                             if (key.contains("resource")) {
