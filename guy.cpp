@@ -958,18 +958,46 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     if (inputBuffer.size() < initialSearch) {
         initialSearch = inputBuffer.size();
     }
-    while (i < initialSearch)
-    {
-        // guile 1112 has 0s everywhere
-        if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, ngKeyFlags))
-        {
-            initialMatch = true;
-        } else if (initialMatch == true) {
-            i--;
-            initialI = i;
-            break; // break once initialMatch no longer true, set i on last true
+
+    if ((okCondFlags & 0x60) == 0x60) {
+        int parallelMatchesFound = 0;
+        int button = LP;
+        while (button <= HK) {
+            if (button & okKeyFlags) {
+                i = 0;
+                initialMatch = false;
+                while (i < initialSearch) {
+                    if (matchInput(inputBuffer[i], button, 0, dcExcFlags, ngKeyFlags))
+                    {
+                        initialMatch = true;
+                    } else if (initialMatch == true) {
+                        i--;
+                        initialI = i;
+                        break; // break once initialMatch no longer true, set i on last true
+                    }
+                    i++;
+                }
+                if (initialMatch) {
+                    parallelMatchesFound++;
+                }
+            }
+            button = button << 1;
         }
-        i++;
+        initialMatch = (parallelMatchesFound >= 2);
+    } else {
+        while (i < initialSearch)
+        {
+            // guile 1112 has 0s everywhere
+            if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, ngKeyFlags))
+            {
+                initialMatch = true;
+            } else if (initialMatch == true) {
+                i--;
+                initialI = i;
+                break; // break once initialMatch no longer true, set i on last true
+            }
+            i++;
+        }
     }
     if (initialMatch)
     {
