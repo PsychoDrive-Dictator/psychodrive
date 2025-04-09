@@ -1371,19 +1371,19 @@ void Guy::UpdateBoxes(void)
             if (immune == 11) {
                 baseBox.flags |= ground_strike_invul;
             }
-            for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    HurtBox newBox = baseBox;
-                    newBox.box = rect;
-                    newBox.flags |= body;
-                    newHurtBoxes.push_front(newBox);
-                }
-            }
             for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
                 if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= legs;
+                    newHurtBoxes.push_front(newBox);
+                }
+            }
+            for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
+                    HurtBox newBox = baseBox;
+                    newBox.box = rect;
+                    newBox.flags |= body;
                     newHurtBoxes.push_front(newBox);
                 }
             }
@@ -2233,6 +2233,8 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         else {
             if (pHurtBox && pHurtBox->flags & hurtBoxFlags::head) {
                 nextAction = 202;
+            } else if (pHurtBox && pHurtBox->flags & hurtBoxFlags::legs) {
+                nextAction = 209;
             } else {
                 nextAction = 205;
             }
