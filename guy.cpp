@@ -2213,7 +2213,9 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         //         nextAction = dmActID;
         //     }
 
-        if (moveType == 13) { // set on wall bounce
+        if (moveType == 72) {
+            nextAction = 268;
+        } else if (moveType == 13) { // set on wall bounce
             nextAction = 232;
         } else if (moveType == 11) {
             nextAction = 277; // back crumple?
