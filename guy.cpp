@@ -3034,18 +3034,6 @@ bool Guy::Frame(bool endWarudoFrame)
         nextAction = 482; // DPA_STD_END
     }
 
-    if (landed && nextAction == -1) {
-        // if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
-        //     nextAction = currentAction + 3; // generic landing
-        // }
-
-        // better4 assume the script has something in mind for landing :/
-
-        if (hitStun) {
-            nextAction = 350; // being down? dunno
-        }
-    }
-
     if (recovered || (canMoveNow && comboHits) || resetComboCount) {
         if ( comboHits) {
             log(true, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
