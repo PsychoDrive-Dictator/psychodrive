@@ -296,7 +296,7 @@ public:
 private:
     void UpdateActionData(void);
     void UpdateBoxes(void);
-    bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain);
+    bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
 
     void ExecuteTrigger(nlohmann::json *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);

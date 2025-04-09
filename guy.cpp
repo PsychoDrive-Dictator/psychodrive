@@ -1371,14 +1371,6 @@ void Guy::UpdateBoxes(void)
             if (immune == 11) {
                 baseBox.flags |= ground_strike_invul;
             }
-            for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    HurtBox newBox = baseBox;
-                    newBox.box = rect;
-                    newBox.flags |= head;
-                    newHurtBoxes.push_front(newBox);
-                }
-            }
             for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
                 if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
                     HurtBox newBox = baseBox;
@@ -1392,6 +1384,14 @@ void Guy::UpdateBoxes(void)
                     HurtBox newBox = baseBox;
                     newBox.box = rect;
                     newBox.flags |= legs;
+                    newHurtBoxes.push_front(newBox);
+                }
+            }
+            for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
+                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
+                    HurtBox newBox = baseBox;
+                    newBox.box = rect;
+                    newBox.flags |= head;
                     newHurtBoxes.push_front(newBox);
                 }
             }
@@ -1948,7 +1948,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 // don't count in combos/etc, just apply DT
                 applyHit = false;
             }
-            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, applyHit, applyHit, wasDrive, hitbox.type == domain) ) {
+            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox) ) {
                 int hitStopSelf = (*pHitEntry)["HitStopOwner"];
                 if ( !hitArmor && hitStopSelf ) {
                     addWarudo(hitStopSelf+1);
@@ -2018,7 +2018,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     return retHit;
 }
 
-bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain)
+bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
 {
     int comboAdd = (*pHitEffect)["ComboAdd"];
     int juggleFirst = (*pHitEffect)["Juggle1st"];
@@ -2231,8 +2231,11 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         }
 
         else {
-            // HH / 202 if head?
-            nextAction = 205; // HIT_MM, not sure how to pick which
+            if (pHurtBox && pHurtBox->flags & hurtBoxFlags::head) {
+                nextAction = 202;
+            } else {
+                nextAction = 205;
+            }
             if ( crouching ) {
                 nextAction = 213;
             }
