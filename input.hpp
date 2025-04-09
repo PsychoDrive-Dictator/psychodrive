@@ -33,7 +33,8 @@ enum InputID
 	firstJoystickID = 10,
 };
 
-static inline int invertDirection(int input) {
+static inline int invertDirection(int input)
+{
 	int newMask = 0;
 	if (input & BACK) {
 		newMask |= FORWARD;
@@ -44,6 +45,31 @@ static inline int invertDirection(int input) {
 	input &= ~(FORWARD+BACK);
 	input |= newMask;
 	return input;
+}
+
+static inline int inputAngle(int input)
+{
+	input = input & 0xF;
+	switch (input) {
+		case FORWARD+UP: return 45;
+		case UP: return 90;
+		case BACK+UP: return 135;
+		case BACK: return 180;
+		case BACK+DOWN: return 225;
+		case DOWN: return 270;
+		case FORWARD+DOWN: return 315;
+		case FORWARD: return 360;
+		default: case NEUTRAL: return 0;
+	}
+	return -1;
+}
+
+static inline int angleDiff(int curAngle, int futureAngle)
+{
+	int res = futureAngle - curAngle;
+	if (res > 180) return res - 360;
+	if (res < -180) return res + 360;
+	return res;
 }
 
 extern std::map<int, int> currentInputMap;
