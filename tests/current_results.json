@@ -125,7 +125,7 @@ var currentResults =
                 "lastFrame": 2465
             },
             {
-                "count": 1150,
+                "count": 1127,
                 "firstFrame": 636,
                 "lastFrame": 2506
             },
@@ -377,6 +377,53 @@ var currentResults =
         ]
     },
     {
+        "testName": "dictator_auto_detonate_setup",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 4128,
+                "firstFrame": 171,
+                "lastFrame": 1939
+            },
+            {
+                "count": 1184,
+                "firstFrame": 201,
+                "lastFrame": 1634
+            },
+            {
+                "count": 607,
+                "firstFrame": 206,
+                "lastFrame": 1633
+            },
+            {
+                "count": 759,
+                "firstFrame": 189,
+                "lastFrame": 1324
+            },
+            {
+                "count": 743,
+                "firstFrame": 205,
+                "lastFrame": 1324
+            },
+            {
+                "count": 2732,
+                "firstFrame": 185,
+                "lastFrame": 1939
+            },
+            {
+                "count": 2878,
+                "firstFrame": 185,
+                "lastFrame": 1939
+            },
+            {
+                "count": 1227,
+                "firstFrame": 205,
+                "lastFrame": 1819
+            }
+        ]
+    },
+    {
         "testName": "gsdump_26_air_normal_timing_limits",
         "testVersion": "26",
         "finished": true,
@@ -454,7 +501,7 @@ var currentResults =
                 "lastFrame": 1520
             },
             {
-                "count": 359,
+                "count": 379,
                 "firstFrame": 120,
                 "lastFrame": 1548
             },
@@ -736,7 +783,7 @@ var currentResults =
                 "lastFrame": 2137
             },
             {
-                "count": 1158,
+                "count": 1022,
                 "firstFrame": 0,
                 "lastFrame": 2270
             },
@@ -783,7 +830,7 @@ var currentResults =
                 "lastFrame": 655
             },
             {
-                "count": 590,
+                "count": 572,
                 "firstFrame": 92,
                 "lastFrame": 863
             },
@@ -1065,7 +1112,7 @@ var currentResults =
                 "lastFrame": 1724
             },
             {
-                "count": 1083,
+                "count": 953,
                 "firstFrame": 124,
                 "lastFrame": 1750
             },
@@ -1159,7 +1206,7 @@ var currentResults =
                 "lastFrame": 912
             },
             {
-                "count": 269,
+                "count": 168,
                 "firstFrame": 96,
                 "lastFrame": 953
             },
