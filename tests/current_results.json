@@ -424,6 +424,241 @@ var currentResults =
         ]
     },
     {
+        "testName": "dictator_bombed_ex_reverse",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1023,
+                "firstFrame": 135,
+                "lastFrame": 603
+            },
+            {
+                "count": 533,
+                "firstFrame": 175,
+                "lastFrame": 545
+            },
+            {
+                "count": 271,
+                "firstFrame": 175,
+                "lastFrame": 544
+            },
+            {
+                "count": 142,
+                "firstFrame": 147,
+                "lastFrame": 397
+            },
+            {
+                "count": 131,
+                "firstFrame": 147,
+                "lastFrame": 397
+            },
+            {
+                "count": 573,
+                "firstFrame": 164,
+                "lastFrame": 603
+            },
+            {
+                "count": 771,
+                "firstFrame": 133,
+                "lastFrame": 603
+            },
+            {
+                "count": 187,
+                "firstFrame": 147,
+                "lastFrame": 545
+            }
+        ]
+    },
+    {
+        "testName": "dictator_corner_light_crusher",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 254,
+                "firstFrame": 207,
+                "lastFrame": 461
+            },
+            {
+                "count": 292,
+                "firstFrame": 195,
+                "lastFrame": 461
+            },
+            {
+                "count": 1,
+                "firstFrame": 232,
+                "lastFrame": 232
+            },
+            {
+                "count": 32,
+                "firstFrame": 195,
+                "lastFrame": 226
+            },
+            {
+                "count": 32,
+                "firstFrame": 195,
+                "lastFrame": 226
+            },
+            {
+                "count": 272,
+                "firstFrame": 205,
+                "lastFrame": 461
+            },
+            {
+                "count": 503,
+                "firstFrame": 205,
+                "lastFrame": 461
+            },
+            {
+                "count": 2,
+                "firstFrame": 233,
+                "lastFrame": 234
+            }
+        ]
+    },
+    {
+        "testName": "dictator_ex_crusher_bomb_combo",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2701,
+                "firstFrame": 243,
+                "lastFrame": 1219
+            },
+            {
+                "count": 620,
+                "firstFrame": 271,
+                "lastFrame": 1103
+            },
+            {
+                "count": 165,
+                "firstFrame": 276,
+                "lastFrame": 1103
+            },
+            {
+                "count": 328,
+                "firstFrame": 259,
+                "lastFrame": 1101
+            },
+            {
+                "count": 237,
+                "firstFrame": 283,
+                "lastFrame": 1101
+            },
+            {
+                "count": 932,
+                "firstFrame": 257,
+                "lastFrame": 1219
+            },
+            {
+                "count": 1560,
+                "firstFrame": 257,
+                "lastFrame": 1219
+            },
+            {
+                "count": 716,
+                "firstFrame": 283,
+                "lastFrame": 1219
+            }
+        ]
+    },
+    {
+        "testName": "dictator_groundbounce",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 789,
+                "firstFrame": 556,
+                "lastFrame": 944
+            },
+            {
+                "count": 596,
+                "firstFrame": 135,
+                "lastFrame": 841
+            },
+            {
+                "count": 188,
+                "firstFrame": 171,
+                "lastFrame": 841
+            },
+            {
+                "count": 289,
+                "firstFrame": 135,
+                "lastFrame": 839
+            },
+            {
+                "count": 289,
+                "firstFrame": 135,
+                "lastFrame": 839
+            },
+            {
+                "count": 411,
+                "firstFrame": 123,
+                "lastFrame": 887
+            },
+            {
+                "count": 1085,
+                "firstFrame": 123,
+                "lastFrame": 944
+            },
+            {
+                "count": 189,
+                "firstFrame": 172,
+                "lastFrame": 845
+            }
+        ]
+    },
+    {
+        "testName": "dictator_sweep_stomp_combo",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1208,
+                "firstFrame": 112,
+                "lastFrame": 946
+            },
+            {
+                "count": 876,
+                "firstFrame": 120,
+                "lastFrame": 821
+            },
+            {
+                "count": 424,
+                "firstFrame": 156,
+                "lastFrame": 821
+            },
+            {
+                "count": 490,
+                "firstFrame": 76,
+                "lastFrame": 819
+            },
+            {
+                "count": 490,
+                "firstFrame": 76,
+                "lastFrame": 819
+            },
+            {
+                "count": 428,
+                "firstFrame": 75,
+                "lastFrame": 935
+            },
+            {
+                "count": 1113,
+                "firstFrame": 75,
+                "lastFrame": 946
+            },
+            {
+                "count": 353,
+                "firstFrame": 157,
+                "lastFrame": 825
+            }
+        ]
+    },
+    {
         "testName": "gsdump_26_air_normal_timing_limits",
         "testVersion": "26",
         "finished": true,
@@ -847,6 +1082,53 @@ var currentResults =
         ]
     },
     {
+        "testName": "honda_launch_combo",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1468,
+                "firstFrame": 200,
+                "lastFrame": 802
+            },
+            {
+                "count": 434,
+                "firstFrame": 225,
+                "lastFrame": 514
+            },
+            {
+                "count": 301,
+                "firstFrame": 225,
+                "lastFrame": 514
+            },
+            {
+                "count": 274,
+                "firstFrame": 225,
+                "lastFrame": 504
+            },
+            {
+                "count": 274,
+                "firstFrame": 225,
+                "lastFrame": 504
+            },
+            {
+                "count": 506,
+                "firstFrame": 50,
+                "lastFrame": 567
+            },
+            {
+                "count": 1027,
+                "firstFrame": 159,
+                "lastFrame": 802
+            },
+            {
+                "count": 264,
+                "firstFrame": 260,
+                "lastFrame": 523
+            }
+        ]
+    },
+    {
         "testName": "jamie_drink_jump_cancel_divekick",
         "testVersion": "26",
         "finished": true,
@@ -984,6 +1266,53 @@ var currentResults =
                 "count": 8,
                 "firstFrame": 257,
                 "lastFrame": 526
+            }
+        ]
+    },
+    {
+        "testName": "jp_wallbounce_bnb",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1726,
+                "firstFrame": 213,
+                "lastFrame": 971
+            },
+            {
+                "count": 1222,
+                "firstFrame": 165,
+                "lastFrame": 892
+            },
+            {
+                "count": 498,
+                "firstFrame": 214,
+                "lastFrame": 892
+            },
+            {
+                "count": 268,
+                "firstFrame": 165,
+                "lastFrame": 444
+            },
+            {
+                "count": 268,
+                "firstFrame": 165,
+                "lastFrame": 444
+            },
+            {
+                "count": 520,
+                "firstFrame": 95,
+                "lastFrame": 940
+            },
+            {
+                "count": 824,
+                "firstFrame": 95,
+                "lastFrame": 971
+            },
+            {
+                "count": 5,
+                "firstFrame": 259,
+                "lastFrame": 898
             }
         ]
     },
@@ -1176,6 +1505,53 @@ var currentResults =
         ]
     },
     {
+        "testName": "ryu_back_hp",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1583,
+                "firstFrame": 62,
+                "lastFrame": 867
+            },
+            {
+                "count": 487,
+                "firstFrame": 62,
+                "lastFrame": 543
+            },
+            {
+                "count": 381,
+                "firstFrame": 62,
+                "lastFrame": 543
+            },
+            {
+                "count": 165,
+                "firstFrame": 283,
+                "lastFrame": 533
+            },
+            {
+                "count": 165,
+                "firstFrame": 283,
+                "lastFrame": 533
+            },
+            {
+                "count": 384,
+                "firstFrame": 296,
+                "lastFrame": 594
+            },
+            {
+                "count": 990,
+                "firstFrame": 296,
+                "lastFrame": 867
+            },
+            {
+                "count": 199,
+                "firstFrame": 283,
+                "lastFrame": 552
+            }
+        ]
+    },
+    {
         "testName": "ryu_corner_bhp_light_dp_juggle",
         "testVersion": "26",
         "finished": true,
@@ -1313,6 +1689,53 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "ryu_wallbounce",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2456,
+                "firstFrame": 115,
+                "lastFrame": 987
+            },
+            {
+                "count": 809,
+                "firstFrame": 111,
+                "lastFrame": 929
+            },
+            {
+                "count": 582,
+                "firstFrame": 111,
+                "lastFrame": 929
+            },
+            {
+                "count": 233,
+                "firstFrame": 122,
+                "lastFrame": 399
+            },
+            {
+                "count": 164,
+                "firstFrame": 122,
+                "lastFrame": 399
+            },
+            {
+                "count": 563,
+                "firstFrame": 108,
+                "lastFrame": 987
+            },
+            {
+                "count": 1471,
+                "firstFrame": 108,
+                "lastFrame": 987
+            },
+            {
+                "count": 162,
+                "firstFrame": 122,
+                "lastFrame": 930
             }
         ]
     },
