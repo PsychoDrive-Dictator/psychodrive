@@ -962,6 +962,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     if ((okCondFlags & 0x60) == 0x60) {
         int parallelMatchesFound = 0;
         int button = LP;
+        bool bothButtonsPressed = false;
         while (button <= HK) {
             if (button & okKeyFlags) {
                 i = 0;
@@ -969,6 +970,9 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
                 while (i < initialSearch) {
                     if (matchInput(inputBuffer[i], button, 0, dcExcFlags, ngKeyFlags))
                     {
+                        if (std::bitset<32>(inputBuffer[i] & okKeyFlags).count() >= 2) {
+                            bothButtonsPressed = true;
+                        }
                         initialMatch = true;
                     } else if (initialMatch == true) {
                         i--;
@@ -983,7 +987,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
             }
             button = button << 1;
         }
-        initialMatch = (parallelMatchesFound >= 2);
+        initialMatch = bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
         while (i < initialSearch)
         {
