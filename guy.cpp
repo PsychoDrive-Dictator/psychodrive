@@ -935,7 +935,7 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
     return true;
 }
 
-bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
+bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
 {
     nlohmann::json *pNorm = &(*pTrigger)["norm"];
     int commandNo = (*pNorm)["command_no"];
@@ -950,12 +950,12 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
     // 00100000000100000: heavy punch with one button mask
     // 00100000001100000: normal throw, two out of two mask t
     // 00100000010100000: taunt, 6 out of 6 in mask
-    uint32_t i = 0;
-    initialI = 0;
+    int i = 0;
+    initialI = -1;
     bool initialMatch = false;
     // current frame + buffer
-    uint32_t initialSearch = 1 + precedingTime + timeInWarudo;
-    if (inputBuffer.size() < initialSearch) {
+    int initialSearch = 1 + precedingTime + timeInWarudo;
+    if (inputBuffer.size() < (size_t)initialSearch) {
         initialSearch = inputBuffer.size();
     }
 
@@ -963,6 +963,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
         int parallelMatchesFound = 0;
         int button = LP;
         bool bothButtonsPressed = false;
+        bool atLeastOneNotConsumed = false;
         while (button <= HK) {
             if (button & okKeyFlags) {
                 i = 0;
@@ -970,13 +971,19 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
                 while (i < initialSearch) {
                     if (matchInput(inputBuffer[i], button, 0, dcExcFlags, ngKeyFlags))
                     {
+                        if (!(inputBuffer[i] & CONSUMED)) {
+                            atLeastOneNotConsumed = true;
+                        }
                         if (std::bitset<32>(inputBuffer[i] & okKeyFlags).count() >= 2) {
                             bothButtonsPressed = true;
                         }
                         initialMatch = true;
                     } else if (initialMatch == true) {
                         i--;
-                        initialI = i;
+                        // set most recent initialI to get marked consumed?
+                        if (initialI == -1 || initialI < i) {
+                            initialI = i;
+                        }
                         break; // break once initialMatch no longer true, set i on last true
                     }
                     i++;
@@ -987,13 +994,17 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
             }
             button = button << 1;
         }
-        initialMatch = bothButtonsPressed && (parallelMatchesFound >= 2);
+        initialMatch = atLeastOneNotConsumed && bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
+        bool atLeastOneNotConsumed = false;
         while (i < initialSearch)
         {
             // guile 1112 has 0s everywhere
             if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, ngKeyFlags))
             {
+                if (!(inputBuffer[i] & CONSUMED)) {
+                    atLeastOneNotConsumed = true;
+                }
                 initialMatch = true;
             } else if (initialMatch == true) {
                 i--;
@@ -1002,6 +1013,12 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI)
             }
             i++;
         }
+        if (atLeastOneNotConsumed == false) {
+            initialMatch = false;
+        }
+    }
+    if (initialI == -1) {
+        initialI = i;
     }
     if (initialMatch)
     {
@@ -1282,7 +1299,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                 }
             }
 
-            uint32_t initialI = 0;
+            int initialI = 0;
 
             if (setDeferredTriggerIDs.find(triggerID) != setDeferredTriggerIDs.end()) {
                 // check deferred trigger activation
@@ -1322,8 +1339,9 @@ void Guy::DoTriggers(int fluffFrameBias)
                     // consume the input by removing matching edge bits from matched initial input
                     // otherwise chains trigger off of one input since the cancel window starts
                     // before input buffer ends
-                    int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
-                    inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+                    //int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
+                    //inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+                    inputBuffer[initialI] |= CONSUMED;
 
                     // skip further triggers and cancel any delayed triggers
                     setDeferredTriggerIDs.clear();

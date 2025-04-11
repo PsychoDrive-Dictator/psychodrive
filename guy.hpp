@@ -301,7 +301,7 @@ private:
     void ExecuteTrigger(nlohmann::json *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
     bool CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID);
-    bool CheckTriggerCommand(nlohmann::json *pTrigger, uint32_t &initialI);
+    bool CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI);
     void DoTriggers(int fluffFrameBias = 0);
 
     void DoBranchKey(bool preHit);
