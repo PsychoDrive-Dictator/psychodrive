@@ -981,7 +981,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
                     } else if (initialMatch == true) {
                         i--;
                         // set most recent initialI to get marked consumed?
-                        if (initialI == -1 || initialI < i) {
+                        if (initialI == -1 || i < initialI) {
                             initialI = i;
                         }
                         break; // break once initialMatch no longer true, set i on last true
