@@ -305,6 +305,7 @@ private:
     void DoTriggers(int fluffFrameBias = 0);
 
     void DoBranchKey(bool preHit);
+    bool CheckHitBoxCondition(int conditionFlag);
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
 
