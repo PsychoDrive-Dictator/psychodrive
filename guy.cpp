@@ -1801,7 +1801,7 @@ bool Guy::WorldPhysics(void)
 
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand) {
-            Frame();
+            Frame(); // todo this probably screws up thingslike bomb countdown, test
         }
     }
 
