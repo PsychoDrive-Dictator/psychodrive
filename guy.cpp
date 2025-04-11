@@ -1383,6 +1383,10 @@ void Guy::UpdateBoxes(void)
                 continue;
             }
 
+            if (!CheckHitBoxCondition(hurtBox["Condition"])) {
+                continue;
+            }
+
             bool isArmor = hurtBox["_isArm"];
             int armorID = hurtBox["AtemiDataListIndex"];
             bool isAtemi = hurtBox["_isAtm"];
@@ -1474,6 +1478,11 @@ void Guy::UpdateBoxes(void)
             if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
                 continue;
             }
+
+            if (!CheckHitBoxCondition(pushBox["Condition"])) {
+                continue;
+            }
+
             Fixed rootOffsetX = Fixed(0);
             Fixed rootOffsetY = Fixed(0);
             parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
@@ -2320,6 +2329,42 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
     return true;
 }
 
+bool Guy::CheckHitBoxCondition(int conditionFlag)
+{
+    if (conditionFlag == 0) {
+        return true;
+    }
+    bool conditionMet = false;
+    bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
+    if ( conditionFlag & (1<<0) && hitThisMove) {
+        // just normal hit ?
+        conditionMet = true;
+    }
+    if ( conditionFlag & (1<<1) && hasBeenBlockedThisMove) {
+        conditionMet = true;
+    }
+    // todo don't forget to add 'not parried' there
+    if ( conditionFlag & (1<<2) &&
+        (!anyHitThisMove && !hasBeenBlockedThisMove &&
+        !hitAtemiThisMove && !hitArmorThisMove)) {
+        conditionMet = true;
+    }
+    if ( conditionFlag & (1<<3) && (hitCounterThisMove || hitPunishCounterThisMove)) {
+        conditionMet = true;
+    }
+    // 1<<4 parry?
+    if ( conditionFlag & (1<<5) && hitAtemiThisMove) {
+        conditionMet = true;
+    }
+    if ( conditionFlag & (1<<6) && hitArmorThisMove) {
+        conditionMet = true;
+    }
+    // 1<<7 PP
+    // todo hit parry
+
+    return conditionMet;
+}
+
 void Guy::DoHitBoxKey(const char *name)
 {
     if (pActionJson->contains(name))
@@ -2327,6 +2372,10 @@ void Guy::DoHitBoxKey(const char *name)
         for (auto& [hitBoxID, hitBox] : (*pActionJson)[name].items())
         {
             if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            if (!CheckHitBoxCondition(hitBox["Condition"])) {
                 continue;
             }
 
