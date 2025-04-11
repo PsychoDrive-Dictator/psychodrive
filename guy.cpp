@@ -2164,7 +2164,8 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
 
         groundBounce = true;
         groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
-        groundBounceAccelX = Fixed(floorDestX / 4) / Fixed(floorTime * floorTime);
+        groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
+        if (groundBounceAccelX.data & 63) groundBounceAccelX.data += 1;
         groundBounceVelX -= groundBounceAccelX;
 
         groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
