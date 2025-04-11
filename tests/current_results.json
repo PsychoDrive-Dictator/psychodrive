@@ -1,6 +1,53 @@
 var currentResults =
 [
     {
+        "testName": "aa_throw_tech",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 336,
+                "firstFrame": 286,
+                "lastFrame": 453
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 26,
+                "firstFrame": 288,
+                "lastFrame": 300
+            },
+            {
+                "count": 26,
+                "firstFrame": 288,
+                "lastFrame": 300
+            },
+            {
+                "count": 306,
+                "firstFrame": 256,
+                "lastFrame": 453
+            },
+            {
+                "count": 358,
+                "firstFrame": 256,
+                "lastFrame": 453
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "bison26_bison26_jumps",
         "testVersion": "26",
         "finished": true,
