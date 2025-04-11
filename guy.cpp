@@ -2830,7 +2830,11 @@ bool Guy::Frame(bool endWarudoFrame)
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     if (!didTrigger && !didBranch) {
+        curNextAction = nextAction;
         DoBranchKey(true);
+        if (nextAction != curNextAction) {
+            didBranch = true;
+        }
     }
 
     if (isProjectile && projHitCount == 0) {
@@ -3183,7 +3187,7 @@ bool Guy::Frame(bool endWarudoFrame)
         bool inheritHitID = (*pInherit)["_HitID"];
         // see eg. 2MP into light crusher - light crusher has inherit hitID true..
         // assuming it's supposed to be for branches only
-        if (didTrigger) {
+        if (!didBranch) {
             inheritHitID = false;
         }
 
@@ -3194,7 +3198,7 @@ bool Guy::Frame(bool endWarudoFrame)
         // only reset on doing a trigger - skull diver trigger is on hit, but the hit
         // happens on a prior script, and it doesn't have inherit HitInfo, so it's not that
         // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch, check what that's about
-        if (didTrigger) {
+        if (!didBranch) {
             hitThisMove = false;
             hitCounterThisMove = false;
             hitPunishCounterThisMove = false;
