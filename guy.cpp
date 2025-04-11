@@ -1145,16 +1145,20 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
                                 bufferInput = invertDirection(bufferInput);
                             }
 
+                            bool inputNg = false;
+
                             if (inputNgCondFlags & 2) {
                                 if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
-                                    fail = true;
-                                    break;
+                                    inputNg = true;
                                 }
                             } else if (inputNgKeyFlags & bufferInput) {
+                                inputNg = true;
+                            }
+                            if (inputNg && !match) {
                                 fail = true;
                                 break;
                             }
-                            if (matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+                            if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
                                 int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
                                 if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
                                     match = true;
