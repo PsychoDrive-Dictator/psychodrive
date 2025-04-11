@@ -21,6 +21,7 @@ enum Input
 	LK_pressed = 8192,
 	MK_pressed = 16384,
 	HK_pressed = 32768,
+	CONSUMED = 65536,
 };
 
 enum InputID
