@@ -2068,11 +2068,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     }
                 }
                 retHit = true;
-                log(logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
+                pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
                     " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                     " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                     " moveType " + std::to_string(moveType) );
-                log(logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
+                pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
             }
         }
         if (retHit) break;
@@ -2307,7 +2307,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
                 nextAction = 213;
             }
         }
-        if ((getAirborne() || posY > Fixed(0)) && destY != 0 ) {
+        if (getAirborne() || posY > Fixed(0) || destY > 0) {
             if (destY > destX) {
                 nextAction = 251; // 90
             } else if (destX > destY * 2.5) {
@@ -2315,10 +2315,12 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             } else {
                 nextAction = 252; // 45
             }
-        }
-        // those apply even for airborne/launch
-        if (moveType == 17) {
-            nextAction = 282;
+            // those apply even for airborne/launch
+            if (moveType == 22) {
+                nextAction = 232;
+            } else if (moveType == 17) {
+                nextAction = 282;
+            }
         }
     }
 
