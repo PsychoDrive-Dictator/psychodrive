@@ -36,12 +36,14 @@ resultsModTime = None
 if os.path.isfile(resultsPath):
     resultsModTime = os.path.getmtime(resultsPath)
 
-if resultsModTime != None and resultsModTime < os.path.getmtime(psychodrivePath):
+if resultsModTime == None:
     testsUpToDate = False
-
-for test in tests:
-    if resultsModTime < os.path.getmtime(test['filePath']):
+else:
+    if resultsModTime < os.path.getmtime(psychodrivePath):
         testsUpToDate = False
+    for test in tests:
+        if resultsModTime < os.path.getmtime(test['filePath']):
+            testsUpToDate = False
 
 for arg in sys.argv:
     if arg == '--force':
