@@ -5,6 +5,9 @@ import subprocess
 import json
 import sys
 from datetime import datetime
+import concurrent.futures
+import multiprocessing
+import time
 
 scriptPath = os.path.abspath(__file__)
 scriptDir = os.path.dirname(scriptPath)
@@ -55,7 +58,7 @@ if testsUpToDate:
 
 testResults = []
 
-for test in tests:
+def runTest(test):
     testPath = test['filePath']
     charVersion = test['charVersion']
     print('running test', testPath, charVersion)
@@ -91,7 +94,27 @@ for test in tests:
             newTestResult['errorTypes'][errorType]['count'] += 1
         if errorLine[0] == 'F':
             newTestResult['finished'] = True
-    testResults.append(newTestResult)
+    return newTestResult
+
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count())
+
+futures = []
+futuresNotDone = []
+
+for test in tests:
+    futures.append(executor.submit(runTest, test))
+
+while True:
+    for f in futures:
+        if f.done():
+            testResults.append(f.result())
+        else:
+            futuresNotDone.append(f)
+    futures = futuresNotDone
+    futuresNotDone = []
+    if len(futures) == 0:
+        break
+    time.sleep(0.1)
 
 testResults = sorted(testResults, key=lambda x:x['testName'])
 
