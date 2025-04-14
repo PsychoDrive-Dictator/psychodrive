@@ -2150,7 +2150,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
     {
         // this is set on honda airborne hands
         // juggle state, just add a bunch of hitstun
-        if (dmgValue != 0 && dmgType & 8) {
+        if (dmgType & 8) {
             hitEntryHitStun += 500000;
             resetHitStunOnLand = true;
         }
