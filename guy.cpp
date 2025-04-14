@@ -1226,49 +1226,52 @@ struct TriggerListEntry {
 void Guy::DoTriggers(int fluffFrameBias)
 {
     std::set<int> keptDeferredTriggerIDs;
-    if (pActionJson->contains("TriggerKey"))
+    bool hasTriggerKey = pActionJson->contains("TriggerKey");
+    if (hasTriggerKey || fluffFrames(fluffFrameBias))
     {
         std::map<int,TriggerListEntry> mapTriggers; // will sort all the valid triggers by ID
 
-        for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
-        {
-            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                continue;
-            }
-
-            int validStyles = key["_ValidStyle"];
-            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                continue;
-            }
-
-            // todo _Input for modern vs. classic
-
-            int other = key["_Other"];
-            bool defer = other & 1<<6;
-            int triggerGroup = key["TriggerGroup"];
-            int condition = key["_Condition"];
-            int state = key["_State"];
-
-            if (!defer && !CheckTriggerGroupConditions(condition, state)) {
-                continue;
-            }
-
-            auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
-            for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
+        if (hasTriggerKey) {
+            for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
             {
-                int triggerID = atoi(keyID.c_str());
-                if (mapTriggers.find(triggerID) == mapTriggers.end()) {
-                    TriggerListEntry newTrig = { key, false, false, false };
-                    mapTriggers[triggerID] = newTrig;
+                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                    continue;
                 }
-                if (!defer) {
-                    mapTriggers[triggerID].hasNormal = true;
+
+                int validStyles = key["_ValidStyle"];
+                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+                    continue;
                 }
-                if (defer) {
-                    mapTriggers[triggerID].hasDeferred = true;
+
+                // todo _Input for modern vs. classic
+
+                int other = key["_Other"];
+                bool defer = other & 1<<6;
+                int triggerGroup = key["TriggerGroup"];
+                int condition = key["_Condition"];
+                int state = key["_State"];
+
+                if (!defer && !CheckTriggerGroupConditions(condition, state)) {
+                    continue;
                 }
-                if (other & 1<<17) {
-                    mapTriggers[triggerID].hasAntiNormal = true;
+
+                auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
+                for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
+                {
+                    int triggerID = atoi(keyID.c_str());
+                    if (mapTriggers.find(triggerID) == mapTriggers.end()) {
+                        TriggerListEntry newTrig = { key, false, false, false };
+                        mapTriggers[triggerID] = newTrig;
+                    }
+                    if (!defer) {
+                        mapTriggers[triggerID].hasNormal = true;
+                    }
+                    if (defer) {
+                        mapTriggers[triggerID].hasDeferred = true;
+                    }
+                    if (other & 1<<17) {
+                        mapTriggers[triggerID].hasAntiNormal = true;
+                    }
                 }
             }
         }
