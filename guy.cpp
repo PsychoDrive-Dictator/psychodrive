@@ -2315,6 +2315,9 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             } else {
                 nextAction = 252; // 45
             }
+            if (destY < 0) {
+                nextAction = 255;
+            }
             // those apply even for airborne/launch
             if (moveType == 22) {
                 nextAction = 232;
