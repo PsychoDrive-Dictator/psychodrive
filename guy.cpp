@@ -288,6 +288,11 @@ bool Guy::PreFrame(void)
         if (debuffTimer > 0 ) {
             debuffTimer--;
         }
+        if (debuffTimer == 1 && warudo == 1) {
+            debuffTimer = 5;
+        } else if (debuffTimer == 1 && warudo > 0) {
+            debuffTimer++;
+        }
     }
 
     if (warudo > 0) {
@@ -2315,14 +2320,17 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
             } else {
                 nextAction = 252; // 45
             }
-            if (destY < 0) {
-                nextAction = 255;
-            }
-            // those apply even for airborne/launch
+
+            // those apply even for (upwards?) airborne/launch
             if (moveType == 22) {
                 nextAction = 232;
             } else if (moveType == 17) {
                 nextAction = 282;
+            } else if (moveType == 16) {
+                nextAction = 280;
+            }
+            if (destY < 0) {
+                nextAction = 255;
             }
         }
     }
