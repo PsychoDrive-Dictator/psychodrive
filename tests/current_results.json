@@ -565,6 +565,53 @@ var currentResults =
         ]
     },
     {
+        "testName": "dictator_bug_di_absorb_ex_ghost_pushback",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 383,
+                "firstFrame": 135,
+                "lastFrame": 517
+            },
+            {
+                "count": 5,
+                "firstFrame": 332,
+                "lastFrame": 336
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 51,
+                "firstFrame": 330,
+                "lastFrame": 380
+            },
+            {
+                "count": 51,
+                "firstFrame": 330,
+                "lastFrame": 380
+            },
+            {
+                "count": 127,
+                "firstFrame": 143,
+                "lastFrame": 481
+            },
+            {
+                "count": 233,
+                "firstFrame": 143,
+                "lastFrame": 517
+            },
+            {
+                "count": 161,
+                "firstFrame": 137,
+                "lastFrame": 418
+            }
+        ]
+    },
+    {
         "testName": "dictator_corner_light_crusher",
         "testVersion": "26",
         "finished": true,
