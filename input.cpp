@@ -21,6 +21,13 @@ struct FingerState {
 SDL_FingerID directionFinger = -1;
 std::map<SDL_FingerID, FingerState> mapFingerPositions;
 
+struct GamepadFlags {
+    bool horizAnalogInput = false;
+    bool vertAnalogInput = false;
+};
+
+std::map<int, GamepadFlags> mapGamepadFlags;
+
 class TouchButton {
 public:
     TouchButton(float x, float y, float yOffset, float radius, int inputSlot, int input) :
@@ -271,22 +278,28 @@ void updateInputs(int sizeX, int sizeY)
                     if (event.caxis.value < -deadzone )  {
                         currentInputMap[inputID] |= BACK;
                         currentInputMap[inputID] &= ~FORWARD;
+                        mapGamepadFlags[inputID].horizAnalogInput = true;
                     } else if (event.caxis.value > deadzone ) {
                         currentInputMap[inputID] |= FORWARD;
                         currentInputMap[inputID] &= ~BACK;
-                    } else {
+                        mapGamepadFlags[inputID].horizAnalogInput = true;
+                    } else if (mapGamepadFlags[inputID].horizAnalogInput) {
                         currentInputMap[inputID] &= ~(FORWARD+BACK);
+                        mapGamepadFlags[inputID].horizAnalogInput = false;
                     }
                     break;
                 case SDL_CONTROLLER_AXIS_LEFTY:
                     if (event.caxis.value < -deadzone )  {
                         currentInputMap[inputID] |= UP;
                         currentInputMap[inputID] &= ~DOWN;
+                        mapGamepadFlags[inputID].vertAnalogInput = true;
                     } else if (event.caxis.value > deadzone ) {
                         currentInputMap[inputID] |= DOWN;
                         currentInputMap[inputID] &= ~UP;
-                    } else {
+                        mapGamepadFlags[inputID].vertAnalogInput = true;
+                    } else if (mapGamepadFlags[inputID].vertAnalogInput) {
                         currentInputMap[inputID] &= ~(DOWN+UP);
+                        mapGamepadFlags[inputID].vertAnalogInput = false;
                     }
                     break;
                 case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
