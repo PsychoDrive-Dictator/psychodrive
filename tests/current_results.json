@@ -1787,6 +1787,53 @@ var currentResults =
         ]
     },
     {
+        "testName": "ryu_fireball_juggle_dr_combo",
+        "testVersion": "26",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2565,
+                "firstFrame": 126,
+                "lastFrame": 1229
+            },
+            {
+                "count": 721,
+                "firstFrame": 126,
+                "lastFrame": 613
+            },
+            {
+                "count": 346,
+                "firstFrame": 140,
+                "lastFrame": 613
+            },
+            {
+                "count": 384,
+                "firstFrame": 125,
+                "lastFrame": 613
+            },
+            {
+                "count": 383,
+                "firstFrame": 126,
+                "lastFrame": 613
+            },
+            {
+                "count": 1610,
+                "firstFrame": 99,
+                "lastFrame": 1208
+            },
+            {
+                "count": 1868,
+                "firstFrame": 99,
+                "lastFrame": 1229
+            },
+            {
+                "count": 873,
+                "firstFrame": 254,
+                "lastFrame": 1144
+            }
+        ]
+    },
+    {
         "testName": "ryu_fullscreen_tatsu_juggle",
         "testVersion": "26",
         "finished": true,
