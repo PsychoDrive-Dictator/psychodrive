@@ -65,7 +65,7 @@ def countActiveFrames(move):
         for key in move["AttackCollisionKey"]:
             if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
                 attackKey = move["AttackCollisionKey"][key]
-                if attackKey["CollisionType"] == 0:
+                if (attackKey["CollisionType"] == 0 or attackKey["CollisionType"] == 1):
                     if minActive == -1:
                         minActive = attackKey["_StartFrame"]
                     if maxActive == -1:
@@ -80,7 +80,7 @@ def getHitInfoDict(move, hitsJson):
         for key in move["AttackCollisionKey"]:
             if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
                 attackKey = move["AttackCollisionKey"][key]
-                if attackKey["CollisionType"] == 0 and attackKey["AttackDataListIndex"] != -1:
+                if (attackKey["CollisionType"] == 0 or attackKey["CollisionType"] == 1) and attackKey["AttackDataListIndex"] != -1:
                     hitEntry = hitsJson[str(attackKey["AttackDataListIndex"]).zfill(3)]
                     hitInfoDict[attackKey["HitID"]] = hitEntry
     return hitInfoDict
