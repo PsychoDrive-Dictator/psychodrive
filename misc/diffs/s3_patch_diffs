@@ -97,7 +97,171 @@ ryu SAA_HADOSHO_END(4) hit 0 on punish counter MoveType was 13, now 69
 ryu SAA_HADOSHO_END(4) hit 0 on punish counter ParryStopOwner was 20, now 23
 ryu SAA_HADOSHO_END(4) hit 0 on punish counter ParryStopTarget was 20, now 23
 ryu SAA_HADOSHO_END(4) ComboScaling was -1 , now 20
+ryu SAA_HADOUKEN(1) PROJ hit 0 on hit DmgValue was 400, now 200
+ryu SAA_HADOUKEN(1) PROJ hit 0 on hit DriveNorm was 4000, now 2000
+ryu SAA_HADOUKEN(1) PROJ hit 0 on hit FocusTgt was -1000, now -600
+ryu SAA_HADOUKEN(1) PROJ hit 0 on hit HitStopOwner was 7, now 4
+ryu SAA_HADOUKEN(1) PROJ hit 0 on hit HitStopTarget was 8, now 5
+ryu SAA_HADOUKEN(1) PROJ hit 0 on block FocusTgt was -500, now -300
+ryu SAA_HADOUKEN(1) PROJ hit 0 on block HitStopOwner was 7, now 4
+ryu SAA_HADOUKEN(1) PROJ hit 0 on block HitStopTarget was 8, now 5
+ryu SAA_HADOUKEN(1) PROJ hit 0 on air hit DmgValue was 400, now 200
+ryu SAA_HADOUKEN(1) PROJ hit 0 on air hit DriveNorm was 4000, now 2000
+ryu SAA_HADOUKEN(1) PROJ hit 0 on air hit FocusTgt was -1000, now -600
+ryu SAA_HADOUKEN(1) PROJ hit 0 on air hit HitStopOwner was 7, now 4
+ryu SAA_HADOUKEN(1) PROJ hit 0 on air hit HitStopTarget was 8, now 5
+ryu SAA_HADOUKEN(1) PROJ hit 0 on burnout block DmgValue was 100, now 50
+ryu SAA_HADOUKEN(1) PROJ hit 0 on burnout block FocusTgt was 250, now 150
+ryu SAA_HADOUKEN(1) PROJ hit 0 on burnout block HitStopOwner was 7, now 4
+ryu SAA_HADOUKEN(1) PROJ hit 0 on burnout block HitStopTarget was 8, now 5
+ryu SAA_HADOUKEN(1) PROJ hit 0 on counter DmgValue was 400, now 200
+ryu SAA_HADOUKEN(1) PROJ hit 0 on counter FocusTgt was -1000, now -600
+ryu SAA_HADOUKEN(1) PROJ hit 0 on counter HitStopOwner was 7, now 4
+ryu SAA_HADOUKEN(1) PROJ hit 0 on counter HitStopTarget was 8, now 5
+ryu SAA_HADOUKEN(1) PROJ hit 0 on punish counter DmgValue was 400, now 200
+ryu SAA_HADOUKEN(1) PROJ hit 0 on punish counter FocusTgt was -1000, now -600
+ryu SAA_HADOUKEN(1) PROJ hit 0 on punish counter HitStopOwner was 7, now 4
+ryu SAA_HADOUKEN(1) PROJ hit 0 on punish counter HitStopTarget was 8, now 5
+ryu SPA_HADO PROJ hit 0 on hit DmgValue was 600, now 700
+ryu SPA_HADO PROJ hit 0 on hit HitStun was 25, now 26
+ryu SPA_HADO PROJ hit 0 on hit MoveTime was 25, now 26
+ryu SPA_HADO PROJ hit 0 on air hit DmgValue was 600, now 700
+ryu SPA_HADO PROJ hit 0 on burnout block DmgValue was 150, now 175
+ryu SPA_HADO PROJ hit 0 on counter DmgValue was 720, now 840
+ryu SPA_HADO PROJ hit 0 on counter HitStun was 27, now 28
+ryu SPA_HADO PROJ hit 0 on counter MoveTime was 27, now 28
+ryu SPA_HADO PROJ hit 0 on punish counter DmgValue was 720, now 840
+ryu SPA_HADO PROJ hit 0 on punish counter HitStun was 29, now 30
+ryu SPA_HADO PROJ hit 0 on punish counter MoveTime was 29, now 30
+ryu SPA_HADO(1) PROJ hit 0 on hit DmgValue was 600, now 700
+ryu SPA_HADO(1) PROJ hit 0 on hit HitStun was 25, now 26
+ryu SPA_HADO(1) PROJ hit 0 on hit MoveTime was 25, now 26
+ryu SPA_HADO(1) PROJ hit 0 on air hit DmgValue was 600, now 700
+ryu SPA_HADO(1) PROJ hit 0 on burnout block DmgValue was 150, now 175
+ryu SPA_HADO(1) PROJ hit 0 on counter DmgValue was 720, now 840
+ryu SPA_HADO(1) PROJ hit 0 on counter HitStun was 27, now 28
+ryu SPA_HADO(1) PROJ hit 0 on counter MoveTime was 27, now 28
+ryu SPA_HADO(1) PROJ hit 0 on punish counter DmgValue was 720, now 840
+ryu SPA_HADO(1) PROJ hit 0 on punish counter HitStun was 29, now 30
+ryu SPA_HADO(1) PROJ hit 0 on punish counter MoveTime was 29, now 30
+ryu SPA_HADO(2) PROJ hit 0 on hit DmgValue was 600, now 700
+ryu SPA_HADO(2) PROJ hit 0 on hit HitStun was 25, now 26
+ryu SPA_HADO(2) PROJ hit 0 on hit MoveTime was 25, now 26
+ryu SPA_HADO(2) PROJ hit 0 on air hit DmgValue was 600, now 700
+ryu SPA_HADO(2) PROJ hit 0 on burnout block DmgValue was 150, now 175
+ryu SPA_HADO(2) PROJ hit 0 on counter DmgValue was 720, now 840
+ryu SPA_HADO(2) PROJ hit 0 on counter HitStun was 27, now 28
+ryu SPA_HADO(2) PROJ hit 0 on counter MoveTime was 27, now 28
+ryu SPA_HADO(2) PROJ hit 0 on punish counter DmgValue was 720, now 840
+ryu SPA_HADO(2) PROJ hit 0 on punish counter HitStun was 29, now 30
+ryu SPA_HADO(2) PROJ hit 0 on punish counter MoveTime was 29, now 30
+ryu SPA_HADO(3) PROJ hit 0 on hit DmgValue was 400, now 500
+ryu SPA_HADO(3) PROJ hit 0 on air hit DmgValue was 400, now 500
+ryu SPA_HADO(3) PROJ hit 0 on burnout block DmgValue was 100, now 125
+ryu SPA_HADO(3) PROJ hit 0 on counter DmgValue was 480, now 600
+ryu SPA_HADO(3) PROJ hit 0 on punish counter DmgValue was 480, now 600
+ryu SPA_HADO(4) PROJ hit 0 on hit DmgValue was 400, now 500
+ryu SPA_HADO(4) PROJ hit 0 on air hit DmgValue was 400, now 500
+ryu SPA_HADO(4) PROJ hit 0 on burnout block DmgValue was 100, now 125
+ryu SPA_HADO(4) PROJ hit 0 on counter DmgValue was 480, now 600
+ryu SPA_HADO(4) PROJ hit 0 on punish counter DmgValue was 480, now 600
+ryu SPA_HADO(5) PROJ hit 0 on hit DmgValue was 300, now 400
+ryu SPA_HADO(5) PROJ hit 0 on air hit DmgValue was 300, now 400
+ryu SPA_HADO(5) PROJ hit 0 on burnout block DmgValue was 75, now 100
+ryu SPA_HADO(5) PROJ hit 0 on counter DmgValue was 360, now 480
+ryu SPA_HADO(5) PROJ hit 0 on punish counter DmgValue was 360, now 480
+ryu _1056 PROJ hit 0 on hit DmgValue was 400, now 500
+ryu _1056 PROJ hit 0 on air hit DmgValue was 400, now 500
+ryu _1056 PROJ hit 0 on burnout block DmgValue was 100, now 125
+ryu _1056 PROJ hit 0 on counter DmgValue was 480, now 600
+ryu _1056 PROJ hit 0 on punish counter DmgValue was 480, now 600
+ryu _1204 PROJ hit 0 on hit DmgType was 11, now 3
+ryu _1204 PROJ hit 0 on hit HitStopOwner was 0, now 7
+ryu _1204 PROJ hit 0 on hit HitStun was 21, now 20
+ryu _1204 PROJ hit 0 on hit Hitmark was 7, now 16
+ryu _1204 PROJ hit 0 on hit Juggle1st was 100, now 1
+ryu _1204 PROJ hit 0 on hit JuggleAdd was 100, now 1
+ryu _1204 PROJ hit 0 on hit MoveDest.x was 170, now 50
+ryu _1204 PROJ hit 0 on hit MoveDest.y was 63, now 0
+ryu _1204 PROJ hit 0 on hit MoveTime was 21, now 20
+ryu _1204 PROJ hit 0 on hit MoveType was 13, now 0
+ryu _1204 PROJ hit 0 on hit ParryStopOwner was 0, now -1
+ryu _1204 PROJ hit 0 on hit ScreenVib was 4, now 5
+ryu _1204 PROJ hit 0 on hit SndPower was 5, now 0
+ryu _1204 PROJ hit 0 on hit SndVoice was 602, now 600
+ryu _1204 PROJ hit 0 on block DmgPower was 2, now 3
+ryu _1204 PROJ hit 0 on block DriveJust was 65535, now 20000
+ryu _1204 PROJ hit 0 on block DriveNorm was 65535, now 4000
+ryu _1204 PROJ hit 0 on block HitStopOwner was 0, now 7
+ryu _1204 PROJ hit 0 on block Hitmark was 7, now 16
+ryu _1204 PROJ hit 0 on block Juggle1st was 100, now 1
+ryu _1204 PROJ hit 0 on block JuggleAdd was 100, now 1
+ryu _1204 PROJ hit 0 on block MoveDest.x was 40, now 0
+ryu _1204 PROJ hit 0 on block ParryStopOwner was 0, now -1
+ryu _1204 PROJ hit 0 on block SndPower was 5, now 0
+ryu _1204 PROJ hit 0 on block SndVoice was 602, now 600
+ryu _1204 PROJ hit 0 on block _IsStrength_H was True, now False
+ryu _1204 PROJ hit 0 on block _IsStrength_S was False, now True
+ryu _1204 PROJ hit 0 on air hit HitStopOwner was 0, now 7
+ryu _1204 PROJ hit 0 on air hit HitStun was 19, now 16
+ryu _1204 PROJ hit 0 on air hit Hitmark was 7, now 16
+ryu _1204 PROJ hit 0 on air hit Juggle1st was 100, now 1
+ryu _1204 PROJ hit 0 on air hit JuggleAdd was 100, now 1
+ryu _1204 PROJ hit 0 on air hit MoveDest.x was 170, now 50
+ryu _1204 PROJ hit 0 on air hit MoveDest.y was 55, now 20
+ryu _1204 PROJ hit 0 on air hit MoveTime was 19, now 16
+ryu _1204 PROJ hit 0 on air hit ParryStopOwner was 0, now -1
+ryu _1204 PROJ hit 0 on air hit ScreenVib was 4, now 5
+ryu _1204 PROJ hit 0 on air hit SndPower was 5, now 0
+ryu _1204 PROJ hit 0 on air hit SndVoice was 602, now 600
+ryu _1204 PROJ hit 0 on burnout block DmgPower was 2, now 3
+ryu _1204 PROJ hit 0 on burnout block DmgVari was 1, now -1
+ryu _1204 PROJ hit 0 on burnout block HitStopOwner was 0, now 7
+ryu _1204 PROJ hit 0 on burnout block Hitmark was 7, now 16
+ryu _1204 PROJ hit 0 on burnout block Juggle1st was 100, now 1
+ryu _1204 PROJ hit 0 on burnout block JuggleAdd was 100, now 1
+ryu _1204 PROJ hit 0 on burnout block MoveDest.x was 40, now 0
+ryu _1204 PROJ hit 0 on burnout block ParryStopOwner was 0, now -1
+ryu _1204 PROJ hit 0 on burnout block SndPower was 5, now 0
+ryu _1204 PROJ hit 0 on burnout block SndVoice was 602, now 600
+ryu _1204 PROJ hit 0 on burnout block _IsStrength_H was True, now False
+ryu _1204 PROJ hit 0 on burnout block _IsStrength_S was False, now True
+ryu _1204 PROJ hit 0 on counter DmgType was 11, now 3
+ryu _1204 PROJ hit 0 on counter DmgValue was 480, now 400
+ryu _1204 PROJ hit 0 on counter HitStopOwner was 0, now 7
+ryu _1204 PROJ hit 0 on counter HitStun was 21, now 22
+ryu _1204 PROJ hit 0 on counter Hitmark was 7, now 16
+ryu _1204 PROJ hit 0 on counter Juggle1st was 100, now 1
+ryu _1204 PROJ hit 0 on counter JuggleAdd was 100, now 1
+ryu _1204 PROJ hit 0 on counter MoveDest.x was 170, now 50
+ryu _1204 PROJ hit 0 on counter MoveDest.y was 63, now 0
+ryu _1204 PROJ hit 0 on counter MoveTime was 21, now 22
+ryu _1204 PROJ hit 0 on counter MoveType was 13, now 0
+ryu _1204 PROJ hit 0 on counter ParryStopOwner was 0, now -1
+ryu _1204 PROJ hit 0 on counter ScreenVib was 4, now 5
+ryu _1204 PROJ hit 0 on counter SndPower was 5, now 0
+ryu _1204 PROJ hit 0 on counter SndVoice was 602, now 600
+ryu _1204 PROJ hit 0 on punish counter DmgType was 11, now 3
+ryu _1204 PROJ hit 0 on punish counter DmgValue was 480, now 400
+ryu _1204 PROJ hit 0 on punish counter HitStopOwner was 0, now 7
+ryu _1204 PROJ hit 0 on punish counter HitStun was 21, now 24
+ryu _1204 PROJ hit 0 on punish counter Hitmark was 7, now 16
+ryu _1204 PROJ hit 0 on punish counter Juggle1st was 100, now 1
+ryu _1204 PROJ hit 0 on punish counter JuggleAdd was 100, now 1
+ryu _1204 PROJ hit 0 on punish counter MoveDest.x was 170, now 50
+ryu _1204 PROJ hit 0 on punish counter MoveDest.y was 63, now 0
+ryu _1204 PROJ hit 0 on punish counter MoveTime was 21, now 24
+ryu _1204 PROJ hit 0 on punish counter MoveType was 13, now 0
+ryu _1204 PROJ hit 0 on punish counter ParryStopOwner was 0, now -1
+ryu _1204 PROJ hit 0 on punish counter ScreenVib was 4, now 5
+ryu _1204 PROJ hit 0 on punish counter SndPower was 5, now 0
+ryu _1204 PROJ hit 0 on punish counter SndVoice was 602, now 600
 ryu _1204 PROJ _StartScaling was -1 , now 50
+ryu _914 PROJ hit 0 on hit DmgValue was 400, now 500
+ryu _914 PROJ hit 0 on air hit DmgValue was 400, now 500
+ryu _914 PROJ hit 0 on burnout block DmgValue was 100, now 125
+ryu _914 PROJ hit 0 on counter DmgValue was 480, now 600
+ryu _914 PROJ hit 0 on punish counter DmgValue was 480, now 600
 luke SPA_FLASHKNUCKLE_EX_2 hit 1 (dt 147):
 burnout stand block vs stand block should be -4, but is -2
 luke SPA_FLASHKNUCKLE_EX_1(1) hit 1 (dt 155):
@@ -160,12 +324,17 @@ luke SPA_AvengerImpalar(2) hit 1 on block HitStun was 20, now 22
 luke SPA_AvengerImpalar(2) hit 1 on block MoveTime was 20, now 22
 luke SPA_AvengerImpalar(2) hit 1 on burnout block HitStun was 24, now 26
 luke SPA_AvengerImpalar(2) hit 1 on burnout block MoveTime was 24, now 26
+luke SPA_HADO PROJ hit 0 on block FocusTgt was -2500, now -3000
+luke SPA_HADO(1) PROJ hit 0 on block FocusTgt was -2500, now -3000
+luke SPA_HADO(2) PROJ hit 0 on block FocusTgt was -2500, now -3000
 luke SPA_RisingUpper_L_START hit 0 on hit JuggleLimit was 7, now 17
 luke SPA_RisingUpper_L_START hit 0 on block JuggleLimit was 7, now 17
 luke SPA_RisingUpper_L_START hit 0 on air hit JuggleLimit was 7, now 17
 luke SPA_RisingUpper_L_START hit 0 on burnout block JuggleLimit was 7, now 17
 luke SPA_RisingUpper_L_START hit 0 on counter JuggleLimit was 7, now 17
 luke SPA_RisingUpper_L_START hit 0 on punish counter JuggleLimit was 7, now 17
+luke SPA_SandBlast_EX_1 PROJ hit 0 on block FocusTgt was -1000, now -1500
+luke _914 PROJ hit 0 on block FocusTgt was -1000, now -1500
 kimberly ATK_5HP hit 0 (dt 018):
 stand hit vs stand PC should be 4, but is 20
 kimberly ATK_6HK hit 0 (dt 038):
@@ -276,7 +445,11 @@ kimberly ATK_GOKUSA_Kim_5MP_5HP_5HK_TC_Long(1) hit 1 on air hit FloorDest.x was 
 kimberly ATK_GOKUSA_Kim_5MP_5HP_5HK_TC_Long(1) hit 1 on air hit FloorDest.y was 0, now 15
 kimberly ATK_GOKUSA_Kim_5MP_5HP_5HK_TC_Long(1) hit 1 on air hit FloorTime was 0, now 17
 kimberly ATK_GOKUSA_Kim_5MP_5HP_5HK_TC_Long(1) hit 1 on air hit _jimen_bound was False, now True
+kimberly _995 PROJ was active from 0-10 now active from -1--1
+kimberly _995 PROJ different hit count
 kimberly _995 PROJ _StartScaling was 10 , now -1
+kimberly _996 PROJ was active from 0-10 now active from -1--1
+kimberly _996 PROJ different hit count
 kimberly _996 PROJ _StartScaling was 10 , now -1
 chunli ATK_6HK hit 0 (dt 059):
 stand hit vs stand PC should be 4, but is -2
@@ -793,6 +966,11 @@ jp ATK_2HK hit 0 on counter HitStopOwner was 13, now 10
 jp ATK_2HK hit 0 on counter HitStopTarget was 13, now 10
 jp ATK_2HK hit 0 on counter _no_rolling was True, now False
 jp ATK_2MK _StartScaling was -1 , now 20
+jp SPA_SP3(5) PROJ hit 0 on hit DmgValue was 400, now 800
+jp SPA_SP3(5) PROJ hit 0 on air hit DmgValue was 400, now 800
+jp SPA_SP3(5) PROJ hit 0 on burnout block DmgValue was 100, now 200
+jp SPA_SP3(5) PROJ hit 0 on counter DmgValue was 480, now 960
+jp SPA_SP3(5) PROJ hit 0 on punish counter DmgValue was 480, now 960
 jp SPA_SP5_END(1) PROJ _StartScaling was -1 , now 20
 jp SPA_SP5_END(2) PROJ _StartScaling was -1 , now 20
 jp _981 PROJ _StartScaling was -1 , now 20
@@ -845,6 +1023,42 @@ dhalsim SPA_YOGABLAST(2) PROJ hit 0 on punish counter HitStun was 27, now 30
 dhalsim SPA_YOGABLAST(2) PROJ hit 0 on punish counter MoveDest.x was 120, now 145
 dhalsim SPA_YOGABLAST(2) PROJ hit 0 on punish counter MoveTime was 27, now 30
 dhalsim SPA_YOGABLAST(2) PROJ ComboScaling was -1 , now 20
+dhalsim _929 PROJ hit 0 on hit HitStun was 21, now 22
+dhalsim _929 PROJ hit 0 on hit MoveTime was 21, now 22
+dhalsim _929 PROJ hit 0 on block HitStun was 14, now 15
+dhalsim _929 PROJ hit 0 on block MoveTime was 14, now 15
+dhalsim _929 PROJ hit 0 on air hit HitStun was 20, now 21
+dhalsim _929 PROJ hit 0 on air hit MoveTime was 20, now 21
+dhalsim _929 PROJ hit 0 on burnout block HitStun was 18, now 19
+dhalsim _929 PROJ hit 0 on burnout block MoveTime was 18, now 19
+dhalsim _929 PROJ hit 0 on counter HitStun was 21, now 22
+dhalsim _929 PROJ hit 0 on counter MoveTime was 21, now 22
+dhalsim _929 PROJ hit 0 on punish counter HitStun was 21, now 22
+dhalsim _929 PROJ hit 0 on punish counter MoveTime was 21, now 22
+dhalsim _931 PROJ hit 0 on hit HitStun was 21, now 22
+dhalsim _931 PROJ hit 0 on hit MoveTime was 21, now 22
+dhalsim _931 PROJ hit 0 on block HitStun was 14, now 15
+dhalsim _931 PROJ hit 0 on block MoveTime was 14, now 15
+dhalsim _931 PROJ hit 0 on air hit HitStun was 20, now 21
+dhalsim _931 PROJ hit 0 on air hit MoveTime was 20, now 21
+dhalsim _931 PROJ hit 0 on burnout block HitStun was 18, now 19
+dhalsim _931 PROJ hit 0 on burnout block MoveTime was 18, now 19
+dhalsim _931 PROJ hit 0 on counter HitStun was 21, now 22
+dhalsim _931 PROJ hit 0 on counter MoveTime was 21, now 22
+dhalsim _931 PROJ hit 0 on punish counter HitStun was 21, now 22
+dhalsim _931 PROJ hit 0 on punish counter MoveTime was 21, now 22
+dhalsim _933 PROJ hit 0 on hit HitStun was 21, now 22
+dhalsim _933 PROJ hit 0 on hit MoveTime was 21, now 22
+dhalsim _933 PROJ hit 0 on block HitStun was 14, now 15
+dhalsim _933 PROJ hit 0 on block MoveTime was 14, now 15
+dhalsim _933 PROJ hit 0 on air hit HitStun was 20, now 21
+dhalsim _933 PROJ hit 0 on air hit MoveTime was 20, now 21
+dhalsim _933 PROJ hit 0 on burnout block HitStun was 18, now 19
+dhalsim _933 PROJ hit 0 on burnout block MoveTime was 18, now 19
+dhalsim _933 PROJ hit 0 on counter HitStun was 21, now 22
+dhalsim _933 PROJ hit 0 on counter MoveTime was 21, now 22
+dhalsim _933 PROJ hit 0 on punish counter HitStun was 21, now 22
+dhalsim _933 PROJ hit 0 on punish counter MoveTime was 21, now 22
 dhalsim _946 PROJ different hit count
 cammy ATK_CTA hit 1 (dt 159):
 stand hit vs stand PC should be 4, but is -4
@@ -1703,6 +1917,97 @@ ed SPA_SP4_M hit 0 on counter SuperOwn was 1200, now 1000
 ed SPA_SP4_M hit 0 on counter SuperTgt was 840, now 700
 ed SPA_SP4_M hit 0 on punish counter SuperOwn was 1200, now 1000
 ed SPA_SP4_M hit 0 on punish counter SuperTgt was 840, now 700
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ was active from 0-4 now active from 0-5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on hit DmgValue was 400, now 800
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on hit FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on hit HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on hit JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on hit SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on hit SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on hit DmgValue was 400, now 800
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on hit FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on hit HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on hit JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on hit SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on hit SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block HitStun was 18, now 40
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block MoveTime was 18, now 40
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block SuperOwn was 150, now 300
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on block SuperTgt was 75, now 150
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block HitStun was 18, now 40
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block MoveTime was 18, now 40
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block SuperOwn was 150, now 300
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on block SuperTgt was 75, now 150
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit DmgValue was 600, now 800
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit DriveJust was 65535, now 5000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit DriveNorm was 5000, now 2500
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit HitStopTarget was 15, now 18
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit HitStun was 20, now 25
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit MoveDest.x was 150, now 120
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit MoveDest.y was 100, now 90
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit MoveTime was 20, now 25
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on air hit SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit DmgValue was 600, now 800
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit DriveJust was 65535, now 5000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit DriveNorm was 5000, now 2500
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit HitStopTarget was 15, now 18
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit HitStun was 20, now 25
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit MoveDest.x was 150, now 120
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit MoveDest.y was 100, now 90
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit MoveTime was 20, now 25
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on air hit SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block DmgValue was 100, now 200
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block HitStun was 22, now 44
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block MoveTime was 22, now 44
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block SuperOwn was 150, now 300
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on burnout block SuperTgt was 75, now 150
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block DmgValue was 100, now 200
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block HitStun was 22, now 44
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block MoveTime was 22, now 44
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block SuperOwn was 150, now 300
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on burnout block SuperTgt was 75, now 150
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on counter DmgValue was 480, now 960
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on counter FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on counter HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on counter JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on counter SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on counter SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on counter DmgValue was 480, now 960
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on counter FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on counter HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on counter JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on counter SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on counter SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on punish counter DmgValue was 480, now 960
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on punish counter FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on punish counter HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on punish counter JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on punish counter SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 0 on punish counter SuperTgt was 210, now 420
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on punish counter DmgValue was 480, now 960
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on punish counter FocusOwn was 0, now 1000
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on punish counter HitStopTarget was 15, now 13
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on punish counter JuggleLimit was 1, now 5
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on punish counter SuperOwn was 300, now 600
+ed SP_01_PsychoFlicker_Shoot_L(4) PROJ hit 1 on punish counter SuperTgt was 210, now 420
 ed SP_01_PsychoFlicker_Shoot_L(4) PROJ ComboScaling was 15 , now 25
 honda ATK_5HP hit 0 (dt 019):
 stand hit vs stand PC should be 4, but is -4
@@ -1984,6 +2289,48 @@ akuma ATK_6HP hit 0 on air hit FocusOwn was 2000, now 3000
 akuma ATK_6HP hit 0 on burnout block FocusOwn was 2000, now 3000
 akuma ATK_6HP hit 0 on counter FocusOwn was 2000, now 3000
 akuma ATK_6HP hit 0 on punish counter FocusOwn was 2000, now 3000
+akuma SPA_GOHADO_Half PROJ hit 0 on block MoveDest.x was 50, now 40
+akuma SPA_GOHADO_Half PROJ hit 0 on burnout block MoveDest.x was 50, now 40
+akuma SPA_GOHADO_Half(1) PROJ hit 0 on block MoveDest.x was 50, now 40
+akuma SPA_GOHADO_Half(1) PROJ hit 0 on burnout block MoveDest.x was 50, now 40
+akuma SPA_GOHADO_Half(2) PROJ hit 0 on block MoveDest.x was 50, now 40
+akuma SPA_GOHADO_Half(2) PROJ hit 0 on burnout block MoveDest.x was 50, now 40
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on hit DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on hit DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on block DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on block DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on air hit DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on air hit DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on burnout block DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on burnout block DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on counter DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on counter DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on punish counter DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(4) PROJ hit 0 on punish counter DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on hit DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on hit DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on block DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on block DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on air hit DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on air hit DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on burnout block DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on burnout block DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on counter DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on counter DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on punish counter DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(5) PROJ hit 0 on punish counter DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on hit DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on hit DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on block DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on block DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on air hit DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on air hit DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on burnout block DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on burnout block DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on counter DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on counter DriveNorm was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on punish counter DriveJust was 2000, now 2500
+akuma SPA_GOHADO_Half(6) PROJ hit 0 on punish counter DriveNorm was 2000, now 2500
 akuma SPA_HYAKKI_GOZIN_H _StartScaling was 20 , now 30
 akuma SPA_HYAKKI_GOZIN_L _StartScaling was 20 , now 30
 akuma SPA_HYAKKI_GOZIN_M _StartScaling was 20 , now 30
@@ -2002,6 +2349,18 @@ akuma SPA_SYORYU_H_START(2) different hit count
 akuma SPA_ZANKU_BOSS PROJ _StartScaling was 20 , now 40
 akuma SPA_ZANKU_BOSS PROJ(1) _StartScaling was 20 , now 40
 akuma SPA_ZANKU_H PROJ _StartScaling was 20 , now 40
+akuma _927 PROJ hit 0 on hit DriveJust was 2000, now 2500
+akuma _927 PROJ hit 0 on hit DriveNorm was 2000, now 2500
+akuma _927 PROJ hit 0 on block DriveJust was 2000, now 2500
+akuma _927 PROJ hit 0 on block DriveNorm was 2000, now 2500
+akuma _927 PROJ hit 0 on air hit DriveJust was 2000, now 2500
+akuma _927 PROJ hit 0 on air hit DriveNorm was 2000, now 2500
+akuma _927 PROJ hit 0 on burnout block DriveJust was 2000, now 2500
+akuma _927 PROJ hit 0 on burnout block DriveNorm was 2000, now 2500
+akuma _927 PROJ hit 0 on counter DriveJust was 2000, now 2500
+akuma _927 PROJ hit 0 on counter DriveNorm was 2000, now 2500
+akuma _927 PROJ hit 0 on punish counter DriveJust was 2000, now 2500
+akuma _927 PROJ hit 0 on punish counter DriveNorm was 2000, now 2500
 dictator ATK_5HP hit 0 (dt 023):
 stand hit vs stand PC should be 4, but is 13
 dictator ATK_5HP hit 0 (dt 024):
@@ -2304,6 +2663,14 @@ terry ATK_SPA_SP2_M(2) hit 2 on counter JuggleAdd was 1, now 0
 terry ATK_SPA_SP2_M(2) hit 2 on counter JuggleLimit was 5, now 6
 terry ATK_SPA_SP2_M(2) hit 2 on punish counter JuggleAdd was 1, now 0
 terry ATK_SPA_SP2_M(2) hit 2 on punish counter JuggleLimit was 5, now 6
+terry SAA_2_2 PROJ(1) hit 0 on hit MoveDest.x was 40, now 15
+terry SAA_2_2 PROJ(1) hit 0 on air hit MoveDest.x was 40, now 15
+terry SAA_2_2 PROJ(1) hit 0 on counter MoveDest.x was 40, now 15
+terry SAA_2_2 PROJ(1) hit 0 on punish counter MoveDest.x was 40, now 15
+terry SAA_2_2(1) PROJ(1) hit 0 on hit MoveDest.x was 40, now 15
+terry SAA_2_2(1) PROJ(1) hit 0 on air hit MoveDest.x was 40, now 15
+terry SAA_2_2(1) PROJ(1) hit 0 on counter MoveDest.x was 40, now 15
+terry SAA_2_2(1) PROJ(1) hit 0 on punish counter MoveDest.x was 40, now 15
 terry SPA_SP4_EX_1_2 hit 0 on hit DmgValue was 400, now 500
 terry SPA_SP4_EX_1_2 hit 0 on hit FocusOwn was 0, now 1000
 terry SPA_SP4_EX_1_2 hit 0 on hit HitmarkDirY was 5, now 6
@@ -2458,6 +2825,30 @@ mai SPA_214P_M PROJ hit 1 on air hit FocusOwn was 1000, now 1500
 mai SPA_214P_M PROJ hit 1 on burnout block FocusOwn was 1000, now 1500
 mai SPA_214P_M PROJ hit 1 on counter FocusOwn was 1000, now 1500
 mai SPA_214P_M PROJ hit 1 on punish counter FocusOwn was 1000, now 1500
+mai SPA_236P_OD_Shoot PROJ hit 0 on hit DriveJust was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on hit DriveNorm was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on block DriveJust was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on block DriveNorm was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on air hit DriveJust was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on air hit DriveNorm was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on burnout block DriveJust was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on burnout block DriveNorm was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on counter DriveJust was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on counter DriveNorm was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on punish counter DriveJust was 2500, now 5000
+mai SPA_236P_OD_Shoot PROJ hit 0 on punish counter DriveNorm was 2500, now 5000
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on hit DriveJust was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on hit DriveNorm was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on block DriveJust was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on block DriveNorm was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on air hit DriveJust was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on air hit DriveNorm was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on burnout block DriveJust was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on burnout block DriveNorm was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on counter DriveJust was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on counter DriveNorm was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on punish counter DriveJust was 1250, now 2500
+mai SPA_236P_OD_Shoot(1) PROJ hit 0 on punish counter DriveNorm was 1250, now 2500
 mai SPA_623K_H_Start hit 0 on hit JuggleLimit was 4, now 10
 mai SPA_623K_H_Start hit 1 on hit JuggleLimit was 5, now 11
 mai SPA_623K_H_Start hit 0 on block JuggleLimit was 4, now 10
@@ -2498,9 +2889,444 @@ mai START_MISS _StartScaling was -1 , now 50
 mai START_MISS(1) _StartScaling was -1 , now 50
 mai START_MISS(2) _StartScaling was -1 , now 50
 mai START_MISS(3) _StartScaling was -1 , now 50
+mai _1002 PROJ was active from 1-10 now active from 10-90
+mai _1002 PROJ hit 0 on hit DmgType was 11, now 3
+mai _1002 PROJ hit 0 on hit DmgValue was 200, now 300
+mai _1002 PROJ hit 0 on hit DriveJust was 1050, now 750
+mai _1002 PROJ hit 0 on hit DriveNorm was 1050, now 750
+mai _1002 PROJ hit 0 on hit HitStun was 23, now 17
+mai _1002 PROJ hit 0 on hit HitmarkDirX was 0, now 1
+mai _1002 PROJ hit 0 on hit HitmarkStrength was 0, now 2
+mai _1002 PROJ hit 0 on hit JuggleAdd was 1, now 0
+mai _1002 PROJ hit 0 on hit JuggleLimit was 3, now 6
+mai _1002 PROJ hit 0 on hit MoveDest.x was 100, now 40
+mai _1002 PROJ hit 0 on hit MoveDest.y was 50, now 0
+mai _1002 PROJ hit 0 on hit MoveTime was 23, now 17
+mai _1002 PROJ hit 0 on hit MoveType was 13, now 0
+mai _1002 PROJ hit 0 on hit ParryStopOwner was -1, now 0
+mai _1002 PROJ hit 0 on hit ScreenVib was 3, now 7
+mai _1002 PROJ hit 0 on hit SuperOwn was 150, now 300
+mai _1002 PROJ hit 0 on hit SuperTgt was 105, now 210
+mai _1002 PROJ hit 0 on block DmgKind was 2, now 0
+mai _1002 PROJ hit 0 on block DriveJust was 1050, now 750
+mai _1002 PROJ hit 0 on block DriveNorm was 1050, now 750
+mai _1002 PROJ hit 0 on block FocusTgt was -500, now -1000
+mai _1002 PROJ hit 0 on block HitStun was 15, now 18
+mai _1002 PROJ hit 0 on block HitmarkDirX was 0, now 1
+mai _1002 PROJ hit 0 on block HitmarkStrength was 0, now 2
+mai _1002 PROJ hit 0 on block JuggleAdd was 1, now 0
+mai _1002 PROJ hit 0 on block JuggleLimit was 3, now 6
+mai _1002 PROJ hit 0 on block MoveDest.x was 40, now 30
+mai _1002 PROJ hit 0 on block MoveTime was 15, now 18
+mai _1002 PROJ hit 0 on block ParryStopOwner was -1, now 0
+mai _1002 PROJ hit 0 on block SuperOwn was 75, now 150
+mai _1002 PROJ hit 0 on block SuperTgt was 37, now 75
+mai _1002 PROJ hit 0 on air hit DmgValue was 200, now 300
+mai _1002 PROJ hit 0 on air hit DriveJust was 1050, now 750
+mai _1002 PROJ hit 0 on air hit DriveNorm was 1050, now 750
+mai _1002 PROJ hit 0 on air hit HitStun was 20, now 25
+mai _1002 PROJ hit 0 on air hit HitmarkDirX was 0, now 1
+mai _1002 PROJ hit 0 on air hit HitmarkStrength was 0, now 2
+mai _1002 PROJ hit 0 on air hit JuggleAdd was 1, now 0
+mai _1002 PROJ hit 0 on air hit JuggleLimit was 3, now 6
+mai _1002 PROJ hit 0 on air hit MoveDest.x was 100, now 70
+mai _1002 PROJ hit 0 on air hit MoveDest.y was 40, now 80
+mai _1002 PROJ hit 0 on air hit MoveTime was 20, now 25
+mai _1002 PROJ hit 0 on air hit ParryStopOwner was -1, now 0
+mai _1002 PROJ hit 0 on air hit ScreenVib was 3, now 7
+mai _1002 PROJ hit 0 on air hit SuperOwn was 150, now 300
+mai _1002 PROJ hit 0 on air hit SuperTgt was 105, now 210
+mai _1002 PROJ hit 0 on burnout block DmgKind was 2, now 0
+mai _1002 PROJ hit 0 on burnout block DmgValue was 50, now 75
+mai _1002 PROJ hit 0 on burnout block DriveJust was 1050, now 750
+mai _1002 PROJ hit 0 on burnout block DriveNorm was 1050, now 750
+mai _1002 PROJ hit 0 on burnout block FocusTgt was 250, now 500
+mai _1002 PROJ hit 0 on burnout block HitStun was 19, now 22
+mai _1002 PROJ hit 0 on burnout block HitmarkDirX was 0, now 1
+mai _1002 PROJ hit 0 on burnout block HitmarkStrength was 0, now 2
+mai _1002 PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+mai _1002 PROJ hit 0 on burnout block JuggleLimit was 3, now 6
+mai _1002 PROJ hit 0 on burnout block MoveDest.x was 40, now 30
+mai _1002 PROJ hit 0 on burnout block MoveTime was 19, now 22
+mai _1002 PROJ hit 0 on burnout block ParryStopOwner was -1, now 0
+mai _1002 PROJ hit 0 on burnout block SuperOwn was 75, now 150
+mai _1002 PROJ hit 0 on burnout block SuperTgt was 37, now 75
+mai _1002 PROJ hit 0 on counter DmgType was 11, now 3
+mai _1002 PROJ hit 0 on counter DmgValue was 240, now 360
+mai _1002 PROJ hit 0 on counter DriveJust was 1050, now 750
+mai _1002 PROJ hit 0 on counter DriveNorm was 1050, now 750
+mai _1002 PROJ hit 0 on counter HitStun was 23, now 19
+mai _1002 PROJ hit 0 on counter HitmarkDirX was 0, now 1
+mai _1002 PROJ hit 0 on counter HitmarkStrength was 0, now 2
+mai _1002 PROJ hit 0 on counter JuggleAdd was 1, now 0
+mai _1002 PROJ hit 0 on counter JuggleLimit was 3, now 6
+mai _1002 PROJ hit 0 on counter MoveDest.x was 100, now 40
+mai _1002 PROJ hit 0 on counter MoveDest.y was 50, now 0
+mai _1002 PROJ hit 0 on counter MoveTime was 23, now 19
+mai _1002 PROJ hit 0 on counter MoveType was 13, now 0
+mai _1002 PROJ hit 0 on counter ParryStopOwner was -1, now 0
+mai _1002 PROJ hit 0 on counter ScreenVib was 3, now 7
+mai _1002 PROJ hit 0 on counter SuperOwn was 150, now 300
+mai _1002 PROJ hit 0 on counter SuperTgt was 105, now 210
+mai _1002 PROJ hit 0 on punish counter DmgType was 11, now 3
+mai _1002 PROJ hit 0 on punish counter DmgValue was 240, now 360
+mai _1002 PROJ hit 0 on punish counter DriveJust was 1050, now 750
+mai _1002 PROJ hit 0 on punish counter DriveNorm was 1050, now 750
+mai _1002 PROJ hit 0 on punish counter FocusTgt was -1000, now -2500
+mai _1002 PROJ hit 0 on punish counter HitStun was 23, now 21
+mai _1002 PROJ hit 0 on punish counter HitmarkDirX was 0, now 1
+mai _1002 PROJ hit 0 on punish counter HitmarkStrength was 0, now 2
+mai _1002 PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+mai _1002 PROJ hit 0 on punish counter JuggleLimit was 3, now 6
+mai _1002 PROJ hit 0 on punish counter MoveDest.x was 100, now 40
+mai _1002 PROJ hit 0 on punish counter MoveDest.y was 50, now 0
+mai _1002 PROJ hit 0 on punish counter MoveTime was 23, now 21
+mai _1002 PROJ hit 0 on punish counter MoveType was 13, now 0
+mai _1002 PROJ hit 0 on punish counter ParryStopOwner was -1, now 0
+mai _1002 PROJ hit 0 on punish counter ScreenVib was 3, now 7
+mai _1002 PROJ hit 0 on punish counter SuperOwn was 150, now 300
+mai _1002 PROJ hit 0 on punish counter SuperTgt was 105, now 210
 mai _1002 PROJ _StartScaling was -1 , now 20
+mai _1004 PROJ was active from -1--1 now active from 1-10
+mai _1004 PROJ different hit count
+mai _933 PROJ hit 0 on hit DriveJust was 2500, now 5000
+mai _933 PROJ hit 0 on hit DriveNorm was 2500, now 5000
+mai _933 PROJ hit 0 on block DriveJust was 2500, now 5000
+mai _933 PROJ hit 0 on block DriveNorm was 2500, now 5000
+mai _933 PROJ hit 0 on air hit DriveJust was 2500, now 5000
+mai _933 PROJ hit 0 on air hit DriveNorm was 2500, now 5000
+mai _933 PROJ hit 0 on burnout block DriveJust was 2500, now 5000
+mai _933 PROJ hit 0 on burnout block DriveNorm was 2500, now 5000
+mai _933 PROJ hit 0 on counter DriveJust was 2500, now 5000
+mai _933 PROJ hit 0 on counter DriveNorm was 2500, now 5000
+mai _933 PROJ hit 0 on punish counter DriveJust was 2500, now 5000
+mai _933 PROJ hit 0 on punish counter DriveNorm was 2500, now 5000
+mai _934 PROJ hit 0 on hit DriveJust was 2500, now 5000
+mai _934 PROJ hit 0 on hit DriveNorm was 2500, now 5000
+mai _934 PROJ hit 0 on block DriveJust was 2500, now 5000
+mai _934 PROJ hit 0 on block DriveNorm was 2500, now 5000
+mai _934 PROJ hit 0 on air hit DriveJust was 2500, now 5000
+mai _934 PROJ hit 0 on air hit DriveNorm was 2500, now 5000
+mai _934 PROJ hit 0 on burnout block DriveJust was 2500, now 5000
+mai _934 PROJ hit 0 on burnout block DriveNorm was 2500, now 5000
+mai _934 PROJ hit 0 on counter DriveJust was 2500, now 5000
+mai _934 PROJ hit 0 on counter DriveNorm was 2500, now 5000
+mai _934 PROJ hit 0 on punish counter DriveJust was 2500, now 5000
+mai _934 PROJ hit 0 on punish counter DriveNorm was 2500, now 5000
+mai _970 PROJ was active from 0-499 now active from 1-499
+mai _970 PROJ hit 0 on hit DriveJust was 2500, now 1250
+mai _970 PROJ hit 0 on hit DriveNorm was 2500, now 1250
+mai _970 PROJ hit 0 on hit HitStopOwner was 0, now 6
+mai _970 PROJ hit 0 on hit HitStun was 15, now 16
+mai _970 PROJ hit 0 on hit HitmarkStrength was 0, now 1
+mai _970 PROJ hit 0 on hit MoveTime was 15, now 16
+mai _970 PROJ hit 0 on block DriveJust was 2500, now 1250
+mai _970 PROJ hit 0 on block DriveNorm was 2500, now 1250
+mai _970 PROJ hit 0 on block HitStopOwner was 0, now 6
+mai _970 PROJ hit 0 on block HitStun was 11, now 14
+mai _970 PROJ hit 0 on block HitmarkStrength was 0, now 1
+mai _970 PROJ hit 0 on block MoveTime was 11, now 14
+mai _970 PROJ hit 0 on air hit DriveJust was 2500, now 1250
+mai _970 PROJ hit 0 on air hit DriveNorm was 2500, now 1250
+mai _970 PROJ hit 0 on air hit HitStopOwner was 0, now 6
+mai _970 PROJ hit 0 on air hit HitmarkStrength was 0, now 1
+mai _970 PROJ hit 0 on burnout block DriveJust was 2500, now 1250
+mai _970 PROJ hit 0 on burnout block DriveNorm was 2500, now 1250
+mai _970 PROJ hit 0 on burnout block HitStopOwner was 0, now 6
+mai _970 PROJ hit 0 on burnout block HitStun was 15, now 18
+mai _970 PROJ hit 0 on burnout block HitmarkStrength was 0, now 1
+mai _970 PROJ hit 0 on burnout block MoveTime was 15, now 18
+mai _970 PROJ hit 0 on counter DriveJust was 2500, now 1250
+mai _970 PROJ hit 0 on counter DriveNorm was 2500, now 1250
+mai _970 PROJ hit 0 on counter HitStopOwner was 0, now 6
+mai _970 PROJ hit 0 on counter HitStun was 17, now 18
+mai _970 PROJ hit 0 on counter HitmarkStrength was 0, now 1
+mai _970 PROJ hit 0 on counter MoveTime was 17, now 18
+mai _970 PROJ hit 0 on punish counter DriveJust was 2500, now 1250
+mai _970 PROJ hit 0 on punish counter DriveNorm was 2500, now 1250
+mai _970 PROJ hit 0 on punish counter HitStopOwner was 0, now 6
+mai _970 PROJ hit 0 on punish counter HitStun was 19, now 20
+mai _970 PROJ hit 0 on punish counter HitmarkStrength was 0, now 1
+mai _970 PROJ hit 0 on punish counter MoveTime was 19, now 20
+mai _973 PROJ was active from 1-499 now active from 0-499
+mai _973 PROJ hit 0 on hit DriveJust was 1250, now 2500
+mai _973 PROJ hit 0 on hit DriveNorm was 1250, now 2500
+mai _973 PROJ hit 0 on hit HitStopOwner was 6, now 0
+mai _973 PROJ hit 0 on hit HitStun was 16, now 15
+mai _973 PROJ hit 0 on hit HitmarkStrength was 1, now 0
+mai _973 PROJ hit 0 on hit MoveTime was 16, now 15
+mai _973 PROJ hit 0 on block DriveJust was 1250, now 2500
+mai _973 PROJ hit 0 on block DriveNorm was 1250, now 2500
+mai _973 PROJ hit 0 on block HitStopOwner was 6, now 0
+mai _973 PROJ hit 0 on block HitStun was 14, now 11
+mai _973 PROJ hit 0 on block HitmarkStrength was 1, now 0
+mai _973 PROJ hit 0 on block MoveTime was 14, now 11
+mai _973 PROJ hit 0 on air hit DriveJust was 1250, now 2500
+mai _973 PROJ hit 0 on air hit DriveNorm was 1250, now 2500
+mai _973 PROJ hit 0 on air hit HitStopOwner was 6, now 0
+mai _973 PROJ hit 0 on air hit HitmarkStrength was 1, now 0
+mai _973 PROJ hit 0 on burnout block DriveJust was 1250, now 2500
+mai _973 PROJ hit 0 on burnout block DriveNorm was 1250, now 2500
+mai _973 PROJ hit 0 on burnout block HitStopOwner was 6, now 0
+mai _973 PROJ hit 0 on burnout block HitStun was 18, now 15
+mai _973 PROJ hit 0 on burnout block HitmarkStrength was 1, now 0
+mai _973 PROJ hit 0 on burnout block MoveTime was 18, now 15
+mai _973 PROJ hit 0 on counter DriveJust was 1250, now 2500
+mai _973 PROJ hit 0 on counter DriveNorm was 1250, now 2500
+mai _973 PROJ hit 0 on counter HitStopOwner was 6, now 0
+mai _973 PROJ hit 0 on counter HitStun was 18, now 17
+mai _973 PROJ hit 0 on counter HitmarkStrength was 1, now 0
+mai _973 PROJ hit 0 on counter MoveTime was 18, now 17
+mai _973 PROJ hit 0 on punish counter DriveJust was 1250, now 2500
+mai _973 PROJ hit 0 on punish counter DriveNorm was 1250, now 2500
+mai _973 PROJ hit 0 on punish counter HitStopOwner was 6, now 0
+mai _973 PROJ hit 0 on punish counter HitStun was 20, now 19
+mai _973 PROJ hit 0 on punish counter HitmarkStrength was 1, now 0
+mai _973 PROJ hit 0 on punish counter MoveTime was 20, now 19
+mai _979 PROJ was active from 10-90 now active from 1-499
+mai _979 PROJ hit 0 on hit DmgValue was 200, now 300
+mai _979 PROJ hit 0 on hit DriveJust was 2500, now 1250
+mai _979 PROJ hit 0 on hit DriveNorm was 2500, now 1250
+mai _979 PROJ hit 0 on hit FocusOwn was 1000, now 500
+mai _979 PROJ hit 0 on hit HitStopOwner was 0, now 6
+mai _979 PROJ hit 0 on hit HitStun was 22, now 16
+mai _979 PROJ hit 0 on hit HitmarkDirX was 1, now 0
+mai _979 PROJ hit 0 on hit HitmarkStrength was 2, now 1
+mai _979 PROJ hit 0 on hit JuggleAdd was 1, now 0
+mai _979 PROJ hit 0 on hit MoveDest.x was 50, now 40
+mai _979 PROJ hit 0 on hit MoveTime was 22, now 16
+mai _979 PROJ hit 0 on block DriveJust was 2500, now 1250
+mai _979 PROJ hit 0 on block DriveNorm was 2500, now 1250
+mai _979 PROJ hit 0 on block FocusOwn was 1000, now 500
+mai _979 PROJ hit 0 on block FocusTgt was -1000, now -1250
+mai _979 PROJ hit 0 on block HitStopOwner was 0, now 6
+mai _979 PROJ hit 0 on block HitStun was 18, now 14
+mai _979 PROJ hit 0 on block HitmarkDirX was 1, now 0
+mai _979 PROJ hit 0 on block HitmarkStrength was 2, now 1
+mai _979 PROJ hit 0 on block JuggleAdd was 1, now 0
+mai _979 PROJ hit 0 on block MoveDest.x was 30, now 40
+mai _979 PROJ hit 0 on block MoveTime was 18, now 14
+mai _979 PROJ hit 0 on air hit DmgValue was 200, now 300
+mai _979 PROJ hit 0 on air hit DriveJust was 2500, now 1250
+mai _979 PROJ hit 0 on air hit DriveNorm was 2500, now 1250
+mai _979 PROJ hit 0 on air hit FocusOwn was 1000, now 500
+mai _979 PROJ hit 0 on air hit HitStopOwner was 0, now 6
+mai _979 PROJ hit 0 on air hit HitmarkDirX was 1, now 0
+mai _979 PROJ hit 0 on air hit HitmarkStrength was 2, now 1
+mai _979 PROJ hit 0 on air hit JuggleAdd was 1, now 0
+mai _979 PROJ hit 0 on burnout block DmgValue was 50, now 75
+mai _979 PROJ hit 0 on burnout block DriveJust was 2500, now 1250
+mai _979 PROJ hit 0 on burnout block DriveNorm was 2500, now 1250
+mai _979 PROJ hit 0 on burnout block FocusOwn was 1000, now 500
+mai _979 PROJ hit 0 on burnout block FocusTgt was 500, now 625
+mai _979 PROJ hit 0 on burnout block HitStopOwner was 0, now 6
+mai _979 PROJ hit 0 on burnout block HitStun was 22, now 18
+mai _979 PROJ hit 0 on burnout block HitmarkDirX was 1, now 0
+mai _979 PROJ hit 0 on burnout block HitmarkStrength was 2, now 1
+mai _979 PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+mai _979 PROJ hit 0 on burnout block MoveDest.x was 30, now 40
+mai _979 PROJ hit 0 on burnout block MoveTime was 22, now 18
+mai _979 PROJ hit 0 on counter DmgValue was 240, now 360
+mai _979 PROJ hit 0 on counter DriveJust was 2500, now 1250
+mai _979 PROJ hit 0 on counter DriveNorm was 2500, now 1250
+mai _979 PROJ hit 0 on counter FocusOwn was 1000, now 500
+mai _979 PROJ hit 0 on counter HitStopOwner was 0, now 6
+mai _979 PROJ hit 0 on counter HitStun was 24, now 18
+mai _979 PROJ hit 0 on counter HitmarkDirX was 1, now 0
+mai _979 PROJ hit 0 on counter HitmarkStrength was 2, now 1
+mai _979 PROJ hit 0 on counter JuggleAdd was 1, now 0
+mai _979 PROJ hit 0 on counter MoveDest.x was 50, now 40
+mai _979 PROJ hit 0 on counter MoveTime was 24, now 18
+mai _979 PROJ hit 0 on punish counter DmgValue was 240, now 360
+mai _979 PROJ hit 0 on punish counter DriveJust was 2500, now 1250
+mai _979 PROJ hit 0 on punish counter DriveNorm was 2500, now 1250
+mai _979 PROJ hit 0 on punish counter FocusOwn was 1000, now 500
+mai _979 PROJ hit 0 on punish counter FocusTgt was -2500, now -1500
+mai _979 PROJ hit 0 on punish counter HitStopOwner was 0, now 6
+mai _979 PROJ hit 0 on punish counter HitStun was 26, now 20
+mai _979 PROJ hit 0 on punish counter HitmarkDirX was 1, now 0
+mai _979 PROJ hit 0 on punish counter HitmarkStrength was 2, now 1
+mai _979 PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+mai _979 PROJ hit 0 on punish counter MoveDest.x was 50, now 40
+mai _979 PROJ hit 0 on punish counter MoveTime was 26, now 20
 mai _979 PROJ _StartScaling was 20 , now -1
+mai _980 PROJ was active from 10-90 now active from 1-499
+mai _980 PROJ hit 0 on hit DmgValue was 200, now 300
+mai _980 PROJ hit 0 on hit DriveJust was 2500, now 1250
+mai _980 PROJ hit 0 on hit DriveNorm was 2500, now 1250
+mai _980 PROJ hit 0 on hit FocusOwn was 1000, now 500
+mai _980 PROJ hit 0 on hit HitStopOwner was 0, now 6
+mai _980 PROJ hit 0 on hit HitStun was 22, now 16
+mai _980 PROJ hit 0 on hit HitmarkDirX was 1, now 0
+mai _980 PROJ hit 0 on hit HitmarkStrength was 2, now 1
+mai _980 PROJ hit 0 on hit JuggleAdd was 1, now 0
+mai _980 PROJ hit 0 on hit MoveDest.x was 50, now 40
+mai _980 PROJ hit 0 on hit MoveTime was 22, now 16
+mai _980 PROJ hit 0 on block DriveJust was 2500, now 1250
+mai _980 PROJ hit 0 on block DriveNorm was 2500, now 1250
+mai _980 PROJ hit 0 on block FocusOwn was 1000, now 500
+mai _980 PROJ hit 0 on block FocusTgt was -1000, now -1250
+mai _980 PROJ hit 0 on block HitStopOwner was 0, now 6
+mai _980 PROJ hit 0 on block HitStun was 18, now 14
+mai _980 PROJ hit 0 on block HitmarkDirX was 1, now 0
+mai _980 PROJ hit 0 on block HitmarkStrength was 2, now 1
+mai _980 PROJ hit 0 on block JuggleAdd was 1, now 0
+mai _980 PROJ hit 0 on block MoveDest.x was 30, now 40
+mai _980 PROJ hit 0 on block MoveTime was 18, now 14
+mai _980 PROJ hit 0 on air hit DmgValue was 200, now 300
+mai _980 PROJ hit 0 on air hit DriveJust was 2500, now 1250
+mai _980 PROJ hit 0 on air hit DriveNorm was 2500, now 1250
+mai _980 PROJ hit 0 on air hit FocusOwn was 1000, now 500
+mai _980 PROJ hit 0 on air hit HitStopOwner was 0, now 6
+mai _980 PROJ hit 0 on air hit HitmarkDirX was 1, now 0
+mai _980 PROJ hit 0 on air hit HitmarkStrength was 2, now 1
+mai _980 PROJ hit 0 on air hit JuggleAdd was 1, now 0
+mai _980 PROJ hit 0 on burnout block DmgValue was 50, now 75
+mai _980 PROJ hit 0 on burnout block DriveJust was 2500, now 1250
+mai _980 PROJ hit 0 on burnout block DriveNorm was 2500, now 1250
+mai _980 PROJ hit 0 on burnout block FocusOwn was 1000, now 500
+mai _980 PROJ hit 0 on burnout block FocusTgt was 500, now 625
+mai _980 PROJ hit 0 on burnout block HitStopOwner was 0, now 6
+mai _980 PROJ hit 0 on burnout block HitStun was 22, now 18
+mai _980 PROJ hit 0 on burnout block HitmarkDirX was 1, now 0
+mai _980 PROJ hit 0 on burnout block HitmarkStrength was 2, now 1
+mai _980 PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+mai _980 PROJ hit 0 on burnout block MoveDest.x was 30, now 40
+mai _980 PROJ hit 0 on burnout block MoveTime was 22, now 18
+mai _980 PROJ hit 0 on counter DmgValue was 240, now 360
+mai _980 PROJ hit 0 on counter DriveJust was 2500, now 1250
+mai _980 PROJ hit 0 on counter DriveNorm was 2500, now 1250
+mai _980 PROJ hit 0 on counter FocusOwn was 1000, now 500
+mai _980 PROJ hit 0 on counter HitStopOwner was 0, now 6
+mai _980 PROJ hit 0 on counter HitStun was 24, now 18
+mai _980 PROJ hit 0 on counter HitmarkDirX was 1, now 0
+mai _980 PROJ hit 0 on counter HitmarkStrength was 2, now 1
+mai _980 PROJ hit 0 on counter JuggleAdd was 1, now 0
+mai _980 PROJ hit 0 on counter MoveDest.x was 50, now 40
+mai _980 PROJ hit 0 on counter MoveTime was 24, now 18
+mai _980 PROJ hit 0 on punish counter DmgValue was 240, now 360
+mai _980 PROJ hit 0 on punish counter DriveJust was 2500, now 1250
+mai _980 PROJ hit 0 on punish counter DriveNorm was 2500, now 1250
+mai _980 PROJ hit 0 on punish counter FocusOwn was 1000, now 500
+mai _980 PROJ hit 0 on punish counter FocusTgt was -2500, now -1500
+mai _980 PROJ hit 0 on punish counter HitStopOwner was 0, now 6
+mai _980 PROJ hit 0 on punish counter HitStun was 26, now 20
+mai _980 PROJ hit 0 on punish counter HitmarkDirX was 1, now 0
+mai _980 PROJ hit 0 on punish counter HitmarkStrength was 2, now 1
+mai _980 PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+mai _980 PROJ hit 0 on punish counter MoveDest.x was 50, now 40
+mai _980 PROJ hit 0 on punish counter MoveTime was 26, now 20
 mai _980 PROJ _StartScaling was 20 , now -1
+mai _983 PROJ was active from -1--1 now active from 10-90
+mai _983 PROJ different hit count
 mai _983 PROJ _StartScaling was -1 , now 20
+mai _989 PROJ was active from 10-90 now active from 1-499
+mai _989 PROJ hit 0 on hit DmgValue was 200, now 300
+mai _989 PROJ hit 0 on hit HitStun was 22, now 18
+mai _989 PROJ hit 0 on hit HitmarkDirX was 1, now 0
+mai _989 PROJ hit 0 on hit HitmarkStrength was 2, now 1
+mai _989 PROJ hit 0 on hit JuggleAdd was 1, now 0
+mai _989 PROJ hit 0 on hit MoveDest.x was 40, now 20
+mai _989 PROJ hit 0 on hit MoveTime was 22, now 18
+mai _989 PROJ hit 0 on hit ParryStopOwner was 0, now -1
+mai _989 PROJ hit 0 on hit SndVoice was 602, now 601
+mai _989 PROJ hit 0 on block FocusTgt was -1000, now -1250
+mai _989 PROJ hit 0 on block HitStun was 18, now 16
+mai _989 PROJ hit 0 on block HitmarkDirX was 1, now 0
+mai _989 PROJ hit 0 on block HitmarkStrength was 2, now 1
+mai _989 PROJ hit 0 on block JuggleAdd was 1, now 0
+mai _989 PROJ hit 0 on block MoveDest.x was 30, now 20
+mai _989 PROJ hit 0 on block MoveTime was 18, now 16
+mai _989 PROJ hit 0 on block ParryStopOwner was 0, now -1
+mai _989 PROJ hit 0 on block SndVoice was 602, now 601
+mai _989 PROJ hit 0 on air hit DmgValue was 200, now 300
+mai _989 PROJ hit 0 on air hit HitmarkDirX was 1, now 0
+mai _989 PROJ hit 0 on air hit HitmarkStrength was 2, now 1
+mai _989 PROJ hit 0 on air hit JuggleAdd was 1, now 0
+mai _989 PROJ hit 0 on air hit ParryStopOwner was 0, now -1
+mai _989 PROJ hit 0 on air hit SndVoice was 602, now 601
+mai _989 PROJ hit 0 on burnout block DmgValue was 50, now 75
+mai _989 PROJ hit 0 on burnout block FocusTgt was 500, now 625
+mai _989 PROJ hit 0 on burnout block HitStun was 22, now 20
+mai _989 PROJ hit 0 on burnout block HitmarkDirX was 1, now 0
+mai _989 PROJ hit 0 on burnout block HitmarkStrength was 2, now 1
+mai _989 PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+mai _989 PROJ hit 0 on burnout block MoveDest.x was 30, now 20
+mai _989 PROJ hit 0 on burnout block MoveTime was 22, now 20
+mai _989 PROJ hit 0 on burnout block ParryStopOwner was 0, now -1
+mai _989 PROJ hit 0 on burnout block SndVoice was 602, now 601
+mai _989 PROJ hit 0 on counter DmgValue was 240, now 360
+mai _989 PROJ hit 0 on counter HitStun was 24, now 20
+mai _989 PROJ hit 0 on counter HitmarkDirX was 1, now 0
+mai _989 PROJ hit 0 on counter HitmarkStrength was 2, now 1
+mai _989 PROJ hit 0 on counter JuggleAdd was 1, now 0
+mai _989 PROJ hit 0 on counter MoveDest.x was 40, now 20
+mai _989 PROJ hit 0 on counter MoveTime was 24, now 20
+mai _989 PROJ hit 0 on counter ParryStopOwner was 0, now -1
+mai _989 PROJ hit 0 on counter SndVoice was 602, now 601
+mai _989 PROJ hit 0 on punish counter DmgValue was 240, now 360
+mai _989 PROJ hit 0 on punish counter FocusTgt was -2500, now -1500
+mai _989 PROJ hit 0 on punish counter HitStun was 26, now 22
+mai _989 PROJ hit 0 on punish counter HitmarkDirX was 1, now 0
+mai _989 PROJ hit 0 on punish counter HitmarkStrength was 2, now 1
+mai _989 PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+mai _989 PROJ hit 0 on punish counter MoveDest.x was 40, now 20
+mai _989 PROJ hit 0 on punish counter MoveTime was 26, now 22
+mai _989 PROJ hit 0 on punish counter ParryStopOwner was 0, now -1
+mai _989 PROJ hit 0 on punish counter SndVoice was 602, now 601
 mai _989 PROJ ComboScaling was -1 , now 20
+mai _990 PROJ was active from 10-90 now active from 1-499
+mai _990 PROJ hit 0 on hit DmgValue was 200, now 300
+mai _990 PROJ hit 0 on hit HitStun was 22, now 18
+mai _990 PROJ hit 0 on hit HitmarkDirX was 1, now 0
+mai _990 PROJ hit 0 on hit HitmarkStrength was 2, now 1
+mai _990 PROJ hit 0 on hit JuggleAdd was 1, now 0
+mai _990 PROJ hit 0 on hit MoveDest.x was 40, now 20
+mai _990 PROJ hit 0 on hit MoveTime was 22, now 18
+mai _990 PROJ hit 0 on hit ParryStopOwner was 0, now -1
+mai _990 PROJ hit 0 on hit SndVoice was 602, now 601
+mai _990 PROJ hit 0 on block FocusTgt was -1000, now -1250
+mai _990 PROJ hit 0 on block HitStun was 18, now 16
+mai _990 PROJ hit 0 on block HitmarkDirX was 1, now 0
+mai _990 PROJ hit 0 on block HitmarkStrength was 2, now 1
+mai _990 PROJ hit 0 on block JuggleAdd was 1, now 0
+mai _990 PROJ hit 0 on block MoveDest.x was 30, now 20
+mai _990 PROJ hit 0 on block MoveTime was 18, now 16
+mai _990 PROJ hit 0 on block ParryStopOwner was 0, now -1
+mai _990 PROJ hit 0 on block SndVoice was 602, now 601
+mai _990 PROJ hit 0 on air hit DmgValue was 200, now 300
+mai _990 PROJ hit 0 on air hit HitmarkDirX was 1, now 0
+mai _990 PROJ hit 0 on air hit HitmarkStrength was 2, now 1
+mai _990 PROJ hit 0 on air hit JuggleAdd was 1, now 0
+mai _990 PROJ hit 0 on air hit ParryStopOwner was 0, now -1
+mai _990 PROJ hit 0 on air hit SndVoice was 602, now 601
+mai _990 PROJ hit 0 on burnout block DmgValue was 50, now 75
+mai _990 PROJ hit 0 on burnout block FocusTgt was 500, now 625
+mai _990 PROJ hit 0 on burnout block HitStun was 22, now 20
+mai _990 PROJ hit 0 on burnout block HitmarkDirX was 1, now 0
+mai _990 PROJ hit 0 on burnout block HitmarkStrength was 2, now 1
+mai _990 PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+mai _990 PROJ hit 0 on burnout block MoveDest.x was 30, now 20
+mai _990 PROJ hit 0 on burnout block MoveTime was 22, now 20
+mai _990 PROJ hit 0 on burnout block ParryStopOwner was 0, now -1
+mai _990 PROJ hit 0 on burnout block SndVoice was 602, now 601
+mai _990 PROJ hit 0 on counter DmgValue was 240, now 360
+mai _990 PROJ hit 0 on counter HitStun was 24, now 20
+mai _990 PROJ hit 0 on counter HitmarkDirX was 1, now 0
+mai _990 PROJ hit 0 on counter HitmarkStrength was 2, now 1
+mai _990 PROJ hit 0 on counter JuggleAdd was 1, now 0
+mai _990 PROJ hit 0 on counter MoveDest.x was 40, now 20
+mai _990 PROJ hit 0 on counter MoveTime was 24, now 20
+mai _990 PROJ hit 0 on counter ParryStopOwner was 0, now -1
+mai _990 PROJ hit 0 on counter SndVoice was 602, now 601
+mai _990 PROJ hit 0 on punish counter DmgValue was 240, now 360
+mai _990 PROJ hit 0 on punish counter FocusTgt was -2500, now -1500
+mai _990 PROJ hit 0 on punish counter HitStun was 26, now 22
+mai _990 PROJ hit 0 on punish counter HitmarkDirX was 1, now 0
+mai _990 PROJ hit 0 on punish counter HitmarkStrength was 2, now 1
+mai _990 PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+mai _990 PROJ hit 0 on punish counter MoveDest.x was 40, now 20
+mai _990 PROJ hit 0 on punish counter MoveTime was 26, now 22
+mai _990 PROJ hit 0 on punish counter ParryStopOwner was 0, now -1
+mai _990 PROJ hit 0 on punish counter SndVoice was 602, now 601
 mai _990 PROJ ComboScaling was -1 , now 20
