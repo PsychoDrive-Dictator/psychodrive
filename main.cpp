@@ -67,6 +67,7 @@ void makeCharEntries(void)
     charEntries.push_back({26, "dictator", "M. Bison"});
     charEntries.push_back({27, "terry", "Terry"});
     charEntries.push_back({28, "mai", "Mai"});
+    charEntries.push_back({29, "elena", "Elena"});
 
     for (charEntry entry : charEntries ) {
         charNames.push_back(entry.name);
@@ -92,7 +93,8 @@ const char* charVersions[] = {
     "23 - S2 (dictator patch)",
     "24 - S2 (terry patch)",
     "25 - S2 (dec balance patch)",
-    "26 - S2 (mai patch)"
+    "26 - S2 (mai patch)",
+    "30 - S3 (elena patch)"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
