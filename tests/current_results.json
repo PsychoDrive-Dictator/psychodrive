@@ -48,6 +48,147 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_imperfect_parry",
+        "testVersion": "30",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 276,
+                "firstFrame": 49,
+                "lastFrame": 324
+            },
+            {
+                "count": 10,
+                "firstFrame": 49,
+                "lastFrame": 58
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 150,
+                "firstFrame": 58,
+                "lastFrame": 173
+            },
+            {
+                "count": 485,
+                "firstFrame": 59,
+                "lastFrame": 324
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_parry",
+        "testVersion": "30",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 271,
+                "firstFrame": 53,
+                "lastFrame": 323
+            },
+            {
+                "count": 10,
+                "firstFrame": 53,
+                "lastFrame": 62
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 119,
+                "firstFrame": 62,
+                "lastFrame": 173
+            },
+            {
+                "count": 262,
+                "firstFrame": 63,
+                "lastFrame": 323
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_perfect_parry",
+        "testVersion": "30",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 317,
+                "firstFrame": 77,
+                "lastFrame": 393
+            },
+            {
+                "count": 12,
+                "firstFrame": 77,
+                "lastFrame": 100
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 163,
+                "firstFrame": 86,
+                "lastFrame": 244
+            },
+            {
+                "count": 530,
+                "firstFrame": 87,
+                "lastFrame": 393
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_throw_tech",
         "testVersion": "26",
         "finished": true,
