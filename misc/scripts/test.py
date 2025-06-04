@@ -108,27 +108,27 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    # charWithVersion = char + "25"
-    # hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
-    # movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     charWithVersion = char + "26"
+    hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
+    movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
+    charWithVersion = char + "30"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    # for hitID in hitsJson:
-    #     hitParam = hitsJson[hitID]["param"]
-    #     # check movetime vs hitstun
-    #     for param in hitParam:
-    #         if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
-    #             print("movetime != hitstun")
-    #     # check burnout block is -4 compared to normal block
-    #     checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
-    #     checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
-    #     checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
-    #     checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
-    #     checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
-    #     checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
-    #     checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
-    #     checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
+    for hitID in hitsJson:
+        hitParam = hitsJson[hitID]["param"]
+        # check movetime vs hitstun
+        for param in hitParam:
+            if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
+                print("movetime != hitstun")
+        # check burnout block is -4 compared to normal block
+        checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
+        checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
+        checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
+        checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
+        checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
+        checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
+        checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
+        checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
 
     # find hitboxes with certain flags
     # for moveID in moves21Json:
@@ -203,43 +203,43 @@ for char in characters:
     #                     "-" + str(switchKey["_EndFrame"]) + mismatch)
 
     # find certain SteerKey target types 
-    nextSteerKey = 0
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "SteerKey" in move:
-            for key in move["SteerKey"]:
-                if isinstance(move["SteerKey"][key], dict) and "TargetType" in move["SteerKey"][key]:
-                    steerKey = move["SteerKey"][key]
-                    # if nextSteerKey == 1:
-                    #     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["OperationType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["MultiValueType"]))
-                    #     nextSteerKey = 0
-                    if steerKey["OperationType"] == 14:
-                        nextSteerKey = 1
-                        print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["TargetType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["ValueType"]))
-
+    # nextSteerKey = 0
     # for moveID in moves21Json:
-    #     moveIDLeft = moveID
-    #     # if "_Y2" in moveID:
-    #     #     moveIDLeft = moveIDLeft.replace("_Y2", "")
-    #     if moveIDLeft in movesJson:
-    #         moveLeft = movesJson[moveIDLeft]
-    #         moveRight = moves21Json[moveID]
-    #         descHeader = char + " " + moveID
-    #         minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
-    #         minActiveRight, maxActiveRight = countActiveFrames(moveRight)
-    #         if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
-    #             print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
-    #                   " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
-    #         hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
-    #         hitInfoRight = getHitInfoDict(moveRight, hits21Json)
-    #         if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
-    #             print(descHeader + " different hit count")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
-    #         compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
-    #         compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
-    #         compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)
+    #     move = moves21Json[moveID]
+    #     if "SteerKey" in move:
+    #         for key in move["SteerKey"]:
+    #             if isinstance(move["SteerKey"][key], dict) and "TargetType" in move["SteerKey"][key]:
+    #                 steerKey = move["SteerKey"][key]
+    #                 # if nextSteerKey == 1:
+    #                 #     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["OperationType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["MultiValueType"]))
+    #                 #     nextSteerKey = 0
+    #                 if steerKey["OperationType"] == 14:
+    #                     nextSteerKey = 1
+    #                     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["TargetType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["ValueType"]))
+
+    for moveID in moves21Json:
+        moveIDLeft = moveID
+        # if "_Y2" in moveID:
+        #     moveIDLeft = moveIDLeft.replace("_Y2", "")
+        if moveIDLeft in movesJson:
+            moveLeft = movesJson[moveIDLeft]
+            moveRight = moves21Json[moveID]
+            descHeader = char + " " + moveID
+            minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
+            minActiveRight, maxActiveRight = countActiveFrames(moveRight)
+            if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
+                print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
+                      " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
+            hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
+            hitInfoRight = getHitInfoDict(moveRight, hits21Json)
+            if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
+                print(descHeader + " different hit count")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
+            compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
+            compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
+            compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)

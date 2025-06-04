@@ -68,6 +68,7 @@ dedupe_char_dumps ken
 dedupe_char_dumps kimberly
 dedupe_char_dumps lily
 dedupe_char_dumps luke
+dedupe_char_dumps mai
 dedupe_char_dumps manon
 dedupe_char_dumps marisa
 dedupe_char_dumps rashid
