@@ -1,6 +1,6 @@
 #!/bin/bash
 
-versions=("19" "20" "21" "22" "23" "24" "25" "26" "30")
+versions=("19" "20" "21" "22" "23" "24" "25" "26" "30" "31")
 
 dedupe_char_file() {
     sum=blah
@@ -38,6 +38,7 @@ dedupe_char_file() {
 
 dedupe_char_dumps() {
     dedupe_char_file "$1" atemi
+    dedupe_char_file "$1" assist
     dedupe_char_file "$1" charinfo
     dedupe_char_file "$1" commands
     dedupe_char_file "$1" hit

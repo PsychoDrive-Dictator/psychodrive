@@ -27,7 +27,8 @@ characters = [
     "akuma",
     "dictator",
     "terry",
-    "mai"
+    "mai",
+    "elena"
 ]
 
 dataPath = "./data/chars/"
@@ -108,27 +109,28 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    charWithVersion = char + "26"
+    charWithVersion = char + "30"
     hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "30"
+    charWithVersion = char + "31"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    for hitID in hitsJson:
-        hitParam = hitsJson[hitID]["param"]
-        # check movetime vs hitstun
-        for param in hitParam:
-            if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
-                print("movetime != hitstun")
-        # check burnout block is -4 compared to normal block
-        checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
-        checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
-        checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
-        checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
-        checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
-        checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
-        checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
-        checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
+
+    # for hitID in hitsJson:
+    #     hitParam = hitsJson[hitID]["param"]
+    #     # check movetime vs hitstun
+    #     for param in hitParam:
+    #         if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
+    #             print("movetime != hitstun")
+    #     # check burnout block is -4 compared to normal block
+    #     checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
+    #     checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
+    #     checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
+    #     checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
+    #     checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
+    #     checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
+    #     checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
+    #     checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
 
     # find hitboxes with certain flags
     # for moveID in moves21Json:
