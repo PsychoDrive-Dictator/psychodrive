@@ -3014,8 +3014,6 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    bool recovered = false;
-
     if (currentFrame >= actionFrameDuration && nextAction == -1)
     {
         if (currentAction >= 251 && currentAction <= 253) {
@@ -3086,7 +3084,6 @@ bool Guy::Frame(bool endWarudoFrame)
                 }
             } else {
                 blocking = false;
-                recovered = true;
             }
         }
     }
@@ -3100,6 +3097,9 @@ bool Guy::Frame(bool endWarudoFrame)
     // Process movement if any
     if ( canMoveNow )
     {
+        if ( !couldMove ) {
+            recoveryTiming = globalFrameCount;
+        }
         // reset status - recovered control to neutral
         jumped = false;
         turnaround = needsTurnaround();
@@ -3156,17 +3156,11 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    if (canMoveNow && wasHit && nextAction == 1 && neutralMove != 0) {
-        std::string moveString = vecMoveList[neutralMove];
-        int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
-        nextAction = actionID;
-    }
-
     if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {
         nextAction = 482; // DPA_STD_END
     }
 
-    if (recovered || (canMoveNow && comboHits) || resetComboCount) {
+    if ((canMoveNow && comboHits) || resetComboCount) {
         if ( comboHits) {
             log(true, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
         }
@@ -3175,7 +3169,7 @@ bool Guy::Frame(bool endWarudoFrame)
         resetComboCount = false;
     }
 
-    if (recovered || (canMoveNow && wasHit)) {
+    if (canMoveNow && wasHit) {
         int advantage = globalFrameCount - pOpponent->recoveryTiming;
         std::string message = "recovered! adv " + std::to_string(advantage);
         log(true, message );
@@ -3187,6 +3181,12 @@ bool Guy::Frame(bool endWarudoFrame)
         wallSplat = false;
 
         wasHit = false;
+
+        if (neutralMove != 0) {
+            std::string moveString = vecMoveList[neutralMove];
+            int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
+            nextAction = actionID;
+        }
     }
 
     if (didTrigger) {
@@ -3206,10 +3206,10 @@ bool Guy::Frame(bool endWarudoFrame)
     // Transition
     if ( nextAction != -1 )
     {
-        if (currentAction != 1 && nextAction == 1) {
-            recoveryTiming = globalFrameCount;
-            //log("recovered!");
-        }
+        // if (currentAction != 1 && nextAction == 1) {
+        //     recoveryTiming = globalFrameCount;
+        //     //log("recovered!");
+        // }
 
         if (currentAction != nextAction) {
             currentAction = nextAction;
@@ -3361,6 +3361,8 @@ bool Guy::Frame(bool endWarudoFrame)
         prevPoseStatus = forcedPoseStatus;
     }
     DoStatusKey();
+
+    couldMove = canMoveNow;
 
     return true;
 }

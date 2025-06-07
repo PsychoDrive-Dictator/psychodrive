@@ -450,6 +450,7 @@ private:
     bool didPush = false;
     bool jumped = false;
     int jumpDirection = 0;
+    bool couldMove = false;
 
     int landingAdjust = 0;
     int prevPoseStatus = 0;
