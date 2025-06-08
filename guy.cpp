@@ -1553,6 +1553,7 @@ bool Guy::Push(Guy *pOtherGuy)
 
                 pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
                 pushXRight = fixMin(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
+                //log(logTransitions, "push left/right " + std::to_string(pushXLeft.f()) + " " + std::to_string(pushXRight.f()));
                 hasPushed = true;
             }
         }
@@ -1567,18 +1568,27 @@ bool Guy::Push(Guy *pOtherGuy)
         // it still needs to push apparently and there's no side-switch in that situation
 
         Fixed pushNeeded = Fixed(0);
-        if (getPosX() < pOpponent->getPosX()) {
-            pushNeeded = -pushXLeft;
+        if (getAirborne() || pOpponent->getAirborne()) {
+            if (getPosX() < pOpponent->getPosX()) {
+                pushNeeded = -pushXLeft;
+            }
+            if (getPosX() > pOpponent->getPosX()) {
+                pushNeeded = -pushXRight;
+            }
+            if (getPosX() == pOpponent->getPosX() && direction > Fixed(0)) {
+                pushNeeded = -pushXLeft;
+            }
+            if (getPosX() == pOpponent->getPosX() && direction < Fixed(0)) {
+                pushNeeded = -pushXRight;
+            }
+        } else {
+            if (fixAbs(pushXLeft) < fixAbs(pushXRight)) {
+                pushNeeded = -pushXLeft;
+            } else {
+                pushNeeded = -pushXRight;
+            }
         }
-        if (getPosX() > pOpponent->getPosX()) {
-            pushNeeded = -pushXRight;
-        }
-        if (getPosX() == pOpponent->getPosX() && direction > Fixed(0)) {
-            pushNeeded = -pushXLeft;
-        }
-        if (getPosX() == pOpponent->getPosX() && direction < Fixed(0)) {
-            pushNeeded = -pushXRight;
-        }
+
         // if (fixAbs(pushXLeft) < fixAbs(pushXRight)) {
         //     pushNeeded = -pushXLeft;
         // }
@@ -1595,7 +1605,9 @@ bool Guy::Push(Guy *pOtherGuy)
         //     pushNeeded = -pushXLeft;
         // }
         Fixed velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
-        log(logTransitions, "push needed " + std::to_string(pushNeeded.data) + " vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string(offsetDoesNotPush));
+        log(logTransitions, "push needed " + std::to_string(pushNeeded.data) +
+" vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string
+(offsetDoesNotPush));
         // if (velDiff * pushNeeded < 0.0) {
         //     // if velDiff different sign, we can deduct it
         //     if (fabsf(velDiff) > fabsf(pushNeeded)) {
@@ -3203,6 +3215,10 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
+    if (nextAction == -1 && turnaround) {
+        nextAction = crouching ? 8 : 7;
+    }
+
     // Transition
     if ( nextAction != -1 )
     {
@@ -3244,10 +3260,6 @@ bool Guy::Frame(bool endWarudoFrame)
 
         nextAction = -1;
         nextActionFrame = -1;
-
-        if (turnaround) {
-            switchDirection();
-        }
 
         UpdateActionData();
 
@@ -3331,6 +3343,10 @@ bool Guy::Frame(bool endWarudoFrame)
         landingAdjust = 0;
 
         didTransition = true;
+    }
+
+    if (needsTurnaround() && (canMoveNow || (didTrigger && !airborne))) {
+        switchDirection();
     }
 
     if (warudo == 0) {
