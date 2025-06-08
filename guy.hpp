@@ -55,6 +55,8 @@ public:
 
         // swap l/r in current input
         currentInput = invertDirection(currentInput);
+
+        posOffsetX = posOffsetX * Fixed(-1);
     }
 
     Fixed getStartPosX() { return startPosX; }
@@ -332,10 +334,11 @@ private:
         }
         // todo is action 6 ok here? try a dump fo akuma zanku and trying to move immediately on landing
         bool isStanding = actionCheckCanMove == 1 || actionCheckCanMove == 2;
+        bool isTurningAround = actionCheckCanMove == 7 || actionCheckCanMove == 8;
         isCrouching = actionCheckCanMove == 4 || actionCheckCanMove == 5;
         forward = actionCheckCanMove == 9 || actionCheckCanMove == 10;
         backward = actionCheckCanMove == 13 || actionCheckCanMove == 14;
-        if (isStanding || isCrouching || actionCheckCanMove == 6 ||
+        if (isStanding || isCrouching || isTurningAround || actionCheckCanMove == 6 ||
             forward || actionCheckCanMove == 11 ||
             backward || actionCheckCanMove == 15) {
             ret = true;
