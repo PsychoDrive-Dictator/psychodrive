@@ -363,13 +363,16 @@ private:
 
     bool conditionOperator(int op, int operand, int threshold, std::string desc);
 
-    bool needsTurnaround() {
+    bool needsTurnaround(Fixed threshold = Fixed(0)) {
         bool turnaround = false;
         if (pOpponent) {
             if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
                 turnaround = true;
             } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
                 turnaround = true;
+            }
+            if (threshold != Fixed(0) && fixAbs(getPosX() - pOpponent->getPosX()) < threshold) {
+                turnaround = false;
             }
         }
         return turnaround;

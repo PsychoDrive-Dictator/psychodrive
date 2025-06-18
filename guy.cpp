@@ -3104,7 +3104,7 @@ bool Guy::Frame(bool endWarudoFrame)
     bool movingBackward = false;
     bool canMoveNow = canMove(crouching, movingForward, movingBackward);
     
-    bool turnaround = false;
+    bool moveTurnaround = false;
 
     // Process movement if any
     if ( canMoveNow )
@@ -3114,11 +3114,11 @@ bool Guy::Frame(bool endWarudoFrame)
         }
         // reset status - recovered control to neutral
         jumped = false;
-        turnaround = needsTurnaround();
+        moveTurnaround = needsTurnaround(Fixed(10));
 
         int moveInput = currentInput;
 
-        if (turnaround) {
+        if (moveTurnaround) {
             moveInput = invertDirection(moveInput);
         }
 
@@ -3215,7 +3215,7 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    if (nextAction == -1 && turnaround) {
+    if (nextAction == -1 && moveTurnaround) {
         nextAction = crouching ? 8 : 7;
     }
 
@@ -3345,7 +3345,7 @@ bool Guy::Frame(bool endWarudoFrame)
         didTransition = true;
     }
 
-    if (needsTurnaround() && (canMoveNow || (didTrigger && !airborne))) {
+    if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne))) {
         switchDirection();
     }
 
