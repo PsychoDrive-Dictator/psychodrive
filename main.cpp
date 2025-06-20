@@ -653,6 +653,7 @@ static void mainloop(void)
                     // swap players here, we track combo hits on the opponent
                     compareGameStateInt(players[i]["comboCount"], guys[!i]->getComboHits(), Simulation::eComboCount, desc + " combo");
 
+                    compareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, guys[i]->getDirection(), Simulation::eDirection, desc + " direction");
 
                     i++;
                 }

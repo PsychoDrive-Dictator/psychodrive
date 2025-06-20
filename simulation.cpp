@@ -189,6 +189,8 @@ void Simulation::AdvanceFrame(void)
                 // swap players here, we track combo hits on the opponent
                 CompareGameStateInt(players[i]["comboCount"], simGuys[!i]->getComboHits(), i, targetDumpFrame, eComboCount, desc + " combo");
 
+                CompareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, simGuys[i]->getDirection(), i, targetDumpFrame, eDirection, desc + " direction");
+
                 i++;
             }
 
