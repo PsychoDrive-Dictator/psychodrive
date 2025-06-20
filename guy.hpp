@@ -371,7 +371,7 @@ private:
             } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
                 turnaround = true;
             }
-            if (threshold != Fixed(0) && fixAbs(getPosX() - pOpponent->getPosX()) < threshold) {
+            if (threshold != Fixed(0) && fixAbs(getPosX() - pOpponent->getPosX()) <= threshold) {
                 turnaround = false;
             }
         }
