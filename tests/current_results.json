@@ -1,6 +1,58 @@
 var currentResults =
 [
     {
+        "testName": "26_dictator_meaty_overhead_s3_oki",
+        "testVersion": "31",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 732,
+                "firstFrame": 347,
+                "lastFrame": 1164
+            },
+            {
+                "count": 604,
+                "firstFrame": 309,
+                "lastFrame": 961
+            },
+            {
+                "count": 4,
+                "firstFrame": 346,
+                "lastFrame": 961
+            },
+            {
+                "count": 479,
+                "firstFrame": 309,
+                "lastFrame": 1030
+            },
+            {
+                "count": 477,
+                "firstFrame": 309,
+                "lastFrame": 1030
+            },
+            {
+                "count": 287,
+                "firstFrame": 207,
+                "lastFrame": 1081
+            },
+            {
+                "count": 751,
+                "firstFrame": 296,
+                "lastFrame": 1164
+            },
+            {
+                "count": 310,
+                "firstFrame": 628,
+                "lastFrame": 1030
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_crouch_drc_dash_cancel",
         "testVersion": "26",
         "finished": true,
