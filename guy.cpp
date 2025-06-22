@@ -760,7 +760,7 @@ bool Guy::PreFrame(void)
                     if (pOpponent) {
                         pOpponent->hitStun = 0;
                         pOpponent->locked = false;
-                        pOpponent->ApplyHitEffect(pHitEntry, false, true, false, false);
+                        pOpponent->ApplyHitEffect(pHitEntry, this, false, true, false, false);
                     }
                 }
             }
@@ -2048,7 +2048,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 // don't count in combos/etc, just apply DT
                 applyHit = false;
             }
-            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox) ) {
+            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, this, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox) ) {
                 int hitStopSelf = (*pHitEntry)["HitStopOwner"];
                 if ( !hitArmor && hitStopSelf ) {
                     addWarudo(hitStopSelf+1);
@@ -2068,8 +2068,6 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     hitMarkerRadius = 35.0f;
                 }
                 addHitMarker({hitMarkerOffsetX.f(),hitMarkerOffsetY.f(),hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
-
-                pOtherGuy->pAttacker = this;
 
                 if (isGrab) {
                     grabbedThisFrame = true;
@@ -2118,7 +2116,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     return retHit;
 }
 
-bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
+bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
 {
     int comboAdd = (*pHitEffect)["ComboAdd"];
     int juggleFirst = (*pHitEffect)["Juggle1st"];
@@ -2149,6 +2147,20 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
 
     if (!isDomain && airborne && juggleCounter > juggleLimit) {
         return false;
+    }
+
+    pAttacker = attacker;
+
+    Fixed attackerDirection = pAttacker->direction;
+    Fixed hitVelDirection = attackerDirection * Fixed(-1);
+    // in a real crossup, hitvel will go opposite the direction of the hit player
+    if (pAttacker->needsTurnaround(Fixed(10))) {
+        attackerDirection *= Fixed(-1);
+    }
+
+    if (applyHit && direction == attackerDirection) {
+        // like in a sideswitch combo
+        switchDirection();
     }
 
     // like guile 4HK has destY but stays grounded if hits grounded
@@ -2266,12 +2278,11 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHi
         wallBounceVelY -= wallBounceAccelY;
     }
 
-    // assume hit direction is opposite as facing for now, not sure if that's true
     if (destTime != 0) {
         if (!airborne && !jimenBound) {
-            hitVelX = Fixed(direction.i() * destX * -2) / Fixed(destTime);
-            hitAccelX = Fixed(direction.i() * destX * 2) / Fixed(destTime * destTime);
-            if (hitAccelX.data & 63) hitAccelX.data += direction.i(); // there seems to be a bias of 1 raw units
+            hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+            hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
+            if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
         } else {
             hitVelX = Fixed(0);
             hitAccelX = Fixed(0);

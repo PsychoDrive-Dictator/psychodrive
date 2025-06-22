@@ -298,7 +298,7 @@ public:
 private:
     void UpdateActionData(void);
     void UpdateBoxes(void);
-    bool ApplyHitEffect(nlohmann::json *pHitEffect, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
+    bool ApplyHitEffect(nlohmann::json *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
 
     void ExecuteTrigger(nlohmann::json *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
@@ -363,12 +363,16 @@ private:
 
     bool conditionOperator(int op, int operand, int threshold, std::string desc);
 
-    bool needsTurnaround(Fixed threshold = Fixed(0)) {
+    bool needsTurnaround(Fixed threshold = Fixed(0), Fixed directionOverride = Fixed(0)) {
         bool turnaround = false;
+        Fixed checkDirection = direction;
+        if (directionOverride != Fixed(0)) {
+            checkDirection = directionOverride;
+        }
         if (pOpponent) {
-            if ( direction > 0 && getPosX() > pOpponent->getPosX() ) {
+            if ( checkDirection > 0 && getPosX() > pOpponent->getPosX() ) {
                 turnaround = true;
-            } else if ( direction < 0 && getPosX() < pOpponent->getPosX() ) {
+            } else if ( checkDirection < 0 && getPosX() < pOpponent->getPosX() ) {
                 turnaround = true;
             }
             if (threshold != Fixed(0) && fixAbs(getPosX() - pOpponent->getPosX()) <= threshold) {
