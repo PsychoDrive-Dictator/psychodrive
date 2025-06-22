@@ -365,6 +365,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_normal_throw",
+        "testVersion": "31",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 857,
+                "firstFrame": 101,
+                "lastFrame": 532
+            },
+            {
+                "count": 92,
+                "firstFrame": 180,
+                "lastFrame": 438
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 119,
+                "firstFrame": 179,
+                "lastFrame": 326
+            },
+            {
+                "count": 119,
+                "firstFrame": 179,
+                "lastFrame": 326
+            },
+            {
+                "count": 486,
+                "firstFrame": 107,
+                "lastFrame": 532
+            },
+            {
+                "count": 755,
+                "firstFrame": 107,
+                "lastFrame": 532
+            },
+            {
+                "count": 7,
+                "firstFrame": 178,
+                "lastFrame": 215
+            },
+            {
+                "count": 104,
+                "firstFrame": 101,
+                "lastFrame": 471
+            }
+        ]
+    },
+    {
         "testName": "aa_parry",
         "testVersion": "30",
         "finished": true,
