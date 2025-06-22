@@ -378,6 +378,7 @@ bool Guy::PreFrame(void)
                 int flag = placeKey["OptionFlag"];
                 // todo there's a bunch of other flags
                 bool cosmeticOffset = flag & 1;
+                Fixed ratio = Fixed(placeKey["Ratio"].get<double>());
 
                 if (cosmeticOffset) {
                     continue;
@@ -397,6 +398,8 @@ bool Guy::PreFrame(void)
                     }
                     offsetMatch = Fixed(offset.get<double>());
                 }
+
+                offsetMatch *= ratio;
 
                 if (placeKey["Axis"] == 0) {
                     posOffsetX = offsetMatch;
