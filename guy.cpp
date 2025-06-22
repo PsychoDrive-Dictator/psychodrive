@@ -363,6 +363,9 @@ bool Guy::PreFrame(void)
 
         Fixed prevPosY = getPosY();
 
+        posOffsetX = Fixed(0);
+        posOffsetY = Fixed(0);
+
         if (pActionJson->contains("PlaceKey"))
         {
             for (auto& [placeKeyID, placeKey] : (*pActionJson)["PlaceKey"].items())
@@ -371,24 +374,34 @@ bool Guy::PreFrame(void)
                     continue;
                 }
 
+                Fixed offsetMatch;
+                int flag = placeKey["OptionFlag"];
+                // todo there's a bunch of other flags
+                bool cosmeticOffset = flag & 1;
+
+                if (cosmeticOffset) {
+                    continue;
+                }
+
                 for (auto& [frame, offset] : placeKey["PosList"].items()) {
                     int keyStartFrame = placeKey["_StartFrame"];
-                    int flag = placeKey["OptionFlag"];
-                    // todo there's a bunch of other flags
-                    bool curPlaceKeyDoesNotPush = flag & 1;
                     // todo implement ratio here? check on cammy spiralarrow ex as an example
                     if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
-                        if (placeKey["Axis"] == 0) {
-                            posOffsetX = Fixed(offset.get<double>());
-                        } else if (placeKey["Axis"] == 1) {
-                            posOffsetY = Fixed(offset.get<double>());
-                        }
-                        // do we need to disambiguate which axis doesn't push? that'd be annoying
-                        // is vertical pushback even a thing
-                        if (curPlaceKeyDoesNotPush) {
-                            offsetDoesNotPush = true;
-                        }
+                        offsetMatch = Fixed(offset.get<double>());
+                        // // do we need to disambiguate which axis doesn't push? that'd be annoying
+                        // // is vertical pushback even a thing
+                        // if (curPlaceKeyDoesNotPush) {
+                        //     offsetDoesNotPush = true;
+                        // }
+                        break;
                     }
+                    offsetMatch = Fixed(offset.get<double>());
+                }
+
+                if (placeKey["Axis"] == 0) {
+                    posOffsetX = offsetMatch;
+                } else if (placeKey["Axis"] == 1) {
+                    posOffsetY = offsetMatch;
                 }
             }
         }
@@ -1629,28 +1642,29 @@ bool Guy::Push(Guy *pOtherGuy)
             // we only handle this one direction for now - let the other push witht hat logic
             // if both have it, we currently do order-dependent handling, need to check what
             // happens in reality (two simultaneous dashes, with and without gap)
-            if (!offsetDoesNotPush && pOpponent->offsetDoesNotPush) {
-                return false;
-            }
+            // todo figure out if this ever existed, or is this was just cosmetic offset
+            // if (!offsetDoesNotPush && pOpponent->offsetDoesNotPush) {
+            //     return false;
+            // }
 
-            // does no-push-offset go against push? (different sign)
-            if (offsetDoesNotPush && posOffsetX * pushNeeded < Fixed(0)) {
-                 Fixed absOffset = fixAbs(posOffsetX);
-                Fixed absPushNeeded = fixAbs(pushNeeded);
+            // // does no-push-offset go against push? (different sign)
+            // if (offsetDoesNotPush && posOffsetX * pushNeeded < Fixed(0)) {
+            //      Fixed absOffset = fixAbs(posOffsetX);
+            //     Fixed absPushNeeded = fixAbs(pushNeeded);
 
-                if (absPushNeeded > absOffset) {
-                    posOffsetX = Fixed(0);
-                    absPushNeeded -= absOffset;
-                    // restore sign
-                    pushNeeded = absPushNeeded * (pushNeeded / fixAbs(pushNeeded));
-                } else {
-                    pushNeeded = Fixed(0);
-                    absOffset -= absPushNeeded;
-                    // restore sign
-                    posOffsetX = absOffset * (posOffsetX / fixAbs(posOffsetX));
-                }
-                posX += pushNeeded;
-            }
+            //     if (absPushNeeded > absOffset) {
+            //         posOffsetX = Fixed(0);
+            //         absPushNeeded -= absOffset;
+            //         // restore sign
+            //         pushNeeded = absPushNeeded * (pushNeeded / fixAbs(pushNeeded));
+            //     } else {
+            //         pushNeeded = Fixed(0);
+            //         absOffset -= absPushNeeded;
+            //         // restore sign
+            //         posOffsetX = absOffset * (posOffsetX / fixAbs(posOffsetX));
+            //     }
+            //     posX += pushNeeded;
+            // }
 
             Fixed halfPushNeeded = pushNeeded / Fixed(2);
 
