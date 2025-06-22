@@ -595,8 +595,10 @@ bool Guy::PreFrame(void)
         }
 
         if (hitVelX != Fixed(0)) {
-            posX = posX + hitVelX;
-            pushBackThisFrame = hitVelX;
+            if (!locked) {
+                posX = posX + hitVelX;
+                pushBackThisFrame = hitVelX;
+            }
 
             Fixed prevHitVelX = hitVelX;
             hitVelX = hitVelX + hitAccelX;
@@ -746,21 +748,23 @@ bool Guy::PreFrame(void)
                     if (pOpponent) {
                         pOpponent->nextAction = param01;
                         pOpponent->nextActionOpponentAction = true;
-                        pOpponent->locked = true;
                         pOpponent->hitStun = 50000;
-                        // test
+                        // do we need to continually snap position or just at beginning?
                         pOpponent->direction = direction;
                         pOpponent->posX = posX;
                         pOpponent->posY = posY;
+                        // for transition
+                        pOpponent->Frame();
+                        // for placekey/etc
+                        pOpponent->PreFrame();
+                        pOpponent->locked = true;
                     }
                 } else if (type == 2) {
                     // apply hit DT param 02
                     std::string hitIDString = to_string_leading_zeroes(param02, 3);
                     nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"]; // going by crowd wisdom there
                     if (pOpponent) {
-                        pOpponent->hitStun = 0;
-                        pOpponent->locked = false;
-                        pOpponent->ApplyHitEffect(pHitEntry, this, false, true, false, false);
+                        pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, true);
                     }
                 }
             }
@@ -1853,6 +1857,9 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     if ( !pOtherGuy ) return false;
 
     bool retHit = false;
+    int hitStopSelf = 0;
+    int hitStopTarget = 0;
+
     for (auto hitbox : hitBoxes ) {
         if (hitbox.type != domain && ((1<<hitbox.hitID) & canHitID)) {
             continue;
@@ -1953,6 +1960,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
             nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
 
+            if (isGrab) {
+                pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
+            }
+
             bool bombBurst = false;
 
             // back compat with old versions, this wasn't there before
@@ -2049,9 +2060,15 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 applyHit = false;
             }
             if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, this, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox) ) {
-                int hitStopSelf = (*pHitEntry)["HitStopOwner"];
-                if ( !hitArmor && hitStopSelf ) {
-                    addWarudo(hitStopSelf+1);
+                hitStopSelf = (*pHitEntry)["HitStopOwner"];
+                hitStopTarget = (*pHitEntry)["HitStopTarget"];
+                // or it could be that normal throws take their value from somewhere else
+                if (hitStopTarget == -1) {
+                    hitStopTarget = hitStopSelf;
+                }
+                if (hitArmor) {
+                    hitStopSelf = 0;
+                    hitStopTarget = 0;
                 }
 
                 Fixed hitMarkerOffsetX = hitbox.box.x - pOtherGuy->getPosX();
@@ -2113,6 +2130,28 @@ bool Guy::CheckHit(Guy *pOtherGuy)
         if (retHit) break;
     }
 
+    if (grabbedThisFrame && nextAction == -1) {
+        DoBranchKey();
+        if (nextAction != -1) {
+            // For Transition
+            Frame();
+            // For LockKey
+            PreFrame();
+        } else {
+            log(true, "instagrab branch not found!");
+        }
+    }
+
+    // add warudo after potential instagrab branch (technical term)
+    if (hitStopSelf > 0) {
+        addWarudo(hitStopSelf+1);
+    }
+    if (hitStopTarget > 0) {
+        pOtherGuy->addWarudo(hitStopTarget+1);
+#ifdef __EMSCRIPTEN__
+        emscripten_vibrate(hitStopTarget*2);
+#endif
+    }
     return retHit;
 }
 
@@ -2135,7 +2174,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     bool jimenBound = (*pHitEffect)["_jimen_bound"];
     bool kabeBound = (*pHitEffect)["_kabe_bound"];
     bool kabeTataki = (*pHitEffect)["_kabe_tataki"];
-    int hitStopTarget = (*pHitEffect)["HitStopTarget"];
+
     int dmgKind = (*pHitEffect)["DmgKind"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
@@ -2158,7 +2197,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         attackerDirection *= Fixed(-1);
     }
 
-    if (applyHit && direction == attackerDirection) {
+    if (!isDomain && applyHit && direction == attackerDirection) {
         // like in a sideswitch combo
         switchDirection();
     }
@@ -2179,13 +2218,6 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         } else {
             juggleCounter += juggleAdd;
         }
-    }
-
-    if (hitStopTarget) {
-        addWarudo(hitStopTarget+1);
-#ifdef __EMSCRIPTEN__
-        emscripten_vibrate(hitStopTarget*2);
-#endif
     }
 
     if (isDrive) {
@@ -2233,152 +2265,160 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     //int origPoseStatus = getPoseStatus() - 1;
 
-    if (destY > 0 ) {
-        airborne = true;
-        forceKnockDown = true;
-    }
+    if (applyHit) {
+        if (destY > 0 ) {
+            airborne = true;
+            forceKnockDown = true;
+        }
 
-    if (jimenBound && floorTime) {
-        int floorDestX = (*pHitEffect)["FloorDest"]["x"];
-        int floorDestY = (*pHitEffect)["FloorDest"]["y"];
+        if (jimenBound && floorTime) {
+            int floorDestX = (*pHitEffect)["FloorDest"]["x"];
+            int floorDestY = (*pHitEffect)["FloorDest"]["y"];
 
-        groundBounce = true;
-        groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
-        groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
-        if (groundBounceAccelX.data & 63) groundBounceAccelX.data += 1;
-        groundBounceVelX -= groundBounceAccelX;
+            groundBounce = true;
+            groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
+            groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
+            if (groundBounceAccelX.data & 63) groundBounceAccelX.data += 1;
+            groundBounceVelX -= groundBounceAccelX;
 
-        groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
-        groundBounceAccelY = Fixed(floorDestY * -8) / Fixed(floorTime * floorTime);
-        if (groundBounceAccelY.data & 63) groundBounceAccelY.data -= 1;
-        groundBounceVelY -= groundBounceAccelY;
-    } else {
-        groundBounce = false;
-    }
-
-    wallSplat = false;
-    wallBounce = false;
-    int wallTime = (*pHitEffect)["WallTime"];
-    if (kabeTataki) {
-        // this can happen even if you block! blocked DI
-        wallSplat = true;
-        wallStopFrames = (*pHitEffect)["WallStop"];
-    } else if (kabeBound && wallTime) {
-        int wallDestX = (*pHitEffect)["WallDest"]["x"];
-        int wallDestY = (*pHitEffect)["WallDest"]["y"];
-        wallStopFrames = (*pHitEffect)["WallStop"];
-
-        wallBounce = true;
-        wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
-        //wallBounceAccelX = -direction * wallDestX / 2.0 / (float)wallTime * 2.0 / (float)wallTime;
-        //wallBounceVelX -= wallBounceAccelX;
-
-        wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
-        wallBounceAccelY = Fixed(wallDestY * -8) / Fixed(wallTime * wallTime);
-        wallBounceVelY -= wallBounceAccelY;
-    }
-
-    if (destTime != 0) {
-        if (!airborne && !jimenBound) {
-            hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
-            hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
-            if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
+            groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
+            groundBounceAccelY = Fixed(floorDestY * -8) / Fixed(floorTime * floorTime);
+            if (groundBounceAccelY.data & 63) groundBounceAccelY.data -= 1;
+            groundBounceVelY -= groundBounceAccelY;
         } else {
-            hitVelX = Fixed(0);
-            hitAccelX = Fixed(0);
-            velocityX = Fixed(-destX) / Fixed(destTime);
+            groundBounce = false;
         }
 
-        if (destY != 0) {
-            if (destY > 0) {
-                velocityY = Fixed(destY * 4) / Fixed(destTime);
-                accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
-                if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
-                // i think this vel wants to apply this frame, lame workaround to get same intensity
-                velocityY -= accelY; //
+        wallSplat = false;
+        wallBounce = false;
+        int wallTime = (*pHitEffect)["WallTime"];
+        if (kabeTataki) {
+            // this can happen even if you block! blocked DI
+            wallSplat = true;
+            wallStopFrames = (*pHitEffect)["WallStop"];
+        } else if (kabeBound && wallTime) {
+            int wallDestX = (*pHitEffect)["WallDest"]["x"];
+            int wallDestY = (*pHitEffect)["WallDest"]["y"];
+            wallStopFrames = (*pHitEffect)["WallStop"];
+
+            wallBounce = true;
+            wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
+            //wallBounceAccelX = -direction * wallDestX / 2.0 / (float)wallTime * 2.0 / (float)wallTime;
+            //wallBounceVelX -= wallBounceAccelX;
+
+            wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
+            wallBounceAccelY = Fixed(wallDestY * -8) / Fixed(wallTime * wallTime);
+            wallBounceVelY -= wallBounceAccelY;
+        }
+
+        if (destTime != 0) {
+            if (!airborne && !jimenBound) {
+                hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+                hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
+                if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
             } else {
-                velocityY = Fixed(destY) / Fixed(destTime);
-                accelY = Fixed(0);
+                hitVelX = Fixed(0);
+                hitAccelX = Fixed(0);
+                velocityX = Fixed(-destX) / Fixed(destTime);
+            }
+
+            if (destY != 0) {
+                if (destY > 0) {
+                    velocityY = Fixed(destY * 4) / Fixed(destTime);
+                    accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
+                    if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
+                    // i think this vel wants to apply this frame, lame workaround to get same intensity
+                    velocityY -= accelY; //
+                } else {
+                    velocityY = Fixed(destY) / Fixed(destTime);
+                    accelY = Fixed(0);
+                }
             }
         }
     }
 
-    // need to figure out if body or head is getting hit here later
-
-    if (blocking) {
-        nextAction = 161;
-        if (crouching) {
-            nextAction = 175;
-        }
-    } else {
-        //if (dmgType & 3) { // crumple? :/
-
-        // haven't found a situation where dm_info_tbl helped as-is yet
-        // bool foundAirborne = false;
-        // std::string moveTypeString = to_string_leading_zeroes(moveType, 2);
-        // if (staticPlayer["dm_info_tbl"].contains(moveTypeString)) {
-        //     nlohmann::json &dmEntryJson = staticPlayer["dm_info_tbl"][moveTypeString];
-        //     int dmType = dmEntryJson["type"];
-        //     int dmPose = dmEntryJson["pose"];
-        //     int dmActID = dmEntryJson["actID"];
-        //     if (dmActID != -1 && dmType == dmgType && (dmPose == 255 || dmPose == origPoseStatus)) {
-        //         if (dmPose == 2) foundAirborne = true;
-        //         nextAction = dmActID;
-        //     }
-
-        if (moveType == 72) {
-            nextAction = 268;
-        } else if (moveType == 13) { // set on wall bounce
-            nextAction = 232;
-        } else if (moveType == 11) {
-            nextAction = 277; // back crumple?
-        } else if (moveType == 10) {
-            nextAction = 276;
-        } else if (moveType == 3) {
-            // not a crumple, just a long stun
-            nextAction = 279; // seen on guile 5hp, moveType 3
-            //}
-            // if (airborne) {
-            //     nextAction = 255;
-            // }
-        }
-
-        else {
-            if (pHurtBox && pHurtBox->flags & hurtBoxFlags::head) {
-                nextAction = 202;
-            } else if (pHurtBox && pHurtBox->flags & hurtBoxFlags::legs) {
-                nextAction = 209;
-            } else {
-                nextAction = 205;
+        // need to figure out if body or head is getting hit here later
+    if (!isDomain && applyHit) {
+        if (blocking) {
+            nextAction = 161;
+            if (crouching) {
+                nextAction = 175;
             }
-            if ( crouching ) {
-                nextAction = 213;
-            }
-        }
-        if (getAirborne() || posY > Fixed(0) || destY > 0) {
-            if (destY > destX) {
-                nextAction = 251; // 90
-            } else if (destX > destY * 2.5) {
-                nextAction = 253; // 00
-            } else {
-                nextAction = 252; // 45
-            }
+        } else {
+            //if (dmgType & 3) { // crumple? :/
 
-            // those apply even for (upwards?) airborne/launch
-            if (moveType == 22) {
+            // haven't found a situation where dm_info_tbl helped as-is yet
+            // bool foundAirborne = false;
+            // std::string moveTypeString = to_string_leading_zeroes(moveType, 2);
+            // if (staticPlayer["dm_info_tbl"].contains(moveTypeString)) {
+            //     nlohmann::json &dmEntryJson = staticPlayer["dm_info_tbl"][moveTypeString];
+            //     int dmType = dmEntryJson["type"];
+            //     int dmPose = dmEntryJson["pose"];
+            //     int dmActID = dmEntryJson["actID"];
+            //     if (dmActID != -1 && dmType == dmgType && (dmPose == 255 || dmPose == origPoseStatus)) {
+            //         if (dmPose == 2) foundAirborne = true;
+            //         nextAction = dmActID;
+            //     }
+
+            if (moveType == 72) {
+                nextAction = 268;
+            } else if (moveType == 13) { // set on wall bounce
                 nextAction = 232;
-            } else if (moveType == 17) {
-                nextAction = 282;
-            } else if (moveType == 16) {
-                nextAction = 280;
+            } else if (moveType == 11) {
+                nextAction = 277; // back crumple?
+            } else if (moveType == 10) {
+                nextAction = 276;
+            } else if (moveType == 3) {
+                // not a crumple, just a long stun
+                nextAction = 279; // seen on guile 5hp, moveType 3
+                //}
+                // if (airborne) {
+                //     nextAction = 255;
+                // }
             }
-            if (destY < 0) {
-                nextAction = 255;
+
+            else {
+                if (pHurtBox && pHurtBox->flags & hurtBoxFlags::head) {
+                    nextAction = 202;
+                } else if (pHurtBox && pHurtBox->flags & hurtBoxFlags::legs) {
+                    nextAction = 209;
+                } else {
+                    nextAction = 205;
+                }
+                if ( crouching ) {
+                    nextAction = 213;
+                }
+            }
+            if (getAirborne() || posY > Fixed(0) || destY > 0) {
+                if (destY > destX) {
+                    nextAction = 251; // 90
+                } else if (destX > destY * 2.5) {
+                    nextAction = 253; // 00
+                } else {
+                    nextAction = 252; // 45
+                }
+
+                // those apply even for (upwards?) airborne/launch
+                if (moveType == 22) {
+                    nextAction = 232;
+                } else if (moveType == 17) {
+                    nextAction = 282;
+                } else if (moveType == 16) {
+                    nextAction = 280;
+                }
+                if (destY < 0) {
+                    nextAction = 255;
+                }
             }
         }
-    }
 
-    noCounterPush = noZu;
+        noCounterPush = noZu;
+
+        if (nextAction != -1) {
+            hitStun++;
+            Frame();
+        }
+    }
 
     // fire/elec/psychopower effect
     // the two that seem to matter for gameplay are 9 for poison and 11 for mine
@@ -2505,7 +2545,7 @@ void Guy::DoHitBoxKey(const char *name)
     }
 }
 
-void Guy::DoBranchKey(bool preHit = false)
+void Guy::DoBranchKey(bool preHit)
 {
     int maxBranchType = -1;
 
@@ -2673,7 +2713,15 @@ void Guy::DoBranchKey(bool preHit = false)
                 case 31: // todo loop count
                 case 36:
                     if (grabbedThisFrame) {
-                        doBranch = true;
+                        if (branchParam0 == 2 && hitPunishCounterThisMove) {
+                            doBranch = true;
+                        }
+                        if (branchParam0 == 0 && !hitPunishCounterThisMove) {
+                            doBranch = true;
+                        }
+                        if (branchParam0 != 0 && branchParam0 != 2) {
+                            log(logUnknowns, "unknown catch branch kind");
+                        }
                     }
                     break;
                 case 37:
@@ -3281,6 +3329,8 @@ bool Guy::Frame(bool endWarudoFrame)
         }
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
+
+        locked = false;
 
         keepPlace = false;
 

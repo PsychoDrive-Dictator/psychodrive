@@ -306,7 +306,7 @@ private:
     bool CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI);
     void DoTriggers(int fluffFrameBias = 0);
 
-    void DoBranchKey(bool preHit);
+    void DoBranchKey(bool preHit = false);
     bool CheckHitBoxCondition(int conditionFlag);
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
