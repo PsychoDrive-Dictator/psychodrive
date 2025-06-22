@@ -1,6 +1,58 @@
 var currentResults =
 [
     {
+        "testName": "26_cammy_ex_spiral_placeratio",
+        "testVersion": "31",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 841,
+                "firstFrame": 142,
+                "lastFrame": 494
+            },
+            {
+                "count": 471,
+                "firstFrame": 130,
+                "lastFrame": 394
+            },
+            {
+                "count": 172,
+                "firstFrame": 166,
+                "lastFrame": 394
+            },
+            {
+                "count": 150,
+                "firstFrame": 130,
+                "lastFrame": 390
+            },
+            {
+                "count": 142,
+                "firstFrame": 130,
+                "lastFrame": 390
+            },
+            {
+                "count": 237,
+                "firstFrame": 104,
+                "lastFrame": 450
+            },
+            {
+                "count": 449,
+                "firstFrame": 104,
+                "lastFrame": 494
+            },
+            {
+                "count": 113,
+                "firstFrame": 270,
+                "lastFrame": 400
+            },
+            {
+                "count": 69,
+                "firstFrame": 166,
+                "lastFrame": 380
+            }
+        ]
+    },
+    {
         "testName": "26_dictator_meaty_overhead_s3_oki",
         "testVersion": "31",
         "finished": true,
