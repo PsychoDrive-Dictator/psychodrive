@@ -53,6 +53,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_crossup_protection",
+        "testVersion": "31",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1001,
+                "firstFrame": 366,
+                "lastFrame": 852
+            },
+            {
+                "count": 194,
+                "firstFrame": 137,
+                "lastFrame": 701
+            },
+            {
+                "count": 28,
+                "firstFrame": 137,
+                "lastFrame": 701
+            },
+            {
+                "count": 84,
+                "firstFrame": 354,
+                "lastFrame": 713
+            },
+            {
+                "count": 84,
+                "firstFrame": 354,
+                "lastFrame": 713
+            },
+            {
+                "count": 744,
+                "firstFrame": 133,
+                "lastFrame": 839
+            },
+            {
+                "count": 662,
+                "firstFrame": 133,
+                "lastFrame": 852
+            },
+            {
+                "count": 56,
+                "firstFrame": 568,
+                "lastFrame": 713
+            },
+            {
+                "count": 488,
+                "firstFrame": 354,
+                "lastFrame": 713
+            }
+        ]
+    },
+    {
         "testName": "aa_crouch_drc_dash_cancel",
         "testVersion": "26",
         "finished": true,
