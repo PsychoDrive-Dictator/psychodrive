@@ -2130,7 +2130,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
                 retHit = true;
                 pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
-                    " dt " + hitIDString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+                    " dt " + hitIDString + " " + hitEntryFlagString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                     " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                     " moveType " + std::to_string(moveType) );
                 pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
@@ -2199,6 +2199,8 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     int attr3 = (*pHitEffect)["Attr3"];
 
     int dmgKind = (*pHitEffect)["DmgKind"];
+    // int dmgPart = (*pHitEffect)["DmgPart"];
+    // int dmgVari = (*pHitEffect)["DmgVari"];
     // int curveTargetID = hitEntry["CurveTgtID"];
 
     if (isDrive) {
@@ -2431,7 +2433,11 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
             //     }
 
             if (moveType == 72) {
-                nextAction = 268;
+                if (attackStrength >= 2) {
+                    nextAction = 268;
+                } else {
+                    nextAction = 267;
+                }
             } else if (moveType == 13) { // set on wall bounce
                 nextAction = 232;
             } else if (moveType == 11) {
