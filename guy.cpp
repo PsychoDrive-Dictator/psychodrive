@@ -2191,10 +2191,11 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     int moveType = (*pHitEffect)["MoveType"];
     int floorTime = (*pHitEffect)["FloorTime"];
     int downTime = (*pHitEffect)["DownTime"];
-    bool noZu = (*pHitEffect)["_no_zu"];
     bool jimenBound = (*pHitEffect)["_jimen_bound"];
     bool kabeBound = (*pHitEffect)["_kabe_bound"];
     bool kabeTataki = (*pHitEffect)["_kabe_tataki"];
+    int attackStrength = (*pHitEffect)["DmgPower"];
+    int attr0 = (*pHitEffect)["Attr0"];
     int attr3 = (*pHitEffect)["Attr3"];
 
     int dmgKind = (*pHitEffect)["DmgKind"];
@@ -2210,6 +2211,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         return false;
     }
 
+    noCounterPush = attr0 & (1<<0);
     recoverForward = attr3 & (1<<0);
     recoverReverse = attr3 & (1<<1);
 
@@ -2406,7 +2408,6 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-        // need to figure out if body or head is getting hit here later
     if (!isDomain && applyHit) {
         if (blocking) {
             nextAction = 161;
@@ -2448,14 +2449,14 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
             else {
                 if (pHurtBox && pHurtBox->flags & hurtBoxFlags::head) {
-                    nextAction = 202;
+                    nextAction = 200 + attackStrength;
                 } else if (pHurtBox && pHurtBox->flags & hurtBoxFlags::legs) {
-                    nextAction = 209;
+                    nextAction = 208 + attackStrength;
                 } else {
-                    nextAction = 205;
+                    nextAction = 204 + attackStrength;
                 }
                 if ( crouching ) {
-                    nextAction = 213;
+                    nextAction = 212 + attackStrength;
                 }
             }
             if (getAirborne() || posY > Fixed(0) || destY > 0) {
@@ -2480,8 +2481,6 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 }
             }
         }
-
-        noCounterPush = noZu;
 
         if (nextAction != -1) {
             hitStun++;
