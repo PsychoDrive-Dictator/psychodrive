@@ -3249,6 +3249,11 @@ bool Guy::Frame(bool endWarudoFrame)
                     switchDirection();
                 }
 
+                accelX = Fixed(0);
+                accelY = Fixed(0);
+                velocityX = Fixed(0);
+                velocityY = Fixed(0);
+
                 nageKnockdown = false;
             } else {
                 blocking = false;
