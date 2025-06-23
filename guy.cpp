@@ -374,6 +374,11 @@ bool Guy::PreFrame(void)
                     continue;
                 }
 
+                // seems like we stop obeying palcekey after a nage hit?
+                if (nageKnockdown) {
+                    break;
+                }
+
                 Fixed offsetMatch;
                 int flag = placeKey["OptionFlag"];
                 // todo there's a bunch of other flags
@@ -623,6 +628,7 @@ bool Guy::PreFrame(void)
         counterState = false;
         punishCounterState = false;
         forceKnockDownState = false;
+        throwTechable = false;
 
         if (pActionJson->contains("SwitchKey"))
         {
@@ -645,6 +651,9 @@ bool Guy::PreFrame(void)
                 }
                 if (flag & 0x2) {
                     counterState = true;
+                }
+                if (flag & 0x1) {
+                    throwTechable = true;
                 }
 
                 int operation = key["OperationFlag"];
@@ -760,12 +769,12 @@ bool Guy::PreFrame(void)
                         pOpponent->locked = true;
                     }
                 } else if (type == 2) {
-                    // apply hit DT param 02
-                    std::string hitIDString = to_string_leading_zeroes(param02, 3);
-                    nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"]; // going by crowd wisdom there
-                    if (pOpponent) {
-                        pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, true);
+                    // apply hit DT param 02 after preframe, since we dont know if other guy preframe
+                    // has run or not yet and it introduces ordering issues
+                    if (pendingLockHit != -1) {
+                        log(true, "weird!");
                     }
+                    pendingLockHit = param02;
                 }
             }
         }
@@ -2130,6 +2139,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
         if (retHit) break;
     }
 
+    // let's try to be doing the grab before time stops
     if (grabbedThisFrame && nextAction == -1) {
         DoBranchKey();
         if (nextAction != -1) {
@@ -2151,6 +2161,17 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 #ifdef __EMSCRIPTEN__
         emscripten_vibrate(hitStopTarget*2);
 #endif
+    }
+
+    if (pendingLockHit != -1) {
+        std::string hitIDString = to_string_leading_zeroes(pendingLockHit, 3);
+        nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"]; // going by crowd wisdom there
+        // really we should save the lock target, etc.
+        if (pOpponent) {
+            pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, true);
+            pOpponent->log(pOpponent->logHits, "lock hit dt applied " + hitIDString);
+        }
+        pendingLockHit = -1;
     }
     return retHit;
 }
@@ -2203,7 +2224,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     }
 
     // like guile 4HK has destY but stays grounded if hits grounded
-    if (!(dmgType & 8) && !airborne) {
+    if (!(dmgType & 8) && !(dmgType == 21) && !airborne) {
         destY = 0;
     }
 
@@ -2231,15 +2252,14 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     {
         // this is set on honda airborne hands
         // juggle state, just add a bunch of hitstun
-        if (dmgType & 8) {
-            hitEntryHitStun += 500000;
-            resetHitStunOnLand = true;
-        }
+        hitEntryHitStun += 500000;
+        resetHitStunOnLand = true;
+
+        knockDownFrames = downTime;
+
         if (forceKnockDownState) {
-            hitEntryHitStun += 500000;
             forceKnockDown = true;
         }
-        knockDownFrames = downTime;
     }
 
     if (moveType == 11 || moveType == 10) { //airborne crumples
@@ -2312,26 +2332,71 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
 
         if (destTime != 0) {
-            if (!airborne && !jimenBound) {
-                hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
-                hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
-                if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
-            } else {
-                hitVelX = Fixed(0);
-                hitAccelX = Fixed(0);
-                velocityX = Fixed(-destX) / Fixed(destTime);
-            }
+            if (dmgType == 21 || dmgType == 22) {
+                // thrown? constant velocity one frame from now, ignore place/hitvel, hard knockdown after hitstun is done
+                if (!locked) {
+                    log(true, "nage but not locked?");
+                }
+                if (dmgType == 21) {
+                    // those aren't actually used but they're set in game so it quiets some warnings
+                    // there's a race condition with getting them right, because the hit is applied
+                    // from preframe -> lockkey, and the velocity will be off by one frame depending
+                    // on who's preframe runs first
+                    hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+                    hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
+                    if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
 
-            if (destY != 0) {
-                if (destY > 0) {
-                    velocityY = Fixed(destY * 4) / Fixed(destTime);
-                    accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
-                    if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
-                    // i think this vel wants to apply this frame, lame workaround to get same intensity
-                    velocityY -= accelY; //
+                    velocityX = Fixed(destX) / Fixed(destTime);
+                }
+
+                nageKnockdown = true;
+
+                // commit current place offset
+                posX = posX + (posOffsetX * direction);
+                posOffsetX = Fixed(0);
+
+                if (hitStun > 1) {
+                    hitStun--;
+                }
+
+                forceKnockDown = true;
+                knockDownFrames = downTime;
+
+                if (destY != 0) {
+                    if (destY > 0) {
+                        velocityY = Fixed(destY * 4) / Fixed(destTime);
+                        accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
+                        if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
+                        // i think this vel wants to apply this frame, lame workaround to get same intensity
+                        velocityY -= accelY; //
+                    } else {
+                        velocityY = Fixed(destY) / Fixed(destTime);
+                        accelY = Fixed(0);
+                    }
+                }
+            } else {
+                // generic pushback/airborne knock
+                if (!airborne) {
+                    hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+                    hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
+                    if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
                 } else {
-                    velocityY = Fixed(destY) / Fixed(destTime);
-                    accelY = Fixed(0);
+                    hitVelX = Fixed(0);
+                    hitAccelX = Fixed(0);
+                    velocityX = Fixed(-destX) / Fixed(destTime);
+                }
+
+                if (destY != 0) {
+                    if (destY > 0) {
+                        velocityY = Fixed(destY * 4) / Fixed(destTime);
+                        accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
+                        if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
+                        // i think this vel wants to apply this frame, lame workaround to get same intensity
+                        velocityY -= accelY; //
+                    } else {
+                        velocityY = Fixed(destY) / Fixed(destTime);
+                        accelY = Fixed(0);
+                    }
                 }
             }
         }
@@ -3131,7 +3196,7 @@ bool Guy::Frame(bool endWarudoFrame)
             }
         } else if ((isProjectile && loopCount == 0) || (pParent && !isProjectile)) {
             return false; // die if minion at end of script
-        } else if (airborne || (isProjectile && loopCount == -1)) {
+        } else if (locked || airborne || (isProjectile && loopCount == -1)) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
             currentFrame--;
@@ -3170,6 +3235,8 @@ bool Guy::Frame(bool endWarudoFrame)
 
                     resetComboCount = true;
                 }
+
+                nageKnockdown = false;
             } else {
                 blocking = false;
             }

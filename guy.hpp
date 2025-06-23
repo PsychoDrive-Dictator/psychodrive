@@ -472,6 +472,10 @@ private:
     bool punishCounterState = false;
     bool forceKnockDownState = false;
 
+    bool throwTechable = false;
+    int pendingLockHit = -1;
+    bool nageKnockdown = false;
+
     bool offsetDoesNotPush = false;
     bool noVelNextFrame = false;
     Fixed posOffsetX;
