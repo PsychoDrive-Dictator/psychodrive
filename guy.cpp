@@ -17,6 +17,8 @@
 #include "render.hpp"
 #include <string>
 
+#include <cmath>
+
 nlohmann::json staticPlayer;
 bool staticPlayerLoaded = false;
 
@@ -2197,6 +2199,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     int attackStrength = (*pHitEffect)["DmgPower"];
     int attr0 = (*pHitEffect)["Attr0"];
     int attr3 = (*pHitEffect)["Attr3"];
+    int ext0 = (*pHitEffect)["Ext0"];
 
     int dmgKind = (*pHitEffect)["DmgKind"];
     // int dmgPart = (*pHitEffect)["DmgPart"];
@@ -2466,24 +2469,33 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 }
             }
             if (getAirborne() || posY > Fixed(0) || destY > 0) {
-                if (destY > destX) {
-                    nextAction = 251; // 90
-                } else if (destX > destY * 2.5) {
-                    nextAction = 253; // 00
-                } else {
-                    nextAction = 252; // 45
-                }
-
-                // those apply even for (upwards?) airborne/launch
+                // those specific scripts apply even for airborne/launch
                 if (moveType == 22) {
                     nextAction = 232;
                 } else if (moveType == 17) {
                     nextAction = 282;
                 } else if (moveType == 16) {
                     nextAction = 280;
-                }
-                if (destY < 0) {
-                    nextAction = 255;
+                } else {
+                    // generic angle-based launch
+                    float angle = std::fmod(std::atan2(destY,destX)/M_PI*180.0,360);
+                    //log(logHits, "launch angle " + std::to_string(angle));
+
+                    if (angle >= 57.5) {
+                        nextAction = 251; // 90
+                    } else if (angle >= 22.5) {
+                        nextAction = 252; // 45
+                    } else if (angle >= -22.5) {
+                        nextAction = 253; // 00
+                    } else if (angle >= -57.5) {
+                        nextAction = 254; // -45
+                    } else {
+                        nextAction = 255; // -90
+                    }
+
+                    if (ext0 != 0) {
+                        nextAction = 250 + ext0; // weird override ??
+                    }
                 }
             }
         }
