@@ -2195,6 +2195,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     bool jimenBound = (*pHitEffect)["_jimen_bound"];
     bool kabeBound = (*pHitEffect)["_kabe_bound"];
     bool kabeTataki = (*pHitEffect)["_kabe_tataki"];
+    int attr3 = (*pHitEffect)["Attr3"];
 
     int dmgKind = (*pHitEffect)["DmgKind"];
     // int curveTargetID = hitEntry["CurveTgtID"];
@@ -2208,6 +2209,9 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     if (!isDomain && airborne && juggleCounter > juggleLimit) {
         return false;
     }
+
+    recoverForward = attr3 & (1<<0);
+    recoverReverse = attr3 & (1<<1);
 
     pAttacker = attacker;
 
@@ -3234,6 +3238,10 @@ bool Guy::Frame(bool endWarudoFrame)
                     forceKnockDown = false;
 
                     resetComboCount = true;
+                }
+
+                if (recoverForward && needsTurnaround()) {
+                    switchDirection();
                 }
 
                 nageKnockdown = false;

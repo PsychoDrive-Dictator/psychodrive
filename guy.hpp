@@ -473,8 +473,6 @@ private:
     bool forceKnockDownState = false;
 
     bool throwTechable = false;
-    int pendingLockHit = -1;
-    bool nageKnockdown = false;
 
     bool offsetDoesNotPush = false;
     bool noVelNextFrame = false;
@@ -560,14 +558,23 @@ private:
     int comboDamage = 0;
     bool wasHit = false;
     bool resetComboCount = false;
+
+    int pendingLockHit = -1;
+
     bool forceKnockDown = false;
     bool isDown = false;
     int knockDownFrames = 0;
+    bool nageKnockdown = false;
+
+    bool recoverForward = false;
+    bool recoverReverse = false;
+
     bool groundBounce = false;
     Fixed groundBounceVelX;
     Fixed groundBounceVelY;
     Fixed groundBounceAccelX;
     Fixed groundBounceAccelY;
+
     bool wallBounce = false;
     bool wallSplat = false;
     Fixed wallBounceVelX;
@@ -576,6 +583,7 @@ private:
     Fixed wallBounceAccelY;
     bool wallStopped = false;
     int wallStopFrames = 0;
+
     int currentArmorID = -1;
     int armorHitsLeft = 0;
     bool armorThisFrame = false;
