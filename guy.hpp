@@ -20,7 +20,7 @@ extern bool staticPlayerLoaded;
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
-    void setSim(Simulation *sim) { pSim = sim; }
+    void setSim(Simulation *sim) { pSim = sim; uniqueID = pSim->guyIDCounter++; }
 
     void Input(int input);
     bool PreFrame(void);
@@ -36,8 +36,10 @@ public:
         warudoIsFreeze = isFreeze;
     }
 
-    int getVersion() { return version; }
+    std::string *getName() { return &name; }
     std::string getCharacter() { return character + std::to_string(version); }
+    int getVersion() { return version; }
+    int getUniqueID() { return uniqueID; }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
     // for opponent direction
@@ -111,7 +113,6 @@ public:
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
     int getUniqueTimer() { return uniqueTimerCount; }
-    std::string *getName() { return &name; }
     int getforcedPoseStatus() { return forcedPoseStatus; }
     int getPoseStatus() {
         if (forcedPoseStatus) {
@@ -169,25 +170,36 @@ public:
         outAccelY = accelY;
     }
 
+    bool enableCleanup = true;
+
     ~Guy() {
         // todo stop leaking strdup from BuildMoveList
+        if (!enableCleanup) {
+            return;
+        }
 
         for (auto minion : minions) {
             delete minion;
         }
         minions.clear();
 
+        std::vector<Guy*> &guyList = guys;
+        if (pSim) {
+            guyList = pSim->simGuys;
+        }
+
+
         if (pParent) {
             // std erase when
             const auto it = std::remove(pParent->minions.begin(), pParent->minions.end(), this);
             pParent->minions.erase(it, pParent->minions.end());
         } else {
-            const auto it = std::remove(guys.begin(), guys.end(), this);
-            guys.erase(it, guys.end());
+            const auto it = std::remove(guyList.begin(), guyList.end(), this);
+            guyList.erase(it, guyList.end());
         }
 
         std::vector<Guy *> everyone;
-        for (auto guy : guys) {
+        for (auto guy : guyList) {
             everyone.push_back(guy);
             for ( auto minion : guy->getMinions() ) {
                 everyone.push_back(minion);
@@ -392,6 +404,7 @@ private:
     std::string name;
     std::string character;
     int version;
+    int uniqueID = -1;
     Guy *pOpponent = nullptr;
 
     void log(bool log, std::string logLine)
@@ -627,3 +640,15 @@ private:
 
     Simulation *pSim = nullptr;
 };
+
+static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> &vecOutEveryone)
+{
+    vecOutEveryone.clear();
+    for (auto guy : vecGuys) {
+        vecOutEveryone.push_back(guy);
+        for ( auto minion : guy->getMinions() ) {
+            vecOutEveryone.push_back(minion);
+        }
+    }
+}
+

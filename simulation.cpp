@@ -2,6 +2,20 @@
 #include "guy.hpp"
 #include "ui.hpp"
 
+Simulation::~Simulation() {
+    gatherEveryone(simGuys, everyone);
+    for (auto guy: everyone) {
+        guy->enableCleanup = false;
+        delete guy;
+    }
+    for (auto &frame: stateRecording) {
+        for (auto [id, guy]: frame) {
+            guy->enableCleanup = false;
+            delete guy;
+        }
+    }
+}
+
 void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
     Guy *pNewGuy = new Guy(charName, charVersion, x, y, startDir, color);
@@ -133,27 +147,14 @@ void Simulation::AdvanceFrame(void)
     }
     vecGuysToDelete.clear();
 
-    std::vector<Guy *> everyone;
-
-    for (auto guy : simGuys) {
-        everyone.push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
-            everyone.push_back(minion);
-        }
-    }
+    gatherEveryone(simGuys, everyone);
 
     for (auto guy : everyone) {
         guy->PreFrame();
     }
 
     // gather everyone again in case of deletions/additions in PreFrame
-    everyone.clear();
-    for (auto guy : simGuys) {
-        everyone.push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
-            everyone.push_back(minion);
-        }
-    }
+    gatherEveryone(simGuys, everyone);
 
     for (auto guy : everyone) {
         guy->WorldPhysics();
@@ -245,15 +246,19 @@ void Simulation::AdvanceFrame(void)
         bool die = !guy->Frame();
 
         if (die) {
+            // don't delete guys before other guys might be done with them this frame
+            // and also not before the start of next frame so we may still render them
             vecGuysToDelete.push_back(guy);
         }
     }
 
     if (recordingState) {
-        FrameState newFrame = {};
-        Guy *pGuy = new Guy;
-        *pGuy = *simGuys[0];
-        newFrame.vecGuyState.push_back(pGuy);
-        stateRecording.push_back(newFrame);
+        stateRecording.emplace_back();
+        std::map<int,Guy*> &frameSavedGuys = stateRecording[stateRecording.size()-1];
+        for (auto guy : everyone) {
+            Guy *pGuy = new Guy;
+            *pGuy = *guy;
+            frameSavedGuys[guy->getUniqueID()] = pGuy;
+        }
     }
 }

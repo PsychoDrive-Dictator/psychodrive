@@ -8,12 +8,9 @@
 
 class CharacterUIController;
 
-struct FrameState {
-    std::vector<Guy *> vecGuyState;
-};
-
 class Simulation {
 public:
+    ~Simulation();
     void CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color);
     void CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int version);
     void CreateGuyFromCharController(CharacterUIController &controller);
@@ -39,6 +36,8 @@ public:
 
     void AdvanceFrame();
 
+    std::vector<Guy *> everyone;
+    int guyIDCounter = 0;
     std::vector<Guy *> simGuys;
     std::vector<Guy *> vecGuysToDelete;
 
@@ -51,5 +50,5 @@ public:
     int replayErrors = 0;
 
     bool recordingState = false;
-    std::vector<FrameState> stateRecording;
+    std::vector<std::map<int,Guy*>> stateRecording;
 };

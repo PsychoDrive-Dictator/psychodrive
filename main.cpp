@@ -565,7 +565,9 @@ static void mainloop(void)
         setRenderState(clearColor, sizeX, sizeY);
 
         if (!simInputsChanged) {
-            simController.pSim->stateRecording[simController.scrubberFrame].vecGuyState[0]->Render();
+            for (auto [id, guy] : simController.pSim->stateRecording[simController.scrubberFrame]) {
+                guy->Render();
+            }
         }
 
     } else {

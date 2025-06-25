@@ -516,7 +516,7 @@ void CharacterUIController::RenderUI(void)
     }
     if (simController.scrubberFrame < (int)simController.pSim->stateRecording.size()) {
         int charID = rightSide ? 1 : 0;
-        Guy *pGuy = simController.pSim->stateRecording[simController.scrubberFrame].vecGuyState[charID];
+        Guy *pGuy = simController.pSim->stateRecording[simController.scrubberFrame][charID];
         if (pGuy->getFrameTriggers().size()) {
             vecTriggerDropDownLabels.clear();
             vecTriggers.clear();
