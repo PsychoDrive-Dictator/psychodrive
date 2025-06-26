@@ -2352,7 +2352,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         } else if (kabeBound && wallTime) {
             int wallDestX = (*pHitEffect)["WallDest"]["x"];
             int wallDestY = (*pHitEffect)["WallDest"]["y"];
-            wallStopFrames = (*pHitEffect)["WallStop"];
+            wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 1;
 
             wallBounce = true;
             wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
@@ -2361,6 +2361,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
             wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
             wallBounceAccelY = Fixed(wallDestY * -8) / Fixed(wallTime * wallTime);
+            if (wallBounceAccelY.data & 63) wallBounceAccelY.data -= 1;
             wallBounceVelY -= wallBounceAccelY;
         }
 
