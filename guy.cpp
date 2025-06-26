@@ -2806,6 +2806,11 @@ void Guy::DoBranchKey(bool preHit)
                     if (branchParam1 >= 0 && branchParam1 < Guy::uniqueParamCount) {
                         doBranch = conditionOperator(branchParam2, uniqueParam[branchParam1], branchParam3, "unique param");
                     }
+                    // _only_ do the branch in prehit, opposite from usual
+                    // needs checked before we've evaluated the eventkey that can bump unique
+                    if (!preHit) {
+                        doBranch = false;
+                    }
                     break;
                 case 30: // unique timer
                     if (uniqueTimer) {
@@ -2999,10 +3004,7 @@ void Guy::DoBranchKey(bool preHit)
             if (doBranch) {
 
                 if (keepFrame) {
-                    // condition seems needed for guile's branch to 1229, otherwise unique
-                    // isn't deducted (eventkey on frame 0)
-                    // possible this is depending of type of branch and when in the frame it happens
-                    if (preHit || currentFrame == 0) {
+                    if (preHit) {
                         branchFrame = currentFrame;
                     } else {
                         branchFrame = currentFrame + 1;
