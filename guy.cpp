@@ -2974,7 +2974,9 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     // todo 6 and 7 parry and PP
 
-                    // backfist needs this working post-bump too
+                    if (preHit) {
+                        doBranch = false;
+                    }
                     break;
                 case 63:
                     // what's the difference between this and 20?
