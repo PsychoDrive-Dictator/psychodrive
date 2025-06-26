@@ -2671,6 +2671,11 @@ void Guy::DoBranchKey(bool preHit)
             int branchFrame = key["ActionFrame"];
             bool keepFrame = key["_InheritFrameX"];
 
+            // this helps a ton of solid puncher sequences but not all..
+            // if (keepFrame && !preHit) {
+            //     continue;
+            // }
+
             if (branchType <= maxBranchType) {
                 // todo high priority field maybe overrides that?
                 continue;
@@ -2997,7 +3002,7 @@ void Guy::DoBranchKey(bool preHit)
                     // condition seems needed for guile's branch to 1229, otherwise unique
                     // isn't deducted (eventkey on frame 0)
                     // possible this is depending of type of branch and when in the frame it happens
-                    if (currentFrame == 0) {
+                    if (preHit || currentFrame == 0) {
                         branchFrame = currentFrame;
                     } else {
                         branchFrame = currentFrame + 1;
