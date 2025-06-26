@@ -2090,6 +2090,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, this, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox) ) {
                 hitStopSelf = (*pHitEntry)["HitStopOwner"];
                 hitStopTarget = (*pHitEntry)["HitStopTarget"];
+                int attr2 = (*pHitEntry)["Attr2"];
                 // or it could be that normal throws take their value from somewhere else
                 if (hitStopTarget == -1) {
                     hitStopTarget = hitStopSelf;
@@ -2114,7 +2115,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 }
                 addHitMarker({hitMarkerOffsetX.f(),hitMarkerOffsetY.f(),hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
 
-                if (isGrab) {
+                // grab or hitgrab
+                if (isGrab || (attr2 & (1<<1))) {
                     grabbedThisFrame = true;
                     if (hitFlagToParent) pParent->grabbedThisFrame = true;
                 }
