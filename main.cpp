@@ -878,6 +878,10 @@ int main(int argc, char**argv)
         }
         dumpSim.SetupFromGameDump(argv[2], version);
 
+        if (std::string(argv[2]).find("guile_jp_66_hit_guile_combo") != std::string::npos) {
+            forcePunishCounter = true;
+        }
+
         while (true) {
             dumpSim.AdvanceFrame();
             if (dumpSim.replayingGameStateDump == false) {
