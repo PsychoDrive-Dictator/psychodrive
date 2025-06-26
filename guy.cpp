@@ -2814,6 +2814,7 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 31: // todo loop count
+                    break;
                 case 36:
                     if (grabbedThisFrame) {
                         if (branchParam0 == 2 && hitPunishCounterThisMove) {
@@ -3010,7 +3011,7 @@ void Guy::DoBranchKey(bool preHit)
                         log(true, "branch to other frame of same action - todo check we're not off by 1");
                         currentFrame = branchFrame;
                     } else {
-                        log(logBranches, "branching to action " + std::to_string(branchAction));
+                        log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
                         nextAction = branchAction;
                         nextActionFrame = branchFrame;
                     }
