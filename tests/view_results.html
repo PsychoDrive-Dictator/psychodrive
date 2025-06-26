@@ -83,10 +83,10 @@
               (newError.firstFrame != curError.firstFrame || newError.lastFrame != curError.lastFrame)) {
                 newCell.classList.add("movedErrors");
             }
-            if (newError.firstFrame > curError.firstFrame) {
+            if (newError.firstFrame > curError.firstFrame || (curError.count > 0 && newError.count == 0)) {
                 newCell.classList.add("fixedFirstErrors");
             }
-            if (newError.firstFrame < curError.firstFrame) {
+            if (newError.count > 0 && (newError.firstFrame < curError.firstFrame || curError.count == 0)) {
                 newCell.classList.add("newFirstErrors");
             }
           }
