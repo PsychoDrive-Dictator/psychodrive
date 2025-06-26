@@ -1802,9 +1802,11 @@ bool Guy::WorldPhysics(void)
         }
     }
 
-    // if we're going up (like jsut getting hit), we're not landing,
-    // just being helped off the ground - see heavy donkey into lp dp
-    if (forceLanding || (airborne && floorpush && velocityY < 0))
+    // you can still be in floor contact on your way up
+    // especially with the 1 threshold
+    bool landedByFloorPush = airborne && floorpush && velocityY < 0;
+
+    if (forceLanding || landedByFloorPush)
     {
         velocityY = Fixed(0);
         accelY = Fixed(0);
@@ -1855,15 +1857,19 @@ bool Guy::WorldPhysics(void)
         UpdateBoxes();
     }
 
-    if (landed || forceLanding || bounced || floorpush) {
+    if (getPosY() - Fixed(landingAdjust) < Fixed(0) || landedByFloorPush)
+    {
         // don't update hitboxes before setting posY, the current frame
         // or the box will be too high up as we're still on the falling box
         // see heave donky into lp dp
         posY = Fixed(0);
         posOffsetY = Fixed(0);
+    }
 
+    if (landed) {
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand) {
+            log(logTransitions, "hack extra landing frame");
             Frame(); // todo this probably screws up thingslike bomb countdown, test
         }
     }

@@ -83,6 +83,12 @@
               (newError.firstFrame != curError.firstFrame || newError.lastFrame != curError.lastFrame)) {
                 newCell.classList.add("movedErrors");
             }
+            if (newError.firstFrame > curError.firstFrame) {
+                newCell.classList.add("fixedFirstErrors");
+            }
+            if (newError.firstFrame < curError.firstFrame) {
+                newCell.classList.add("newFirstErrors");
+            }
           }
         }
       }
@@ -106,13 +112,21 @@
       background-color: rgb(0, 60, 40);
     }
     .newErrors {
-      background-color: rgb(179, 0, 0);
+      background-color: rgb(100, 0, 0);
     }
     .fixedErrors {
-      background-color: green;
+      background-color: rgb(0, 100, 0);
     }
     .movedErrors {
       background-color: rgb(138, 138, 0);
+    }
+    .fixedFirstErrors {
+      background-color: rgb(0, 200, 0);
+      color: black;
+    }
+    .newFirstErrors {
+      background-color: rgb(200, 0, 0);
+      color: black;
     }
   </style>
 </head>

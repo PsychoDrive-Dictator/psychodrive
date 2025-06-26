@@ -532,6 +532,7 @@ void CharacterUIController::RenderUI(void)
                         return (key >= simController.scrubberFrame);
                     });
                     timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
+
                     simInputsChanged = true;
                     changed = true;
                     pendingTriggerAdd = 0;
