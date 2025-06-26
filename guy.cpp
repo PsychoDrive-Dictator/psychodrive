@@ -2277,7 +2277,10 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     resetHitStunOnLand = false;
     resetHitStunOnTransition = false;
-    knockDownFrames = 0;
+    knockDownFrames = 3;
+    if (downTime <= 1) {
+        downTime = 3;
+    }
     if (destY != 0)
     {
         // this is set on honda airborne hands
