@@ -101,7 +101,8 @@ const char* charVersions[] = {
     "25 - S2 December Update",
     "26 - S2 Mai Update",
     "30 - S3 Elena Update + Hotfix 1",
-    "31 - S3 Hotfix 2"
+    "31 - S3 Hotfix 2",
+    "32 - S3 Hotfix 3"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
