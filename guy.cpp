@@ -1892,6 +1892,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     if ( !pOtherGuy ) return false;
 
     bool retHit = false;
+    bool hitStopToParent = false;
     int hitStopSelf = 0;
     int hitStopTarget = 0;
 
@@ -1945,13 +1946,13 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
             bool hitFlagToParent = false;
-            if (isProjectile && pActionJson->contains("pdata") &&
-                (*pActionJson)["pdata"]["_HitFlagToPlayer"] == true && pParent) {
+            if (isProjectile && pActionJson->contains("pdata") && pParent) {
                 // either this means "to both" - current code or touch branch checks different
                 // flags - mai charged fan has a touch branch on the proj but sets this flag
                 // also used by double geyser where the player has a trigger condition
                 // todo checking touch branch on player would disambiguate
-                hitFlagToParent = true;
+                hitFlagToParent = (*pActionJson)["pdata"]["_HitFlagToPlayer"];
+                hitStopToParent = (*pActionJson)["pdata"]["_HitStopToPlayer"];
             }
 
             if (otherGuyAirborne) {
@@ -2182,6 +2183,10 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
     // add warudo after potential instagrab branch (technical term)
     if (hitStopSelf > 0) {
+        if (hitStopToParent) {
+            pParent->addWarudo(hitStopSelf+1);
+            // todo is it instead of to self? :/
+        }
         addWarudo(hitStopSelf+1);
     }
     if (hitStopTarget > 0) {
