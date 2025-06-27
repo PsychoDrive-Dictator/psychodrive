@@ -2346,8 +2346,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 2413,
-                "firstFrame": 218,
+                "count": 2330,
+                "firstFrame": 255,
                 "lastFrame": 1229
             },
             {
@@ -2386,8 +2386,8 @@ var currentResults =
                 "lastFrame": 1144
             },
             {
-                "count": 501,
-                "firstFrame": 218,
+                "count": 481,
+                "firstFrame": 614,
                 "lastFrame": 1094
             }
         ]

@@ -498,6 +498,7 @@ private:
     bool throwTechable = false;
 
     bool offsetDoesNotPush = false;
+    bool ignoreBodyPush = false;
     bool noVelNextFrame = false;
     Fixed posOffsetX;
     Fixed posOffsetY;

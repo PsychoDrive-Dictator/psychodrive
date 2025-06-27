@@ -634,6 +634,7 @@ bool Guy::PreFrame(void)
         punishCounterState = false;
         forceKnockDownState = false;
         throwTechable = false;
+        ignoreBodyPush = false;
 
         if (pActionJson->contains("SwitchKey"))
         {
@@ -654,6 +655,9 @@ bool Guy::PreFrame(void)
                 if (flag & 0x400000) {
                     forceKnockDownState = true;
                 }
+                if (flag & 0x80000) {
+                    ignoreBodyPush = true;
+                }
                 if (flag & 0x2) {
                     counterState = true;
                 }
@@ -670,6 +674,7 @@ bool Guy::PreFrame(void)
             }
         }
 
+        // todo factor into function that shares code with SwitchKEy..
         if (pActionJson->contains("ExtSwitchKey"))
         {
             for (auto& [keyID, key] : (*pActionJson)["ExtSwitchKey"].items())
@@ -694,8 +699,21 @@ bool Guy::PreFrame(void)
                 if (flag & 0x400000) {
                     forceKnockDownState = true;
                 }
+                if (flag & 0x80000) {
+                    ignoreBodyPush = true;
+                }
                 if (flag & 0x2) {
                     counterState = true;
+                }
+                if (flag & 0x1) {
+                    throwTechable = true;
+                }
+
+                int operation = key["OperationFlag"];
+
+                if (operation & 1) {
+                    log (logTransitions, "force landing op");
+                    forceLanding = true;
                 }
             }
         }
@@ -1698,25 +1716,31 @@ bool Guy::Push(Guy *pOtherGuy)
             Fixed halfPushNeeded = pushNeeded / Fixed(2);
 
             // do regular push with any remaining pushNeeded
-            posX = posX + halfPushNeeded;
-            pOtherGuy->posX = pOtherGuy->posX - halfPushNeeded;
-
-            int fixedRemainder = pushNeeded.data - halfPushNeeded.data * 2;
-            int frameNumber = globalFrameCount;
-            if (replayFrameNumber != 0) {
-                frameNumber = replayFrameNumber;
-            }
-            if (pSim) {
-                frameNumber = pSim->frameCounter;
-            }
-
-            //log(logTransitions, "fixedRemainder " + std::to_string(fixedRemainder) + " frameNum " +  std::to_string(frameNumber) + " " + getCharacter());
-
-            // give remainder to either player depending on frame count
-            if (frameNumber & 1) {
-                posX.data += fixedRemainder;
+            if (ignoreBodyPush && !pOtherGuy->ignoreBodyPush) {
+                pOtherGuy->posX -= pushNeeded;
+            } else if (!ignoreBodyPush && pOtherGuy->ignoreBodyPush) {
+                posX += pushNeeded;
             } else {
-                pOtherGuy->posX.data += fixedRemainder;
+                posX = posX + halfPushNeeded;
+                pOtherGuy->posX = pOtherGuy->posX - halfPushNeeded;
+
+                int fixedRemainder = pushNeeded.data - halfPushNeeded.data * 2;
+                int frameNumber = globalFrameCount;
+                if (replayFrameNumber != 0) {
+                    frameNumber = replayFrameNumber;
+                }
+                if (pSim) {
+                    frameNumber = pSim->frameCounter;
+                }
+
+                //log(logTransitions, "fixedRemainder " + std::to_string(fixedRemainder) + " frameNum " +  std::to_string(frameNumber) + " " + getCharacter());
+
+                // give remainder to either player depending on frame count
+                if (frameNumber & 1) {
+                    posX.data += fixedRemainder;
+                } else {
+                    pOtherGuy->posX.data += fixedRemainder;
+                }
             }
 
             // both are in contact now, slide back/forth appropriately if anyone got pushed into a wall
