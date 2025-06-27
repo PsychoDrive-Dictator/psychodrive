@@ -1845,6 +1845,13 @@ bool Guy::WorldPhysics(void)
 
     if ( hasPushed ) {
         posX += pushX;
+        if (locked) {
+            // 1:1 pushback for opponent during lock
+            if (pAttacker) {
+                pAttacker->posX += pushX;
+                pAttacker->UpdateBoxes();
+            }
+        }
 
         if (pushBackThisFrame != Fixed(0) && pushX != Fixed(0) && pushX * pushBackThisFrame < Fixed(0)) {
             // some pushback went into the wall, it needs to go into opponent
