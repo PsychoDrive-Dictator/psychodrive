@@ -345,7 +345,7 @@ private:
         return false;
     }
 
-    bool canMove(bool &isCrouching, bool &forward, bool &backward, int frameBias = 0) {
+    bool canMove(bool &outCrouching, bool &forward, bool &backward, int frameBias = 0) {
         bool ret = false;
         int actionCheckCanMove = currentAction;
         if (nextAction != -1 ) {
@@ -354,7 +354,7 @@ private:
         // todo is action 6 ok here? try a dump fo akuma zanku and trying to move immediately on landing
         bool isStanding = actionCheckCanMove == 1 || actionCheckCanMove == 2;
         bool isTurningAround = actionCheckCanMove == 7 || actionCheckCanMove == 8;
-        isCrouching = actionCheckCanMove == 4 || actionCheckCanMove == 5;
+        bool isCrouching = actionCheckCanMove == 4 || actionCheckCanMove == 5;
         forward = actionCheckCanMove == 9 || actionCheckCanMove == 10;
         backward = actionCheckCanMove == 13 || actionCheckCanMove == 14;
         if (isStanding || isCrouching || isTurningAround || actionCheckCanMove == 6 ||
@@ -372,6 +372,10 @@ private:
         }
         if (hitStun) {
             ret = false;
+        }
+
+        if (ret == true) {
+            outCrouching = isCrouching;
         }
 
         return ret;
