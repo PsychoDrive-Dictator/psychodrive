@@ -2224,6 +2224,7 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     bool kabeTataki = (*pHitEffect)["_kabe_tataki"];
     int attackStrength = (*pHitEffect)["DmgPower"];
     int attr0 = (*pHitEffect)["Attr0"];
+    int attr1 = (*pHitEffect)["Attr1"];
     int attr3 = (*pHitEffect)["Attr3"];
     int ext0 = (*pHitEffect)["Ext0"];
 
@@ -2248,10 +2249,14 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     pAttacker = attacker;
 
-    Fixed attackerDirection = pAttacker->direction;
+    if (attr1 & (1<<10) && attacker->pParent) {
+        // for the purpose of checking direction below
+        attacker = attacker->pParent;
+    }
+    Fixed attackerDirection = attacker->direction;
     Fixed hitVelDirection = attackerDirection * Fixed(-1);
     // in a real crossup, hitvel will go opposite the direction of the hit player
-    if (pAttacker->needsTurnaround(Fixed(10))) {
+    if (attacker->needsTurnaround(Fixed(10))) {
         attackerDirection *= Fixed(-1);
     }
 
