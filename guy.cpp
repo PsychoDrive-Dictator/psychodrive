@@ -1921,7 +1921,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     int hitStopTarget = 0;
 
     for (auto hitbox : hitBoxes ) {
-        if (hitbox.type != domain && ((1<<hitbox.hitID) & canHitID)) {
+        if (hitbox.hitID != -1 && ((1<<hitbox.hitID) & canHitID)) {
             continue;
         }
         if (hitbox.type == proximity_guard || hitbox.type == destroy_projectile) {
@@ -2153,7 +2153,17 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     if (hitFlagToParent) pParent->grabbedThisFrame = true;
                 }
 
-                canHitID |= 1 << hitbox.hitID;
+                if (isProjectile) {
+                    projHitCount--;
+                    if (hitbox.type == projectile) {
+                        hitbox.hitID = -1;
+                    }
+                }
+
+                if (hitbox.hitID != -1) {
+                    canHitID |= 1 << hitbox.hitID;
+                }
+
 
                 if (!pOtherGuy->blocking && !hitArmor) {
                     if (hitEntryFlag & punish_counter) {
@@ -2683,8 +2693,15 @@ void Guy::DoHitBoxKey(const char *name)
 
                     int hitEntryID = hitBox["AttackDataListIndex"];
                     int hitID = hitBox["HitID"];
+                    bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
+                    if (type == domain || type == direct_damage) {
+                        hasHitID = false;
+                    }
                     if (hitID < 0) {
                         hitID = 15; // overflow, that's the highest hit bit AFAIK
+                    }
+                    if (hasHitID == false) {
+                        hitID = -1;
                     }
                     if (hitEntryID != -1) {
                         hitBoxes.push_back({rect,type,hitEntryID,hitID});
@@ -3140,13 +3157,6 @@ bool Guy::Frame(bool endWarudoFrame)
     }
     currentFrame++;
 
-    // if we just branched we're about to reset pdata, avoid killing proj here
-    if (isProjectile && !didBranch && canHitID != 0) {
-        projHitCount--;
-        //log("proj hitcount " + std::to_string(projHitCount));
-        canHitID = 0; // re-arm, all projectile hitboxes seem to have hitID 0
-    }
-
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     if (!didTrigger && !didBranch) {
         curNextAction = nextAction;
@@ -3156,7 +3166,7 @@ bool Guy::Frame(bool endWarudoFrame)
         }
     }
 
-    if (isProjectile && projHitCount == 0) {
+    if (isProjectile && !didBranch && projHitCount == 0) {
         return false; // die
     }
 
