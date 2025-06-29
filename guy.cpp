@@ -757,6 +757,12 @@ bool Guy::PreFrame(void)
                     tokiToTomare = false;
                     if (pOpponent ) {
                         pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
+                        for ( auto minion : pOpponent->minions ) {
+                            minion->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
+                        }
+                    }
+                    for ( auto minion : minions ) {
+                        minion->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
                     }
                 }
             }

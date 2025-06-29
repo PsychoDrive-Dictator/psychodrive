@@ -1155,9 +1155,9 @@ var currentResults =
                 "lastFrame": 517
             },
             {
-                "count": 5,
-                "firstFrame": 332,
-                "lastFrame": 336
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
@@ -1165,27 +1165,27 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 51,
-                "firstFrame": 330,
-                "lastFrame": 380
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 51,
-                "firstFrame": 330,
-                "lastFrame": 380
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 159,
+                "count": 30,
                 "firstFrame": 137,
                 "lastFrame": 481
             },
             {
-                "count": 264,
+                "count": 253,
                 "firstFrame": 137,
                 "lastFrame": 517
             },
             {
-                "count": 161,
+                "count": 150,
                 "firstFrame": 137,
                 "lastFrame": 418
             },
@@ -1514,8 +1514,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1863,
-                "firstFrame": 508,
+                "count": 1635,
+                "firstFrame": 685,
                 "lastFrame": 2270
             },
             {
@@ -1529,8 +1529,8 @@ var currentResults =
                 "lastFrame": 1841
             },
             {
-                "count": 1076,
-                "firstFrame": 498,
+                "count": 1072,
+                "firstFrame": 685,
                 "lastFrame": 2141
             },
             {
@@ -1544,13 +1544,13 @@ var currentResults =
                 "lastFrame": 2270
             },
             {
-                "count": 1811,
+                "count": 1789,
                 "firstFrame": 0,
                 "lastFrame": 2270
             },
             {
-                "count": 1344,
-                "firstFrame": 498,
+                "count": 1332,
+                "firstFrame": 776,
                 "lastFrame": 2141
             },
             {
