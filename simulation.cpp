@@ -162,6 +162,13 @@ void Simulation::AdvanceFrame(void)
         guy->Push(guy->getOpponent());
     }
     for (auto guy : everyone) {
+        guy->PreFramePostPush();
+    }
+
+    // gather everyone again in case of deletions/additions in PreFrame
+    gatherEveryone(simGuys, everyone);
+
+    for (auto guy : everyone) {
         guy->CheckHit(guy->getOpponent());
     }
 

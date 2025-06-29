@@ -731,8 +731,6 @@ bool Guy::PreFrame(void)
             }
         }
 
-        DoShotKey(pActionJson, currentFrame);
-
         if (pActionJson->contains("WorldKey"))
         {
             bool tokiToTomare = false;
@@ -811,6 +809,15 @@ bool Guy::PreFrame(void)
     }
 
     return true;
+}
+
+void Guy::PreFramePostPush(void)
+{
+    if (warudo > 0) {
+        return;
+    }
+
+    DoShotKey(pActionJson, currentFrame);
 }
 
 void Guy::ExecuteTrigger(nlohmann::json *pTrigger)

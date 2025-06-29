@@ -568,7 +568,7 @@ static void mainloop(void)
             }
         }
 
-        std::vector<Guy *> everyone;
+        static std::vector<Guy *> everyone;
 
         if (runFrame) {
             for (auto guy : vecGuysToDelete) {
@@ -577,12 +577,7 @@ static void mainloop(void)
             vecGuysToDelete.clear();
         }
 
-        for (auto guy : guys) {
-            everyone.push_back(guy);
-            for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
-            }
-        }
+        gatherEveryone(guys, everyone);
 
         int frameGuyCount = 0;
         if (runFrame) {
@@ -594,13 +589,7 @@ static void mainloop(void)
         }
 
         // gather everyone again in case of deletions/additions in PreFrame
-        everyone.clear();
-        for (auto guy : guys) {
-            everyone.push_back(guy);
-            for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
-            }
-        }
+        gatherEveryone(guys, everyone);
 
         if (!replayingGameState && frameGuyCount == 0) {
             globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
@@ -617,6 +606,14 @@ static void mainloop(void)
             for (auto guy : everyone) {
                 guy->Push(guy->getOpponent());
             }
+
+            for (auto guy : everyone) {
+                guy->PreFramePostPush();
+            }
+
+            // gather everyone again in case of deletions/additions in PreFrame
+            gatherEveryone(guys, everyone);
+
             for (auto guy : everyone) {
                 guy->CheckHit(guy->getOpponent());
             }

@@ -1514,43 +1514,43 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1635,
+                "count": 1588,
                 "firstFrame": 685,
                 "lastFrame": 2270
             },
             {
-                "count": 280,
-                "firstFrame": 872,
+                "count": 140,
+                "firstFrame": 1777,
                 "lastFrame": 1841
             },
             {
-                "count": 142,
-                "firstFrame": 872,
+                "count": 71,
+                "firstFrame": 1777,
                 "lastFrame": 1841
             },
             {
-                "count": 1072,
+                "count": 1067,
                 "firstFrame": 685,
                 "lastFrame": 2141
             },
             {
-                "count": 978,
+                "count": 986,
                 "firstFrame": 729,
                 "lastFrame": 2141
             },
             {
-                "count": 753,
+                "count": 554,
                 "firstFrame": 0,
                 "lastFrame": 2270
             },
             {
-                "count": 1789,
+                "count": 1652,
                 "firstFrame": 0,
                 "lastFrame": 2270
             },
             {
-                "count": 1332,
-                "firstFrame": 776,
+                "count": 1088,
+                "firstFrame": 838,
                 "lastFrame": 2141
             },
             {

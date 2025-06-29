@@ -26,6 +26,7 @@ public:
     bool PreFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
+    void PreFramePostPush(void);
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
     bool Frame(bool endWarudoFrame = false);
