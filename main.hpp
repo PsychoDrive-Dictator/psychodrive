@@ -103,6 +103,7 @@ extern bool oneframe;
 extern int globalFrameCount;
 extern int replayFrameNumber;
 extern bool lockCamera;
+extern bool toggleRenderUI;
 
 extern bool recordingInput;
 extern std::vector<int> recordedInput;

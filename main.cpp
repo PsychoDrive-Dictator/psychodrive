@@ -237,6 +237,7 @@ bool oneframe = false;
 int globalFrameCount = 0;
 int replayFrameNumber = 0;
 bool lockCamera = true;
+bool toggleRenderUI = true;
 
 bool recordingInput = false;
 std::vector<int> recordedInput;
@@ -564,6 +565,7 @@ static void mainloop(void)
         }
 
         setRenderState(clearColor, sizeX, sizeY);
+        renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
         if (!simInputsChanged) {
             for (auto [id, guy] : simController.pSim->stateRecording[simController.scrubberFrame]) {
@@ -828,6 +830,7 @@ static void mainloop(void)
         }
 
         setRenderState(clearColor, sizeX, sizeY);
+        renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
         for (auto guy : everyone) {
             guy->Render();
@@ -852,9 +855,6 @@ static void mainloop(void)
     }
 
     renderMarkersAndStuff();
-
-
-    renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
     setScreenSpaceRenderState(sizeX, sizeY);
     renderTouchControls(sizeX, sizeY);

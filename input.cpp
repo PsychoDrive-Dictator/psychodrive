@@ -222,6 +222,9 @@ void updateInputs(int sizeX, int sizeY)
                 case SDLK_0:
                     oneframe = true;
                     break;
+                case SDLK_F2:
+                    toggleRenderUI = !toggleRenderUI;
+                    break;
                 case SDLK_F3:
                     thickboxes = !thickboxes;
                     break;
@@ -230,6 +233,9 @@ void updateInputs(int sizeX, int sizeY)
                     break;
                 case SDLK_F5:
                     lockCamera = !lockCamera;
+                    break;
+                case SDLK_F8:
+                    limitRate = !limitRate;
                     break;
                 case SDLK_r:
                     recordingInput = !recordingInput;
@@ -251,9 +257,6 @@ void updateInputs(int sizeX, int sizeY)
                         currentInputMap[recordingID] = 0;
                     }
                     paused = false;
-                    break;
-                case SDLK_F8:
-                    limitRate = !limitRate;
                     break;
                 case SDLK_DELETE:
                     deleteInputs = true;

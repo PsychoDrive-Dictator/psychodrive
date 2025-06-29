@@ -546,6 +546,12 @@ void CharacterUIController::RenderUI(void)
 
 void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
 {
+    if (!toggleRenderUI) {
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        return;
+    }
+
     if (gameMode == Training) {
         renderAdvancedUI(frameRate, pLogQueue, sizeX, sizeY);
     }
