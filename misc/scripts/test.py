@@ -109,10 +109,10 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    charWithVersion = char + "30"
+    charWithVersion = char + "31"
     hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "31"
+    charWithVersion = char + "32"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))
@@ -220,19 +220,31 @@ for char in characters:
     #                     nextSteerKey = 1
     #                     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["TargetType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["ValueType"]))
 
-    for key, value in tgroups21Json["000"].items():
-        moveName = value.split(" ")[1]
-        moveNoKara = False
-        if "TriggerKey" not in moves21Json[moveName]:
-            moveNoKara = True
-        else:
-            moveNoKara = True
-            for triggernum, triggerkey in moves21Json[moveName]["TriggerKey"].items():
-                if isinstance(triggerkey, dict):
-                    if triggerkey["_StartFrame"] == 0 and triggerkey["_EndFrame"] == 1:
-                        moveNoKara = False
-        if moveNoKara:
-            print(char, moveName)
+    # Find moves with missing kara cancels
+    # for key, value in tgroups21Json["000"].items():
+    #     moveName = value.split(" ")[1]
+    #     moveNoKara = False
+    #     if "TriggerKey" not in moves21Json[moveName]:
+    #         moveNoKara = True
+    #     else:
+    #         moveNoKara = True
+    #         for triggernum, triggerkey in moves21Json[moveName]["TriggerKey"].items():
+    #             if isinstance(triggerkey, dict):
+    #                 if triggerkey["_StartFrame"] == 0 and triggerkey["_EndFrame"] == 1:
+    #                     moveNoKara = False
+    #     if moveNoKara:
+    #         print(char, moveName)
+
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "TriggerKey" in move:
+            for key in move["TriggerKey"]:
+                if isinstance(move["TriggerKey"][key], dict):
+                    trigger = move["TriggerKey"][key]
+                    if trigger["TriggerGroup"] == 0 and trigger["_StartFrame"] != 0 and not trigger["_Other"] & 0x20000 and trigger["_NotDefer"] == True and trigger["_StartFrame"] < move["fab"]["ActionFrame"]["MarginFrame"]:
+                        print(char + " " + moveID + " margin " + str(move["fab"]["ActionFrame"]["MarginFrame"]) + " end buffer " + str(trigger["_StartFrame"]))
+
+
 
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
