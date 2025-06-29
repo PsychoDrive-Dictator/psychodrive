@@ -3649,6 +3649,8 @@ bool Guy::Frame(bool endWarudoFrame)
 
     couldMove = canMoveNow;
 
+    forcedTrigger = std::make_pair(0,0);
+
     return true;
 }
 

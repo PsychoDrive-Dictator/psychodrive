@@ -734,16 +734,46 @@ void SimulationController::RenderUI(void)
 
 void SimulationController::AdvanceUntilComplete(void)
 {
-    // todo detect completion kappa
-    for (int frame = 0; frame < 200; frame++) {
+    int frameCount = 0;
+    while (true) {
         for (int i = 0; i < charCount; i++) {
             auto &forcedTrigger = pSim->simGuys[charControllers[i].getSimCharSlot()]->getForcedTrigger();
-            if (charControllers[i].timelineTriggers.find(frame) != charControllers[i].timelineTriggers.end()) {
-                forcedTrigger = charControllers[i].timelineTriggers[frame];
-            } else {
-                forcedTrigger = std::make_pair(0,0);
+            if (charControllers[i].timelineTriggers.find(frameCount) != charControllers[i].timelineTriggers.end()) {
+                forcedTrigger = charControllers[i].timelineTriggers[frameCount];
             }
         }
         pSim->AdvanceFrame();
+        frameCount++;
+
+        bool bDone = true;
+
+        for (int i = 0; i < charCount; i++) {
+            Guy *pGuy = pSim->simGuys[charControllers[i].getSimCharSlot()];
+            // if we're not idle, we're not done
+            if (pGuy->getCurrentAction() > 2) {
+                bDone = false;
+            }
+            // if we have any minions, we're not done
+            if (pGuy->getMinions().size()) {
+                bDone = false;
+            }
+
+            // if we're supposed to do an action sometime in the future, we're not done
+            for (auto &[key, trigger] : charControllers[i].timelineTriggers) {
+                // bias a bit to have some buffer for stuff to get delayed?
+                if (key > frameCount - 10) {
+                    bDone = false;
+                }
+            }
+        }
+
+        // failsafe
+        if (frameCount > 1000) {
+            bDone = true;
+        }
+
+        if (bDone) {
+            break;
+        }
     }
 }
