@@ -309,8 +309,6 @@ bool Guy::PreFrame(void)
                 delete this;
                 return false;
             }
-            // if eg. landingadjust changed during warudo
-            WorldPhysics();
             warudoIsFreeze = false;
         }
     }
@@ -3646,6 +3644,8 @@ bool Guy::Frame(bool endWarudoFrame)
         prevPoseStatus = forcedPoseStatus;
     }
     DoStatusKey();
+    WorldPhysics();
+    UpdateBoxes();
 
     couldMove = canMoveNow;
 
@@ -3673,9 +3673,10 @@ void Guy::DoStatusKey(void)
             int sideOperation = key["Side"];
 
             switch (sideOperation) {
-                case 0:
                 default:
                     log (logUnknowns, "unknown side op " + std::to_string(sideOperation));
+                    break;
+                case 0:
                     break;
                 case 1:
                     if (needsTurnaround()) {
