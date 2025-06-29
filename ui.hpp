@@ -17,11 +17,16 @@ struct timelineTrigger {
 class CharacterUIController {
 public:
     void RenderUI(void);
+    int getSimCharSlot(void) { return rightSide ? 1 : 0; }
 
     int character;
     int charVersion;
+    color charColor;
     bool changed;
     bool rightSide;
+
+    float flStartPosX;
+    Fixed startPosX;
 
     std::map<int, std::pair<int, int>> timelineTriggers;
 
@@ -32,16 +37,20 @@ public:
 
 class SimulationController {
 public:
-    void NewSim(void);
+    SimulationController() { Reset(); }
+    void Reset(void);
+    bool NewSim(void);
+    void RenderUI(void);
+    void AdvanceUntilComplete(void);
+
+    std::vector<CharacterUIController> charControllers;
 
     Simulation *pSim = nullptr;
     int scrubberFrame = 0;
+    int charCount = 1;
 };
 
 extern SimulationController simController;
-
-extern CharacterUIController leftCharController;
-extern CharacterUIController rightCharController;
 extern bool simInputsChanged;
 
 void timelineToInputBuffer(std::deque<int> &inputBuffer);

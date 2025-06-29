@@ -47,10 +47,9 @@ void Simulation::CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int versi
 void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
 {
     std::string charName = charNames[controller.character];
-    color charColor = {randFloat(), randFloat(), randFloat()};
 
     int version = atoi(charVersions[controller.charVersion]);
-    CreateGuy(charName, version, Fixed(0), Fixed(0), 1, charColor);
+    CreateGuy(charName, version, controller.startPosX, Fixed(0), controller.rightSide ? -1 : 1, controller.charColor);
 }
 
 

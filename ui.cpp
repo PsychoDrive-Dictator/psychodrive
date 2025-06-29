@@ -19,6 +19,9 @@
 
 #include "font_droidsans.hpp"
 
+int renderSizeX;
+int renderSizeY;
+
 bool webWidgets = false;
 
 ImFont *font = nullptr;
@@ -28,10 +31,7 @@ Guy *pGuyToDelete = nullptr;
 int mobileDropDownOption = -1;
 ImGuiID curDropDownID = -1;
 
- SimulationController simController;
-
-CharacterUIController leftCharController;
-CharacterUIController rightCharController;
+SimulationController simController;
 bool simInputsChanged = true;
 
 extern "C" {
@@ -415,7 +415,7 @@ void drawInputEditor()
     ImGui::End();
 }
 
-void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
+void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
@@ -495,57 +495,10 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue, int s
     drawHitboxExtentPlotWindow();
 }
 
-void CharacterUIController::RenderUI(void)
-{
-    ImGui::SetNextWindowPos(ImVec2(rightSide ? 800 : 0, 0));
-    ImGui::SetNextWindowSize(ImVec2(0, 0));
-    const char *pWindowName = rightSide ? "PsychoDrive Right Char Easy Panel" : "PsychoDrive Left Char Easy Panel";
-
-    ImGui::Begin(pWindowName, nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
-    if (modalDropDown("##char", &character, charNiceNames, 100)) {
-        simInputsChanged = true;
-        changed = true;
-        timelineTriggers.clear();
-    }
-    ImGui::SameLine();
-    if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 200)) {
-        simInputsChanged = true;
-        changed = true;
-        timelineTriggers.clear();
-    }
-    if (simController.scrubberFrame < (int)simController.pSim->stateRecording.size()) {
-        int charID = rightSide ? 1 : 0;
-        Guy *pGuy = simController.pSim->stateRecording[simController.scrubberFrame][charID];
-        if (pGuy->getFrameTriggers().size()) {
-            vecTriggerDropDownLabels.clear();
-            vecTriggers.clear();
-            vecTriggerDropDownLabels.push_back("Available Triggers");
-            for (auto &trigger : pGuy->getFrameTriggers()) {
-                vecTriggerDropDownLabels.push_back(pGuy->FindMove(trigger.first, trigger.second));
-                vecTriggers.push_back(trigger);
-            }
-            if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 300)) {
-                if (pendingTriggerAdd != 0) {
-                    std::erase_if(timelineTriggers, [](const auto& item) {
-                        auto const& [key, value] = item;
-                        return (key >= simController.scrubberFrame);
-                    });
-                    timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
-
-                    simInputsChanged = true;
-                    changed = true;
-                    pendingTriggerAdd = 0;
-                }
-            }
-        }
-    }
-
-    ImGui::End();
-}
-
 void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
 {
+    renderSizeX = sizeX;
+    renderSizeY = sizeY;
     if (!toggleRenderUI) {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -553,35 +506,24 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, in
     }
 
     if (gameMode == Training) {
-        renderAdvancedUI(frameRate, pLogQueue, sizeX, sizeY);
+        renderAdvancedUI(frameRate, pLogQueue);
     }
     
     // Mode selector button
     int modeSelectorSize = 200;
-    ImGui::SetNextWindowPos(ImVec2((sizeX - modeSelectorSize) * 0.5f - ImGui::GetStyle().WindowPadding.x, 0));
+    ImGui::SetNextWindowPos(ImVec2((renderSizeX - modeSelectorSize) * 0.5f - ImGui::GetStyle().WindowPadding.x, 0));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("PsychoDrive Top Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
-    const char* modes[] = { "Training", "Move Viewer" };//, "Move Comparison", "Combo Maker" };
+    const char* modes[] = { "Training", "Move Viewer", "Combo Maker" };
     if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), modeSelectorSize)) {
         simInputsChanged = true;
+        simController.Reset();
     }
     ImGui::End();
 
-    if (gameMode == MoveViewer || gameMode == ComboMaker) {
-        leftCharController.RenderUI();
-
-        ImGui::SetNextWindowPos(ImVec2(10, sizeY - 50));
-        ImGui::SetNextWindowSize(ImVec2(0, 0));
-        ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
-        
-        int simFrameCount = simController.pSim->stateRecording.size();
-        if (simFrameCount) {
-            ImGui::SetNextItemWidth(sizeX - 40);
-            ImGui::SliderInt("##framedump", &simController.scrubberFrame, 0, simFrameCount - 1);
-        }
-        ImGui::End();
+    if (gameMode != Training) {
+        simController.RenderUI();
     }
 
     ImGui::Render();
@@ -590,7 +532,7 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, in
 
 ImGuiIO& initUI(void)
 {
-    int fontSize = 20;
+    int fontSize = 18;
 #ifdef __EMSCRIPTEN__
     webWidgets = true;
     gameMode = MoveViewer;
@@ -618,14 +560,6 @@ ImGuiIO& initUI(void)
 
     ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.00f);
 
-    rightCharController.rightSide = true;
-    leftCharController.character = 1;
-    rightCharController.character = 2;
-    leftCharController.charVersion = charVersionCount - 1;
-    rightCharController.charVersion = charVersionCount - 1;
-
-    simController.NewSim();
-
     return io;
 }
 
@@ -637,8 +571,127 @@ void destroyUI(void)
     ImGui::DestroyContext();
 }
 
-void SimulationController::NewSim(void)
+void CharacterUIController::RenderUI(void)
 {
+    ImGui::SetNextWindowPos(ImVec2(rightSide ? renderSizeX - 265.0f : 0, 0));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    const char *pWindowName = rightSide ? "PsychoDrive Right Char Easy Panel" : "PsychoDrive Left Char Easy Panel";
+
+    ImGui::Begin(pWindowName, nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+    if (modalDropDown("##char", &character, charNiceNames, 207)) {
+        simInputsChanged = true;
+        changed = true;
+        timelineTriggers.clear();
+    }
+    ImGui::SameLine();
+    if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 35)) {
+        simInputsChanged = true;
+        changed = true;
+        timelineTriggers.clear();
+    }
+
+    if (gameMode == ComboMaker) {
+        ImGui::SetNextItemWidth( webWidgets ? 250.0 : 170.0 );
+        float newStartPosX = flStartPosX;
+        ImGui::SliderFloat("##startpos", &newStartPosX, -765.0, 765.0);
+        if (!webWidgets) {
+            char startPosTest[32] = {};
+            snprintf(startPosTest, sizeof(startPosTest), "%.2f", newStartPosX);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth( 70.0 );
+            if (ImGui::InputText("##startpostext", startPosTest, sizeof(startPosTest))) {
+                newStartPosX = atof(startPosTest);
+            }
+        }
+        if (newStartPosX != flStartPosX) {
+            flStartPosX = newStartPosX;
+            startPosX = Fixed(flStartPosX, true);
+            simInputsChanged = true;
+            changed = true;
+        }
+    }
+
+    if (simController.pSim && simController.scrubberFrame < (int)simController.pSim->stateRecording.size()) {
+        for (auto &[id, guy] : simController.pSim->stateRecording[simController.scrubberFrame]) {
+            if (id == getSimCharSlot() && guy && guy->getFrameTriggers().size()) {
+                vecTriggerDropDownLabels.clear();
+                vecTriggers.clear();
+                vecTriggerDropDownLabels.push_back("Available Triggers");
+                for (auto &trigger : guy->getFrameTriggers()) {
+                    vecTriggerDropDownLabels.push_back(guy->FindMove(trigger.first, trigger.second));
+                    vecTriggers.push_back(trigger);
+                }
+                if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 250)) {
+                    if (pendingTriggerAdd != 0) {
+                        std::erase_if(timelineTriggers, [](const auto& item) {
+                            auto const& [key, value] = item;
+                            return (key >= simController.scrubberFrame);
+                        });
+                        timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
+
+                        simInputsChanged = true;
+                        changed = true;
+                        pendingTriggerAdd = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+}
+
+void SimulationController::Reset(void)
+{
+    charControllers.clear();
+    charControllers.emplace_back();
+    charControllers.emplace_back();
+
+    charControllers[0].character = 1;
+    charControllers[0].charVersion = charVersionCount - 1;
+    charControllers[0].charColor = { 255.0, 0.0, 255.0 };
+    charControllers[1].character = 2;
+    charControllers[1].charVersion = charVersionCount - 1;
+    charControllers[1].rightSide = true;
+    charControllers[1].charColor = { 255.0, 255.0, 0.0 };
+
+    if (gameMode == ComboMaker) {
+        charControllers[0].startPosX = Fixed(-150);
+        charControllers[1].startPosX = Fixed(150);
+    } else {
+        charControllers[0].startPosX = Fixed(0);
+        charControllers[1].startPosX = Fixed(0);
+    }
+
+    for (auto &charController : charControllers) {
+        charController.timelineTriggers.clear();
+        charController.flStartPosX = charController.startPosX.f();
+    }
+}
+
+bool SimulationController::NewSim(void)
+{
+    charCount = 1;
+
+    if (gameMode == ComboMaker) {
+        charCount = 2;
+    }
+
+    bool charsLoaded = true;
+
+    for (int i = 0; i < charCount; i++) {
+        const char *charName = charNames[charControllers[i].character];
+        if (!isCharLoaded(charName)) {
+            requestCharDownload(charName);
+            charsLoaded = false;
+        }
+    }
+
+    if (!charsLoaded) {
+        return false;
+    }
+
     if (pSim != nullptr) {
         delete pSim;
         pSim = nullptr;
@@ -651,4 +704,46 @@ void SimulationController::NewSim(void)
     }
 
     pSim->recordingState = true;
+
+    for (int i = 0; i < charCount; i++) {
+        pSim->CreateGuyFromCharController(charControllers[i]);
+    }
+
+    return true;
+}
+
+void SimulationController::RenderUI(void)
+{
+    for (int i = 0; i < charCount; i++) {
+        charControllers[i].RenderUI();
+    }
+
+    int simFrameCount = pSim ? pSim->stateRecording.size() : 0;
+    if (simFrameCount) {
+        ImGui::SetNextWindowPos(ImVec2(10, renderSizeY - 50));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+
+        ImGui::SetNextItemWidth(renderSizeX - 40);
+        ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
+
+        ImGui::End();
+    }
+}
+
+void SimulationController::AdvanceUntilComplete(void)
+{
+    // todo detect completion kappa
+    for (int frame = 0; frame < 200; frame++) {
+        for (int i = 0; i < charCount; i++) {
+            auto &forcedTrigger = pSim->simGuys[charControllers[i].getSimCharSlot()]->getForcedTrigger();
+            if (charControllers[i].timelineTriggers.find(frame) != charControllers[i].timelineTriggers.end()) {
+                forcedTrigger = charControllers[i].timelineTriggers[frame];
+            } else {
+                forcedTrigger = std::make_pair(0,0);
+            }
+        }
+        pSim->AdvanceFrame();
+    }
 }

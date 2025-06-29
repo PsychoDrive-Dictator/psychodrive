@@ -514,16 +514,6 @@ static void mainloop(void)
 #endif
     }
 
-    // if (gameMode == MoveViewer || gameMode == ComboMaker || gameMode == MoveComparison) {
-    //     if (leftCharUIChanged && (guys.size() == 0 || *guys[0]->getName() != charNames[leftCharUI] || guys[0]->getVersion() != atoi(charVersions[leftCharUIVersion]))) {
-    //         while (guys.size()) {
-    //             delete guys[0];
-    //         }
-    //         createGuy(charNames[leftCharUI], atoi(charVersions[leftCharUIVersion]), Fixed(0.0f), Fixed(0.0f), 1, {0.78f, 0.098f, 0.318f} );
-    //         leftCharUIChanged = false;
-    //     }
-    // }
-
     doDeferredCreateGuys();
 
     const float desiredFrameTimeMS = 1000.0 / 60.0f;
@@ -542,39 +532,21 @@ static void mainloop(void)
     updateInputs(sizeX, sizeY);
 
     if (gameMode != Training) {
-
-        if (simInputsChanged && isCharLoaded(charNames[leftCharController.character])) {
-            simController.NewSim();
-
-            simController.pSim->CreateGuyFromCharController(leftCharController);
-
-            int frameCount = 0;
-            while (frameCount < 50) {
-                if (leftCharController.timelineTriggers.find(frameCount) != leftCharController.timelineTriggers.end()) {
-                    simController.pSim->simGuys[0]->getForcedTrigger() = leftCharController.timelineTriggers[frameCount];
-                } else {
-                    simController.pSim->simGuys[0]->getForcedTrigger() = std::make_pair(0,0);
-                }
-                simController.pSim->AdvanceFrame();
-                frameCount++;
-            }
-
-            simInputsChanged = false;
-        } else if (simInputsChanged && !isCharLoaded(charNames[leftCharController.character])) {
-            requestCharDownload(charNames[leftCharController.character]);
-        }
-
         setRenderState(clearColor, sizeX, sizeY);
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
+
+        if (simInputsChanged && simController.NewSim()) {
+            simController.AdvanceUntilComplete();
+
+            simInputsChanged = false;
+        }
 
         if (!simInputsChanged) {
             for (auto [id, guy] : simController.pSim->stateRecording[simController.scrubberFrame]) {
                 guy->Render();
             }
         }
-
     } else {
-
         if (recordingInput) {
             recordedInput.push_back(currentInputMap[keyboardID]);
         }
@@ -851,7 +823,6 @@ static void mainloop(void)
             paused = true; // cant pause in the middle above
             lasterrorcount = replayErrors;
         }
-
     }
 
     renderMarkersAndStuff();

@@ -8,7 +8,6 @@
 enum EGameMode {
     Training = 0,
     MoveViewer,
-    MoveComparison,
     ComboMaker
 };
 
@@ -89,6 +88,9 @@ const char *getCharNameFromID(int charID);
 
 extern const char* charVersions[];
 extern const int charVersionCount;
+
+bool isCharLoaded(std::string charName);
+void requestCharDownload(std::string charName);
 
 extern float startPos1;
 extern float startPos2;
