@@ -2288,15 +2288,23 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     pAttacker = attacker;
 
-    if (attr1 & (1<<10) && attacker->pParent) {
+    bool useParentDirection = attr1 & (1<<10);
+    bool usePositionAsDirection = attr1 & (1<<11);
+    if (useParentDirection && attacker->pParent) {
         // for the purpose of checking direction below
         attacker = attacker->pParent;
     }
     Fixed attackerDirection = attacker->direction;
     Fixed hitVelDirection = attackerDirection * Fixed(-1);
     // in a real crossup, hitvel will go opposite the direction of the hit player
-    if (attacker->needsTurnaround(Fixed(10))) {
+    if (!attacker->isProjectile && pAttacker->needsTurnaround(Fixed(10))) {
         attackerDirection *= Fixed(-1);
+    }
+    if (usePositionAsDirection) {
+        attackerDirection = attacker->direction;
+        if (pAttacker->needsTurnaround(Fixed(0))) {
+            attackerDirection *= Fixed(-1);
+        }
     }
 
     if (!isDomain && applyHit && direction == attackerDirection) {
@@ -2918,7 +2926,7 @@ void Guy::DoBranchKey(bool preHit)
                         int offsetX = branchParam1 & 0xFFFF;
                         if (offsetX > 0x8000) offsetX = -(0xFFFF - offsetX);
 
-                        offsetX *= -pOpponent->direction.i();
+                        offsetX *= direction.i();
 
                         int offsetY = (branchParam1 & 0xFFFF0000) >> 16;
                         if (offsetY > 0x8000) offsetY = -(0xFFFF - offsetY);
@@ -3667,6 +3675,7 @@ void Guy::DoStatusKey(void)
             switch (sideOperation) {
                 case 0:
                 default:
+                    log (logUnknowns, "unknown side op " + std::to_string(sideOperation));
                     break;
                 case 1:
                     if (needsTurnaround()) {
@@ -3675,6 +3684,16 @@ void Guy::DoStatusKey(void)
                     break;
                 case 3:
                     switchDirection();
+                    break;
+                case 9:
+                    if (direction != 1) {
+                        switchDirection();
+                    }
+                    break;
+                case 10:
+                    if (direction != -1) {
+                        switchDirection();
+                    }
                     break;
             }
         }
