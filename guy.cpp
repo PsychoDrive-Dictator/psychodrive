@@ -287,32 +287,42 @@ void Guy::UpdateActionData(void)
 
 bool Guy::PreFrame(void)
 {
-    // todo check if it also counts down in screen freeze..
-    // if it doesn't we might need to have two kinds of warudos
-    if (!warudoIsFreeze || !warudo) {
+    if (!warudo) {
         if (debuffTimer > 0 ) {
             debuffTimer--;
         }
-        if (debuffTimer == 1 && warudo == 1) {
+        if (debuffTimer == 1 && hitStop == 1) {
             debuffTimer = 5;
-        } else if (debuffTimer == 1 && warudo > 0) {
+        } else if (debuffTimer == 1 && hitStop > 0) {
             debuffTimer++;
         }
     }
 
-    if (warudo > 0) {
-        timeInWarudo++;
-        warudo--;
-        // increment the frame we skipped at the beginning of warudo
-        if (warudo == 0) {
+    if (!warudo && tokiWaUgokidasu) {
+        tokiWaUgokidasu = false;
+        if (!Frame(true)) {
+            delete this;
+            return false;
+        }
+    }
+
+    if (warudo) {
+        return false;
+    }
+
+    if (hitStop) {
+        timeInHitStop++;
+        hitStop--;
+        if (hitStop == 0) {
+            // increment the frame we skipped at the beginning of hitstop
             if (!Frame(true)) {
                 delete this;
                 return false;
             }
-            warudoIsFreeze = false;
         }
     }
-    if (warudo > 0) {
+
+    if (hitStop) {
         return false;
     }
 
@@ -731,37 +741,50 @@ bool Guy::PreFrame(void)
             }
         }
 
-        if (pActionJson->contains("WorldKey"))
-        {
-            bool tokiToTomare = false;
-            for (auto& [keyID, key] : (*pActionJson)["WorldKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || (!tokiToTomare && ( key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame))) {
+        if (pActionJson->contains("WorldKey")) {
+            for (auto& [keyID, key] : (*pActionJson)["WorldKey"].items()) {
+                if ( !key.contains("_StartFrame") || (( key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame))) {
                     continue;
                 }
 
-                if (key["Type"] == 0 || key["Type"] == 1) {
-                    // time stops, need to find when it resumes
-                    // timer field here isn't always set, so we're going to look ahead for type 5
-                    //pOpponent->addWarudo(key["Timer"].get<int>() * -1);
-                    tokiToTomare = true;
-                }
+                int type = key["Type"];
 
-                if (tokiToTomare && key["Type"] == 5) {
-                    // if we find a move with two shuffled pairs of those
-                    // we might need to introduce more careful matching
-                    // todo actions can branch while warudo is on into another warudo block
-                    // like guile's fk cancel into sa3 - will need a warudo toggle state i suppose
-                    tokiToTomare = false;
-                    if (pOpponent ) {
-                        pOpponent->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
-                        for ( auto minion : pOpponent->minions ) {
-                            minion->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
+                switch (type) {
+                    case 0:
+                    case 1:
+                        // type 1 is sa3 vs normal? why does that matter?
+                        // todo is timer timer deduction?
+                        if (pOpponent) {
+                            pOpponent->tokiYoTomare = true;
+                            for ( auto minion : pOpponent->minions ) {
+                                minion->tokiYoTomare = true;
+                            }
                         }
-                    }
-                    for ( auto minion : minions ) {
-                        minion->addWarudo(key["_StartFrame"].get<int>() - currentFrame + 1, true);
-                    }
+                        for ( auto minion : minions ) {
+                            minion->tokiYoTomare = true;
+                        }
+                        break;
+                    case 5:
+                        // resume
+                        if (pOpponent) {
+                            if (pOpponent->warudo) {
+                                pOpponent->tokiWaUgokidasu = true;
+                            }
+                            for ( auto minion : pOpponent->minions ) {
+                                if (minion->warudo) {
+                                    minion->tokiWaUgokidasu = true;
+                                }
+                            }
+                        }
+                        for ( auto minion : minions ) {
+                            if (minion->warudo) {
+                                minion->tokiWaUgokidasu = true;
+                            }
+                        }
+                        break;
+                    default:
+                        log(logUnknowns, "unknown worldkey type " + std::to_string(type));
+                        break;
                 }
             }
         }
@@ -813,7 +836,7 @@ bool Guy::PreFrame(void)
 
 void Guy::PreFramePostPush(void)
 {
-    if (warudo > 0) {
+    if (warudo || hitStop) {
         return;
     }
 
@@ -1022,7 +1045,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
     initialI = -1;
     bool initialMatch = false;
     // current frame + buffer
-    int initialSearch = 1 + precedingTime + timeInWarudo;
+    int initialSearch = 1 + precedingTime + timeInHitStop;
     if (inputBuffer.size() < (size_t)initialSearch) {
         initialSearch = inputBuffer.size();
     }
@@ -1605,7 +1628,7 @@ void Guy::Render(void) {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
-    if (warudo) return false;
+    if (warudo || hitStop) return false;
     if (didPush) return false;
     if ( !pOtherGuy ) return false;
     // for now, maybe there's other rules
@@ -1923,7 +1946,7 @@ bool Guy::WorldPhysics(void)
 
 bool Guy::CheckHit(Guy *pOtherGuy)
 {
-    if (warudo) return false;
+    if (warudo || hitStop) return false;
     if ( !pOtherGuy ) return false;
 
     bool retHit = false;
@@ -2091,8 +2114,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                         hitArmor = false;
                         if (pOtherGuy->armorHitsLeft == 0) {
                             log(logHits, "armor break!");
-                            addWarudo(armorBreakHitStopHitter+1);
-                            pOtherGuy->addWarudo(armorBreakHitStopHitted+1);
+                            addHitStop(armorBreakHitStopHitter+1);
+                            pOtherGuy->addHitStop(armorBreakHitStopHitted+1);
                         }
                     } else {
                         // apply gauge effects here
@@ -2101,8 +2124,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                         // todo i think this is wrong, it needs to add to the normal hitstop?
                         // there's TargetStopAdd too, figure it out at some point
-                        addWarudo(armorHitStopHitter+1);
-                        pOtherGuy->addWarudo(armorHitStopHitted+1);
+                        addHitStop(armorHitStopHitter+1);
+                        pOtherGuy->addHitStop(armorHitStopHitted+1);
                         log(logHits, "armor hit!");
                     }
                 }
@@ -2118,8 +2141,8 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pOtherGuy->atemiThisFrame = true;
 
                 // is that hardcoded on atemi? not sure if the number is right
-                addWarudo(13+1);
-                pOtherGuy->addWarudo(13+1);
+                addHitStop(13+1);
+                pOtherGuy->addHitStop(13+1);
 
                 log(logHits, "atemi hit!");
             }
@@ -2229,13 +2252,13 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     // add warudo after potential instagrab branch (technical term)
     if (hitStopSelf > 0) {
         if (hitStopToParent) {
-            pParent->addWarudo(hitStopSelf+1);
+            pParent->addHitStop(hitStopSelf+1);
             // todo is it instead of to self? :/
         }
-        addWarudo(hitStopSelf+1);
+        addHitStop(hitStopSelf+1);
     }
     if (hitStopTarget > 0) {
-        pOtherGuy->addWarudo(hitStopTarget+1);
+        pOtherGuy->addHitStop(hitStopTarget+1);
 #ifdef __EMSCRIPTEN__
         emscripten_vibrate(hitStopTarget*2);
 #endif
@@ -3130,18 +3153,30 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
-bool Guy::Frame(bool endWarudoFrame)
+bool Guy::Frame(bool endHitStopFrame)
 {
-    // if this is the frame that was stolen from beginning warudo when it ends, don't
-    // add pending warudo yet, so we can play it out fully, in case warudo got added
+    // if this is the frame that was stolen from beginning hitstop when it ends, don't
+    // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
-    if (!endWarudoFrame) {
-        warudo += pendingWarudo;
-        pendingWarudo = 0;
+    if (!endHitStopFrame) {
+        if (pendingHitStop) {
+            hitStop += pendingHitStop;
+            pendingHitStop = 0;
+        }
+        // time stops
+        if (tokiYoTomare) {
+            warudo = true;
+            tokiYoTomare = false;
+        }
     }
 
-    if (warudo) {
+    if (hitStop || warudo) {
+        if (tokiWaUgokidasu) {
+            // time has begun to move again
+            warudo = false;
+            // leave tokiWaUgokidasu set for PreFrame to know this happened
+        }
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers
         // we'll re-run it in PreFrame
@@ -3629,8 +3664,8 @@ bool Guy::Frame(bool endWarudoFrame)
         switchDirection();
     }
 
-    if (warudo == 0) {
-        timeInWarudo = 0;
+    if (hitStop == 0) {
+        timeInHitStop = 0;
     }
 
     // if just did a trigger, give the first frame an opportunity ot branch
@@ -3652,7 +3687,7 @@ bool Guy::Frame(bool endWarudoFrame)
         nextAction = -1;
     }
 
-    // if we need landing adjust/etc during warudo, need this updated now
+    // if we need landing adjust/etc during hitStop, need this updated now
     if (!didTransition) {
         prevPoseStatus = forcedPoseStatus;
     }

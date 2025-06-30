@@ -220,10 +220,18 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     }
     ImGui::Text("push %zd hit %zd hit extent %.2f hurt %zd", pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox.f(), pGuy->getHurtBoxes()->size());
     if (pGuy->getProjectile()) {
-        ImGui::Text("limit category %i hit count %i warudo %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getWarudo() );
+        ImGui::Text("limit category %i hit count %i hitstop %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getHitStop() );
+        if (pGuy->getWarudo()) {
+            ImGui::SameLine();
+            ImGui::Text("warudo");
+        }
     } else {
         ImGui::Text("health %i unique %s debuff %i style %i install %i timer %i", pGuy->getHealth(), pGuy->getUniqueParam().c_str(), pGuy->getDebuffTimer(), pGuy->getStyle(), pGuy->getInstallFrames(), pGuy->getUniqueTimer());
-        ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i warudo %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getWarudo());
+        ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i hitstop %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getHitStop());
+        if (pGuy->getWarudo()) {
+            ImGui::SameLine();
+            ImGui::Text("warudo");
+        }
     }
     if ( ImGui::Button("destroy") ) { pGuyToDelete = pGuy; }
     ImGui::SameLine();

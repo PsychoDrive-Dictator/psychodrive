@@ -296,7 +296,7 @@ void renderMarkersAndStuff(void)
         glUniform1i(loc_progress, progress);
         drawBox(hitMarkPosX - vecMarkers[i].radius, hitMarkPosY - vecMarkers[i].radius,
         vecMarkers[i].radius*2, vecMarkers[i].radius*2, vecMarkers[i].radius*2, col.r,col.g,col.b,alpha);
-        if (!vecMarkers[i].pOrigin->getWarudo()) {
+        if (!vecMarkers[i].pOrigin->getHitStop()) {
             vecMarkers[i].time++;
         }
         if (vecMarkers[i].time > vecMarkers[i].maxtime) {

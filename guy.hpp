@@ -29,12 +29,11 @@ public:
     void PreFramePostPush(void);
     bool WorldPhysics(void);
     bool CheckHit(Guy *pOtherGuy);
-    bool Frame(bool endWarudoFrame = false);
+    bool Frame(bool endHitStopFrame = false);
     std::string getActionName(int actionID);
 
-    void addWarudo(int w, bool isFreeze = false) {
-        pendingWarudo += w;
-        warudoIsFreeze = isFreeze;
+    void addHitStop(int w) {
+        pendingHitStop += w;
     }
 
     std::string *getName() { return &name; }
@@ -97,7 +96,8 @@ public:
 
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
-    int getWarudo() { return warudo; }
+    int getHitStop() { return hitStop; }
+    bool getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     std::string getUniqueParam() {
@@ -563,10 +563,12 @@ private:
     bool hitArmorThisMove = false;
     bool hitAtemiThisMove = false;
 
-    int warudo = 0;
-    int pendingWarudo = 0;
-    int timeInWarudo = 0;
-    bool warudoIsFreeze = false;
+    int hitStop = 0;
+    int pendingHitStop = 0;
+    int timeInHitStop = 0;
+    bool tokiYoTomare = false;
+    bool warudo = false;
+    bool tokiWaUgokidasu = false;
 
     // getting hit side
     Guy *pAttacker = nullptr;
