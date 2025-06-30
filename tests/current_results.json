@@ -1561,6 +1561,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "guile_lp_cancel_boom_reflect",
+        "testVersion": "31",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 251,
+                "firstFrame": 162,
+                "lastFrame": 412
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 38,
+                "firstFrame": 158,
+                "lastFrame": 195
+            },
+            {
+                "count": 38,
+                "firstFrame": 158,
+                "lastFrame": 195
+            },
+            {
+                "count": 140,
+                "firstFrame": 152,
+                "lastFrame": 262
+            },
+            {
+                "count": 248,
+                "firstFrame": 153,
+                "lastFrame": 412
+            },
+            {
+                "count": 1,
+                "firstFrame": 195,
+                "lastFrame": 195
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "guile_solidpuncher_simple_sequence",
         "testVersion": "26",
         "finished": true,
