@@ -341,7 +341,8 @@ bool Guy::PreFrame(void)
     armorThisFrame = false;
     atemiThisFrame = false;
     landed = false;
-    pushBackThisFrame = 0.0f;
+    pushBackThisFrame = Fixed(0);
+    reflectThisFrame = Fixed(0);
     offsetDoesNotPush = false;
 
     if (pActionJson != nullptr)
@@ -612,17 +613,19 @@ bool Guy::PreFrame(void)
             noVelNextFrame = false;
         }
 
-        if (hitVelX != Fixed(0)) {
-            if (!locked) {
-                posX = posX + hitVelX;
-                pushBackThisFrame = hitVelX;
-            }
+        if (pOpponent && !pOpponent->warudo) {
+            if (hitVelX != Fixed(0)) {
+                if (!locked) {
+                    posX = posX + hitVelX;
+                    pushBackThisFrame = hitVelX;
+                }
 
-            Fixed prevHitVelX = hitVelX;
-            hitVelX = hitVelX + hitAccelX;
-            if ((hitVelX * prevHitVelX) < Fixed(0) || (hitAccelX != Fixed(0)&& hitVelX == Fixed(0))) {
-                hitAccelX = Fixed(0);
-                hitVelX = Fixed(0);
+                Fixed prevHitVelX = hitVelX;
+                hitVelX = hitVelX + hitAccelX;
+                if ((hitVelX * prevHitVelX) < Fixed(0) || (hitAccelX != Fixed(0)&& hitVelX == Fixed(0))) {
+                    hitAccelX = Fixed(0);
+                    hitVelX = Fixed(0);
+                }
             }
         }
 
@@ -1629,6 +1632,27 @@ void Guy::Render(void) {
 bool Guy::Push(Guy *pOtherGuy)
 {
     if (warudo || hitStop) return false;
+
+    // do reflect before push, since vel could be winning to push us flush against someone
+    // in theory should do before wall touch too but not sure if both can be touching the
+    // wall at the same time while stll being affected by reflect
+    if (pOpponent && !pOpponent->warudo && reflectThisFrame == Fixed(0)) {
+        if (hitReflectVelX != Fixed(0)) {
+            if (!locked) {
+                posX = posX + hitReflectVelX;
+            }
+
+            Fixed prevHitVelX = hitReflectVelX;
+            hitReflectVelX = hitReflectVelX + hitReflectAccelX;
+            if ((hitReflectVelX * prevHitVelX) < Fixed(0) || (hitReflectAccelX != Fixed(0) && hitReflectVelX == Fixed(0))) {
+                hitReflectAccelX = Fixed(0);
+                hitReflectVelX = Fixed(0);
+            }
+
+            UpdateBoxes();
+        }
+    }
+
     if (didPush) return false;
     if ( !pOtherGuy ) return false;
     // for now, maybe there's other rules
@@ -1912,11 +1936,17 @@ bool Guy::WorldPhysics(void)
         }
 
         if (pushBackThisFrame != Fixed(0) && pushX != Fixed(0) && pushX * pushBackThisFrame < Fixed(0)) {
-            // some pushback went into the wall, it needs to go into opponent
+            // touched the wall during pushback
             if (pAttacker && !pAttacker->noPush && !noCounterPush) {
-                pAttacker->posX += fixMax(pushX, pushBackThisFrame * Fixed(-1));
+                pAttacker->reflectThisFrame = fixMax(pushX, pushBackThisFrame * Fixed(-1));
+                pAttacker->posX += pAttacker->reflectThisFrame;
                 pAttacker->UpdateBoxes();
+                pAttacker->hitReflectVelX = hitVelX * Fixed(-1);
+                pAttacker->hitReflectAccelX = hitAccelX * Fixed(-1);
+                //pAttacker->hitReflectVelX -= pAttacker->hitReflectAccelX;
             }
+            hitVelX = Fixed(0);
+            hitAccelX = Fixed(0);
         }
 
         UpdateBoxes();

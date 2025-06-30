@@ -578,6 +578,9 @@ private:
     Fixed hitVelX;
     Fixed hitAccelX;
     Fixed pushBackThisFrame;
+    Fixed hitReflectVelX;
+    Fixed hitReflectAccelX;
+    Fixed reflectThisFrame;
     bool noCounterPush = false;
     bool beenHitThisFrame = false;
     int comboHits = 0;
