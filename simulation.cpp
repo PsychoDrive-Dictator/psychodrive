@@ -299,7 +299,8 @@ void Simulation::renderRecordedHitMarkers(int frameIndex)
                     float worldX = targetGuy->getPosX().f() + event.hitEventData.x;
                     float worldY = targetGuy->getPosY().f() + event.hitEventData.y;
                     drawHitMarker(worldX, worldY, event.hitEventData.radius,
-                                 event.hitEventData.hitType, markerAge, maxMarkerAge);
+                                 event.hitEventData.hitType, markerAge, maxMarkerAge,
+                                 event.hitEventData.dirX, event.hitEventData.dirY, event.hitEventData.seed);
                 }
             }
         }

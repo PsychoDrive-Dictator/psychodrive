@@ -23,6 +23,9 @@ struct HitMarker {
     int type;
     int time;
     int maxtime;
+    int seed;
+    float dirX;
+    float dirY;
 };
 
 extern bool thickboxes;
@@ -37,7 +40,7 @@ void setScreenSpaceRenderState(int sizeX, int sizeY);
 void addHitMarker(HitMarker newMarker);
 void clearHitMarkers(void);
 void renderMarkersAndStuff(void);
-void drawHitMarker(float x, float y, float radius, int hitType, int time, int maxTime);
+void drawHitMarker(float x, float y, float radius, int hitType, int time, int maxTime, float dirX = 1.0f, float dirY = 0.0f, int seed = 0);
 void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ );
 void drawBox(float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront = false);
 SDL_Window* initWindowRender(void);

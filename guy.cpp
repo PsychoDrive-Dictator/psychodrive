@@ -2195,31 +2195,40 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     hitStopSelf = 0;
                     hitStopTarget = 0;
                 }
+                Box hitIntersection;
+                hitIntersection.x = fixMax(hitbox.box.x, hurtBox.box.x);
+                hitIntersection.y = fixMax(hitbox.box.y, hurtBox.box.y);
+                hitIntersection.w = fixMin(hitbox.box.x + hitbox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
+                hitIntersection.h = fixMin(hitbox.box.y + hitbox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
 
-                Fixed hitMarkerOffsetX = hitbox.box.x - pOtherGuy->getPosX();
-                if (direction > Fixed(0)) {
-                    hitMarkerOffsetX += hitbox.box.w;
+                float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
+                if (direction < Fixed(0)) {
+                    hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
                 }
-                Fixed hitMarkerOffsetY = hitbox.box.y+hitbox.box.h/Fixed(2) - pOtherGuy->posY;
+                float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
                 int hitMarkerType = 1;
-                float hitMarkerRadius = 25.0f;
+                float hitMarkerRadius = 35.0f;
                 if (hasBeenBlockedThisFrame) {
                     hitMarkerType = 2;
-                }
-                if (hitEntryFlag & punish_counter) {
-                    hitMarkerRadius = 35.0f;
+                    hitMarkerRadius = 30.0f;
+                } else if (hitEntryFlag & punish_counter) {
+                    hitMarkerRadius = 45.0f;
                 }
                 if (pSim) {
                     FrameEvent event;
                     event.type = FrameEvent::Hit;
                     event.hitEventData.targetID = pOtherGuy->getUniqueID();
-                    event.hitEventData.x = hitMarkerOffsetX.f();
-                    event.hitEventData.y = hitMarkerOffsetY.f();
+                    event.hitEventData.x = hitMarkerOffsetX;
+                    event.hitEventData.y = hitMarkerOffsetY;
                     event.hitEventData.radius = hitMarkerRadius;
                     event.hitEventData.hitType = hasBeenBlockedThisFrame ? 1 : 0;
+                    event.hitEventData.seed = pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
+                    event.hitEventData.dirX = direction.f();
+                    event.hitEventData.dirY = 0.0f;
                     pSim->getCurrentFrameEvents().push_back(event);
                 } else {
-                    addHitMarker({hitMarkerOffsetX.f(),hitMarkerOffsetY.f(),hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
+                    int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
+                    addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, direction.f(), 0.0f});
                 }
 
                 // grab or hitgrab

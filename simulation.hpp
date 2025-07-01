@@ -14,14 +14,19 @@ struct FrameEvent {
     };
     Type type;
 
+    struct HitEventData {
+        int targetID;
+        float x;
+        float y;
+        float radius;
+        int hitType; // 0 = normal hit, 1 = block
+        int seed;
+        float dirX;
+        float dirY;
+    };
+
     union {
-        struct {
-            int targetID;
-            float x;
-            float y;
-            float radius;
-            int hitType; // 0 = normal hit, 1 = block
-        } hitEventData;
+        HitEventData hitEventData;
     };
 };
 
