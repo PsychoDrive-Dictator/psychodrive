@@ -8,6 +8,33 @@
 
 class CharacterUIController;
 
+struct FrameEvent {
+    enum Type {
+        Hit = 0
+    };
+    Type type;
+
+    union {
+        struct {
+            int targetID;
+            float x;
+            float y;
+            float radius;
+            int hitType; // 0 = normal hit, 1 = block
+        } hitEventData;
+    };
+};
+
+struct RecordedFrame {
+    std::map<int,Guy*> guys;
+    std::vector<FrameEvent> events;
+
+    Guy* findGuyByID(int uniqueID) {
+        auto it = guys.find(uniqueID);
+        return (it != guys.end()) ? it->second : nullptr;
+    }
+};
+
 class Simulation {
 public:
     ~Simulation();
@@ -35,6 +62,7 @@ public:
     void Log(std::string logLine);
 
     void AdvanceFrame();
+    std::vector<FrameEvent>& getCurrentFrameEvents() { return currentFrameEvents; }
 
     std::vector<Guy *> everyone;
     int guyIDCounter = 0;
@@ -50,5 +78,6 @@ public:
     int replayErrors = 0;
 
     bool recordingState = false;
-    std::vector<std::map<int,Guy*>> stateRecording;
+    std::vector<RecordedFrame> stateRecording;
+    std::vector<FrameEvent> currentFrameEvents;
 };

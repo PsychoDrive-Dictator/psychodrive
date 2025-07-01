@@ -538,12 +538,45 @@ static void mainloop(void)
         if (simInputsChanged && simController.NewSim()) {
             simController.AdvanceUntilComplete();
 
+            if (simController.scrubberFrame >= simController.pSim->stateRecording.size()) {
+                simController.scrubberFrame = simController.pSim->stateRecording.size() - 1;
+            }
+
             simInputsChanged = false;
         }
 
         if (!simInputsChanged) {
-            for (auto [id, guy] : simController.pSim->stateRecording[simController.scrubberFrame]) {
+            auto &frame = simController.pSim->stateRecording[simController.scrubberFrame];
+            for (auto [id, guy] : frame.guys) {
                 guy->Render();
+            }
+
+            clearHitMarkers();
+
+            int maxMarkerAge = 10;
+            int startFrame = std::max(0, simController.scrubberFrame - maxMarkerAge + 1);
+
+            for (int checkFrame = startFrame; checkFrame <= simController.scrubberFrame; checkFrame++) {
+                auto &histFrame = simController.pSim->stateRecording[checkFrame];
+                for (const auto &event : histFrame.events) {
+                    if (event.type == FrameEvent::Hit) {
+                        int markerAge = simController.scrubberFrame - checkFrame;
+
+                        Guy* targetGuy = frame.findGuyByID(event.hitEventData.targetID);
+                        if (targetGuy) {
+                            int markerType = event.hitEventData.hitType ? 2 : 1;
+                            addHitMarker({
+                                event.hitEventData.x,
+                                event.hitEventData.y,
+                                event.hitEventData.radius,
+                                targetGuy,
+                                markerType,
+                                markerAge,
+                                maxMarkerAge
+                            });
+                        }
+                    }
+                }
             }
         }
     } else {

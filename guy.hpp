@@ -289,6 +289,9 @@ public:
         pCommonAtemiJson = parent.pCommonAtemiJson;
 
         pOpponent = parent.pOpponent;
+        if (parent.pSim) {
+            setSim(parent.pSim);
+        }
 
         currentAction = startAction;
         styleInstall = styleID;

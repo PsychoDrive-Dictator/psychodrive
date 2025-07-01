@@ -2209,7 +2209,18 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (hitEntryFlag & punish_counter) {
                     hitMarkerRadius = 35.0f;
                 }
-                addHitMarker({hitMarkerOffsetX.f(),hitMarkerOffsetY.f(),hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
+                if (pSim) {
+                    FrameEvent event;
+                    event.type = FrameEvent::Hit;
+                    event.hitEventData.targetID = pOtherGuy->getUniqueID();
+                    event.hitEventData.x = hitMarkerOffsetX.f();
+                    event.hitEventData.y = hitMarkerOffsetY.f();
+                    event.hitEventData.radius = hitMarkerRadius;
+                    event.hitEventData.hitType = hasBeenBlockedThisFrame ? 1 : 0;
+                    pSim->getCurrentFrameEvents().push_back(event);
+                } else {
+                    addHitMarker({hitMarkerOffsetX.f(),hitMarkerOffsetY.f(),hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10});
+                }
 
                 // grab or hitgrab
                 if (isGrab || (attr2 & (1<<1))) {

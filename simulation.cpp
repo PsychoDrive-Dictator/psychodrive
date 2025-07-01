@@ -9,7 +9,7 @@ Simulation::~Simulation() {
         delete guy;
     }
     for (auto &frame: stateRecording) {
-        for (auto [id, guy]: frame) {
+        for (auto [id, guy]: frame.guys) {
             guy->enableCleanup = false;
             delete guy;
         }
@@ -260,11 +260,13 @@ void Simulation::AdvanceFrame(void)
 
     if (recordingState) {
         stateRecording.emplace_back();
-        std::map<int,Guy*> &frameSavedGuys = stateRecording[stateRecording.size()-1];
+        RecordedFrame &frame = stateRecording[stateRecording.size()-1];
         for (auto guy : everyone) {
             Guy *pGuy = new Guy;
             *pGuy = *guy;
-            frameSavedGuys[guy->getUniqueID()] = pGuy;
+            frame.guys[guy->getUniqueID()] = pGuy;
         }
+        frame.events = currentFrameEvents;
+        currentFrameEvents.clear();
     }
 }

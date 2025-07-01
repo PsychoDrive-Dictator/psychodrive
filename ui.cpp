@@ -621,7 +621,7 @@ void CharacterUIController::RenderUI(void)
     }
 
     if (simController.pSim && simController.scrubberFrame < (int)simController.pSim->stateRecording.size()) {
-        for (auto &[id, guy] : simController.pSim->stateRecording[simController.scrubberFrame]) {
+        for (auto &[id, guy] : simController.pSim->stateRecording[simController.scrubberFrame].guys) {
             if (id == getSimCharSlot() && guy && guy->getFrameTriggers().size()) {
                 vecTriggerDropDownLabels.clear();
                 vecTriggers.clear();

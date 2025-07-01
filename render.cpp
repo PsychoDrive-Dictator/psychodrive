@@ -277,6 +277,11 @@ void addHitMarker(HitMarker newMarker)
     vecMarkers.push_back(newMarker);
 }
 
+void clearHitMarkers(void)
+{
+    vecMarkers.clear();
+}
+
 void renderMarkersAndStuff(void)
 {
     int markerToDelete = -1;
