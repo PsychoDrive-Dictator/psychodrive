@@ -63,6 +63,8 @@ public:
 
     void AdvanceFrame();
     std::vector<FrameEvent>& getCurrentFrameEvents() { return currentFrameEvents; }
+    void renderRecordedGuys(int frameIndex);
+    void renderRecordedHitMarkers(int frameIndex);
 
     std::vector<Guy *> everyone;
     int guyIDCounter = 0;

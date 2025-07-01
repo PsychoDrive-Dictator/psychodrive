@@ -546,38 +546,8 @@ static void mainloop(void)
         }
 
         if (!simInputsChanged) {
-            auto &frame = simController.pSim->stateRecording[simController.scrubberFrame];
-            for (auto [id, guy] : frame.guys) {
-                guy->Render();
-            }
-
-            clearHitMarkers();
-
-            int maxMarkerAge = 10;
-            int startFrame = std::max(0, simController.scrubberFrame - maxMarkerAge + 1);
-
-            for (int checkFrame = startFrame; checkFrame <= simController.scrubberFrame; checkFrame++) {
-                auto &histFrame = simController.pSim->stateRecording[checkFrame];
-                for (const auto &event : histFrame.events) {
-                    if (event.type == FrameEvent::Hit) {
-                        int markerAge = simController.scrubberFrame - checkFrame;
-
-                        Guy* targetGuy = frame.findGuyByID(event.hitEventData.targetID);
-                        if (targetGuy) {
-                            int markerType = event.hitEventData.hitType ? 2 : 1;
-                            addHitMarker({
-                                event.hitEventData.x,
-                                event.hitEventData.y,
-                                event.hitEventData.radius,
-                                targetGuy,
-                                markerType,
-                                markerAge,
-                                maxMarkerAge
-                            });
-                        }
-                    }
-                }
-            }
+            simController.pSim->renderRecordedGuys(simController.scrubberFrame);
+            simController.pSim->renderRecordedHitMarkers(simController.scrubberFrame);
         }
     } else {
         if (recordingInput) {

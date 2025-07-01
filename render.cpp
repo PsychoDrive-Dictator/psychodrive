@@ -34,6 +34,16 @@ GLuint loc_color;
 GLuint loc_isgrid;
 GLuint loc_progress;
 
+static int current_isgrid = -1;
+
+static void setIsGrid(int value)
+{
+    if (current_isgrid != value) {
+        glUniform1i(loc_isgrid, value);
+        current_isgrid = value;
+    }
+}
+
 void crossProduct( float *a, float *b, float *res) {
  
     res[0] = a[1] * b[2]  -  b[1] * a[2];
@@ -191,7 +201,7 @@ const float cube[] = {
     1.0, 1.0, 1.0,
 };
 
-void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront /*= false*/ )
+void drawBoxInternal( float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront = false )
 {
     glUniform3f(loc_size, w, h, thickness);
     glUniform3f(loc_offset, x, y, -thickness/2.0);
@@ -203,8 +213,15 @@ void drawBox( float x, float y, float w, float h, float thickness, float r, floa
     glDrawArrays(GL_TRIANGLES, first, count);
 }
 
+void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront /*= false*/ )
+{
+    setIsGrid(0);
+    drawBoxInternal(x, y, w, h, thickness, r, g, b, a, noFront);
+}
+
 void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
 {
+    setIsGrid(0);
     if (isDrive || isParry || isDI ) {
         float driveOffset = 0.75;
         float colorR = 0.0;
@@ -220,9 +237,9 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBox( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,0.2);
+        drawBoxInternal( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,0.2);
     }
-    drawBox( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,0.2);
+    drawBoxInternal( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,0.2);
 }
 
 bool thickboxes = false;
@@ -282,10 +299,25 @@ void clearHitMarkers(void)
     vecMarkers.clear();
 }
 
+void drawHitMarker(float x, float y, float radius, int hitType, int time, int maxTime)
+{
+    int progress = radius + time + 4;
+    color col = {0.9, 0.4, 0.3};
+    float alpha = 0.9;
+    if (hitType == 2) {
+        col = {0.55, 0.7, 0.8};
+        alpha = 0.75;
+        progress = radius + maxTime / 2 - time;
+    }
+    setIsGrid(2);
+    glUniform1i(loc_progress, progress);
+    drawBoxInternal(x - radius, y - radius, radius*2, radius*2, radius*2, col.r, col.g, col.b, alpha);
+}
+
 void renderMarkersAndStuff(void)
 {
     int markerToDelete = -1;
-    glUniform1i(loc_isgrid, 2);
+    setIsGrid(2);
     for (uint32_t i = 0; i < vecMarkers.size(); i++)
     {
         float hitMarkPosX = vecMarkers[i].pOrigin->getPosX().f() + vecMarkers[i].x;
@@ -299,7 +331,7 @@ void renderMarkersAndStuff(void)
             progress = vecMarkers[i].radius + vecMarkers[i].maxtime / 2 - vecMarkers[i].time;
         }
         glUniform1i(loc_progress, progress);
-        drawBox(hitMarkPosX - vecMarkers[i].radius, hitMarkPosY - vecMarkers[i].radius,
+        drawBoxInternal(hitMarkPosX - vecMarkers[i].radius, hitMarkPosY - vecMarkers[i].radius,
         vecMarkers[i].radius*2, vecMarkers[i].radius*2, vecMarkers[i].radius*2, col.r,col.g,col.b,alpha);
         if (!vecMarkers[i].pOrigin->getHitStop()) {
             vecMarkers[i].time++;
@@ -311,7 +343,6 @@ void renderMarkersAndStuff(void)
     if (markerToDelete != -1) {
         vecMarkers.erase(vecMarkers.begin()+markerToDelete);
     }
-    glUniform1i(loc_isgrid, 0);
 }
 
 void setRenderState(color clearColor, int sizeX, int sizeY)
@@ -340,9 +371,8 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     glUniformMatrix4fv(loc_view, 1, false, viewMatrix);
 
     // render stage
-    glUniform1i(loc_isgrid, 1);
-    drawBox(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0, true);
-    glUniform1i(loc_isgrid, 0);
+    setIsGrid(1);
+    drawBoxInternal(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0, true);
 }
 
 void setScreenSpaceRenderState(int sizeX, int sizeY)

@@ -1,6 +1,7 @@
 #include "simulation.hpp"
 #include "guy.hpp"
 #include "ui.hpp"
+#include "render.hpp"
 
 Simulation::~Simulation() {
     gatherEveryone(simGuys, everyone);
@@ -268,5 +269,39 @@ void Simulation::AdvanceFrame(void)
         }
         frame.events = currentFrameEvents;
         currentFrameEvents.clear();
+    }
+}
+
+void Simulation::renderRecordedGuys(int frameIndex)
+{
+    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
+        for (auto [id, guy] : stateRecording[frameIndex].guys) {
+            guy->Render();
+        }
+    }
+}
+
+void Simulation::renderRecordedHitMarkers(int frameIndex)
+{
+    int maxMarkerAge = 10;
+    int startFrame = std::max(0, frameIndex - maxMarkerAge + 1);
+
+    for (int checkFrame = startFrame; checkFrame <= frameIndex; checkFrame++) {
+        auto &histFrame = stateRecording[checkFrame];
+        auto &currentFrameGuys = stateRecording[frameIndex];
+
+        for (const auto &event : histFrame.events) {
+            if (event.type == FrameEvent::Hit) {
+                int markerAge = frameIndex - checkFrame;
+
+                Guy* targetGuy = currentFrameGuys.findGuyByID(event.hitEventData.targetID);
+                if (targetGuy) {
+                    float worldX = targetGuy->getPosX().f() + event.hitEventData.x;
+                    float worldY = targetGuy->getPosY().f() + event.hitEventData.y;
+                    drawHitMarker(worldX, worldY, event.hitEventData.radius,
+                                 event.hitEventData.hitType, markerAge, maxMarkerAge);
+                }
+            }
+        }
     }
 }
