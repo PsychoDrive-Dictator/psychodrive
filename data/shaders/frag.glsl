@@ -93,6 +93,10 @@ void main() {
                     float dist = length(localPos2D - particlePos2D);
 
                     int particleIndex = i * textureSize + j;
+
+                    if (particleIndex % 4 != 0) {
+                        continue;
+                    }
                     bool isProjectile = isBlockEffect ? (particleIndex < 128) : (particleIndex < 64);
                     bool isBackground = !isBlockEffect && isProjectile && colorVariation < 0.5;
 
