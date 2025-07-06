@@ -862,6 +862,8 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
         } else {
             jumpDirection = 0;
         }
+
+        log(logTransitions, "forced jump status from trigger, direction " + std::to_string(jumpDirection));
     }
 }
 

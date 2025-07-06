@@ -53,6 +53,214 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_air_recovery",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 179,
+                "firstFrame": 338,
+                "lastFrame": 516
+            },
+            {
+                "count": 91,
+                "firstFrame": 295,
+                "lastFrame": 372
+            },
+            {
+                "count": 1,
+                "firstFrame": 338,
+                "lastFrame": 338
+            },
+            {
+                "count": 33,
+                "firstFrame": 295,
+                "lastFrame": 327
+            },
+            {
+                "count": 33,
+                "firstFrame": 295,
+                "lastFrame": 327
+            },
+            {
+                "count": 106,
+                "firstFrame": 197,
+                "lastFrame": 516
+            },
+            {
+                "count": 73,
+                "firstFrame": 309,
+                "lastFrame": 381
+            },
+            {
+                "count": 4,
+                "firstFrame": 338,
+                "lastFrame": 341
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_air_trade",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 276,
+                "firstFrame": 171,
+                "lastFrame": 333
+            },
+            {
+                "count": 201,
+                "firstFrame": 159,
+                "lastFrame": 240
+            },
+            {
+                "count": 54,
+                "firstFrame": 159,
+                "lastFrame": 210
+            },
+            {
+                "count": 79,
+                "firstFrame": 159,
+                "lastFrame": 198
+            },
+            {
+                "count": 79,
+                "firstFrame": 159,
+                "lastFrame": 198
+            },
+            {
+                "count": 137,
+                "firstFrame": 159,
+                "lastFrame": 239
+            },
+            {
+                "count": 248,
+                "firstFrame": 159,
+                "lastFrame": 333
+            },
+            {
+                "count": 53,
+                "firstFrame": 159,
+                "lastFrame": 210
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_antiair_crumple",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 496,
+                "firstFrame": 126,
+                "lastFrame": 780
+            },
+            {
+                "count": 3,
+                "firstFrame": 189,
+                "lastFrame": 780
+            },
+            {
+                "count": 312,
+                "firstFrame": 126,
+                "lastFrame": 773
+            },
+            {
+                "count": 312,
+                "firstFrame": 126,
+                "lastFrame": 773
+            },
+            {
+                "count": 164,
+                "firstFrame": 413,
+                "lastFrame": 1002
+            },
+            {
+                "count": 289,
+                "firstFrame": 152,
+                "lastFrame": 779
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_antiair_knockdowns",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 676,
+                "firstFrame": 692,
+                "lastFrame": 920
+            },
+            {
+                "count": 203,
+                "firstFrame": 109,
+                "lastFrame": 733
+            },
+            {
+                "count": 3,
+                "firstFrame": 155,
+                "lastFrame": 733
+            },
+            {
+                "count": 102,
+                "firstFrame": 109,
+                "lastFrame": 722
+            },
+            {
+                "count": 102,
+                "firstFrame": 109,
+                "lastFrame": 722
+            },
+            {
+                "count": 110,
+                "firstFrame": 124,
+                "lastFrame": 786
+            },
+            {
+                "count": 402,
+                "firstFrame": 123,
+                "lastFrame": 920
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_crossup_protection",
         "testVersion": "31",
         "finished": true,
@@ -153,6 +361,58 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_driverush_crossunder",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 527,
+                "firstFrame": 175,
+                "lastFrame": 439
+            },
+            {
+                "count": 8,
+                "firstFrame": 175,
+                "lastFrame": 182
+            },
+            {
+                "count": 8,
+                "firstFrame": 175,
+                "lastFrame": 182
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 70,
+                "firstFrame": 182,
+                "lastFrame": 251
+            },
+            {
+                "count": 258,
+                "firstFrame": 182,
+                "lastFrame": 439
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 523,
+                "firstFrame": 175,
+                "lastFrame": 439
             }
         ]
     },
@@ -261,6 +521,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_grounded_trade",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 138,
+                "firstFrame": 115,
+                "lastFrame": 229
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 70,
+                "firstFrame": 103,
+                "lastFrame": 145
+            },
+            {
+                "count": 47,
+                "firstFrame": 103,
+                "lastFrame": 145
+            },
+            {
+                "count": 117,
+                "firstFrame": 103,
+                "lastFrame": 184
+            },
+            {
+                "count": 242,
+                "firstFrame": 103,
+                "lastFrame": 229
+            },
+            {
+                "count": 47,
+                "firstFrame": 103,
+                "lastFrame": 145
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_imperfect_parry",
         "testVersion": "30",
         "finished": true,
@@ -299,6 +611,58 @@ var currentResults =
                 "count": 509,
                 "firstFrame": 59,
                 "lastFrame": 324
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_jump_landing_triggers",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 158,
+                "firstFrame": 477,
+                "lastFrame": 1314
+            },
+            {
+                "count": 4,
+                "firstFrame": 473,
+                "lastFrame": 830
+            },
+            {
+                "count": 4,
+                "firstFrame": 473,
+                "lastFrame": 830
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 398,
+                "firstFrame": 476,
+                "lastFrame": 1314
+            },
+            {
+                "count": 149,
+                "firstFrame": 476,
+                "lastFrame": 787
             },
             {
                 "count": 0,
@@ -616,6 +980,110 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_sweep_hard_knockdown",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 415,
+                "firstFrame": 83,
+                "lastFrame": 317
+            },
+            {
+                "count": 7,
+                "firstFrame": 83,
+                "lastFrame": 89
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 38,
+                "firstFrame": 140,
+                "lastFrame": 177
+            },
+            {
+                "count": 38,
+                "firstFrame": 140,
+                "lastFrame": 177
+            },
+            {
+                "count": 265,
+                "firstFrame": 83,
+                "lastFrame": 292
+            },
+            {
+                "count": 386,
+                "firstFrame": 90,
+                "lastFrame": 317
+            },
+            {
+                "count": 97,
+                "firstFrame": 140,
+                "lastFrame": 213
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "aa_sweep_knockdown",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 134,
+                "firstFrame": 84,
+                "lastFrame": 217
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 33,
+                "firstFrame": 70,
+                "lastFrame": 102
+            },
+            {
+                "count": 33,
+                "firstFrame": 70,
+                "lastFrame": 102
+            },
+            {
+                "count": 186,
+                "firstFrame": 70,
+                "lastFrame": 205
+            },
+            {
+                "count": 247,
+                "firstFrame": 84,
+                "lastFrame": 217
+            },
+            {
+                "count": 10,
+                "firstFrame": 103,
+                "lastFrame": 112
             },
             {
                 "count": 0,
@@ -985,6 +1453,110 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "chunli_instant_legs",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 337,
+                "firstFrame": 69,
+                "lastFrame": 198
+            },
+            {
+                "count": 170,
+                "firstFrame": 69,
+                "lastFrame": 138
+            },
+            {
+                "count": 97,
+                "firstFrame": 69,
+                "lastFrame": 138
+            },
+            {
+                "count": 59,
+                "firstFrame": 74,
+                "lastFrame": 132
+            },
+            {
+                "count": 59,
+                "firstFrame": 74,
+                "lastFrame": 132
+            },
+            {
+                "count": 211,
+                "firstFrame": 67,
+                "lastFrame": 190
+            },
+            {
+                "count": 257,
+                "firstFrame": 67,
+                "lastFrame": 198
+            },
+            {
+                "count": 75,
+                "firstFrame": 74,
+                "lastFrame": 148
+            },
+            {
+                "count": 191,
+                "firstFrame": 97,
+                "lastFrame": 198
+            }
+        ]
+    },
+    {
+        "testName": "chunli_triangle_jump",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 438,
+                "firstFrame": 77,
+                "lastFrame": 287
+            },
+            {
+                "count": 174,
+                "firstFrame": 77,
+                "lastFrame": 163
+            },
+            {
+                "count": 133,
+                "firstFrame": 77,
+                "lastFrame": 163
+            },
+            {
+                "count": 28,
+                "firstFrame": 123,
+                "lastFrame": 150
+            },
+            {
+                "count": 28,
+                "firstFrame": 123,
+                "lastFrame": 150
+            },
+            {
+                "count": 219,
+                "firstFrame": 77,
+                "lastFrame": 222
+            },
+            {
+                "count": 373,
+                "firstFrame": 77,
+                "lastFrame": 287
+            },
+            {
+                "count": 28,
+                "firstFrame": 123,
+                "lastFrame": 150
+            },
+            {
+                "count": 256,
+                "firstFrame": 153,
+                "lastFrame": 287
             }
         ]
     },
@@ -1873,6 +2445,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "jamie_jump_cancel_landings",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 24,
+                "firstFrame": 654,
+                "lastFrame": 676
+            },
+            {
+                "count": 395,
+                "firstFrame": 85,
+                "lastFrame": 828
+            },
+            {
+                "count": 10,
+                "firstFrame": 134,
+                "lastFrame": 828
+            },
+            {
+                "count": 265,
+                "firstFrame": 85,
+                "lastFrame": 815
+            },
+            {
+                "count": 265,
+                "firstFrame": 85,
+                "lastFrame": 815
+            },
+            {
+                "count": 99,
+                "firstFrame": 85,
+                "lastFrame": 806
+            },
+            {
+                "count": 308,
+                "firstFrame": 97,
+                "lastFrame": 827
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "jp_departure",
         "testVersion": "26",
         "finished": true,
@@ -1921,6 +2545,58 @@ var currentResults =
                 "count": 345,
                 "firstFrame": 384,
                 "lastFrame": 1956
+            }
+        ]
+    },
+    {
+        "testName": "jp_departure_manual_detonate",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 939,
+                "firstFrame": 253,
+                "lastFrame": 723
+            },
+            {
+                "count": 150,
+                "firstFrame": 239,
+                "lastFrame": 417
+            },
+            {
+                "count": 50,
+                "firstFrame": 239,
+                "lastFrame": 417
+            },
+            {
+                "count": 41,
+                "firstFrame": 240,
+                "lastFrame": 280
+            },
+            {
+                "count": 41,
+                "firstFrame": 240,
+                "lastFrame": 280
+            },
+            {
+                "count": 244,
+                "firstFrame": 220,
+                "lastFrame": 520
+            },
+            {
+                "count": 480,
+                "firstFrame": 239,
+                "lastFrame": 723
+            },
+            {
+                "count": 52,
+                "firstFrame": 239,
+                "lastFrame": 420
+            },
+            {
+                "count": 82,
+                "firstFrame": 239,
+                "lastFrame": 450
             }
         ]
     },
@@ -2129,6 +2805,58 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "mai_cartwheel_landing",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 287,
+                "firstFrame": 67,
+                "lastFrame": 209
+            },
+            {
+                "count": 40,
+                "firstFrame": 67,
+                "lastFrame": 111
+            },
+            {
+                "count": 3,
+                "firstFrame": 76,
+                "lastFrame": 111
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 19,
+                "firstFrame": 94,
+                "lastFrame": 184
+            },
+            {
+                "count": 258,
+                "firstFrame": 67,
+                "lastFrame": 209
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 9,
+                "firstFrame": 94,
+                "lastFrame": 114
             }
         ]
     },
