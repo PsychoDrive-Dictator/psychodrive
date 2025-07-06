@@ -331,6 +331,10 @@ bool Guy::PreFrame(void)
         uniqueTimerCount++;
     }
 
+    if (jumpLandingDisabledFrames) {
+        jumpLandingDisabledFrames--;
+    }
+
     hitThisFrame = false;
     hitArmorThisFrame = false;
     hitAtemiThisFrame = false;
@@ -1904,12 +1908,17 @@ bool Guy::WorldPhysics(void)
             landed = true;
         }
         if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
-            currentAction = currentAction + 3; // generic landing, immediate transition
+            // empty jump landing, immediate transition
+            // this is why empty jumps have a frame shaved off
+            currentAction = currentAction + 3;
             currentFrame = 0;
             UpdateActionData();
 
             velocityX = Fixed(0);
             accelX = Fixed(0);
+
+            // so we avoid the non-empty landing code below
+            jumped = false;
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
@@ -3238,6 +3247,9 @@ bool Guy::Frame(bool endHitStopFrame)
     frameTriggers.clear();
 
     bool doTriggers = true;
+    if (jumpLandingDisabledFrames) {
+        doTriggers = false;
+    }
     bool a,b,c;
     if (canMove(a,b,c, 1) && (currentInput & 1)) {
         // jump will take precedence below, don't do ground triggers
@@ -3288,6 +3300,14 @@ bool Guy::Frame(bool endHitStopFrame)
     }
 
     if (landed) {
+        if (jumped && nextAction != 39 && nextAction != 40 && nextAction != 41) {
+            // non-empty jump landing
+            log(logTriggers, "disabling actions due to non-empty landing");
+            jumpLandingDisabledFrames = 3 + 1; // 3, but we decrement in preframe
+        }
+
+        jumped = false;
+
         DoInstantAction(587); // IMM_LANDING - after style thing below or before?
         if ( resetHitStunOnLand ) {
             hitStun = 1;
@@ -3587,11 +3607,6 @@ bool Guy::Frame(bool endHitStopFrame)
     // Transition
     if ( nextAction != -1 )
     {
-        // if (currentAction != 1 && nextAction == 1) {
-        //     recoveryTiming = globalFrameCount;
-        //     //log("recovered!");
-        // }
-
         if (currentAction != nextAction) {
             currentAction = nextAction;
             log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace) + " keep frame " + std::to_string(keepFrame));

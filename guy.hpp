@@ -487,6 +487,7 @@ private:
     bool didPush = false;
     bool jumped = false;
     int jumpDirection = 0;
+    int jumpLandingDisabledFrames = 0;
     bool couldMove = false;
 
     int landingAdjust = 0;
