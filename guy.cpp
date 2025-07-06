@@ -2095,7 +2095,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 if (hitFlagToParent) pParent->hasBeenBlockedThisFrame = true;
                 hasBeenBlockedThisMove = true;
                 if (hitFlagToParent) pParent->hasBeenBlockedThisMove = true;
-                log(logHits, "block!");
+                pOtherGuy->log(pOtherGuy->logHits, "block!");
             }
 
             if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
@@ -2131,6 +2131,16 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
             }
 
+            int juggleLimit = (*pHitEntry)["JuggleLimit"];
+            if (wasDrive) {
+                juggleLimit += 3;
+            }
+            if (hitbox.type != domain && pOtherGuy->getAirborne() && pOtherGuy->juggleCounter > juggleLimit) {
+                continue;
+            }
+
+            // juggle was the last thing to check, hit is valid
+
             int destX = (*pHitEntry)["MoveDest"]["x"];
             int destY = (*pHitEntry)["MoveDest"]["y"];
             int hitHitStun = (*pHitEntry)["HitStun"];
@@ -2138,7 +2148,6 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             int moveType = (*pHitEntry)["MoveType"];
             int attr0 = (*pHitEntry)["Attr0"];
             int hitMark = (*pHitEntry)["Hitmark"];
-            // we're hitting for sure after this point (modulo juggle), side effects
 
             bool hitArmor = false;
             if (hurtBox.flags & armor && hurtBox.armorID) {
@@ -2213,107 +2222,112 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 // don't count in combos/etc, just apply DT
                 applyHit = false;
             }
-            if ( hitArmor || pOtherGuy->ApplyHitEffect(pHitEntry, this, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox) ) {
-                hitStopSelf = (*pHitEntry)["HitStopOwner"];
-                hitStopTarget = (*pHitEntry)["HitStopTarget"];
-                int attr2 = (*pHitEntry)["Attr2"];
-                // or it could be that normal throws take their value from somewhere else
-                if (hitStopTarget == -1) {
-                    hitStopTarget = hitStopSelf;
-                }
-                if (hitArmor) {
-                    hitStopSelf = 0;
-                    hitStopTarget = 0;
-                }
-                Box hitIntersection;
-                hitIntersection.x = fixMax(hitbox.box.x, hurtBox.box.x);
-                hitIntersection.y = fixMax(hitbox.box.y, hurtBox.box.y);
-                hitIntersection.w = fixMin(hitbox.box.x + hitbox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
-                hitIntersection.h = fixMin(hitbox.box.y + hitbox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
 
-                float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
-                if (direction < Fixed(0)) {
-                    hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
+            if (!hitArmor) {
+                pOtherGuy->ApplyHitEffect(pHitEntry, this, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox);
+            }
+
+            hitStopSelf = (*pHitEntry)["HitStopOwner"];
+            hitStopTarget = (*pHitEntry)["HitStopTarget"];
+            int attr2 = (*pHitEntry)["Attr2"];
+            // or it could be that normal throws take their value from somewhere else
+            if (hitStopTarget == -1) {
+                hitStopTarget = hitStopSelf;
+            }
+            if (hitArmor) {
+                hitStopSelf = 0;
+                hitStopTarget = 0;
+            }
+            Box hitIntersection;
+            hitIntersection.x = fixMax(hitbox.box.x, hurtBox.box.x);
+            hitIntersection.y = fixMax(hitbox.box.y, hurtBox.box.y);
+            hitIntersection.w = fixMin(hitbox.box.x + hitbox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
+            hitIntersection.h = fixMin(hitbox.box.y + hitbox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
+
+            float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
+            if (direction < Fixed(0)) {
+                hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
+            }
+            float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
+            int hitMarkerType = 1;
+            float hitMarkerRadius = 35.0f;
+            if (hasBeenBlockedThisFrame) {
+                hitMarkerType = 2;
+                hitMarkerRadius = 30.0f;
+            } else if (hitEntryFlag & punish_counter) {
+                hitMarkerRadius = 45.0f;
+            }
+            if (pSim) {
+                FrameEvent event;
+                event.type = FrameEvent::Hit;
+                event.hitEventData.targetID = pOtherGuy->getUniqueID();
+                event.hitEventData.x = hitMarkerOffsetX;
+                event.hitEventData.y = hitMarkerOffsetY;
+                event.hitEventData.radius = hitMarkerRadius;
+                event.hitEventData.hitType = hasBeenBlockedThisFrame ? 1 : 0;
+                event.hitEventData.seed = pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
+                event.hitEventData.dirX = direction.f();
+                event.hitEventData.dirY = 0.0f;
+                pSim->getCurrentFrameEvents().push_back(event);
+            } else {
+                int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
+                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, direction.f(), 0.0f});
+            }
+
+            // grab or hitgrab
+            if (isGrab || (attr2 & (1<<1))) {
+                grabbedThisFrame = true;
+                if (hitFlagToParent) pParent->grabbedThisFrame = true;
+            }
+
+            if (isProjectile) {
+                projHitCount--;
+                if (hitbox.type == projectile && !obeyHitID) {
+                    hitbox.hitID = -1;
                 }
-                float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
-                int hitMarkerType = 1;
-                float hitMarkerRadius = 35.0f;
-                if (hasBeenBlockedThisFrame) {
-                    hitMarkerType = 2;
-                    hitMarkerRadius = 30.0f;
-                } else if (hitEntryFlag & punish_counter) {
-                    hitMarkerRadius = 45.0f;
-                }
-                if (pSim) {
-                    FrameEvent event;
-                    event.type = FrameEvent::Hit;
-                    event.hitEventData.targetID = pOtherGuy->getUniqueID();
-                    event.hitEventData.x = hitMarkerOffsetX;
-                    event.hitEventData.y = hitMarkerOffsetY;
-                    event.hitEventData.radius = hitMarkerRadius;
-                    event.hitEventData.hitType = hasBeenBlockedThisFrame ? 1 : 0;
-                    event.hitEventData.seed = pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
-                    event.hitEventData.dirX = direction.f();
-                    event.hitEventData.dirY = 0.0f;
-                    pSim->getCurrentFrameEvents().push_back(event);
-                } else {
-                    int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
-                    addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, direction.f(), 0.0f});
-                }
+            }
 
-                // grab or hitgrab
-                if (isGrab || (attr2 & (1<<1))) {
-                    grabbedThisFrame = true;
-                    if (hitFlagToParent) pParent->grabbedThisFrame = true;
+            if (hitbox.hitID != -1) {
+                canHitID |= 1 << hitbox.hitID;
+            }
+
+
+            if (!pOtherGuy->blocking && !hitArmor) {
+                if (hitEntryFlag & punish_counter) {
+                    punishCounterThisFrame = true;
+                    if (hitFlagToParent) pParent->punishCounterThisFrame = true;
+                    hitPunishCounterThisMove = true;
+                    if (hitFlagToParent) pParent->hitPunishCounterThisMove = true;
+                }
+                if (hitEntryFlag & counter) {
+                    hitCounterThisMove = true;
+                    if (hitFlagToParent) pParent->hitCounterThisMove = true;
+                }
+                hitThisFrame = true;
+                if (hitFlagToParent) pParent->hitThisFrame = true;
+                hitThisMove = true;
+                if (hitFlagToParent) pParent->hitThisMove = true;
+
+                int dmgKind = (*pHitEntry)["DmgKind"];
+
+                if (dmgKind == 11) {
+                    DoInstantAction(592); // IMM_VEGA_BOMB
                 }
 
-                if (isProjectile) {
-                    projHitCount--;
-                    if (hitbox.type == projectile && !obeyHitID) {
-                        hitbox.hitID = -1;
-                    }
+                if (bombBurst) {
+                    pOtherGuy->debuffTimer = 0;
                 }
 
-                if (hitbox.hitID != -1) {
-                    canHitID |= 1 << hitbox.hitID;
-                }
-
-
-                if (!pOtherGuy->blocking && !hitArmor) {
-                    if (hitEntryFlag & punish_counter) {
-                        punishCounterThisFrame = true;
-                        if (hitFlagToParent) pParent->punishCounterThisFrame = true;
-                        hitPunishCounterThisMove = true;
-                        if (hitFlagToParent) pParent->hitPunishCounterThisMove = true;
-                    }
-                    if (hitEntryFlag & counter) {
-                        hitCounterThisMove = true;
-                        if (hitFlagToParent) pParent->hitCounterThisMove = true;
-                    }
-                    hitThisFrame = true;
-                    if (hitFlagToParent) pParent->hitThisFrame = true;
-                    hitThisMove = true;
-                    if (hitFlagToParent) pParent->hitThisMove = true;
-
-                    int dmgKind = (*pHitEntry)["DmgKind"];
-
-                    if (dmgKind == 11) {
-                        DoInstantAction(592); // IMM_VEGA_BOMB
-                    }
-
-                    if (bombBurst) {
-                        pOtherGuy->debuffTimer = 0;
-                    }
-                }
                 retHit = true;
                 pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
                     " dt " + hitIDString + " " + hitEntryFlagString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                     " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                     " moveType " + std::to_string(moveType) );
                 pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
+
+                break;
             }
         }
-        if (retHit) break;
     }
 
     // let's try to be doing the grab before time stops
@@ -2357,12 +2371,11 @@ bool Guy::CheckHit(Guy *pOtherGuy)
     return retHit;
 }
 
-bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
+void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
 {
     int comboAdd = (*pHitEffect)["ComboAdd"];
     int juggleFirst = (*pHitEffect)["Juggle1st"];
     int juggleAdd = (*pHitEffect)["JuggleAdd"];
-    int juggleLimit = (*pHitEffect)["JuggleLimit"];
     int hitEntryHitStun = (*pHitEffect)["HitStun"];
     int destX = (*pHitEffect)["MoveDest"]["x"];
     int destY = (*pHitEffect)["MoveDest"]["y"];
@@ -2389,11 +2402,6 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     if (isDrive) {
         juggleAdd = 0;
         juggleFirst = 0;
-        juggleLimit += 3;
-    }
-
-    if (!isDomain && airborne && juggleCounter > juggleLimit) {
-        return false;
     }
 
     noCounterPush = attr0 & (1<<0);
@@ -2707,8 +2715,6 @@ bool Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     if (dmgKind == 11) {
         debuffTimer = 300;
     }
-
-    return true;
 }
 
 bool Guy::CheckHitBoxCondition(int conditionFlag)
