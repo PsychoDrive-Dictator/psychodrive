@@ -362,7 +362,8 @@ bool Guy::PreFrame(void)
                 // log("initial hitcount " + std::to_string(projHitCount));
 
                 airborne = (*pProjData)["_AirStatus"];
-
+                int flagsX = (*pProjData)["AttrX"];
+                obeyHitID = flagsX & (1<<0);
                 limitShotCategory = (*pProjData)["Category"];
                 noPush = (*pProjData)["_NoPush"];
                 projLifeTime = (*pProjData)["LifeTime"];
@@ -2154,9 +2155,9 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                     if (pOtherGuy->armorHitsLeft <= 0) {
                         hitArmor = false;
                         if (pOtherGuy->armorHitsLeft == 0) {
-                            log(logHits, "armor break!");
                             addHitStop(armorBreakHitStopHitter+1);
                             pOtherGuy->addHitStop(armorBreakHitStopHitted+1);
+                            pOtherGuy->log(pOtherGuy->logHits, "armor break!");
                         }
                     } else {
                         // apply gauge effects here
@@ -2167,7 +2168,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                         // there's TargetStopAdd too, figure it out at some point
                         addHitStop(armorHitStopHitter+1);
                         pOtherGuy->addHitStop(armorHitStopHitted+1);
-                        log(logHits, "armor hit!");
+                        pOtherGuy->log(pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
                     }
                 }
             }
@@ -2185,7 +2186,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 addHitStop(13+1);
                 pOtherGuy->addHitStop(13+1);
 
-                log(logHits, "atemi hit!");
+                pOtherGuy->log(pOtherGuy->logHits, "atemi hit!");
             }
 
             // not hitstun for initial grab hit as we dont want to recover during the lock
@@ -2250,7 +2251,7 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
                 if (isProjectile) {
                     projHitCount--;
-                    if (hitbox.type == projectile) {
+                    if (hitbox.type == projectile && !obeyHitID) {
                         hitbox.hitID = -1;
                     }
                 }
@@ -3182,10 +3183,8 @@ void Guy::DoBranchKey(bool preHit)
                     log(true, "noop branch - branch type inhibit?");
                 } else {
                     if (branchAction == currentAction) {
-                        // unclear where we'll hit it so not sure if we need to offset yet
-                        // todo we should probably defer setting currentFrame to frame jump?
-                        log(true, "branch to other frame of same action - todo check we're not off by 1");
-                        currentFrame = branchFrame;
+                        log(logBranches, "branching to frame " + std::to_string(branchFrame));
+                        currentFrame = (branchFrame && !preHit) ? branchFrame - 1 : branchFrame;
                     } else {
                         log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
                         nextAction = branchAction;
@@ -3672,7 +3671,7 @@ bool Guy::Frame(bool endHitStopFrame)
 
         if (!hitStun || blocking) {
             // should this use airborne status from previous or new action? currently previous
-            if (isDrive || getAirborne()) {
+            if (isDrive || getAirborne() || isProjectile) {
                 accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
                 accelY = accelY * Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
                 velocityX = velocityX * Fixed((*pInherit)["Velocity"]["x"].get<double>());

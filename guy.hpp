@@ -449,6 +449,7 @@ private:
     bool die = false;
     int limitShotCategory = -1;
     bool noPush = false;
+    bool obeyHitID = false;
     Guy *pParent = nullptr;
 
     nlohmann::json *pMovesDictJson;
