@@ -385,6 +385,9 @@ bool Guy::PreFrame(void)
         posOffsetX = Fixed(0);
         posOffsetY = Fixed(0);
 
+        // assuming it doesn't stick for now
+        ignoreSteerType  = -1;
+
         if (pActionJson->contains("PlaceKey"))
         {
             for (auto& [placeKeyID, placeKey] : (*pActionJson)["PlaceKey"].items())
@@ -480,6 +483,13 @@ bool Guy::PreFrame(void)
                             case 1: if (velocityY > fixValue) velocityY = fixValue; break;
                             case 3: if (accelX > fixValue) accelX = fixValue; break;
                             case 4: if (accelY > fixValue) accelY = fixValue; break;
+                        }
+                        break;
+                    case 11:
+                        if (ignoreSteerType != -1) {
+                            log(logUnknowns, "two ignore at same time need more code");
+                        } else {
+                            ignoreSteerType = valueType;
                         }
                         break;
                     case 12:
@@ -594,8 +604,12 @@ bool Guy::PreFrame(void)
         prevVelX = velocityX;
         Fixed prevVelY = velocityY;
 
-        velocityX = velocityX + accelX;
-        velocityY = velocityY + accelY;
+        if (ignoreSteerType != 3) {
+            velocityX = velocityX + accelX;
+        }
+        if (ignoreSteerType != 4) {
+            velocityY = velocityY + accelY;
+        }
 
         if ((velocityY * prevVelY) < Fixed(0) || (accelY != Fixed(0) && velocityY == Fixed(0))) {
             startsFalling = true;
@@ -612,8 +626,12 @@ bool Guy::PreFrame(void)
         }
 
         if (!noVelNextFrame) {
-            posX = posX + (velocityX * direction);
-            posY = posY + velocityY;
+            if (ignoreSteerType != 0) {
+                posX = posX + (velocityX * direction);
+            }
+            if (ignoreSteerType != 1) {
+                posY = posY + velocityY;
+            }
         } else {
             noVelNextFrame = false;
         }

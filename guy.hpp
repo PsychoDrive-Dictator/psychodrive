@@ -522,6 +522,8 @@ private:
     Fixed homeTargetY;
     int homeTargetType;
 
+    int ignoreSteerType = -1;
+
     int maxHealth;
     int health;
 
