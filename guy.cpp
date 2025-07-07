@@ -2896,11 +2896,6 @@ void Guy::DoBranchKey(bool preHit)
             int branchFrame = key["ActionFrame"];
             bool keepFrame = key["_InheritFrameX"];
 
-            // this helps a ton of solid puncher sequences but not all..
-            // if (keepFrame && !preHit) {
-            //     continue;
-            // }
-
             if (branchType <= maxBranchType) {
                 // todo high priority field maybe overrides that?
                 continue;
@@ -2911,20 +2906,21 @@ void Guy::DoBranchKey(bool preHit)
                     doBranch = true;
                     break;
                 case 1:
-                    // else?! jesus christ we're turing complete soon
-                    // i dont know what it means though
-                    if (deniedLastBranch) {
+                    // else.. we could have 'denied' the condition because prehit, so avoid those there
+                    // it seems like a hack, maybe some else branches are meant to work prehit - if so,
+                    // we'll need to keep more careful track of why we might have not taken a branch
+                    if (deniedLastBranch && !preHit) {
                         doBranch = true;
                     }
                     break;
                 case 2:
-                    if (!preHit && hitThisFrame) { // has hit ever this move.. not sure if right
+                    if (!preHit && hitThisFrame) {
                         doBranch = true;
                     }
 
                     break;
                 case 4:
-                    if (hasBeenBlockedThisMove) { // just this frame.. enough?
+                    if (hasBeenBlockedThisMove) {
                         doBranch = true;
                     }
 

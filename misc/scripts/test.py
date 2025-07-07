@@ -146,16 +146,16 @@ for char in characters:
     #                           " condition " + str(attackKey["Condition"]))
 
     # find certain branches
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "BranchKey" in move:
-    #         for key in move["BranchKey"]:
-    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-    #                 branchKey = move["BranchKey"][key]
-    #                 if branchKey["Type"] == 52:
-    #                     print(char + " " + moveID + " SHOT branch params " + str(branchKey["Param00"]) +
-    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "BranchKey" in move:
+            for key in move["BranchKey"]:
+                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+                    branchKey = move["BranchKey"][key]
+                    if branchKey["Type"] == 1:
+                        print(char + " " + moveID + " ELSE branch params " + str(branchKey["Param00"]) +
+                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
     # for moveID in moves21Json:
@@ -235,14 +235,15 @@ for char in characters:
     #     if moveNoKara:
     #         print(char, moveName)
 
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "TriggerKey" in move:
-            for key in move["TriggerKey"]:
-                if isinstance(move["TriggerKey"][key], dict):
-                    trigger = move["TriggerKey"][key]
-                    if trigger["TriggerGroup"] == 0 and trigger["_StartFrame"] != 0 and not trigger["_Other"] & 0x20000 and trigger["_NotDefer"] == True and trigger["_StartFrame"] < move["fab"]["ActionFrame"]["MarginFrame"]:
-                        print(char + " " + moveID + " margin " + str(move["fab"]["ActionFrame"]["MarginFrame"]) + " end buffer " + str(trigger["_StartFrame"]))
+    # Find moves with end buffers that don't match move recovery
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "TriggerKey" in move:
+    #         for key in move["TriggerKey"]:
+    #             if isinstance(move["TriggerKey"][key], dict):
+    #                 trigger = move["TriggerKey"][key]
+    #                 if trigger["TriggerGroup"] == 0 and trigger["_StartFrame"] != 0 and not trigger["_Other"] & 0x20000 and trigger["_NotDefer"] == True and trigger["_StartFrame"] < move["fab"]["ActionFrame"]["MarginFrame"]:
+    #                     print(char + " " + moveID + " margin " + str(move["fab"]["ActionFrame"]["MarginFrame"]) + " end buffer " + str(trigger["_StartFrame"]))
 
 
 
