@@ -618,9 +618,13 @@ static void mainloop(void)
             // gather everyone again in case of deletions/additions in PreFrame
             gatherEveryone(guys, everyone);
 
+            std::vector<PendingHit> pendingHitList;
+
             for (auto guy : everyone) {
-                guy->CheckHit(guy->getOpponent());
+                guy->CheckHit(guy->getOpponent(), pendingHitList);
             }
+
+            ResolveHits(pendingHitList);
 
             static bool hasAddedData = false;
             // update plot range if we're doing that

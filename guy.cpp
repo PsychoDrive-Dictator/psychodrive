@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <unordered_set>
 
 nlohmann::json staticPlayer;
 bool staticPlayerLoaded = false;
@@ -2004,17 +2005,12 @@ bool Guy::WorldPhysics(void)
     return hasPushed;
 }
 
-bool Guy::CheckHit(Guy *pOtherGuy)
+void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 {
-    if (warudo || hitStop) return false;
-    if ( !pOtherGuy ) return false;
+    if (warudo || hitStop) return;
+    if ( !pOtherGuy ) return;
 
-    bool retHit = false;
-    bool hitStopToParent = false;
-    int hitStopSelf = 0;
-    int hitStopTarget = 0;
-
-    for (auto hitbox : hitBoxes ) {
+    for (auto const &hitbox : hitBoxes ) {
         if (hitbox.hitID != -1 && ((1<<hitbox.hitID) & canHitID)) {
             continue;
         }
@@ -2063,16 +2059,6 @@ bool Guy::CheckHit(Guy *pOtherGuy)
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
-            bool hitFlagToParent = false;
-            if (isProjectile && pActionJson->contains("pdata") && pParent) {
-                // either this means "to both" - current code or touch branch checks different
-                // flags - mai charged fan has a touch branch on the proj but sets this flag
-                // also used by double geyser where the player has a trigger condition
-                // todo checking touch branch on player would disambiguate
-                hitFlagToParent = (*pActionJson)["pdata"]["_HitFlagToPlayer"];
-                hitStopToParent = (*pActionJson)["pdata"]["_HitStopToPlayer"];
-            }
-
             if (otherGuyAirborne) {
                 hitEntryFlag |= air;
             }
@@ -2083,23 +2069,21 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0)) {
                 hitEntryFlag |= punish_counter;
             }
+
+
             bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
             bool otherGuyCanBlock = !otherGuyAirborne && !otherGuyHit && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
             if (isGrab) {
                 otherGuyCanBlock = false;
             }
+            bool blocked = false;
             if (pOtherGuy->blocking || otherGuyCanBlock) {
                 hitEntryFlag = block;
-                pOtherGuy->blocking = true;
-                hasBeenBlockedThisFrame = true;
-                if (hitFlagToParent) pParent->hasBeenBlockedThisFrame = true;
-                hasBeenBlockedThisMove = true;
-                if (hitFlagToParent) pParent->hasBeenBlockedThisMove = true;
-                pOtherGuy->log(pOtherGuy->logHits, "block!");
+                blocked = true;
             }
 
             if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
-                // a grab would whiff if opponent is in blockstun
+                // a grab would whiff if opponent is already in blockstun
                 continue;
             }
 
@@ -2118,16 +2102,14 @@ bool Guy::CheckHit(Guy *pOtherGuy)
                 pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
             }
 
+            int hitEntryID = hitbox.hitEntryID;
+
             bool bombBurst = false;
-
-            // back compat with old versions, this wasn't there before
-            if (pHitEntry->contains("_bomb_burst")) {
-                bombBurst = (*pHitEntry)["_bomb_burst"];
-            }
-
             // if bomb burst and found a bomb, use the next hit ID instead 
-            if (bombBurst && pOpponent->debuffTimer) {
-                hitIDString = to_string_leading_zeroes(hitbox.hitEntryID + 1, 3);
+            if (pHitEntry->value("_bomb_burst", false) && pOpponent->debuffTimer) {
+                bombBurst = true;
+                hitEntryID += 1;
+                hitIDString = to_string_leading_zeroes(hitEntryID, 3);
                 pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
             }
 
@@ -2140,227 +2122,18 @@ bool Guy::CheckHit(Guy *pOtherGuy)
             }
 
             // juggle was the last thing to check, hit is valid
+            pendingHitList.push_back({
+                this, pOtherGuy, hitbox, hurtBox, pHitEntry,
+                hitEntryID, hitEntryFlag, blocked, bombBurst
+            });
 
-            int destX = (*pHitEntry)["MoveDest"]["x"];
-            int destY = (*pHitEntry)["MoveDest"]["y"];
-            int hitHitStun = (*pHitEntry)["HitStun"];
-            int dmgType = (*pHitEntry)["DmgType"];
-            int moveType = (*pHitEntry)["MoveType"];
-            int attr0 = (*pHitEntry)["Attr0"];
-            int hitMark = (*pHitEntry)["Hitmark"];
-
-            bool hitArmor = false;
-            if (hurtBox.flags & armor && hurtBox.armorID) {
-                hitArmor = true;
-                hitArmorThisFrame = true;
-                if (hitFlagToParent) pParent->hitArmorThisFrame = true;
-                hitArmorThisMove = true;
-                if (hitFlagToParent) pParent->hitArmorThisMove = true;
-                auto atemiIDString = std::to_string(hurtBox.armorID);
-                // need to pull from opponents atemi here or put in opponent method
-                nlohmann::json *pAtemi = nullptr;
-                if (pOtherGuy->pAtemiJson->contains(atemiIDString)) {
-                    pAtemi = &(*pOtherGuy->pAtemiJson)[atemiIDString];
-                } else if (pCommonAtemiJson->contains(atemiIDString)) {
-                    pAtemi = &(*pCommonAtemiJson)[atemiIDString];
-                } else {
-                    log(true, "atemi not found!!");
-                    break;
-                }
-
-                int armorHitStopHitted = (*pAtemi)["TargetStop"];
-                int armorHitStopHitter = (*pAtemi)["OwnerStop"];
-                int armorBreakHitStopHitted = (*pAtemi)["TargetStopShell"]; // ??
-                int armorBreakHitStopHitter = (*pAtemi)["OwnerStopShell"];
-
-                if (pOtherGuy->currentArmorID != hurtBox.armorID) {
-                    pOtherGuy->armorHitsLeft = (*pAtemi)["ResistLimit"].get<int>() + 1;
-                    pOtherGuy->currentArmorID = hurtBox.armorID;
-                }
-                if ( pOtherGuy->currentArmorID == hurtBox.armorID ) {
-                    pOtherGuy->armorHitsLeft--;
-                    if (pOtherGuy->armorHitsLeft <= 0) {
-                        hitArmor = false;
-                        if (pOtherGuy->armorHitsLeft == 0) {
-                            addHitStop(armorBreakHitStopHitter+1);
-                            pOtherGuy->addHitStop(armorBreakHitStopHitted+1);
-                            pOtherGuy->log(pOtherGuy->logHits, "armor break!");
-                        }
-                    } else {
-                        // apply gauge effects here
-
-                        pOtherGuy->armorThisFrame = true;
-
-                        // todo i think this is wrong, it needs to add to the normal hitstop?
-                        // there's TargetStopAdd too, figure it out at some point
-                        addHitStop(armorHitStopHitter+1);
-                        pOtherGuy->addHitStop(armorHitStopHitted+1);
-                        pOtherGuy->log(pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
-                    }
-                }
-            }
-
-            if (hurtBox.flags & atemi) {
-                // like armor except onthing really happens beyond setting the flag
-                hitArmor = true;
-                hitAtemiThisFrame = true;
-                if (hitFlagToParent) pParent->hitAtemiThisFrame = true;
-                hitAtemiThisMove = true;
-                if (hitFlagToParent) pParent->hitAtemiThisMove = true;
-                pOtherGuy->atemiThisFrame = true;
-
-                // is that hardcoded on atemi? not sure if the number is right
-                addHitStop(13+1);
-                pOtherGuy->addHitStop(13+1);
-
-                pOtherGuy->log(pOtherGuy->logHits, "atemi hit!");
-            }
-
-            // not hitstun for initial grab hit as we dont want to recover during the lock
-            bool applyHit = !isGrab;
-            if (hitbox.type == direct_damage) {
-                // don't count in combos/etc, just apply DT
-                applyHit = false;
-            }
-
-            if (!hitArmor) {
-                pOtherGuy->ApplyHitEffect(pHitEntry, this, applyHit, applyHit, wasDrive, hitbox.type == domain, &hurtBox);
-            }
-
-            hitStopSelf = (*pHitEntry)["HitStopOwner"];
-            hitStopTarget = (*pHitEntry)["HitStopTarget"];
-            int attr2 = (*pHitEntry)["Attr2"];
-            // or it could be that normal throws take their value from somewhere else
-            if (hitStopTarget == -1) {
-                hitStopTarget = hitStopSelf;
-            }
-            if (hitArmor) {
-                hitStopSelf = 0;
-                hitStopTarget = 0;
-            }
-            Box hitIntersection;
-            hitIntersection.x = fixMax(hitbox.box.x, hurtBox.box.x);
-            hitIntersection.y = fixMax(hitbox.box.y, hurtBox.box.y);
-            hitIntersection.w = fixMin(hitbox.box.x + hitbox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
-            hitIntersection.h = fixMin(hitbox.box.y + hitbox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
-
-            float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
-            if (direction < Fixed(0)) {
-                hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
-            }
-            float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
-            int hitMarkerType = 1;
-            float hitMarkerRadius = 35.0f;
-            if (hasBeenBlockedThisFrame) {
-                hitMarkerType = 2;
-                hitMarkerRadius = 30.0f;
-            } else if (hitEntryFlag & punish_counter) {
-                hitMarkerRadius = 45.0f;
-            }
-            if (pSim) {
-                FrameEvent event;
-                event.type = FrameEvent::Hit;
-                event.hitEventData.targetID = pOtherGuy->getUniqueID();
-                event.hitEventData.x = hitMarkerOffsetX;
-                event.hitEventData.y = hitMarkerOffsetY;
-                event.hitEventData.radius = hitMarkerRadius;
-                event.hitEventData.hitType = hasBeenBlockedThisFrame ? 1 : 0;
-                event.hitEventData.seed = pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
-                event.hitEventData.dirX = direction.f();
-                event.hitEventData.dirY = 0.0f;
-                pSim->getCurrentFrameEvents().push_back(event);
-            } else {
-                int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
-                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, direction.f(), 0.0f});
-            }
-
-            // grab or hitgrab
-            if (isGrab || (attr2 & (1<<1))) {
-                grabbedThisFrame = true;
-                if (hitFlagToParent) pParent->grabbedThisFrame = true;
-            }
-
-            if (isProjectile) {
-                projHitCount--;
-                if (hitbox.type == projectile && !obeyHitID) {
-                    hitbox.hitID = -1;
-                }
-            }
-
-            if (hitbox.hitID != -1) {
-                canHitID |= 1 << hitbox.hitID;
-            }
-
-
-            if (!pOtherGuy->blocking && !hitArmor) {
-                if (hitEntryFlag & punish_counter) {
-                    punishCounterThisFrame = true;
-                    if (hitFlagToParent) pParent->punishCounterThisFrame = true;
-                    hitPunishCounterThisMove = true;
-                    if (hitFlagToParent) pParent->hitPunishCounterThisMove = true;
-                }
-                if (hitEntryFlag & counter) {
-                    hitCounterThisMove = true;
-                    if (hitFlagToParent) pParent->hitCounterThisMove = true;
-                }
-                hitThisFrame = true;
-                if (hitFlagToParent) pParent->hitThisFrame = true;
-                hitThisMove = true;
-                if (hitFlagToParent) pParent->hitThisMove = true;
-
-                int dmgKind = (*pHitEntry)["DmgKind"];
-
-                if (dmgKind == 11) {
-                    DoInstantAction(592); // IMM_VEGA_BOMB
-                }
-
-                if (bombBurst) {
-                    pOtherGuy->debuffTimer = 0;
-                }
-
-                retHit = true;
-                pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitbox.type) + " id " + std::to_string(hitbox.hitID) +
-                    " dt " + hitIDString + " " + hitEntryFlagString + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
-                    " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
-                    " moveType " + std::to_string(moveType) );
-                pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
-
-                break;
-            }
+            break;
         }
-    }
-
-    // let's try to be doing the grab before time stops
-    if (grabbedThisFrame && nextAction == -1) {
-        DoBranchKey();
-        if (nextAction != -1) {
-            // For Transition
-            Frame();
-            // For LockKey
-            PreFrame();
-        } else {
-            log(true, "instagrab branch not found!");
-        }
-    }
-
-    // add warudo after potential instagrab branch (technical term)
-    if (hitStopSelf > 0) {
-        if (hitStopToParent) {
-            pParent->addHitStop(hitStopSelf+1);
-            // todo is it instead of to self? :/
-        }
-        addHitStop(hitStopSelf+1);
-    }
-    if (hitStopTarget > 0) {
-        pOtherGuy->addHitStop(hitStopTarget+1);
-#ifdef __EMSCRIPTEN__
-        emscripten_vibrate(hitStopTarget*2);
-#endif
     }
 
     if (pendingLockHit != -1) {
         std::string hitIDString = to_string_leading_zeroes(pendingLockHit, 3);
-        nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"]; // going by crowd wisdom there
+        nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
         // really we should save the lock target, etc.
         if (pOpponent) {
             pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, true);
@@ -2368,7 +2141,267 @@ bool Guy::CheckHit(Guy *pOtherGuy)
         }
         pendingLockHit = -1;
     }
-    return retHit;
+}
+
+void ResolveHits(std::vector<PendingHit> &pendingHitList)
+{
+    std::unordered_set<Guy *> hitGuys;
+
+    // todo proper trade checking ahead of time, strike>throw
+    // todo hitgrabs should just apply their hit DT on trade?
+
+    for (auto &pendingHit : pendingHitList) {
+        HitBox &hitBox = pendingHit.hitBox;
+        HurtBox &hurtBox = pendingHit.hurtBox;
+        nlohmann::json *pHitEntry = pendingHit.pHitEntry;
+        Guy *pOtherGuy = pendingHit.pGuyGettingHit;
+        Guy *pGuy = pendingHit.pGuyHitting;
+        int hitEntryFlag = pendingHit.hitEntryFlag;
+
+        // for now don't hit the same guy twice
+        // todo figure out what happens when two simultaneous hits happen
+        if (hitGuys.find(pOtherGuy) != hitGuys.end()) {
+            continue;
+        } else {
+            hitGuys.insert(pOtherGuy);
+        }
+
+        int destX = (*pHitEntry)["MoveDest"]["x"];
+        int destY = (*pHitEntry)["MoveDest"]["y"];
+        int hitHitStun = (*pHitEntry)["HitStun"];
+        int dmgType = (*pHitEntry)["DmgType"];
+        int moveType = (*pHitEntry)["MoveType"];
+        int attr0 = (*pHitEntry)["Attr0"];
+        int hitMark = (*pHitEntry)["Hitmark"];
+
+        bool isGrab = hitBox.type == grab;
+
+        bool hitFlagToParent = false;
+        bool hitStopToParent = false;
+        if (pGuy->isProjectile && pGuy->pActionJson->contains("pdata") && pGuy->pParent) {
+            // either this means "to both" - current code or touch branch checks different
+            // flags - mai charged fan has a touch branch on the proj but sets this flag
+            // also used by double geyser where the player has a trigger condition
+            // todo checking touch branch on player would disambiguate
+            hitFlagToParent = (*pGuy->pActionJson)["pdata"]["_HitFlagToPlayer"];
+            hitStopToParent = (*pGuy->pActionJson)["pdata"]["_HitStopToPlayer"];
+        }
+
+        if (pendingHit.blocked) {
+            pOtherGuy->blocking = true;
+            pGuy->hasBeenBlockedThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->hasBeenBlockedThisFrame = true;
+            pGuy->hasBeenBlockedThisMove = true;
+            if (hitFlagToParent) pGuy->pParent->hasBeenBlockedThisMove = true;
+            pOtherGuy->log(pOtherGuy->logHits, "block!");
+        }
+
+        bool hitArmor = false;
+        if (hurtBox.flags & armor && hurtBox.armorID) {
+            hitArmor = true;
+            pGuy->hitArmorThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->hitArmorThisFrame = true;
+            pGuy->hitArmorThisMove = true;
+            if (hitFlagToParent) pGuy->pParent->hitArmorThisMove = true;
+            auto atemiIDString = std::to_string(hurtBox.armorID);
+            // need to pull from opponents atemi here or put in opponent method
+            nlohmann::json *pAtemi = nullptr;
+            if (pOtherGuy->pAtemiJson->contains(atemiIDString)) {
+                pAtemi = &(*pOtherGuy->pAtemiJson)[atemiIDString];
+            } else if (pGuy->pCommonAtemiJson->contains(atemiIDString)) {
+                pAtemi = &(*pGuy->pCommonAtemiJson)[atemiIDString];
+            } else {
+                pGuy->log(true, "atemi not found!!");
+                continue;
+            }
+
+            int armorHitStopHitted = (*pAtemi)["TargetStop"];
+            int armorHitStopHitter = (*pAtemi)["OwnerStop"];
+            int armorBreakHitStopHitted = (*pAtemi)["TargetStopShell"]; // ??
+            int armorBreakHitStopHitter = (*pAtemi)["OwnerStopShell"];
+
+            if (pOtherGuy->currentArmorID != hurtBox.armorID) {
+                pOtherGuy->armorHitsLeft = (*pAtemi)["ResistLimit"].get<int>() + 1;
+                pOtherGuy->currentArmorID = hurtBox.armorID;
+            }
+            if ( pOtherGuy->currentArmorID == hurtBox.armorID ) {
+                pOtherGuy->armorHitsLeft--;
+                if (pOtherGuy->armorHitsLeft <= 0) {
+                    hitArmor = false;
+                    if (pOtherGuy->armorHitsLeft == 0) {
+                        pGuy->addHitStop(armorBreakHitStopHitter+1);
+                        pOtherGuy->addHitStop(armorBreakHitStopHitted+1);
+                        pOtherGuy->log(pOtherGuy->logHits, "armor break!");
+                    }
+                } else {
+                    // apply gauge effects here
+
+                    pOtherGuy->armorThisFrame = true;
+
+                    // todo i think this is wrong, it needs to add to the normal hitstop?
+                    // there's TargetStopAdd too, figure it out at some point
+                    pGuy->addHitStop(armorHitStopHitter+1);
+                    pOtherGuy->addHitStop(armorHitStopHitted+1);
+                    pOtherGuy->log(pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
+                }
+            }
+        }
+
+        if (hurtBox.flags & atemi) {
+            // like armor except onthing really happens beyond setting the flag
+            hitArmor = true;
+            pGuy->hitAtemiThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->hitAtemiThisFrame = true;
+            pGuy->hitAtemiThisMove = true;
+            if (hitFlagToParent) pGuy->pParent->hitAtemiThisMove = true;
+            pOtherGuy->atemiThisFrame = true;
+
+            // is that hardcoded on atemi? not sure if the number is right
+            pGuy->addHitStop(13+1);
+            pOtherGuy->addHitStop(13+1);
+
+            pOtherGuy->log(pOtherGuy->logHits, "atemi hit!");
+        }
+
+        // not hitstun for initial grab hit as we dont want to recover during the lock
+        bool applyHit = !isGrab;
+        if (hitBox.type == direct_damage) {
+            // don't count in combos/etc, just apply DT
+            applyHit = false;
+        }
+
+        if (!hitArmor) {
+            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, &hurtBox);
+        }
+
+        int hitStopSelf = (*pHitEntry)["HitStopOwner"];
+        int hitStopTarget = (*pHitEntry)["HitStopTarget"];
+        int attr2 = (*pHitEntry)["Attr2"];
+        // or it could be that normal throws take their value from somewhere else
+        if (hitStopTarget == -1) {
+            hitStopTarget = hitStopSelf;
+        }
+        if (hitArmor) {
+            hitStopSelf = 0;
+            hitStopTarget = 0;
+        }
+        Box hitIntersection;
+        hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
+        hitIntersection.y = fixMax(hitBox.box.y, hurtBox.box.y);
+        hitIntersection.w = fixMin(hitBox.box.x + hitBox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
+        hitIntersection.h = fixMin(hitBox.box.y + hitBox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
+
+        float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
+        if (pGuy->direction < Fixed(0)) {
+            hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
+        }
+        float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
+        int hitMarkerType = 1;
+        float hitMarkerRadius = 35.0f;
+        if (pGuy->hasBeenBlockedThisFrame) {
+            hitMarkerType = 2;
+            hitMarkerRadius = 30.0f;
+        } else if (hitEntryFlag & punish_counter) {
+            hitMarkerRadius = 45.0f;
+        }
+        if (pGuy->pSim) {
+            FrameEvent event;
+            event.type = FrameEvent::Hit;
+            event.hitEventData.targetID = pOtherGuy->getUniqueID();
+            event.hitEventData.x = hitMarkerOffsetX;
+            event.hitEventData.y = hitMarkerOffsetY;
+            event.hitEventData.radius = hitMarkerRadius;
+            event.hitEventData.hitType = pGuy->hasBeenBlockedThisFrame ? 1 : 0;
+            event.hitEventData.seed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
+            event.hitEventData.dirX = pGuy->direction.f();
+            event.hitEventData.dirY = 0.0f;
+            pGuy->pSim->getCurrentFrameEvents().push_back(event);
+        } else {
+            int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
+            addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
+        }
+
+        // grab or hitgrab
+        if (isGrab || (attr2 & (1<<1))) {
+            pGuy->grabbedThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
+        }
+
+        int hitID = hitBox.hitID;
+
+        if (pGuy->isProjectile) {
+            pGuy->projHitCount--;
+            if (hitBox.type == projectile && !pGuy->obeyHitID) {
+                hitID = -1;
+            }
+        }
+
+        if (hitID != -1) {
+            pGuy->canHitID |= 1 << hitID;
+        }
+
+
+        if (!pOtherGuy->blocking && !hitArmor) {
+            if (hitEntryFlag & punish_counter) {
+                pGuy->punishCounterThisFrame = true;
+                if (hitFlagToParent) pGuy->pParent->punishCounterThisFrame = true;
+                pGuy->hitPunishCounterThisMove = true;
+                if (hitFlagToParent) pGuy->pParent->hitPunishCounterThisMove = true;
+            }
+            if (hitEntryFlag & counter) {
+                pGuy->hitCounterThisMove = true;
+                if (hitFlagToParent) pGuy->pParent->hitCounterThisMove = true;
+            }
+            pGuy->hitThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->hitThisFrame = true;
+            pGuy->hitThisMove = true;
+            if (hitFlagToParent) pGuy->pParent->hitThisMove = true;
+
+            int dmgKind = (*pHitEntry)["DmgKind"];
+
+            if (dmgKind == 11) {
+                pGuy->DoInstantAction(592); // IMM_VEGA_BOMB
+            }
+
+            if (pendingHit.bombBurst) {
+                pOtherGuy->debuffTimer = 0;
+            }
+
+            pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " id " + std::to_string(hitBox.hitID) +
+                " dt " + std::to_string(pendingHit.hitEntryID) + " " + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+                " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
+                " moveType " + std::to_string(moveType) );
+            pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
+        }
+
+        // let's try to be doing the grab before time stops
+        if (pGuy->grabbedThisFrame && pGuy->nextAction == -1) {
+            pGuy->DoBranchKey();
+            if (pGuy->nextAction != -1) {
+                // For Transition
+                pGuy->Frame();
+                // For LockKey
+                pGuy->PreFrame();
+            } else {
+                pGuy->log(true, "instagrab branch not found!");
+            }
+        }
+
+        // add warudo after potential instagrab branch (technical term)
+        if (hitStopSelf > 0) {
+            if (hitStopToParent) {
+                pGuy->pParent->addHitStop(hitStopSelf+1);
+                // todo is it instead of to self? :/
+            }
+            pGuy->addHitStop(hitStopSelf+1);
+        }
+        if (hitStopTarget > 0) {
+            pOtherGuy->addHitStop(hitStopTarget+1);
+#ifdef __EMSCRIPTEN__
+            emscripten_vibrate(hitStopTarget*2);
+#endif
+        }
+    }
 }
 
 void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)

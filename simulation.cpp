@@ -169,9 +169,13 @@ void Simulation::AdvanceFrame(void)
     // gather everyone again in case of deletions/additions in PreFrame
     gatherEveryone(simGuys, everyone);
 
+    std::vector<PendingHit> pendingHitList;
+
     for (auto guy : everyone) {
-        guy->CheckHit(guy->getOpponent());
+        guy->CheckHit(guy->getOpponent(), pendingHitList);
     }
+
+    ResolveHits(pendingHitList);
 
     if (replayingGameStateDump) {
         static bool firstFrame = true;

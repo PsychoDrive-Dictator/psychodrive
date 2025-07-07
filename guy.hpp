@@ -17,6 +17,8 @@ const Fixed maxPlayerDistance = Fixed(490.0f);
 extern nlohmann::json staticPlayer;
 extern bool staticPlayerLoaded;
 
+void ResolveHits(std::vector<PendingHit> &pendingHitList);
+
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
@@ -28,7 +30,7 @@ public:
     bool Push(Guy *pOtherGuy);
     void PreFramePostPush(void);
     bool WorldPhysics(void);
-    bool CheckHit(Guy *pOtherGuy);
+    void CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList);
     bool Frame(bool endHitStopFrame = false);
     std::string getActionName(int actionID);
 
@@ -657,6 +659,7 @@ private:
     nlohmann::json *pActionJson;
 
     Simulation *pSim = nullptr;
+    friend void ResolveHits(std::vector<PendingHit> &pendingHitList);
 };
 
 static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> &vecOutEveryone)

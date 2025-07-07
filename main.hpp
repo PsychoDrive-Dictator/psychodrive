@@ -63,6 +63,20 @@ struct HurtBox {
     int armorID = 0;
 };
 
+class Guy;
+
+struct PendingHit {
+    Guy *pGuyHitting;
+    Guy *pGuyGettingHit;
+    HitBox hitBox;
+    HurtBox hurtBox;
+    nlohmann::json *pHitEntry;
+    int hitEntryID;
+    int hitEntryFlag;
+    bool blocked;
+    bool bombBurst;
+};
+
 struct color {
     float r;
     float g;
