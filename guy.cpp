@@ -3250,12 +3250,6 @@ void Guy::DoBranchKey(bool preHit)
                     deniedLastBranch = false;
 
                     keepPlace = key["_KeepPlace"];
-
-                    if (isProjectile && projHitCount == 0 ) {
-                        // take new hitcount from branch action's pdata
-                        // not just for hitcountzero branch, see also mai's charged fan
-                        projHitCount = -1;
-                    }
                 }
 
                 // FALL THROUGH - there might be another branch that works later for this frame
@@ -3663,6 +3657,8 @@ bool Guy::Frame(bool endHitStopFrame)
     // Transition
     if ( nextAction != -1 )
     {
+        int oldProjDataIndex = (*pActionJson)["fab"]["Projectile"]["DataIndex"];
+
         if (currentAction != nextAction) {
             currentAction = nextAction;
             log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace) + " keep frame " + std::to_string(keepFrame));
@@ -3769,7 +3765,10 @@ bool Guy::Frame(bool endHitStopFrame)
         }
 
         if (isProjectile) {
-            projDataInitialized = false;
+            int newProjDataIndex = (*pActionJson)["fab"]["Projectile"]["DataIndex"];
+            if (oldProjDataIndex != newProjDataIndex) {
+                projDataInitialized = false;
+            }
         }
 
         prevPoseStatus = forcedPoseStatus;

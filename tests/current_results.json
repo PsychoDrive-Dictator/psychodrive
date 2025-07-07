@@ -3230,43 +3230,43 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 809,
+                "count": 792,
                 "firstFrame": 182,
                 "lastFrame": 1034
             },
             {
-                "count": 159,
-                "firstFrame": 181,
-                "lastFrame": 963
-            },
-            {
-                "count": 92,
+                "count": 141,
                 "firstFrame": 173,
                 "lastFrame": 963
             },
             {
-                "count": 97,
+                "count": 49,
+                "firstFrame": 208,
+                "lastFrame": 963
+            },
+            {
+                "count": 105,
                 "firstFrame": 173,
                 "lastFrame": 957
             },
             {
-                "count": 97,
+                "count": 105,
                 "firstFrame": 173,
                 "lastFrame": 957
             },
             {
-                "count": 261,
+                "count": 155,
                 "firstFrame": 173,
                 "lastFrame": 1014
             },
             {
-                "count": 757,
+                "count": 764,
                 "firstFrame": 182,
                 "lastFrame": 1034
             },
             {
-                "count": 157,
-                "firstFrame": 181,
+                "count": 93,
+                "firstFrame": 217,
                 "lastFrame": 972
             },
             {
