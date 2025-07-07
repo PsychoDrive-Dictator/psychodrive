@@ -3225,6 +3225,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "ryu_s3_lvl1",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 809,
+                "firstFrame": 182,
+                "lastFrame": 1034
+            },
+            {
+                "count": 159,
+                "firstFrame": 181,
+                "lastFrame": 963
+            },
+            {
+                "count": 92,
+                "firstFrame": 173,
+                "lastFrame": 963
+            },
+            {
+                "count": 97,
+                "firstFrame": 173,
+                "lastFrame": 957
+            },
+            {
+                "count": 97,
+                "firstFrame": 173,
+                "lastFrame": 957
+            },
+            {
+                "count": 261,
+                "firstFrame": 173,
+                "lastFrame": 1014
+            },
+            {
+                "count": 757,
+                "firstFrame": 182,
+                "lastFrame": 1034
+            },
+            {
+                "count": 157,
+                "firstFrame": 181,
+                "lastFrame": 972
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ryu_wallbounce",
         "testVersion": "26",
         "finished": true,
