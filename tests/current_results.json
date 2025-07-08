@@ -3329,6 +3329,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "terry_fierce",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 105,
+                "firstFrame": 11,
+                "lastFrame": 169
+            },
+            {
+                "count": 124,
+                "firstFrame": 107,
+                "lastFrame": 230
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "zangief_rotate_motions_grabs",
         "testVersion": "26",
         "finished": true,
