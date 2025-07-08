@@ -1648,10 +1648,11 @@ void Guy::Render(void) {
     }
 
     if (renderPositionAnchors) {
-        float radius = 16.5;
-        drawBox(x-radius/2,y-radius/2,radius,radius,radius,1.0,1.0,1.0,0.2);
-        radius = 15;
-        drawBox(x-radius/2,y-radius/2,radius,radius,radius,charColorR,charColorG,charColorB,0.2);
+        float radius = 6.0;
+        float thickness = thickboxes?radius:1;
+        drawBox(x-radius/2,y-radius/2,radius,radius,thickness,charColorR,charColorG,charColorB,0.2);
+        // radius = 5.0;
+        // drawBox(x-radius/2,y-radius/2,radius,radius,thickness,1.0,1.0,1.0,0.2);
     }
 }
 
