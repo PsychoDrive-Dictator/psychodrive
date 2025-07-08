@@ -24,6 +24,8 @@ int renderSizeY;
 
 bool webWidgets = false;
 
+ImFont *comboFont = nullptr;
+ImFont *comboFontSubscript = nullptr;
 ImFont *font = nullptr;
 
 Guy *pGuyToDelete = nullptr;
@@ -135,10 +137,34 @@ bool modalDropDown(const char *label, int *pSelection, const char** ppOptions, i
     return modalDropDown(label, pSelection, vecOptions, nFixedWidth);
 }
 
+void renderComboMeter(bool rightSpot, int comboHits) {
+    ImGui::SetNextWindowPos(ImVec2(rightSpot ? renderSizeX - 100.0f : 0, 300.0));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    const char *pComboWindowName = rightSpot ? "Right Combo Meter" : "Left Combo Meter";
+
+    ImGui::Begin(pComboWindowName, nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+        ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing );
+    //ImGui::AlignTextToFramePadding();
+    ImGui::PushFont(comboFont);
+    if (rightSpot) {
+        float offset = comboHits < 10 ? 37.0 : -4.0;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+    }
+    ImGui::Text("%d", comboHits);
+    ImGui::PopFont();
+    //ImGui::SameLine();
+    ImGui::PushFont(comboFontSubscript);
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY()-25.0);
+    //ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 10.0);
+    ImGui::Text("HIT");
+    ImGui::PopFont();
+    ImGui::End();
+}
+
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
     ImGui::Begin(windowName);
-    ImGui::PushFont(font);
     color col = pGuy->getColor();
     ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "name %s moveset %s", pGuy->getName()->c_str(), pGuy->getCharacter().c_str());
     ImGui::SameLine();
@@ -250,13 +276,16 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     for (int i = logQueue.size() - 1; i >= 0; i--) {
         ImGui::Text("%s", logQueue[i].c_str());
     }
-    ImGui::PopFont();
     ImGui::End();
 
     int minionID = 1;
     for (auto minion : pGuy->getMinions() ) {
         std::string minionWinName = std::string(windowName) + "'s Minion " + std::to_string(minionID++);
         drawGuyStatusWindow(minionWinName.c_str(), minion);
+    }
+
+    if (guys.size() >= 2 && (pGuy == guys[0] || pGuy == guys[1]) && pGuy->getOpponent() && pGuy->getOpponent()->getComboHits()) {
+        renderComboMeter(pGuy == guys[1], pGuy->getOpponent()->getComboHits());
     }
 }
 
@@ -429,7 +458,6 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("PsychoDrive", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
-    ImGui::PushFont(font);
     static float newCharColor[3] = { randFloat(), randFloat(), randFloat() };
     static int charID = rand() % charNames.size();
     static int versionID = charVersionCount - 1;
@@ -483,7 +511,6 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
     for (int i = pLogQueue->size() - 1; i >= 0; i--) {
         ImGui::Text("%s", (*pLogQueue)[i].c_str());
     }
-    ImGui::PopFont();
     ImGui::End();
 
     pGuyToDelete = nullptr;
@@ -556,9 +583,17 @@ ImGuiIO& initUI(void)
 
     ImGui::StyleColorsDark();
 
+    comboFont = io.Fonts->AddFontFromMemoryCompressedTTF(
+        Droid_Sans_compressed_data, Droid_Sans_compressed_size, 96.0
+    );
+    comboFontSubscript = io.Fonts->AddFontFromMemoryCompressedTTF(
+        Droid_Sans_compressed_data, Droid_Sans_compressed_size, 64.0
+    );
     font = io.Fonts->AddFontFromMemoryCompressedTTF(
         Droid_Sans_compressed_data, Droid_Sans_compressed_size, fontSize
     );
+
+    ImGui::PushFont(font);
 
     ImGui::GetStyle().TabRounding = 4.0f;
     ImGui::GetStyle().FrameRounding = 4.0f;
@@ -620,34 +655,52 @@ void CharacterUIController::RenderUI(void)
         }
     }
 
-    if (simController.pSim && simController.scrubberFrame < (int)simController.pSim->stateRecording.size()) {
-        for (auto &[id, guy] : simController.pSim->stateRecording[simController.scrubberFrame].guys) {
-            if (id == getSimCharSlot() && guy && guy->getFrameTriggers().size()) {
-                vecTriggerDropDownLabels.clear();
-                vecTriggers.clear();
-                vecTriggerDropDownLabels.push_back("Available Triggers");
-                for (auto &trigger : guy->getFrameTriggers()) {
-                    vecTriggerDropDownLabels.push_back(guy->FindMove(trigger.first, trigger.second));
-                    vecTriggers.push_back(trigger);
-                }
-                if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 250)) {
-                    if (pendingTriggerAdd != 0) {
-                        std::erase_if(timelineTriggers, [](const auto& item) {
-                            auto const& [key, value] = item;
-                            return (key >= simController.scrubberFrame);
-                        });
-                        timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
+    if (!simController.pSim) {
+        ImGui::End();
+        return;
+    }
 
-                        simInputsChanged = true;
-                        changed = true;
-                        pendingTriggerAdd = 0;
-                    }
-                }
+    Guy *pGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
+
+    if (pGuy && pGuy->getFrameTriggers().size()) {
+        vecTriggerDropDownLabels.clear();
+        vecTriggers.clear();
+        vecTriggerDropDownLabels.push_back("Available Triggers");
+        for (auto &trigger : pGuy->getFrameTriggers()) {
+            vecTriggerDropDownLabels.push_back(pGuy->FindMove(trigger.first, trigger.second));
+            vecTriggers.push_back(trigger);
+        }
+        if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 250)) {
+            if (pendingTriggerAdd != 0) {
+                std::erase_if(timelineTriggers, [](const auto& item) {
+                    auto const& [key, value] = item;
+                    return (key >= simController.scrubberFrame);
+                });
+                timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
+
+                simInputsChanged = true;
+                changed = true;
+                pendingTriggerAdd = 0;
             }
         }
     }
-
     ImGui::End();
+
+
+    if (pGuy && pGuy->getOpponent()) {
+        int opponentID = pGuy->getOpponent()->getUniqueID();
+        Guy *pOpponent = simController.pSim->getRecordedGuy(simController.scrubberFrame, opponentID);
+        //Guy *pOpponentPrevFrame = simController.pSim->getRecordedGuy(std::max(0, simController.scrubberFrame - 1), opponentID);
+
+        if (pOpponent) {
+            //bool newComboHit = pOpponentPrevFrame->getComboHits() != pOpponent->getComboHits();
+            int comboHits = pOpponent->getComboHits();
+
+            if (comboHits != 0) {
+                renderComboMeter(rightSide, comboHits);
+            }
+        }
+    }
 }
 
 void SimulationController::Reset(void)

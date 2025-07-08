@@ -285,6 +285,18 @@ void Simulation::renderRecordedGuys(int frameIndex)
     }
 }
 
+Guy *Simulation::getRecordedGuy(int frameIndex, int guyID)
+{
+    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
+        for (auto [id, guy] : stateRecording[frameIndex].guys) {
+            if (id == guyID) {
+                return guy;
+            }
+        }
+    }
+    return nullptr;
+}
+
 void Simulation::renderRecordedHitMarkers(int frameIndex)
 {
     int maxMarkerAge = 10;
