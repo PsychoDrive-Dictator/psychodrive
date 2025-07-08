@@ -3778,7 +3778,7 @@ bool Guy::Frame(bool endHitStopFrame)
         didTransition = true;
     }
 
-    if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne))) {
+    if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
         switchDirection();
     }
 
