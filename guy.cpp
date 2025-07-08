@@ -3680,6 +3680,12 @@ bool Guy::Frame(bool endHitStopFrame)
             posOffsetY = Fixed(0);
         }
 
+        if (didBranch) {
+            // kinda crazy, but do EventKey for the bumped branch frame before the transition
+            // steering moves will apply twice, on purpose. is it the same for triggers? :thonk:
+            DoEventKey(pActionJson, currentFrame);
+        }
+
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
 
         locked = false;
