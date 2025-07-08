@@ -703,6 +703,49 @@ void CharacterUIController::RenderUI(void)
     }
 }
 
+void CharacterUIController::renderFrameMeter(int frameIndex)
+{
+    ImGui::PushID(getSimCharSlot());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0,ImGui::GetStyle().ItemSpacing.y));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.4,0.4,0.4,1.0));
+    for (int i = frameIndex; i < (int)simController.pSim->stateRecording.size(); i++) {
+        Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
+        ImVec4 frameColor = ImVec4(1.0,1.0,1.0,1.0);
+        bool a,b,c;
+        if (pGuy->canMove(a,b,c)) {
+            frameColor = ImVec4(0.106,0.102,0.094,1.0);
+        }
+        if (pGuy->punishCounterState) {
+            frameColor = ImVec4(0.02,0.443,0.729,1.0);
+        }
+        if (pGuy->counterState) {
+            frameColor = ImVec4(0.0,0.733,0.573,1.0);
+        }
+        if (pGuy->hitBoxes.size()) {
+            frameColor = ImVec4(0.78,0.173,0.4,1.0);
+        }
+        if (pGuy->hitStun) {
+            frameColor = ImVec4(1.0,0.965,0.224,1.0);
+        }
+        if (pGuy->hitStop) {
+            frameColor = ImVec4(0.0,0.0,0.0,0.0);
+        }
+        if (i != frameIndex) ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Button, frameColor);
+        ImGui::PushID(i);
+        ImGui::Button("", ImVec2(25.0,35.0));
+        ImGui::PopID();
+        ImGui::PopStyleColor();
+    }
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopID();
+}
+
 void SimulationController::Reset(void)
 {
     charControllers.clear();
@@ -781,13 +824,17 @@ void SimulationController::RenderUI(void)
 
     int simFrameCount = pSim ? pSim->stateRecording.size() : 0;
     if (simFrameCount) {
-        ImGui::SetNextWindowPos(ImVec2(10, renderSizeY - 50));
+        ImGui::SetNextWindowPos(ImVec2(10, renderSizeY - 200));
         ImGui::SetNextWindowSize(ImVec2(0, 0));
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
 
         ImGui::SetNextItemWidth(renderSizeX - 40);
         ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
+
+        for (int i = 0; i < charCount; i++) {
+            charControllers[i].renderFrameMeter(scrubberFrame);
+        }
 
         ImGui::End();
     }

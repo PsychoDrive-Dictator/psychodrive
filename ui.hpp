@@ -17,6 +17,7 @@ struct timelineTrigger {
 class CharacterUIController {
 public:
     void RenderUI(void);
+    void renderFrameMeter(int frameIndex);
     int getSimCharSlot(void) { return rightSide ? 1 : 0; }
 
     int character;

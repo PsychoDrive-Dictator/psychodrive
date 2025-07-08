@@ -260,6 +260,8 @@ public:
     
         UpdateActionData();
 
+        DoTriggers();
+
         health = maxHealth = 10000; // todo pull that, need to make one of the dumps contain vital_max
     }
 
@@ -660,6 +662,7 @@ private:
 
     Simulation *pSim = nullptr;
     friend void ResolveHits(std::vector<PendingHit> &pendingHitList);
+    friend class CharacterUIController;
 };
 
 static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> &vecOutEveryone)
