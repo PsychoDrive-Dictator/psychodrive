@@ -26,6 +26,7 @@ bool webWidgets = false;
 
 ImFont *comboFont = nullptr;
 ImFont *comboFontSubscript = nullptr;
+ImFont *fontBigger = nullptr;
 ImFont *font = nullptr;
 
 Guy *pGuyToDelete = nullptr;
@@ -567,11 +568,9 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, in
 
 ImGuiIO& initUI(void)
 {
-    int fontSize = 18;
 #ifdef __EMSCRIPTEN__
     webWidgets = true;
     gameMode = MoveViewer;
-    fontSize = 28;
 #endif
 
     IMGUI_CHECKVERSION();
@@ -589,11 +588,18 @@ ImGuiIO& initUI(void)
     comboFontSubscript = io.Fonts->AddFontFromMemoryCompressedTTF(
         Droid_Sans_compressed_data, Droid_Sans_compressed_size, 64.0
     );
+    fontBigger = io.Fonts->AddFontFromMemoryCompressedTTF(
+        Droid_Sans_compressed_data, Droid_Sans_compressed_size, 28.0
+    );
     font = io.Fonts->AddFontFromMemoryCompressedTTF(
-        Droid_Sans_compressed_data, Droid_Sans_compressed_size, fontSize
+        Droid_Sans_compressed_data, Droid_Sans_compressed_size, 18.0
     );
 
-    ImGui::PushFont(font);
+    if (webWidgets) {
+        ImGui::PushFont(fontBigger);
+    } else {
+        ImGui::PushFont(font);
+    }
 
     ImGui::GetStyle().TabRounding = 4.0f;
     ImGui::GetStyle().FrameRounding = 4.0f;
@@ -703,39 +709,38 @@ void CharacterUIController::RenderUI(void)
     }
 }
 
+static ImVec4 frameMeterColors[] = {
+    { 1.0,1.0,1.0,1.0 }, // default blinding white
+    { 0.106,0.102,0.094,1.0 }, // can act/move very dark grey
+    { 0.02,0.443,0.729,1.0 }, // recovery blue
+    { 0.0,0.733,0.573,1.0 }, // startup green
+    { 0.78,0.173,0.4,1.0 }, // active red
+    { 1.0,0.965,0.224,1.0 }, // hitstun yellow
+    { 0.0,0.0,0.0,0.0 }, // hitstop missing
+};
+
 void CharacterUIController::renderFrameMeter(int frameIndex)
 {
     ImGui::PushID(getSimCharSlot());
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0,ImGui::GetStyle().ItemSpacing.y));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.0,ImGui::GetStyle().ItemSpacing.y));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.4,0.4,0.4,1.0));
-    for (int i = frameIndex; i < (int)simController.pSim->stateRecording.size(); i++) {
+    int sameColorCount = 0;
+    for (int i = frameIndex; i < (int)simController.pSim->stateRecording.size() - 1; i++) {
         Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
-        ImVec4 frameColor = ImVec4(1.0,1.0,1.0,1.0);
-        bool a,b,c;
-        if (pGuy->canMove(a,b,c)) {
-            frameColor = ImVec4(0.106,0.102,0.094,1.0);
-        }
-        if (pGuy->punishCounterState) {
-            frameColor = ImVec4(0.02,0.443,0.729,1.0);
-        }
-        if (pGuy->counterState) {
-            frameColor = ImVec4(0.0,0.733,0.573,1.0);
-        }
-        if (pGuy->hitBoxes.size()) {
-            frameColor = ImVec4(0.78,0.173,0.4,1.0);
-        }
-        if (pGuy->hitStun) {
-            frameColor = ImVec4(1.0,0.965,0.224,1.0);
-        }
-        if (pGuy->hitStop) {
-            frameColor = ImVec4(0.0,0.0,0.0,0.0);
-        }
+        Guy *pGuyNextFrame = simController.pSim->getRecordedGuy(i+1, getSimCharSlot());
         if (i != frameIndex) ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button, frameColor);
+        ImGui::PushStyleColor(ImGuiCol_Button, frameMeterColors[pGuy->getFrameMeterColorIndex()]);
         ImGui::PushID(i);
-        ImGui::Button("", ImVec2(25.0,35.0));
+        std::string strButtonCaption = "";
+        if (pGuy->getFrameMeterColorIndex() != pGuyNextFrame->getFrameMeterColorIndex()) {
+            strButtonCaption = std::to_string(sameColorCount+1);
+            sameColorCount = 0;
+        } else {
+            sameColorCount++;
+        }
+        ImGui::Button(strButtonCaption.c_str(), ImVec2(25.0,35.0));
         ImGui::PopID();
         ImGui::PopStyleColor();
     }
@@ -832,9 +837,11 @@ void SimulationController::RenderUI(void)
         ImGui::SetNextItemWidth(renderSizeX - 40);
         ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
 
+        ImGui::PushFont(font);
         for (int i = 0; i < charCount; i++) {
             charControllers[i].renderFrameMeter(scrubberFrame);
         }
+        ImGui::PopFont();
 
         ImGui::End();
     }

@@ -1656,6 +1656,30 @@ void Guy::Render(void) {
     }
 }
 
+int Guy::getFrameMeterColorIndex() {
+    int ret = 0;
+    bool a,b,c;
+    if (canMove(a,b,c)) {
+        ret = 1;
+    }
+    if (punishCounterState) {
+        ret = 2;
+    }
+    if (counterState) {
+        ret = 3;
+    }
+    if (hitBoxes.size()) {
+        ret = 4;
+    }
+    if (hitStun) {
+        ret = 5;
+    }
+    if (hitStop) {
+        ret = 6;
+    }
+    return ret;
+}
+
 bool Guy::Push(Guy *pOtherGuy)
 {
     if (warudo || hitStop) return false;

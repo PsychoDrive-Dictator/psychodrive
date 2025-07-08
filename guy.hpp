@@ -315,6 +315,7 @@ public:
 
     std::vector<const char *> &getMoveList() { return vecMoveList; }
     std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
+    int getFrameMeterColorIndex();
     std::map<std::pair<int, int>, std::pair<std::string, bool>> &getMapMoveStyle() { return mapMoveStyle; }
     std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
@@ -662,7 +663,6 @@ private:
 
     Simulation *pSim = nullptr;
     friend void ResolveHits(std::vector<PendingHit> &pendingHitList);
-    friend class CharacterUIController;
 };
 
 static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> &vecOutEveryone)
