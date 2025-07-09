@@ -1420,8 +1420,6 @@ void Guy::DoTriggers(int fluffFrameBias)
                 forceTrigger = true;
             }
 
-            frameTriggers.insert(std::make_pair(actionID, styleInstall));
-
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
@@ -1432,6 +1430,10 @@ void Guy::DoTriggers(int fluffFrameBias)
                     pTrigger = &key;
                     break;
                 }
+            }
+
+            if (it->second.hasNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+                frameTriggers.insert(std::make_pair(actionID, styleInstall));
             }
 
             int initialI = 0;
@@ -1656,7 +1658,7 @@ void Guy::Render(void) {
     }
 }
 
-int Guy::getFrameMeterColorIndex() {
+void Guy::SaveFrameMeterColorIndex() {
     int ret = 0;
     bool a,b,c;
     if (canMove(a,b,c)) {
@@ -1677,7 +1679,7 @@ int Guy::getFrameMeterColorIndex() {
     if (hitStop) {
         ret = 6;
     }
-    return ret;
+    frameMeterColorIndex = ret;
 }
 
 bool Guy::Push(Guy *pOtherGuy)
@@ -3287,6 +3289,9 @@ void Guy::DoBranchKey(bool preHit)
 
 bool Guy::Frame(bool endHitStopFrame)
 {
+    // before we do destructive stuff as we move to next frame
+    SaveFrameMeterColorIndex();
+
     // if this is the frame that was stolen from beginning hitstop when it ends, don't
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add

@@ -252,6 +252,17 @@ void Simulation::AdvanceFrame(void)
             }
         }
     }
+
+    for (auto guy : everyone) {
+        bool die = !guy->Frame();
+
+        if (die) {
+            // don't delete guys before other guys might be done with them this frame
+            // and also not before the start of next frame so we may still render them
+            vecGuysToDelete.push_back(guy);
+        }
+    }
+
     if (recordingState) {
         stateRecording.emplace_back();
         RecordedFrame &frame = stateRecording[stateRecording.size()-1];
@@ -262,16 +273,6 @@ void Simulation::AdvanceFrame(void)
         }
         frame.events = currentFrameEvents;
         currentFrameEvents.clear();
-    }
-
-    for (auto guy : everyone) {
-        bool die = !guy->Frame();
-
-        if (die) {
-            // don't delete guys before other guys might be done with them this frame
-            // and also not before the start of next frame so we may still render them
-            vecGuysToDelete.push_back(guy);
-        }
     }
 }
 

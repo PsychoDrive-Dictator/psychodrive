@@ -720,8 +720,42 @@ static ImVec4 frameMeterColors[] = {
     { 1.0,0.965,0.224,1.0 }, // hitstun yellow
     { 0.0,0.0,0.0,0.0 }, // hitstop missing
 };
-const float kHorizSpacing = 1.0;
-const float kFrameButtonWidth = 25.0;
+
+void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
+{
+    int frameCount = simController.pSim->stateRecording.size();
+
+    float cursorX = ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth);
+    float cursorY = ImGui::GetCursorPosY();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+    for (int i = 0; i < frameCount; i++) {
+        Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
+        Guy *pGuyPrevFrame = simController.pSim->getRecordedGuy(i-1, getSimCharSlot());
+
+        if ((!pGuyPrevFrame || !pGuyPrevFrame->getFrameTriggers().size()) && pGuy->getFrameTriggers().size()) {
+            // cancel window, figure out how far it goes
+            int j = i;
+            while (true) {
+                j++;
+                Guy *pGuyJ = simController.pSim->getRecordedGuy(j, getSimCharSlot());
+                if (!pGuyJ || !pGuyJ->getFrameTriggers().size()) {
+                    break;
+                }
+            }
+
+            float startOffset = (kFrameButtonWidth + kHorizSpacing) * i;
+            ImGui::SetCursorPosX(cursorX + startOffset);
+            ImGui::SetCursorPosY(cursorY);
+
+            float cancelWidth = (kFrameButtonWidth + kHorizSpacing) * (j-i) - kHorizSpacing;
+            ImGui::PushID(i);
+            ImGui::Button("##input", ImVec2(cancelWidth,10.0));
+            ImGui::PopID();
+        }
+    }
+    ImGui::PopStyleColor();
+}
 
 void CharacterUIController::renderFrameMeter(int frameIndex)
 {
@@ -729,14 +763,14 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
 
     const float kFrameButtonHeight = 35.0;
     const ImVec4 kFrameButtonBorderColor = ImVec4(0.0,0.0,0.0,1.0);
-    // number of frames to show behind present, eg. how far right the current frame arrow is
-    const int kFrameOffset = 8;
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(kHorizSpacing,ImGui::GetStyle().ItemSpacing.y));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
     ImGui::PushStyleColor(ImGuiCol_Border, kFrameButtonBorderColor);
     int sameColorCount = 0;
     int frameCount = simController.pSim->stateRecording.size();
+
+    if (!rightSide) renderFrameMeterCancelWindows(frameIndex);
 
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth));
     float tronglePosY = ImGui::GetCursorPosY();
@@ -745,6 +779,9 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
         Guy *pGuyNextFrame = simController.pSim->getRecordedGuy(i+1, getSimCharSlot());
         if (i != 0) ImGui::SameLine();
+
+        ImGui::PushID(i);
+
         int colorIndex = pGuy->getFrameMeterColorIndex();
         ImGui::PushStyleColor(ImGuiCol_Button, frameMeterColors[colorIndex]);
         bool darkText = false;
@@ -754,7 +791,6 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         if (darkText) {
             ImGui::PushStyleColor(ImGuiCol_Text, kFrameButtonBorderColor);
         }
-        ImGui::PushID(i);
         std::string strButtonCaption = "";
         if (!pGuyNextFrame || colorIndex != pGuyNextFrame->getFrameMeterColorIndex()) {
             strButtonCaption = std::to_string(sameColorCount+1);
@@ -765,7 +801,6 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         //ImGui::BeginDisabled();
         ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight));
        // ImGui::EndDisabled();
-        ImGui::PopID();
         if (darkText) {
             ImGui::PopStyleColor();
         }
@@ -782,12 +817,16 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
             simController.momentumActive = true;
             simController.curMomentum = simController.lastDragDelta.x;
         }
+
+        ImGui::PopID();
     }
+
+    if (rightSide) renderFrameMeterCancelWindows(frameIndex);
+
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
-    ImGui::PopID();
 
     ImVec2 trongle[] = {
         {15.0,0.0},
@@ -812,6 +851,8 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         }
     }
     ImGui::GetCurrentWindow()->DrawList->AddConvexPolyFilled(curTrongle, IM_ARRAYSIZE(trongle), ImColor(kFrameButtonBorderColor));
+
+    ImGui::PopID();
 }
 
 void SimulationController::Reset(void)
@@ -939,7 +980,7 @@ void SimulationController::RenderUI(void)
                 curMomentum = 0.0f;
             }
         }
-        const float dragThresholdForMovingOneFrame = (kHorizSpacing + kFrameButtonWidth) / 2.5f;
+        const float dragThresholdForMovingOneFrame = (CharacterUIController::kHorizSpacing + CharacterUIController::kFrameButtonWidth) / 2.5f;
         while (frameMeterMouseDragAmount > dragThresholdForMovingOneFrame) {
             simController.scrubberFrame--;
             frameMeterMouseDragAmount -= dragThresholdForMovingOneFrame;

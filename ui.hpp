@@ -18,6 +18,7 @@ class CharacterUIController {
 public:
     void RenderUI(void);
     void renderFrameMeter(int frameIndex);
+    void renderFrameMeterCancelWindows(int frameIndex);
     int getSimCharSlot(void) { return rightSide ? 1 : 0; }
 
     int character;
@@ -30,6 +31,11 @@ public:
     float flStartPosX;
     // real one
     Fixed startPosX;
+
+    // number of frames to show behind present, eg. how far right the current frame arrow is
+    static constexpr int kFrameOffset = 8;
+    static constexpr float kHorizSpacing = 1.0;
+    static constexpr float kFrameButtonWidth = 25.0;
 
     std::map<int, std::pair<int, int>> timelineTriggers;
 
