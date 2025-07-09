@@ -557,6 +557,8 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, in
     if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), modeSelectorSize)) {
         simInputsChanged = true;
         simController.Reset();
+
+        translateY = gameMode == Training ? 150.0 : 100.0;
     }
     ImGui::End();
 

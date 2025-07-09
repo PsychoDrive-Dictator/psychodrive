@@ -534,21 +534,48 @@ static void mainloop(void)
 
     if (gameMode != Training) {
         setRenderState(clearColor, sizeX, sizeY);
+        int curFrame = simController.scrubberFrame; // before ui changes it
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
-
         if (simInputsChanged && simController.NewSim()) {
             simController.AdvanceUntilComplete();
 
-            if (simController.scrubberFrame >= simController.pSim->stateRecording.size()) {
+            if (simController.scrubberFrame >= (int)simController.pSim->stateRecording.size()) {
                 simController.scrubberFrame = simController.pSim->stateRecording.size() - 1;
+                curFrame = simController.scrubberFrame;
             }
 
             simInputsChanged = false;
         }
 
         if (!simInputsChanged) {
-            simController.pSim->renderRecordedGuys(simController.scrubberFrame);
-            simController.pSim->renderRecordedHitMarkers(simController.scrubberFrame);
+            simController.pSim->renderRecordedGuys(curFrame);
+            simController.pSim->renderRecordedHitMarkers(curFrame);
+
+            // for next frame
+            Guy *pLeftGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, 0);
+            Guy *pRightGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, 1);
+            if (!pRightGuy) {
+                pRightGuy = pLeftGuy;
+            }
+            if (lockCamera && pLeftGuy) {
+                translateX = (pRightGuy->getPosX().f() + pLeftGuy->getPosX().f()) / 2.0f;
+                translateX = fmin(translateX, 550.0);
+                translateX = fmax(translateX, -550.0);
+
+                // first find required camera distance to have both guys in view horizontally
+                float distGuys = fabs( pRightGuy->getPosX().f() - pLeftGuy->getPosX().f() );
+                distGuys += 200.0; // account for some buffer behind
+                float angleRad = fov / 2.0 * std::numbers::pi / 180.0;
+                // zoom is adjacent edge, equals opposite over tan(ang)
+                float zoomToFitGuys = distGuys / 2.0 / tanf( angleRad );
+
+                float vertFovRad = 2.0 * atanf( tanf( ( fov * std::numbers::pi / 180.0 ) / 2.0 ) * ((float)sizeY / (float)sizeX) );
+                // we want to see a point 25 units below the chars to clearly see their feet
+                float zoomToFitFloor = (translateY + 75.0) / tanf( vertFovRad / 2.0 );
+
+                zoom = fmax( zoomToFitGuys, zoomToFitFloor );
+                zoom = fmax( zoom, 250.0f );
+            }
         }
     } else {
         if (recordingInput) {
