@@ -31,12 +31,6 @@ public:
     // real one
     Fixed startPosX;
 
-    float frameMeterMouseDragAmount;
-    ImVec2 lastDragDelta;
-    bool momentumActive = false;
-    float curMomentum;
-    int activeDragID = -1;
-
     std::map<int, std::pair<int, int>> timelineTriggers;
 
     std::vector<std::string> vecTriggerDropDownLabels;
@@ -57,6 +51,12 @@ public:
     Simulation *pSim = nullptr;
     int scrubberFrame = 0;
     int charCount = 1;
+
+    float frameMeterMouseDragAmount;
+    ImVec2 lastDragDelta;
+    bool momentumActive = false;
+    float curMomentum;
+    ImGuiID activeDragID = 0;
 };
 
 extern SimulationController simController;

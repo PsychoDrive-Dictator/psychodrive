@@ -720,12 +720,13 @@ static ImVec4 frameMeterColors[] = {
     { 1.0,0.965,0.224,1.0 }, // hitstun yellow
     { 0.0,0.0,0.0,0.0 }, // hitstop missing
 };
+const float kHorizSpacing = 1.0;
+const float kFrameButtonWidth = 25.0;
 
 void CharacterUIController::renderFrameMeter(int frameIndex)
 {
     ImGui::PushID(getSimCharSlot());
-    const float kHorizSpacing = 1.0;
-    const float kFrameButtonWidth = 25.0;
+
     const float kFrameButtonHeight = 35.0;
     const ImVec4 kFrameButtonBorderColor = ImVec4(0.0,0.0,0.0,1.0);
     // number of frames to show behind present, eg. how far right the current frame arrow is
@@ -771,15 +772,15 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         ImGui::PopStyleColor();
 
         if (ImGui::IsItemActive()) {
-            momentumActive = false;
-            frameMeterMouseDragAmount += ImGui::GetMouseDragDelta(0, 0.0).x;
-            lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0);
-            activeDragID = i;
+            simController.momentumActive = false;
+            simController.frameMeterMouseDragAmount += ImGui::GetMouseDragDelta(0, 0.0).x;
+            simController.lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0);
+            simController.activeDragID = ImGui::GetItemID();
             ImGui::ResetMouseDragDelta();
-        } else if (activeDragID == i) {
-            activeDragID = -1;
-            momentumActive = true;
-            curMomentum = lastDragDelta.x;
+        } else if (simController.activeDragID == ImGui::GetItemID()) {
+            simController.activeDragID = 0;
+            simController.momentumActive = true;
+            simController.curMomentum = simController.lastDragDelta.x;
         }
     }
     ImGui::PopStyleColor();
@@ -811,37 +812,6 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         }
     }
     ImGui::GetCurrentWindow()->DrawList->AddConvexPolyFilled(curTrongle, IM_ARRAYSIZE(trongle), ImColor(kFrameButtonBorderColor));
-
-    const float momentumDeceleration = 1.0;
-    if (momentumActive) {
-        frameMeterMouseDragAmount += curMomentum;
-        float oldCurMomentum = curMomentum;
-        if (curMomentum > 0.0) {
-            curMomentum -= momentumDeceleration;
-        } else if (curMomentum < 0.0) {
-            curMomentum += momentumDeceleration;
-        }
-        if (oldCurMomentum * curMomentum < 0.0) {
-            momentumActive = false;
-            curMomentum = 0.0f;
-        }
-    }
-    const float dragThresholdForMovingOneFrame = (kHorizSpacing + kFrameButtonWidth) / 2.5f;
-    while (frameMeterMouseDragAmount > dragThresholdForMovingOneFrame) {
-        simController.scrubberFrame--;
-        frameMeterMouseDragAmount -= dragThresholdForMovingOneFrame;
-    }
-    // im not fucking around with modulo of negative numbers you cant fool me
-    while (frameMeterMouseDragAmount < -dragThresholdForMovingOneFrame) {
-        simController.scrubberFrame++;
-        frameMeterMouseDragAmount += dragThresholdForMovingOneFrame;
-    }
-    if (simController.scrubberFrame < 0) {
-        simController.scrubberFrame = 0;
-    }
-    if (simController.scrubberFrame >= frameCount) {
-        simController.scrubberFrame = frameCount - 1;
-    }
 }
 
 void SimulationController::Reset(void)
@@ -929,7 +899,17 @@ void SimulationController::RenderUI(void)
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
-
+        if (ImGui::IsItemActive()) {
+            simController.momentumActive = false;
+            simController.frameMeterMouseDragAmount += ImGui::GetMouseDragDelta(0, 0.0).x;
+            simController.lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0);
+            simController.activeDragID = ImGui::GetItemID();
+            ImGui::ResetMouseDragDelta();
+        } else if (simController.activeDragID == ImGui::GetItemID()) {
+            simController.activeDragID = 0;
+            simController.momentumActive = true;
+            simController.curMomentum = simController.lastDragDelta.x;
+        }
 
         ImGui::PushFont(font);
         for (int i = 0; i < charCount; i++) {
@@ -944,7 +924,40 @@ void SimulationController::RenderUI(void)
         ImGui::PopStyleColor();
         ImGui::PopStyleVar();
         ImGui::PopStyleVar();
+
+        const float momentumDeceleration = 1.0;
+        if (momentumActive) {
+            frameMeterMouseDragAmount += curMomentum;
+            float oldCurMomentum = curMomentum;
+            if (curMomentum > 0.0) {
+                curMomentum -= momentumDeceleration;
+            } else if (curMomentum < 0.0) {
+                curMomentum += momentumDeceleration;
+            }
+            if (oldCurMomentum * curMomentum < 0.0) {
+                momentumActive = false;
+                curMomentum = 0.0f;
+            }
+        }
+        const float dragThresholdForMovingOneFrame = (kHorizSpacing + kFrameButtonWidth) / 2.5f;
+        while (frameMeterMouseDragAmount > dragThresholdForMovingOneFrame) {
+            simController.scrubberFrame--;
+            frameMeterMouseDragAmount -= dragThresholdForMovingOneFrame;
+        }
+        // im not fucking around with modulo of negative numbers you cant fool me
+        while (frameMeterMouseDragAmount < -dragThresholdForMovingOneFrame) {
+            simController.scrubberFrame++;
+            frameMeterMouseDragAmount += dragThresholdForMovingOneFrame;
+        }
+        if (simController.scrubberFrame < 0) {
+            simController.scrubberFrame = 0;
+        }
+        if (simController.scrubberFrame >= simFrameCount) {
+            simController.scrubberFrame = simFrameCount - 1;
+        }
     }
+
+
 }
 
 void SimulationController::AdvanceUntilComplete(void)
