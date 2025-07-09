@@ -1,3 +1,5 @@
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -711,7 +713,7 @@ void CharacterUIController::RenderUI(void)
 
 static ImVec4 frameMeterColors[] = {
     { 1.0,1.0,1.0,1.0 }, // default blinding white
-    { 0.106,0.102,0.094,1.0 }, // can act/move very dark grey
+    { 0.206,0.202,0.184,1.0 }, // can act/move very dark grey
     { 0.02,0.443,0.729,1.0 }, // recovery blue
     { 0.0,0.733,0.573,1.0 }, // startup green
     { 0.78,0.173,0.4,1.0 }, // active red
@@ -722,33 +724,124 @@ static ImVec4 frameMeterColors[] = {
 void CharacterUIController::renderFrameMeter(int frameIndex)
 {
     ImGui::PushID(getSimCharSlot());
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.0,ImGui::GetStyle().ItemSpacing.y));
+    const float kHorizSpacing = 1.0;
+    const float kFrameButtonWidth = 25.0;
+    const float kFrameButtonHeight = 35.0;
+    const ImVec4 kFrameButtonBorderColor = ImVec4(0.0,0.0,0.0,1.0);
+    // number of frames to show behind present, eg. how far right the current frame arrow is
+    const int kFrameOffset = 8;
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(kHorizSpacing,ImGui::GetStyle().ItemSpacing.y));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
-    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.4,0.4,0.4,1.0));
+    ImGui::PushStyleColor(ImGuiCol_Border, kFrameButtonBorderColor);
     int sameColorCount = 0;
-    for (int i = frameIndex; i < (int)simController.pSim->stateRecording.size() - 1; i++) {
+    int frameCount = simController.pSim->stateRecording.size();
+
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth));
+    float tronglePosY = ImGui::GetCursorPosY();
+
+    for (int i = 0; i < frameCount; i++) {
         Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
         Guy *pGuyNextFrame = simController.pSim->getRecordedGuy(i+1, getSimCharSlot());
-        if (i != frameIndex) ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button, frameMeterColors[pGuy->getFrameMeterColorIndex()]);
+        if (i != 0) ImGui::SameLine();
+        int colorIndex = pGuy->getFrameMeterColorIndex();
+        ImGui::PushStyleColor(ImGuiCol_Button, frameMeterColors[colorIndex]);
+        bool darkText = false;
+        if (colorIndex != 1) {
+            darkText = true;
+        }
+        if (darkText) {
+            ImGui::PushStyleColor(ImGuiCol_Text, kFrameButtonBorderColor);
+        }
         ImGui::PushID(i);
         std::string strButtonCaption = "";
-        if (pGuy->getFrameMeterColorIndex() != pGuyNextFrame->getFrameMeterColorIndex()) {
+        if (!pGuyNextFrame || colorIndex != pGuyNextFrame->getFrameMeterColorIndex()) {
             strButtonCaption = std::to_string(sameColorCount+1);
             sameColorCount = 0;
         } else {
             sameColorCount++;
         }
-        ImGui::Button(strButtonCaption.c_str(), ImVec2(25.0,35.0));
+        //ImGui::BeginDisabled();
+        ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight));
+       // ImGui::EndDisabled();
         ImGui::PopID();
+        if (darkText) {
+            ImGui::PopStyleColor();
+        }
         ImGui::PopStyleColor();
+
+        if (ImGui::IsItemActive()) {
+            momentumActive = false;
+            frameMeterMouseDragAmount += ImGui::GetMouseDragDelta(0, 0.0).x;
+            lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0);
+            activeDragID = i;
+            ImGui::ResetMouseDragDelta();
+        } else if (activeDragID == i) {
+            activeDragID = -1;
+            momentumActive = true;
+            curMomentum = lastDragDelta.x;
+        }
     }
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopID();
+
+    ImVec2 trongle[] = {
+        {15.0,0.0},
+        {25.0,0.0},
+        {20.0,8.0}
+    };
+    // can't just invert it as both need to be clockwise for imgui AA
+    ImVec2 upsideDownTrongle[] = {
+        {15.0,0.0},
+        {20.0,-8.0},
+        {25.0,0.0}
+    };
+    ImVec2 *curTrongle = rightSide ? upsideDownTrongle : trongle;
+    for (int i = 0; i < IM_ARRAYSIZE(trongle); i++) {
+        curTrongle[i] += ImGui::GetWindowPos();
+        curTrongle[i].x += kFrameOffset * (kHorizSpacing + kFrameButtonWidth);
+        curTrongle[i].y += tronglePosY;
+        if (rightSide) {
+            curTrongle[i].y += kFrameButtonHeight - 1.0;
+        } else {
+            curTrongle[i].y += 1.0;
+        }
+    }
+    ImGui::GetCurrentWindow()->DrawList->AddConvexPolyFilled(curTrongle, IM_ARRAYSIZE(trongle), ImColor(kFrameButtonBorderColor));
+
+    const float momentumDeceleration = 1.0;
+    if (momentumActive) {
+        frameMeterMouseDragAmount += curMomentum;
+        float oldCurMomentum = curMomentum;
+        if (curMomentum > 0.0) {
+            curMomentum -= momentumDeceleration;
+        } else if (curMomentum < 0.0) {
+            curMomentum += momentumDeceleration;
+        }
+        if (oldCurMomentum * curMomentum < 0.0) {
+            momentumActive = false;
+            curMomentum = 0.0f;
+        }
+    }
+    const float dragThresholdForMovingOneFrame = (kHorizSpacing + kFrameButtonWidth) / 2.5f;
+    while (frameMeterMouseDragAmount > dragThresholdForMovingOneFrame) {
+        simController.scrubberFrame--;
+        frameMeterMouseDragAmount -= dragThresholdForMovingOneFrame;
+    }
+    // im not fucking around with modulo of negative numbers you cant fool me
+    while (frameMeterMouseDragAmount < -dragThresholdForMovingOneFrame) {
+        simController.scrubberFrame++;
+        frameMeterMouseDragAmount += dragThresholdForMovingOneFrame;
+    }
+    if (simController.scrubberFrame < 0) {
+        simController.scrubberFrame = 0;
+    }
+    if (simController.scrubberFrame >= frameCount) {
+        simController.scrubberFrame = frameCount - 1;
+    }
 }
 
 void SimulationController::Reset(void)
@@ -829,13 +922,14 @@ void SimulationController::RenderUI(void)
 
     int simFrameCount = pSim ? pSim->stateRecording.size() : 0;
     if (simFrameCount) {
-        ImGui::SetNextWindowPos(ImVec2(10, renderSizeY - 200));
-        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 150));
+        ImGui::SetNextWindowSize(ImVec2(renderSizeX, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
 
-        ImGui::SetNextItemWidth(renderSizeX - 40);
-        ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
 
         ImGui::PushFont(font);
         for (int i = 0; i < charCount; i++) {
@@ -843,7 +937,13 @@ void SimulationController::RenderUI(void)
         }
         ImGui::PopFont();
 
+        // ImGui::SetNextItemWidth(renderSizeX - 40);
+        // ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
+
         ImGui::End();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
     }
 }
 

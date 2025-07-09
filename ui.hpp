@@ -26,8 +26,16 @@ public:
     bool changed;
     bool rightSide;
 
+    // ui one
     float flStartPosX;
+    // real one
     Fixed startPosX;
+
+    float frameMeterMouseDragAmount;
+    ImVec2 lastDragDelta;
+    bool momentumActive = false;
+    float curMomentum;
+    int activeDragID = -1;
 
     std::map<int, std::pair<int, int>> timelineTriggers;
 
