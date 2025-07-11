@@ -758,6 +758,18 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
 
             simController.doFrameMeterDrag();
         }
+
+        if (timelineTriggers.find(i) != timelineTriggers.end()) {
+            float startOffset = (kFrameButtonWidth + kHorizSpacing) * i;
+            ImGui::SetCursorPosX(cursorX + startOffset + 5.0);
+            ImGui::SetCursorPosY(cursorY - 2.5);
+
+            ImGui::PushID(i);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 7.5f);
+            ImGui::Button("##timeline_trigger", ImVec2(15.0,15.0));
+            ImGui::PopStyleVar();
+            ImGui::PopID();
+        }
     }
     ImGui::PopStyleColor();
 }
