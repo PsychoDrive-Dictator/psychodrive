@@ -2426,7 +2426,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (hitStopTarget > 0) {
             pOtherGuy->addHitStop(hitStopTarget+1);
 #ifdef __EMSCRIPTEN__
-            emscripten_vibrate(hitStopTarget*2);
+            // only vibrate here in realtime mode
+            if (!pGuy->pSim) {
+                emscripten_vibrate(hitStopTarget*2);            
+            }
 #endif
         }
     }
