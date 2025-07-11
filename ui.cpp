@@ -2,6 +2,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/html5.h>
 #endif
 
 #include "imgui_neo_sequencer.h"
@@ -727,7 +728,7 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
 {
     int frameCount = simController.pSim->stateRecording.size();
 
-    float cursorX = ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth);
+    float cursorX = ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth) + simController.frameMeterMouseDragAmount * simController.kFrameMeterDragRatio;
     float cursorY = ImGui::GetCursorPosY();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
@@ -754,6 +755,8 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
             ImGui::PushID(i);
             ImGui::Button("##input", ImVec2(cancelWidth,10.0));
             ImGui::PopID();
+
+            simController.doFrameMeterDrag();
         }
     }
     ImGui::PopStyleColor();
@@ -774,7 +777,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
 
     if (!rightSide) renderFrameMeterCancelWindows(frameIndex);
 
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth));
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth) + simController.frameMeterMouseDragAmount * simController.kFrameMeterDragRatio);
     float tronglePosY = ImGui::GetCursorPosY();
 
     for (int i = 0; i < frameCount; i++) {
@@ -808,17 +811,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         }
         ImGui::PopStyleColor();
 
-        if (ImGui::IsItemActive()) {
-            simController.momentumActive = false;
-            simController.frameMeterMouseDragAmount += ImGui::GetMouseDragDelta(0, 0.0).x;
-            simController.lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0);
-            simController.activeDragID = ImGui::GetItemID();
-            ImGui::ResetMouseDragDelta();
-        } else if (simController.activeDragID == ImGui::GetItemID()) {
-            simController.activeDragID = 0;
-            simController.momentumActive = true;
-            simController.curMomentum = simController.lastDragDelta.x;
-        }
+        simController.doFrameMeterDrag();
 
         ImGui::PopID();
     }
@@ -927,6 +920,22 @@ bool SimulationController::NewSim(void)
     return true;
 }
 
+void SimulationController::doFrameMeterDrag(void)
+{
+    if (ImGui::IsItemActive()) {
+        momentumActive = false;
+        lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0).x;
+        pendingFrameMeterMouseDragAmount += lastDragDelta;
+
+        activeDragID = ImGui::GetItemID();
+        ImGui::ResetMouseDragDelta();
+    } else if (activeDragID == ImGui::GetItemID()) {
+        activeDragID = 0;
+        momentumActive = true;
+        curMomentum = lastDragDelta;
+    }
+}
+
 void SimulationController::RenderUI(void)
 {
     for (int i = 0; i < charCount; i++) {
@@ -942,17 +951,7 @@ void SimulationController::RenderUI(void)
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
-        if (ImGui::IsItemActive()) {
-            simController.momentumActive = false;
-            simController.frameMeterMouseDragAmount += ImGui::GetMouseDragDelta(0, 0.0).x;
-            simController.lastDragDelta = ImGui::GetMouseDragDelta(0, 0.0);
-            simController.activeDragID = ImGui::GetItemID();
-            ImGui::ResetMouseDragDelta();
-        } else if (simController.activeDragID == ImGui::GetItemID()) {
-            simController.activeDragID = 0;
-            simController.momentumActive = true;
-            simController.curMomentum = simController.lastDragDelta.x;
-        }
+        doFrameMeterDrag();
 
         ImGui::PushFont(font);
         for (int i = 0; i < charCount; i++) {
@@ -968,7 +967,20 @@ void SimulationController::RenderUI(void)
         ImGui::PopStyleVar();
         ImGui::PopStyleVar();
 
-        const float momentumDeceleration = 1.0;
+        frameMeterMouseDragAmount += pendingFrameMeterMouseDragAmount;
+        pendingFrameMeterMouseDragAmount = 0.0f;
+        if (simController.scrubberFrame == 0 && frameMeterMouseDragAmount > 0) {
+            frameMeterMouseDragAmount = 0.0f;
+            momentumActive = false;
+            curMomentum = 0.0f;
+        }
+        if (simController.scrubberFrame == simFrameCount - 1 && frameMeterMouseDragAmount < 0) {
+            frameMeterMouseDragAmount = 0.0f;
+            momentumActive = false;
+            curMomentum = 0.0f;
+        }
+
+        const float momentumDeceleration = 0.25;
         if (momentumActive) {
             frameMeterMouseDragAmount += curMomentum;
             float oldCurMomentum = curMomentum;
@@ -977,30 +989,50 @@ void SimulationController::RenderUI(void)
             } else if (curMomentum < 0.0) {
                 curMomentum += momentumDeceleration;
             }
-            if (oldCurMomentum * curMomentum < 0.0) {
+            if (oldCurMomentum * curMomentum < 0.0 || curMomentum == 0.0) {
                 momentumActive = false;
                 curMomentum = 0.0f;
+                frameMeterMouseDragAmount = 0.0f;
+#ifdef __EMSCRIPTEN__
+                emscripten_vibrate(6);
+#endif
             }
         }
-        const float dragThresholdForMovingOneFrame = (CharacterUIController::kHorizSpacing + CharacterUIController::kFrameButtonWidth) / 2.5f;
-        while (frameMeterMouseDragAmount > dragThresholdForMovingOneFrame) {
+        const float dragThresholdForMovingOneFrame = (CharacterUIController::kHorizSpacing + CharacterUIController::kFrameButtonWidth) / kFrameMeterDragRatio;
+        bool changed = false;
+        while (frameMeterMouseDragAmount + dragThresholdForMovingOneFrame / 2.0 > dragThresholdForMovingOneFrame) {
             simController.scrubberFrame--;
             frameMeterMouseDragAmount -= dragThresholdForMovingOneFrame;
+            changed = true;
         }
         // im not fucking around with modulo of negative numbers you cant fool me
-        while (frameMeterMouseDragAmount < -dragThresholdForMovingOneFrame) {
+        while (frameMeterMouseDragAmount - dragThresholdForMovingOneFrame / 2.0 < -dragThresholdForMovingOneFrame) {
             simController.scrubberFrame++;
             frameMeterMouseDragAmount += dragThresholdForMovingOneFrame;
+            changed = true;
         }
+        bool clamped = false;
         if (simController.scrubberFrame < 0) {
             simController.scrubberFrame = 0;
+            clamped = true;
         }
         if (simController.scrubberFrame >= simFrameCount) {
             simController.scrubberFrame = simFrameCount - 1;
+            clamped = true;
         }
+        if (clamped || (changed && (simController.scrubberFrame == 0 || simController.scrubberFrame == simFrameCount - 1))) {
+            momentumActive = false;
+            curMomentum = 0.0f;
+            frameMeterMouseDragAmount = 0.0f;
+        }
+#ifdef __EMSCRIPTEN__
+        if (clamped) {
+            emscripten_vibrate(6);
+        } else if (changed) {
+            emscripten_vibrate(3);
+        }
+#endif
     }
-
-
 }
 
 void SimulationController::AdvanceUntilComplete(void)

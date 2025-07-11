@@ -51,15 +51,19 @@ public:
     bool NewSim(void);
     void RenderUI(void);
     void AdvanceUntilComplete(void);
+    void doFrameMeterDrag(void);
 
     std::vector<CharacterUIController> charControllers;
+
+    static constexpr float kFrameMeterDragRatio = 2.5;
 
     Simulation *pSim = nullptr;
     int scrubberFrame = 0;
     int charCount = 1;
 
+    float pendingFrameMeterMouseDragAmount;
     float frameMeterMouseDragAmount;
-    ImVec2 lastDragDelta;
+    float lastDragDelta;
     bool momentumActive = false;
     float curMomentum;
     ImGuiID activeDragID = 0;

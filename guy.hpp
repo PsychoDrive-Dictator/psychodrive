@@ -645,7 +645,6 @@ private:
 
     std::set<std::pair<int,int>> frameTriggers;
     std::pair<int, int> forcedTrigger;
-    int frameMeterColorIndex;
 
     bool isDrive = false;
     bool wasDrive = false;
