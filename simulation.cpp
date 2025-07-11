@@ -252,7 +252,16 @@ void Simulation::AdvanceFrame(void)
             }
         }
     }
-
+    if (recordingState) {
+        stateRecording.emplace_back();
+        RecordedFrame &frame = stateRecording[stateRecording.size()-1];
+        for (auto guy : everyone) {
+            Guy *pGuy = new Guy;
+            *pGuy = *guy;
+            // this is the canonical state of the guy for this frame, record boxes/state/etc here
+            frame.guys[guy->getUniqueID()] = pGuy;
+        }
+    }
     for (auto guy : everyone) {
         bool die = !guy->Frame();
 
@@ -262,14 +271,13 @@ void Simulation::AdvanceFrame(void)
             vecGuysToDelete.push_back(guy);
         }
     }
-
     if (recordingState) {
-        stateRecording.emplace_back();
         RecordedFrame &frame = stateRecording[stateRecording.size()-1];
         for (auto guy : everyone) {
             Guy *pGuy = new Guy;
             *pGuy = *guy;
-            frame.guys[guy->getUniqueID()] = pGuy;
+            // update frame triggers after NextFrame() though
+            frame.guys[guy->getUniqueID()]->getFrameTriggers() = pGuy->getFrameTriggers();
         }
         frame.events = currentFrameEvents;
         currentFrameEvents.clear();

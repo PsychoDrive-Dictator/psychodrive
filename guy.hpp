@@ -315,7 +315,7 @@ public:
 
     std::vector<const char *> &getMoveList() { return vecMoveList; }
     std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
-    int getFrameMeterColorIndex() { return frameMeterColorIndex; }
+    int getFrameMeterColorIndex();
     std::map<std::pair<int, int>, std::pair<std::string, bool>> &getMapMoveStyle() { return mapMoveStyle; }
     std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
@@ -327,7 +327,6 @@ private:
     void UpdateActionData(void);
     void UpdateBoxes(void);
 
-    void SaveFrameMeterColorIndex();
     void ApplyHitEffect(nlohmann::json *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
 
     void ExecuteTrigger(nlohmann::json *pTrigger);

@@ -1658,7 +1658,7 @@ void Guy::Render(void) {
     }
 }
 
-void Guy::SaveFrameMeterColorIndex() {
+int Guy::getFrameMeterColorIndex() {
     int ret = 0;
     bool a,b,c;
     if (canMove(a,b,c)) {
@@ -1679,7 +1679,7 @@ void Guy::SaveFrameMeterColorIndex() {
     if (hitStop) {
         ret = 6;
     }
-    frameMeterColorIndex = ret;
+    return ret;
 }
 
 bool Guy::Push(Guy *pOtherGuy)
@@ -1905,7 +1905,6 @@ bool Guy::WorldPhysics(void)
         if (getPosY() - Fixed(landingAdjust) < 1) {
             //log("floorpush pos");
             floorpush = true;
-            hasPushed = true;
         }
 
         // Walls
@@ -1966,6 +1965,8 @@ bool Guy::WorldPhysics(void)
 
             // so we avoid the non-empty landing code below
             jumped = false;
+
+            UpdateBoxes();
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
@@ -3289,9 +3290,6 @@ void Guy::DoBranchKey(bool preHit)
 
 bool Guy::Frame(bool endHitStopFrame)
 {
-    // before we do destructive stuff as we move to next frame
-    SaveFrameMeterColorIndex();
-
     // if this is the frame that was stolen from beginning hitstop when it ends, don't
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add
