@@ -613,13 +613,13 @@ static void mainloop(void)
         int frameGuyCount = 0;
         if (runFrame) {
             for (auto guy : everyone) {
-                if (guy->PreFrame()) {
+                if (guy->RunFrame()) {
                     frameGuyCount++;
                 }
             }
         }
 
-        // gather everyone again in case of deletions/additions in PreFrame
+        // gather everyone again in case of deletions/additions in RunFrame
         gatherEveryone(guys, everyone);
 
         if (!replayingGameState && frameGuyCount == 0) {
@@ -639,10 +639,10 @@ static void mainloop(void)
             }
 
             for (auto guy : everyone) {
-                guy->PreFramePostPush();
+                guy->RunFramePostPush();
             }
 
-            // gather everyone again in case of deletions/additions in PreFrame
+            // gather everyone again in case of deletions/additions in RunFramePostPush
             gatherEveryone(guys, everyone);
 
             std::vector<PendingHit> pendingHitList;
@@ -784,7 +784,7 @@ static void mainloop(void)
 
         if (runFrame) {
             for (auto guy : everyone) {
-                bool die = !guy->Frame();
+                bool die = !guy->AdvanceFrame();
 
                 if (die) {
                     vecGuysToDelete.push_back(guy);

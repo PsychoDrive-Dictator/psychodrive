@@ -25,13 +25,13 @@ public:
     void setSim(Simulation *sim) { pSim = sim; uniqueID = pSim->guyIDCounter++; }
 
     void Input(int input);
-    bool PreFrame(void);
+    bool RunFrame(void);
     void Render(void);
     bool Push(Guy *pOtherGuy);
-    void PreFramePostPush(void);
+    void RunFramePostPush(void);
     bool WorldPhysics(void);
     void CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList);
-    bool Frame(bool endHitStopFrame = false);
+    bool AdvanceFrame(bool endHitStopFrame = false);
     std::string getActionName(int actionID);
 
     void addHitStop(int w) {

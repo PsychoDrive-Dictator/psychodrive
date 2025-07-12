@@ -150,10 +150,10 @@ void Simulation::AdvanceFrame(void)
     gatherEveryone(simGuys, everyone);
 
     for (auto guy : everyone) {
-        guy->PreFrame();
+        guy->RunFrame();
     }
 
-    // gather everyone again in case of deletions/additions in PreFrame
+    // gather everyone again in case of deletions/additions in RunFrame
     gatherEveryone(simGuys, everyone);
 
     for (auto guy : everyone) {
@@ -163,10 +163,10 @@ void Simulation::AdvanceFrame(void)
         guy->Push(guy->getOpponent());
     }
     for (auto guy : everyone) {
-        guy->PreFramePostPush();
+        guy->RunFramePostPush();
     }
 
-    // gather everyone again in case of deletions/additions in PreFrame
+    // gather everyone again in case of deletions/additions in RunFramePostPush
     gatherEveryone(simGuys, everyone);
 
     std::vector<PendingHit> pendingHitList;
@@ -264,7 +264,7 @@ void Simulation::AdvanceFrame(void)
         }
     }
     for (auto guy : everyone) {
-        bool die = !guy->Frame();
+        bool die = !guy->AdvanceFrame();
 
         if (die) {
             // don't delete guys before other guys might be done with them this frame
@@ -275,7 +275,7 @@ void Simulation::AdvanceFrame(void)
     if (recordingState) {
         RecordedFrame &frame = stateRecording[stateRecording.size()-1];
         for (auto guy : everyone) {
-            // update frame triggers after NextFrame() though
+            // update frame triggers after AdvanceFrame() though
             frame.guys[guy->getUniqueID()]->getFrameTriggers() = guy->getFrameTriggers();
         }
         frame.events = currentFrameEvents;

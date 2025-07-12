@@ -286,7 +286,7 @@ void Guy::UpdateActionData(void)
     hasLooped = false;
 }
 
-bool Guy::PreFrame(void)
+bool Guy::RunFrame(void)
 {
     if (!warudo) {
         if (debuffTimer > 0 ) {
@@ -301,7 +301,7 @@ bool Guy::PreFrame(void)
 
     if (!warudo && tokiWaUgokidasu) {
         tokiWaUgokidasu = false;
-        if (!Frame(true)) {
+        if (!AdvanceFrame(true)) {
             delete this;
             return false;
         }
@@ -316,7 +316,7 @@ bool Guy::PreFrame(void)
         hitStop--;
         if (hitStop == 0) {
             // increment the frame we skipped at the beginning of hitstop
-            if (!Frame(true)) {
+            if (!AdvanceFrame(true)) {
                 delete this;
                 return false;
             }
@@ -838,13 +838,13 @@ bool Guy::PreFrame(void)
                         pOpponent->posX = posX;
                         pOpponent->posY = posY;
                         // for transition
-                        pOpponent->Frame();
+                        pOpponent->AdvanceFrame();
                         // for placekey/etc
-                        pOpponent->PreFrame();
+                        pOpponent->RunFrame();
                         pOpponent->locked = true;
                     }
                 } else if (type == 2) {
-                    // apply hit DT param 02 after preframe, since we dont know if other guy preframe
+                    // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame
                     // has run or not yet and it introduces ordering issues
                     if (pendingLockHit != -1) {
                         log(true, "weird!");
@@ -861,7 +861,7 @@ bool Guy::PreFrame(void)
     return true;
 }
 
-void Guy::PreFramePostPush(void)
+void Guy::RunFramePostPush(void)
 {
     if (warudo || hitStop) {
         return;
@@ -2024,7 +2024,7 @@ bool Guy::WorldPhysics(void)
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand) {
             log(logTransitions, "hack extra landing frame");
-            Frame(); // todo this probably screws up thingslike bomb countdown, test
+            AdvanceFrame(); // todo this probably screws up thingslike bomb countdown, test
         }
     }
 
@@ -2407,9 +2407,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->DoBranchKey();
             if (pGuy->nextAction != -1) {
                 // For Transition
-                pGuy->Frame();
+                pGuy->AdvanceFrame();
                 // For LockKey
-                pGuy->PreFrame();
+                pGuy->RunFrame();
             } else {
                 pGuy->log(true, "instagrab branch not found!");
             }
@@ -2619,8 +2619,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 if (dmgType == 21) {
                     // those aren't actually used but they're set in game so it quiets some warnings
                     // there's a race condition with getting them right, because the hit is applied
-                    // from preframe -> lockkey, and the velocity will be off by one frame depending
-                    // on who's preframe runs first
+                    // from RunFrame -> lockkey, and the velocity will be off by one frame depending
+                    // on who's RunFrame runs first
                     hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
                     hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
                     if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
@@ -2770,7 +2770,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
         if (nextAction != -1) {
             hitStun++;
-            Frame();
+            AdvanceFrame();
         }
     }
 
@@ -3291,7 +3291,7 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
-bool Guy::Frame(bool endHitStopFrame)
+bool Guy::AdvanceFrame(bool endHitStopFrame)
 {
     // if this is the frame that was stolen from beginning hitstop when it ends, don't
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
@@ -3313,11 +3313,11 @@ bool Guy::Frame(bool endHitStopFrame)
         if (tokiWaUgokidasu) {
             // time has begun to move again
             warudo = false;
-            // leave tokiWaUgokidasu set for PreFrame to know this happened
+            // leave tokiWaUgokidasu set for RunFrame to know this happened
         }
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers
-        // we'll re-run it in PreFrame
+        // we'll re-run it in RunFrame
         return true;
     }
 
@@ -3380,7 +3380,7 @@ bool Guy::Frame(bool endHitStopFrame)
         if (jumped && nextAction != 39 && nextAction != 40 && nextAction != 41) {
             // non-empty jump landing
             log(logTriggers, "disabling actions due to non-empty landing");
-            jumpLandingDisabledFrames = 3 + 1; // 3, but we decrement in preframe
+            jumpLandingDisabledFrames = 3 + 1; // 3, but we decrement in RunFrame
         }
 
         jumped = false;
@@ -4097,7 +4097,7 @@ void Guy::DoShotKey(nlohmann::json *pAction, int frameID)
 
                 // spawn new guy
                 Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
-                pNewGuy->PreFrame();
+                pNewGuy->RunFrame();
                 if (pParent) {
                     pParent->minions.push_back(pNewGuy);
                 } else {
