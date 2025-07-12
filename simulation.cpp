@@ -6,12 +6,12 @@
 Simulation::~Simulation() {
     gatherEveryone(simGuys, everyone);
     for (auto guy: everyone) {
+        // don't try to massage the guys list or opponent pointers, we're deleting everything
         guy->enableCleanup = false;
         delete guy;
     }
     for (auto &frame: stateRecording) {
         for (auto [id, guy]: frame.guys) {
-            guy->enableCleanup = false;
             delete guy;
         }
     }
@@ -258,6 +258,7 @@ void Simulation::AdvanceFrame(void)
         for (auto guy : everyone) {
             Guy *pGuy = new Guy;
             *pGuy = *guy;
+            pGuy->facSimile = true;
             // this is the canonical state of the guy for this frame, record boxes/state/etc here
             frame.guys[guy->getUniqueID()] = pGuy;
         }
@@ -274,10 +275,8 @@ void Simulation::AdvanceFrame(void)
     if (recordingState) {
         RecordedFrame &frame = stateRecording[stateRecording.size()-1];
         for (auto guy : everyone) {
-            Guy *pGuy = new Guy;
-            *pGuy = *guy;
             // update frame triggers after NextFrame() though
-            frame.guys[guy->getUniqueID()]->getFrameTriggers() = pGuy->getFrameTriggers();
+            frame.guys[guy->getUniqueID()]->getFrameTriggers() = guy->getFrameTriggers();
         }
         frame.events = currentFrameEvents;
         currentFrameEvents.clear();

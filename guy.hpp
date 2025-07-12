@@ -174,9 +174,19 @@ public:
     }
 
     bool enableCleanup = true;
+    bool facSimile = false;
 
     ~Guy() {
-        // todo stop leaking strdup from BuildMoveList
+        if (facSimile) {
+            // movelist is just pointers to the original in this case, we don't have
+            // any manually allocated memory, just stl container members
+            return;
+        }
+        for (auto moveString : vecMoveList) {
+            free((void*)moveString);
+        }
+        vecMoveList.clear();
+
         if (!enableCleanup) {
             return;
         }
