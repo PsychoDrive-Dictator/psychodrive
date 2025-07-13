@@ -3004,7 +3004,7 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 13:
-                    if (!airborne) { // it's technically landed, but like heavy buttslam checks one frame
+                    if (!airborne && !preHit) { // it's technically landed, but like heavy buttslam checks one frame
                         doBranch = true;
                     }
                     break;
