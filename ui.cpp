@@ -704,6 +704,21 @@ void CharacterUIController::RenderUI(void)
             }
         }
     }
+    if (ImGui::Button("Jump to next cancel window")) {
+        int searchFrame = simController.scrubberFrame;
+        bool foundNoWindow = false;
+        while (searchFrame < simController.simFrameCount) {
+            Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
+            if (pFrameGuy && !foundNoWindow && !pFrameGuy->getFrameTriggers().size()) {
+                foundNoWindow = true;
+            }
+            if (foundNoWindow && pFrameGuy->getFrameTriggers().size()) {
+                simController.scrubberFrame = searchFrame;
+                break;
+            }
+            searchFrame++;
+        }
+    }
     ImGui::End();
 
 
