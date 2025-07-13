@@ -673,7 +673,15 @@ void CharacterUIController::RenderUI(void)
 
     Guy *pGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
 
-    if (pGuy && pGuy->getFrameTriggers().size()) {
+    if (timelineTriggers.find(simController.scrubberFrame) != timelineTriggers.end()) {
+        auto &trigger = timelineTriggers[simController.scrubberFrame];
+        std::string strLabel = "Delete " + std::string(pGuy->FindMove(trigger.first, trigger.second));
+        if (ImGui::Button(strLabel.c_str())) {
+            timelineTriggers.erase(timelineTriggers.find(simController.scrubberFrame));
+            simInputsChanged = true;
+            changed = true;
+        }
+    } else if (pGuy && pGuy->getFrameTriggers().size()) {
         vecTriggerDropDownLabels.clear();
         vecTriggers.clear();
         vecTriggerDropDownLabels.push_back("Available Triggers");
@@ -732,6 +740,7 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
     float cursorY = ImGui::GetCursorPosY();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+    ImGui::BeginDisabled();
     for (int i = 0; i < frameCount; i++) {
         Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
         Guy *pGuyPrevFrame = simController.pSim->getRecordedGuy(i-1, getSimCharSlot());
@@ -771,6 +780,7 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
             ImGui::PopID();
         }
     }
+    ImGui::EndDisabled();
     ImGui::PopStyleColor();
 }
 
