@@ -1145,6 +1145,58 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_h_tatsu_knockdown",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 729,
+                "firstFrame": 127,
+                "lastFrame": 456
+            },
+            {
+                "count": 226,
+                "firstFrame": 68,
+                "lastFrame": 170
+            },
+            {
+                "count": 105,
+                "firstFrame": 126,
+                "lastFrame": 170
+            },
+            {
+                "count": 95,
+                "firstFrame": 68,
+                "lastFrame": 168
+            },
+            {
+                "count": 95,
+                "firstFrame": 68,
+                "lastFrame": 168
+            },
+            {
+                "count": 111,
+                "firstFrame": 80,
+                "lastFrame": 246
+            },
+            {
+                "count": 697,
+                "firstFrame": 80,
+                "lastFrame": 456
+            },
+            {
+                "count": 54,
+                "firstFrame": 126,
+                "lastFrame": 179
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "cammy_air_throw",
         "testVersion": "26",
         "finished": true,
