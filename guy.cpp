@@ -2551,9 +2551,11 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     comboDamage += dmgValue;
 
-    if (!blocking && applyHit) {
-        beenHitThisFrame = true;
-        comboHits += comboAdd;
+    if (applyHit) {
+        if (!blocking) {
+            beenHitThisFrame = true;
+            comboHits += comboAdd;
+        }
         wasHit = true;
     }
 
