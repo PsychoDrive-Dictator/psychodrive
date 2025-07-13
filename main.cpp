@@ -538,11 +538,8 @@ static void mainloop(void)
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
         if (simInputsChanged && simController.NewSim()) {
             simController.AdvanceUntilComplete();
-
-            if (simController.scrubberFrame >= simController.simFrameCount) {
-                simController.scrubberFrame = simController.simFrameCount - 1;
-                curFrame = simController.scrubberFrame;
-            }
+            // in case it got clamped
+            curFrame = simController.scrubberFrame;
 
             simInputsChanged = false;
         }

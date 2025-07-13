@@ -700,6 +700,7 @@ void CharacterUIController::RenderUI(void)
                 simInputsChanged = true;
                 changed = true;
                 pendingTriggerAdd = 0;
+                triggerAdded = true;
             }
         }
     }
@@ -826,7 +827,9 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
             sameColorCount++;
         }
         //ImGui::BeginDisabled();
-        ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight));
+        if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
+            simController.scrubberFrame = i;
+        }
        // ImGui::EndDisabled();
         if (darkText) {
             ImGui::PopStyleColor();
@@ -1114,4 +1117,28 @@ void SimulationController::AdvanceUntilComplete(void)
     }
 
     simFrameCount = pSim->stateRecording.size();
+
+    int controllerSearchForNextTrigger = -1;
+
+    for (int i = 0; i < charCount; i++) {
+        if (charControllers[i].triggerAdded) {
+            controllerSearchForNextTrigger = i;
+            break;
+        }
+    }
+
+    if (scrubberFrame >= simFrameCount) {
+        scrubberFrame = simFrameCount - 1;
+    } else if (controllerSearchForNextTrigger != -1) {
+        int searchFrame = scrubberFrame + 2; // skip kara cancel :/
+        while (searchFrame < simFrameCount) {
+            Guy *pGuy = pSim->getRecordedGuy(searchFrame, charControllers[controllerSearchForNextTrigger].getSimCharSlot());
+            if (pGuy->getFrameTriggers().size()) {
+                scrubberFrame = searchFrame;
+                break;
+            }
+            searchFrame++;
+        }
+        charControllers[controllerSearchForNextTrigger].triggerAdded = false;
+    }
 }

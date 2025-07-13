@@ -41,6 +41,7 @@ public:
 
     std::vector<std::string> vecTriggerDropDownLabels;
     std::vector<std::pair<int, int>> vecTriggers;
+    bool triggerAdded = false;
     int pendingTriggerAdd;
 };
 
