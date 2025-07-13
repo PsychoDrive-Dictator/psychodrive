@@ -539,8 +539,8 @@ static void mainloop(void)
         if (simInputsChanged && simController.NewSim()) {
             simController.AdvanceUntilComplete();
 
-            if (simController.scrubberFrame >= (int)simController.pSim->stateRecording.size()) {
-                simController.scrubberFrame = simController.pSim->stateRecording.size() - 1;
+            if (simController.scrubberFrame >= simController.simFrameCount) {
+                simController.scrubberFrame = simController.simFrameCount - 1;
                 curFrame = simController.scrubberFrame;
             }
 
@@ -550,6 +550,14 @@ static void mainloop(void)
         if (!simInputsChanged) {
             simController.pSim->renderRecordedGuys(curFrame);
             simController.pSim->renderRecordedHitMarkers(curFrame);
+
+            if (simController.playing) {
+                simController.scrubberFrame++;
+                if (simController.scrubberFrame >= (int)simController.pSim->stateRecording.size()) {
+                    simController.scrubberFrame = simController.pSim->stateRecording.size() - 1;
+                    simController.playing = false;
+                }
+            }
 
             // for next frame
             Guy *pLeftGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, 0);

@@ -974,6 +974,17 @@ void SimulationController::RenderUI(void)
         // ImGui::SetNextItemWidth(renderSizeX - 40);
         // ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
 
+        if (ImGui::Button("Rewind")) {
+            scrubberFrame = 0;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Play")) {
+            if (simController.scrubberFrame >= simController.simFrameCount - 1) {
+                simController.scrubberFrame = 0;
+            }
+            playing = !playing;
+        }
+
         ImGui::End();
         ImGui::PopStyleColor();
         ImGui::PopStyleVar();
@@ -1091,4 +1102,6 @@ void SimulationController::AdvanceUntilComplete(void)
             break;
         }
     }
+
+    simFrameCount = pSim->stateRecording.size();
 }

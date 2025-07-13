@@ -59,7 +59,10 @@ public:
 
     Simulation *pSim = nullptr;
     int scrubberFrame = 0;
+    int simFrameCount = 0;
     int charCount = 1;
+
+    bool playing = false;
 
     float pendingFrameMeterMouseDragAmount;
     float frameMeterMouseDragAmount;
