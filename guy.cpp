@@ -2895,6 +2895,9 @@ void Guy::DoHitBoxKey(const char *name)
                     if (hasHitID == false) {
                         hitID = -1;
                     }
+                    if (hitID == 15) {
+                        hitID = 15 + atoi(hitBoxID.c_str());
+                    }
                     if (hitEntryID != -1) {
                         hitBoxes.push_back({rect,type,hitEntryID,hitID});
                     }

@@ -572,7 +572,7 @@ private:
     std::deque<int> directionBuffer;
 
     // hitting side
-    int canHitID = 0;
+    uint64_t canHitID = 0;
     bool hitThisFrame = false;
     bool hasBeenBlockedThisFrame = false;
     bool hitArmorThisFrame = false;
