@@ -89,6 +89,7 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
             actionFrame = 0;
         }
         simGuys[playerID]->setAction(actionID, actionFrame - 1);
+        simGuys[playerID]->setHealth(playerJson["hp"]);
         playerID++;
     }
 
@@ -210,6 +211,8 @@ void Simulation::RunFrame(void) {
                 CompareGameStateInt(players[i]["comboCount"], simGuys[!i]->getComboHits(), i, targetDumpFrame, eComboCount, desc + " combo");
 
                 CompareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, simGuys[i]->getDirection(), i, targetDumpFrame, eDirection, desc + " direction");
+
+                CompareGameStateInt(players[i]["hp"], simGuys[i]->getHealth(), i, targetDumpFrame, eHealth, desc + " health");
 
                 i++;
             }

@@ -137,6 +137,7 @@ public:
     int getLandingAdjust() { return landingAdjust; }
 
     int getHealth() { return health; }
+    void setHealth(int newHealth) { health = newHealth; }
 
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }

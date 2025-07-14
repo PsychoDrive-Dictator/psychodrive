@@ -745,6 +745,8 @@ static void mainloop(void)
 
                         compareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, guys[i]->getDirection(), Simulation::eDirection, desc + " direction");
 
+                        compareGameStateInt(players[i]["hp"], guys[i]->getHealth(), Simulation::eHealth, desc + " health");
+
                         i++;
                     }
 
@@ -1001,6 +1003,8 @@ int main(int argc, char**argv)
                 actionFrame = 0;
             }
             guys[playerID]->setAction(actionID, actionFrame - 1);
+            guys[playerID]->setHealth(playerJson["hp"]);
+
             playerID++;
         }
 
