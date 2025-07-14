@@ -286,6 +286,63 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_comboscaling",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 85,
+                "firstFrame": 154,
+                "lastFrame": 238
+            },
+            {
+                "count": 133,
+                "firstFrame": 85,
+                "lastFrame": 285
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 154,
+                "firstFrame": 132,
+                "lastFrame": 285
+            }
+        ]
+    },
+    {
         "testName": "aa_crossup_protection",
         "testVersion": "31",
         "finished": true,
@@ -1080,6 +1137,63 @@ var currentResults =
                 "count": 752,
                 "firstFrame": 1877,
                 "lastFrame": 2628
+            }
+        ]
+    },
+    {
+        "testName": "aa_startscaling",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 14,
+                "firstFrame": 139,
+                "lastFrame": 152
+            },
+            {
+                "count": 122,
+                "firstFrame": 138,
+                "lastFrame": 259
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 162,
+                "firstFrame": 98,
+                "lastFrame": 259
             }
         ]
     },
