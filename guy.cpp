@@ -686,87 +686,8 @@ bool Guy::RunFrame(void)
         throwTechable = false;
         ignoreBodyPush = false;
 
-        if (pActionJson->contains("SwitchKey"))
-        {
-            for (auto& [keyID, key] : (*pActionJson)["SwitchKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int flag = key["SystemFlag"];
-
-                if (flag & 0x8000000) {
-                    isDrive = true;
-                }
-                if (flag & 0x800000) {
-                    punishCounterState = true;
-                }
-                if (flag & 0x400000) {
-                    forceKnockDownState = true;
-                }
-                if (flag & 0x80000) {
-                    ignoreBodyPush = true;
-                }
-                if (flag & 0x2) {
-                    counterState = true;
-                }
-                if (flag & 0x1) {
-                    throwTechable = true;
-                }
-
-                int operation = key["OperationFlag"];
-
-                if (operation & 1) {
-                    log (logTransitions, "force landing op");
-                    forceLanding = true;
-                }
-            }
-        }
-
-        // todo factor into function that shares code with SwitchKEy..
-        if (pActionJson->contains("ExtSwitchKey"))
-        {
-            for (auto& [keyID, key] : (*pActionJson)["ExtSwitchKey"].items())
-            {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int validStyles = key["_ValidStyle"];
-                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                    continue;
-                }
-
-                int flag = key["SystemFlag"];
-
-                if (flag & 0x8000000) {
-                    isDrive = true;
-                }
-                if (flag & 0x800000) {
-                    punishCounterState = true;
-                }
-                if (flag & 0x400000) {
-                    forceKnockDownState = true;
-                }
-                if (flag & 0x80000) {
-                    ignoreBodyPush = true;
-                }
-                if (flag & 0x2) {
-                    counterState = true;
-                }
-                if (flag & 0x1) {
-                    throwTechable = true;
-                }
-
-                int operation = key["OperationFlag"];
-
-                if (operation & 1) {
-                    log (logTransitions, "force landing op");
-                    forceLanding = true;
-                }
-            }
-        }
+        DoSwitchKey("SwitchKey");
+        DoSwitchKey("ExtSwitchKey");
 
         DoEventKey(pActionJson, currentFrame);
 
@@ -3911,6 +3832,53 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     forcedTrigger = std::make_pair(0,0);
 
     return true;
+}
+
+void Guy::DoSwitchKey(const char *name)
+{
+    if (pActionJson->contains(name))
+    {
+        for (auto& [keyID, key] : (*pActionJson)[name].items())
+        {
+            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                continue;
+            }
+
+            // only in ExtSwitchKey
+            int validStyles = key.value("_ValidStyle", 0);
+            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+                continue;
+            }
+
+            int flag = key["SystemFlag"];
+
+            if (flag & 0x8000000) {
+                isDrive = true;
+            }
+            if (flag & 0x800000) {
+                punishCounterState = true;
+            }
+            if (flag & 0x400000) {
+                forceKnockDownState = true;
+            }
+            if (flag & 0x80000) {
+                ignoreBodyPush = true;
+            }
+            if (flag & 0x2) {
+                counterState = true;
+            }
+            if (flag & 0x1) {
+                throwTechable = true;
+            }
+
+            int operation = key["OperationFlag"];
+
+            if (operation & 1) {
+                log (logTransitions, "force landing op");
+                forceLanding = true;
+            }
+        }
+    }
 }
 
 void Guy::DoStatusKey(void)

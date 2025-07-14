@@ -356,6 +356,7 @@ private:
     void DoHitBoxKey(const char *name);
     void DoStatusKey();
 
+    void DoSwitchKey(const char *name);
     void DoEventKey(nlohmann::json *pAction, int frameID);
     void DoShotKey(nlohmann::json *pAction, int frameID);
 
