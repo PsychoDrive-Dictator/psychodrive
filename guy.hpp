@@ -561,6 +561,9 @@ private:
     int marginFrame = 0;
     int loopCount = 0;
     int loopPoint = 0;
+    int startScale = 0;
+    int comboScale = 0;
+    int instantScale = 0;
     bool nextActionOpponentAction = false;
     bool opponentAction = false;
     bool locked = false;
@@ -612,6 +615,9 @@ private:
     Fixed reflectThisFrame;
     bool noCounterPush = false;
     bool beenHitThisFrame = false;
+    // 2.0 was here
+    int currentScaling = 0;
+    int pendingScaling = 0;
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;

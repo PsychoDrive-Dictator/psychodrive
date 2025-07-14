@@ -284,6 +284,21 @@ void Guy::UpdateActionData(void)
     }
     loopCount = (*pFab)["State"]["LoopCount"];
     hasLooped = false;
+    startScale = (*pFab)["Combo"]["_StartScaling"];
+    if (startScale == -1) {
+        startScale = 0;
+    }
+    comboScale = (*pFab)["Combo"]["ComboScaling"];
+    if (comboScale == -1) {
+        comboScale = 10;
+    }
+    instantScale = (*pFab)["Combo"]["InstScaling"];
+    if (instantScale == -1) {
+        instantScale = 0;
+    }
+    if (pOpponent && !pOpponent->comboHits) {
+        instantScale = 0;
+    }
 }
 
 bool Guy::RunFrame(void)
@@ -875,6 +890,7 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
     nextAction = (*pTrigger)["action_id"];
     // apply condition flags BCM.TRIGGER.TAG.NEW_ID.json to make jamie jump cancel divekick work
     uint64_t flags = (*pTrigger)["category_flags"];
+    int inst = (*pTrigger)["combo_inst"];
 
     if (flags & (1ULL<<26)) {
         jumped = true;
@@ -888,6 +904,13 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
         }
 
         log(logTransitions, "forced jump status from trigger, direction " + std::to_string(jumpDirection));
+    }
+
+    if (inst) {
+        instantScale = inst;
+        if (pOpponent && !pOpponent->comboHits) {
+            instantScale = 0;
+        }
     }
 }
 
@@ -2547,9 +2570,27 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         knockDownFrames = downTime;
     }
 
-    health -= dmgValue; // todo scaling here
+    if (comboHits == 0) {
+        currentScaling = 100;
+    }
 
-    comboDamage += dmgValue;
+    if (applyHit && !blocking) {
+        if (comboHits == 0) {
+            pendingScaling = pAttacker->startScale;
+        } else {
+            pendingScaling = pAttacker->comboScale;
+            if (currentScaling == 100) {
+                pendingScaling += 10;
+            }
+        }
+    }
+
+    log(logHits, "effective scaling " + std::to_string(currentScaling - pAttacker->instantScale));
+    float currentScalingFactor = (currentScaling - pAttacker->instantScale) * 0.01f;
+
+    health -= dmgValue * currentScalingFactor;
+
+    comboDamage += dmgValue * currentScalingFactor;
 
     if (applyHit) {
         if (!blocking) {
@@ -3645,6 +3686,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
         comboDamage = 0;
         comboHits = 0;
+        currentScaling = 0;
         resetComboCount = false;
     }
 
@@ -3668,10 +3710,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (didTrigger) {
-        // todo scaling stuff here?
-    }
-
     bool didTransition = false;
 
     if (!didTrigger && canMoveNow && nextAction == -1) {
@@ -3685,6 +3723,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     if (nextAction == -1 && moveTurnaround) {
         nextAction = crouching ? 8 : 7;
     }
+
+    bool hadHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
 
     // Transition
     if ( nextAction != -1 )
@@ -3835,6 +3875,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         DoBranchKey(true);
     } else if (didTransition && canMoveNow && nextAction == -1) {
         DoTriggers();
+        if (nextAction != -1) {
+            didTrigger = true;
+        }
     }
 
     // if successful, eat this frame away and go right now
@@ -3845,6 +3888,14 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         UpdateActionData();
         log (logTransitions, "nvm! current action " + std::to_string(currentAction));
         nextAction = -1;
+    }
+
+    if (didTrigger && hadHitThisMove) {
+        if (pOpponent && pOpponent->pendingScaling) {
+            log(true, "pending scaling applied " + std::to_string(pOpponent->pendingScaling));
+            pOpponent->currentScaling -= pOpponent->pendingScaling;
+            pOpponent->pendingScaling = 0;
+        }
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now
