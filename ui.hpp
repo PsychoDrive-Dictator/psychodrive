@@ -75,6 +75,11 @@ public:
     int simFrameCount = 0;
     int charCount = 1;
 
+    int viewSelect = 0;
+
+    int maxComboCount = 0;
+    int maxComboDamage = 0;
+
     bool playing = false;
 
     float pendingFrameMeterMouseDragAmount;
