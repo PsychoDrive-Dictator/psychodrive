@@ -719,6 +719,127 @@ void CharacterUIController::RenderUI(void)
             searchFrame++;
         }
     }
+
+    static const int dirIDToInput[] = {
+        5, 1, 9,
+        4, 0, 8,
+        6, 2, 10
+    };
+    static const int buttonIDToInput[] = {
+        16, 32, 64,
+        128, 256, 512,
+    };
+    int regionID = 0;
+    int pendingDragID = 0;
+    for (auto &region: inputRegions) {
+
+        // do this before continuing to have consistent enough IDs
+        regionID++;
+
+        if (activeInputDragID != regionID &&
+            (simController.scrubberFrame < region.frame || simController.scrubberFrame >= region.frame + region.duration)) {
+            continue;
+        }
+
+        float cursorX = ImGui::GetCursorPosX();
+        float cursorY = ImGui::GetCursorPosY();
+
+        ImGui::PushID(regionID);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0,0.0));
+        // direction
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (j != 0) {
+                    ImGui::SameLine();
+                }
+                int id = i * 3 + j;
+                bool highlighted = dirIDToInput[id] == (region.input & 0xf);
+                ImGui::PushID(id);
+                if (highlighted) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+                }
+                if (ImGui::Button("##", ImVec2(20.0,20.0))) {
+                    region.input &= ~0xf;
+                    region.input |= dirIDToInput[id];
+                    simInputsChanged = true;
+                    changed = true;
+                }
+                if (highlighted) {
+                    ImGui::PopStyleColor();
+                }
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopStyleVar();
+        // botans
+
+        ImGui::SetCursorPosY(cursorY + 2.5);
+
+        for (int i = 0; i < 2; i++) {
+            ImGui::SetCursorPosX(cursorX + 70.0);
+            for (int j = 0; j < 3; j++) {
+                if (j != 0) {
+                    ImGui::SameLine();
+                }
+                int id = i * 3 + j;
+                bool highlighted = buttonIDToInput[id] & region.input;
+                ImGui::PushID(10+id);
+                if (highlighted) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+                }
+                if (ImGui::Button("##", ImVec2(25.0,25.0))) {
+                    region.input = region.input ^ buttonIDToInput[id];
+                    simInputsChanged = true;
+                    changed = true;
+                }
+                if (highlighted) {
+                    ImGui::PopStyleColor();
+                }
+                ImGui::PopID();
+            }
+        }
+
+        ImGui::SetCursorPosY(cursorY);
+
+        ImGui::SetCursorPosX(cursorX + 170.0);
+        ImGui::Text("Start frame:");
+
+        ImGui::SameLine();
+        std::string startFrameLabel = std::to_string(region.frame) + "###startframe";
+        ImGui::Button(startFrameLabel.c_str());
+
+        if (ImGui::IsItemActive()) {
+            region.frame += (int)ImGui::GetMouseDragDelta(0, 0.0).x;
+            simController.clampFrame(region.frame);
+            ImGui::ResetMouseDragDelta();
+            pendingDragID = regionID;
+            simInputsChanged = true;
+            changed = true;
+        }
+
+        ImGui::SetCursorPosX(cursorX + 170.0);
+        ImGui::Text("Frame count:");
+
+        ImGui::SameLine();
+        std::string frameCountLabel = std::to_string(region.duration) + "###framecount";
+        ImGui::Button(frameCountLabel.c_str());
+
+        if (ImGui::IsItemActive()) {
+            region.duration += (int)ImGui::GetMouseDragDelta(0, 0.0).x;
+            simController.clampFrame(region.duration);
+            ImGui::ResetMouseDragDelta();
+            pendingDragID = regionID;
+            simInputsChanged = true;
+            changed = true;
+        }
+
+        ImGui::PopID();
+    }
+
+    activeInputDragID = pendingDragID;
+    if (ImGui::Button("Add input")) {
+        inputRegions.push_back({simController.scrubberFrame, 1, 0});
+    }
     ImGui::End();
 
 
@@ -888,6 +1009,18 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     ImGui::GetCurrentWindow()->DrawList->AddConvexPolyFilled(curTrongle, IM_ARRAYSIZE(trongle), ImColor(kFrameButtonBorderColor));
 
     ImGui::PopID();
+}
+
+int CharacterUIController::getInput(int frameID)
+{
+    int input = 0;
+    for (auto &region: inputRegions) {
+        if ((frameID < region.frame || frameID >= region.frame + region.duration)) {
+            continue;
+        }
+        input |= region.input;
+    }
+    return input;
 }
 
 void SimulationController::Reset(void)
@@ -1090,11 +1223,17 @@ void SimulationController::AdvanceUntilComplete(void)
 {
     int frameCount = 0;
     while (true) {
+        pSim->RunFrame();
+
         for (int i = 0; i < charCount; i++) {
-            auto &forcedTrigger = pSim->simGuys[charControllers[i].getSimCharSlot()]->getForcedTrigger();
+            Guy *pGuy = pSim->simGuys[charControllers[i].getSimCharSlot()];
+            auto &forcedTrigger = pGuy->getForcedTrigger();
             if (charControllers[i].timelineTriggers.find(frameCount) != charControllers[i].timelineTriggers.end()) {
                 forcedTrigger = charControllers[i].timelineTriggers[frameCount];
             }
+            int input = charControllers[i].getInput(frameCount);
+            int prevInput = pGuy->getCurrentInput();
+            pGuy->Input(addPressBits(input, prevInput));
         }
         pSim->AdvanceFrame();
         frameCount++;
@@ -1104,7 +1243,7 @@ void SimulationController::AdvanceUntilComplete(void)
         for (int i = 0; i < charCount; i++) {
             Guy *pGuy = pSim->simGuys[charControllers[i].getSimCharSlot()];
             // if we're not idle, we're not done
-            if (pGuy->getCurrentAction() > 2) {
+            if (!pGuy->canAct()) {
                 bDone = false;
             }
             // if we have any minions, we're not done
@@ -1113,9 +1252,16 @@ void SimulationController::AdvanceUntilComplete(void)
             }
 
             // if we're supposed to do an action sometime in the future, we're not done
+            // bias a bit to have some buffer for stuff to get delayed?
+            const int kBias = 10;
+
             for (auto &[key, trigger] : charControllers[i].timelineTriggers) {
-                // bias a bit to have some buffer for stuff to get delayed?
-                if (key > frameCount - 10) {
+                if (key > frameCount - kBias) {
+                    bDone = false;
+                }
+            }
+            for (auto &region : charControllers[i].inputRegions) {
+                if (region.frame + region.duration > frameCount - kBias) {
                     bDone = false;
                 }
             }

@@ -55,6 +55,7 @@ public:
         return posY + posOffsetY;
     }
     int getDirection() { return direction.i(); }
+    int getCurrentInput() { return currentInput; }
     void switchDirection() {
         direction = direction * Fixed(-1);
 
@@ -326,6 +327,10 @@ public:
     std::vector<const char *> &getMoveList() { return vecMoveList; }
     std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
     int getFrameMeterColorIndex();
+    bool canAct() {
+        bool a,b,c;
+        return canMove(a,b,c);
+    }
     std::map<std::pair<int, int>, std::pair<std::string, bool>> &getMapMoveStyle() { return mapMoveStyle; }
     std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }

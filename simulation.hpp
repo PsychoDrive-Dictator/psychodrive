@@ -66,6 +66,7 @@ public:
 
     void Log(std::string logLine);
 
+    void RunFrame();
     void AdvanceFrame();
     std::vector<FrameEvent>& getCurrentFrameEvents() { return currentFrameEvents; }
     Guy *getRecordedGuy(int frameIndex, int guyID);

@@ -144,6 +144,9 @@ void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int s
 
 bool isCharLoaded(std::string charName)
 {
+    if (charName == "") {
+        return false;
+    }
 #ifdef __EMSCRIPTEN__
     return setCharsLoaded.find(charName) != setCharsLoaded.end();
 #else
@@ -153,6 +156,9 @@ bool isCharLoaded(std::string charName)
 
 void requestCharDownload(std::string charName)
 {
+    if (charName == "") {
+        return;
+    }
 #ifdef __EMSCRIPTEN__
     if (isCharLoaded(charName)) {
         return;
@@ -892,6 +898,7 @@ int main(int argc, char**argv)
         }
 
         while (true) {
+            dumpSim.RunFrame();
             dumpSim.AdvanceFrame();
             if (dumpSim.replayingGameStateDump == false) {
                 exit(0);

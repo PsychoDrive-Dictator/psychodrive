@@ -136,8 +136,7 @@ void Simulation::Log(std::string logLine)
     fprintf(stderr, "%s\n", logLine.c_str());
 }
 
-void Simulation::AdvanceFrame(void)
-{
+void Simulation::RunFrame(void) {
     if (!replayingGameStateDump) {
         frameCounter++;
     }
@@ -252,6 +251,7 @@ void Simulation::AdvanceFrame(void)
             }
         }
     }
+
     if (recordingState) {
         stateRecording.emplace_back();
         RecordedFrame &frame = stateRecording[stateRecording.size()-1];
@@ -263,6 +263,10 @@ void Simulation::AdvanceFrame(void)
             frame.guys[guy->getUniqueID()] = pGuy;
         }
     }
+}
+
+void Simulation::AdvanceFrame(void)
+{
     for (auto guy : everyone) {
         bool die = !guy->AdvanceFrame();
 
