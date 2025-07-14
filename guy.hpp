@@ -137,6 +137,7 @@ public:
     int getLandingAdjust() { return landingAdjust; }
 
     int getHealth() { return health; }
+    int getMaxHealth() { return maxHealth; }
     void setHealth(int newHealth) { health = newHealth; }
 
     bool getProjectile() { return isProjectile; }
@@ -274,7 +275,7 @@ public:
 
         DoTriggers();
 
-        health = maxHealth = 10000; // todo pull that, need to make one of the dumps contain vital_max
+        health = maxHealth = (*pCharInfoJson)["PlData"]["Vitality"];
     }
 
     Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)

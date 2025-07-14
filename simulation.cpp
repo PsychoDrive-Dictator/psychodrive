@@ -212,6 +212,14 @@ void Simulation::RunFrame(void) {
 
                 CompareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, simGuys[i]->getDirection(), i, targetDumpFrame, eDirection, desc + " direction");
 
+                if (targetDumpFrame > 0) {
+                    // try to detect and align to training mode life auto-regen
+                    nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
+                    if (prevPlayers[i]["hp"] < players[i]["hp"] && players[i]["hp"] == simGuys[i]->getMaxHealth()) {
+                        simGuys[i]->setHealth(simGuys[i]->getMaxHealth());
+                    }
+                }
+
                 CompareGameStateInt(players[i]["hp"], simGuys[i]->getHealth(), i, targetDumpFrame, eHealth, desc + " health");
 
                 i++;
