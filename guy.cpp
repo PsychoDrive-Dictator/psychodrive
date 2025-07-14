@@ -3651,8 +3651,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         nextAction = crouching ? 8 : 7;
     }
 
-    bool hadHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
-
     // Transition
     if ( nextAction != -1 )
     {
@@ -3817,7 +3815,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         nextAction = -1;
     }
 
-    if (didTrigger && hadHitThisMove) {
+    if (didTrigger) {
         if (pOpponent && pOpponent->pendingScaling) {
             log(true, "pending scaling applied " + std::to_string(pOpponent->pendingScaling));
             pOpponent->currentScaling -= pOpponent->pendingScaling;
