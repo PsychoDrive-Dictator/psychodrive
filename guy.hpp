@@ -619,6 +619,7 @@ private:
     // 2.0 was here
     int currentScaling = 0;
     int pendingScaling = 0;
+    bool appliedDriveScaling = false;
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;

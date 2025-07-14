@@ -3608,6 +3608,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         comboDamage = 0;
         comboHits = 0;
         currentScaling = 0;
+        appliedDriveScaling = false;
         resetComboCount = false;
     }
 
@@ -3854,6 +3855,11 @@ void Guy::DoSwitchKey(const char *name)
 
             if (flag & 0x8000000) {
                 isDrive = true;
+                if (pOpponent && !pOpponent->appliedDriveScaling && pOpponent->currentScaling) {
+                    pOpponent->currentScaling *= 0.85;
+                    pOpponent->appliedDriveScaling = true;
+                    log(true, "drive scaling " + std::to_string(pOpponent->currentScaling));
+                }
             }
             if (flag & 0x800000) {
                 punishCounterState = true;
