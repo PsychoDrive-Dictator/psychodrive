@@ -561,7 +561,7 @@ static void mainloop(void)
                     simController.playUntilFrame = 0;
                 }
                 if (simController.scrubberFrame >= simController.simFrameCount) {
-                    simController.scrubberFrame = simController.simFrameCount;
+                    simController.scrubberFrame = simController.simFrameCount - 1;
                     simController.playing = false;
                     simController.playUntilFrame = 0;
                 }
