@@ -2506,8 +2506,13 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-    log(logHits, "effective scaling " + std::to_string(currentScaling - pAttacker->instantScale));
-    float currentScalingFactor = (currentScaling - pAttacker->instantScale) * 0.01f;
+    int effectiveScaling = currentScaling - pAttacker->instantScale;
+    if (driveScaling) {
+        effectiveScaling *= 0.85;
+    }
+
+    log(logHits, "effective scaling " + std::to_string(effectiveScaling));
+    float currentScalingFactor = effectiveScaling * 0.01f;
 
     health -= dmgValue * currentScalingFactor;
 
@@ -3608,7 +3613,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         comboDamage = 0;
         comboHits = 0;
         currentScaling = 0;
-        appliedDriveScaling = false;
+        driveScaling = false;
         resetComboCount = false;
     }
 
@@ -3855,10 +3860,8 @@ void Guy::DoSwitchKey(const char *name)
 
             if (flag & 0x8000000) {
                 isDrive = true;
-                if (pOpponent && !pOpponent->appliedDriveScaling && pOpponent->currentScaling) {
-                    pOpponent->currentScaling *= 0.85;
-                    pOpponent->appliedDriveScaling = true;
-                    log(true, "drive scaling " + std::to_string(pOpponent->currentScaling));
+                if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
+                    pOpponent->driveScaling = true;
                 }
             }
             if (flag & 0x800000) {
