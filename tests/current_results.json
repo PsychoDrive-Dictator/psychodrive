@@ -1369,6 +1369,63 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_drc_6hp",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 52,
+                "firstFrame": 186,
+                "lastFrame": 226
+            },
+            {
+                "count": 1,
+                "firstFrame": 226,
+                "lastFrame": 226
+            },
+            {
+                "count": 35,
+                "firstFrame": 186,
+                "lastFrame": 220
+            },
+            {
+                "count": 35,
+                "firstFrame": 186,
+                "lastFrame": 220
+            },
+            {
+                "count": 105,
+                "firstFrame": 33,
+                "lastFrame": 210
+            },
+            {
+                "count": 85,
+                "firstFrame": 73,
+                "lastFrame": 225
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "akuma_h_tatsu_knockdown",
         "testVersion": "33",
         "finished": true,
