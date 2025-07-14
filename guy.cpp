@@ -833,6 +833,8 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
             instantScale = 0;
         }
     }
+
+    superAction = flags & (1ULL<<15);
 }
 
 bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
@@ -2509,6 +2511,10 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     int effectiveScaling = currentScaling - pAttacker->instantScale;
     if (driveScaling) {
         effectiveScaling *= 0.85;
+    }
+
+    if (pAttacker->superAction && effectiveScaling < 50) {
+        effectiveScaling = 50;
     }
 
     log(logHits, "effective scaling " + std::to_string(effectiveScaling));

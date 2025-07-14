@@ -3129,9 +3129,9 @@ var currentResults =
                 "lastFrame": 895
             },
             {
-                "count": 486,
-                "firstFrame": 445,
-                "lastFrame": 930
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },
@@ -3642,8 +3642,8 @@ var currentResults =
                 "lastFrame": 1229
             },
             {
-                "count": 563,
-                "firstFrame": 614,
+                "count": 233,
+                "firstFrame": 944,
                 "lastFrame": 1176
             }
         ]
@@ -3813,8 +3813,8 @@ var currentResults =
                 "lastFrame": 987
             },
             {
-                "count": 563,
-                "firstFrame": 400,
+                "count": 233,
+                "firstFrame": 730,
                 "lastFrame": 962
             }
         ]

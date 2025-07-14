@@ -571,6 +571,8 @@ private:
     bool locked = false;
     bool hasLooped = false;
 
+    bool superAction = false;
+
     // todo round begin action needs to set that
     int styleInstall = 0;
     int styleInstallFrames = 0;
