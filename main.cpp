@@ -555,10 +555,20 @@ static void mainloop(void)
             simController.pSim->renderRecordedHitMarkers(curFrame);
 
             if (simController.playing) {
-                simController.scrubberFrame++;
-                if (simController.scrubberFrame >= (int)simController.pSim->stateRecording.size()) {
-                    simController.scrubberFrame = simController.pSim->stateRecording.size() - 1;
+                simController.scrubberFrame += simController.playSpeed;
+                if (simController.scrubberFrame == simController.playUntilFrame) {
                     simController.playing = false;
+                    simController.playUntilFrame = 0;
+                }
+                if (simController.scrubberFrame >= simController.simFrameCount) {
+                    simController.scrubberFrame = simController.simFrameCount;
+                    simController.playing = false;
+                    simController.playUntilFrame = 0;
+                }
+                if (simController.scrubberFrame < 0) {
+                    simController.scrubberFrame = 0;
+                    simController.playing = false;
+                    simController.playUntilFrame = 0;
                 }
             }
 

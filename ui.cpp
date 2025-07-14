@@ -74,7 +74,7 @@ bool modalDropDown(const char *label, int *pSelection, std::vector<const char *>
 #ifdef __EMSCRIPTEN__
         std::string strButtonID = std::string(vecOptions[selectedOption]) + "##mobilemodaldropdown_" + label;
         bool showingDropDown = false;
-        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
         if (ImGui::Button(strButtonID.c_str(), ImVec2(nFixedWidth, 0))) {
             showingDropDown = true;
         }
@@ -568,7 +568,7 @@ ImGuiIO& initUI(void)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
 
     comboFont = io.Fonts->AddFontFromMemoryCompressedTTF(
         Droid_Sans_compressed_data, Droid_Sans_compressed_size, 96.0
@@ -608,234 +608,258 @@ void destroyUI(void)
     ImGui::DestroyContext();
 }
 
-void CharacterUIController::RenderUI(void)
+void CharacterUIController::renderCharSetup(void)
 {
-    Guy *pGuy = nullptr;
+    if (modalDropDown("##char", &character, charNiceNames, 207)) {
+        simInputsChanged = true;
+        changed = true;
+        timelineTriggers.clear();
+    }
+    ImGui::SameLine();
+    if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 35)) {
+        simInputsChanged = true;
+        changed = true;
+        timelineTriggers.clear();
+    }
 
-    if (getSimCharSlot() == simController.viewSelect) {
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(0, 0));
-        const char *pWindowName = rightSide ? "PsychoDrive Right Char Easy Panel" : "PsychoDrive Left Char Easy Panel";
-
-        ImGui::Begin(pWindowName, nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
-        if (modalDropDown("##char", &character, charNiceNames, 207)) {
+    if (gameMode == ComboMaker) {
+        ImGui::SetNextItemWidth( webWidgets ? 250.0 : 170.0 );
+        float newStartPosX = flStartPosX;
+        ImGui::SliderFloat("##startpos", &newStartPosX, -765.0, 765.0);
+        if (!webWidgets) {
+            char startPosTest[32] = {};
+            snprintf(startPosTest, sizeof(startPosTest), "%.2f", newStartPosX);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth( 70.0 );
+            if (ImGui::InputText("##startpostext", startPosTest, sizeof(startPosTest))) {
+                newStartPosX = atof(startPosTest);
+            }
+        }
+        if (newStartPosX != flStartPosX) {
+            flStartPosX = newStartPosX;
+            startPosX = Fixed(flStartPosX, true);
             simInputsChanged = true;
             changed = true;
-            timelineTriggers.clear();
         }
-        ImGui::SameLine();
-        if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 35)) {
+    }
+}
+
+void CharacterUIController::renderActionSetup(int frameIndex)
+{
+    if (!simController.pSim) {
+        return;
+    }
+
+    Guy *pGuy = simController.pSim->getRecordedGuy(frameIndex, getSimCharSlot());
+
+    ImGui::Text("Navigation:");
+    if (ImGui::Button("<")) {
+        int searchFrame = frameIndex;
+        bool foundNoWindow = false;
+        while (searchFrame >= 0) {
+            Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
+            if (pFrameGuy && !foundNoWindow && !pFrameGuy->getFrameTriggers().size()) {
+                foundNoWindow = true;
+            }
+            if (foundNoWindow && pFrameGuy->getFrameTriggers().size()) {
+                simController.playing = true;
+                simController.playUntilFrame = searchFrame;
+                simController.playSpeed = -1;
+                break;
+            }
+            searchFrame--;
+        }
+    }
+    ImGui::SameLine();
+    ImGui::Text("Action windows");
+    ImGui::SameLine();
+    if (ImGui::Button(">")) {
+        int searchFrame = frameIndex;
+        bool foundNoWindow = false;
+        while (searchFrame < simController.simFrameCount) {
+            Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
+            if (pFrameGuy && !foundNoWindow && !pFrameGuy->getFrameTriggers().size()) {
+                foundNoWindow = true;
+            }
+            if (foundNoWindow && pFrameGuy->getFrameTriggers().size()) {
+                simController.playing = true;
+                simController.playUntilFrame = searchFrame;
+                simController.playSpeed = 1;
+                break;
+            }
+            searchFrame++;
+        }
+    }
+    if (timelineTriggers.find(frameIndex) != timelineTriggers.end()) {
+        auto &trigger = timelineTriggers[frameIndex];
+        std::string strLabel = "Delete " + std::string(pGuy->FindMove(trigger.first, trigger.second));
+        if (ImGui::Button(strLabel.c_str())) {
+            timelineTriggers.erase(timelineTriggers.find(frameIndex));
             simInputsChanged = true;
             changed = true;
-            timelineTriggers.clear();
+        }
+    } else if (pGuy && pGuy->getFrameTriggers().size()) {
+        vecTriggerDropDownLabels.clear();
+        vecTriggers.clear();
+        vecTriggerDropDownLabels.push_back("Add Action");
+        for (auto &trigger : pGuy->getFrameTriggers()) {
+            vecTriggerDropDownLabels.push_back(pGuy->FindMove(trigger.first, trigger.second));
+            vecTriggers.push_back(trigger);
+        }
+        if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 220)) {
+            if (pendingTriggerAdd != 0) {
+                timelineTriggers[frameIndex] = vecTriggers[pendingTriggerAdd - 1];
+
+                simInputsChanged = true;
+                changed = true;
+                pendingTriggerAdd = 0;
+                triggerAdded = true;
+            }
+        }
+    }
+
+    static const int dirIDToInput[] = {
+        5, 1, 9,
+        4, 0, 8,
+        6, 2, 10
+    };
+    static const int buttonIDToInput[] = {
+        16, 32, 64,
+        128, 256, 512,
+    };
+    int regionID = 0;
+    int pendingDragID = 0;
+    bool hasRegionDisplayed = false;
+    for (auto &region: inputRegions) {
+
+        // do this before continuing to have consistent enough IDs
+        regionID++;
+
+        if (activeInputDragID != regionID &&
+            (frameIndex < region.frame || frameIndex >= region.frame + region.duration)) {
+            continue;
         }
 
-        if (gameMode == ComboMaker) {
-            ImGui::SetNextItemWidth( webWidgets ? 250.0 : 170.0 );
-            float newStartPosX = flStartPosX;
-            ImGui::SliderFloat("##startpos", &newStartPosX, -765.0, 765.0);
-            if (!webWidgets) {
-                char startPosTest[32] = {};
-                snprintf(startPosTest, sizeof(startPosTest), "%.2f", newStartPosX);
-                ImGui::SameLine();
-                ImGui::SetNextItemWidth( 70.0 );
-                if (ImGui::InputText("##startpostext", startPosTest, sizeof(startPosTest))) {
-                    newStartPosX = atof(startPosTest);
+        if (!hasRegionDisplayed) {
+            ImGui::Text("Current input regions:");
+        }
+
+        hasRegionDisplayed = true;
+
+        float cursorX = ImGui::GetCursorPosX();
+        float cursorY = ImGui::GetCursorPosY();
+
+        ImGui::PushID(regionID);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0,0.0));
+        // direction
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (j != 0) {
+                    ImGui::SameLine();
                 }
-            }
-            if (newStartPosX != flStartPosX) {
-                flStartPosX = newStartPosX;
-                startPosX = Fixed(flStartPosX, true);
-                simInputsChanged = true;
-                changed = true;
-            }
-        }
-
-        if (!simController.pSim) {
-            ImGui::End();
-            return;
-        }
-
-        pGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
-
-        if (timelineTriggers.find(simController.scrubberFrame) != timelineTriggers.end()) {
-            auto &trigger = timelineTriggers[simController.scrubberFrame];
-            std::string strLabel = "Delete " + std::string(pGuy->FindMove(trigger.first, trigger.second));
-            if (ImGui::Button(strLabel.c_str())) {
-                timelineTriggers.erase(timelineTriggers.find(simController.scrubberFrame));
-                simInputsChanged = true;
-                changed = true;
-            }
-        } else if (pGuy && pGuy->getFrameTriggers().size()) {
-            vecTriggerDropDownLabels.clear();
-            vecTriggers.clear();
-            vecTriggerDropDownLabels.push_back("Available Triggers");
-            for (auto &trigger : pGuy->getFrameTriggers()) {
-                vecTriggerDropDownLabels.push_back(pGuy->FindMove(trigger.first, trigger.second));
-                vecTriggers.push_back(trigger);
-            }
-            if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 250)) {
-                if (pendingTriggerAdd != 0) {
-                    std::erase_if(timelineTriggers, [](const auto& item) {
-                        auto const& [key, value] = item;
-                        return (key >= simController.scrubberFrame);
-                    });
-                    timelineTriggers[simController.scrubberFrame] = vecTriggers[pendingTriggerAdd - 1];
-
+                int id = i * 3 + j;
+                bool highlighted = dirIDToInput[id] == (region.input & 0xf);
+                ImGui::PushID(id);
+                if (highlighted) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+                }
+                if (ImGui::Button("##", ImVec2(24.0,24.0))) {
+                    region.input &= ~0xf;
+                    region.input |= dirIDToInput[id];
                     simInputsChanged = true;
                     changed = true;
-                    pendingTriggerAdd = 0;
-                    triggerAdded = true;
                 }
+                if (highlighted) {
+                    ImGui::PopStyleColor();
+                }
+                ImGui::PopID();
             }
         }
-        if (ImGui::Button("Jump to next cancel window")) {
-            int searchFrame = simController.scrubberFrame;
-            bool foundNoWindow = false;
-            while (searchFrame < simController.simFrameCount) {
-                Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
-                if (pFrameGuy && !foundNoWindow && !pFrameGuy->getFrameTriggers().size()) {
-                    foundNoWindow = true;
+        ImGui::PopStyleVar();
+        // botans
+
+        ImGui::SetCursorPosY(cursorY + 2.5);
+
+        for (int i = 0; i < 2; i++) {
+            ImGui::SetCursorPosX(cursorX + 85.0);
+            for (int j = 0; j < 3; j++) {
+                if (j != 0) {
+                    ImGui::SameLine();
                 }
-                if (foundNoWindow && pFrameGuy->getFrameTriggers().size()) {
-                    simController.scrubberFrame = searchFrame;
-                    break;
+                int id = i * 3 + j;
+                bool highlighted = buttonIDToInput[id] & region.input;
+                ImGui::PushID(10+id);
+                if (highlighted) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
                 }
-                searchFrame++;
+                if (ImGui::Button("##", ImVec2(32.0,32.0))) {
+                    region.input = region.input ^ buttonIDToInput[id];
+                    simInputsChanged = true;
+                    changed = true;
+                }
+                if (highlighted) {
+                    ImGui::PopStyleColor();
+                }
+                ImGui::PopID();
             }
         }
 
-        static const int dirIDToInput[] = {
-            5, 1, 9,
-            4, 0, 8,
-            6, 2, 10
-        };
-        static const int buttonIDToInput[] = {
-            16, 32, 64,
-            128, 256, 512,
-        };
-        int regionID = 0;
-        int pendingDragID = 0;
-        for (auto &region: inputRegions) {
+        ImGui::SetCursorPosY(cursorY);
 
-            // do this before continuing to have consistent enough IDs
-            regionID++;
+        ImGui::SetCursorPosX(cursorX + 205.0);
+        ImGui::Text("Start frame:");
 
-            if (activeInputDragID != regionID &&
-                (simController.scrubberFrame < region.frame || simController.scrubberFrame >= region.frame + region.duration)) {
-                continue;
-            }
+        ImGui::SameLine();
+        std::string startFrameLabel = std::to_string(region.frame) + "###startframe";
+        ImGui::Button(startFrameLabel.c_str());
 
-            float cursorX = ImGui::GetCursorPosX();
-            float cursorY = ImGui::GetCursorPosY();
-
-            ImGui::PushID(regionID);
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0,0.0));
-            // direction
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (j != 0) {
-                        ImGui::SameLine();
-                    }
-                    int id = i * 3 + j;
-                    bool highlighted = dirIDToInput[id] == (region.input & 0xf);
-                    ImGui::PushID(id);
-                    if (highlighted) {
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
-                    }
-                    if (ImGui::Button("##", ImVec2(20.0,20.0))) {
-                        region.input &= ~0xf;
-                        region.input |= dirIDToInput[id];
-                        simInputsChanged = true;
-                        changed = true;
-                    }
-                    if (highlighted) {
-                        ImGui::PopStyleColor();
-                    }
-                    ImGui::PopID();
-                }
-            }
-            ImGui::PopStyleVar();
-            // botans
-
-            ImGui::SetCursorPosY(cursorY + 2.5);
-
-            for (int i = 0; i < 2; i++) {
-                ImGui::SetCursorPosX(cursorX + 70.0);
-                for (int j = 0; j < 3; j++) {
-                    if (j != 0) {
-                        ImGui::SameLine();
-                    }
-                    int id = i * 3 + j;
-                    bool highlighted = buttonIDToInput[id] & region.input;
-                    ImGui::PushID(10+id);
-                    if (highlighted) {
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
-                    }
-                    if (ImGui::Button("##", ImVec2(25.0,25.0))) {
-                        region.input = region.input ^ buttonIDToInput[id];
-                        simInputsChanged = true;
-                        changed = true;
-                    }
-                    if (highlighted) {
-                        ImGui::PopStyleColor();
-                    }
-                    ImGui::PopID();
-                }
-            }
-
-            ImGui::SetCursorPosY(cursorY);
-
-            ImGui::SetCursorPosX(cursorX + 170.0);
-            ImGui::Text("Start frame:");
-
-            ImGui::SameLine();
-            std::string startFrameLabel = std::to_string(region.frame) + "###startframe";
-            ImGui::Button(startFrameLabel.c_str());
-
-            if (ImGui::IsItemActive()) {
-                region.frame += (int)ImGui::GetMouseDragDelta(0, 0.0).x;
-                simController.clampFrame(region.frame);
-                ImGui::ResetMouseDragDelta();
-                pendingDragID = regionID;
-                simInputsChanged = true;
-                changed = true;
-            }
-
-            ImGui::SetCursorPosX(cursorX + 170.0);
-            ImGui::Text("Frame count:");
-
-            ImGui::SameLine();
-            std::string frameCountLabel = std::to_string(region.duration) + "###framecount";
-            ImGui::Button(frameCountLabel.c_str());
-
-            if (ImGui::IsItemActive()) {
-                region.duration += (int)ImGui::GetMouseDragDelta(0, 0.0).x;
-                simController.clampFrame(region.duration);
-                ImGui::ResetMouseDragDelta();
-                pendingDragID = regionID;
-                simInputsChanged = true;
-                changed = true;
-            }
-
-            ImGui::PopID();
+        if (ImGui::IsItemActive()) {
+            region.frame += (int)ImGui::GetMouseDragDelta(0, 0.0).x;
+            simController.clampFrame(region.frame);
+            ImGui::ResetMouseDragDelta();
+            pendingDragID = regionID;
+            simInputsChanged = true;
+            changed = true;
         }
 
-        activeInputDragID = pendingDragID;
-        if (ImGui::Button("Add input")) {
-            inputRegions.push_back({simController.scrubberFrame, 1, 0});
+        ImGui::SetCursorPosX(cursorX + 205.0);
+        ImGui::Text("Frame count:");
+
+        ImGui::SameLine();
+        std::string frameCountLabel = std::to_string(region.duration) + "###framecount";
+        ImGui::Button(frameCountLabel.c_str());
+
+        if (ImGui::IsItemActive()) {
+            region.duration += (int)ImGui::GetMouseDragDelta(0, 0.0).x;
+            simController.clampFrame(region.duration);
+            ImGui::ResetMouseDragDelta();
+            pendingDragID = regionID;
+            simInputsChanged = true;
+            changed = true;
         }
-        ImGui::End();
+
+        ImGui::PopID();
     }
+
+    activeInputDragID = pendingDragID;
+    if (ImGui::Button(hasRegionDisplayed ? "Add Another Input" : "Add Input", ImVec2(220, 0))) {
+        inputRegions.push_back({frameIndex, 1, 0});
+    }
+}
+
+void CharacterUIController::RenderUI(void)
+{
+    if (!simController.pSim) {
+        return;
+    }
+
+    Guy *pGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
 
     if (pGuy && pGuy->getOpponent()) {
         int opponentID = pGuy->getOpponent()->getUniqueID();
         Guy *pOpponent = simController.pSim->getRecordedGuy(simController.scrubberFrame, opponentID);
-        //Guy *pOpponentPrevFrame = simController.pSim->getRecordedGuy(std::max(0, simController.scrubberFrame - 1), opponentID);
 
         if (pOpponent) {
-            //bool newComboHit = pOpponentPrevFrame->getComboHits() != pOpponent->getComboHits();
             int comboHits = pOpponent->getComboHits();
 
             if (comboHits != 0) {
@@ -1100,34 +1124,66 @@ void SimulationController::doFrameMeterDrag(void)
 
 void SimulationController::RenderUI(void)
 {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
+
+    if (gameMode != Training) {
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::Begin("PsychoDrive Left Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus );
+        switch (viewSelect) {
+            default:
+            case 0:
+                charControllers[0].renderCharSetup();
+                break;
+            case 1:
+                charControllers[0].renderActionSetup(scrubberFrame);
+                break;
+            case 2:
+                charControllers[1].renderCharSetup();
+                break;
+            case 3:
+                charControllers[1].renderActionSetup(scrubberFrame);
+                break;
+        }
+        if (maxComboCount > 0) {
+            std::string strComboInfo = "Max damage: " + std::to_string(maxComboDamage);
+            ImGui::Text("%s", strComboInfo.c_str());
+        }
+        ImGui::End();
+    }
+
     // Top right panel
-    int modeSelectorSize = 200;
-    ImGui::SetNextWindowPos(ImVec2(renderSizeX - 500.0, 0));
+    int modeSelectorSize = 180;
+    ImGui::SetNextWindowPos(ImVec2(renderSizeX - 190.0, 0));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("PsychoDrive Top Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground );
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
     const char* modes[] = { "Training", "Move Viewer", "Combo Maker" };
-    ImGui::SetCursorPosX(300.0 - 5.0);
     if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), modeSelectorSize)) {
         simInputsChanged = true;
         simController.Reset();
 
         translateY = gameMode == Training ? 150.0 : 100.0;
     }
-    if (gameMode == ComboMaker) {
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(100.0 - 10.0);
-        const char* views[] = { "P1 Setup", "P2 Setup" };
-        modalDropDown("##viewselect", (int*)&viewSelect, views, IM_ARRAYSIZE(views), modeSelectorSize);
-    }
-    if (maxComboCount > 0) {
-        std::string strComboInfo = "Max combo: " + std::to_string(maxComboCount) + " hit " + std::to_string(maxComboDamage) + " damage";
-        ImGui::SetCursorPosX(500.0 - 5.0 - ImGui::CalcTextSize(strComboInfo.c_str()).x);
-        ImGui::Text("%s", strComboInfo.c_str());
+    if (gameMode != Training) {
+        std::vector<std::string> vecViewLabels;
+        vecViewLabels.push_back("P1 Setup");
+        vecViewLabels.push_back("P1 Actions");
+        if (gameMode == ComboMaker) {
+            vecViewLabels.push_back("P2 Setup");
+            vecViewLabels.push_back("P2 Actions");
+        }
+        modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
     }
     ImGui::End();
 
     if (gameMode == Training) {
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
         return;
     }
 
@@ -1139,9 +1195,7 @@ void SimulationController::RenderUI(void)
     if (simFrameCount) {
         ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 150));
         ImGui::SetNextWindowSize(ImVec2(renderSizeX, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
+
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
         doFrameMeterDrag();
@@ -1164,12 +1218,11 @@ void SimulationController::RenderUI(void)
                 simController.scrubberFrame = 0;
             }
             playing = !playing;
+            simController.playSpeed = 1;
+            simController.playUntilFrame = 0;
         }
 
         ImGui::End();
-        ImGui::PopStyleColor();
-        ImGui::PopStyleVar();
-        ImGui::PopStyleVar();
 
         frameMeterMouseDragAmount += pendingFrameMeterMouseDragAmount;
         pendingFrameMeterMouseDragAmount = 0.0f;
@@ -1237,6 +1290,9 @@ void SimulationController::RenderUI(void)
         }
 #endif
     }
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
 }
 
 void SimulationController::AdvanceUntilComplete(void)
@@ -1319,11 +1375,13 @@ void SimulationController::AdvanceUntilComplete(void)
     if (scrubberFrame >= simFrameCount) {
         scrubberFrame = simFrameCount - 1;
     } else if (controllerSearchForNextTrigger != -1) {
+        playing = true;
+        simController.playSpeed = 1;
         int searchFrame = scrubberFrame + 2; // skip kara cancel :/
         while (searchFrame < simFrameCount) {
             Guy *pGuy = pSim->getRecordedGuy(searchFrame, charControllers[controllerSearchForNextTrigger].getSimCharSlot());
             if (pGuy->getFrameTriggers().size()) {
-                scrubberFrame = searchFrame;
+                playUntilFrame = searchFrame;
                 break;
             }
             searchFrame++;

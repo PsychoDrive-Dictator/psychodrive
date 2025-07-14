@@ -17,6 +17,8 @@ struct inputRegion {
 class CharacterUIController {
 public:
     void RenderUI(void);
+    void renderCharSetup(void);
+    void renderActionSetup(int frameIndex);
     void renderFrameMeter(int frameIndex);
     void renderFrameMeterCancelWindows(int frameIndex);
     int getSimCharSlot(void) { return rightSide ? 1 : 0; }
@@ -81,6 +83,8 @@ public:
     int maxComboDamage = 0;
 
     bool playing = false;
+    int playSpeed = 1;
+    int playUntilFrame = 0;
 
     float pendingFrameMeterMouseDragAmount;
     float frameMeterMouseDragAmount;
