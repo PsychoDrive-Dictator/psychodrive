@@ -1299,6 +1299,14 @@ void SimulationController::AdvanceUntilComplete(void)
 {
     int frameCount = 0;
     while (true) {
+        for (int i = 0; i < charCount; i++) {
+            // put forced triggers in place before RunFrame(), because it contains the hitstop end AdvanceFrame()
+            Guy *pGuy = pSim->simGuys[charControllers[i].getSimCharSlot()];
+            auto &forcedTrigger = pGuy->getForcedTrigger();
+            if (charControllers[i].timelineTriggers.find(frameCount) != charControllers[i].timelineTriggers.end()) {
+                forcedTrigger = charControllers[i].timelineTriggers[frameCount];
+            }
+        }
         pSim->RunFrame();
 
         for (int i = 0; i < charCount; i++) {
@@ -1311,10 +1319,6 @@ void SimulationController::AdvanceUntilComplete(void)
                 maxComboDamage = pGuy->getComboDamage();
             }
 
-            auto &forcedTrigger = pGuy->getForcedTrigger();
-            if (charControllers[i].timelineTriggers.find(frameCount) != charControllers[i].timelineTriggers.end()) {
-                forcedTrigger = charControllers[i].timelineTriggers[frameCount];
-            }
             int input = charControllers[i].getInput(frameCount);
             int prevInput = pGuy->getCurrentInput();
             pGuy->Input(addPressBits(input, prevInput));
