@@ -2117,6 +2117,25 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     }
 }
 
+nlohmann::json *Guy::findAtemi(int atemiID)
+{
+    nlohmann::json *pAtemi = nullptr;
+
+    // there's leading zeroes or not depending on how it was dumped........
+    // .............................................
+    for (auto &[keyID, key] : pAtemiJson->items()) {
+        if (atoi(keyID.c_str()) == atemiID) {
+            return &key;
+        }
+    }
+    for (auto &[keyID, key] : pCommonAtemiJson->items()) {
+        if (atoi(keyID.c_str()) == atemiID) {
+            return &key;
+        }
+    }
+    return pAtemi;
+}
+
 void ResolveHits(std::vector<PendingHit> &pendingHitList)
 {
     std::unordered_set<Guy *> hitGuys;
@@ -2171,6 +2190,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
 
         bool hitArmor = false;
+        bool hitAtemi = false;
         if (hurtBox.flags & armor && hurtBox.armorID) {
             hitArmor = true;
             pGuy->hitArmorThisFrame = true;
@@ -2179,13 +2199,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitFlagToParent) pGuy->pParent->hitArmorThisMove = true;
             auto atemiIDString = std::to_string(hurtBox.armorID);
             // need to pull from opponents atemi here or put in opponent method
-            nlohmann::json *pAtemi = nullptr;
-            if (pOtherGuy->pAtemiJson->contains(atemiIDString)) {
-                pAtemi = &(*pOtherGuy->pAtemiJson)[atemiIDString];
-            } else if (pGuy->pCommonAtemiJson->contains(atemiIDString)) {
-                pAtemi = &(*pGuy->pCommonAtemiJson)[atemiIDString];
-            } else {
-                pGuy->log(true, "atemi not found!!");
+            nlohmann::json *pAtemi = pOtherGuy->findAtemi(hurtBox.armorID);
+            if (!pAtemi) {
+                pGuy->log(true, "atemi not found!! " + std::to_string(hurtBox.armorID));
                 continue;
             }
 
@@ -2212,10 +2228,11 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
                     pOtherGuy->armorThisFrame = true;
 
-                    // todo i think this is wrong, it needs to add to the normal hitstop?
-                    // there's TargetStopAdd too, figure it out at some point
+                    // todo there's TargetStopAdd too
                     pGuy->addHitStop(armorHitStopHitter+1);
                     pOtherGuy->addHitStop(armorHitStopHitted+1);
+                    // fall through to normal hit case and add hitstop there too
+                    // todo does armor hitstop replace if specified?
                     pOtherGuy->log(pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
                 }
             }
@@ -2224,6 +2241,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (hurtBox.flags & atemi) {
             // like armor except onthing really happens beyond setting the flag
             hitArmor = true;
+            hitAtemi = true;
             pGuy->hitAtemiThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->hitAtemiThisFrame = true;
             pGuy->hitAtemiThisMove = true;
@@ -2255,7 +2273,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (hitStopTarget == -1) {
             hitStopTarget = hitStopSelf;
         }
-        if (hitArmor) {
+        if (hitAtemi) {
             hitStopSelf = 0;
             hitStopTarget = 0;
         }
