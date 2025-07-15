@@ -10,11 +10,6 @@ Simulation::~Simulation() {
         guy->enableCleanup = false;
         delete guy;
     }
-    for (auto &frame: stateRecording) {
-        for (auto [id, guy]: frame.guys) {
-            delete guy;
-        }
-    }
 }
 
 void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
@@ -267,7 +262,15 @@ void Simulation::RunFrame(void) {
         stateRecording.emplace_back();
         RecordedFrame &frame = stateRecording[stateRecording.size()-1];
         for (auto guy : everyone) {
-            Guy *pGuy = new Guy;
+            if ((int)simController.recordedGuysPool.size() == simController.recordedGuysPoolIndex) {
+                // let's say a half second of action, 2 guys for 300 frames?
+                const int kPoolGrowSize = 600;
+                Guy *newGuys = new Guy[kPoolGrowSize];
+                for (int i = 0; i < kPoolGrowSize; i++) {
+                    simController.recordedGuysPool.push_back(&newGuys[i]);
+                }
+            }
+            Guy *pGuy = simController.recordedGuysPool[simController.recordedGuysPoolIndex++];
             *pGuy = *guy;
             pGuy->facSimile = true;
             // this is the canonical state of the guy for this frame, record boxes/state/etc here

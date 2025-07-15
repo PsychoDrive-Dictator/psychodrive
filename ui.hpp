@@ -92,6 +92,9 @@ public:
     bool momentumActive = false;
     float curMomentum;
     ImGuiID activeDragID = 0;
+
+    std::vector<Guy*> recordedGuysPool;
+    int recordedGuysPoolIndex = 0;
 };
 
 extern SimulationController simController;

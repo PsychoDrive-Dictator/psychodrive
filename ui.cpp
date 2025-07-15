@@ -1100,6 +1100,8 @@ bool SimulationController::NewSim(void)
         pSim->CreateGuyFromCharController(charControllers[i]);
     }
 
+    recordedGuysPoolIndex = 0;
+
     maxComboCount = 0;
     maxComboDamage = 0;
 
