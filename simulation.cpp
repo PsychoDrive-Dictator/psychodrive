@@ -216,6 +216,7 @@ void Simulation::RunFrame(void) {
                 }
 
                 CompareGameStateInt(players[i]["hp"], simGuys[i]->getHealth(), i, targetDumpFrame, eHealth, desc + " health");
+                CompareGameStateInt(players[i]["hitStop"], simGuys[i]->getHitStopForDump(), i, targetDumpFrame, eHitStop, desc + " hitstop");
 
                 i++;
             }

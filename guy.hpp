@@ -100,6 +100,7 @@ public:
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
     int getHitStop() { return hitStop; }
+    int getHitStopForDump() { if (pendingHitStop) return pendingHitStop - 1; return std::max(0, hitStop - 1); }
     bool getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }

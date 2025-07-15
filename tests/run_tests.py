@@ -68,7 +68,7 @@ def runTest(test):
     newTestResult['testVersion'] = charVersion
     newTestResult['finished'] = False
     newTestResult['errorTypes'] = []
-    while 10 > len(newTestResult['errorTypes']):
+    while 11 > len(newTestResult['errorTypes']):
         emptyErrorType = {}
         emptyErrorType['count'] = 0
         emptyErrorType['firstFrame'] = -1

@@ -59,7 +59,8 @@ public:
         eActionFrame,
         eComboCount,
         eDirection,
-        eHealth
+        eHealth,
+        eHitStop
     };
 
     void CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description );

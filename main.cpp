@@ -764,6 +764,7 @@ static void mainloop(void)
                         }
 
                         compareGameStateInt(players[i]["hp"], guys[i]->getHealth(), Simulation::eHealth, desc + " health");
+                        compareGameStateInt(players[i]["hitStop"], guys[i]->getHitStopForDump(), Simulation::eHitStop, desc + " hitstop");
 
                         i++;
                     }
