@@ -1483,6 +1483,63 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_impact",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 594,
+                "firstFrame": 191,
+                "lastFrame": 487
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 97,
+                "firstFrame": 213,
+                "lastFrame": 309
+            },
+            {
+                "count": 97,
+                "firstFrame": 213,
+                "lastFrame": 309
+            },
+            {
+                "count": 438,
+                "firstFrame": 191,
+                "lastFrame": 436
+            },
+            {
+                "count": 593,
+                "firstFrame": 191,
+                "lastFrame": 487
+            },
+            {
+                "count": 267,
+                "firstFrame": 190,
+                "lastFrame": 372
+            },
+            {
+                "count": 526,
+                "firstFrame": 214,
+                "lastFrame": 487
+            },
+            {
+                "count": 407,
+                "firstFrame": 190,
+                "lastFrame": 404
+            }
+        ]
+    },
+    {
         "testName": "cammy_air_throw",
         "testVersion": "26",
         "finished": true,
