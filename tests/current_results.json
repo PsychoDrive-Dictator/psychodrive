@@ -2851,6 +2851,63 @@ var currentResults =
         ]
     },
     {
+        "testName": "honda_ex_headbutt",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 310,
+                "firstFrame": 0,
+                "lastFrame": 622
+            },
+            {
+                "count": 91,
+                "firstFrame": 475,
+                "lastFrame": 537
+            },
+            {
+                "count": 1,
+                "firstFrame": 529,
+                "lastFrame": 529
+            },
+            {
+                "count": 46,
+                "firstFrame": 475,
+                "lastFrame": 520
+            },
+            {
+                "count": 46,
+                "firstFrame": 475,
+                "lastFrame": 520
+            },
+            {
+                "count": 223,
+                "firstFrame": 263,
+                "lastFrame": 622
+            },
+            {
+                "count": 363,
+                "firstFrame": 263,
+                "lastFrame": 622
+            },
+            {
+                "count": 59,
+                "firstFrame": 475,
+                "lastFrame": 539
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 175,
+                "firstFrame": 475,
+                "lastFrame": 569
+            }
+        ]
+    },
+    {
         "testName": "honda_launch_combo",
         "testVersion": "26",
         "finished": true,
@@ -3478,6 +3535,63 @@ var currentResults =
         ]
     },
     {
+        "testName": "marisa_armors",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 5117,
+                "firstFrame": 158,
+                "lastFrame": 2420
+            },
+            {
+                "count": 1155,
+                "firstFrame": 98,
+                "lastFrame": 2254
+            },
+            {
+                "count": 335,
+                "firstFrame": 206,
+                "lastFrame": 2239
+            },
+            {
+                "count": 329,
+                "firstFrame": 163,
+                "lastFrame": 2233
+            },
+            {
+                "count": 270,
+                "firstFrame": 163,
+                "lastFrame": 2233
+            },
+            {
+                "count": 1813,
+                "firstFrame": 98,
+                "lastFrame": 2394
+            },
+            {
+                "count": 2930,
+                "firstFrame": 98,
+                "lastFrame": 2420
+            },
+            {
+                "count": 1238,
+                "firstFrame": 130,
+                "lastFrame": 2352
+            },
+            {
+                "count": 41,
+                "firstFrame": 206,
+                "lastFrame": 283
+            },
+            {
+                "count": 2144,
+                "firstFrame": 130,
+                "lastFrame": 2420
+            }
+        ]
+    },
+    {
         "testName": "pushphysics_new_luke_ryu",
         "testVersion": "26",
         "finished": true,
@@ -3987,6 +4101,63 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "zangief_fierce_armor",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 881,
+                "firstFrame": 0,
+                "lastFrame": 707
+            },
+            {
+                "count": 93,
+                "firstFrame": 220,
+                "lastFrame": 591
+            },
+            {
+                "count": 67,
+                "firstFrame": 307,
+                "lastFrame": 591
+            },
+            {
+                "count": 151,
+                "firstFrame": 270,
+                "lastFrame": 585
+            },
+            {
+                "count": 151,
+                "firstFrame": 270,
+                "lastFrame": 585
+            },
+            {
+                "count": 397,
+                "firstFrame": 220,
+                "lastFrame": 642
+            },
+            {
+                "count": 712,
+                "firstFrame": 220,
+                "lastFrame": 707
+            },
+            {
+                "count": 197,
+                "firstFrame": 252,
+                "lastFrame": 600
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 346,
+                "firstFrame": 252,
+                "lastFrame": 632
             }
         ]
     },
