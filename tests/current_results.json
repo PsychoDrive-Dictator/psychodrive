@@ -2171,6 +2171,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "dhalsim_float",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 4,
+                "firstFrame": 209,
+                "lastFrame": 707
+            },
+            {
+                "count": 4,
+                "firstFrame": 209,
+                "lastFrame": 707
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 37,
+                "firstFrame": 213,
+                "lastFrame": 714
+            },
+            {
+                "count": 48,
+                "firstFrame": 213,
+                "lastFrame": 714
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "dict_dict_light_backfist_heavy_backfist",
         "testVersion": "26",
         "finished": true,
