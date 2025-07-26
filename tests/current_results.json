@@ -3597,6 +3597,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "kim_spraycans",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1993,
+                "firstFrame": 374,
+                "lastFrame": 1296
+            },
+            {
+                "count": 436,
+                "firstFrame": 374,
+                "lastFrame": 1130
+            },
+            {
+                "count": 142,
+                "firstFrame": 360,
+                "lastFrame": 1130
+            },
+            {
+                "count": 101,
+                "firstFrame": 360,
+                "lastFrame": 1127
+            },
+            {
+                "count": 101,
+                "firstFrame": 360,
+                "lastFrame": 1127
+            },
+            {
+                "count": 433,
+                "firstFrame": 119,
+                "lastFrame": 1181
+            },
+            {
+                "count": 1054,
+                "firstFrame": 360,
+                "lastFrame": 1296
+            },
+            {
+                "count": 141,
+                "firstFrame": 360,
+                "lastFrame": 1139
+            },
+            {
+                "count": 1779,
+                "firstFrame": 404,
+                "lastFrame": 1296
+            },
+            {
+                "count": 517,
+                "firstFrame": 360,
+                "lastFrame": 1171
+            },
+            {
+                "count": 68,
+                "firstFrame": 360,
+                "lastFrame": 1094
+            }
+        ]
+    },
+    {
         "testName": "kimberly_tp",
         "testVersion": "26",
         "finished": true,
