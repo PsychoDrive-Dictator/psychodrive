@@ -2329,7 +2329,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             event.hitEventData.x = hitMarkerOffsetX;
             event.hitEventData.y = hitMarkerOffsetY;
             event.hitEventData.radius = hitMarkerRadius;
-            event.hitEventData.hitType = pGuy->hasBeenBlockedThisFrame ? 1 : 0;
+            event.hitEventData.hitType = pGuy->hasBeenBlockedThisFrame ? 2 : 1;
             event.hitEventData.seed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
             event.hitEventData.dirX = pGuy->direction.f();
             event.hitEventData.dirY = 0.0f;

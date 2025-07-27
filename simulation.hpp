@@ -19,7 +19,7 @@ struct FrameEvent {
         float x;
         float y;
         float radius;
-        int hitType; // 0 = normal hit, 1 = block
+        int hitType; // 1 = normal hit, 2 = block
         int seed;
         float dirX;
         float dirY;
