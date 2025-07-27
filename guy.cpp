@@ -1648,7 +1648,7 @@ int Guy::getFrameMeterColorIndex() {
     if (hitStun) {
         ret = 5;
     }
-    if (hitStop) {
+    if (hitStop || warudo) {
         ret = 6;
     }
     return ret;

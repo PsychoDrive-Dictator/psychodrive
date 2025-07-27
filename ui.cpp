@@ -870,13 +870,13 @@ void CharacterUIController::RenderUI(void)
 }
 
 static ImVec4 frameMeterColors[] = {
-    { 1.0,1.0,1.0,1.0 }, // default blinding white
+    { 0.5,0.5,0.5,1.0 }, // default can't move grey (dash/jump)
     { 0.206,0.202,0.184,1.0 }, // can act/move very dark grey
     { 0.02,0.443,0.729,1.0 }, // recovery blue
     { 0.0,0.733,0.573,1.0 }, // startup green
     { 0.78,0.173,0.4,1.0 }, // active red
     { 1.0,0.965,0.224,1.0 }, // hitstun yellow
-    { 0.0,0.0,0.0,0.0 }, // hitstop missing
+    { 0.25,0.11,0.11,1.0 }, // hitstop/warudo very dark red
 };
 
 void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
@@ -959,7 +959,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         int colorIndex = pGuy->getFrameMeterColorIndex();
         ImGui::PushStyleColor(ImGuiCol_Button, frameMeterColors[colorIndex]);
         bool darkText = false;
-        if (colorIndex != 1) {
+        if (colorIndex != 1 && colorIndex != 6) {
             darkText = true;
         }
         if (darkText) {
