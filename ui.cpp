@@ -951,6 +951,40 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth) + simController.frameMeterMouseDragAmount * simController.kFrameMeterDragRatio);
     float tronglePosY = ImGui::GetCursorPosY();
 
+    bool foundAdvantageWindow = false;
+    int endAdvantageWindowFrame = -1;
+    int advantageFrames = 0;
+    if (simController.charCount == 2) {
+        // walk from the end and find advantage
+        int i = frameCount - 1;
+        while (i > 0) {
+            Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
+            Guy *pOtherGuy = simController.pSim->getRecordedGuy(i, !getSimCharSlot());
+            if (pGuy->getFrameMeterColorIndex() == 1 && pOtherGuy->getFrameMeterColorIndex() != 1) {
+                foundAdvantageWindow = true;
+                endAdvantageWindowFrame = i;
+                while (i > 0) {
+                    Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
+                    if (pGuy->getFrameMeterColorIndex() != 1) {
+                        break;
+                    }
+                    advantageFrames++;
+                    i--;
+                }
+                if (i == 0) {
+                    foundAdvantageWindow = false;
+                }
+                if (foundAdvantageWindow) {
+                    break;
+                }
+            }
+            if (pGuy->getFrameMeterColorIndex() != 1 && pOtherGuy->getFrameMeterColorIndex() != 1) {
+                break;
+            }
+            i--;
+        }
+    }
+
     for (int i = 0; i < frameCount; i++) {
         Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
         Guy *pGuyNextFrame = simController.pSim->getRecordedGuy(i+1, getSimCharSlot());
@@ -974,12 +1008,31 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         } else {
             sameColorCount++;
         }
+        bool popColor = false;
+        if (foundAdvantageWindow && endAdvantageWindowFrame == i+1 && advantageFrames > 9) {
+            strButtonCaption = "+";
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0,1.0,0.0,1.0));
+            popColor = true;
+        }
+        if (foundAdvantageWindow && endAdvantageWindowFrame == i) {
+            if (advantageFrames < 10) {
+                strButtonCaption = "+" + std::to_string(advantageFrames);
+            } else {
+                strButtonCaption = std::to_string(advantageFrames);
+            }
+            sameColorCount = 0;
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0,1.0,0.0,1.0));
+            popColor = true;
+        }
         //ImGui::BeginDisabled();
         if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
             simController.scrubberFrame = i;
         }
        // ImGui::EndDisabled();
         if (darkText) {
+            ImGui::PopStyleColor();
+        }
+        if (popColor) {
             ImGui::PopStyleColor();
         }
         ImGui::PopStyleColor();
@@ -1165,7 +1218,7 @@ void SimulationController::RenderUI(void)
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("PsychoDrive Top Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
-    const char* modes[] = { "Training", "Move Viewer", "Combo Maker" };
+    const char* modes[] = { "Developer", "Move Viewer", "Combo Maker" };
     if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), modeSelectorSize)) {
         simInputsChanged = true;
         simController.Reset();
@@ -1302,6 +1355,7 @@ void SimulationController::RenderUI(void)
 void SimulationController::AdvanceUntilComplete(void)
 {
     int frameCount = 0;
+    bool bLastFrame = false;
     while (true) {
         for (int i = 0; i < charCount; i++) {
             // put forced triggers in place before RunFrame(), because it contains the hitstop end AdvanceFrame()
@@ -1329,6 +1383,10 @@ void SimulationController::AdvanceUntilComplete(void)
         }
         pSim->AdvanceFrame();
         frameCount++;
+
+        if (bLastFrame) {
+            break;
+        }
 
         bool bDone = true;
 
@@ -1365,7 +1423,12 @@ void SimulationController::AdvanceUntilComplete(void)
         }
 
         if (bDone) {
-            break;
+            // one more so they actually stand up
+            if (frameCount != 1) {
+                bLastFrame = true;
+            } else {
+                break;
+            }
         }
     }
 
