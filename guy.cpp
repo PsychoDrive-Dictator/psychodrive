@@ -454,6 +454,11 @@ bool Guy::RunFrame(void)
 
         Fixed prevVelX = velocityX;
 
+        cancelInheritVelX = Fixed(0);
+        cancelInheritVelY = Fixed(0);
+        cancelInheritAccelX = Fixed(0);
+        cancelInheritAccelY = Fixed(0);
+
         if (pActionJson->contains("SteerKey"))
         {
             for (auto& [steerKeyID, steerKey] : (*pActionJson)["SteerKey"].items())
@@ -581,6 +586,23 @@ bool Guy::RunFrame(void)
                             }
                         }
                         break;
+                    case 16:
+                        // set cancel inherit %
+                        // there's some weirdness here - kim setting 1 then 9 undoes velX in-game
+                        // this will work in practice, but there's some subtle bug to maybe match
+                        if (multiValueType & 1) {
+                            cancelInheritVelX = fixValue;
+                        }
+                        if (multiValueType & 2) {
+                            cancelInheritVelY = fixValue;
+                        }
+                        if (multiValueType & 8) {
+                            cancelInheritAccelX = fixValue;
+                        }
+                        if (multiValueType & 16) {
+                            cancelInheritAccelY = fixValue;
+                        }
+                        break;
                     default:
                         log(logUnknowns, "unknown steer keyoperation " + std::to_string(operationType));
                         break;
@@ -620,11 +642,15 @@ bool Guy::RunFrame(void)
         prevVelX = velocityX;
         Fixed prevVelY = velocityY;
 
-        if (ignoreSteerType != 3) {
-            velocityX = velocityX + accelX;
-        }
-        if (ignoreSteerType != 4) {
-            velocityY = velocityY + accelY;
+        if (!noAccelNextFrame) {
+            if (ignoreSteerType != 3) {
+                velocityX = velocityX + accelX;
+            }
+            if (ignoreSteerType != 4) {
+                velocityY = velocityY + accelY;
+            }
+        } else {
+            noAccelNextFrame = false;
         }
 
         if ((velocityY * prevVelY) < Fixed(0) || (accelY != Fixed(0) && velocityY == Fixed(0))) {
@@ -3749,7 +3775,15 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             hitAtemiThisMove = false;
         }
 
-        if (!hitStun || blocking) {
+        if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
+            cancelInheritAccelX != Fixed(0) || cancelInheritAccelY != Fixed(0)) {
+            velocityX = velocityX * cancelInheritVelX;
+            velocityY = velocityY * cancelInheritVelY;
+            accelX = accelX * cancelInheritAccelX;
+            accelY = accelY * cancelInheritAccelY;
+            noAccelNextFrame = true; // see kim TP into normal..
+            // not sure if we should pick and choose here, assume the steer-driven one wins for now
+        } else if (!hitStun || blocking) {
             // should this use airborne status from previous or new action? currently previous
             if (isDrive || getAirborne() || isProjectile) {
                 accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());

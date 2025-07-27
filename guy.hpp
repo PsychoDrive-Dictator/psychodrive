@@ -532,6 +532,7 @@ private:
     bool offsetDoesNotPush = false;
     bool ignoreBodyPush = false;
     bool noVelNextFrame = false;
+    bool noAccelNextFrame = false;
     Fixed posOffsetX;
     Fixed posOffsetY;
     Fixed velocityX;
@@ -543,6 +544,11 @@ private:
     Fixed cancelVelocityY;
     Fixed cancelAccelX;
     Fixed cancelAccelY;
+
+    Fixed cancelInheritVelX;
+    Fixed cancelInheritVelY;
+    Fixed cancelInheritAccelX;
+    Fixed cancelInheritAccelY;
 
     Fixed homeTargetX;
     Fixed homeTargetY;

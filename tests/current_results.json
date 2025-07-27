@@ -3726,18 +3726,18 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 905,
-                "firstFrame": 127,
+                "count": 703,
+                "firstFrame": 179,
                 "lastFrame": 580
             },
             {
-                "count": 25,
-                "firstFrame": 127,
+                "count": 4,
+                "firstFrame": 280,
                 "lastFrame": 314
             },
             {
-                "count": 22,
-                "firstFrame": 127,
+                "count": 1,
+                "firstFrame": 314,
                 "lastFrame": 314
             },
             {
