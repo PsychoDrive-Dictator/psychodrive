@@ -658,7 +658,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         bool foundNoWindow = false;
         while (searchFrame >= 0) {
             Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
-            if (pFrameGuy && !foundNoWindow && !pFrameGuy->getFrameTriggers().size()) {
+            if (pFrameGuy && !foundNoWindow && pFrameGuy->getFrameTriggers() != pGuy->getFrameTriggers()) {
                 foundNoWindow = true;
             }
             if (foundNoWindow && pFrameGuy->getFrameTriggers().size()) {
@@ -678,7 +678,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         bool foundNoWindow = false;
         while (searchFrame < simController.simFrameCount) {
             Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
-            if (pFrameGuy && !foundNoWindow && !pFrameGuy->getFrameTriggers().size()) {
+            if (pFrameGuy && !foundNoWindow && pFrameGuy->getFrameTriggers() != pGuy->getFrameTriggers()) {
                 foundNoWindow = true;
             }
             if (foundNoWindow && pFrameGuy->getFrameTriggers().size()) {
@@ -892,15 +892,17 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
         Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
         Guy *pGuyPrevFrame = simController.pSim->getRecordedGuy(i-1, getSimCharSlot());
 
-        if ((!pGuyPrevFrame || !pGuyPrevFrame->getFrameTriggers().size()) && pGuy->getFrameTriggers().size()) {
+        if (!pGuyPrevFrame || (pGuy->getFrameTriggers().size() && (pGuyPrevFrame->getFrameTriggers() != pGuy->getFrameTriggers()))) {
             // cancel window, figure out how far it goes
             int j = i;
+            pGuyPrevFrame = pGuy;
             while (true) {
                 j++;
                 Guy *pGuyJ = simController.pSim->getRecordedGuy(j, getSimCharSlot());
-                if (!pGuyJ || !pGuyJ->getFrameTriggers().size()) {
+                if (!pGuyJ || (pGuyPrevFrame->getFrameTriggers() != pGuyJ->getFrameTriggers())) {
                     break;
                 }
+                pGuyPrevFrame = pGuyJ;
             }
 
             float startOffset = (kFrameButtonWidth + kHorizSpacing) * i;
