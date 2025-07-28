@@ -597,6 +597,8 @@ ImGuiIO& initUI(void)
 
     ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.00f);
 
+    ImGui::PushStyleVar(ImGuiStyleVar_DisabledAlpha, 1.0f);
+
     return io;
 }
 
@@ -1024,11 +1026,15 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0,1.0,0.0,1.0));
             popColor = true;
         }
-        //ImGui::BeginDisabled();
+        if (webWidgets) {
+            ImGui::BeginDisabled();
+        }
         if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
             simController.scrubberFrame = i;
         }
-       // ImGui::EndDisabled();
+        if (webWidgets) {
+            ImGui::EndDisabled();
+        }
         if (darkText) {
             ImGui::PopStyleColor();
         }
