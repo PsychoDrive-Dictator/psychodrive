@@ -2567,6 +2567,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     health -= dmgValue * currentScalingFactor;
 
     comboDamage += dmgValue * currentScalingFactor;
+    lastDamageScale = effectiveScaling;
 
     if (applyHit) {
         if (!blocking) {
@@ -3665,6 +3666,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         currentScaling = 0;
         driveScaling = false;
         resetComboCount = false;
+        lastDamageScale = 0;
     }
 
     if (canMoveNow && wasHit) {

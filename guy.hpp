@@ -104,6 +104,7 @@ public:
     bool getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
+    int getLastDamageScale() { return lastDamageScale; }
     std::string getUniqueParam() {
         std::string ret;
         for ( int i = 0; i < uniqueParamCount; i++) {
@@ -634,6 +635,7 @@ private:
     int comboHits = 0;
     int juggleCounter = 0;
     int comboDamage = 0;
+    int lastDamageScale = 0;
     bool wasHit = false;
     bool resetComboCount = false;
 

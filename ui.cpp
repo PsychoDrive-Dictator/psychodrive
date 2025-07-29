@@ -141,13 +141,17 @@ bool modalDropDown(const char *label, int *pSelection, const char** ppOptions, i
     return modalDropDown(label, pSelection, vecOptions, nFixedWidth);
 }
 
-void renderComboMeter(bool rightSpot, int comboHits) {
+void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scaling) {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
+
     ImGui::SetNextWindowPos(ImVec2(rightSpot ? renderSizeX - 100.0f : 0, 300.0));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     const char *pComboWindowName = rightSpot ? "Right Combo Meter" : "Left Combo Meter";
 
     ImGui::Begin(pComboWindowName, nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing );
     //ImGui::AlignTextToFramePadding();
     ImGui::PushFont(comboFont);
@@ -163,7 +167,13 @@ void renderComboMeter(bool rightSpot, int comboHits) {
     //ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 10.0);
     ImGui::Text("HIT");
     ImGui::PopFont();
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY()-10.0);
+    ImGui::Text("%d (%d%%)", comboDamage, scaling);
     ImGui::End();
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
 }
 
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
@@ -289,7 +299,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     }
 
     if (guys.size() >= 2 && (pGuy == guys[0] || pGuy == guys[1]) && pGuy->getOpponent() && pGuy->getOpponent()->getComboHits()) {
-        renderComboMeter(pGuy == guys[1], pGuy->getOpponent()->getComboHits());
+        renderComboMeter(pGuy == guys[1], pGuy->getOpponent()->getComboHits(), pGuy->getOpponent()->getComboDamage(), pGuy->getOpponent()->getLastDamageScale());
     }
 }
 
@@ -865,7 +875,7 @@ void CharacterUIController::RenderUI(void)
             int comboHits = pOpponent->getComboHits();
 
             if (comboHits != 0) {
-                renderComboMeter(rightSide, comboHits);
+                renderComboMeter(rightSide, comboHits, pOpponent->getComboDamage(), pOpponent->getLastDamageScale());
             }
         }
     }
