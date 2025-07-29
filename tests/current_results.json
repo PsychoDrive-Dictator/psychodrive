@@ -2543,6 +2543,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "dictator_double_bomb",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2812,
+                "firstFrame": 157,
+                "lastFrame": 1862
+            },
+            {
+                "count": 1152,
+                "firstFrame": 184,
+                "lastFrame": 1263
+            },
+            {
+                "count": 677,
+                "firstFrame": 219,
+                "lastFrame": 1263
+            },
+            {
+                "count": 387,
+                "firstFrame": 184,
+                "lastFrame": 750
+            },
+            {
+                "count": 373,
+                "firstFrame": 184,
+                "lastFrame": 750
+            },
+            {
+                "count": 1392,
+                "firstFrame": 201,
+                "lastFrame": 1862
+            },
+            {
+                "count": 1634,
+                "firstFrame": 173,
+                "lastFrame": 1862
+            },
+            {
+                "count": 714,
+                "firstFrame": 222,
+                "lastFrame": 1296
+            },
+            {
+                "count": 1,
+                "firstFrame": 1263,
+                "lastFrame": 1263
+            },
+            {
+                "count": 839,
+                "firstFrame": 489,
+                "lastFrame": 1327
+            },
+            {
+                "count": 91,
+                "firstFrame": 257,
+                "lastFrame": 665
+            }
+        ]
+    },
+    {
         "testName": "dictator_ex_crusher_bomb_combo",
         "testVersion": "26",
         "finished": true,
