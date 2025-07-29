@@ -3851,12 +3851,10 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         timeInHitStop = 0;
     }
 
-    // if just did a trigger, give the first frame an opportunity ot branch
-    // eg. honda's buffed fierce doesn't play its regular frame 0
-    // but departure inner scripts don't want to do that
-    if (didTrigger) {
-        DoBranchKey(true);
-    } else if (didTransition && canMoveNow && nextAction == -1) {
+    // give the first frame an opportunity ot branch
+    DoBranchKey(true);
+
+    if (!didTrigger && didTransition && canMoveNow && nextAction == -1) {
         DoTriggers();
         if (nextAction != -1) {
             didTrigger = true;
