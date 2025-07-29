@@ -1983,7 +1983,7 @@ bool Guy::WorldPhysics(void)
         UpdateBoxes();
     }
 
-    if (getPosY() - Fixed(landingAdjust) < Fixed(0) || landedByFloorPush)
+    if (getPosY() - Fixed(landingAdjust) < Fixed(0) || landedByFloorPush || forceLanding)
     {
         // don't update hitboxes before setting posY, the current frame
         // or the box will be too high up as we're still on the falling box
