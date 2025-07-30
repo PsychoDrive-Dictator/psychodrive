@@ -3311,12 +3311,7 @@ void Guy::DoBranchKey(bool preHit)
             if (doBranch) {
 
                 if (keepFrame) {
-                    int frameBias = 0;
-                    // todo xxx fixme UH OH clown alert
-                    // maybe it's a param that controls that? akuma DI
-                    if (branchType == 21) {
-                        frameBias = -1;
-                    }
+                    int frameBias = branchFrame;
                     if (preHit) {
                         branchFrame = currentFrame + frameBias;
                     } else {
