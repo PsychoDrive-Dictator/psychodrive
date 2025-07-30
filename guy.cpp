@@ -2127,8 +2127,6 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 this, pOtherGuy, hitbox, hurtBox, pHitEntry,
                 hitEntryID, hitEntryFlag, blocked, bombBurst
             });
-
-            break;
         }
     }
 
@@ -2180,7 +2178,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         // for now don't hit the same guy twice
         // todo figure out what happens when two simultaneous hits happen
-        if (hitGuys.find(pOtherGuy) != hitGuys.end()) {
+        if (pendingHit.hitBox.type != direct_damage && hitGuys.find(pOtherGuy) != hitGuys.end()) {
             continue;
         } else {
             hitGuys.insert(pOtherGuy);
@@ -4125,9 +4123,10 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
                             }
                             break;
                         case 52: // bomb?
-                            if (pOpponent) {
-                                pOpponent->debuffTimer = 300;
-                            }
+                            // used by ex crusher bombed scripts but unclear what it does
+                            // if (pOpponent) {
+                            //     pOpponent->debuffTimer = 0;
+                            // }
                             break;
                         default:
                             log(logUnknowns, "unknown chara event id " + std::to_string(eventID));
