@@ -2798,6 +2798,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     // fire/elec/psychopower effect
     // the two that seem to matter for gameplay are 9 for poison and 11 for mine
     if (dmgKind == 11) {
+        // todo change hit marker color
         debuffTimer = 300;
     }
 }
@@ -4122,6 +4123,11 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
                                 styleInstallFrames += param2;
                             } else {
                                 log(logUnknowns, "unknown operator in chara event style install timer");
+                            }
+                            break;
+                        case 52: // bomb?
+                            if (pOpponent) {
+                                pOpponent->debuffTimer = 300;
                             }
                             break;
                         default:
