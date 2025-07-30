@@ -99,8 +99,13 @@ public:
 
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
-    int getHitStop() { return hitStop; }
     int getHitStopForDump() { if (pendingHitStop) return pendingHitStop - 1; return std::max(0, hitStop - 1); }
+    int getHitStop() { 
+        if (ignoreHitStop) {
+            return 0;
+        }
+        return hitStop;
+    }
     bool getWarudo() { return warudo; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
@@ -611,6 +616,7 @@ private:
     int hitStop = 0;
     int pendingHitStop = 0;
     int timeInHitStop = 0;
+    bool ignoreHitStop = false;
     bool tokiYoTomare = false;
     bool warudo = false;
     bool tokiWaUgokidasu = false;

@@ -307,9 +307,9 @@ bool Guy::RunFrame(void)
         if (debuffTimer > 0 ) {
             debuffTimer--;
         }
-        if (debuffTimer == 1 && hitStop == 1) {
+        if (debuffTimer == 1 && getHitStop() == 1) {
             debuffTimer = 5;
-        } else if (debuffTimer == 1 && hitStop > 0) {
+        } else if (debuffTimer == 1 && getHitStop() > 0) {
             debuffTimer++;
         }
     }
@@ -326,10 +326,10 @@ bool Guy::RunFrame(void)
         return false;
     }
 
-    if (hitStop) {
+    if (getHitStop()) {
         timeInHitStop++;
         hitStop--;
-        if (hitStop == 0) {
+        if (getHitStop() == 0) {
             // increment the frame we skipped at the beginning of hitstop
             if (!AdvanceFrame(true)) {
                 delete this;
@@ -338,7 +338,7 @@ bool Guy::RunFrame(void)
         }
     }
 
-    if (hitStop) {
+    if (getHitStop()) {
         return false;
     }
 
@@ -711,6 +711,7 @@ bool Guy::RunFrame(void)
         forceKnockDownState = false;
         throwTechable = false;
         ignoreBodyPush = false;
+        ignoreHitStop = false;
 
         DoSwitchKey("SwitchKey");
         DoSwitchKey("ExtSwitchKey");
@@ -825,7 +826,7 @@ bool Guy::RunFrame(void)
 
 void Guy::RunFramePostPush(void)
 {
-    if (warudo || hitStop) {
+    if (warudo || getHitStop()) {
         return;
     }
 
@@ -1648,7 +1649,7 @@ int Guy::getFrameMeterColorIndex() {
     if (hitStun) {
         ret = 5;
     }
-    if (hitStop || warudo) {
+    if (getHitStop() || warudo) {
         ret = 6;
     }
     return ret;
@@ -1656,7 +1657,7 @@ int Guy::getFrameMeterColorIndex() {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
-    if (warudo || hitStop) return false;
+    if (warudo || getHitStop()) return false;
 
     // do reflect before push, since vel could be winning to push us flush against someone
     // in theory should do before wall touch too but not sure if both can be touching the
@@ -2007,7 +2008,7 @@ bool Guy::WorldPhysics(void)
 
 void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 {
-    if (warudo || hitStop) return;
+    if (warudo || getHitStop()) return;
     if ( !pOtherGuy ) return;
 
     for (auto const &hitbox : hitBoxes ) {
@@ -3332,7 +3333,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (hitStop || warudo) {
+    if (getHitStop() || warudo) {
         if (tokiWaUgokidasu) {
             // time has begun to move again
             warudo = false;
@@ -3849,7 +3850,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         switchDirection();
     }
 
-    if (hitStop == 0) {
+    if (getHitStop() == 0) {
         timeInHitStop = 0;
     }
 
@@ -3928,6 +3929,9 @@ void Guy::DoSwitchKey(const char *name)
             }
             if (flag & 0x80000) {
                 ignoreBodyPush = true;
+            }
+            if (flag & 0x8) {
+                ignoreHitStop = true;
             }
             if (flag & 0x2) {
                 counterState = true;
