@@ -2535,22 +2535,39 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         knockDownFrames = downTime;
     }
 
-    if (comboHits == 0) {
-        currentScaling = 100;
-    }
-
-    if (applyHit && !blocking) {
+    if (applyHit) {
         if (comboHits == 0) {
+            currentScaling = 100;
+            pendingScaling = 0;
+        }
+
+        bool applyScaling = pAttacker->scalingTriggerID != lastScalingTriggerID;
+
+        if (pendingScaling && applyScaling) {
+            currentScaling -= pendingScaling;
+            pendingScaling = 0;
+        }
+
+        if (!blocking && applyScaling) {
+            if (comboHits == 0) {
             pendingScaling = pAttacker->startScale;
-        } else {
-            pendingScaling = pAttacker->comboScale;
-            if (currentScaling == 100) {
-                pendingScaling += 10;
+            } else {
+                pendingScaling = pAttacker->comboScale;
+                if (currentScaling == 100) {
+                    pendingScaling += 10;
+                }
             }
         }
+
+        lastScalingTriggerID = pAttacker->scalingTriggerID;
     }
 
     int effectiveScaling = currentScaling - pAttacker->instantScale;
+
+    if (effectiveScaling < 10) {
+        effectiveScaling = 10;
+    }
+
     if (driveScaling) {
         effectiveScaling *= 0.85;
     }
@@ -3739,12 +3756,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         log (logTransitions, "nvm! current action " + std::to_string(currentAction));
     }
 
-    if (didTrigger) {
-        if (pOpponent && pOpponent->pendingScaling) {
-            log(true, "pending scaling applied " + std::to_string(pOpponent->pendingScaling));
-            pOpponent->currentScaling -= pOpponent->pendingScaling;
-            pOpponent->pendingScaling = 0;
-        }
+    if (didTrigger && didTransition) {
+        scalingTriggerID++;
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now

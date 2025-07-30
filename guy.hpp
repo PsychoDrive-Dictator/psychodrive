@@ -320,6 +320,8 @@ public:
         currentAction = startAction;
         styleInstall = styleID;
 
+        scalingTriggerID = parent.scalingTriggerID;
+
         isProjectile = isProj;
         projHitCount = -1; // unset yet, is in the first action
         if (parent.pParent) {
@@ -622,6 +624,8 @@ private:
     bool warudo = false;
     bool tokiWaUgokidasu = false;
 
+    int scalingTriggerID = 0;
+
     // getting hit side
     Guy *pAttacker = nullptr;
     int hitStun = 0;
@@ -643,6 +647,7 @@ private:
     int juggleCounter = 0;
     int comboDamage = 0;
     int lastDamageScale = 0;
+    int lastScalingTriggerID = 0;
     bool wasHit = false;
     bool resetComboCount = false;
 
