@@ -349,6 +349,7 @@ public:
     const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson = nullptr);
     nlohmann::json *findAtemi(int atemiID);
 private:
+    void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
     void UpdateActionData(void);
     void UpdateBoxes(void);
 

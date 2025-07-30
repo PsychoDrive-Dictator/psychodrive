@@ -2932,6 +2932,11 @@ void Guy::DoBranchKey(bool preHit)
 {
     int maxBranchType = -1;
 
+    // ignore deferral here. weird
+    if (hitStop) {
+        return;
+    }
+
     if (pActionJson != nullptr && pActionJson->contains("BranchKey"))
     {
         for (auto& [keyID, key] : (*pActionJson)["BranchKey"].items())
@@ -3704,7 +3709,63 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         nextAction = crouching ? 8 : 7;
     }
 
-    // Transition
+    if (nextAction != -1) {
+        NextAction(didTrigger, didBranch);
+        didTransition = true;
+    }
+
+    if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
+        switchDirection();
+    }
+
+    if (getHitStop() == 0) {
+        timeInHitStop = 0;
+    }
+
+    // give the first frame an opportunity ot branch
+    DoBranchKey(true);
+    if (nextAction != -1) {
+        didBranch = true;
+    }
+
+    if (!didTrigger && didTransition && canMoveNow && nextAction == -1) {
+        DoTriggers();
+        if (nextAction != -1) {
+            didTrigger = true;
+        }
+    }
+
+    // if successful, eat this frame away and go right now
+    if (nextAction != -1) {
+        NextAction(didTrigger, didBranch, true);
+        log (logTransitions, "nvm! current action " + std::to_string(currentAction));
+    }
+
+    if (didTrigger) {
+        if (pOpponent && pOpponent->pendingScaling) {
+            log(true, "pending scaling applied " + std::to_string(pOpponent->pendingScaling));
+            pOpponent->currentScaling -= pOpponent->pendingScaling;
+            pOpponent->pendingScaling = 0;
+        }
+    }
+
+    // if we need landing adjust/etc during hitStop, need this updated now
+    if (!didTransition) {
+        prevPoseStatus = forcedPoseStatus;
+    }
+    DoStatusKey();
+    WorldPhysics();
+    UpdateBoxes();
+
+    couldMove = canMoveNow;
+
+    forcedTrigger = std::make_pair(0,0);
+
+    return true;
+}
+
+void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
+{
     if ( nextAction != -1 )
     {
         int oldProjDataIndex = (*pActionJson)["fab"]["Projectile"]["DataIndex"];
@@ -3766,66 +3827,68 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             canHitID = 0;
         }
 
-        // only reset on doing a trigger - skull diver trigger is on hit, but the hit
-        // happens on a prior script, and it doesn't have inherit HitInfo, so it's not that
-        // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch, check what that's about
-        if (!didBranch) {
-            hitThisMove = false;
-            hitCounterThisMove = false;
-            hitPunishCounterThisMove = false;
-            hasBeenBlockedThisMove = false;
-            hitArmorThisMove = false;
-            hitAtemiThisMove = false;
-        }
+        if (!bElide) {
+            // only reset on doing a trigger - skull diver trigger is on hit, but the hit
+            // happens on a prior script, and it doesn't have inherit HitInfo, so it's not that
+            // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch, check what that's about
+            if (!didBranch) {
+                hitThisMove = false;
+                hitCounterThisMove = false;
+                hitPunishCounterThisMove = false;
+                hasBeenBlockedThisMove = false;
+                hitArmorThisMove = false;
+                hitAtemiThisMove = false;
+            }
 
-        if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
-            cancelInheritAccelX != Fixed(0) || cancelInheritAccelY != Fixed(0)) {
-            velocityX = velocityX * cancelInheritVelX;
-            velocityY = velocityY * cancelInheritVelY;
-            accelX = accelX * cancelInheritAccelX;
-            accelY = accelY * cancelInheritAccelY;
-            noAccelNextFrame = true; // see kim TP into normal..
-            // not sure if we should pick and choose here, assume the steer-driven one wins for now
-        } else if (!hitStun || blocking) {
-            // should this use airborne status from previous or new action? currently previous
-            if (isDrive || getAirborne() || isProjectile) {
-                accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
-                accelY = accelY * Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
-                velocityX = velocityX * Fixed((*pInherit)["Velocity"]["x"].get<double>());
-                velocityY = velocityY * Fixed((*pInherit)["Velocity"]["y"].get<double>());
+            if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
+                cancelInheritAccelX != Fixed(0) || cancelInheritAccelY != Fixed(0)) {
+                velocityX = velocityX * cancelInheritVelX;
+                velocityY = velocityY * cancelInheritVelY;
+                accelX = accelX * cancelInheritAccelX;
+                accelY = accelY * cancelInheritAccelY;
+                noAccelNextFrame = true; // see kim TP into normal..
+                // not sure if we should pick and choose here, assume the steer-driven one wins for now
+            } else if (!hitStun || blocking) {
+                // should this use airborne status from previous or new action? currently previous
+                if (isDrive || getAirborne() || isProjectile) {
+                    accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
+                    accelY = accelY * Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
+                    velocityX = velocityX * Fixed((*pInherit)["Velocity"]["x"].get<double>());
+                    velocityY = velocityY * Fixed((*pInherit)["Velocity"]["y"].get<double>());
+                } else {
+                    accelX = Fixed(0);
+                    accelY = Fixed(0);
+                    velocityX = Fixed(0);
+                    velocityY = Fixed(0);
+                }
+            }
+
+            if (didTrigger) {
+                if (cancelAccelX != Fixed(0)) {
+                    accelX = cancelAccelX;
+                }
+                if (cancelAccelY != Fixed(0)) {
+                    accelY = cancelAccelY;
+                }
+                if (cancelVelocityX != Fixed(0)) {
+                    velocityX = cancelVelocityX;
+                }
+                if (cancelVelocityY != Fixed(0)) {
+                    velocityY = cancelVelocityY;
+                }
+            }
+            cancelAccelX = Fixed(0);
+            cancelAccelY = Fixed(0);
+            cancelVelocityX = Fixed(0);
+            cancelVelocityY = Fixed(0);
+
+            if (isDrive == true) {
+                isDrive = false;
+                // at some point make it so we cant drive specials
+                wasDrive = true;
             } else {
-                accelX = Fixed(0);
-                accelY = Fixed(0);
-                velocityX = Fixed(0);
-                velocityY = Fixed(0);
+                wasDrive = false;
             }
-        }
-
-        if (didTrigger) {
-            if (cancelAccelX != Fixed(0)) {
-                accelX = cancelAccelX;
-            }
-            if (cancelAccelY != Fixed(0)) {
-                accelY = cancelAccelY;
-            }
-            if (cancelVelocityX != Fixed(0)) {
-                velocityX = cancelVelocityX;
-            }
-            if (cancelVelocityY != Fixed(0)) {
-                velocityY = cancelVelocityY;
-            }
-        }
-        cancelAccelX = Fixed(0);
-        cancelAccelY = Fixed(0);
-        cancelVelocityX = Fixed(0);
-        cancelVelocityY = Fixed(0);
-
-        if (isDrive == true) {
-            isDrive = false;
-            // at some point make it so we cant drive specials
-            wasDrive = true;
-        } else {
-            wasDrive = false;
         }
 
         if (isProjectile) {
@@ -3837,64 +3900,12 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
         prevPoseStatus = forcedPoseStatus;
 
-        // careful about airborne/etc checks until call do DoStatusKey() below
+        // careful about airborne/etc checks until call do DoStatusKey() later
         forcedPoseStatus = 0;
         actionStatus = 0;
         jumpStatus = 0;
         landingAdjust = 0;
-
-        didTransition = true;
     }
-
-    if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
-        switchDirection();
-    }
-
-    if (getHitStop() == 0) {
-        timeInHitStop = 0;
-    }
-
-    // give the first frame an opportunity ot branch
-    DoBranchKey(true);
-
-    if (!didTrigger && didTransition && canMoveNow && nextAction == -1) {
-        DoTriggers();
-        if (nextAction != -1) {
-            didTrigger = true;
-        }
-    }
-
-    // if successful, eat this frame away and go right now
-    if (nextAction != -1) {
-        currentAction = nextAction;
-        currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
-        nextActionFrame = -1;
-        UpdateActionData();
-        log (logTransitions, "nvm! current action " + std::to_string(currentAction));
-        nextAction = -1;
-    }
-
-    if (didTrigger) {
-        if (pOpponent && pOpponent->pendingScaling) {
-            log(true, "pending scaling applied " + std::to_string(pOpponent->pendingScaling));
-            pOpponent->currentScaling -= pOpponent->pendingScaling;
-            pOpponent->pendingScaling = 0;
-        }
-    }
-
-    // if we need landing adjust/etc during hitStop, need this updated now
-    if (!didTransition) {
-        prevPoseStatus = forcedPoseStatus;
-    }
-    DoStatusKey();
-    WorldPhysics();
-    UpdateBoxes();
-
-    couldMove = canMoveNow;
-
-    forcedTrigger = std::make_pair(0,0);
-
-    return true;
 }
 
 void Guy::DoSwitchKey(const char *name)
