@@ -398,8 +398,13 @@ bool Guy::RunFrame(void)
 
         Fixed prevPosY = getPosY();
 
-        posOffsetX = Fixed(0);
-        posOffsetY = Fixed(0);
+        if (!noPlaceXNextFrame) {
+            posOffsetX = Fixed(0);
+        }
+
+        if (!noPlaceYNextFrame) {
+            posOffsetY = Fixed(0);
+        }
 
         // assuming it doesn't stick for now
         ignoreSteerType  = -1;
@@ -443,6 +448,9 @@ bool Guy::RunFrame(void)
                 }
 
                 offsetMatch *= ratio;
+                if (offsetMatch == Fixed(0)) {
+                    continue;
+                }
 
                 if (placeKey["Axis"] == 0) {
                     posOffsetX = offsetMatch;
@@ -451,6 +459,9 @@ bool Guy::RunFrame(void)
                 }
             }
         }
+
+        noPlaceXNextFrame = false;
+        noPlaceYNextFrame = false;
 
         Fixed prevVelX = velocityX;
 
@@ -3300,10 +3311,19 @@ void Guy::DoBranchKey(bool preHit)
             if (doBranch) {
 
                 if (keepFrame) {
+                    int frameBias = 0;
+                    // todo xxx fixme UH OH clown alert
+                    // maybe it's a param that controls that? akuma DI
+                    if (branchType == 21) {
+                        frameBias = -1;
+                    }
                     if (preHit) {
-                        branchFrame = currentFrame;
+                        branchFrame = currentFrame + frameBias;
                     } else {
-                        branchFrame = currentFrame + 1;
+                        branchFrame = currentFrame + 1 + frameBias;
+                    }
+                    if (branchFrame < 0) {
+                        branchFrame = 0;
                     }
                 }
 
@@ -3319,7 +3339,6 @@ void Guy::DoBranchKey(bool preHit)
                         nextActionFrame = branchFrame;
                     }
                     deniedLastBranch = false;
-
                     keepPlace = key["_KeepPlace"];
                 }
 
@@ -3783,7 +3802,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         if (currentAction != nextAction) {
             currentAction = nextAction;
-            log (logTransitions, "current action " + std::to_string(currentAction) + " keep place " + std::to_string(keepPlace) + " keep frame " + std::to_string(keepFrame));
+            log (logTransitions, "current action " + std::to_string(currentAction));
 
             if (styleInstallFrames && !countingDownInstall) {
                 // start counting down on wakeup after install super?
@@ -3798,14 +3817,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             opponentAction = false;
         }
 
-        if (!keepPlace) {
-            // commit current place offset
-            posX = posX + (posOffsetX * direction);
-            posOffsetX = Fixed(0);
-            posY = posY + posOffsetY;
-            posOffsetY = Fixed(0);
-        }
-
         if (didBranch) {
             // kinda crazy, but do EventKey for the bumped branch frame before the transition
             // steering moves will apply twice, on purpose. is it the same for triggers? :thonk:
@@ -3816,8 +3827,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         locked = false;
 
-        keepPlace = false;
-
         currentArmorID = -1; // uhhh
 
         nextAction = -1;
@@ -3826,6 +3835,23 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         UpdateActionData();
 
         nlohmann::json *pInherit = &(*pActionJson)["fab"]["Inherit"];
+
+        int inheritFlags = (*pInherit)["KindFlag"];
+
+        if (!(inheritFlags & (1<<0)) && !keepPlace) {
+            posX = posX + (posOffsetX * direction);
+            posOffsetX = Fixed(0);
+        } else {
+            noPlaceXNextFrame = true;
+        }
+        if (!(inheritFlags & (1<<1)) && !keepPlace) {
+            posY = posY + posOffsetY;
+            posOffsetY = Fixed(0);
+        } else {
+            noPlaceYNextFrame = true;
+        }
+
+        keepPlace = false;
 
         bool inheritHitID = (*pInherit)["_HitID"];
         // see eg. 2MP into light crusher - light crusher has inherit hitID true..
