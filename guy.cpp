@@ -2499,12 +2499,11 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     }
 
     // if going airborne, start counting juggle
-    if (!airborne && destY != 0) {
-        if (juggleCounter == 0) {
-            juggleCounter = juggleFirst; // ?
-        } else {
-            juggleCounter += juggleAdd;
-        }
+    if (!isDomain && applyHit && !airborne && destY != 0) {
+        juggleCounter = juggleFirst;
+    }
+    if (!isDomain && applyHit && airborne) {
+        juggleCounter += juggleAdd;
     }
 
     if (isDrive) {
