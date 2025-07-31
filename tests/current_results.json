@@ -1928,12 +1928,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 562,
-                "firstFrame": 142,
-                "lastFrame": 494
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 265,
+                "count": 204,
                 "firstFrame": 130,
                 "lastFrame": 394
             },

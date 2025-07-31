@@ -2709,6 +2709,10 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     hitVelX = Fixed(0);
                     hitAccelX = Fixed(0);
                     velocityX = Fixed(-destX) / Fixed(destTime);
+                    if (destX < 0) {
+                        // there's something about negative values and biases? weird
+                        velocityX.data += 1;
+                    }
                 }
 
                 if (destY != 0) {
