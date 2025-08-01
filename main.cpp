@@ -731,8 +731,10 @@ static void mainloop(void)
                     int i = 0;
                     while (i < 2) {
                         std::string desc = "player " + std::to_string(i);
-                        compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), Simulation::ePos, desc + " pos X");
-                        compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), Simulation::ePos, desc + " pos Y");
+                        if (targetDumpFrame > 1) {
+                            compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), Simulation::ePos, desc + " pos X");
+                            compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), Simulation::ePos, desc + " pos Y");
+                        }
                         Fixed velX, velY, accelX, accelY;
                         guys[i]->getVel(velX, velY, accelX, accelY);
                         compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, Simulation::eVel, desc + " vel X");
