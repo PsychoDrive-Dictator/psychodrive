@@ -1613,6 +1613,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_ex_backfist_wallsplat_left",
+        "testVersion": "33",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 71,
+                "firstFrame": 136,
+                "lastFrame": 209
+            },
+            {
+                "count": 25,
+                "firstFrame": 167,
+                "lastFrame": 209
+            },
+            {
+                "count": 45,
+                "firstFrame": 121,
+                "lastFrame": 166
+            },
+            {
+                "count": 46,
+                "firstFrame": 121,
+                "lastFrame": 166
+            },
+            {
+                "count": 65,
+                "firstFrame": 121,
+                "lastFrame": 253
+            },
+            {
+                "count": 71,
+                "firstFrame": 111,
+                "lastFrame": 208
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "akuma_h_tatsu_knockdown",
         "testVersion": "33",
         "finished": true,
