@@ -672,7 +672,7 @@ bool Guy::RunFrame(void)
 
         // log(std::to_string(currentAction) + " " + std::to_string(prevVelX) + " " + std::to_string(velocityX));
 
-        if ( (velocityX * prevVelX) < Fixed(0) || (accelX != Fixed(0) && velocityX == Fixed(0)) ) {
+        if ((velocityX * prevVelX) < Fixed(0) || (accelX != Fixed(0) && (prevVelX*velocityX == Fixed(0)))) {
             // sign change?
             velocityX = Fixed(0);
             accelX = Fixed(0);
