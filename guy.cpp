@@ -1893,7 +1893,7 @@ bool Guy::WorldPhysics(void)
 
         // Walls
         Fixed x = getPosX();
-        if (pOpponent) {
+        if (pOpponent && !isProjectile) {
             Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
             Fixed screenCenterX = bothPlayerPos / Fixed(2);
             int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
