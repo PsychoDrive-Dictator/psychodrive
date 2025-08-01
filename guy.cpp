@@ -1892,8 +1892,24 @@ bool Guy::WorldPhysics(void)
         }
 
         // Walls
-
         Fixed x = getPosX();
+        if (pOpponent) {
+            Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
+            Fixed screenCenterX = bothPlayerPos / Fixed(2);
+            int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+            screenCenterX.data += fixedRemainder;
+            if (x < screenCenterX - maxPlayerDistance) {
+                pushX = -(x - (screenCenterX - maxPlayerDistance));
+                touchedWall = true;
+                hasPushed = true;
+            }
+            if (x > screenCenterX + maxPlayerDistance) {
+                pushX = -(x - (screenCenterX + maxPlayerDistance));
+                touchedWall = true;
+                hasPushed = true;
+            }
+        }
+
         if (x < -wallDistance ) {
             pushX = -(x - -wallDistance);
             touchedWall = true;
@@ -1903,20 +1919,6 @@ bool Guy::WorldPhysics(void)
             pushX = -(x - wallDistance);
             touchedWall = true;
             hasPushed = true;
-        }
-
-        if (pOpponent && velocityX != Fixed(0)) {
-            Fixed opX = pOpponent->getPosX();
-            if (fixAbs(opX - x) > maxPlayerDistance) {
-                Fixed directionToOpponent = (opX - x) / fixAbs(opX - x);
-                // if moving away from opponent, obey virtual wall
-                if (directionToOpponent == direction) {
-                    touchedWall = true;
-                    hasPushed = true;
-
-                    pushX = (fixAbs(opX - x) - maxPlayerDistance) * direction;
-                }
-            }
         }
     }
 
@@ -2639,17 +2641,17 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         if (kabeTataki) {
             // this can happen even if you block! blocked DI
             wallSplat = true;
-            wallStopFrames = (*pHitEffect)["WallStop"];
+            wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 2;
         } else if (kabeBound && wallTime) {
             int wallDestX = (*pHitEffect)["WallDest"]["x"];
             int wallDestY = (*pHitEffect)["WallDest"]["y"];
-            wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 1;
+            wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 2;
 
             wallBounce = true;
             wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
             //wallBounceAccelX = -direction * wallDestX / 2.0 / (float)wallTime * 2.0 / (float)wallTime;
             //wallBounceVelX -= wallBounceAccelX;
-
+            if (wallBounceVelX.data & 63) wallBounceVelX.data += 1;
             wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
             wallBounceAccelY = Fixed(wallDestY * -8) / Fixed(wallTime * wallTime);
             if (wallBounceAccelY.data & 63) wallBounceAccelY.data -= 1;
@@ -3464,12 +3466,15 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if ((wallBounce || wallSplat) && touchedWall) {
-        wallStopped = wallBounce || airborne;
+    if (wallStopped) {
         velocityX = Fixed(0);
         velocityY = Fixed(0);
         accelX = Fixed(0);
         accelY = Fixed(0);
+    }
+
+    if ((wallBounce || wallSplat) && touchedWall) {
+        wallStopped = wallBounce || airborne;
         if (wallSplat) {
             if (airborne) {
                 nextAction = 285;
@@ -3493,8 +3498,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             if (wallSplat) {
                 nextAction = 287;
                 wallSplat = false;
-                // todo ??
-                accelY = Fixed(-0.6f, true);
+                accelY.data = -39497; // todo -0.6ish ? magic gravity constant?
             } else {
                 nextAction = 235; // combo/bounce state
 
@@ -3787,6 +3791,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     UpdateBoxes();
 
     couldMove = canMoveNow;
+    lastPosX = getPosX();
+    lastPosY = getPosY();
 
     forcedTrigger = std::make_pair(0,0);
 

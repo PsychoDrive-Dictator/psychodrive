@@ -12,7 +12,7 @@
 #include "simulation.hpp"
 
 const Fixed wallDistance = Fixed(765.0f);
-const Fixed maxPlayerDistance = Fixed(490.0f);
+const Fixed maxPlayerDistance = Fixed(245.0f);
 
 extern nlohmann::json staticPlayer;
 extern bool staticPlayerLoaded;
@@ -71,6 +71,8 @@ public:
     void resetPos() {
         posX = startPosX;
         posY = startPosY;
+        lastPosX = posX;
+        lastPosY = posY;
 
         airborne = false;
         landed = false;
@@ -247,8 +249,8 @@ public:
         character = charName;
         version = charVersion;
         name = character;
-        posX = startPosX = x;
-        posY = startPosY = y;
+        posX = startPosX = lastPosX = x;
+        posY = startPosY = lastPosY = y;
         direction = startDir;
         charColorR = color.r;
         charColorG = color.g;
@@ -293,6 +295,8 @@ public:
         direction = parent.direction;
         posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
         posY = parent.posY + parent.posOffsetY + posOffsetY;
+        lastPosX = posX;
+        lastPosY = posY;
         charColorR = parent.charColorR;
         charColorG = parent.charColorG;
         charColorB = parent.charColorB;
@@ -507,6 +511,9 @@ private:
     Fixed posX;
     Fixed posY;
     Fixed direction = Fixed(1);
+
+    Fixed lastPosX;
+    Fixed lastPosY;
 
     Fixed startPosX;
     Fixed startPosY;
