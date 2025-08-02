@@ -54,6 +54,8 @@ public:
     Fixed getPosY() {
         return posY + posOffsetY;
     }
+    Fixed getLastPosX() { return lastPosX; }
+    Fixed getLastPosY() { return lastPosY; }
     int getDirection() { return direction.i(); }
     int getCurrentInput() { return currentInput; }
     void switchDirection() {
