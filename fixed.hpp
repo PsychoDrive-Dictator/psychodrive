@@ -174,5 +174,15 @@ public:
         return a;
     }
 
+    friend Fixed fixDivWithBias( Fixed a, Fixed b) {
+        Fixed ret = a / b;
+        // int remainder = a.data - b.data * ret.data;
+        // remainder /= std::abs(remainder);
+        if (std::abs(ret.data) & 63) {
+            ret.data += ret.i() / std::abs(ret.i());
+        }
+        return ret;
+    }
+
     int64_t data = 0;
 };

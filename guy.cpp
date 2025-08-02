@@ -2623,13 +2623,11 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
             groundBounce = true;
             groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
-            groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
-            if (groundBounceAccelX.data & 63) groundBounceAccelX.data += 1;
+            groundBounceAccelX = fixDivWithBias(Fixed(floorDestX) , Fixed(floorTime * 32));
             groundBounceVelX -= groundBounceAccelX;
 
             groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
-            groundBounceAccelY = Fixed(floorDestY * -8) / Fixed(floorTime * floorTime);
-            if (groundBounceAccelY.data & 63) groundBounceAccelY.data -= 1;
+            groundBounceAccelY = fixDivWithBias(Fixed(floorDestY * -8) , Fixed(floorTime * floorTime));
             groundBounceVelY -= groundBounceAccelY;
         } else {
             groundBounce = false;
@@ -2648,13 +2646,9 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
             wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 2;
 
             wallBounce = true;
-            wallBounceVelX = Fixed(-wallDestX) / Fixed(wallTime);
-            //wallBounceAccelX = -direction * wallDestX / 2.0 / (float)wallTime * 2.0 / (float)wallTime;
-            //wallBounceVelX -= wallBounceAccelX;
-            if (wallBounceVelX.data & 63) wallBounceVelX.data += 1;
+            wallBounceVelX = fixDivWithBias(Fixed(-wallDestX) , Fixed(wallTime));
             wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
-            wallBounceAccelY = Fixed(wallDestY * -8) / Fixed(wallTime * wallTime);
-            if (wallBounceAccelY.data & 63) wallBounceAccelY.data -= 1;
+            wallBounceAccelY = fixDivWithBias(Fixed(wallDestY * -8) , Fixed(wallTime * wallTime));
             wallBounceVelY -= wallBounceAccelY;
         }
 
@@ -2670,8 +2664,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     // from RunFrame -> lockkey, and the velocity will be off by one frame depending
                     // on who's RunFrame runs first
                     hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
-                    hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
-                    if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
+                    hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
 
                     velocityX = Fixed(destX) / Fixed(destTime);
                 }
@@ -2692,10 +2685,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 if (destY != 0) {
                     if (destY > 0) {
                         velocityY = Fixed(destY * 4) / Fixed(destTime);
-                        accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
-                        if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
-                        // i think this vel wants to apply this frame, lame workaround to get same intensity
-                        velocityY -= accelY; //
+                        accelY = fixDivWithBias(Fixed(destY * -8) , Fixed(destTime * destTime));
+                        velocityY -= accelY;
                     } else {
                         velocityY = Fixed(destY) / Fixed(destTime);
                         accelY = Fixed(0);
@@ -2705,14 +2696,13 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 // generic pushback/airborne knock
                 if (!airborne) {
                     hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
-                    hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
-                    if (hitAccelX.data & 63) hitAccelX.data += hitVelDirection.i(); // there seems to be a bias of 1 raw units
+                    hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
                 } else {
                     hitVelX = Fixed(0);
                     hitAccelX = Fixed(0);
                     velocityX = Fixed(-destX) / Fixed(destTime);
                     if (destX < 0) {
-                        // there's something about negative values and biases? weird
+                        // this bias not like the others?
                         velocityX.data += 1;
                     }
                 }
@@ -2720,10 +2710,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 if (destY != 0) {
                     if (destY > 0) {
                         velocityY = Fixed(destY * 4) / Fixed(destTime);
-                        accelY = Fixed(destY * -8) / Fixed(destTime * destTime);
-                        if (accelY.data & 63) accelY.data -= 1; // bias is only for the accels?
-                        // i think this vel wants to apply this frame, lame workaround to get same intensity
-                        velocityY -= accelY; //
+                        accelY = fixDivWithBias(Fixed(destY * -8) , Fixed(destTime * destTime));
+                        velocityY -= accelY;
                     } else {
                         velocityY = Fixed(destY) / Fixed(destTime);
                         accelY = Fixed(0);
