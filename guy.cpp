@@ -1887,7 +1887,7 @@ bool Guy::Push(Guy *pOtherGuy)
     return false;
 }
 
-bool Guy::WorldPhysics(void)
+bool Guy::WorldPhysics(bool onlyFloor)
 {
     bool hasPushed = false;
     Fixed pushX = 0;
@@ -1904,33 +1904,35 @@ bool Guy::WorldPhysics(void)
         }
 
         // Walls
-        Fixed x = getPosX();
-        if (pOpponent && !isProjectile) {
-            Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
-            Fixed screenCenterX = bothPlayerPos / Fixed(2);
-            int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
-            screenCenterX.data += fixedRemainder;
-            if (x < screenCenterX - maxPlayerDistance) {
-                pushX = -(x - (screenCenterX - maxPlayerDistance));
-                touchedWall = true;
-                hasPushed = true;
+        if (!onlyFloor) {
+            Fixed x = getPosX();
+            if (pOpponent && !isProjectile) {
+                Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
+                Fixed screenCenterX = bothPlayerPos / Fixed(2);
+                int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+                screenCenterX.data += fixedRemainder;
+                if (x < screenCenterX - maxPlayerDistance) {
+                    pushX = -(x - (screenCenterX - maxPlayerDistance));
+                    touchedWall = true;
+                    hasPushed = true;
+                }
+                if (x > screenCenterX + maxPlayerDistance) {
+                    pushX = -(x - (screenCenterX + maxPlayerDistance));
+                    touchedWall = true;
+                    hasPushed = true;
+                }
             }
-            if (x > screenCenterX + maxPlayerDistance) {
-                pushX = -(x - (screenCenterX + maxPlayerDistance));
-                touchedWall = true;
-                hasPushed = true;
-            }
-        }
 
-        if (x < -wallDistance ) {
-            pushX = -(x - -wallDistance);
-            touchedWall = true;
-            hasPushed = true;
-        }
-        if (x > wallDistance ) {
-            pushX = -(x - wallDistance);
-            touchedWall = true;
-            hasPushed = true;
+            if (x < -wallDistance ) {
+                pushX = -(x - -wallDistance);
+                touchedWall = true;
+                hasPushed = true;
+            }
+            if (x > wallDistance ) {
+                pushX = -(x - wallDistance);
+                touchedWall = true;
+                hasPushed = true;
+            }
         }
     }
 
@@ -3787,7 +3789,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         prevPoseStatus = forcedPoseStatus;
     }
     DoStatusKey();
-    WorldPhysics();
+    WorldPhysics(true); // only floor
     UpdateBoxes();
 
     couldMove = canMoveNow;

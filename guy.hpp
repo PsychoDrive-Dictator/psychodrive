@@ -29,7 +29,7 @@ public:
     void Render(void);
     bool Push(Guy *pOtherGuy);
     void RunFramePostPush(void);
-    bool WorldPhysics(void);
+    bool WorldPhysics(bool onlyFloor = false);
     void CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList);
     bool AdvanceFrame(bool endHitStopFrame = false);
     std::string getActionName(int actionID);
