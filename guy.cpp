@@ -2727,7 +2727,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                         accelY = fixDivWithBias(Fixed(destY * -8) , Fixed(destTime * destTime));
                         velocityY -= accelY;
                     } else {
-                        velocityY = Fixed(destY) / Fixed(destTime);
+                        velocityY = fixDivWithBias(Fixed(destY) , Fixed(destTime));
                         accelY = Fixed(0);
                     }
                 }
