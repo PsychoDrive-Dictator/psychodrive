@@ -2424,7 +2424,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 3250,
+                "count": 3251,
                 "firstFrame": 171,
                 "lastFrame": 1939
             },
@@ -4470,8 +4470,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1332,
-                "firstFrame": 612,
+                "count": 1328,
+                "firstFrame": 614,
                 "lastFrame": 1229
             },
             {
@@ -4656,8 +4656,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1248,
-                "firstFrame": 398,
+                "count": 1244,
+                "firstFrame": 400,
                 "lastFrame": 987
             },
             {
@@ -4842,7 +4842,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 2436,
+                "count": 2429,
                 "firstFrame": 948,
                 "lastFrame": 2557
             },

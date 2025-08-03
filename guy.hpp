@@ -588,6 +588,7 @@ private:
     int mainFrame = 0;
     int followFrame = 0;
     int marginFrame = 0;
+    int actionFlags = 0;
     int loopCount = 0;
     int loopPoint = 0;
     int startScale = 0;

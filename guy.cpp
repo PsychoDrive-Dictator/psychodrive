@@ -277,6 +277,7 @@ void Guy::UpdateActionData(void)
     mainFrame = (*pFab)["ActionFrame"]["MainFrame"];
     followFrame = (*pFab)["ActionFrame"]["FollowFrame"];
     marginFrame = (*pFab)["ActionFrame"]["MarginFrame"];
+    actionFlags = (*pFab)["Category"]["Flags"];
     actionFrameDuration = (*pFab)["Frame"];
     loopPoint = (*pFab)["State"]["EndStateParam"];
     if ( loopPoint == -1 ) {
@@ -1819,9 +1820,9 @@ bool Guy::Push(Guy *pOtherGuy)
             Fixed halfPushNeeded = pushNeeded / Fixed(2);
 
             // do regular push with any remaining pushNeeded
-            if (ignoreBodyPush && !pOtherGuy->ignoreBodyPush) {
+            if ((ignoreBodyPush && !pOtherGuy->ignoreBodyPush) || (warudo)) {
                 pOtherGuy->posX -= pushNeeded;
-            } else if (!ignoreBodyPush && pOtherGuy->ignoreBodyPush) {
+            } else if ((!ignoreBodyPush && pOtherGuy->ignoreBodyPush) || (pOtherGuy->warudo)) {
                 posX += pushNeeded;
             } else {
                 posX = posX + halfPushNeeded;
