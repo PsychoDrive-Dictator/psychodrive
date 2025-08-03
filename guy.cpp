@@ -3897,7 +3897,11 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
                 if (isDrive || getAirborne() || isProjectile) {
                     accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
                     accelY = accelY * Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
-                    velocityX = velocityX * Fixed((*pInherit)["Velocity"]["x"].get<double>());
+                    Fixed inheritVelXRatio = Fixed((*pInherit)["Velocity"]["x"].get<double>());
+                    velocityX = inheritVelXRatio * velocityX;
+                    if (velocityX != Fixed(0) && inheritVelXRatio.data & 1) {
+                        velocityX.data |= 1;
+                    }
                     velocityY = velocityY * Fixed((*pInherit)["Velocity"]["y"].get<double>());
                 } else {
                     accelX = Fixed(0);
