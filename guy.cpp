@@ -2719,6 +2719,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                         // this bias not like the others?
                         velocityX.data += 1;
                     }
+                    accelX = Fixed(0);
                 }
 
                 if (destY != 0) {
