@@ -647,6 +647,7 @@ private:
     Fixed hitReflectVelX;
     Fixed hitReflectAccelX;
     Fixed reflectThisFrame;
+    bool deferredReflect = false;
     bool noCounterPush = false;
     bool beenHitThisFrame = false;
     // 2.0 was here

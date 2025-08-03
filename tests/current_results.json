@@ -3044,9 +3044,9 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 6,
-                "firstFrame": 729,
-                "lastFrame": 734
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,

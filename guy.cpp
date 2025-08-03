@@ -842,6 +842,11 @@ void Guy::RunFramePostPush(void)
     }
 
     DoShotKey(pActionJson, currentFrame);
+
+    if (touchedWall && pushBackThisFrame != Fixed(0) && pOpponent && pOpponent->reflectThisFrame == Fixed(0)) {
+        pOpponent->deferredReflect = true;
+        log (logTransitions, "deferred reflect!");
+    }
 }
 
 void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
@@ -1673,12 +1678,14 @@ bool Guy::Push(Guy *pOtherGuy)
     // do reflect before push, since vel could be winning to push us flush against someone
     // in theory should do before wall touch too but not sure if both can be touching the
     // wall at the same time while stll being affected by reflect
-    if (pOpponent && !pOpponent->warudo && reflectThisFrame == Fixed(0)) {
+    if (pOpponent && !pOpponent->warudo && (reflectThisFrame == Fixed(0) || deferredReflect)) {
         if (hitReflectVelX != Fixed(0)) {
             if (!locked) {
                 posX = posX + hitReflectVelX;
             }
 
+            log(logTransitions, "reflect " + std::to_string(hitReflectVelX.f()));
+            reflectThisFrame = hitReflectVelX;
             Fixed prevHitVelX = hitReflectVelX;
             hitReflectVelX = hitReflectVelX + hitReflectAccelX;
             if ((hitReflectVelX * prevHitVelX) < Fixed(0) || (hitReflectAccelX != Fixed(0) && hitReflectVelX == Fixed(0))) {
@@ -1689,6 +1696,7 @@ bool Guy::Push(Guy *pOtherGuy)
             UpdateBoxes();
         }
     }
+    deferredReflect = false;
 
     if (didPush) return false;
     if ( !pOtherGuy ) return false;
@@ -1843,18 +1851,22 @@ bool Guy::Push(Guy *pOtherGuy)
             if (getPosX() < -wallDistance) {
                 wallDiff = -wallDistance;
                 wallDiff -= getPosX();
+                touchedWall = true;
             }
             if (getPosX() > wallDistance) {
                 wallDiff = wallDistance;
                 wallDiff -= getPosX();
+                touchedWall = true;
             }
             if (pOtherGuy->getPosX() < -wallDistance) {
                 wallDiff = -wallDistance;
                 wallDiff -= pOtherGuy->getPosX();
+                pOtherGuy->touchedWall = true;
             }
             if (pOtherGuy->getPosX() > wallDistance) {
                 wallDiff = wallDistance;
                 wallDiff -= pOtherGuy->getPosX();
+                pOtherGuy->touchedWall = true;
             }
             if (wallDiff != Fixed(0)) {
                 posX += wallDiff;
@@ -1988,7 +2000,7 @@ bool Guy::WorldPhysics(void)
                 pAttacker->UpdateBoxes();
                 pAttacker->hitReflectVelX = hitVelX * Fixed(-1);
                 pAttacker->hitReflectAccelX = hitAccelX * Fixed(-1);
-                //pAttacker->hitReflectVelX -= pAttacker->hitReflectAccelX;
+                log (logTransitions, "reflect!");
             }
             hitVelX = Fixed(0);
             hitAccelX = Fixed(0);
