@@ -179,7 +179,7 @@ public:
         // int remainder = a.data - b.data * ret.data;
         // remainder /= std::abs(remainder);
         if (std::abs(ret.data) & 63) {
-            ret.data += ret.i() / std::abs(ret.i());
+            ret.data += ret.data / std::abs(ret.data);
         }
         return ret;
     }

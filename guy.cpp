@@ -752,8 +752,9 @@ bool Guy::RunFrame(void)
                 int type = key["Type"];
 
                 switch (type) {
-                    case 0:
                     case 1:
+                        break;
+                    case 0:
                         // type 1 is sa3 vs normal? why does that matter?
                         // todo is timer timer deduction?
                         if (pOpponent) {
@@ -808,6 +809,8 @@ bool Guy::RunFrame(void)
                         pOpponent->nextAction = param01;
                         pOpponent->nextActionOpponentAction = true;
                         pOpponent->hitStun = 50000;
+                        pOpponent->resetHitStunOnLand = false;
+                        pOpponent->forceKnockDown = false;
                         // do we need to continually snap position or just at beginning?
                         pOpponent->direction = direction;
                         pOpponent->posX = posX;
@@ -2049,7 +2052,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
         bool isGrab = hitbox.type == grab;
         bool foundBox = false;
-        HurtBox hurtBox;
+        HurtBox hurtBox = {};
 
         if (isGrab) {
             for (auto throwBox : *pOtherGuy->getThrowBoxes() ) {
@@ -2060,18 +2063,22 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 }
             }
         } else {
-            for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
-                if (hitbox.type == hit && hurtbox.flags & full_strike_invul) {
-                    continue;
-                }
-                if (hitbox.type == projectile && hurtbox.flags & projectile_invul) {
-                    continue;
-                }
-                // todo air/ground strike invul here
-                if (hitbox.type == domain || doBoxesHit(hitbox.box, hurtbox.box)) {
-                    hurtBox = hurtbox;
-                    foundBox = true;
-                    break;
+            if (hitbox.type == domain) {
+                foundBox = true;
+            } else {
+                for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
+                    if (hitbox.type == hit && hurtbox.flags & full_strike_invul) {
+                        continue;
+                    }
+                    if (hitbox.type == projectile && hurtbox.flags & projectile_invul) {
+                        continue;
+                    }
+                    // todo air/ground strike invul here
+                    if (doBoxesHit(hitbox.box, hurtbox.box)) {
+                        hurtBox = hurtbox;
+                        foundBox = true;
+                        break;
+                    }
                 }
             }
         }
@@ -2163,7 +2170,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
         // really we should save the lock target, etc.
         if (pOpponent) {
-            pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, true);
+            pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, false);
             pOpponent->log(pOpponent->logHits, "lock hit dt applied " + hitIDString);
         }
         pendingLockHit = -1;
@@ -2367,7 +2374,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
 
         // grab or hitgrab
-        if (isGrab || (attr2 & (1<<1))) {
+        if (!pOtherGuy->locked && (isGrab || (attr2 & (1<<1)))) {
             pGuy->grabbedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
         }
@@ -2510,7 +2517,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-    if (!isDomain && applyHit && direction == attackerDirection) {
+    if (!locked && !isDomain && applyHit && direction == attackerDirection) {
         // like in a sideswitch combo
         switchDirection();
     }
@@ -2561,6 +2568,12 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         resetHitStunOnTransition = true;
         forceKnockDown = true;
         knockDownFrames = downTime;
+    }
+
+    if (dmgType == 13) {
+        forceKnockDown = true;
+        knockDownFrames = downTime;
+        //resetHitStunOnTransition = true;
     }
 
     if (applyHit) {
@@ -2620,7 +2633,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         wasHit = true;
     }
 
-    if (applyHitStun) {
+    if (!isDomain && applyHitStun) {
         hitStun = hitEntryHitStun + hitStunAdder;
     }
 
@@ -2737,7 +2750,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-    if (!isDomain && applyHit) {
+    if (!isDomain && applyHit && !locked) {
         if (blocking) {
             nextAction = 161;
             if (crouching) {
@@ -2952,7 +2965,7 @@ void Guy::DoHitBoxKey(const char *name)
                     if (hasHitID == false) {
                         hitID = -1;
                     }
-                    if (hitID == 15) {
+                    if (hitID == 15 || type == domain) {
                         hitID = 15 + atoi(hitBoxID.c_str());
                     }
                     if (hitEntryID != -1) {
@@ -3342,6 +3355,9 @@ void Guy::DoBranchKey(bool preHit)
                         log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
                         nextAction = branchAction;
                         nextActionFrame = branchFrame;
+                        if (opponentAction) {
+                            nextActionOpponentAction = true;
+                        }
                     }
                     deniedLastBranch = false;
                     keepPlace = key["_KeepPlace"];
@@ -3821,7 +3837,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         if (nextActionOpponentAction) {
             opponentAction = true;
-            nextActionOpponentAction = false;
         } else {
             opponentAction = false;
         }
@@ -3834,7 +3849,10 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
 
-        locked = false;
+        if (!nextActionOpponentAction) {
+            locked = false;
+        }
+        nextActionOpponentAction = false;
 
         currentArmorID = -1; // uhhh
 
