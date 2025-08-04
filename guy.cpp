@@ -3557,6 +3557,11 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
         resetHitStunOnLand = true;
 
+        if (recoverForward && needsTurnaround()) {
+            // todo do we need to consume something here? or leave recoverForward until final landing
+            switchDirection();
+        }
+
         groundBounce = false;
         groundBounceVelX = 0.0f;
         groundBounceAccelX = 0.0f;
