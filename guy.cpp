@@ -3171,6 +3171,8 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 31: // todo loop count
                     break;
+                case 37:
+                    // hit catch - maybe will need a separate 'hitgrabbed this frame' later?
                 case 36:
                     if (grabbedThisFrame) {
                         if (branchParam0 == 2 && hitPunishCounterThisMove) {
@@ -3182,14 +3184,6 @@ void Guy::DoBranchKey(bool preHit)
                         if (branchParam0 != 0 && branchParam0 != 2) {
                             log(logUnknowns, "unknown catch branch kind");
                         }
-                    }
-                    break;
-                case 37:
-                    // Hit catch vs just hit.. is this one "ever hit" and the other 'hit this frame'?
-                    // or the opposite...?
-                    // todo what if you hit armor? are there condition bits here?
-                    if (hitThisFrame) {
-                        doBranch = true;
                     }
                     break;
                 case 40: // area target
