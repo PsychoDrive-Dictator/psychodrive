@@ -553,6 +553,8 @@ private:
     bool noAccelNextFrame = false;
     Fixed posOffsetX;
     Fixed posOffsetY;
+    bool setPlaceX = false;
+    bool setPlaceY = false;
     Fixed velocityX;
     Fixed velocityY;
     Fixed accelX;

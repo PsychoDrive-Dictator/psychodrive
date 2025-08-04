@@ -399,11 +399,11 @@ bool Guy::RunFrame(void)
 
         Fixed prevPosY = getPosY();
 
-        if (!noPlaceXNextFrame) {
+        if (!noPlaceXNextFrame && !setPlaceX) {
             posOffsetX = Fixed(0);
         }
 
-        if (!noPlaceYNextFrame) {
+        if (!noPlaceYNextFrame && !setPlaceY) {
             posOffsetY = Fixed(0);
         }
 
@@ -449,14 +449,16 @@ bool Guy::RunFrame(void)
                 }
 
                 offsetMatch *= ratio;
-                if (offsetMatch == Fixed(0)) {
+                if (offsetMatch == Fixed(0) && !setPlaceX && !setPlaceY) {
                     continue;
                 }
 
                 if (placeKey["Axis"] == 0) {
                     posOffsetX = offsetMatch;
+                    setPlaceX = true;
                 } else if (placeKey["Axis"] == 1) {
                     posOffsetY = offsetMatch;
+                    setPlaceY = true;
                 }
             }
         }
@@ -3894,6 +3896,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             noPlaceYNextFrame = true;
         }
 
+        setPlaceX = false;
+        setPlaceY = false;
         keepPlace = false;
 
         bool inheritHitID = (*pInherit)["_HitID"];
