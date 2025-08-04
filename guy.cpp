@@ -692,7 +692,7 @@ bool Guy::RunFrame(void)
 
         if (pOpponent && !pOpponent->warudo) {
             if (hitVelX != Fixed(0)) {
-                if (!locked) {
+                if (!locked && !nageKnockdown) {
                     posX = posX + hitVelX;
                     pushBackThisFrame = hitVelX;
                 }
@@ -821,6 +821,7 @@ bool Guy::RunFrame(void)
                         pOpponent->direction = direction;
                         pOpponent->posX = posX;
                         pOpponent->posY = posY;
+                        pOpponent->airborne = airborne;
                         pOpponent->velocityX = Fixed(0);
                         pOpponent->velocityY = Fixed(0);
                         pOpponent->accelX = Fixed(0);
@@ -1694,7 +1695,7 @@ bool Guy::Push(Guy *pOtherGuy)
     // wall at the same time while stll being affected by reflect
     if (pOpponent && !pOpponent->warudo && (reflectThisFrame == Fixed(0) || deferredReflect)) {
         if (hitReflectVelX != Fixed(0)) {
-            if (!locked) {
+            if (!locked && !nageKnockdown) {
                 posX = posX + hitReflectVelX;
             }
 
@@ -2182,6 +2183,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (pOpponent) {
             pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, false);
             pOpponent->log(pOpponent->logHits, "lock hit dt applied " + hitIDString);
+            pOpponent->locked = false;
         }
         pendingLockHit = -1;
     }
@@ -2644,7 +2646,9 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     }
 
     if (!isDomain && applyHitStun) {
-        hitStun = hitEntryHitStun + hitStunAdder;
+        if (hitEntryHitStun > 0) {
+            hitStun = hitEntryHitStun + hitStunAdder;
+        }
     }
 
     //int origPoseStatus = getPoseStatus() - 1;
@@ -3554,6 +3558,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         accelX = groundBounceAccelX;
         velocityY = groundBounceVelY;
         accelY = groundBounceAccelY;
+
+        resetHitStunOnLand = true;
 
         groundBounce = false;
         groundBounceVelX = 0.0f;
