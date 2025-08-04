@@ -1372,6 +1372,8 @@ void Guy::DoTriggers(int fluffFrameBias)
                 int condition = key["_Condition"];
                 int state = key["_State"];
 
+                bool antiNormal = other & 1<<17;
+
                 if (!defer && !CheckTriggerGroupConditions(condition, state)) {
                     continue;
                 }
@@ -1384,13 +1386,13 @@ void Guy::DoTriggers(int fluffFrameBias)
                         TriggerListEntry newTrig = { key, false, false, false };
                         mapTriggers[triggerID] = newTrig;
                     }
-                    if (!defer) {
+                    if (!defer && !antiNormal) {
                         mapTriggers[triggerID].hasNormal = true;
                     }
-                    if (defer) {
+                    if (defer && !antiNormal) {
                         mapTriggers[triggerID].hasDeferred = true;
                     }
-                    if (other & 1<<17) {
+                    if (antiNormal) {
                         mapTriggers[triggerID].hasAntiNormal = true;
                     }
                 }
@@ -1470,13 +1472,16 @@ void Guy::DoTriggers(int fluffFrameBias)
                 log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " +
                     std::to_string(it->second.hasDeferred) + " normal " + std::to_string(it->second.hasNormal) +
                     + " antinormal " + std::to_string(it->second.hasAntiNormal));
-                if (it->second.hasDeferred) {
+                if (it->second.hasDeferred || it->second.hasAntiNormal) {
                     // queue the deferred trigger
                     setDeferredTriggerIDs.insert(triggerID);
                     keptDeferredTriggerIDs.insert(triggerID);
+                    if (it->second.hasAntiNormal) {
+                        break;
+                    }
                 }
 
-                if (it->second.hasNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+                if (it->second.hasNormal && !it->second.hasAntiNormal && CheckTriggerConditions(pTrigger, triggerID)) {
                     ExecuteTrigger(pTrigger);
 
                     // consume the input by removing matching edge bits from matched initial input
