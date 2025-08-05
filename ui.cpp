@@ -1110,13 +1110,13 @@ void SimulationController::Reset(void)
     charControllers.emplace_back();
     charControllers.emplace_back();
 
-    charControllers[0].character = 1;
+    charControllers[0].character = 22;
     charControllers[0].charVersion = charVersionCount - 1;
-    charControllers[0].charColor = { 255.0, 0.0, 255.0 };
+    charControllers[0].charColor = { 0.78, 0.5, 0.15 };
     charControllers[1].character = 2;
     charControllers[1].charVersion = charVersionCount - 1;
     charControllers[1].rightSide = true;
-    charControllers[1].charColor = { 255.0, 255.0, 0.0 };
+    charControllers[1].charColor = { 0.15, 0.5, 0.78 };
 
     if (gameMode == ComboMaker) {
         charControllers[0].startPosX = Fixed(-150);
