@@ -1554,6 +1554,7 @@ void SimulationController::Restore(std::string strSerialized)
         charControllers[i].charVersion = atoi(&strSerialized.c_str()[cursor]);
         cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
         charControllers[i].startPosX.data = atoi(&strSerialized.c_str()[cursor]);
+        charControllers[i].flStartPosX = charControllers[i].startPosX.f();
         cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
         charControllers[i].timelineTriggers.clear();
         charControllers[i].inputRegions.clear();
