@@ -854,7 +854,30 @@ bool Guy::RunFrame(void)
 
 void Guy::RunFramePostPush(void)
 {
-    if (warudo || getHitStop()) {
+    if (warudo) {
+        return;
+    }
+
+    // throw tech - do it before AdvanceFrame to prevent sequencing issue
+    // todo modern
+    if (locked && pOpponent && pOpponent->throwTechable && (currentInput & (LP+LK)) == LP+LK && nextAction == -1) {
+        nextAction = 320;
+        hitStop = 0;
+        hitStun = 0;
+        pOpponent->nextAction = 321;
+        pOpponent->hitStop = 0;
+        if (needsTurnaround()) {
+            switchDirection();
+        }
+        hitVelX = Fixed(-13) * direction;
+        hitAccelX = Fixed(1) * direction;
+        hitVelX -= hitAccelX;
+        pOpponent->hitVelX = Fixed(-13) * pOpponent->direction;
+        pOpponent->hitAccelX = Fixed(1) * pOpponent->direction;
+        pOpponent->hitVelX -= pOpponent->hitAccelX;
+    }
+
+    if (getHitStop()) {
         return;
     }
 
@@ -2377,7 +2400,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (pGuy->hasBeenBlockedThisFrame) {
             hitMarkerType = 2;
             hitMarkerRadius = 30.0f;
-        } else if (hitEntryFlag & punish_counter) {
+        } else if ((hitEntryFlag & punish_counter) == punish_counter) {
             hitMarkerRadius = 45.0f;
         }
         if (pGuy->pSim) {
@@ -2418,7 +2441,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
 
         if (!pOtherGuy->blocking && !hitArmor) {
-            if (hitEntryFlag & punish_counter) {
+            if ((hitEntryFlag & punish_counter) == punish_counter) {
                 pGuy->punishCounterThisFrame = true;
                 if (hitFlagToParent) pGuy->pParent->punishCounterThisFrame = true;
                 pGuy->hitPunishCounterThisMove = true;

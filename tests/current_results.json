@@ -1447,44 +1447,44 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 27,
-                "firstFrame": 288,
-                "lastFrame": 398
-            },
-            {
-                "count": 27,
-                "firstFrame": 288,
-                "lastFrame": 398
-            },
-            {
-                "count": 363,
-                "firstFrame": 247,
-                "lastFrame": 453
-            },
-            {
-                "count": 343,
-                "firstFrame": 269,
-                "lastFrame": 453
-            },
-            {
-                "count": 31,
-                "firstFrame": 375,
-                "lastFrame": 405
-            },
-            {
-                "count": 111,
-                "firstFrame": 288,
-                "lastFrame": 398
-            },
-            {
-                "count": 79,
-                "firstFrame": 375,
-                "lastFrame": 453
-            },
-            {
-                "count": 10,
+                "count": 2,
                 "firstFrame": 287,
-                "lastFrame": 291
+                "lastFrame": 287
+            },
+            {
+                "count": 2,
+                "firstFrame": 287,
+                "lastFrame": 287
+            },
+            {
+                "count": 35,
+                "firstFrame": 247,
+                "lastFrame": 281
+            },
+            {
+                "count": 13,
+                "firstFrame": 269,
+                "lastFrame": 281
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 287,
+                "lastFrame": 287
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },
