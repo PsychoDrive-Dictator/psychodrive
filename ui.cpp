@@ -1266,6 +1266,8 @@ void SimulationController::RenderUI(void)
 
         translateY = gameMode == Training ? 150.0 : 100.0;
     }
+    int simFrameCount = pSim ? pSim->stateRecording.size() : 0;
+
     if (gameMode != Training) {
         std::vector<std::string> vecViewLabels;
         vecViewLabels.push_back("P1 Setup");
@@ -1276,15 +1278,17 @@ void SimulationController::RenderUI(void)
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
 #ifdef __EMSCRIPTEN__
-        if (ImGui::Button("Share Combo", ImVec2(modeSelectorSize,0))) {
-            std::string strSerialized;
-            Serialize(strSerialized);
-            //Restore(strSerialized);
-            EM_ASM({
-                var serialized = UTF8ToString($0);
-                navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '?combo=' + serialized);
-                //window.location.href = '?combo=' + serialized;
-            }, strSerialized.c_str());
+        if (simFrameCount > 1) {
+            if (ImGui::Button("Share Combo", ImVec2(modeSelectorSize,0))) {
+                std::string strSerialized;
+                Serialize(strSerialized);
+                //Restore(strSerialized);
+                EM_ASM({
+                    var serialized = UTF8ToString($0);
+                    navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '?combo=' + serialized);
+                    //window.location.href = '?combo=' + serialized;
+                }, strSerialized.c_str());
+            }
         }
 #endif
     }
@@ -1301,7 +1305,6 @@ void SimulationController::RenderUI(void)
         charControllers[i].RenderUI();
     }
 
-    int simFrameCount = pSim ? pSim->stateRecording.size() : 0;
     if (simFrameCount) {
         ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 150));
         ImGui::SetNextWindowSize(ImVec2(renderSizeX, 0));
