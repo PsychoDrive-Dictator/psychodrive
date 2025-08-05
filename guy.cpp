@@ -817,6 +817,7 @@ bool Guy::RunFrame(void)
                         pOpponent->nextAction = param01;
                         pOpponent->nextActionOpponentAction = true;
                         pOpponent->hitStun = 50000;
+                        pOpponent->juggleCounter = 0;
                         pOpponent->resetHitStunOnLand = false;
                         pOpponent->forceKnockDown = false;
                         // do we need to continually snap position or just at beginning?

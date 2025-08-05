@@ -1514,7 +1514,7 @@ void SimulationController::AdvanceUntilComplete(void)
     }
 }
 
-#define DL1 '-'
+#define DL1 '|'
 #define DL2 '_'
 
 void CharacterUIController::Serialize(std::string &outStr)
