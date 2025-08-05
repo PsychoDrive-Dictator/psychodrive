@@ -2564,7 +2564,12 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-    if (!locked && !isDomain && applyHit && direction == attackerDirection) {
+    bool doSwitchDirection = applyHit;
+    if (dmgType == 21 || dmgType == 22) {
+        doSwitchDirection = false; // grab type hits that happen even as unlock
+    }
+
+    if (doSwitchDirection && !recoverReverse && !isDomain && direction == attackerDirection) {
         // like in a sideswitch combo
         switchDirection();
     }
@@ -2807,7 +2812,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-    if (!isDomain && applyHit && !locked) {
+    if (!isDomain && applyHit) {
         if (blocking) {
             nextAction = 161;
             if (crouching) {
@@ -2848,9 +2853,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 // if (airborne) {
                 //     nextAction = 255;
                 // }
-            }
-
-            else {
+            } else if (!locked) {
                 if (pHurtBox && pHurtBox->flags & hurtBoxFlags::head) {
                     nextAction = 200 + attackStrength;
                 } else if (pHurtBox && pHurtBox->flags & hurtBoxFlags::legs) {
@@ -2862,6 +2865,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     nextAction = 212 + attackStrength;
                 }
             }
+
             if (getAirborne() || posY > Fixed(0) || destY > 0) {
                 // those specific scripts apply even for airborne/launch
                 if (moveType == 22) {
@@ -2870,7 +2874,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     nextAction = 282;
                 } else if (moveType == 16) {
                     nextAction = 280;
-                } else {
+                } else if (!locked) {
                     // generic angle-based launch
                     float angle = std::fmod(std::atan2(destY,destX)/std::numbers::pi*180.0,360);
                     //log(logHits, "launch angle " + std::to_string(angle));
