@@ -602,6 +602,7 @@ private:
     bool hasLooped = false;
 
     bool superAction = false;
+    int superLevel = 0;
 
     // todo round begin action needs to set that
     int styleInstall = 0;

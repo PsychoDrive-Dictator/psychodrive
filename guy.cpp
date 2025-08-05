@@ -895,6 +895,11 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
     }
 
     superAction = flags & (1ULL<<15);
+    superLevel = 0;
+    if (flags & (1ULL<<7)) superLevel = 1;
+    if (flags & (1ULL<<8)) superLevel = 2;
+    if (flags & (1ULL<<9)) superLevel = 3;
+    if (flags & (1ULL<<10)) superLevel = 3; // ca?
 }
 
 bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
@@ -2632,8 +2637,16 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         effectiveScaling *= 0.85;
     }
 
-    if (pAttacker->superAction && effectiveScaling < 50) {
-        effectiveScaling = 50;
+    if (pAttacker->superAction) {
+        if (pAttacker->superLevel == 1 && effectiveScaling < 30) {
+            effectiveScaling = 30;
+        }
+        if (pAttacker->superLevel == 2 && effectiveScaling < 40) {
+            effectiveScaling = 40;
+        }
+        if (pAttacker->superLevel == 3 && effectiveScaling < 50) {
+            effectiveScaling = 50;
+        }
     }
 
     log(logHits, "effective scaling " + std::to_string(effectiveScaling));
