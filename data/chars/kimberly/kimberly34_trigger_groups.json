@@ -1,0 +1,530 @@
+{
+    "000": {
+        "000": "17 BAS_DASH_F(1)",
+        "001": "18 BAS_DASH_B(1)",
+        "003": "600 ATK_5LP(4)",
+        "004": "606 ATK_5LK(2)",
+        "005": "603 ATK_5MP(4)",
+        "006": "607 ATK_5MK(2)",
+        "007": "604 ATK_5HP(2)",
+        "008": "608 ATK_5HK(2)",
+        "010": "610 ATK_2LP(4)",
+        "011": "616 ATK_2LK(6)",
+        "012": "613 ATK_2MP(3)",
+        "013": "619 ATK_2MK(2)",
+        "014": "615 ATK_2HP(2)",
+        "015": "620 ATK_2HK(2)",
+        "027": "631 ATK_4HK(2)",
+        "028": "632 ATK_6HK(4)",
+        "032": "637 ATK_3MK(3)",
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "097": "966 SPA_SpraySmoke_M(2)",
+        "116": "480 DPA_STD_START",
+        "124": "715 NGS(2)",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H",
+        "211": "1500 DEM_APPEAL_04",
+        "219": "1150 _1150",
+        "229": "1160 _1160",
+        "232": "1163 _1163"
+    },
+    "001": {
+        "017": "622 ATK_8LP",
+        "018": "625 ATK_8LK",
+        "019": "623 ATK_8MP",
+        "020": "626 ATK_8MK",
+        "021": "624 ATK_8HP",
+        "022": "627 ATK_8HK",
+        "101": "1015 SPA_Tengu_MISS",
+        "204": "1023 SPA_Tengu_MISS(1)"
+    },
+    "002": {
+        "017": "622 ATK_8LP",
+        "018": "625 ATK_8LK",
+        "019": "623 ATK_8MP",
+        "020": "626 ATK_8MK",
+        "021": "624 ATK_8HP",
+        "022": "627 ATK_8HK",
+        "101": "1015 SPA_Tengu_MISS",
+        "204": "1023 SPA_Tengu_MISS(1)"
+    },
+    "003": {
+        "116": "480 DPA_STD_START",
+        "140": "855 ATK_CTA(7)"
+    },
+    "004": {
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "079": "902 SPA_Hayagake_Start(2)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "097": "966 SPA_SpraySmoke_M(2)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H"
+    },
+    "005": {
+        "001": "18 BAS_DASH_B(1)",
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "097": "966 SPA_SpraySmoke_M(2)",
+        "116": "480 DPA_STD_START",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H"
+    },
+    "010": {
+        "117": "500 ATK_CTA_DASH(4)",
+        "118": "500 ATK_CTA_DASH(4)"
+    },
+    "011": {
+        "141": "850 ATK_CTA_4(3)"
+    },
+    "015": {
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "097": "966 SPA_SpraySmoke_M(2)",
+        "116": "480 DPA_STD_START",
+        "124": "715 NGS(2)",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H",
+        "211": "1500 DEM_APPEAL_04"
+    },
+    "017": {
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H"
+    },
+    "019": {
+        "101": "1015 SPA_Tengu_MISS",
+        "204": "1023 SPA_Tengu_MISS(1)"
+    },
+    "021": {
+        "204": "1023 SPA_Tengu_MISS(1)"
+    },
+    "022": {
+        "101": "1015 SPA_Tengu_MISS",
+        "102": "949 SPA_BushinSenpu_Air",
+        "158": "1210 SAA_Lv2_START(1)",
+        "204": "1023 SPA_Tengu_MISS(1)",
+        "205": "951 SPA_BushinSenpu_Air(1)"
+    },
+    "023": {
+        "158": "1210 SAA_Lv2_START(1)",
+        "204": "1023 SPA_Tengu_MISS(1)",
+        "205": "951 SPA_BushinSenpu_Air(1)"
+    },
+    "025": {
+        "035": "601 ATK_5LP_B(2)",
+        "038": "612 ATK_2LP(5)",
+        "040": "618 ATK_2LK(8)"
+    },
+    "026": {
+        "036": "602 ATK_5LP(5)",
+        "037": "611 ATK_2LP_B(2)",
+        "040": "618 ATK_2LK(8)"
+    },
+    "027": {
+        "036": "602 ATK_5LP(5)",
+        "038": "612 ATK_2LP(5)",
+        "039": "617 ATK_2LK(7)"
+    },
+    "030": {
+        "044": "641 ATK_5MP(5)"
+    },
+    "031": {
+        "045": "642 ATK_GOKUSA_Kim_5MP_5HP_TC(4)"
+    },
+    "032": {
+        "046": "643 ATK_GOKUSA_Kim_5MP_5HP_5HK_TC_Long(4)"
+    },
+    "033": {
+        "048": "646 ATK_GOKUSA_Kim_5MP_5HP_TC(5)"
+    },
+    "034": {
+        "050": "648 ATK_GOKUSA_Guy_5MP_5HP_TC(2)"
+    },
+    "035": {
+        "051": "649 ATK_GOKUSA_Guy_5MP_5HP_5HK_TC(2)"
+    },
+    "036": {
+        "053": "651 ATK_GOKUSA_Guy_NGS(2)"
+    },
+    "038": {
+        "029": "635 ATK_6HK_V",
+        "030": "634 ATK_6HK_B",
+        "031": "636 ATK_6HK_F"
+    },
+    "039": {
+        "055": "655 BAS_JUMP_F_START(1)"
+    },
+    "040": {
+        "084": "907 SPA_Hayagake_LK(4)",
+        "085": "909 SPA_Hayagake_MK(4)",
+        "086": "912 SPA_Hayagake_HK(4)",
+        "087": "905 SPA_Hayagake_LP(8)",
+        "088": "905 SPA_Hayagake_LP(8)",
+        "089": "905 SPA_Hayagake_LP(8)"
+    },
+    "041": {
+        "084": "907 SPA_Hayagake_LK(4)",
+        "085": "909 SPA_Hayagake_MK(4)",
+        "086": "912 SPA_Hayagake_HK(4)",
+        "087": "905 SPA_Hayagake_LP(8)",
+        "088": "905 SPA_Hayagake_LP(8)",
+        "089": "905 SPA_Hayagake_LP(8)",
+        "092": "909 SPA_Hayagake_MK(4)"
+    },
+    "042": {
+        "081": "907 SPA_Hayagake_LK(4)",
+        "082": "909 SPA_Hayagake_MK(4)",
+        "083": "912 SPA_Hayagake_HK(4)"
+    },
+    "043": {
+        "185": "908 SPA_Hayagake_LK(5)",
+        "186": "908 SPA_Hayagake_LK(5)",
+        "187": "910 SPA_Hayagake_MK(5)",
+        "188": "910 SPA_Hayagake_MK(5)",
+        "189": "913 SPA_Hayagake_HK(5)",
+        "190": "913 SPA_Hayagake_HK(5)",
+        "191": "906 SPA_Hayagake_LP(9)",
+        "193": "906 SPA_Hayagake_LP(9)",
+        "194": "906 SPA_Hayagake_LP(9)"
+    },
+    "044": {
+        "182": "908 SPA_Hayagake_LK(5)",
+        "183": "910 SPA_Hayagake_MK(5)",
+        "184": "913 SPA_Hayagake_HK(5)"
+    },
+    "045": {
+        "191": "906 SPA_Hayagake_LP(9)",
+        "193": "906 SPA_Hayagake_LP(9)",
+        "194": "906 SPA_Hayagake_LP(9)"
+    },
+    "046": {
+        "090": "931 SPA_Hayagake_Jump_Kick_Start",
+        "091": "920 SPA_Hayagake_IZUNA_Miss"
+    },
+    "047": {
+        "195": "934 SPA_Hayagake_Jump_Kick_EX",
+        "197": "924 SPA_Hayagake_IZUNA_Miss(1)"
+    },
+    "049": {
+        "060": "501 ATK_CTA_DASH(5)",
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "079": "902 SPA_Hayagake_Start(2)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "097": "966 SPA_SpraySmoke_M(2)",
+        "120": "501 ATK_CTA_DASH(5)",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H"
+    },
+    "052": {
+        "151": "1209 SAA_Lv2_START",
+        "165": "1220 SAA_Lv3_START",
+        "169": "1224 SAA_Lv3_START(1)"
+    },
+    "054": {
+        "165": "1220 SAA_Lv3_START",
+        "169": "1224 SAA_Lv3_START(1)"
+    },
+    "056": {
+        "101": "1015 SPA_Tengu_MISS",
+        "204": "1023 SPA_Tengu_MISS(1)"
+    },
+    "058": {
+        "160": "1211 SAA_Lv2_START(2)"
+    },
+    "060": {
+        "142": "852 ATK_CTA_4(2)"
+    },
+    "062": {
+        "017": "622 ATK_8LP",
+        "018": "625 ATK_8LK",
+        "019": "623 ATK_8MP",
+        "020": "626 ATK_8MK",
+        "021": "624 ATK_8HP",
+        "022": "627 ATK_8HK",
+        "101": "1015 SPA_Tengu_MISS",
+        "102": "949 SPA_BushinSenpu_Air",
+        "158": "1210 SAA_Lv2_START(1)",
+        "204": "1023 SPA_Tengu_MISS(1)",
+        "205": "951 SPA_BushinSenpu_Air(1)"
+    },
+    "063": {
+        "017": "622 ATK_8LP",
+        "018": "625 ATK_8LK",
+        "019": "623 ATK_8MP",
+        "020": "626 ATK_8MK",
+        "021": "624 ATK_8HP",
+        "022": "627 ATK_8HK",
+        "101": "1015 SPA_Tengu_MISS",
+        "158": "1210 SAA_Lv2_START(1)",
+        "204": "1023 SPA_Tengu_MISS(1)"
+    },
+    "064": {
+        "101": "1015 SPA_Tengu_MISS",
+        "102": "949 SPA_BushinSenpu_Air",
+        "158": "1210 SAA_Lv2_START(1)",
+        "204": "1023 SPA_Tengu_MISS(1)",
+        "205": "951 SPA_BushinSenpu_Air(1)"
+    },
+    "066": {
+        "102": "949 SPA_BushinSenpu_Air",
+        "158": "1210 SAA_Lv2_START(1)",
+        "205": "951 SPA_BushinSenpu_Air(1)"
+    },
+    "067": {
+        "101": "1015 SPA_Tengu_MISS",
+        "102": "949 SPA_BushinSenpu_Air",
+        "158": "1210 SAA_Lv2_START(1)",
+        "204": "1023 SPA_Tengu_MISS(1)",
+        "205": "951 SPA_BushinSenpu_Air(1)"
+    },
+    "068": {
+        "023": "639 ATK_82HP"
+    },
+    "070": {
+        "003": "600 ATK_5LP(4)",
+        "004": "606 ATK_5LK(2)",
+        "005": "603 ATK_5MP(4)",
+        "006": "607 ATK_5MK(2)",
+        "007": "604 ATK_5HP(2)",
+        "008": "608 ATK_5HK(2)",
+        "010": "610 ATK_2LP(4)",
+        "011": "616 ATK_2LK(6)",
+        "012": "613 ATK_2MP(3)",
+        "013": "619 ATK_2MK(2)",
+        "014": "615 ATK_2HP(2)",
+        "015": "620 ATK_2HK(2)",
+        "027": "631 ATK_4HK(2)",
+        "028": "632 ATK_6HK(4)",
+        "032": "637 ATK_3MK(3)",
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "124": "715 NGS(2)",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)"
+    },
+    "071": {
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "124": "715 NGS(2)",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "211": "1500 DEM_APPEAL_04"
+    },
+    "074": {
+        "060": "501 ATK_CTA_DASH(5)",
+        "120": "501 ATK_CTA_DASH(5)"
+    },
+    "076": {
+        "116": "480 DPA_STD_START"
+    },
+    "079": {
+        "180": "979 SPA_SprayBomb_M(5)"
+    },
+    "123": {
+        "003": "600 ATK_5LP(4)",
+        "004": "606 ATK_5LK(2)",
+        "005": "603 ATK_5MP(4)",
+        "006": "607 ATK_5MK(2)",
+        "007": "604 ATK_5HP(2)",
+        "008": "608 ATK_5HK(2)",
+        "010": "610 ATK_2LP(4)",
+        "011": "616 ATK_2LK(6)",
+        "012": "613 ATK_2MP(3)",
+        "013": "619 ATK_2MK(2)",
+        "014": "615 ATK_2HP(2)",
+        "015": "620 ATK_2HK(2)",
+        "027": "631 ATK_4HK(2)",
+        "028": "632 ATK_6HK(4)",
+        "032": "637 ATK_3MK(3)",
+        "067": "973 SPA_SprayBomb_R(4)",
+        "068": "975 SPA_SprayBomb_L(4)",
+        "069": "976 SPA_SprayBomb_M(4)",
+        "070": "977 SPA_SprayBomb_H(4)",
+        "074": "957 SPA_ChargeChop_L_START(6)",
+        "075": "958 SPA_ChargeChop_M(2)",
+        "076": "960 SPA_ChargeChop_H(4)",
+        "080": "900 SPA_Hayagake_Start",
+        "094": "940 SPA_BushinSenpu_Start",
+        "095": "941 SPA_BushinSenpu_Start(1)",
+        "096": "942 SPA_BushinSenpu_Start(2)",
+        "097": "966 SPA_SpraySmoke_M(2)",
+        "124": "715 NGS(2)",
+        "140": "855 ATK_CTA(7)",
+        "146": "1200 SPA_Hayagake_LP(10)",
+        "147": "1203 SPA_Hayagake_LP(11)",
+        "151": "1209 SAA_Lv2_START",
+        "163": "1220 SAA_Lv3_START",
+        "167": "1224 SAA_Lv3_START(1)",
+        "175": "962 SPA_ChargeChop_H(5)",
+        "176": "974 SPA_SprayBomb_R(5)",
+        "177": "978 SPA_SprayBomb_L(5)",
+        "178": "979 SPA_SprayBomb_M(5)",
+        "179": "980 SPA_SprayBomb_H(5)",
+        "180": "979 SPA_SprayBomb_M(5)",
+        "181": "903 SPA_Hayagake_Start(3)",
+        "199": "943 SPA_BushinSenpu_Start(3)",
+        "201": "970 SPA_SpraySmoke_H"
+    }
+}

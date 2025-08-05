@@ -69,6 +69,7 @@ void makeCharEntries(void)
     charEntries.push_back({20, "honda", "E. Honda"});
     charEntries.push_back({21, "jamie", "Jamie"});
     charEntries.push_back({22, "akuma", "Akuma"});
+    charEntries.push_back({25, "sagat", "Sagat"});
     charEntries.push_back({26, "dictator", "M. Bison"});
     charEntries.push_back({27, "terry", "Terry"});
     charEntries.push_back({28, "mai", "Mai"});
@@ -103,7 +104,8 @@ const char* charVersions[] = {
     "30 - S3 Elena Update + Hotfix 1",
     "31 - S3 Hotfix 2",
     "32 - S3 Hotfix 3",
-    "33 - S3 Hotfix 4"
+    "33 - S3 Hotfix 4",
+    "34 - S3 Sagat Update"
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
