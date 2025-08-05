@@ -17,6 +17,7 @@ struct inputRegion {
 class CharacterUIController {
 public:
     void RenderUI(void);
+    void Serialize(std::string &outStr);
     void renderCharSetup(void);
     void renderActionSetup(int frameIndex);
     void renderFrameMeter(int frameIndex);
@@ -55,6 +56,8 @@ class SimulationController {
 public:
     SimulationController() { Reset(); }
     void Reset(void);
+    void Restore(std::string strSerialized);
+    void Serialize(std::string &outStr);
     bool NewSim(void);
     void RenderUI(void);
     void AdvanceUntilComplete(void);

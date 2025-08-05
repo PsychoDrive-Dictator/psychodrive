@@ -28,7 +28,8 @@ characters = [
     "dictator",
     "terry",
     "mai",
-    "elena"
+    "elena",
+#    "sagat"
 ]
 
 dataPath = "./data/chars/"
@@ -109,10 +110,10 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    charWithVersion = char + "31"
+    charWithVersion = char + "33"
     hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "32"
+    charWithVersion = char + "34"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))
@@ -146,16 +147,16 @@ for char in characters:
     #                           " condition " + str(attackKey["Condition"]))
 
     # find certain branches
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "BranchKey" in move:
-            for key in move["BranchKey"]:
-                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-                    branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 1:
-                        print(char + " " + moveID + " ELSE branch params " + str(branchKey["Param00"]) +
-                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "BranchKey" in move:
+    #         for key in move["BranchKey"]:
+    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+    #                 branchKey = move["BranchKey"][key]
+    #                 if branchKey["Type"] == 1:
+    #                     print(char + " " + moveID + " ELSE branch params " + str(branchKey["Param00"]) +
+    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
     # for moveID in moves21Json:
@@ -247,29 +248,29 @@ for char in characters:
 
 
 
-    # for moveID in moves21Json:
-    #     moveIDLeft = moveID
-    #     # if "_Y2" in moveID:
-    #     #     moveIDLeft = moveIDLeft.replace("_Y2", "")
-    #     if moveIDLeft in movesJson:
-    #         moveLeft = movesJson[moveIDLeft]
-    #         moveRight = moves21Json[moveID]
-    #         descHeader = char + " " + moveID
-    #         minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
-    #         minActiveRight, maxActiveRight = countActiveFrames(moveRight)
-    #         if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
-    #             print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
-    #                   " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
-    #         hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
-    #         hitInfoRight = getHitInfoDict(moveRight, hits21Json)
-    #         if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
-    #             print(descHeader + " different hit count")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
-    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
-    #         compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
-    #         compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
-    #         compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)
+    for moveID in moves21Json:
+        moveIDLeft = moveID
+        # if "_Y2" in moveID:
+        #     moveIDLeft = moveIDLeft.replace("_Y2", "")
+        if moveIDLeft in movesJson:
+            moveLeft = movesJson[moveIDLeft]
+            moveRight = moves21Json[moveID]
+            descHeader = char + " " + moveID
+            minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
+            minActiveRight, maxActiveRight = countActiveFrames(moveRight)
+            if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
+                print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
+                      " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
+            hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
+            hitInfoRight = getHitInfoDict(moveRight, hits21Json)
+            if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
+                print(descHeader + " different hit count")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
+            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
+            compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
+            compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
+            compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)

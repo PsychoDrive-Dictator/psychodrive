@@ -1132,8 +1132,28 @@ void SimulationController::Reset(void)
     }
 }
 
+bool triedRestoreFromURL = false;
+bool hasRestored = false;
+
 bool SimulationController::NewSim(void)
 {
+#ifdef __EMSCRIPTEN__
+    if (!triedRestoreFromURL) {
+        std::string strCombo = (char*)EM_ASM_PTR({
+            let params = new URLSearchParams(document.location.search);
+            let combo = params?.get("combo");
+            if (combo == null) {
+                combo = "";
+            }
+            return stringToNewUTF8(combo);
+        });
+        if (strCombo != "") {
+            Restore(strCombo);
+            hasRestored = true;
+        }
+        triedRestoreFromURL = true;
+    }
+#endif
     charCount = 1;
 
     if (gameMode == ComboMaker) {
@@ -1175,6 +1195,11 @@ bool SimulationController::NewSim(void)
 
     maxComboCount = 0;
     maxComboDamage = 0;
+
+    if (hasRestored) {
+        playing = true;
+        hasRestored = false;
+    }
 
     return true;
 }
@@ -1250,6 +1275,18 @@ void SimulationController::RenderUI(void)
             vecViewLabels.push_back("P2 Actions");
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
+#ifdef __EMSCRIPTEN__
+        if (ImGui::Button("Share Combo", ImVec2(modeSelectorSize,0))) {
+            std::string strSerialized;
+            Serialize(strSerialized);
+            //Restore(strSerialized);
+            EM_ASM({
+                var serialized = UTF8ToString($0);
+                navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '?combo=' + serialized);
+                //window.location.href = '?combo=' + serialized;
+            }, strSerialized.c_str());
+        }
+#endif
     }
     ImGui::End();
 
@@ -1474,5 +1511,78 @@ void SimulationController::AdvanceUntilComplete(void)
             searchFrame++;
         }
         charControllers[controllerSearchForNextTrigger].triggerAdded = false;
+    }
+}
+
+#define DL1 '-'
+#define DL2 '_'
+
+void CharacterUIController::Serialize(std::string &outStr)
+{
+    outStr += std::to_string(character) + DL1 + std::to_string(charVersion) + DL1 + std::to_string(startPosX.data) + DL1;
+    for (auto &i:timelineTriggers) {
+        outStr += std::to_string(i.first) + DL1 + std::to_string(i.second.first) + DL1 + std::to_string(i.second.second) + DL1;
+    }
+    outStr += DL1;
+    for (auto &i:inputRegions) {
+        outStr += std::to_string(i.frame) + DL1 + std::to_string(i.duration) + DL1 + std::to_string(i.input) + DL1;
+    }
+    outStr += DL1;
+}
+
+void SimulationController::Serialize(std::string &outStr)
+{
+    outStr = "";
+    outStr += std::to_string(gameMode) + DL2 + std::to_string(charCount) + DL2;
+    for (int i = 0; i < charCount; i++) {
+        charControllers[i].Serialize(outStr);
+        outStr += DL2;
+    }
+}
+
+void SimulationController::Restore(std::string strSerialized)
+{
+    int cursor = 0;
+    int max = strSerialized.length();
+    gameMode = (EGameMode)atoi(&strSerialized.c_str()[cursor]);
+    cursor = strSerialized.find(DL2, cursor) + 1; if (cursor >= max) return;
+    charCount = atoi(&strSerialized.c_str()[cursor]);
+    cursor = strSerialized.find(DL2, cursor) + 1; if (cursor >= max) return;
+    for (int i = 0; i < charCount; i++) {
+        charControllers[i].character = atoi(&strSerialized.c_str()[cursor]);
+        cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+        charControllers[i].charVersion = atoi(&strSerialized.c_str()[cursor]);
+        cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+        charControllers[i].startPosX.data = atoi(&strSerialized.c_str()[cursor]);
+        cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+        charControllers[i].timelineTriggers.clear();
+        charControllers[i].inputRegions.clear();
+        int a,b,c;
+        while (true) {
+            if (strSerialized.c_str()[cursor] == DL1) {
+                cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+                break;
+            }
+            a = atoi(&strSerialized.c_str()[cursor]);
+            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            b = atoi(&strSerialized.c_str()[cursor]);
+            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            c = atoi(&strSerialized.c_str()[cursor]);
+            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            charControllers[i].timelineTriggers[a] = std::make_pair(b,c);
+        }
+        while (true) {
+            if (strSerialized.c_str()[cursor] == DL1) {
+                cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+                break;
+            }
+            a = atoi(&strSerialized.c_str()[cursor]);
+            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            b = atoi(&strSerialized.c_str()[cursor]);
+            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            c = atoi(&strSerialized.c_str()[cursor]);
+            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            charControllers[i].inputRegions.push_back({a,b,c});
+        }
     }
 }
