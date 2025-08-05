@@ -4713,6 +4713,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "sagat_sa2_followup",
+        "testVersion": "34",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1698,
+                "firstFrame": 221,
+                "lastFrame": 1153
+            },
+            {
+                "count": 375,
+                "firstFrame": 332,
+                "lastFrame": 1009
+            },
+            {
+                "count": 108,
+                "firstFrame": 383,
+                "lastFrame": 1009
+            },
+            {
+                "count": 171,
+                "firstFrame": 332,
+                "lastFrame": 1003
+            },
+            {
+                "count": 171,
+                "firstFrame": 332,
+                "lastFrame": 1003
+            },
+            {
+                "count": 355,
+                "firstFrame": 5,
+                "lastFrame": 1086
+            },
+            {
+                "count": 850,
+                "firstFrame": 57,
+                "lastFrame": 1153
+            },
+            {
+                "count": 80,
+                "firstFrame": 386,
+                "lastFrame": 1011
+            },
+            {
+                "count": 124,
+                "firstFrame": 332,
+                "lastFrame": 936
+            },
+            {
+                "count": 101,
+                "firstFrame": 943,
+                "lastFrame": 1043
+            },
+            {
+                "count": 52,
+                "firstFrame": 943,
+                "lastFrame": 971
+            }
+        ]
+    },
+    {
         "testName": "terry_fierce",
         "testVersion": "33",
         "finished": true,
