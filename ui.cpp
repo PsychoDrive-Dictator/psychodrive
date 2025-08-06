@@ -1564,7 +1564,7 @@ void SimulationController::Restore(std::string strSerialized)
         int a,b,c;
         while (true) {
             if (strSerialized.c_str()[cursor] == DL1) {
-                cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+                cursor += 1; if (cursor >= max) return;
                 break;
             }
             a = atoi(&strSerialized.c_str()[cursor]);
@@ -1577,7 +1577,7 @@ void SimulationController::Restore(std::string strSerialized)
         }
         while (true) {
             if (strSerialized.c_str()[cursor] == DL1) {
-                cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+                cursor += 1; if (cursor >= max) return;
                 break;
             }
             a = atoi(&strSerialized.c_str()[cursor]);
@@ -1588,5 +1588,6 @@ void SimulationController::Restore(std::string strSerialized)
             cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
             charControllers[i].inputRegions.push_back({a,b,c});
         }
+        cursor = strSerialized.find(DL2, cursor) + 1; if (cursor >= max) return;
     }
 }
