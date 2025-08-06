@@ -2641,7 +2641,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
     }
 
-    if (moveType == 11 || moveType == 10) { //airborne crumples
+    if (moveType == 11 || moveType == 10 || moveType == 18) { // crumples, hkds
         hitEntryHitStun += 500000;
         resetHitStunOnTransition = true;
         knockDown = true;
@@ -2865,6 +2865,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 } else {
                     nextAction = 267;
                 }
+            } else if (moveType == 18) {
+                nextAction = 274;
             } else if (moveType == 13) { // set on wall bounce
                 nextAction = 232;
             } else if (moveType == 11) {
