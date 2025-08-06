@@ -386,6 +386,10 @@ private:
     void ExitStyle();
 
     bool fluffFrames(int frameBias = 0) {
+        if (hitStun) {
+            // todo shouldn't be needed once we have proper speed in dmg scripts
+            return false;
+        }
         if ((marginFrame != -1 && (currentFrame + frameBias) >= marginFrame) && nextAction == -1 ) {
             return true;
         }
