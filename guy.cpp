@@ -819,7 +819,7 @@ bool Guy::RunFrame(void)
                         pOpponent->hitStun = 50000;
                         pOpponent->juggleCounter = 0;
                         pOpponent->resetHitStunOnLand = false;
-                        pOpponent->forceKnockDown = false;
+                        pOpponent->knockDown = false;
                         // do we need to continually snap position or just at beginning?
                         pOpponent->direction = direction;
                         pOpponent->posX = posX;
@@ -2001,7 +2001,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
         // we dont go through the landing transition here
         // we just need to go to the ground and not be airborne
         // so we can move after this script ends, like tatsu
-        if (!forceLanding || forceKnockDown) {
+        if (!forceLanding || knockDown) {
             landed = true;
         }
         if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
@@ -2031,7 +2031,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
         bounced = true;
     }
 
-    if (landed && forceKnockDown) {
+    if (landed && knockDown) {
         isDown = true; // can't let stuff hit us on landing frame - see donkey kick into mp dp
     }
 
@@ -2636,20 +2636,20 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
         knockDownFrames = downTime;
 
-        if (forceKnockDownState) {
-            forceKnockDown = true;
+        if (forceKnockDownState || dmgType == 11 || dmgType == 15) {
+            knockDown = true;
         }
     }
 
     if (moveType == 11 || moveType == 10) { //airborne crumples
         hitEntryHitStun += 500000;
         resetHitStunOnTransition = true;
-        forceKnockDown = true;
+        knockDown = true;
         knockDownFrames = downTime;
     }
 
     if (dmgType == 13) {
-        forceKnockDown = true;
+        knockDown = true;
         knockDownFrames = downTime;
         //resetHitStunOnTransition = true;
     }
@@ -2730,7 +2730,6 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     if (applyHit) {
         if (destY > 0 ) {
             airborne = true;
-            forceKnockDown = true;
         }
 
         if (jimenBound && floorTime) {
@@ -2795,7 +2794,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     hitStun--;
                 }
 
-                forceKnockDown = true;
+                knockDown = true;
                 knockDownFrames = downTime;
 
                 if (destY != 0) {
@@ -2900,6 +2899,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                     nextAction = 282;
                 } else if (moveType == 16) {
                     nextAction = 280;
+                } else if (moveType == 12 && !knockDown) {
+                    nextAction = 222;
                 } else if (!locked) {
                     // generic angle-based launch
                     float angle = std::fmod(std::atan2(destY,destX)/std::numbers::pi*180.0,360);
@@ -3587,7 +3588,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
                 hitStun = 50000;
                 resetHitStunOnTransition = true;
                 wallSplat = false;
-                forceKnockDown = true;
+                knockDown = true;
             }
         } else {
             nextAction = 256;
@@ -3707,7 +3708,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             // end at the same time at hitstun?
             nextAction = 1;
 
-            if (forceKnockDown) {
+            if (knockDown) {
                 if (knockDownFrames) {
                     hitStun = knockDownFrames;
                     knockDownFrames = 0;
@@ -3716,7 +3717,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
                 } else {
                     nextAction = 340;
                     isDown = false;
-                    forceKnockDown = false;
+                    knockDown = false;
 
                     resetComboCount = true;
                 }

@@ -670,7 +670,7 @@ private:
 
     int pendingLockHit = -1;
 
-    bool forceKnockDown = false;
+    bool knockDown = false;
     bool isDown = false;
     int knockDownFrames = 0;
     bool nageKnockdown = false;
