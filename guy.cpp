@@ -1152,6 +1152,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
         initialMatch = atLeastOneNotConsumed && bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
         bool atLeastOneNotConsumed = false;
+        bool match = false;
         while (i < initialSearch)
         {
             // guile 1112 has 0s everywhere
@@ -1161,14 +1162,20 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
                     atLeastOneNotConsumed = true;
                 }
                 initialMatch = true;
+                match = true;
             } else if (initialMatch == true) {
                 i--;
                 initialI = i;
+                match = false;
                 break; // break once initialMatch no longer true, set i on last true
             }
             i++;
         }
         if (atLeastOneNotConsumed == false) {
+            initialMatch = false;
+        }
+        if (okCondFlags & 1024 && match) {
+            // if we never got to not-matching, we never saw the initial edge
             initialMatch = false;
         }
     }
