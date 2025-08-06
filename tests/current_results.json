@@ -4837,6 +4837,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "sagat_trade_combo",
+        "testVersion": "34",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 3162,
+                "firstFrame": 106,
+                "lastFrame": 1401
+            },
+            {
+                "count": 1058,
+                "firstFrame": 85,
+                "lastFrame": 1044
+            },
+            {
+                "count": 574,
+                "firstFrame": 151,
+                "lastFrame": 1044
+            },
+            {
+                "count": 561,
+                "firstFrame": 85,
+                "lastFrame": 617
+            },
+            {
+                "count": 537,
+                "firstFrame": 85,
+                "lastFrame": 617
+            },
+            {
+                "count": 1820,
+                "firstFrame": 85,
+                "lastFrame": 1193
+            },
+            {
+                "count": 2508,
+                "firstFrame": 106,
+                "lastFrame": 1401
+            },
+            {
+                "count": 918,
+                "firstFrame": 130,
+                "lastFrame": 1075
+            },
+            {
+                "count": 1002,
+                "firstFrame": 425,
+                "lastFrame": 1014
+            },
+            {
+                "count": 1240,
+                "firstFrame": 162,
+                "lastFrame": 1401
+            },
+            {
+                "count": 392,
+                "firstFrame": 85,
+                "lastFrame": 816
+            }
+        ]
+    },
+    {
         "testName": "terry_fierce",
         "testVersion": "33",
         "finished": true,
