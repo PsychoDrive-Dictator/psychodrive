@@ -497,6 +497,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_di_splats",
+        "testVersion": "34",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 158,
+                "firstFrame": 165,
+                "lastFrame": 322
+            },
+            {
+                "count": 116,
+                "firstFrame": 84,
+                "lastFrame": 194
+            },
+            {
+                "count": 82,
+                "firstFrame": 113,
+                "lastFrame": 194
+            },
+            {
+                "count": 62,
+                "firstFrame": 84,
+                "lastFrame": 185
+            },
+            {
+                "count": 62,
+                "firstFrame": 84,
+                "lastFrame": 185
+            },
+            {
+                "count": 185,
+                "firstFrame": 84,
+                "lastFrame": 322
+            },
+            {
+                "count": 199,
+                "firstFrame": 110,
+                "lastFrame": 322
+            },
+            {
+                "count": 126,
+                "firstFrame": 197,
+                "lastFrame": 322
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_driverush_crossunder",
         "testVersion": "33",
         "finished": true,
