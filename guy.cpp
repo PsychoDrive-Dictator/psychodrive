@@ -2403,8 +2403,12 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitStopTarget = 0;
         }
         if (trade) {
-            hitStopSelf += 4;
-            hitStopTarget += 4;
+            if (hitStopSelf<15) {
+                hitStopSelf = 15;
+            }
+            if (hitStopTarget<15) {
+                hitStopTarget = 15;
+            }
         }
         Box hitIntersection;
         hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
