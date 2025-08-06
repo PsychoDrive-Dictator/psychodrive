@@ -35,7 +35,9 @@ public:
     std::string getActionName(int actionID);
 
     void addHitStop(int w) {
-        pendingHitStop += w;
+        if (w > pendingHitStop) {
+            pendingHitStop = w;
+        }
     }
 
     std::string *getName() { return &name; }

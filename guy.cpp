@@ -2248,9 +2248,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 {
     std::unordered_set<Guy *> hitGuys;
 
-    // todo proper trade checking ahead of time, strike>throw
-    // todo hitgrabs should just apply their hit DT on trade?
-
     for (auto &pendingHit : pendingHitList) {
         HitBox &hitBox = pendingHit.hitBox;
         HurtBox &hurtBox = pendingHit.hurtBox;
@@ -2258,6 +2255,18 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         Guy *pOtherGuy = pendingHit.pGuyGettingHit;
         Guy *pGuy = pendingHit.pGuyHitting;
         int hitEntryFlag = pendingHit.hitEntryFlag;
+
+        bool trade = false;
+        PendingHit tradeHit;
+        for (auto &otherPendingHit : pendingHitList) {
+            if (otherPendingHit.pGuyGettingHit == pGuy) {
+                pOtherGuy->log(pOtherGuy->logHits, "trade!");
+                trade = true;
+                // todo see simultaneous hit question thing below
+                tradeHit = otherPendingHit;
+                break;
+            }
+        }
 
         // for now don't hit the same guy twice
         // todo figure out what happens when two simultaneous hits happen
@@ -2276,6 +2285,14 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         int hitMark = (*pHitEntry)["Hitmark"];
 
         bool isGrab = hitBox.type == grab;
+
+        // todo make this configurable pluggable rule
+        if (isGrab && trade && tradeHit.hitBox.type == hit) {
+            // strike loses vs. throw
+            continue;
+        }
+
+        // todo sf5 style normal priority system could also go here
 
         bool hitFlagToParent = false;
         bool hitStopToParent = false;
@@ -2385,6 +2402,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitStopSelf = 0;
             hitStopTarget = 0;
         }
+        if (trade) {
+            hitStopSelf += 4;
+            hitStopTarget += 4;
+        }
         Box hitIntersection;
         hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
         hitIntersection.y = fixMax(hitBox.box.y, hurtBox.box.y);
@@ -2422,7 +2443,12 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
 
         // grab or hitgrab
-        if (!pOtherGuy->locked && (isGrab || (attr2 & (1<<1)))) {
+        bool hitGrab = (attr2 & (1<<1));
+        if (trade) {
+            // just apply the hit on trade
+            hitGrab = false;
+        }
+        if (!pOtherGuy->locked && (isGrab || hitGrab)) {
             pGuy->grabbedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
         }
@@ -2439,7 +2465,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (hitID != -1) {
             pGuy->canHitID |= 1 << hitID;
         }
-
 
         if (!pOtherGuy->blocking && !hitArmor) {
             if ((hitEntryFlag & punish_counter) == punish_counter) {
@@ -2900,8 +2925,9 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
 
         if (nextAction != -1) {
-            hitStun++;
-            AdvanceFrame();
+            NextAction(false, false);
+            DoStatusKey();
+            WorldPhysics(true);
         }
     }
 
