@@ -176,8 +176,86 @@ void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scalin
     ImGui::PopStyleVar();
 }
 
+const float frameWidth = 30;
+
+void drawActionTimelineKeys(nlohmann::json *pAction, const char *keyName, nlohmann::json *pTriggerGroups)
+{
+    int lineStartFrame = -1;
+    int lineEndFrame = -1;
+    float cursorX = ImGui::GetCursorPosX();
+    for (auto& [keyID, key] : (*pAction)[keyName].items()) {
+        if (!key.contains("_StartFrame")) {
+            continue;
+        }
+
+        int startFrame = key["_StartFrame"];
+        int endFrame = key["_EndFrame"];
+
+        if (lineEndFrame == -1) {
+            lineStartFrame = startFrame;
+            lineEndFrame = endFrame;
+        } else {
+            if (startFrame >= lineEndFrame || endFrame <= lineStartFrame) {
+                ImGui::SameLine();
+                if (startFrame < lineStartFrame) {
+                    lineStartFrame = startFrame;
+                }
+                if (endFrame > lineEndFrame) {
+                    lineEndFrame = endFrame;
+                }
+            } else {
+                // newline
+                lineStartFrame = startFrame;
+                lineEndFrame = endFrame;
+            }
+        }
+
+        std::string strButtonName = std::string(keyName) + " " + keyID;
+        log(strButtonName.c_str());
+
+        ImGui::SetCursorPosX(cursorX + frameWidth * startFrame);
+        if (key["_NotDefer"] == true) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6, 0.0, 0.0, 1.0));
+        }
+        ImGui::Button(strButtonName.c_str() , ImVec2((endFrame - startFrame) * frameWidth, 0));
+        if (key["_NotDefer"] == true) {
+            ImGui::PopStyleColor();
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::BeginTooltip();
+            if (std::string(keyName) == "TriggerKey") {
+                for (auto& [trigGroupKeyID, trigGroupKey] : (*pTriggerGroups).items()) {
+                    if (atoi(trigGroupKeyID.c_str()) != key["TriggerGroup"]) {
+                        continue;
+                    }
+                    for (auto& [trigKeyID, trigKey] : trigGroupKey.items()) {
+                        ImGui::Text(std::string(trigKey).c_str());
+                    }
+                }
+            }
+            ImGui::EndTooltip();
+        }
+    }
+}
+
+void drawActionTimeline(const char *charName, int version, const char *moveName)
+{
+    nlohmann::json *pMovesDictJson = loadCharFile(charName, version, "moves");
+    nlohmann::json *pTriggerGroups = loadCharFile(charName, version, "trigger_groups");
+
+    nlohmann::json *pAction = &(*pMovesDictJson)[moveName];
+
+    if (!pAction) {
+        return;
+    }
+
+    drawActionTimelineKeys(pAction, "TriggerKey", pTriggerGroups);
+}
+
 void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 {
+    //drawActionTimeline(pGuy->getName()->c_str(), pGuy->getVersion(), pGuy->getActionName().c_str());
+
     ImGui::Begin(windowName);
     color col = pGuy->getColor();
     ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "name %s moveset %s", pGuy->getName()->c_str(), pGuy->getCharacter().c_str());

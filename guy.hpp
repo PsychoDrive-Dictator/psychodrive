@@ -248,8 +248,6 @@ public:
 
     Guy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
     {
-        const std::string charPath = "data/chars/" + charName + "/";
-        const std::string commonPath = "data/chars/common/";
         character = charName;
         version = charVersion;
         name = character;
@@ -265,20 +263,20 @@ public:
             staticPlayerLoaded = true;
         }
 
-        pMovesDictJson = loadCharFile(charPath, character, version, "moves");
-        pRectsJson = loadCharFile(charPath, character, version, "rects");
-        pNamesJson = loadCharFile(charPath, character, version, "names");
-        pTriggerGroupsJson = loadCharFile(charPath, character, version, "trigger_groups");
-        pTriggersJson = loadCharFile(charPath, character, version, "triggers");
-        pCommandsJson = loadCharFile(charPath, character, version, "commands");
-        pChargeJson = loadCharFile(charPath, character, version, "charge");
-        pHitJson = loadCharFile(charPath, character, version, "hit");
-        pAtemiJson = loadCharFile(charPath, character, version, "atemi");
-        pCharInfoJson = loadCharFile(charPath, character, version, "charinfo");
+        pMovesDictJson = loadCharFile(character, version, "moves");
+        pRectsJson = loadCharFile(character, version, "rects");
+        pNamesJson = loadCharFile(character, version, "names");
+        pTriggerGroupsJson = loadCharFile(character, version, "trigger_groups");
+        pTriggersJson = loadCharFile(character, version, "triggers");
+        pCommandsJson = loadCharFile(character, version, "commands");
+        pChargeJson = loadCharFile(character, version, "charge");
+        pHitJson = loadCharFile(character, version, "hit");
+        pAtemiJson = loadCharFile(character, version, "atemi");
+        pCharInfoJson = loadCharFile(character, version, "charinfo");
 
-        pCommonMovesJson = loadCharFile(commonPath, "common", version, "moves");
-        pCommonRectsJson = loadCharFile(commonPath, "common", version, "rects");
-        pCommonAtemiJson = loadCharFile(commonPath, "common", version, "atemi");
+        pCommonMovesJson = loadCharFile("common", version, "moves");
+        pCommonRectsJson = loadCharFile("common", version, "rects");
+        pCommonAtemiJson = loadCharFile("common", version, "atemi");
 
         Input(0);
 

@@ -372,8 +372,9 @@ int findCharVersionSlot(int version)
     return versionSlot;
 }
 
-nlohmann::json *loadCharFile(const std::string &path, const std::string &charName, int version, const std::string &jsonName)
+nlohmann::json *loadCharFile(const std::string &charName, int version, const std::string &jsonName)
 {
+    std::string charPath = "data/chars/" + charName + "/";
     std::string charFileName;
     bool foundFile = false;
 
@@ -384,7 +385,7 @@ nlohmann::json *loadCharFile(const std::string &path, const std::string &charNam
     }
     while (versionSlot >= 0) {
         charFileName = charName + std::to_string(atoi(charVersions[versionSlot])) + "_" + jsonName + ".json";
-        if (charFileExists(path, charName, charFileName)) {
+        if (charFileExists(charPath, charName, charFileName)) {
             foundFile = true;
             break;
         }
@@ -399,7 +400,7 @@ nlohmann::json *loadCharFile(const std::string &path, const std::string &charNam
     if (mapCharFileLoader.find(charFileName) == mapCharFileLoader.end()) {
         bool loaded = false;
         // try loading from loose file first
-        std::string looseFileName = path + charFileName;
+        std::string looseFileName = charPath + charFileName;
         if (std::filesystem::exists(looseFileName)) {
             mapCharFileLoader[charFileName] = parse_json_file(looseFileName);
             loaded = true;
