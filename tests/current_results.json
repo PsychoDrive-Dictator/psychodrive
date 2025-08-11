@@ -3845,6 +3845,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "jp_manual_detonate_from_od",
+        "testVersion": "34",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 487,
+                "firstFrame": 221,
+                "lastFrame": 623
+            },
+            {
+                "count": 250,
+                "firstFrame": 204,
+                "lastFrame": 383
+            },
+            {
+                "count": 103,
+                "firstFrame": 204,
+                "lastFrame": 383
+            },
+            {
+                "count": 70,
+                "firstFrame": 207,
+                "lastFrame": 276
+            },
+            {
+                "count": 70,
+                "firstFrame": 207,
+                "lastFrame": 276
+            },
+            {
+                "count": 521,
+                "firstFrame": 188,
+                "lastFrame": 623
+            },
+            {
+                "count": 671,
+                "firstFrame": 204,
+                "lastFrame": 623
+            },
+            {
+                "count": 105,
+                "firstFrame": 204,
+                "lastFrame": 386
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 405,
+                "firstFrame": 204,
+                "lastFrame": 623
+            },
+            {
+                "count": 53,
+                "firstFrame": 204,
+                "lastFrame": 349
+            }
+        ]
+    },
+    {
         "testName": "jp_wallbounce_bnb",
         "testVersion": "26",
         "finished": true,
