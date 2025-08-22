@@ -3773,6 +3773,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             moveInput = invertDirection(moveInput);
         }
 
+        bool crouchingFluffFrames = forcedPoseStatus == 2 && fluffFrames();
+
         if ( moveInput & 1 ) {
 
             jumped = true;
@@ -3788,7 +3790,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
                 nextAction = 33; // BAS_JUMP_N_START
             }
         } else if ( moveInput & 2 ) {
-            if ( !crouching ) {
+            if ( !crouchingFluffFrames && !crouching ) {
                 crouching = true;
                 if (forcedPoseStatus == 2) {
                     nextAction = 4; // crouch loop after the first sitting down anim if already crouched
@@ -3813,7 +3815,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             if ( !(moveInput & 8) && movingForward ) {
                 nextAction = 11; // BAS_FORWARD_END
             }
-            if ( !(moveInput & 2) && crouching ) {
+            if ( !(moveInput & 2) && (crouching || crouchingFluffFrames) ) {
                 nextAction = 6;
             }
         }
