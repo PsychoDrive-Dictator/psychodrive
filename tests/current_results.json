@@ -807,6 +807,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_guard",
+        "testVersion": "34",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1626,
+                "firstFrame": 14,
+                "lastFrame": 859
+            },
+            {
+                "count": 209,
+                "firstFrame": 14,
+                "lastFrame": 749
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 183,
+                "firstFrame": 259,
+                "lastFrame": 751
+            },
+            {
+                "count": 183,
+                "firstFrame": 259,
+                "lastFrame": 751
+            },
+            {
+                "count": 474,
+                "firstFrame": 14,
+                "lastFrame": 808
+            },
+            {
+                "count": 822,
+                "firstFrame": 14,
+                "lastFrame": 859
+            },
+            {
+                "count": 117,
+                "firstFrame": 259,
+                "lastFrame": 663
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 126,
+                "firstFrame": 259,
+                "lastFrame": 666
+            },
+            {
+                "count": 130,
+                "firstFrame": 259,
+                "lastFrame": 731
+            }
+        ]
+    },
+    {
         "testName": "aa_imperfect_parry",
         "testVersion": "30",
         "finished": true,
