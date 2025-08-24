@@ -3864,7 +3864,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         } else if ( moveInput & 2 ) {
             if ( !crouchingFluffFrames && !crouching ) {
                 crouching = true;
-                if (forcedPoseStatus == 2) {
+                if (forcedPoseStatus == 2 && currentAction != 6) {
                     nextAction = 4; // crouch loop after the first sitting down anim if already crouched
                 } else {
                     nextAction = 5; // BAS_STD_CRH
