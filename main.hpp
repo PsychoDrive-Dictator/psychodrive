@@ -38,6 +38,11 @@ enum hitBoxType {
     direct_damage = 7,
 };
 
+enum hitBoxFlags {
+    overhead = 1,
+    low = 2,
+};
+
 enum hurtBoxFlags {
     full_strike_invul = 1,
     projectile_invul = 2,
@@ -55,6 +60,7 @@ struct HitBox {
     hitBoxType type;
     int hitEntryID;
     int hitID;
+    int flags;
 };
 
 struct HurtBox {

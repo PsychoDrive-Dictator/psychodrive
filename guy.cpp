@@ -2170,8 +2170,20 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             }
             bool blocked = false;
             if (pOtherGuy->blocking || otherGuyCanBlock) {
-                hitEntryFlag = block;
                 blocked = true;
+            }
+
+            if (blocked && hitbox.type != proximity_guard) {
+                if (hitbox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
+                    blocked = false;
+                }
+                if (hitbox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
+                    blocked = false;
+                }
+            }
+
+            if (blocked) {
+                hitEntryFlag = block;
             }
 
             if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
@@ -2421,6 +2433,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
 
         if (!hitArmor) {
+            if (applyHit && !pendingHit.blocked) {
+                pOtherGuy->blocking = false;
+            }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, &hurtBox);
         }
 
@@ -3084,6 +3099,16 @@ void Guy::DoHitBoxKey(const char *name)
                     int hitEntryID = hitBox["AttackDataListIndex"];
                     int hitID = hitBox["HitID"];
                     bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
+                    int flags = 0;
+                    if (hitBox.value("_IsGuardBit", false)) {
+                        int guardBit = hitBox["GuardBit"];
+                        if ((guardBit & 3) == 1) {
+                            flags |= overhead;
+                        }
+                        if ((guardBit & 3) == 2) {
+                            flags |= low;
+                        }
+                    }
                     if (type == domain || type == direct_damage) {
                         hasHitID = false;
                     }
@@ -3097,7 +3122,7 @@ void Guy::DoHitBoxKey(const char *name)
                         hitID = 15 + atoi(hitBoxID.c_str());
                     }
                     if (type == proximity_guard || hitEntryID != -1) {
-                        hitBoxes.push_back({rect,type,hitEntryID,hitID});
+                        hitBoxes.push_back({rect,type,hitEntryID,hitID,flags});
                     }
                 }
             }
