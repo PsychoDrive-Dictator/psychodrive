@@ -3820,6 +3820,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
         applyFreeMovement = false;
     }
+    if (nextAction != -1) {
+        applyFreeMovement = false;
+    }
     
     bool moveTurnaround = false;
 
