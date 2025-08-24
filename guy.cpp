@@ -2164,8 +2164,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
 
             bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
-            bool otherGuyCanBlock = !otherGuyAirborne && !otherGuyHit && (pOtherGuy->canAct() || pOtherGuy->blocking) && pOtherGuy->currentInput & BACK;
-            if (isGrab) {
+            bool otherGuyCanBlock = pOtherGuy->canAct() || pOtherGuy->blocking || pOtherGuy->currentAction == 482;
+            if (!(pOtherGuy->currentInput & BACK)) {
+                otherGuyCanBlock = false;
+            }
+            if (otherGuyAirborne || otherGuyHit || isGrab) {
                 otherGuyCanBlock = false;
             }
             bool blocked = false;
