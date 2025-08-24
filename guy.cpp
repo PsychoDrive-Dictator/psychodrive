@@ -725,6 +725,7 @@ bool Guy::RunFrame(void)
         punishCounterState = false;
         forceKnockDownState = false;
         throwTechable = false;
+        canBlock = false;
         ignoreBodyPush = false;
         ignoreHitStop = false;
 
@@ -2164,7 +2165,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
 
             bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
-            bool otherGuyCanBlock = pOtherGuy->canAct() || pOtherGuy->blocking || pOtherGuy->currentAction == 482;
+            bool otherGuyCanBlock = pOtherGuy->canAct() || pOtherGuy->blocking || pOtherGuy->currentAction == 482 || pOtherGuy->canBlock;
             if (!(pOtherGuy->currentInput & BACK)) {
                 otherGuyCanBlock = false;
             }
@@ -4170,6 +4171,9 @@ void Guy::DoSwitchKey(const char *name)
 
             int flag = key["SystemFlag"];
 
+            if (flag & 0x40000000) {
+                canBlock = true;
+            }
             if (flag & 0x8000000) {
                 isDrive = true;
                 if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {

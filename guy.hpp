@@ -551,6 +551,7 @@ private:
     bool forceKnockDownState = false;
 
     bool throwTechable = false;
+    bool canBlock = false;
 
     bool offsetDoesNotPush = false;
     bool ignoreBodyPush = false;
