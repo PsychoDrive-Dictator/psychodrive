@@ -311,6 +311,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_canblock_cornercases",
+        "testVersion": "34",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 476,
+                "firstFrame": 173,
+                "lastFrame": 648
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 110,
+                "firstFrame": 161,
+                "lastFrame": 495
+            },
+            {
+                "count": 110,
+                "firstFrame": 161,
+                "lastFrame": 495
+            },
+            {
+                "count": 143,
+                "firstFrame": 137,
+                "lastFrame": 517
+            },
+            {
+                "count": 243,
+                "firstFrame": 137,
+                "lastFrame": 648
+            },
+            {
+                "count": 110,
+                "firstFrame": 161,
+                "lastFrame": 495
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 488,
+                "firstFrame": 161,
+                "lastFrame": 648
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_comboscaling",
         "testVersion": "33",
         "finished": true,
