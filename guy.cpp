@@ -2102,7 +2102,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (hitbox.hitID != -1 && ((1<<hitbox.hitID) & canHitID)) {
             continue;
         }
-        if (hitbox.type == proximity_guard || hitbox.type == destroy_projectile) {
+        if (hitbox.type == destroy_projectile) {
             // todo right now we do nothing with those
             continue;
         }
@@ -2164,7 +2164,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
 
             bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
-            bool otherGuyCanBlock = !otherGuyAirborne && !otherGuyHit && pOtherGuy->actionStatus != -1 && pOtherGuy->currentInput & BACK;
+            bool otherGuyCanBlock = !otherGuyAirborne && !otherGuyHit && (pOtherGuy->canAct() || pOtherGuy->blocking) && pOtherGuy->currentInput & BACK;
             if (isGrab) {
                 otherGuyCanBlock = false;
             }
@@ -2188,29 +2188,32 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             }
 
             std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
-            nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
-
-            if (isGrab) {
-                pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
-            }
-
+            nlohmann::json *pHitEntry = nullptr;
             int hitEntryID = hitbox.hitEntryID;
-
             bool bombBurst = false;
-            // if bomb burst and found a bomb, use the next hit ID instead 
-            if (pHitEntry->value("_bomb_burst", false) && pOpponent->debuffTimer) {
-                bombBurst = true;
-                hitEntryID += 1;
-                hitIDString = to_string_leading_zeroes(hitEntryID, 3);
-                pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
-            }
 
-            int juggleLimit = (*pHitEntry)["JuggleLimit"];
-            if (wasDrive) {
-                juggleLimit += 3;
-            }
-            if (hitbox.type != domain && pOtherGuy->getAirborne() && pOtherGuy->juggleCounter > juggleLimit) {
-                continue;
+            if (hitbox.type != proximity_guard) {
+                pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
+
+                if (isGrab) {
+                    pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
+                }
+
+                // if bomb burst and found a bomb, use the next hit ID instead
+                if (pHitEntry->value("_bomb_burst", false) && pOpponent->debuffTimer) {
+                    bombBurst = true;
+                    hitEntryID += 1;
+                    hitIDString = to_string_leading_zeroes(hitEntryID, 3);
+                    pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
+                }
+
+                int juggleLimit = (*pHitEntry)["JuggleLimit"];
+                if (wasDrive) {
+                    juggleLimit += 3;
+                }
+                if (hitbox.type != domain && pOtherGuy->getAirborne() && pOtherGuy->juggleCounter > juggleLimit) {
+                    continue;
+                }
             }
 
             // juggle was the last thing to check, hit is valid
@@ -2267,22 +2270,43 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         bool trade = false;
         PendingHit tradeHit;
-        for (auto &otherPendingHit : pendingHitList) {
-            if (otherPendingHit.pGuyGettingHit == pGuy) {
-                pOtherGuy->log(pOtherGuy->logHits, "trade!");
-                trade = true;
-                // todo see simultaneous hit question thing below
-                tradeHit = otherPendingHit;
-                break;
+        if (hitBox.type != proximity_guard) {
+            for (auto &otherPendingHit : pendingHitList) {
+                if (otherPendingHit.hitBox.type == proximity_guard) {
+                    continue;
+                }
+                if (otherPendingHit.pGuyGettingHit == pGuy) {
+                    pOtherGuy->log(pOtherGuy->logHits, "trade!");
+                    trade = true;
+                    // todo see simultaneous hit question thing below
+                    tradeHit = otherPendingHit;
+                    break;
+                }
             }
-        }
 
-        // for now don't hit the same guy twice
-        // todo figure out what happens when two simultaneous hits happen
-        if (pendingHit.hitBox.type != direct_damage && hitGuys.find(pOtherGuy) != hitGuys.end()) {
-            continue;
+            // for now don't hit the same guy twice
+            // todo figure out what happens when two simultaneous hits happen
+            if (hitBox.type != direct_damage && hitGuys.find(pOtherGuy) != hitGuys.end()) {
+                continue;
+            } else {
+                hitGuys.insert(pOtherGuy);
+            }
         } else {
-            hitGuys.insert(pOtherGuy);
+            if (pendingHit.blocked) {
+                if (pOtherGuy->crouching) {
+                    pOtherGuy->nextAction = 171;
+                } else {
+                    pOtherGuy->nextAction = 161;
+                }
+                if (!(pOtherGuy->inputBuffer[1] & BACK)) {
+                    // immediately go into guard if you tap back in a prox guard box
+                    pOtherGuy->NextAction(false, false);
+                }
+                pOtherGuy->blocking = true;
+                pOtherGuy->log(pOtherGuy->logHits, "proximity guard!");
+            }
+            // do nothing esle with those box
+            continue;
         }
 
         int destX = (*pHitEntry)["MoveDest"]["x"];
@@ -3072,7 +3096,7 @@ void Guy::DoHitBoxKey(const char *name)
                     if (hitID == 15 || type == domain) {
                         hitID = 15 + atoi(hitBoxID.c_str());
                     }
-                    if (hitEntryID != -1) {
+                    if (type == proximity_guard || hitEntryID != -1) {
                         hitBoxes.push_back({rect,type,hitEntryID,hitID});
                     }
                 }
@@ -3224,6 +3248,10 @@ void Guy::DoBranchKey(bool preHit)
                         if (branchParam0 == 0 && !(currentInput & branchParam1)) {
                             doBranch = true;
                         }
+                    }
+                    if (hitStun) {
+                        // guard scripts have branches to switch guard? but theyre not supposed to work?
+                        doBranch = false;
                     }
                     break;
                 case 21: // armor
@@ -3759,7 +3787,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     bool canMoveNow = false;
 
     canMoveNow = canMove(crouching, movingForward, movingBackward);
-    bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames;
+    bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames && !hitStun;
     if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
         applyFreeMovement = false;
     }
