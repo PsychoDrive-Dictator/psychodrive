@@ -3887,7 +3887,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             if ( !(moveInput & 8) && movingForward ) {
                 nextAction = 11; // BAS_FORWARD_END
             }
-            if ( !(moveInput & 2) && (crouching || crouchingFluffFrames) ) {
+            if (!(moveInput & 2) && (crouching || getCrouching()) && currentAction != 6) {
                 nextAction = 6;
             }
         }
