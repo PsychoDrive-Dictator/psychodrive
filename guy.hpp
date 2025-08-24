@@ -531,6 +531,7 @@ private:
     bool touchedOpponent = false;
     bool startsFalling = false;
     bool crouching = false;
+    bool freeMovement = false;
     bool blocking = false;
     bool bounced = false;
     bool didPush = false;

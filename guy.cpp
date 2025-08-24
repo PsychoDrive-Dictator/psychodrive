@@ -365,6 +365,7 @@ bool Guy::RunFrame(void)
     pushBackThisFrame = Fixed(0);
     reflectThisFrame = Fixed(0);
     offsetDoesNotPush = false;
+    freeMovement = false;
 
     if (pActionJson != nullptr)
     {
@@ -1424,6 +1425,10 @@ void Guy::DoTriggers(int fluffFrameBias)
                     }
                     if (!defer && !antiNormal) {
                         mapTriggers[triggerID].hasNormal = true;
+
+                        if (triggerGroup == 0) {
+                            freeMovement = true;
+                        }
                     }
                     if (defer && !antiNormal) {
                         mapTriggers[triggerID].hasDeferred = true;
@@ -2020,9 +2025,6 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
             velocityX = Fixed(0);
             accelX = Fixed(0);
-
-            // so we avoid the non-empty landing code below
-            jumped = false;
 
             UpdateBoxes();
         }
@@ -3557,7 +3559,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     if (landed) {
-        if (jumped && nextAction != 39 && nextAction != 40 && nextAction != 41) {
+        if (currentAction != 39 && currentAction != 40 && currentAction != 41 &&
+            nextAction != 39 && nextAction != 40 && nextAction != 41) {
             // non-empty jump landing
             log(logTriggers, "disabling actions due to non-empty landing");
             jumpLandingDisabledFrames = 3 + 1; // 3, but we decrement in RunFrame
@@ -3753,19 +3756,27 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
     bool movingForward = false;
     bool movingBackward = false;
-    bool canMoveNow = canMove(crouching, movingForward, movingBackward);
+    bool canMoveNow = false;
+
+    canMoveNow = canMove(crouching, movingForward, movingBackward);
+    bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames;
+    if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
+        applyFreeMovement = false;
+    }
     
     bool moveTurnaround = false;
 
     // Process movement if any
-    if ( canMoveNow )
+    if ( canMoveNow || applyFreeMovement)
     {
         if ( !couldMove ) {
             recoveryTiming = globalFrameCount;
         }
         // reset status - recovered control to neutral
         jumped = false;
-        moveTurnaround = needsTurnaround(Fixed(10));
+        if (canMoveNow) {
+            moveTurnaround = needsTurnaround(Fixed(10));
+        }
 
         int moveInput = currentInput;
 
@@ -3963,6 +3974,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         nextAction = -1;
         nextActionFrame = -1;
+
+        freeMovement = false;
 
         UpdateActionData();
 
