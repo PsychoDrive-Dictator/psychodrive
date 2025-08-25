@@ -2937,8 +2937,9 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 } else {
                     nextAction = 261;
                 }
-                if (crouching) {
+                if (crouching || getCrouching()) {
                     nextAction += 3;
+                    crouching = true;
                 }
             } else if (moveType == 18) {
                 nextAction = 274;
@@ -3792,6 +3793,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
+    curNextAction = nextAction;
+
     // first hitstun countdown happens on the same "frame" as hit, before hitstop
     // todo that's no longer true, we play that frame after hitstop?
     if (hitStun > 0)
@@ -3802,7 +3805,16 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             // todo need to decouple hitstun 0 from progressing to the next script
             // damage and juggle states' scripts' speed need to be scaled to naturally
             // end at the same time at hitstun?
-            nextAction = 1;
+            if (crouching) {
+                if (!(currentInput & DOWN)) {
+                    nextAction = 6;
+                } else {
+                    nextAction = 4;
+                }
+            } else {
+                nextAction = 1;
+            }
+            // todo recover in prox guard?
 
             if (knockDown) {
                 if (knockDownFrames) {
@@ -3955,6 +3967,10 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
             nextAction = actionID;
         }
+    }
+
+    if (curNextAction != nextAction) {
+        nextActionFrame = 0;
     }
 
     bool didTransition = false;
