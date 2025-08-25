@@ -2905,9 +2905,9 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     if (!isDomain && applyHit) {
         if (blocking) {
-            nextAction = 161;
+            nextAction = 160 + attackStrength;
             if (currentInput & DOWN) {
-                nextAction = 175;
+                nextAction = 174 + attackStrength;
             }
         } else {
             //if (dmgType & 3) { // crumple? :/
