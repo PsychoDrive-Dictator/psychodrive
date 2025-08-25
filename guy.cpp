@@ -2310,11 +2310,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             }
         } else {
             if (pendingHit.blocked && pOtherGuy->canAct()) {
-                if (pOtherGuy->currentInput & DOWN) {
-                    pOtherGuy->nextAction = 171;
-                } else {
-                    pOtherGuy->nextAction = 161;
-                }
+                // it seems to branch as needed between stand/crouch?
+                pOtherGuy->nextAction = 171;
                 if (!(pOtherGuy->inputBuffer[1] & BACK)) {
                     // immediately go into guard if you tap back in a prox guard box
                     pOtherGuy->NextAction(false, false);
@@ -4052,6 +4049,10 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         freeMovement = false;
 
         UpdateActionData();
+
+        if (currentFrame >= actionFrameDuration) {
+            currentFrame = actionFrameDuration - 1;
+        }
 
         nlohmann::json *pInherit = &(*pActionJson)["fab"]["Inherit"];
 
