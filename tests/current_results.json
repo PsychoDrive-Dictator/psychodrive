@@ -4408,58 +4408,58 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 4628,
+                "count": 4732,
                 "firstFrame": 212,
                 "lastFrame": 2420
             },
             {
-                "count": 1090,
-                "firstFrame": 339,
+                "count": 835,
+                "firstFrame": 794,
                 "lastFrame": 2338
             },
             {
-                "count": 126,
+                "count": 210,
                 "firstFrame": 915,
                 "lastFrame": 2239
             },
             {
-                "count": 793,
-                "firstFrame": 492,
+                "count": 472,
+                "firstFrame": 523,
                 "lastFrame": 2361
             },
             {
-                "count": 793,
-                "firstFrame": 492,
+                "count": 472,
+                "firstFrame": 523,
                 "lastFrame": 2361
             },
             {
-                "count": 2570,
+                "count": 1744,
                 "firstFrame": 99,
                 "lastFrame": 2404
             },
             {
-                "count": 3008,
+                "count": 2231,
                 "firstFrame": 113,
                 "lastFrame": 2420
             },
             {
-                "count": 987,
+                "count": 1075,
                 "firstFrame": 130,
                 "lastFrame": 2361
             },
             {
-                "count": 4244,
-                "firstFrame": 294,
-                "lastFrame": 2420
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 1960,
+                "count": 2260,
                 "firstFrame": 130,
                 "lastFrame": 2420
             },
             {
-                "count": 531,
-                "firstFrame": 492,
+                "count": 447,
+                "firstFrame": 523,
                 "lastFrame": 2334
             }
         ]
@@ -4743,24 +4743,24 @@ var currentResults =
                 "lastFrame": 613
             },
             {
-                "count": 266,
+                "count": 173,
                 "firstFrame": 103,
-                "lastFrame": 1229
+                "lastFrame": 1144
             },
             {
-                "count": 511,
+                "count": 333,
                 "firstFrame": 124,
-                "lastFrame": 1229
+                "lastFrame": 1144
             },
             {
-                "count": 10,
-                "firstFrame": 1145,
-                "lastFrame": 1154
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 188,
-                "firstFrame": 1105,
-                "lastFrame": 1229
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
@@ -4929,24 +4929,24 @@ var currentResults =
                 "lastFrame": 399
             },
             {
-                "count": 105,
+                "count": 40,
                 "firstFrame": 265,
-                "lastFrame": 987
+                "lastFrame": 930
             },
             {
-                "count": 344,
+                "count": 222,
                 "firstFrame": 109,
-                "lastFrame": 987
+                "lastFrame": 930
             },
             {
-                "count": 10,
-                "firstFrame": 931,
-                "lastFrame": 940
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 132,
-                "firstFrame": 891,
-                "lastFrame": 987
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,

@@ -2625,6 +2625,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     noCounterPush = attr0 & (1<<0);
     recoverForward = attr3 & (1<<0);
     recoverReverse = attr3 & (1<<1);
+    bool piyoBound = attr1 & (1<<2);
 
     pAttacker = attacker;
 
@@ -2707,7 +2708,15 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     if (dmgType == 13) {
         knockDown = true;
-        knockDownFrames = downTime;
+        if (!isDomain && applyHit && piyoBound) { // ??
+            knockDownFrames = 0;
+            hitEntryHitStun = downTime;
+            nextAction = 330;
+            isDown = true;
+        } else {
+            knockDownFrames = downTime;
+        }
+
         //resetHitStunOnTransition = true;
     }
 
