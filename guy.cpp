@@ -2931,6 +2931,15 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
                 } else {
                     nextAction = 267;
                 }
+            } else if (moveType == 71) {
+                if (attackStrength >= 2) {
+                    nextAction = 262;
+                } else {
+                    nextAction = 261;
+                }
+                if (crouching) {
+                    nextAction += 3;
+                }
             } else if (moveType == 18) {
                 nextAction = 274;
             } else if (moveType == 13) { // set on wall bounce
