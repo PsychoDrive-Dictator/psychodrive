@@ -3759,6 +3759,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             }
         } else if ((isProjectile && loopCount == 0) || (pParent && !isProjectile)) {
             return false; // die if minion at end of script
+        } else if (blocking) {
+            // ???
+            nextAction = currentAction + 1;
         } else if (hitStun || locked || airborne || (isProjectile && loopCount == -1)) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
@@ -3816,7 +3819,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (blocking && !hitStun && !proxGuarded) {
+    if (blocking && !hitStun && (!proxGuarded || !(currentInput & BACK))) {
         // was proximity guard, can act now
         blocking = false;
         nextAction = 1;
