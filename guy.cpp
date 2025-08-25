@@ -366,6 +366,7 @@ bool Guy::RunFrame(void)
     reflectThisFrame = Fixed(0);
     offsetDoesNotPush = false;
     freeMovement = false;
+    proxGuarded = false;
 
     if (pActionJson != nullptr)
     {
@@ -2308,8 +2309,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 hitGuys.insert(pOtherGuy);
             }
         } else {
-            if (pendingHit.blocked) {
-                if (pOtherGuy->crouching) {
+            if (pendingHit.blocked && pOtherGuy->canAct()) {
+                if (pOtherGuy->currentInput & DOWN) {
                     pOtherGuy->nextAction = 171;
                 } else {
                     pOtherGuy->nextAction = 161;
@@ -2319,8 +2320,11 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                     pOtherGuy->NextAction(false, false);
                 }
                 pOtherGuy->blocking = true;
+
                 pOtherGuy->log(pOtherGuy->logHits, "proximity guard!");
             }
+            // mark them regardless, since we might prox guard on recovery later I GUESS
+            pOtherGuy->proxGuarded = true;
             // do nothing esle with those box
             continue;
         }
@@ -2896,7 +2900,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
     if (!isDomain && applyHit) {
         if (blocking) {
             nextAction = 161;
-            if (crouching) {
+            if (currentInput & DOWN) {
                 nextAction = 175;
             }
         } else {
@@ -3812,12 +3816,18 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
+    if (blocking && !hitStun && !proxGuarded) {
+        // was proximity guard, can act now
+        blocking = false;
+        nextAction = 1;
+    }
+
     bool movingForward = false;
     bool movingBackward = false;
     bool canMoveNow = false;
 
     canMoveNow = canMove(crouching, movingForward, movingBackward);
-    bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames && !hitStun;
+    bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames && !hitStun && !blocking;
     if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
         applyFreeMovement = false;
     }

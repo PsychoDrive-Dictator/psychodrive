@@ -423,6 +423,11 @@ private:
             ret = false;
         }
 
+        if (blocking && !hitStun) {
+            // prox guard
+            ret = false;
+        }
+
         if (ret == true) {
             outCrouching = isCrouching;
         }
@@ -533,6 +538,7 @@ private:
     bool crouching = false;
     bool freeMovement = false;
     bool blocking = false;
+    bool proxGuarded = false;
     bool bounced = false;
     bool didPush = false;
     bool jumped = false;
