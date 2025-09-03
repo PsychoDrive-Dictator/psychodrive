@@ -1,6 +1,6 @@
 #!/bin/bash
 
-versions=("19" "20" "21" "22" "23" "24" "25" "26" "30" "31" "32" "33" "34")
+versions=("19" "20" "21" "22" "23" "24" "25" "26" "30" "31" "32" "33" "34" "35")
 
 dedupe_char_file() {
     sum=blah
@@ -74,6 +74,6 @@ dedupe_char_dumps manon
 dedupe_char_dumps marisa
 dedupe_char_dumps rashid
 dedupe_char_dumps ryu
-#dedupe_char_dumps sagat
+dedupe_char_dumps sagat
 dedupe_char_dumps terry
 dedupe_char_dumps zangief
