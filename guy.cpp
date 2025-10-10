@@ -1724,8 +1724,10 @@ int Guy::getFrameMeterColorIndex() {
     if (counterState) {
         ret = 3;
     }
-    if (hitBoxes.size()) {
-        ret = 4;
+    for (auto &hitBox : hitBoxes) {
+        if (hitBox.type != proximity_guard) {
+            ret = 4;
+        }
     }
     if (hitStun) {
         ret = 5;
