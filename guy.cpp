@@ -3631,6 +3631,20 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
+    if (isProjectile && pParent && pOpponent && pActionJson->contains("pdata")) {
+        int rangeB = (*pActionJson)["pdata"]["RangeB"];
+
+        Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
+        Fixed screenCenterX = bothPlayerPos / Fixed(2);
+        int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+        screenCenterX.data += fixedRemainder;
+
+        if (getPosX() > screenCenterX + maxProjectileDistance + Fixed(rangeB) ||
+            getPosX() < screenCenterX - maxProjectileDistance - Fixed(rangeB)) {
+            return false;
+        }
+    }
+
     if (die) {
         return false;
     }

@@ -13,6 +13,7 @@
 
 const Fixed wallDistance = Fixed(765.0f);
 const Fixed maxPlayerDistance = Fixed(245.0f);
+const Fixed maxProjectileDistance = Fixed(280.0f);
 
 extern nlohmann::json staticPlayer;
 extern bool staticPlayerLoaded;
