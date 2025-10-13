@@ -27,7 +27,7 @@
 #include "ui.hpp"
 #include "input.hpp"
 #include "render.hpp"
-
+#include "combogen.hpp"
 
 EGameMode gameMode = Training;
 
@@ -249,6 +249,7 @@ int replayFrameNumber = 0;
 bool lockCamera = true;
 bool toggleRenderUI = true;
 
+bool runComboFinder = false;
 bool recordingInput = false;
 std::vector<int> recordedInput;
 int recordingStartFrame = 0;
@@ -610,6 +611,11 @@ static void mainloop(void)
         bool hasInput = true;
         bool runFrame = oneframe || !paused;
 
+        if (runComboFinder) {
+            findCombos();
+            runComboFinder = false;
+        }
+
         if (playingBackInput) {
             if (runFrame) {
                 if (playBackFrame >= (int)playBackInputBuffer.size()) {
@@ -913,6 +919,7 @@ int main(int argc, char**argv)
     int dumpVersion = -1;
 
     if ( argc > 2 && std::string(argv[1]) == "run_dump") {
+        gameMode = Batch;
         Simulation dumpSim;
         int version = -1;
         if ( argc > 3 ) {
@@ -988,6 +995,7 @@ int main(int argc, char**argv)
         gameStateDump = parse_json_file(strDumpLoadPath);
     }
     if (gameStateDump != nullptr) {
+        gameMode = Batch;
         int i = 0;
         while (i < (int)gameStateDump.size()) {
             if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0) {

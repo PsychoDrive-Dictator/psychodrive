@@ -927,6 +927,26 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
     if (flags & (1ULL<<8)) superLevel = 2;
     if (flags & (1ULL<<9)) superLevel = 3;
     if (flags & (1ULL<<10)) superLevel = 3; // ca?
+
+    // meters
+    int needsFocus = (*pTrigger)["focus_need"];
+    if (needsFocus) {
+        int focusCost = (*pTrigger)["focus_consume"];
+        focus -= focusCost;
+        if (focus < 0) {
+            // todo burnout if 0?
+            focus = 0;
+        }
+    }
+
+    int needsGauge = (*pTrigger)["gauge_need"];
+    if (needsGauge) {
+        int gaugeCost = (*pTrigger)["gauge_consume"];
+        gauge -= gaugeCost;
+        if (gauge < 0) {
+            log(true, "not eonugh gauge to execute?! not supposed to happen");
+        }
+    }
 }
 
 bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
@@ -1088,6 +1108,26 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
     int stateCondition = (*pTrigger)["cond_owner_state_flags"];
     if (stateCondition && !(stateCondition & (1 << (getPoseStatus() - 1)))) {
         return false;
+    }
+
+    // meters
+    if (gameMode == Training) {
+        // todo implement regen so it stops breaks tests
+        int needsFocus = (*pTrigger)["focus_need"];
+        if (needsFocus) {
+            if (focus == 0) {
+                // no need to check cost here as we can bottom out this bar
+                return false;
+            }
+        }
+
+        int needsGauge = (*pTrigger)["gauge_need"];
+        if (needsGauge) {
+            int gaugeCost = (*pTrigger)["gauge_consume"];
+            if (gauge < gaugeCost) {
+                return false;
+            }
+        }
     }
 
     return true;

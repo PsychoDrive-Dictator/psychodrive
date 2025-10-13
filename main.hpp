@@ -6,6 +6,7 @@
 #include "fixed.hpp"
 
 enum EGameMode {
+    Batch = -1,
     Training = 0,
     MoveViewer,
     ComboMaker
@@ -127,6 +128,7 @@ extern int replayFrameNumber;
 extern bool lockCamera;
 extern bool toggleRenderUI;
 
+extern bool runComboFinder;
 extern bool recordingInput;
 extern std::vector<int> recordedInput;
 extern int recordingStartFrame;

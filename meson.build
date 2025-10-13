@@ -10,6 +10,7 @@ project_source_files = [
   'simulation.cpp',
   'guy.cpp',
   'ui.cpp',
+  'combogen.cpp',
   'input.cpp',
   'render.cpp',
   'imgui/imgui.cpp',

@@ -23,6 +23,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList);
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
+    void setAttacker(Guy *pGuy) { pAttacker = pGuy; }
+    Guy *getAttacker() { return pAttacker; }
     void setSim(Simulation *sim) { pSim = sim; uniqueID = pSim->guyIDCounter++; }
 
     void Input(int input);
@@ -114,6 +116,7 @@ public:
         return hitStop;
     }
     bool getWarudo() { return warudo; }
+    bool getIsDown() { return isDown; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     int getLastDamageScale() { return lastDamageScale; }
@@ -153,6 +156,8 @@ public:
     int getHealth() { return health; }
     int getMaxHealth() { return maxHealth; }
     void setHealth(int newHealth) { health = newHealth; }
+    int getFocus() { return focus; }
+    int getGauge() { return gauge; }
 
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }
@@ -288,6 +293,8 @@ public:
         DoTriggers();
 
         health = maxHealth = (*pCharInfoJson)["PlData"]["Vitality"];
+        focus = maxFocus = 60000;
+        gauge = maxGauge = (*pCharInfoJson)["PlData"]["Gauge"].get<int>();
     }
 
     Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)
@@ -591,6 +598,12 @@ private:
 
     int maxHealth;
     int health;
+
+    int maxFocus;
+    int focus;
+
+    int maxGauge;
+    int gauge;
 
     int currentAction = 1;
     int nextAction = -1;
