@@ -2538,7 +2538,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->pSim->getCurrentFrameEvents().push_back(event);
         } else {
             int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
-            addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
+            if (!pGuy->facSimile) {
+                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
+            }
         }
 
         // grab or hitgrab
