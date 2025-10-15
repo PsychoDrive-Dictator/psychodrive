@@ -5147,6 +5147,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "viper_jump_cancel_held_triggers",
+        "testVersion": "36",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 266,
+                "firstFrame": 188,
+                "lastFrame": 424
+            },
+            {
+                "count": 90,
+                "firstFrame": 188,
+                "lastFrame": 288
+            },
+            {
+                "count": 78,
+                "firstFrame": 188,
+                "lastFrame": 288
+            },
+            {
+                "count": 48,
+                "firstFrame": 230,
+                "lastFrame": 284
+            },
+            {
+                "count": 48,
+                "firstFrame": 230,
+                "lastFrame": 284
+            },
+            {
+                "count": 355,
+                "firstFrame": 96,
+                "lastFrame": 364
+            },
+            {
+                "count": 544,
+                "firstFrame": 107,
+                "lastFrame": 424
+            },
+            {
+                "count": 68,
+                "firstFrame": 230,
+                "lastFrame": 297
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 100,
+                "firstFrame": 230,
+                "lastFrame": 329
+            },
+            {
+                "count": 48,
+                "firstFrame": 230,
+                "lastFrame": 261
+            }
+        ]
+    },
+    {
         "testName": "zangief_fierce_armor",
         "testVersion": "33",
         "finished": true,

@@ -997,7 +997,6 @@ int main(int argc, char**argv)
         gameStateDump = parse_json_file(strDumpLoadPath);
     }
     if (gameStateDump != nullptr) {
-        gameMode = Batch;
         int i = 0;
         while (i < (int)gameStateDump.size()) {
             if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0) {
