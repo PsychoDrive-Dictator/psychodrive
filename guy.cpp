@@ -32,11 +32,16 @@ void parseRootOffset( nlohmann::json& keyJson, Fixed&offsetX, Fixed& offsetY)
     }
 }
 
-bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
+bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
     if (dcExcFlags != 0 ) {
         if ((dcExcFlags & input) != dcExcFlags) {
+            return false;
+        }
+    }
+    if (dcIncFlags != 0 ) {
+        if (!(dcIncFlags & input)) {
             return false;
         }
     }
@@ -50,7 +55,7 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
     }
 
     // commands can have only exc/inc flags?
-    if (okKeyFlags == 0 && okCondFlags == 0) {
+    if (okKeyFlags == 0) {
         return true;
     }
 
@@ -1141,6 +1146,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
     uint32_t okCondFlags = (*pNorm)["ok_key_cond_flags"];
     uint32_t ngKeyFlags = (*pNorm)["ng_key_flags"];
     uint32_t dcExcFlags = (*pNorm)["dc_exc_flags"];
+    uint32_t dcIncFlags = (*pNorm)["dc_inc_flags"];
     int precedingTime = (*pNorm)["preceding_time"];
     // condflags..
     // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
@@ -1167,7 +1173,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
                 i = 0;
                 initialMatch = false;
                 while (i < initialSearch) {
-                    if (matchInput(inputBuffer[i], button, 0, dcExcFlags, ngKeyFlags))
+                    if (matchInput(inputBuffer[i], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
                     {
                         if (!(inputBuffer[i] & CONSUMED)) {
                             atLeastOneNotConsumed = true;
@@ -1199,7 +1205,7 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
         while (i < initialSearch)
         {
             // guile 1112 has 0s everywhere
-            if ((okKeyFlags || dcExcFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, ngKeyFlags))
+            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
             {
                 if (!(inputBuffer[i] & CONSUMED)) {
                     atLeastOneNotConsumed = true;
