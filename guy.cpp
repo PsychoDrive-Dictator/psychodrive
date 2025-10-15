@@ -1135,6 +1135,15 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
         }
     }
 
+    // prevent non-jump triggers if about to jump
+    bool a,b,c;
+    if (canMove(a,b,c, 1) && (currentInput & 1)) {
+        int64_t flags = (*pTrigger)["category_flags"];
+        if (!(flags & (1ULL<<26))) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -3634,11 +3643,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
     bool doTriggers = true;
     if (jumpLandingDisabledFrames) {
-        doTriggers = false;
-    }
-    bool a,b,c;
-    if (canMove(a,b,c, 1) && (currentInput & 1)) {
-        // jump will take precedence below, don't do ground triggers
         doTriggers = false;
     }
 
