@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=35
+version=36
 
 copy_char_file() {
     src="PlayerData/$1/$1 $3.json"
@@ -30,6 +30,7 @@ copy_char_dumps Akuma akuma
 copy_char_dumps Blanka blanka
 copy_char_dumps Cammy cammy
 copy_char_dumps Chun-Li chunli
+copy_char_dumps 'C Viper' viper
 copy_char_dumps 'Dee Jay' deejay
 copy_char_dumps Dhalsim dhalsim
 copy_char_dumps Ed ed

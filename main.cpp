@@ -74,6 +74,7 @@ void makeCharEntries(void)
     charEntries.push_back({27, "terry", "Terry"});
     charEntries.push_back({28, "mai", "Mai"});
     charEntries.push_back({29, "elena", "Elena"});
+    charEntries.push_back({30, "viper", "C. Viper"});
 
     for (charEntry entry : charEntries ) {
         charNames.push_back(entry.name);
@@ -107,6 +108,7 @@ const char* charVersions[] = {
     "33 - S3 Hotfix 4",
     "34 - S3 Sagat Update",
     "35 - S3 Sagat Hotfix 1",
+    "36 - S3 Viper Update",
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
