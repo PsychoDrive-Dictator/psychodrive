@@ -5209,6 +5209,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "viper_super_jump_neutral",
+        "testVersion": "36",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 40,
+                "firstFrame": 66,
+                "lastFrame": 105
+            },
+            {
+                "count": 42,
+                "firstFrame": 65,
+                "lastFrame": 106
+            },
+            {
+                "count": 42,
+                "firstFrame": 65,
+                "lastFrame": 106
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 169,
+                "firstFrame": 61,
+                "lastFrame": 175
+            },
+            {
+                "count": 107,
+                "firstFrame": 65,
+                "lastFrame": 175
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "zangief_fierce_armor",
         "testVersion": "33",
         "finished": true,
