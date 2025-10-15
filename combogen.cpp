@@ -1,3 +1,7 @@
+#ifdef __EMSCRIPTEN__
+#include <emscripten/threading.h>
+#endif
+
 #include <map>
 #include <set>
 #include <algorithm>
@@ -151,7 +155,7 @@ public:
                     currentRoute.startedCombo = true;
                 }
 
-                if (pSim->frameCounter == 2000 || (!pSim->simGuys[1]->getComboHits() && currentRoute.startedCombo) || pSim->simGuys[1]->getIsDown() || pSim->simGuys[0]->canAct()) {
+                if (pSim->frameCounter == 2000 || (!pSim->simGuys[1]->getComboHits() && currentRoute.startedCombo) || pSim->simGuys[1]->getIsDown()) {
                     //pSim->Log("framecount " + std::to_string(pSim->frameCounter));
                     break;
                 }
@@ -203,6 +207,9 @@ void findCombos(void)
     if (threadCount == 0) {
         threadCount = 1;
     }
+#ifdef __EMSCRIPTEN__
+    threadCount = emscripten_num_logical_cores();
+#endif
     for (int i = 0; i < threadCount; i++) {
         ComboWorker *pNewWorker = new ComboWorker;
         workerPool.push_back(pNewWorker);
