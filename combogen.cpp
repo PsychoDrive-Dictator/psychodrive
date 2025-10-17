@@ -155,7 +155,7 @@ public:
                     currentRoute.startedCombo = true;
                 }
 
-                if (pSim->frameCounter == 2000 || (!pSim->simGuys[1]->getComboHits() && currentRoute.startedCombo) || pSim->simGuys[1]->getIsDown()) {
+                if (pSim->frameCounter == 2000 || (!pSim->simGuys[1]->getComboHits() && currentRoute.startedCombo) || pSim->simGuys[1]->getIsDown() || pSim->simGuys[0]->canAct()) {
                     //pSim->Log("framecount " + std::to_string(pSim->frameCounter));
                     break;
                 }

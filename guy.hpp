@@ -475,7 +475,6 @@ private:
 
     void log(bool log, std::string logLine)
     {
-        if (!facSimile) return;
         if (!log) return;
         std::string frameDiff = to_string_leading_zeroes(globalFrameCount - lastLogFrame, 3);
         std::string curFrame = to_string_leading_zeroes(currentFrame, 3);
