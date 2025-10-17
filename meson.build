@@ -8,6 +8,7 @@ project(
 project_source_files = [
   'main.cpp',
   'simulation.cpp',
+  'chara.cpp',
   'guy.cpp',
   'ui.cpp',
   'combogen.cpp',

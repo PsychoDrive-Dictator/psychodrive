@@ -10,6 +10,7 @@
 #include "input.hpp"
 #include "fixed.hpp"
 #include "simulation.hpp"
+#include "chara.hpp"
 
 const Fixed wallDistance = Fixed(765.0f);
 const Fixed maxPlayerDistance = Fixed(245.0f);
@@ -279,6 +280,7 @@ public:
         pHitJson = loadCharFile(character, version, "hit");
         pAtemiJson = loadCharFile(character, version, "atemi");
         pCharInfoJson = loadCharFile(character, version, "charinfo");
+        pCharData = loadCharacter(pTriggerGroupsJson, pTriggersJson, pCommandsJson, pChargeJson);
 
         pCommonMovesJson = loadCharFile("common", version, "moves");
         pCommonRectsJson = loadCharFile("common", version, "rects");
@@ -520,6 +522,7 @@ private:
     nlohmann::json *pHitJson;
     nlohmann::json *pAtemiJson;
     nlohmann::json *pCharInfoJson;
+    CharacterData *pCharData;
 
     nlohmann::json *pCommonMovesJson;
     nlohmann::json *pCommonRectsJson;
