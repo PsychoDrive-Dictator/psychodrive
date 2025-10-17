@@ -898,12 +898,12 @@ void Guy::RunFramePostPush(void)
     }
 }
 
-void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
+void Guy::ExecuteTrigger(Trigger *pTrigger)
 {
-    nextAction = (*pTrigger)["action_id"];
+    nextAction = pTrigger->actionID;
     // apply condition flags BCM.TRIGGER.TAG.NEW_ID.json to make jamie jump cancel divekick work
-    uint64_t flags = (*pTrigger)["category_flags"];
-    int inst = (*pTrigger)["combo_inst"];
+    uint64_t flags = pTrigger->flags;
+    int inst = pTrigger->comboInst;
 
     if (flags & (1ULL<<26)) {
         jumped = true;
@@ -934,20 +934,16 @@ void Guy::ExecuteTrigger(nlohmann::json *pTrigger)
     if (flags & (1ULL<<10)) superLevel = 3; // ca?
 
     // meters
-    int needsFocus = (*pTrigger)["focus_need"];
-    if (needsFocus) {
-        int focusCost = (*pTrigger)["focus_consume"];
-        focus -= focusCost;
+    if (pTrigger->needsFocus) {
+        focus -= pTrigger->focusCost;
         if (focus < 0) {
             // todo burnout if 0?
             focus = 0;
         }
     }
 
-    int needsGauge = (*pTrigger)["gauge_need"];
-    if (needsGauge) {
-        int gaugeCost = (*pTrigger)["gauge_consume"];
-        gauge -= gaugeCost;
+    if (pTrigger->needsGauge) {
+        gauge -= pTrigger->gaugeCost;
         if (gauge < 0) {
             log(true, "not eonugh gauge to execute?! not supposed to happen");
         }
@@ -1024,51 +1020,44 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
     return true;
 }
 
-bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
+bool Guy::CheckTriggerConditions(Trigger *pTrigger)
 {
-    int paramID = (*pTrigger)["cond_param_id"];
-    if ((*pTrigger)["_UseUniqueParam"] == true && paramID >= 0 && paramID < Guy::uniqueParamCount) {
-        int op = (*pTrigger)["cond_param_ope"];
-        int value = (*pTrigger)["cond_param_value"];
-
-        if (!conditionOperator(op, uniqueParam[paramID], value, "trigger unique param")) {
+    if (pTrigger->useUniqueParam && pTrigger->condParamID >= 0 && pTrigger->condParamID < Guy::uniqueParamCount) {
+        if (!conditionOperator(pTrigger->condParamOp, uniqueParam[pTrigger->condParamID], pTrigger->condParamValue, "trigger unique param")) {
             return false;
         }
     }
-    int limitShotCount = (*pTrigger)["cond_limit_shot_num"];
-    if (limitShotCount) {
+
+    if (pTrigger->limitShotCount) {
         int count = 0;
-        int limitShotCategory = (*pTrigger)["limit_shot_category"];
         for ( auto minion : minions ) {
-            if (limitShotCategory & (1 << minion->limitShotCategory)) {
+            if (pTrigger->limitShotCategory & (1 << minion->limitShotCategory)) {
                 count++;
             }
         }
-        if (count >= limitShotCount) {
+        if (count >= pTrigger->limitShotCount) {
             return false;
         }
     }
 
-    int airActionCountLimit = (*pTrigger)["cond_jump_cmd_count"];
-    if (airActionCountLimit) {
-        if (airActionCounter >= airActionCountLimit) {
+    if (pTrigger->airActionCountLimit) {
+        if (airActionCounter >= pTrigger->airActionCountLimit) {
             return false;
         }
     }
 
-    int vitalOp = (*pTrigger)["cond_vital_ope"];
-    if (vitalOp != 0) {
+    if (pTrigger->vitalOp != 0) {
         float vitalRatio = (float)health / maxHealth * 100;
 
-        switch (vitalOp) {
+        switch (pTrigger->vitalOp) {
             case 2:
-                if (vitalRatio > (*pTrigger)["cond_vital_ratio"]) {
+                if (vitalRatio > pTrigger->vitalRatio) {
                     // todo figure out exact rounding rules here
                     return false;
                 }
                 break;
             default:
-                log(logUnknowns, "unknown vital op on trigger " + std::to_string(triggerID));
+                log(logUnknowns, "unknown vital op on trigger " + std::to_string(pTrigger->id));
                 return false;
                 break;
         }
@@ -1076,31 +1065,29 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
 
     bool checkingRange = false;
     bool rangeCheckMatch = true;
-    int rangeCondition = (*pTrigger)["cond_range"];
-    Fixed rangeParam = Fixed((*pTrigger)["cond_range_param"].get<double>());
 
-    if (rangeCondition) {
+    if (pTrigger->rangeCondition) {
         checkingRange = true;
     }
 
-    switch (rangeCondition) {
+    switch (pTrigger->rangeCondition) {
         case 3:
         case 4:
         case 5:
-            if (getPosY() < rangeParam) {
+            if (getPosY() < pTrigger->rangeParam) {
                 rangeCheckMatch = false;
             }
-            if (rangeCondition == 4 && !(velocityY > Fixed(0))) {
+            if (pTrigger->rangeCondition == 4 && !(velocityY > Fixed(0))) {
                 // rnage check on the way up? waive if not going up
                 rangeCheckMatch = true;
             }
-            if (rangeCondition == 5 && !(velocityY < Fixed(0))) {
+            if (pTrigger->rangeCondition == 5 && !(velocityY < Fixed(0))) {
                 // rnage check on the way down? waive if not going down
                 rangeCheckMatch = true;
             }
             break;
         default:
-            log(logUnknowns, "unimplemented range cond " + std::to_string(rangeCondition));
+            log(logUnknowns, "unimplemented range cond " + std::to_string(pTrigger->rangeCondition));
             break;
         case 0:
             break;
@@ -1110,26 +1097,22 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
         return false;
     }
 
-    int stateCondition = (*pTrigger)["cond_owner_state_flags"];
-    if (stateCondition && !(stateCondition & (1 << (getPoseStatus() - 1)))) {
+    if (pTrigger->stateCondition && !(pTrigger->stateCondition & (1 << (getPoseStatus() - 1)))) {
         return false;
     }
 
     // meters
     if (gameMode == Training) {
         // todo implement regen so it stops breaks tests
-        int needsFocus = (*pTrigger)["focus_need"];
-        if (needsFocus) {
+        if (pTrigger->needsFocus) {
             if (focus == 0) {
                 // no need to check cost here as we can bottom out this bar
                 return false;
             }
         }
 
-        int needsGauge = (*pTrigger)["gauge_need"];
-        if (needsGauge) {
-            int gaugeCost = (*pTrigger)["gauge_consume"];
-            if (gauge < gaugeCost) {
+        if (pTrigger->needsGauge) {
+            if (gauge < pTrigger->gaugeCost) {
                 return false;
             }
         }
@@ -1138,8 +1121,7 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
     // prevent non-jump triggers if about to jump
     bool a,b,c;
     if (canMove(a,b,c, 1) && (currentInput & 1)) {
-        int64_t flags = (*pTrigger)["category_flags"];
-        if (!(flags & (1ULL<<26))) {
+        if (!(pTrigger->flags & (1ULL<<26))) {
             return false;
         }
     }
@@ -1147,16 +1129,14 @@ bool Guy::CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID)
     return true;
 }
 
-bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
+bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
 {
-    nlohmann::json *pNorm = &(*pTrigger)["norm"];
-    int commandNo = (*pNorm)["command_no"];
-    uint32_t okKeyFlags = (*pNorm)["ok_key_flags"];
-    uint32_t okCondFlags = (*pNorm)["ok_key_cond_flags"];
-    uint32_t ngKeyFlags = (*pNorm)["ng_key_flags"];
-    uint32_t dcExcFlags = (*pNorm)["dc_exc_flags"];
-    uint32_t dcIncFlags = (*pNorm)["dc_inc_flags"];
-    int precedingTime = (*pNorm)["preceding_time"];
+    uint32_t okKeyFlags = pTrigger->okKeyFlags;
+    uint32_t okCondFlags = pTrigger->okCondFlags;
+    uint32_t ngKeyFlags = pTrigger->ngKeyFlags;
+    uint32_t dcExcFlags = pTrigger->dcExcFlags;
+    uint32_t dcIncFlags = pTrigger->dcIncFlags;
+    int precedingTime = pTrigger->precedingTime;
     // condflags..
     // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
     // 10100000001100000: EX, so any two out of three button mask?
@@ -1243,15 +1223,14 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
     if (initialMatch)
     {
         //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
-        if ( commandNo == -1 ) {
+        if ( pTrigger->pCommandClassic == nullptr ) {
             // simple single-input command, initial match is enough
             return true;
         } else {
-            std::string commandNoString = to_string_leading_zeroes(commandNo, 2);
-            for (auto& [keyID, key] : (*pCommandsJson)[commandNoString].items()) {
-                nlohmann::json *pCommand = &key;
-                int inputID = (*pCommand)["input_num"].get<int>() - 1;
-                nlohmann::json *pInputs = &(*pCommand)["inputs"];
+            Command *pCommand = pTrigger->pCommandClassic;
+
+            for (auto& variant : pCommand->variants) {
+                int inputID = variant.size() - 1;
 
                 uint32_t inputBufferCursor = initialI;
                 i = initialI;
@@ -1259,166 +1238,151 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
 
                 while (inputID >= 0 )
                 {
-                    nlohmann::json *pInput = &(*pInputs)[to_string_leading_zeroes(inputID, 2)];
-                    int inputType = (*pInput)["type"];
-                    nlohmann::json *pInputNorm = &(*pInput)["normal"];
-                    uint32_t inputOkKeyFlags = (*pInputNorm)["ok_key_flags"];
-                    uint32_t inputOkCondFlags = (*pInputNorm)["ok_key_cond_check_flags"];
-                    uint32_t inputNgKeyFlags = (*pInputNorm)["ng_key_flags"];
-                    uint32_t inputNgCondFlags = (*pInputNorm)["ng_key_cond_check_flags"];
-                    int numFrames = (*pInput)["frame_num"];
-                    bool match = false;
-                    int lastMatchInput = i;
+                    CommandInput *pInput = &variant[inputID];
+                uint32_t inputOkKeyFlags = pInput->okKeyFlags;
+                uint32_t inputOkCondFlags = pInput->okCondFlags;
+                uint32_t inputNgKeyFlags = pInput->ngKeyFlags;
+                uint32_t inputNgCondFlags = pInput->ngCondFlags;
+                int numFrames = pInput->numFrames;
+                bool match = false;
+                int lastMatchInput = i;
 
-                    if (inputType == 2) {
-                        // rotate
-                        int pointsNeeded = (*pInput)["rotate"]["point"];
-                        uint32_t searchArea = inputBufferCursor + numFrames * 2; // todo, i think that's best case
-                        int curAngle = 0;
-                        int pointsForward = 0;
-                        int pointsBackwards = 0;
+                if (pInput->type == InputType::Rotation) {
+                    // rotate
+                    int pointsNeeded = pInput->rotatePointsNeeded;
+                    uint32_t searchArea = inputBufferCursor + numFrames * 2; // todo, i think that's best case
+                    int curAngle = 0;
+                    int pointsForward = 0;
+                    int pointsBackwards = 0;
+                    while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                    {
+                        int bufferInput = inputBuffer[inputBufferCursor];
+                        int targetAngle = inputAngle(bufferInput);
+                        if (targetAngle) {
+                            if (curAngle == 0) {
+                                curAngle = targetAngle;
+                            }
+                            int diff = angleDiff(curAngle, targetAngle);
+                            //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
+                            if (diff >= 90 && diff < 180) {
+                                pointsForward++;
+                                curAngle = targetAngle;
+                            }
+                            if (diff <= -90 && diff > -180) {
+                                pointsBackwards++;
+                                curAngle = targetAngle;
+                            }
+                        }
+                        inputBufferCursor++;
+                    }
+                    if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
+                        inputID--;
+                    }
+                } else if (pInput->type == InputType::ChargeRelease) {
+                    // charge release
+                    Charge *pCharge = pInput->pCharge;
+
+                    if (pCharge) {
+                        uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
+                        uint32_t inputOkCondFlags = pCharge->okCondFlags;
+                        uint32_t chargeFrames = pCharge->chargeFrames;
+                        uint32_t keepFrames = pCharge->keepFrames;
+                        uint32_t dirCount = 0;
+                        // uint32_t dirNotMatchCount = 0;
+                        // count matching direction in input buffer, super naive but will work for testing
+                        inputBufferCursor = i;
+                        uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
                         while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
                         {
-                            int bufferInput = inputBuffer[inputBufferCursor];
-                            int targetAngle = inputAngle(bufferInput);
-                            if (targetAngle) {
-                                if (curAngle == 0) {
-                                    curAngle = targetAngle;
-                                }
-                                int diff = angleDiff(curAngle, targetAngle);
-                                //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
-                                if (diff >= 90 && diff < 180) {
-                                    pointsForward++;
-                                    curAngle = targetAngle;
-                                }
-                                if (diff <= -90 && diff > -180) {
-                                    pointsBackwards++;
-                                    curAngle = targetAngle;
+                            if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                dirCount++;
+                                if (dirCount >= chargeFrames) {
+                                    break;
                                 }
                             }
+                            // else {
+                            //     dirNotMatchCount++;
+                            // }
                             inputBufferCursor++;
                         }
-                        if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
-                            inputID--;
-                        }
-                    } else if (inputType == 1) {
-                        // charge release
-                        bool chargeMatch = false;
-                        nlohmann::json *pResourceMatch;
-                        int chargeID = (*pInput)["charge"]["id"];
-                        for (auto& [keyID, key] : pChargeJson->items()) {
-                            // support either charge format
-                            if (key.contains("resource")) {
-                                key = key["resource"];
-                            }
-                            if (key["charge_id"] == chargeID ) {
-                                pResourceMatch = &key;
-                                chargeMatch = true;
-                                break;
-                            }
-                        }
 
-                        if (chargeMatch) {
-                            uint32_t inputOkKeyFlags = (*pResourceMatch)["ok_key_flags"];
-                            uint32_t inputOkCondFlags = (*pResourceMatch)["ok_key_cond_check_flags"];
-                            uint32_t chargeFrames = (*pResourceMatch)["ok_frame"];
-                            uint32_t keepFrames = (*pResourceMatch)["keep_frame"];
-                            uint32_t dirCount = 0;
-                            // uint32_t dirNotMatchCount = 0;
-                            // count matching direction in input buffer, super naive but will work for testing
-                            inputBufferCursor = i;
-                            uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                            while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
-                            {
-                                if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                    dirCount++;
-                                    if (dirCount >= chargeFrames) {
-                                        break;
-                                    }
-                                }
-                                // else {
-                                //     dirNotMatchCount++;
-                                // }
-                                inputBufferCursor++;
-                            }
-
-                            if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                                //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-                                break; // cancel trigger
-                            }
-                            //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                            inputID--;
-                        } else {
-                            log(true, "charge entries mismatch?");
+                        if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
+                            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
                             break; // cancel trigger
                         }
+                        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+                        inputID--;
                     } else {
-                        while (inputBufferCursor < inputBuffer.size())
-                        {
-                            bool thismatch = false;
+                        log(true, "charge entries mismatch?");
+                        break; // cancel trigger
+                    }
+                } else {
+                    while (inputBufferCursor < inputBuffer.size())
+                    {
+                        bool thismatch = false;
 
-                            int bufferInput = inputBuffer[inputBufferCursor];
-                            int bufferDirection = directionBuffer[inputBufferCursor];
+                        int bufferInput = inputBuffer[inputBufferCursor];
+                        int bufferDirection = directionBuffer[inputBufferCursor];
 
-                            if (direction.i() != bufferDirection) {
-                                bufferInput = invertDirection(bufferInput);
-                            }
+                        if (direction.i() != bufferDirection) {
+                            bufferInput = invertDirection(bufferInput);
+                        }
 
-                            bool inputNg = false;
+                        bool inputNg = false;
 
-                            if (inputNgCondFlags & 2) {
-                                if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
-                                    inputNg = true;
-                                }
-                            } else if (inputNgKeyFlags & bufferInput) {
+                        if (inputNgCondFlags & 2) {
+                            if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
                                 inputNg = true;
                             }
-                            if (inputNg && !match) {
-                                fail = true;
-                                break;
-                            }
-                            if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
-                                int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                                if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                    match = true;
-                                    thismatch = true;
-                                    i = inputBufferCursor;
-                                }
-                            }
-                            // if ( commandNo == 7 ) {
-                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
-                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " match " + std::to_string(thismatch) + " buffer " + std::to_string(bufferInput));
-                            // }
-                            if (match == true && (thismatch == false || numFrames <= 0)) {
-                                //inputBufferCursor++;
-                                inputID--;
-                                break;
-                            }
-                            inputBufferCursor++;
+                        } else if (inputNgKeyFlags & bufferInput) {
+                            inputNg = true;
                         }
-
-                        if (fail) {
-                            // if ( commandNo == 7 ) {
-                            //     log("fail " + std::to_string(inputBuffer[inputBufferCursor]));
-                            // }
+                        if (inputNg && !match) {
+                            fail = true;
                             break;
                         }
+                        if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+                            int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                            if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                match = true;
+                                thismatch = true;
+                                i = inputBufferCursor;
+                            }
+                        }
+                        // if ( commandNo == 7 ) {
+                        //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
+                        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " match " + std::to_string(thismatch) + " buffer " + std::to_string(bufferInput));
+                        // }
+                        if (match == true && (thismatch == false || numFrames <= 0)) {
+                            //inputBufferCursor++;
+                            inputID--;
+                            break;
+                        }
+                        inputBufferCursor++;
                     }
 
-                    if (inputBufferCursor == inputBuffer.size()) {
-                        // corner case - if we run out of buffer but had matched the input, finalize
-                        // the match now or the trigger won't work - this can happen if you eg. have
-                        // a dash input immediately at the beginning of a replay since the last match
-                        // is a neutral input, it keeps matching all the way to the beginning of the
-                        // buffer
-                        if (match == true) {
-                            inputID--;
-                        }
-
+                    if (fail) {
+                        // if ( commandNo == 7 ) {
+                        //     log("fail " + std::to_string(inputBuffer[inputBufferCursor]));
+                        // }
                         break;
                     }
                 }
+
+                if (inputBufferCursor == inputBuffer.size()) {
+                    // corner case - if we run out of buffer but had matched the input, finalize
+                    // the match now or the trigger won't work - this can happen if you eg. have
+                    // a dash input immediately at the beginning of a replay since the last match
+                    // is a neutral input, it keeps matching all the way to the beginning of the
+                    // buffer
+                    if (match == true) {
+                        inputID--;
+                    }
+
+                    break;
+                }
+            }
 
                 if (inputID < 0) {
                     // ran out of matched inputs, command is OK
@@ -1431,8 +1395,10 @@ bool Guy::CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI)
     return false;
 }
 
-struct TriggerListEntry {
-    std::string triggerName;
+struct TriggerCheckState {
+    int triggerID;
+    int actionID;
+    Trigger *pTrigger;
     bool hasNormal;
     bool hasDeferred;
     bool hasAntiNormal;
@@ -1444,7 +1410,8 @@ void Guy::DoTriggers(int fluffFrameBias)
     bool hasTriggerKey = pActionJson->contains("TriggerKey");
     if (hasTriggerKey || fluffFrames(fluffFrameBias))
     {
-        std::map<int,TriggerListEntry> mapTriggers; // will sort all the valid triggers by ID
+        TriggerCheckState triggers[2048] = {};
+        int triggerCount = 0;
 
         if (hasTriggerKey) {
             for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
@@ -1472,26 +1439,50 @@ void Guy::DoTriggers(int fluffFrameBias)
                     continue;
                 }
 
-                auto triggerGroupString = to_string_leading_zeroes(triggerGroup, 3);
-                for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
+                auto it = pCharData->triggerGroupByID.find(triggerGroup);
+                if (it == pCharData->triggerGroupByID.end()) {
+                    continue;
+                }
+
+                TriggerGroup *pTriggerGroup = it->second;
+                for (auto& entry : pTriggerGroup->entries)
                 {
-                    int triggerID = atoi(keyID.c_str());
-                    if (mapTriggers.find(triggerID) == mapTriggers.end()) {
-                        TriggerListEntry newTrig = { key, false, false, false };
-                        mapTriggers[triggerID] = newTrig;
+                    int actionID = entry.actionID;
+                    int triggerID = entry.triggerID;
+                    int entryIndex = -1;
+                    for (int i = 0; i < triggerCount; i++) {
+                        if (triggers[i].triggerID == triggerID) {
+                            entryIndex = i;
+                            break;
+                        }
                     }
+
+                    if (entryIndex == -1) {
+                        if (triggerCount >= 2048) {
+                            log(true, "WARNING: exceeded max trigger entries (2048)!");
+                            continue;
+                        }
+                        entryIndex = triggerCount++;
+                        triggers[entryIndex].triggerID = triggerID;
+                        triggers[entryIndex].actionID = actionID;
+                        triggers[entryIndex].pTrigger = entry.pTrigger;
+                        triggers[entryIndex].hasNormal = false;
+                        triggers[entryIndex].hasDeferred = false;
+                        triggers[entryIndex].hasAntiNormal = false;
+                    }
+
                     if (!defer && !antiNormal) {
-                        mapTriggers[triggerID].hasNormal = true;
+                        triggers[entryIndex].hasNormal = true;
 
                         if (triggerGroup == 0) {
                             freeMovement = true;
                         }
                     }
                     if (defer && !antiNormal) {
-                        mapTriggers[triggerID].hasDeferred = true;
+                        triggers[entryIndex].hasDeferred = true;
                     }
                     if (antiNormal) {
-                        mapTriggers[triggerID].hasAntiNormal = true;
+                        triggers[entryIndex].hasAntiNormal = true;
                     }
                 }
             }
@@ -1499,21 +1490,52 @@ void Guy::DoTriggers(int fluffFrameBias)
 
         if (fluffFrames(fluffFrameBias)) {
             // add trigger group 0 in fluff frames
-            for (auto& [keyID, key] : (*pTriggerGroupsJson)[to_string_leading_zeroes(0, 3)].items()) {
-                int triggerID = atoi(keyID.c_str());
-                if (mapTriggers.find(triggerID) == mapTriggers.end()) {
-                    TriggerListEntry newTrig = { key, true, false, false };
-                    mapTriggers[triggerID] = newTrig;
+            auto it = pCharData->triggerGroupByID.find(0);
+            if (it != pCharData->triggerGroupByID.end()) {
+                TriggerGroup *pTriggerGroup = it->second;
+                for (auto& entry : pTriggerGroup->entries) {
+                    int actionID = entry.actionID;
+                    int triggerID = entry.triggerID;
+                    int entryIndex = -1;
+                    for (int i = 0; i < triggerCount; i++) {
+                        if (triggers[i].triggerID == triggerID) {
+                            entryIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (entryIndex == -1) {
+                        if (triggerCount >= 2048) {
+                            log(true, "WARNING: exceeded max trigger entries (2048)!");
+                            continue;
+                        }
+                        entryIndex = triggerCount++;
+                        triggers[entryIndex].triggerID = triggerID;
+                        triggers[entryIndex].actionID = actionID;
+                        triggers[entryIndex].pTrigger = entry.pTrigger;
+                        triggers[entryIndex].hasNormal = true;
+                        triggers[entryIndex].hasDeferred = false;
+                        triggers[entryIndex].hasAntiNormal = false;
+                    }
                 }
             }
         }
 
+        std::sort(triggers, triggers + triggerCount, [](const TriggerCheckState& a, const TriggerCheckState& b) {
+            return a.triggerID < b.triggerID;
+        });
+
         // walk in reverse sorted trigger ID order
-        for (auto it = mapTriggers.rbegin(); it != mapTriggers.rend(); it++)
+        for (int idx = triggerCount - 1; idx >= 0; idx--)
         {
-            int triggerID = it->first;
-            std::string actionString = it->second.triggerName;
-            int actionID = atoi(actionString.substr(0, actionString.find(" ")).c_str());
+            TriggerCheckState& trigState = triggers[idx];
+            int triggerID = trigState.triggerID;
+            int actionID = trigState.actionID;
+            Trigger *pTrigger = trigState.pTrigger;
+
+            if (!pTrigger) {
+                continue;
+            }
 
             nlohmann::json *pMoveJson = nullptr;
             if (FindMove(actionID, styleInstall, &pMoveJson) == nullptr) {
@@ -1529,16 +1551,7 @@ void Guy::DoTriggers(int fluffFrameBias)
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-            nlohmann::json *pTrigger = nullptr;
-
-            for (auto& [keyID, key] : (*pTriggersJson)[actionIDString].items()) {
-                if ( atoi(keyID.c_str()) == triggerID ) {
-                    pTrigger = &key;
-                    break;
-                }
-            }
-
-            if (it->second.hasNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+            if (trigState.hasNormal && CheckTriggerConditions(pTrigger)) {
                 frameTriggers.insert(std::make_pair(actionID, styleInstall));
             }
 
@@ -1546,7 +1559,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
             if (setDeferredTriggerIDs.find(triggerID) != setDeferredTriggerIDs.end()) {
                 // check deferred trigger activation
-                if (it->second.hasNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+                if (trigState.hasNormal && CheckTriggerConditions(pTrigger)) {
                     log(logTriggers, "did deferred trigger " + std::to_string(actionID));
 
                     ExecuteTrigger(pTrigger);
@@ -1558,28 +1571,28 @@ void Guy::DoTriggers(int fluffFrameBias)
                 }
 
                 // carry forward
-                if (it->second.hasDeferred) {
+                if (trigState.hasDeferred) {
                     keptDeferredTriggerIDs.insert(triggerID);
                 }
 
                 // skip further triggers
-                if (it->second.hasAntiNormal) {
+                if (trigState.hasAntiNormal) {
                     break;
                 }
             } else if (forceTrigger || CheckTriggerCommand(pTrigger, initialI)) {
                 log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " +
-                    std::to_string(it->second.hasDeferred) + " normal " + std::to_string(it->second.hasNormal) +
-                    + " antinormal " + std::to_string(it->second.hasAntiNormal));
-                if (it->second.hasDeferred || it->second.hasAntiNormal) {
+                    std::to_string(trigState.hasDeferred) + " normal " + std::to_string(trigState.hasNormal) +
+                    + " antinormal " + std::to_string(trigState.hasAntiNormal));
+                if (trigState.hasDeferred || trigState.hasAntiNormal) {
                     // queue the deferred trigger
                     setDeferredTriggerIDs.insert(triggerID);
                     keptDeferredTriggerIDs.insert(triggerID);
-                    if (it->second.hasAntiNormal) {
+                    if (trigState.hasAntiNormal) {
                         break;
                     }
                 }
 
-                if (it->second.hasNormal && !it->second.hasAntiNormal && CheckTriggerConditions(pTrigger, triggerID)) {
+                if (trigState.hasNormal && !trigState.hasAntiNormal && CheckTriggerConditions(pTrigger)) {
                     ExecuteTrigger(pTrigger);
 
                     // consume the input by removing matching edge bits from matched initial input

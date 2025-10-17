@@ -373,10 +373,10 @@ private:
 
     void ApplyHitEffect(nlohmann::json *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
 
-    void ExecuteTrigger(nlohmann::json *pTrigger);
+    void ExecuteTrigger(Trigger *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
-    bool CheckTriggerConditions(nlohmann::json *pTrigger, int triggerID);
-    bool CheckTriggerCommand(nlohmann::json *pTrigger, int &initialI);
+    bool CheckTriggerConditions(Trigger *pTrigger);
+    bool CheckTriggerCommand(Trigger *pTrigger, int &initialI);
     void DoTriggers(int fluffFrameBias = 0);
 
     void DoBranchKey(bool preHit = false);

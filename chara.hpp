@@ -38,11 +38,13 @@ struct CommandInput {
 struct Command {
     int id;
 
-    std::vector<CommandInput> vecInputs;
+    std::vector<std::vector<CommandInput>> variants;
 };
 
 struct Trigger {
     int id;
+
+    int actionID;
 
     Command *pCommandClassic = nullptr;
 
@@ -70,23 +72,37 @@ struct Trigger {
     Fixed rangeParam;
 
     int stateCondition = 0;
-    
+
     bool needsFocus = false;
     int focusCost;
 
     bool needsGauge = false;
     int gaugeCost;
 
+    int comboInst;
+
     int64_t flags = 0;
 };
 
-typedef std::vector<std::pair<int,int>> TriggerGroup;
+struct TriggerGroupEntry {
+    int actionID;
+    int triggerID;
+    Trigger *pTrigger;
+};
+
+struct TriggerGroup {
+    int id;
+
+    std::vector<TriggerGroupEntry> entries;
+};
 
 struct CharacterData {
-    std::map<int, Charge> mapCharges;
-    std::map<int, Command> mapCommands;
-    std::map<int,TriggerGroup> mapTriggerGroups;
-    std::map<int,Trigger> mapTriggers;
+    std::vector<Charge> charges;
+    std::vector<Command> commands;
+    std::vector<Trigger> triggers;
+    std::vector<TriggerGroup> triggerGroups;
+
+    std::map<int, TriggerGroup*> triggerGroupByID;
 };
 
 CharacterData *loadCharacter(nlohmann::json *pTriggerGroupsJson, nlohmann::json *pTriggersJson, nlohmann::json *pCommandsJson, nlohmann::json *pChargeJson);
