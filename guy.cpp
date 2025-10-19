@@ -1020,7 +1020,7 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
     return true;
 }
 
-bool Guy::CheckTriggerConditions(Trigger *pTrigger)
+bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
 {
     if (pTrigger->useUniqueParam && pTrigger->condParamID >= 0 && pTrigger->condParamID < Guy::uniqueParamCount) {
         if (!conditionOperator(pTrigger->condParamOp, uniqueParam[pTrigger->condParamID], pTrigger->condParamValue, "trigger unique param")) {
@@ -1120,7 +1120,8 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger)
 
     // prevent non-jump triggers if about to jump
     bool a,b,c;
-    if (canMove(a,b,c, 1) && (currentInput & 1)) {
+    // only before frame advance
+    if (fluffFramesBias == 1 && canMove(a,b,c, fluffFramesBias) && (currentInput & 1)) {
         if (!(pTrigger->flags & (1ULL<<26))) {
             return false;
         }
@@ -1551,7 +1552,7 @@ void Guy::DoTriggers(int fluffFrameBias)
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-            if (trigState.hasNormal && CheckTriggerConditions(pTrigger)) {
+            if (trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                 frameTriggers.insert(std::make_pair(actionID, styleInstall));
             }
 
@@ -1559,7 +1560,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
             if (setDeferredTriggerIDs.find(triggerID) != setDeferredTriggerIDs.end()) {
                 // check deferred trigger activation
-                if (trigState.hasNormal && CheckTriggerConditions(pTrigger)) {
+                if (trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                     log(logTriggers, "did deferred trigger " + std::to_string(actionID));
 
                     ExecuteTrigger(pTrigger);
@@ -1592,7 +1593,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                     }
                 }
 
-                if (trigState.hasNormal && !trigState.hasAntiNormal && CheckTriggerConditions(pTrigger)) {
+                if (trigState.hasNormal && !trigState.hasAntiNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                     ExecuteTrigger(pTrigger);
 
                     // consume the input by removing matching edge bits from matched initial input

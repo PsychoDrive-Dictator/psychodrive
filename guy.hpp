@@ -375,7 +375,7 @@ private:
 
     void ExecuteTrigger(Trigger *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
-    bool CheckTriggerConditions(Trigger *pTrigger);
+    bool CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias = 0);
     bool CheckTriggerCommand(Trigger *pTrigger, int &initialI);
     void DoTriggers(int fluffFrameBias = 0);
 
