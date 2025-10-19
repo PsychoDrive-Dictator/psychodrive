@@ -247,31 +247,37 @@ for char in characters:
     #                 if trigger["TriggerGroup"] == 0 and trigger["_StartFrame"] != 0 and not trigger["_Other"] & 0x20000 and trigger["_NotDefer"] == True and trigger["_StartFrame"] < move["fab"]["ActionFrame"]["MarginFrame"]:
     #                     print(char + " " + moveID + " margin " + str(move["fab"]["ActionFrame"]["MarginFrame"]) + " end buffer " + str(trigger["_StartFrame"]))
 
+    # Find triggers with certain IDs
+    for key, value in tgroups21Json.items():
+        for tkey, tvalue in value.items():
+            moveName = tvalue.split(" ")[1]
+            triggerID = int(tkey)
+            if triggerID < 50:
+                print(char, moveName, str(triggerID))
 
-
-    for moveID in moves21Json:
-        moveIDLeft = moveID
-        # if "_Y2" in moveID:
-        #     moveIDLeft = moveIDLeft.replace("_Y2", "")
-        if moveIDLeft in movesJson:
-            moveLeft = movesJson[moveIDLeft]
-            moveRight = moves21Json[moveID]
-            descHeader = char + " " + moveID
-            minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
-            minActiveRight, maxActiveRight = countActiveFrames(moveRight)
-            if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
-                print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
-                      " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
-            hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
-            hitInfoRight = getHitInfoDict(moveRight, hits21Json)
-            if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
-                print(descHeader + " different hit count")
-            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
-            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
-            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
-            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
-            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
-            compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
-            compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
-            compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
-            compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)
+    # for moveID in moves21Json:
+    #     moveIDLeft = moveID
+    #     # if "_Y2" in moveID:
+    #     #     moveIDLeft = moveIDLeft.replace("_Y2", "")
+    #     if moveIDLeft in movesJson:
+    #         moveLeft = movesJson[moveIDLeft]
+    #         moveRight = moves21Json[moveID]
+    #         descHeader = char + " " + moveID
+    #         minActiveLeft, maxActiveLeft = countActiveFrames(moveLeft)
+    #         minActiveRight, maxActiveRight = countActiveFrames(moveRight)
+    #         if minActiveLeft != minActiveRight or maxActiveLeft != maxActiveRight:
+    #             print(descHeader + " was active from " + str(minActiveLeft) + "-" + str(maxActiveLeft) + 
+    #                   " now active from " + str(minActiveRight) + "-" + str(maxActiveRight))
+    #         hitInfoLeft = getHitInfoDict(moveLeft, hitsJson)
+    #         hitInfoRight = getHitInfoDict(moveRight, hits21Json)
+    #         if len(hitInfoLeft.keys()) != len(hitInfoRight.keys()):
+    #             print(descHeader + " different hit count")
+    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "00", "hit")
+    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "16", "block")
+    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "02", "air hit")
+    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "04", "burnout block")
+    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "08", "counter")
+    #         compareHitInfo(hitInfoLeft, hitInfoRight, descHeader, "12", "punish counter")
+    #         compareScaling(moveLeft, moveRight, "ComboScaling", descHeader)
+    #         compareScaling(moveLeft, moveRight, "InstScaling", descHeader)
+    #         compareScaling(moveLeft, moveRight, "_StartScaling", descHeader)
