@@ -16,6 +16,8 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     nlohmann::json *pAtemiJson = loadCharFile(charName, charVersion, "atemi");
     nlohmann::json *pCharInfoJson = loadCharFile(charName, charVersion, "charinfo");
 
+    nlohmann::json *pCommonMovesJson = loadCharFile("common", charVersion, "moves");
+
     CharacterData *pRet = new CharacterData;
 
     pRet->charName = charName;
@@ -251,6 +253,44 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
         pRet->rectsByIDs[std::make_pair(rect.listID, rect.id)] = &rect;
     }
 
+    // for UI dropdown selector
+    pRet->vecMoveList.push_back(strdup("1 no action (obey input)"));
+    if (pTriggerGroupsJson) {
+        auto triggerGroupString = to_string_leading_zeroes(0, 3);
+        for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
+        {
+            std::string actionString = key;
+            pRet->vecMoveList.push_back(strdup(actionString.c_str()));
+        }
+    }
+
+    if (pMovesDictJson) {
+        for (auto& [keyID, key] : pMovesDictJson->items())
+        {
+            int actionID = key["fab"]["ActionID"];
+            int styleID = 0;
+            if (key.contains("_PL_StyleID")) {
+                styleID = key["_PL_StyleID"];
+            }
+            auto mapIndex = std::make_pair(actionID, styleID);
+            pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
+        }
+    }
+
+    if (pCommonMovesJson) {
+        for (auto& [keyID, key] : pCommonMovesJson->items())
+        {
+            int actionID = key["fab"]["ActionID"];
+            int styleID = 0;
+            if (key.contains("_PL_StyleID")) {
+                styleID = key["_PL_StyleID"];
+            }
+            auto mapIndex = std::make_pair(actionID, styleID);
+            if (pRet->mapMoveStyle.find(mapIndex) == pRet->mapMoveStyle.end()) {
+                pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, true);
+            }
+        }
+    }
+
     return pRet;
 }
-

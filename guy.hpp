@@ -200,16 +200,6 @@ public:
     bool facSimile = false;
 
     ~Guy() {
-        if (facSimile) {
-            // movelist is just pointers to the original in this case, we don't have
-            // any manually allocated memory, just stl container members
-            return;
-        }
-        for (auto moveString : vecMoveList) {
-            free((void*)moveString);
-        }
-        vecMoveList.clear();
-
         if (!enableCleanup) {
             return;
         }
@@ -288,8 +278,6 @@ public:
         pCommonCharData = loadCharacter("common", version);
 
         Input(0);
-
-        BuildMoveList();
     
         UpdateActionData();
 
@@ -349,12 +337,10 @@ public:
             pParent = &parent;
         }
 
-        BuildMoveList();
-
         UpdateActionData();
     }
 
-    std::vector<const char *> &getMoveList() { return vecMoveList; }
+    std::vector<const char *> &getMoveList() { return pCharData->vecMoveList; }
     std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
     void setRecordFrameTriggers(bool record) { recordFrameTriggers = record; }
     int getFrameMeterColorIndex();
@@ -362,7 +348,6 @@ public:
         bool a,b,c;
         return canMove(a,b,c);
     }
-    std::map<std::pair<int, int>, std::pair<std::string, bool>> &getMapMoveStyle() { return mapMoveStyle; }
     std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
@@ -495,8 +480,6 @@ private:
     std::deque<std::string> logQueue;
 
     bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
-    void BuildMoveList();
-    std::vector<const char *> vecMoveList;
     int neutralMove = 0;
 
     int inputOverride = 0;
@@ -532,8 +515,6 @@ private:
     nlohmann::json *pCommonMovesJson;
     nlohmann::json *pCommonRectsJson;
     nlohmann::json *pCommonAtemiJson;
-
-    std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
 
     Fixed posX;
     Fixed posY;

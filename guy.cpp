@@ -178,7 +178,7 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
 const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson)
 {
     auto mapIndex = std::make_pair(actionID, styleID);
-    if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
+    if (pCharData->mapMoveStyle.find(mapIndex) == pCharData->mapMoveStyle.end()) {
         int parentStyleID = (*pCharInfoJson)["Styles"][std::to_string(styleID)]["ParentStyleID"];
 
         if (parentStyleID == -1) {
@@ -187,49 +187,13 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
 
         return FindMove(actionID, parentStyleID, ppMoveJson);
     } else {
-        const char *moveName = mapMoveStyle[mapIndex].first.c_str();
-        bool commonMove = mapMoveStyle[mapIndex].second;
+        const char *moveName = pCharData->mapMoveStyle[mapIndex].first.c_str();
+        bool commonMove = pCharData->mapMoveStyle[mapIndex].second;
 
         if (ppMoveJson) {
             *ppMoveJson = commonMove ? &(*pCommonMovesJson)[moveName] : &(*pMovesDictJson)[moveName];
         }
         return moveName;
-    }
-}
-
-void Guy::BuildMoveList()
-{
-    // for UI dropdown selector
-    vecMoveList.push_back(strdup("1 no action (obey input)"));
-    auto triggerGroupString = to_string_leading_zeroes(0, 3);
-    for (auto& [keyID, key] : (*pTriggerGroupsJson)[triggerGroupString].items())
-    {
-        std::string actionString = key;
-        vecMoveList.push_back(strdup(actionString.c_str()));
-    }
-
-    for (auto& [keyID, key] : pMovesDictJson->items())
-    {
-        int actionID = key["fab"]["ActionID"];
-        int styleID = 0;
-        if (key.contains("_PL_StyleID")) {
-            styleID = key["_PL_StyleID"];
-        }
-        auto mapIndex = std::make_pair(actionID, styleID);
-        mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
-    }
-
-    for (auto& [keyID, key] : pCommonMovesJson->items())
-    {
-        int actionID = key["fab"]["ActionID"];
-        int styleID = 0;
-        if (key.contains("_PL_StyleID")) {
-            styleID = key["_PL_StyleID"];
-        }
-        auto mapIndex = std::make_pair(actionID, styleID);
-        if (mapMoveStyle.find(mapIndex) == mapMoveStyle.end()) {
-            mapMoveStyle[mapIndex] = std::make_pair(keyID, true);
-        }
     }
 }
 
@@ -4047,7 +4011,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         wasHit = false;
 
         if (neutralMove != 0) {
-            std::string moveString = vecMoveList[neutralMove];
+            std::string moveString = pCharData->vecMoveList[neutralMove];
             int actionID = atoi(moveString.substr(0, moveString.find(" ")).c_str());
             nextAction = actionID;
         }
