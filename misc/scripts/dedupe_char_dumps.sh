@@ -1,6 +1,6 @@
 #!/bin/bash
 
-versions=("19" "20" "21" "22" "23" "24" "25" "26" "30" "31" "32" "33" "34" "35" "36")
+versions=("19" "20" "21" "22" "23" "24" "25" "26" "30" "31" "32" "33" "34" "35" "36" "37")
 
 dedupe_char_file() {
     sum=blah
@@ -50,30 +50,31 @@ dedupe_char_dumps() {
     dedupe_char_file "$1" charge
 }
 
-dedupe_char_dumps aki
-dedupe_char_dumps akuma
-dedupe_char_dumps blanka
-dedupe_char_dumps cammy
-dedupe_char_dumps chunli
-dedupe_char_dumps deejay
-dedupe_char_dumps dhalsim
-dedupe_char_dumps dictator
-dedupe_char_dumps ed
-dedupe_char_dumps elena
-dedupe_char_dumps honda
-dedupe_char_dumps guile
-dedupe_char_dumps jamie
-dedupe_char_dumps jp
-dedupe_char_dumps juri
-dedupe_char_dumps ken
-dedupe_char_dumps kimberly
-dedupe_char_dumps lily
-dedupe_char_dumps luke
-dedupe_char_dumps mai
-dedupe_char_dumps manon
-dedupe_char_dumps marisa
-dedupe_char_dumps rashid
-dedupe_char_dumps ryu
-dedupe_char_dumps sagat
-dedupe_char_dumps terry
-dedupe_char_dumps zangief
+# dedupe_char_dumps aki
+# dedupe_char_dumps akuma
+# dedupe_char_dumps blanka
+# dedupe_char_dumps cammy
+# dedupe_char_dumps chunli
+# dedupe_char_dumps deejay
+# dedupe_char_dumps dhalsim
+# dedupe_char_dumps dictator
+# dedupe_char_dumps ed
+# dedupe_char_dumps elena
+# dedupe_char_dumps honda
+# dedupe_char_dumps guile
+# dedupe_char_dumps jamie
+# dedupe_char_dumps jp
+# dedupe_char_dumps juri
+# dedupe_char_dumps ken
+# dedupe_char_dumps kimberly
+# dedupe_char_dumps lily
+# dedupe_char_dumps luke
+# dedupe_char_dumps mai
+# dedupe_char_dumps manon
+# dedupe_char_dumps marisa
+# dedupe_char_dumps rashid
+# dedupe_char_dumps ryu
+# dedupe_char_dumps sagat
+# dedupe_char_dumps terry
+dedupe_char_dumps viper
+# dedupe_char_dumps zangief
