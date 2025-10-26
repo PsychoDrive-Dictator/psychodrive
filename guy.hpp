@@ -356,6 +356,7 @@ public:
 
     std::vector<const char *> &getMoveList() { return vecMoveList; }
     std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
+    void setRecordFrameTriggers(bool record) { recordFrameTriggers = record; }
     int getFrameMeterColorIndex();
     bool canAct() {
         bool a,b,c;
@@ -740,6 +741,7 @@ private:
 
     std::set<int> setDeferredTriggerIDs;
 
+    bool recordFrameTriggers = false;
     std::set<std::pair<int,int>> frameTriggers;
     std::pair<int, int> forcedTrigger;
 

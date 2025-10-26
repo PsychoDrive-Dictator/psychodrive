@@ -1269,6 +1269,10 @@ bool SimulationController::NewSim(void)
         pSim->CreateGuyFromCharController(charControllers[i]);
     }
 
+    for (auto &guy : pSim->simGuys) {
+        guy->setRecordFrameTriggers(true);
+    }
+
     recordedGuysPoolIndex = 0;
 
     maxComboCount = 0;

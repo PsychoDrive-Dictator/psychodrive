@@ -1554,7 +1554,7 @@ void Guy::DoTriggers(int fluffFrameBias)
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-            if (trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
+            if (recordFrameTriggers && trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                 frameTriggers.insert(std::make_pair(actionID, styleInstall));
             }
 

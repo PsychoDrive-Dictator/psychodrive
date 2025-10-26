@@ -65,6 +65,7 @@ public:
         if (pSim->simGuys[1]->getAttacker() != nullptr) {
             pSim->simGuys[1]->setAttacker(pSim->simGuys[0]);
         }
+        pSim->simGuys[0]->setRecordFrameTriggers(true);
 
         thread = std::thread(&ComboWorker::WorkLoop, this);
     }
@@ -144,6 +145,7 @@ public:
                             pendingRoutes.front().timelineTriggers[pSim->frameCounter] = frameTrigger;
                         }
                     }
+                    pSim->simGuys[0]->getFrameTriggers().clear();
                 }
 
                 if (pSim->simGuys[1]->getComboDamage() > currentRoute.damage) {
