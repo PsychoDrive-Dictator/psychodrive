@@ -280,11 +280,12 @@ public:
         pHitJson = loadCharFile(character, version, "hit");
         pAtemiJson = loadCharFile(character, version, "atemi");
         pCharInfoJson = loadCharFile(character, version, "charinfo");
-        pCharData = loadCharacter(pTriggerGroupsJson, pTriggersJson, pCommandsJson, pChargeJson);
+        pCharData = loadCharacter(character, version);
 
         pCommonMovesJson = loadCharFile("common", version, "moves");
         pCommonRectsJson = loadCharFile("common", version, "rects");
         pCommonAtemiJson = loadCharFile("common", version, "atemi");
+        pCommonCharData = loadCharacter("common", version);
 
         Input(0);
 
@@ -323,10 +324,12 @@ public:
         pHitJson = parent.pHitJson;
         pAtemiJson = parent.pAtemiJson;
         pCharInfoJson = parent.pCharInfoJson;
+        pCharData = parent.pCharData;
 
         pCommonMovesJson = parent.pCommonMovesJson;
         pCommonRectsJson = parent.pCommonRectsJson;
         pCommonAtemiJson = parent.pCommonAtemiJson;
+        pCommonCharData = parent.pCommonCharData;
 
         pOpponent = parent.pOpponent;
         if (parent.pSim) {
@@ -523,6 +526,7 @@ private:
     nlohmann::json *pAtemiJson;
     nlohmann::json *pCharInfoJson;
     CharacterData *pCharData;
+    CharacterData *pCommonCharData;
 
     nlohmann::json *pCommonMovesJson;
     nlohmann::json *pCommonRectsJson;

@@ -149,26 +149,28 @@ bool Guy::conditionOperator(int op, int operand, int threshold, std::string desc
 
 bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed offsetY, int dir)
 {
-    std::string pageIDString = to_string_leading_zeroes(rectsPage, 2);
-    std::string boxIDString = to_string_leading_zeroes(boxID, 3);
-    nlohmann::json *pRects = pRectsJson;
-    if (!pRects->contains(pageIDString) || !(*pRects)[pageIDString].contains(boxIDString)) {
-        pRects = pCommonRectsJson;
+    Rect *pRect = nullptr;
+    auto rectIndex = std::make_pair(rectsPage, boxID);
+
+    auto it = pCharData->rectsByIDs.find(rectIndex);
+
+    if (it != pCharData->rectsByIDs.end()) {
+        pRect = it->second;
+    } else {
+        it = pCommonCharData->rectsByIDs.find(rectIndex);
+        if (it != pCommonCharData->rectsByIDs.end()) {
+            pRect = it->second;
+        }
     }
-    if (!pRects->contains(pageIDString) || !(*pRects)[pageIDString].contains(boxIDString)) {
+
+    if (!pRect) {
         return false;
     }
-    nlohmann::json *pRect = &(*pRects)[pageIDString][boxIDString];
-    int xOrig = (*pRect)["OffsetX"];
-    int yOrig = (*pRect)["OffsetY"];
-    int xRadius = (*pRect)["SizeX"];
-    int yRadius = (*pRect)["SizeY"];
-    xOrig *= dir;
 
-    outBox.x = Fixed(xOrig - xRadius) + offsetX;
-    outBox.y = Fixed(yOrig - yRadius) + offsetY;
-    outBox.w = Fixed(xRadius * 2);
-    outBox.h = Fixed(yRadius * 2);
+    outBox.x = Fixed(pRect->xOrig * dir - pRect->xRadius) + offsetX;
+    outBox.y = Fixed(pRect->yOrig - pRect->yRadius) + offsetY;
+    outBox.w = Fixed(pRect->xRadius * 2);
+    outBox.h = Fixed(pRect->yRadius * 2);
 
     return true;
 }

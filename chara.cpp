@@ -1,10 +1,25 @@
 #include "chara.hpp"
+#include "main.hpp"
 #include <string>
 #include <cstdlib>
 
-CharacterData *loadCharacter(nlohmann::json *pTriggerGroupsJson, nlohmann::json *pTriggersJson, nlohmann::json *pCommandsJson, nlohmann::json *pChargeJson)
+CharacterData *loadCharacter(std::string charName, int charVersion)
 {
+    nlohmann::json *pMovesDictJson = loadCharFile(charName, charVersion, "moves");
+    nlohmann::json *pRectsJson = loadCharFile(charName, charVersion, "rects");
+    nlohmann::json *pNamesJson = loadCharFile(charName, charVersion, "names");
+    nlohmann::json *pTriggerGroupsJson = loadCharFile(charName, charVersion, "trigger_groups");
+    nlohmann::json *pTriggersJson = loadCharFile(charName, charVersion, "triggers");
+    nlohmann::json *pCommandsJson = loadCharFile(charName, charVersion, "commands");
+    nlohmann::json *pChargeJson = loadCharFile(charName, charVersion, "charge");
+    nlohmann::json *pHitJson = loadCharFile(charName, charVersion, "hit");
+    nlohmann::json *pAtemiJson = loadCharFile(charName, charVersion, "atemi");
+    nlohmann::json *pCharInfoJson = loadCharFile(charName, charVersion, "charinfo");
+
     CharacterData *pRet = new CharacterData;
+
+    pRet->charName = charName;
+    pRet->charVersion = charVersion;
 
     size_t chargeCount = 0;
     size_t commandCount = 0;
@@ -16,9 +31,7 @@ CharacterData *loadCharacter(nlohmann::json *pTriggerGroupsJson, nlohmann::json 
     }
 
     if (pCommandsJson) {
-        for (auto& [commandIDStr, commandGroup] : pCommandsJson->items()) {
-            commandCount += commandGroup.size();
-        }
+        commandCount = pCommandsJson->size();
     }
 
     if (pTriggersJson) {
@@ -203,6 +216,39 @@ CharacterData *loadCharacter(nlohmann::json *pTriggerGroupsJson, nlohmann::json 
 
     for (auto& triggerGroup : pRet->triggerGroups) {
         pRet->triggerGroupByID[triggerGroup.id] = &triggerGroup;
+    }
+
+    size_t rectsCount = 0;
+
+    if (pRectsJson) {
+        for (auto& [rectsListIDStr, rectsList] : pRectsJson->items()) {
+            rectsCount = rectsList.size();
+        }
+    }
+
+    pRet->rects.reserve(rectsCount);
+
+    if (pRectsJson) {
+        for (auto& [rectsListIDStr, rectsList] : pRectsJson->items()) {
+            int listID = atoi(rectsListIDStr.c_str());
+            for (auto& [rectIDStr, rect] : rectsList.items()) {
+                Rect newRect;
+
+                newRect.listID = listID;
+                newRect.id = atoi(rectIDStr.c_str());
+
+                newRect.xOrig = rect["OffsetX"];
+                newRect.yOrig = rect["OffsetY"];
+                newRect.xRadius = rect["SizeX"];
+                newRect.yRadius = rect["SizeY"];
+
+                pRet->rects.push_back(newRect);
+            }
+        }
+    }
+
+    for (auto& rect : pRet->rects) {
+        pRet->rectsByIDs[std::make_pair(rect.listID, rect.id)] = &rect;
     }
 
     return pRet;

@@ -96,13 +96,28 @@ struct TriggerGroup {
     std::vector<TriggerGroupEntry> entries;
 };
 
+struct Rect {
+    int listID;
+    int id;
+
+    int xOrig;
+    int yOrig;
+    int xRadius;
+    int yRadius;
+};
+
 struct CharacterData {
+    std::string charName;
+    int charVersion;
+
     std::vector<Charge> charges;
     std::vector<Command> commands;
     std::vector<Trigger> triggers;
     std::vector<TriggerGroup> triggerGroups;
+    std::vector<Rect> rects;
 
     std::map<int, TriggerGroup*> triggerGroupByID;
+    std::map<std::pair<int, int>, Rect*> rectsByIDs;
 };
 
-CharacterData *loadCharacter(nlohmann::json *pTriggerGroupsJson, nlohmann::json *pTriggersJson, nlohmann::json *pCommandsJson, nlohmann::json *pChargeJson);
+CharacterData *loadCharacter(std::string charName, int charVersion);
