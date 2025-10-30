@@ -2813,6 +2813,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
     health -= dmgValue * currentScalingFactor;
 
+    DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
+
     comboDamage += dmgValue * currentScalingFactor;
     lastDamageScale = effectiveScaling;
 
