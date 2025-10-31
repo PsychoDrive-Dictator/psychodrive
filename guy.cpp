@@ -988,6 +988,11 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
 
 bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
 {
+    if (!pTrigger->okKeyFlags && !pTrigger->dcExcFlags && !pTrigger->dcIncFlags) {
+        // some triggers don't seem hooked to anything?
+        return false;
+    }
+
     if (pTrigger->useUniqueParam && pTrigger->condParamID >= 0 && pTrigger->condParamID < Guy::uniqueParamCount) {
         if (!conditionOperator(pTrigger->condParamOp, uniqueParam[pTrigger->condParamID], pTrigger->condParamValue, "trigger unique param")) {
             return false;
