@@ -10,6 +10,9 @@
 #include <mutex>
 #include <chrono>
 #include <atomic>
+#include <locale>
+#include <iostream>
+#include <sstream>
 
 #include "combogen.hpp"
 #include "simulation.hpp"
@@ -138,8 +141,17 @@ public:
                 if (currentRoute.guyFrameProgress < pSim->simGuys[0]->getCurrentFrame() &&
                     currentRoute.simFrameProgress < pSim->frameCounter) {
                     currentRoute.simFrameProgress = pSim->frameCounter;
-                    if (pSim->simGuys[0]->getFrameTriggers().size()) {
+
+                    bool doFrameTriggers = true;
+
+                    // todo try to skip all karas for now, but should probably only skip on free movement
+                    if (pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct()) {
+                        doFrameTriggers = false;
+                    }
+
+                    if (pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) {
                         std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
+                        //for (auto frameTrigger = pSim->simGuys[0]->getFrameTriggers().rbegin(); frameTrigger != pSim->simGuys[0]->getFrameTriggers().rend(); ++frameTrigger) {
                         for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
                             pendingRoutes.push_front(currentRoute);
                             pendingRoutes.front().timelineTriggers[pSim->frameCounter] = frameTrigger;
@@ -162,10 +174,10 @@ public:
                 currentRoute.comboHits = pSim->simGuys[1]->getComboHits();
             }
 
-            // int lastFrameDamage = currentRoute.lastFrameDamage;
-            // std::erase_if(currentRoute.timelineTriggers, [lastFrameDamage](const auto& item) {
-            //     return item.first > lastFrameDamage;
-            // });
+            int lastFrameDamage = currentRoute.lastFrameDamage;
+            std::erase_if(currentRoute.timelineTriggers, [lastFrameDamage](const auto& item) {
+                return item.first > lastFrameDamage;
+            });
 
             DoneRoute doneRoute;
             doneRoute.timelineTriggers = currentRoute.timelineTriggers;
@@ -190,7 +202,7 @@ public:
     }
     std::atomic<bool> idle;
     std::atomic<bool> kill;
-    int framesProcessed = 0;
+    uint64_t framesProcessed = 0;
     bool first;
     ComboRoute currentRoute;
     Simulation *pSim = nullptr;
@@ -234,7 +246,7 @@ void findCombos(void)
     }
 
 
-    int totalFrames = 0;
+    uint64_t totalFrames = 0;
     int maxDamage = 0;
     std::set<DoneRoute, DamageSort> doneRoutes;
 
@@ -246,9 +258,9 @@ void findCombos(void)
                 std::set<DoneRoute, DamageSort> newDoneRoutes;
                 std::swap(newDoneRoutes, worker->doneRoutes);
                 worker->mutexDoneRoutes.unlock();
-                for (auto &route : newDoneRoutes) {
-                    printRoute(route);
-                }
+                // for (auto &route : newDoneRoutes) {
+                //     printRoute(route);
+                // }
                 doneRoutes.merge(newDoneRoutes);
             }
             if (!worker->idle) {
@@ -264,7 +276,6 @@ void findCombos(void)
         }
     }
 
-
     for (auto worker : workerPool) {
         worker->kill = true;
     }
@@ -277,21 +288,36 @@ void findCombos(void)
     }
     workerPool.clear();
 
-    for (auto &route : doneRoutes) {
-        std::string logEntry = std::to_string(route.damage) + " damage: ";
-        for ( auto &trigger : route.timelineTriggers) {
-            logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
-        }
-        log(logEntry);
-        fprintf(stderr, "%s\n", logEntry.c_str());
-    }
+    // for (auto &route : doneRoutes) {
+    //     std::string logEntry = std::to_string(route.damage) + " damage: ";
+    //     for ( auto &trigger : route.timelineTriggers) {
+    //         logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
+    //     }
+    //     log(logEntry);
+    //     fprintf(stderr, "%s\n", logEntry.c_str());
+    // }
+
+    std::stringstream formattedTotalFrames;
+    std::stringstream formattedFPS;
+
+    struct my_numpunct : std::numpunct<char> {
+        std::string do_grouping() const {return "\03";}
+    };
+    std::locale loc (std::cout.getloc(),new my_numpunct);
+
+    formattedTotalFrames.imbue(loc);
+    formattedFPS.imbue(loc);
+
+    formattedTotalFrames << totalFrames;
+
 
     const auto end = std::chrono::steady_clock::now();
     float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.0f;
-    int framesPerSeconds = totalFrames / seconds;
+    uint64_t framesPerSeconds = totalFrames / seconds;
+    formattedFPS << framesPerSeconds;
 
-    auto logEntry = "processed " + std::to_string(totalFrames) + " frames in " + std::to_string(seconds) + "s (";
-    logEntry += std::to_string(framesPerSeconds) + " fps)";
+    auto logEntry = "processed " + formattedTotalFrames.str() + " frames in " + std::to_string(seconds) + "s (";
+    logEntry += formattedFPS.str() + " fps)";
     log(logEntry);
     fprintf(stderr, "%s\n", logEntry.c_str());
 }
