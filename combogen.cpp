@@ -18,7 +18,7 @@
 
 struct ComboRoute {
     std::map<int, std::pair<int, int>> timelineTriggers;
-    bool startedCombo = false;
+    int comboHits = 0;
     int simFrameProgress = 0;
     int guyFrameProgress = 0;
     int damage = 0;
@@ -153,22 +153,19 @@ public:
                     currentRoute.lastFrameDamage = pSim->frameCounter;
                 }
 
-                if (pSim->simGuys[1]->getComboHits()) {
-                    currentRoute.startedCombo = true;
-                }
-
-                if (pSim->frameCounter == 2000 || (!pSim->simGuys[1]->getComboHits() && currentRoute.startedCombo) || pSim->simGuys[1]->getIsDown() || pSim->simGuys[0]->canAct()) {
+                if (pSim->frameCounter == 2000 || (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) || (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne())) {
                     //pSim->Log("framecount " + std::to_string(pSim->frameCounter));
                     break;
                 }
 
                 currentRoute.guyFrameProgress = pSim->simGuys[0]->getCurrentFrame();
+                currentRoute.comboHits = pSim->simGuys[1]->getComboHits();
             }
 
-            int lastFrameDamage = currentRoute.lastFrameDamage;
-            std::erase_if(currentRoute.timelineTriggers, [lastFrameDamage](const auto& item) {
-                return item.first > lastFrameDamage;
-            });
+            // int lastFrameDamage = currentRoute.lastFrameDamage;
+            // std::erase_if(currentRoute.timelineTriggers, [lastFrameDamage](const auto& item) {
+            //     return item.first > lastFrameDamage;
+            // });
 
             DoneRoute doneRoute;
             doneRoute.timelineTriggers = currentRoute.timelineTriggers;
@@ -179,7 +176,9 @@ public:
             // }
             // log(logEntry);
             // fprintf(stderr, "%s\n", logEntry.c_str());
+            mutexDoneRoutes.lock();
             doneRoutes.insert(doneRoute);
+            mutexDoneRoutes.unlock();
 
             GetNextRoute();
 
@@ -198,8 +197,19 @@ public:
     std::thread thread;
     std::mutex mutexPendingRoutes;
     std::deque<ComboRoute> pendingRoutes;
+    std::mutex mutexDoneRoutes;
     std::set<DoneRoute, DamageSort> doneRoutes;
 };
+
+void printRoute(const DoneRoute &route)
+{
+    std::string logEntry = std::to_string(route.damage) + " damage: ";
+    for ( auto &trigger : route.timelineTriggers) {
+        logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
+    }
+    log(logEntry);
+    fprintf(stderr, "%s\n", logEntry.c_str());
+}
 
 void findCombos(void)
 {
@@ -223,22 +233,37 @@ void findCombos(void)
         first = false;
     }
 
+
+    int totalFrames = 0;
+    int maxDamage = 0;
+    std::set<DoneRoute, DamageSort> doneRoutes;
+
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         bool allIdle = true;
         for (auto worker : workerPool) {
+            if (worker->mutexDoneRoutes.try_lock()) {
+                std::set<DoneRoute, DamageSort> newDoneRoutes;
+                std::swap(newDoneRoutes, worker->doneRoutes);
+                worker->mutexDoneRoutes.unlock();
+                for (auto &route : newDoneRoutes) {
+                    printRoute(route);
+                }
+                doneRoutes.merge(newDoneRoutes);
+            }
             if (!worker->idle) {
                 allIdle = false;
             }
+        }
+        if (doneRoutes.size() && doneRoutes.rbegin()->damage > maxDamage) {
+            printRoute(*doneRoutes.rbegin());
+            maxDamage = doneRoutes.rbegin()->damage;
         }
         if (allIdle) {
             break;
         }
     }
 
-    int totalFrames = 0;
-
-    std::set<DoneRoute, DamageSort> doneRoutes;
 
     for (auto worker : workerPool) {
         worker->kill = true;

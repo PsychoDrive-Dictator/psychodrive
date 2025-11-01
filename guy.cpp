@@ -2163,6 +2163,17 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 }
             }
         } else {
+            // not grab - hit (for now)
+            if (hitbox.type == hit || hitbox.type == projectile) {
+                if (pOtherGuy->isDown) {
+                    // todo is real otg a thing?
+                    continue;
+                }
+                if (pOtherGuy->airborne && pOtherGuy->hitStun && !pOtherGuy->knockDown) {
+                    // air recovery
+                    continue;
+                }
+            }
             if (hitbox.type == domain) {
                 foundBox = true;
             } else {
@@ -2186,12 +2197,6 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (foundBox) {
             std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
             int hitEntryFlag = 0;
-
-            if (pOtherGuy->isDown) {
-                // todo need to check for otg capability there i guess?
-                // and cotninue instead of breaking!!! move up in the for hurtbox loop
-                break;
-            }
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
@@ -2738,8 +2743,10 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
         knockDownFrames = downTime;
 
-        if (forceKnockDownState || dmgType == 11 || dmgType == 15) {
+        if (forceKnockDownState || dmgType == 11 || dmgType == 15 || isDrive) {
             knockDown = true;
+        } else {
+            knockDown = false;
         }
     }
 
