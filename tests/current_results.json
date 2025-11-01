@@ -3473,6 +3473,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "honda_air_reset",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 225,
+                "firstFrame": 259,
+                "lastFrame": 482
+            },
+            {
+                "count": 201,
+                "firstFrame": 242,
+                "lastFrame": 368
+            },
+            {
+                "count": 42,
+                "firstFrame": 259,
+                "lastFrame": 368
+            },
+            {
+                "count": 81,
+                "firstFrame": 242,
+                "lastFrame": 322
+            },
+            {
+                "count": 81,
+                "firstFrame": 242,
+                "lastFrame": 322
+            },
+            {
+                "count": 201,
+                "firstFrame": 2,
+                "lastFrame": 475
+            },
+            {
+                "count": 366,
+                "firstFrame": 258,
+                "lastFrame": 482
+            },
+            {
+                "count": 47,
+                "firstFrame": 325,
+                "lastFrame": 371
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 7,
+                "firstFrame": 325,
+                "lastFrame": 331
+            },
+            {
+                "count": 26,
+                "firstFrame": 325,
+                "lastFrame": 337
+            }
+        ]
+    },
+    {
         "testName": "honda_buffed_ex_hands_loop",
         "testVersion": "26",
         "finished": true,
