@@ -3721,6 +3721,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "honda_sa3",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 885,
+                "firstFrame": 326,
+                "lastFrame": 960
+            },
+            {
+                "count": 1,
+                "firstFrame": 775,
+                "lastFrame": 775
+            },
+            {
+                "count": 3,
+                "firstFrame": 773,
+                "lastFrame": 775
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 187,
+                "firstFrame": 774,
+                "lastFrame": 960
+            },
+            {
+                "count": 187,
+                "firstFrame": 774,
+                "lastFrame": 960
+            },
+            {
+                "count": 255,
+                "firstFrame": 706,
+                "lastFrame": 960
+            },
+            {
+                "count": 94,
+                "firstFrame": 867,
+                "lastFrame": 960
+            },
+            {
+                "count": 163,
+                "firstFrame": 706,
+                "lastFrame": 868
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "jamie_drink_jump_cancel_divekick",
         "testVersion": "26",
         "finished": true,
