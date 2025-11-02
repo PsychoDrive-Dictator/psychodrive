@@ -6,6 +6,7 @@
 #include <set>
 #include <deque>
 #include <chrono>
+#include <random>
 
 #include "guy.hpp"
 #include "simulation.hpp"
@@ -44,6 +45,7 @@ public:
     std::atomic<bool> kill;
     uint64_t framesProcessed = 0;
     bool first;
+    std::vector<ComboWorker*> shuffledWorkerPool;
     ComboRoute currentRoute;
     Simulation *pSim = nullptr;
     std::thread thread;
@@ -63,6 +65,8 @@ public:
     uint64_t totalFrames = 0;
     int maxDamage = 0;
     std::set<DoneRoute, DamageSort> doneRoutes;
+
+    std::default_random_engine rng;
 };
 
 extern ComboFinder finder;

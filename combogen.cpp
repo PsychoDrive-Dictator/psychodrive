@@ -17,6 +17,9 @@ void ComboWorker::Start(bool isFirst) {
     idle = false;
     first = isFirst;
 
+    shuffledWorkerPool = finder.workerPool;
+    std::shuffle(shuffledWorkerPool.begin(),shuffledWorkerPool.end(), finder.rng);
+
     pSim = new Simulation;
     pSim->CreateGuy(*guys[0]->getName(), guys[0]->getVersion(), guys[0]->getPosX(), guys[0]->getPosY(), guys[0]->getDirection(), guys[0]->getColor());
     pSim->CreateGuy(*guys[1]->getName(), guys[1]->getVersion(), guys[1]->getPosX(), guys[1]->getPosY(), guys[1]->getDirection(), guys[1]->getColor());
@@ -42,7 +45,7 @@ void ComboWorker::GetNextRoute(void) {
     if (!pendingRoutes.size()) {
         mutexPendingRoutes.unlock();
 again:
-        for (auto& worker : finder.workerPool) {
+        for (auto& worker : shuffledWorkerPool) {
             if (worker->mutexPendingRoutes.try_lock()) {
                 if (worker->pendingRoutes.size()) {
                     currentRoute = worker->pendingRoutes.front();
@@ -262,7 +265,6 @@ void updateComboFinder(void)
 
         formattedTotalFrames << finder.totalFrames;
 
-
         const auto end = std::chrono::steady_clock::now();
         float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - finder.start).count() / 1000.0f;
         uint64_t framesPerSeconds = finder.totalFrames / seconds;
@@ -273,5 +275,8 @@ void updateComboFinder(void)
         log(logEntry);
 
         finder.running = false;
+        finder.totalFrames = 0;
+        finder.maxDamage = 0;
+        finder.doneRoutes.clear();
     }
 }
