@@ -21,12 +21,28 @@ extern bool staticPlayerLoaded;
 
 void ResolveHits(std::vector<PendingHit> &pendingHitList);
 
+class Guy;
+
+struct GuyRef {
+    int guyID = -1;
+    Guy *pGuy = nullptr;
+    GuyRef(Guy* pGuy);
+    operator Guy*() const { return pGuy; }
+    Guy* operator->() const { return pGuy; }
+    GuyRef operator=(Guy* rhs);
+    bool operator==(Guy* rhs) { return this->pGuy == rhs; }
+    // GuyRef operator=(std::nullptr_t rhs) {
+    //     pGuy = nullptr;
+    //     guyID = -1;
+    // }
+};
+
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
     void setAttacker(Guy *pGuy) { pAttacker = pGuy; }
+    void setSim(Simulation *sim) { pSim = sim; }
     Guy *getAttacker() { return pAttacker; }
-    void setSim(Simulation *sim) { pSim = sim; uniqueID = pSim->guyIDCounter++; }
 
     void Input(int input);
     bool RunFrame(void);
@@ -243,8 +259,11 @@ public:
 
     Guy(void) {}
 
-    Guy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
+    Guy(Simulation *sim, std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
     {
+        pSim = sim;
+        uniqueID = pSim->guyIDCounter++;
+
         character = charName;
         version = charVersion;
         name = character;
@@ -290,6 +309,9 @@ public:
 
     Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)
     {
+        pSim = parent.pSim;
+        uniqueID = pSim->guyIDCounter++;
+
         character = parent.character;
         version = parent.version;
         name = character + "'s minion";
@@ -320,9 +342,6 @@ public:
         pCommonCharData = parent.pCommonCharData;
 
         pOpponent = parent.pOpponent;
-        if (parent.pSim) {
-            setSim(parent.pSim);
-        }
 
         currentAction = startAction;
         styleInstall = styleID;
@@ -462,7 +481,7 @@ private:
     std::string character;
     int version;
     int uniqueID = -1;
-    Guy *pOpponent = nullptr;
+    GuyRef pOpponent = nullptr;
 
     void log(bool log, std::string logLine)
     {
@@ -497,7 +516,7 @@ private:
     int limitShotCategory = -1;
     bool noPush = false;
     bool obeyHitID = false;
-    Guy *pParent = nullptr;
+    GuyRef pParent = nullptr;
 
     nlohmann::json *pMovesDictJson;
     nlohmann::json *pRectsJson;
@@ -656,7 +675,7 @@ private:
     int scalingTriggerID = 0;
 
     // getting hit side
-    Guy *pAttacker = nullptr;
+    GuyRef pAttacker = nullptr;
     int hitStun = 0;
     bool resetHitStunOnLand = false;
     bool resetHitStunOnTransition = false;
@@ -757,3 +776,17 @@ static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> 
     }
 }
 
+inline GuyRef GuyRef::operator=(Guy* rhs) {
+    pGuy = rhs;
+    if (pGuy) {
+        guyID = pGuy->getUniqueID();
+    }
+    return *this;
+}
+
+inline GuyRef::GuyRef(Guy *pGuy) {
+    this->pGuy = pGuy;
+    if (this->pGuy) {
+        this->guyID = pGuy->getUniqueID();
+    }
+}

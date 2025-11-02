@@ -25,11 +25,14 @@ void ComboWorker::Start(bool isFirst) {
     pSim->CreateGuy(*guys[1]->getName(), guys[1]->getVersion(), guys[1]->getPosX(), guys[1]->getPosY(), guys[1]->getDirection(), guys[1]->getColor());
     *pSim->simGuys[0] = *guys[0];
     *pSim->simGuys[1] = *guys[1];
+    // reset after assignment clobbered to DefaultSim
+    pSim->simGuys[0]->setSim(pSim);
+    pSim->simGuys[1]->setSim(pSim);
     // pSim->simGuys[0]->setSim(pSim);
     // pSim->simGuys[1]->setSim(pSim);
     // todo not really facsimiles.. don't leak movelist
-    pSim->simGuys[0]->facSimile = true;
-    pSim->simGuys[1]->facSimile = true;
+    pSim->simGuys[0]->enableCleanup = false;
+    pSim->simGuys[1]->enableCleanup = false;
     pSim->simGuys[0]->setOpponent(pSim->simGuys[1]);
     pSim->simGuys[1]->setOpponent(pSim->simGuys[0]);
     if (pSim->simGuys[1]->getAttacker() != nullptr) {
@@ -72,6 +75,8 @@ stolen:
     *pSim->simGuys[0] = currentRoute.guys[0];
     *pSim->simGuys[1] = currentRoute.guys[1];
     // patch up pointers from potentially other sim
+    pSim->simGuys[0]->setSim(pSim);
+    pSim->simGuys[1]->setSim(pSim);
     pSim->simGuys[0]->setOpponent(pSim->simGuys[1]);
     pSim->simGuys[1]->setOpponent(pSim->simGuys[0]);
     if (pSim->simGuys[1]->getAttacker() != nullptr) {

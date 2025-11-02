@@ -2529,7 +2529,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         } else if ((hitEntryFlag & punish_counter) == punish_counter) {
             hitMarkerRadius = 45.0f;
         }
-        if (pGuy->pSim) {
+        if (pGuy->pSim && pGuy->pSim != &defaultSim) {
             FrameEvent event;
             event.type = FrameEvent::Hit;
             event.hitEventData.targetID = pOtherGuy->getUniqueID();
@@ -2630,7 +2630,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pOtherGuy->addHitStop(hitStopTarget+1);
 #ifdef __EMSCRIPTEN__
             // only vibrate here in realtime mode
-            if (!pGuy->pSim) {
+            if (pGuy->pSim == &defaultSim) {
                 emscripten_vibrate(hitStopTarget*2);            
             }
 #endif

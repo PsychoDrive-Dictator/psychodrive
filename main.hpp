@@ -116,7 +116,9 @@ void requestCharDownload(std::string charName);
 extern float startPos1;
 extern float startPos2;
 
-extern std::vector<Guy *> guys;
+class Simulation;
+extern Simulation defaultSim;
+extern std::vector<Guy *> &guys;
 
 extern bool resetpos;
 

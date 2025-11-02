@@ -14,7 +14,7 @@ Simulation::~Simulation() {
 
 void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
-    Guy *pNewGuy = new Guy(charName, charVersion, x, y, startDir, color);
+    Guy *pNewGuy = new Guy(this, charName, charVersion, x, y, startDir, color);
 
     if (simGuys.size()) {
         pNewGuy->setOpponent(simGuys[0]);
@@ -22,8 +22,6 @@ void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed
             simGuys[0]->setOpponent(pNewGuy);
         }
     }
-
-    pNewGuy->setSim(this);
 
     simGuys.push_back(pNewGuy);
 }

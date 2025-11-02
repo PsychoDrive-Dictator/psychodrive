@@ -115,7 +115,8 @@ const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
 bool resetpos = false;
 
-std::vector<Guy *> guys;
+Simulation defaultSim;
+std::vector<Guy *> &guys = defaultSim.simGuys;
 
 std::unordered_set<std::string> setCharsLoaded;
 std::unordered_set<std::string> setCharsStarted;
@@ -134,7 +135,7 @@ bool newCharLoaded = false;
 
 void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
-    Guy *pNewGuy = new Guy(charName, charVersion, x, y, startDir, color);
+    Guy *pNewGuy = new Guy(&defaultSim, charName, charVersion, x, y, startDir, color);
 
     if (guys.size()) {
         pNewGuy->setOpponent(guys[0]);
@@ -145,7 +146,7 @@ void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int s
         *pNewGuy->getInputIDPtr() = keyboardID;
         *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     }
-    guys.push_back(pNewGuy);
+    defaultSim.simGuys.push_back(pNewGuy);
 }
 
 bool isCharLoaded(std::string charName)
