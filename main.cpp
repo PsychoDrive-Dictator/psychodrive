@@ -614,6 +614,8 @@ static void mainloop(void)
         bool hasInput = true;
         bool runFrame = oneframe || !paused;
 
+        updateComboFinder();
+
         if (runComboFinder) {
             findCombos();
             runComboFinder = false;

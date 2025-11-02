@@ -68,7 +68,9 @@ if compiler_id == 'emscripten'
   add_global_arguments('-pthread', language : 'cpp')
   add_global_arguments('-Wno-nontrivial-memaccess', language : 'cpp')
   add_global_arguments('-Wno-dollar-in-identifier-extension', language : 'cpp')
+  add_global_link_arguments('-pthread', language : 'cpp')
   add_global_link_arguments('-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency', language : 'cpp')
+  add_global_link_arguments('-sMALLOC=mimalloc', language : 'cpp')
   add_global_link_arguments('-sMAX_WEBGL_VERSION=2', language : 'cpp')
   add_global_link_arguments('-sMAX_WEBGL_VERSION=2', language : 'cpp')
   add_global_link_arguments('-sFORCE_FILESYSTEM', language : 'cpp')
@@ -80,6 +82,7 @@ if compiler_id == 'emscripten'
   install_data('psychodrive.html', install_dir: bindist_dir)
 else
   project_source_files += 'gl3w.c'
+  project_dependencies += dependency('jemalloc', static : true)
 endif
 
 # ===================================================================
