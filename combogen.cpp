@@ -21,24 +21,12 @@ void ComboWorker::Start(bool isFirst) {
     std::shuffle(shuffledWorkerPool.begin(),shuffledWorkerPool.end(), finder.rng);
 
     pSim = new Simulation;
-    pSim->CreateGuy(*guys[0]->getName(), guys[0]->getVersion(), guys[0]->getPosX(), guys[0]->getPosY(), guys[0]->getDirection(), guys[0]->getColor());
-    pSim->CreateGuy(*guys[1]->getName(), guys[1]->getVersion(), guys[1]->getPosX(), guys[1]->getPosY(), guys[1]->getDirection(), guys[1]->getColor());
-    *pSim->simGuys[0] = *guys[0];
-    *pSim->simGuys[1] = *guys[1];
-    // reset after assignment clobbered to DefaultSim
-    pSim->simGuys[0]->setSim(pSim);
-    pSim->simGuys[1]->setSim(pSim);
-    // pSim->simGuys[0]->setSim(pSim);
-    // pSim->simGuys[1]->setSim(pSim);
-    // todo not really facsimiles.. don't leak movelist
-    pSim->simGuys[0]->enableCleanup = false;
-    pSim->simGuys[1]->enableCleanup = false;
-    pSim->simGuys[0]->setOpponent(pSim->simGuys[1]);
-    pSim->simGuys[1]->setOpponent(pSim->simGuys[0]);
-    if (pSim->simGuys[1]->getAttacker() != nullptr) {
-        pSim->simGuys[1]->setAttacker(pSim->simGuys[0]);
+    if (first) {
+        pSim->Clone(&defaultSim);
+        pSim->simGuys[0]->setRecordFrameTriggers(true);
+
+        currentRoute.pSimSnapshot = new Simulation;
     }
-    pSim->simGuys[0]->setRecordFrameTriggers(true);
 
     thread = std::thread(&ComboWorker::WorkLoop, this);
 }
@@ -72,16 +60,7 @@ again:
 stolen:
     idle = false;
 
-    *pSim->simGuys[0] = currentRoute.guys[0];
-    *pSim->simGuys[1] = currentRoute.guys[1];
-    // patch up pointers from potentially other sim
-    pSim->simGuys[0]->setSim(pSim);
-    pSim->simGuys[1]->setSim(pSim);
-    pSim->simGuys[0]->setOpponent(pSim->simGuys[1]);
-    pSim->simGuys[1]->setOpponent(pSim->simGuys[0]);
-    if (pSim->simGuys[1]->getAttacker() != nullptr) {
-        pSim->simGuys[1]->setAttacker(pSim->simGuys[0]);
-    }
+    pSim->Clone(currentRoute.pSimSnapshot);
     pSim->frameCounter = currentRoute.simFrameProgress-1;
 }
 
@@ -97,8 +76,7 @@ void ComboWorker::WorkLoop(void) {
 
     while (true) {
         while (true) {
-            currentRoute.guys[0] = *pSim->simGuys[0];
-            currentRoute.guys[1] = *pSim->simGuys[1];
+            currentRoute.pSimSnapshot->Clone(pSim);
 
             auto &forcedTrigger = pSim->simGuys[0]->getForcedTrigger();
             if (currentRoute.timelineTriggers.find(pSim->frameCounter+1) != currentRoute.timelineTriggers.end()) {
@@ -125,7 +103,10 @@ void ComboWorker::WorkLoop(void) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
                     //for (auto frameTrigger = pSim->simGuys[0]->getFrameTriggers().rbegin(); frameTrigger != pSim->simGuys[0]->getFrameTriggers().rend(); ++frameTrigger) {
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
-                        pendingRoutes.push_front(currentRoute);
+                        pendingRoutes.emplace_front();
+                        pendingRoutes.front() = currentRoute;
+                        pendingRoutes.front().pSimSnapshot = new Simulation;
+                        pendingRoutes.front().pSimSnapshot->Clone(currentRoute.pSimSnapshot);
                         pendingRoutes.front().timelineTriggers[pSim->frameCounter] = frameTrigger;
                     }
                 }
@@ -163,6 +144,9 @@ void ComboWorker::WorkLoop(void) {
         mutexDoneRoutes.lock();
         doneRoutes.insert(doneRoute);
         mutexDoneRoutes.unlock();
+
+        delete currentRoute.pSimSnapshot;
+        currentRoute.pSimSnapshot = nullptr;
 
         GetNextRoute();
 

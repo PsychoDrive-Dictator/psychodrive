@@ -29,8 +29,20 @@ struct GuyRef {
     GuyRef(Guy* pGuy);
     operator Guy*() const { return pGuy; }
     Guy* operator->() const { return pGuy; }
-    GuyRef operator=(Guy* rhs);
+    GuyRef& operator=(Guy* rhs);
+
+    GuyRef() = default;
+    GuyRef(const GuyRef&) = default;
+    GuyRef& operator=(const GuyRef&) = default;
+
     bool operator==(Guy* rhs) { return this->pGuy == rhs; }
+    void FixRef(std::map<int,Guy*> &guysByID) {
+        if (guyID != -1) {
+            pGuy = guysByID[guyID];
+        } else {
+            pGuy = nullptr;
+        }
+    }
     // GuyRef operator=(std::nullptr_t rhs) {
     //     pGuy = nullptr;
     //     guyID = -1;
@@ -43,6 +55,9 @@ public:
     void setAttacker(Guy *pGuy) { pAttacker = pGuy; }
     void setSim(Simulation *sim) { pSim = sim; }
     Guy *getAttacker() { return pAttacker; }
+    Guy *getOpponent() { return pOpponent; }
+    Guy *getParent() { return pParent; }
+    void FixRefs(std::map<int,Guy*> &guysByID);
 
     void Input(int input);
     bool RunFrame(void);
@@ -67,9 +82,7 @@ public:
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return logQueue; }
     // for opponent direction
-    Guy *getOpponent() { return pOpponent; }
-    Guy *getParent() { return pParent; }
-    std::vector<Guy*> &getMinions() { return minions; }
+    std::vector<GuyRef> &getMinions() { return minions; }
     Fixed getPosX() {
         return posX + (posOffsetX*direction);
     }
@@ -507,7 +520,7 @@ private:
 
     bool deniedLastBranch = false;
 
-    std::vector<Guy*> minions;
+    std::vector<GuyRef> minions;
     bool isProjectile = false;
     int projHitCount = 0;
     int projLifeTime = 0;
@@ -776,10 +789,12 @@ static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> 
     }
 }
 
-inline GuyRef GuyRef::operator=(Guy* rhs) {
+inline GuyRef& GuyRef::operator=(Guy* rhs) {
     pGuy = rhs;
     if (pGuy) {
         guyID = pGuy->getUniqueID();
+    } else {
+        guyID = -1;
     }
     return *this;
 }

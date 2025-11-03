@@ -12,6 +12,58 @@ Simulation::~Simulation() {
     }
 }
 
+void Simulation::Clone(Simulation *pOtherSim)
+{
+    gatherEveryone(simGuys, everyone);
+    gatherEveryone(pOtherSim->simGuys, pOtherSim->everyone);
+
+    if (everyone.size() < pOtherSim->everyone.size()) {
+        int guysToAllocate = pOtherSim->everyone.size() - everyone.size();
+        for (int i = 0; i < guysToAllocate; i++) {
+            Guy *newGuy = new Guy;
+            everyone.push_back(newGuy);
+        }
+    }
+    if (everyone.size() > pOtherSim->everyone.size()) {
+        int guysToFree = everyone.size() - pOtherSim->everyone.size();
+        for (int i = 0; i < guysToFree; i++) {
+            everyone.back()->enableCleanup = false;
+            delete everyone.back();
+            everyone.pop_back();
+        }
+    }
+
+    std::map<int,Guy*> guysByID;
+    std::map<Guy*,Guy*> ourGuyByTheirGuy;
+
+    assert(everyone.size() == pOtherSim->everyone.size());
+
+    for (uint64_t i = 0; i < everyone.size(); i++) {
+        *everyone[i] = *pOtherSim->everyone[i];
+        everyone[i]->setSim(this);
+        guysByID[everyone[i]->getUniqueID()] = everyone[i];
+        ourGuyByTheirGuy[pOtherSim->everyone[i]] = everyone[i];
+    }
+
+    for (uint64_t i = 0; i < everyone.size(); i++) {
+        everyone[i]->FixRefs(guysByID);
+    }
+
+    simGuys.clear();
+    for (Guy *pGuy : pOtherSim->simGuys) {
+        simGuys.push_back(ourGuyByTheirGuy[pGuy]);
+    }
+
+    vecGuysToDelete.clear();
+    for (Guy *pGuy : pOtherSim->vecGuysToDelete) {
+        assert(ourGuyByTheirGuy.find(pGuy) != ourGuyByTheirGuy.end());
+        vecGuysToDelete.push_back(ourGuyByTheirGuy[pGuy]);
+    }
+
+    guyIDCounter = pOtherSim->guyIDCounter;
+    frameCounter = pOtherSim->frameCounter;
+}
+
 void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
     Guy *pNewGuy = new Guy(this, charName, charVersion, x, y, startDir, color);

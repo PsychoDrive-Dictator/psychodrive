@@ -4630,3 +4630,13 @@ void Guy::ExitStyle() {
         styleInstall = (*pStyleJson)["ParentStyleID"];
     }
 }
+
+void Guy::FixRefs(std::map<int,Guy*> &guysByID) {
+    pOpponent.FixRef(guysByID);
+    pParent.FixRef(guysByID);
+    pAttacker.FixRef(guysByID);
+
+    for (GuyRef & minion : minions) {
+        minion.FixRef(guysByID);
+    }
+}
