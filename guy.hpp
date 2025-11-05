@@ -38,6 +38,7 @@ struct GuyRef {
     bool operator==(Guy* rhs) { return this->pGuy == rhs; }
     void FixRef(std::map<int,Guy*> &guysByID) {
         if (guyID != -1) {
+            assert(guysByID.find(guyID) != guysByID.end());
             pGuy = guysByID[guyID];
         } else {
             pGuy = nullptr;
@@ -803,5 +804,7 @@ inline GuyRef::GuyRef(Guy *pGuy) {
     this->pGuy = pGuy;
     if (this->pGuy) {
         this->guyID = pGuy->getUniqueID();
+    } else {
+        this->guyID = -1;
     }
 }

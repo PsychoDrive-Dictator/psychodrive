@@ -19,7 +19,7 @@ struct HitMarker {
     float x;
     float y;
     float radius;
-    Guy *pOrigin;
+    Guy* pOrigin;
     int type;
     int time;
     int maxtime;

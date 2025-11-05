@@ -602,8 +602,14 @@ void drawHitMarker(float x, float y, float radius, int hitType, int time, int ma
 void renderMarkersAndStuff(void)
 {
     int markerToDelete = -1;
+    std::vector<Guy *> everyone;
+    gatherEveryone(guys, everyone);
     for (uint32_t i = 0; i < vecMarkers.size(); i++)
     {
+        if (std::find(everyone.begin(), everyone.end(), vecMarkers[i].pOrigin) == everyone.end()) {
+            // in case it already got deleted (by sim snapshot or otherwise)
+            continue;
+        }
         float hitMarkPosX = vecMarkers[i].pOrigin->getPosX().f() + vecMarkers[i].x;
         float hitMarkPosY = vecMarkers[i].pOrigin->getPosY().f() + vecMarkers[i].y;
 

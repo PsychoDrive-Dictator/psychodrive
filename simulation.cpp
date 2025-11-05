@@ -41,12 +41,14 @@ void Simulation::Clone(Simulation *pOtherSim)
     for (uint64_t i = 0; i < everyone.size(); i++) {
         *everyone[i] = *pOtherSim->everyone[i];
         everyone[i]->setSim(this);
+        assert(guysByID.find(everyone[i]->getUniqueID()) == guysByID.end());
         guysByID[everyone[i]->getUniqueID()] = everyone[i];
         ourGuyByTheirGuy[pOtherSim->everyone[i]] = everyone[i];
     }
 
     for (uint64_t i = 0; i < everyone.size(); i++) {
         everyone[i]->FixRefs(guysByID);
+        assert(everyone[i]->getUniqueID() == pOtherSim->everyone[i]->getUniqueID());
     }
 
     simGuys.clear();

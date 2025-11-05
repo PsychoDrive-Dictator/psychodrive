@@ -213,6 +213,12 @@ void updateInputs(int sizeX, int sizeY)
                     currentInputMap[keyboardID] |= HK;
                     currentInputMap[keyboardID] |= HK_pressed;
                     break;
+                case SDLK_z:
+                    saveState = true;
+                    break;
+                case SDLK_x:
+                    restoreState = true;
+                    break;
                 case SDLK_c:
                     runComboFinder = true;
                     break;

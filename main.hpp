@@ -130,6 +130,8 @@ extern int replayFrameNumber;
 extern bool lockCamera;
 extern bool toggleRenderUI;
 
+extern bool saveState;
+extern bool restoreState;
 extern bool runComboFinder;
 extern bool recordingInput;
 extern std::vector<int> recordedInput;

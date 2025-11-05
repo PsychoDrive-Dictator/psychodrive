@@ -116,6 +116,7 @@ const int charVersionCount = IM_ARRAYSIZE(charVersions);
 bool resetpos = false;
 
 Simulation defaultSim;
+Simulation snapShotSim;
 std::vector<Guy *> &guys = defaultSim.simGuys;
 
 std::unordered_set<std::string> setCharsLoaded;
@@ -253,6 +254,8 @@ int replayFrameNumber = 0;
 bool lockCamera = true;
 bool toggleRenderUI = true;
 
+bool saveState = false;
+bool restoreState = false;
 bool runComboFinder = false;
 bool recordingInput = false;
 std::vector<int> recordedInput;
@@ -614,6 +617,16 @@ static void mainloop(void)
 
         bool hasInput = true;
         bool runFrame = oneframe || !paused;
+
+        if (saveState) {
+            snapShotSim.Clone(&defaultSim);
+            saveState = false;
+        }
+
+        if (restoreState) {
+            defaultSim.Clone(&snapShotSim);
+            restoreState = false;
+        }
 
         updateComboFinder();
 
