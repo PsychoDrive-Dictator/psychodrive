@@ -3163,6 +3163,130 @@ var currentResults =
         ]
     },
     {
+        "testName": "ed_dream_gel",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 659,
+                "firstFrame": 257,
+                "lastFrame": 532
+            },
+            {
+                "count": 412,
+                "firstFrame": 103,
+                "lastFrame": 380
+            },
+            {
+                "count": 89,
+                "firstFrame": 275,
+                "lastFrame": 380
+            },
+            {
+                "count": 234,
+                "firstFrame": 103,
+                "lastFrame": 353
+            },
+            {
+                "count": 234,
+                "firstFrame": 103,
+                "lastFrame": 353
+            },
+            {
+                "count": 168,
+                "firstFrame": 37,
+                "lastFrame": 449
+            },
+            {
+                "count": 628,
+                "firstFrame": 41,
+                "lastFrame": 532
+            },
+            {
+                "count": 127,
+                "firstFrame": 256,
+                "lastFrame": 383
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 141,
+                "firstFrame": 256,
+                "lastFrame": 396
+            },
+            {
+                "count": 93,
+                "firstFrame": 256,
+                "lastFrame": 346
+            }
+        ]
+    },
+    {
+        "testName": "ed_shin_dream_gel",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 617,
+                "firstFrame": 257,
+                "lastFrame": 511
+            },
+            {
+                "count": 407,
+                "firstFrame": 103,
+                "lastFrame": 380
+            },
+            {
+                "count": 89,
+                "firstFrame": 275,
+                "lastFrame": 380
+            },
+            {
+                "count": 223,
+                "firstFrame": 103,
+                "lastFrame": 342
+            },
+            {
+                "count": 223,
+                "firstFrame": 103,
+                "lastFrame": 342
+            },
+            {
+                "count": 183,
+                "firstFrame": 37,
+                "lastFrame": 449
+            },
+            {
+                "count": 600,
+                "firstFrame": 41,
+                "lastFrame": 511
+            },
+            {
+                "count": 127,
+                "firstFrame": 256,
+                "lastFrame": 383
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 130,
+                "firstFrame": 256,
+                "lastFrame": 385
+            },
+            {
+                "count": 93,
+                "firstFrame": 256,
+                "lastFrame": 346
+            }
+        ]
+    },
+    {
         "testName": "guile_fierce_drc_combo",
         "testVersion": "26",
         "finished": true,
