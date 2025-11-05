@@ -239,9 +239,9 @@ public:
         }
         minions.clear();
 
-        std::vector<Guy*> &guyList = guys;
+        std::vector<Guy*> *pGuyList = &guys;
         if (pSim) {
-            guyList = pSim->simGuys;
+            pGuyList = &pSim->simGuys;
         }
 
 
@@ -250,12 +250,12 @@ public:
             const auto it = std::remove(pParent->minions.begin(), pParent->minions.end(), this);
             pParent->minions.erase(it, pParent->minions.end());
         } else {
-            const auto it = std::remove(guyList.begin(), guyList.end(), this);
-            guyList.erase(it, guyList.end());
+            const auto it = std::remove(pGuyList->begin(), pGuyList->end(), this);
+            pGuyList->erase(it, pGuyList->end());
         }
 
         std::vector<Guy *> everyone;
-        for (auto guy : guyList) {
+        for (auto guy : *pGuyList) {
             everyone.push_back(guy);
             for ( auto minion : guy->getMinions() ) {
                 everyone.push_back(minion);
