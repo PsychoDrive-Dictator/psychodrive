@@ -3059,6 +3059,7 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         if (nextAction != -1) {
             NextAction(false, false);
             DoStatusKey();
+            UpdateBoxes();
             WorldPhysics(true);
         }
     }
