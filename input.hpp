@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 enum Input
 {
@@ -33,6 +34,30 @@ enum InputID
 	replayRight = 4,
 	firstJoystickID = 10,
 };
+
+static inline void renderInput(std::string &strOut, int input)
+{
+	bool printed = false;
+	if (input & UP) {
+		strOut += "UP";
+		printed = true;
+	}
+	if (input & DOWN) {
+		if (printed) strOut += "+";
+		strOut += "DOWN";
+		printed = true;
+	}
+	if (input & BACK) {
+		if (printed) strOut += "+";
+		strOut += "BACK";
+		printed = true;
+	}
+	if (input & FORWARD) {
+		if (printed) strOut += "+";
+		strOut += "FORWARD";
+		printed = true;
+	}
+}
 
 static inline int invertDirection(int input)
 {

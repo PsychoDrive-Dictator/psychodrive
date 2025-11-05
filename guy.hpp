@@ -207,7 +207,7 @@ public:
         UpdateActionData();
         UpdateBoxes();
     }
-    std::string getActionName() { return actionName; }
+    std::string &getActionName() { return actionName; }
     bool getIsDrive() { return isDrive; }
     bool getCrouchingDebug() { return crouching; }
     bool getAirborneDebug() { return airborne; }
@@ -381,6 +381,7 @@ public:
         bool a,b,c;
         return canMove(a,b,c);
     }
+    bool couldAct() { return couldMove; }
     std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }

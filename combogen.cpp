@@ -64,6 +64,15 @@ stolen:
     pSim->frameCounter = currentRoute.simFrameProgress-1;
 }
 
+void ComboWorker::QueueRouteFork(std::pair<int,int> frameTrigger) {
+    // call this with mutexPendingRoutes locked!
+    pendingRoutes.emplace_front();
+    pendingRoutes.front() = currentRoute;
+    pendingRoutes.front().pSimSnapshot = new Simulation;
+    pendingRoutes.front().pSimSnapshot->Clone(currentRoute.pSimSnapshot);
+    pendingRoutes.front().timelineTriggers[pSim->frameCounter] = frameTrigger;
+}
+
 void ComboWorker::WorkLoop(void) {
     if (!first) {
         GetNextRoute();
@@ -78,11 +87,20 @@ void ComboWorker::WorkLoop(void) {
         while (true) {
             currentRoute.pSimSnapshot->Clone(pSim);
 
+            int curInput = 0;
+
             auto &forcedTrigger = pSim->simGuys[0]->getForcedTrigger();
-            if (currentRoute.timelineTriggers.find(pSim->frameCounter+1) != currentRoute.timelineTriggers.end()) {
-                forcedTrigger = currentRoute.timelineTriggers[pSim->frameCounter+1];
+            auto frameTrigger = currentRoute.timelineTriggers.find(pSim->frameCounter+1);
+            if (frameTrigger != currentRoute.timelineTriggers.end()) {
+                if (frameTrigger->second.first > 0) {
+                    forcedTrigger = frameTrigger->second;
+                } else {
+                    curInput = -frameTrigger->second.first;
+                }
                 //pSim->Log(std::to_string(pSim->frameCounter+1) + " " + pSim->simGuys[0]->getActionName(forcedTrigger.first));
             }
+
+            pSim->simGuys[0]->Input(curInput);
 
             pSim->RunFrame();
             pSim->AdvanceFrame();
@@ -99,15 +117,17 @@ void ComboWorker::WorkLoop(void) {
                     doFrameTriggers = false;
                 }
 
-                if (pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) {
+                if ((pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) || pSim->simGuys[0]->couldAct()) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
                     //for (auto frameTrigger = pSim->simGuys[0]->getFrameTriggers().rbegin(); frameTrigger != pSim->simGuys[0]->getFrameTriggers().rend(); ++frameTrigger) {
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
-                        pendingRoutes.emplace_front();
-                        pendingRoutes.front() = currentRoute;
-                        pendingRoutes.front().pSimSnapshot = new Simulation;
-                        pendingRoutes.front().pSimSnapshot->Clone(currentRoute.pSimSnapshot);
-                        pendingRoutes.front().timelineTriggers[pSim->frameCounter] = frameTrigger;
+                        QueueRouteFork(frameTrigger);
+                    }
+                    if (pSim->simGuys[0]->couldAct()) {
+                        QueueRouteFork(std::make_pair(-FORWARD, 0));
+                        QueueRouteFork(std::make_pair(-BACK, 0));
+                        QueueRouteFork(std::make_pair(-(UP|FORWARD), 0));
+                        QueueRouteFork(std::make_pair(-(UP|BACK), 0));
                     }
                 }
                 pSim->simGuys[0]->getFrameTriggers().clear();
@@ -161,7 +181,13 @@ void printRoute(const DoneRoute &route)
 {
     std::string logEntry = std::to_string(route.damage) + " damage: ";
     for ( auto &trigger : route.timelineTriggers) {
-        logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
+        std::string actionDesc;
+        if (trigger.second.first < 0) {
+            renderInput(actionDesc, -trigger.second.first);
+        } else {
+            actionDesc = guys[0]->getActionName(trigger.second.first);
+        }
+        logEntry += std::to_string(trigger.first) + " " + actionDesc + " ";
     }
     log(logEntry);
     fprintf(stderr, "%s\n", logEntry.c_str());

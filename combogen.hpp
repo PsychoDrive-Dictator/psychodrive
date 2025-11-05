@@ -39,6 +39,7 @@ class ComboWorker {
 public:
     void Start(bool isFirst);
     void GetNextRoute(void);
+    void QueueRouteFork(std::pair<int,int> frameTrigger);
     void WorkLoop(void);
 
     std::atomic<bool> idle;
