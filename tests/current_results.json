@@ -621,6 +621,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_double_wallbounce",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 640,
+                "firstFrame": 185,
+                "lastFrame": 481
+            },
+            {
+                "count": 248,
+                "firstFrame": 148,
+                "lastFrame": 308
+            },
+            {
+                "count": 59,
+                "firstFrame": 184,
+                "lastFrame": 308
+            },
+            {
+                "count": 111,
+                "firstFrame": 148,
+                "lastFrame": 261
+            },
+            {
+                "count": 111,
+                "firstFrame": 148,
+                "lastFrame": 261
+            },
+            {
+                "count": 128,
+                "firstFrame": 148,
+                "lastFrame": 360
+            },
+            {
+                "count": 255,
+                "firstFrame": 169,
+                "lastFrame": 481
+            },
+            {
+                "count": 30,
+                "firstFrame": 289,
+                "lastFrame": 318
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 10,
+                "firstFrame": 184,
+                "lastFrame": 193
+            }
+        ]
+    },
+    {
         "testName": "aa_driverush_crossunder",
         "testVersion": "33",
         "finished": true,
