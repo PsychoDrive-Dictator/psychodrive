@@ -89,13 +89,22 @@ void ComboWorker::WorkLoop(void) {
 
             int curInput = 0;
 
+            if (currentRoute.walkForward) {
+                currentRoute.walkForward++;
+            }
+
             auto &forcedTrigger = pSim->simGuys[0]->getForcedTrigger();
             auto frameTrigger = currentRoute.timelineTriggers.find(pSim->frameCounter+1);
             if (frameTrigger != currentRoute.timelineTriggers.end()) {
                 if (frameTrigger->second.first > 0) {
                     forcedTrigger = frameTrigger->second;
+                    // rearm forward walk if we did a move
+                    currentRoute.walkForward = 0;
                 } else {
                     curInput = -frameTrigger->second.first;
+                    if (curInput == FORWARD) {
+                        currentRoute.walkForward = 1;
+                    }
                 }
                 //pSim->Log(std::to_string(pSim->frameCounter+1) + " " + pSim->simGuys[0]->getActionName(forcedTrigger.first));
             }
@@ -106,7 +115,7 @@ void ComboWorker::WorkLoop(void) {
             pSim->AdvanceFrame();
             framesProcessed++;
 
-            if (currentRoute.guyFrameProgress < pSim->simGuys[0]->getCurrentFrame() &&
+            if (!pSim->simGuys[0]->getHitStop() &&
                 currentRoute.simFrameProgress < pSim->frameCounter) {
                 currentRoute.simFrameProgress = pSim->frameCounter;
 
@@ -123,11 +132,13 @@ void ComboWorker::WorkLoop(void) {
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
                         QueueRouteFork(frameTrigger);
                     }
-                    if (pSim->simGuys[0]->couldAct()) {
-                        QueueRouteFork(std::make_pair(-FORWARD, 0));
-                        QueueRouteFork(std::make_pair(-BACK, 0));
-                        QueueRouteFork(std::make_pair(-(UP|FORWARD), 0));
-                        QueueRouteFork(std::make_pair(-(UP|BACK), 0));
+                    if (pSim->simGuys[0]->canAct()) {
+                        if (currentRoute.walkForward == 0 || currentRoute.walkForward == 2) {
+                            QueueRouteFork(std::make_pair(-FORWARD, 0));
+                        }
+                        // QueueRouteFork(std::make_pair(-BACK, 0));
+                        // QueueRouteFork(std::make_pair(-(UP|FORWARD), 0));
+                        // QueueRouteFork(std::make_pair(-(UP|BACK), 0));
                     }
                 }
                 pSim->simGuys[0]->getFrameTriggers().clear();
@@ -143,7 +154,7 @@ void ComboWorker::WorkLoop(void) {
                 break;
             }
 
-            currentRoute.guyFrameProgress = pSim->simGuys[0]->getCurrentFrame();
+            //currentRoute.guyFrameProgress = pSim->simGuys[0]->getCurrentFrame();
             currentRoute.comboHits = pSim->simGuys[1]->getComboHits();
         }
 

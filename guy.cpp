@@ -4497,6 +4497,12 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
                             log(logUnknowns, "unknown chara event id " + std::to_string(eventID));
                             break;
                         case 36:
+                            // if (param1 == 4) {
+                            //     focus += param2;
+                            //     if (focus > maxFocus) {
+                            //         focus = maxFocus;
+                            //     }
+                            // }
                             // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
                             break;
                     }

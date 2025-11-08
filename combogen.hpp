@@ -18,6 +18,7 @@ struct ComboRoute {
     int guyFrameProgress = 0;
     int damage = 0;
     int lastFrameDamage = 0;
+    int walkForward = 0;
     Simulation *pSimSnapshot = nullptr;
 };
 
