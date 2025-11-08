@@ -78,6 +78,7 @@ public:
 
     std::string *getName() { return &name; }
     std::string getCharacter() { return character + std::to_string(version); }
+    CharacterData *getCharData() { return pCharData; }
     int getVersion() { return version; }
     int getUniqueID() { return uniqueID; }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
@@ -375,7 +376,7 @@ public:
 
     std::vector<const char *> &getMoveList() { return pCharData->vecMoveList; }
     std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
-    void setRecordFrameTriggers(bool record) { recordFrameTriggers = record; }
+    void setRecordFrameTriggers(bool record, bool lateCancels) { recordFrameTriggers = record; recordLateCancels = lateCancels; }
     int getFrameMeterColorIndex();
     bool canAct() {
         bool a,b,c;
@@ -757,6 +758,7 @@ private:
     std::set<int> setDeferredTriggerIDs;
 
     bool recordFrameTriggers = false;
+    bool recordLateCancels = false;
     std::set<std::pair<int,int>> frameTriggers;
     std::pair<int, int> forcedTrigger;
 

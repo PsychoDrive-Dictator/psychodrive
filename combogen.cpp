@@ -23,7 +23,7 @@ void ComboWorker::Start(bool isFirst) {
     pSim = new Simulation;
     if (first) {
         pSim->Clone(&defaultSim);
-        pSim->simGuys[0]->setRecordFrameTriggers(true);
+        pSim->simGuys[0]->setRecordFrameTriggers(true, finder.doLateCancels);
 
         currentRoute.pSimSnapshot = new Simulation;
     }
@@ -122,18 +122,20 @@ void ComboWorker::WorkLoop(void) {
                 bool doFrameTriggers = true;
 
                 // todo try to skip all karas for now, but should probably only skip on free movement
-                if (pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct()) {
+                if (!finder.doKaras && pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct()) {
                     doFrameTriggers = false;
                 }
 
-                if ((pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) || pSim->simGuys[0]->couldAct()) {
+                if ((pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) || pSim->simGuys[0]->canAct()) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
                     //for (auto frameTrigger = pSim->simGuys[0]->getFrameTriggers().rbegin(); frameTrigger != pSim->simGuys[0]->getFrameTriggers().rend(); ++frameTrigger) {
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
-                        QueueRouteFork(frameTrigger);
+                        if (finder.doLights || (finder.lightsActionIDs.find(frameTrigger.first) == finder.lightsActionIDs.end())) {
+                            QueueRouteFork(frameTrigger);
+                        }
                     }
                     if (pSim->simGuys[0]->canAct()) {
-                        if (currentRoute.walkForward == 0 || currentRoute.walkForward == 2) {
+                        if (finder.doWalk && (currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
                             QueueRouteFork(std::make_pair(-FORWARD, 0));
                         }
                         // QueueRouteFork(std::make_pair(-BACK, 0));
@@ -204,13 +206,29 @@ void printRoute(const DoneRoute &route)
     fprintf(stderr, "%s\n", logEntry.c_str());
 }
 
-void findCombos(void)
+void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk = false, bool doKaras = false)
 {
     if (finder.running) {
         // ?
         return;
     }
-    finder.start = std::chrono::steady_clock::now();
+
+    finder.doLights = doLights;
+    finder.doLateCancels = doLateCancels;
+    finder.doWalk = doWalk;
+    finder.doKaras = doKaras;
+
+    if (!finder.doLights) {
+        for (auto& [key, value] : defaultSim.simGuys[0]->getCharData()->mapMoveStyle) {
+            if (value.first.find("5LP") != std::string::npos ||
+                value.first.find("5LK") != std::string::npos ||
+                value.first.find("2LP") != std::string::npos ||
+                value.first.find("2LK") != std::string::npos)
+            {
+                finder.lightsActionIDs.insert(key.first);
+            }
+        }
+    }
 
     finder.threadCount = std::thread::hardware_concurrency();
     if (finder.threadCount == 0) {
@@ -235,7 +253,9 @@ void findCombos(void)
         first = false;
     }
 
+    finder.start = std::chrono::steady_clock::now();
     log("starting on " + std::to_string(finder.threadCount) + " threads");
+
 
     finder.running = true;
 }

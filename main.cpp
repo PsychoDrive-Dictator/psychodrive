@@ -256,7 +256,14 @@ bool toggleRenderUI = true;
 
 bool saveState = false;
 bool restoreState = false;
+
+bool comboFinderDoLights = false;
+bool comboFinderDoLateCancels = false;
+bool comboFinderDoWalk = false;
+bool comboFinderDoKaras = false;
+bool showComboFinder = false;
 bool runComboFinder = false;
+
 bool recordingInput = false;
 std::vector<int> recordedInput;
 int recordingStartFrame = 0;
@@ -631,7 +638,7 @@ static void mainloop(void)
         updateComboFinder();
 
         if (runComboFinder) {
-            findCombos();
+            findCombos(comboFinderDoLights, comboFinderDoLateCancels, comboFinderDoWalk, comboFinderDoKaras);
             runComboFinder = false;
         }
 

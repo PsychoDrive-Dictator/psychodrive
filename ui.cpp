@@ -544,6 +544,23 @@ void drawInputEditor()
     ImGui::End();
 }
 
+void drawComboFinderWindow()
+{
+    ImGui::Begin("combo finder");
+    ImGui::Checkbox("light normals", &comboFinderDoLights);
+    ImGui::SameLine();
+    ImGui::Checkbox("late cancels", &comboFinderDoLateCancels);
+    ImGui::SameLine();
+    ImGui::Checkbox("walk", &comboFinderDoWalk);
+    ImGui::SameLine();
+    ImGui::Checkbox("karas", &comboFinderDoKaras);
+    if (ImGui::Button("run!")) {
+        runComboFinder = true;
+    }
+
+    ImGui::End();
+}
+
 void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10));
@@ -555,6 +572,10 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
     static int versionID = charVersionCount - 1;
     static float newCharPos = 0.0;
     resetpos = resetpos || ImGui::Button("reset positions (Q)");
+    ImGui::SameLine();
+    if (ImGui::Button("combo finder (C)")) {
+        showComboFinder = true;
+    }
     ImGui::Text("add new guy:");
     ImGui::SliderFloat("##newcharpos", &newCharPos, -765.0, 765.0);
     ImGui::ColorEdit3("##newcharcolor", newCharColor);
@@ -620,6 +641,10 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
     drawInputEditor();
 
     drawHitboxExtentPlotWindow();
+
+    if (showComboFinder) {
+        drawComboFinderWindow();
+    }
 }
 
 void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY)
@@ -1270,7 +1295,7 @@ bool SimulationController::NewSim(void)
     }
 
     for (auto &guy : pSim->simGuys) {
-        guy->setRecordFrameTriggers(true);
+        guy->setRecordFrameTriggers(true, true);
     }
 
     recordedGuysPoolIndex = 0;

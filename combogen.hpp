@@ -63,6 +63,11 @@ public:
     int threadCount = 0;
     bool running = false;
     std::chrono::time_point<std::chrono::steady_clock> start;
+    bool doLights = false;
+    bool doLateCancels = false;
+    bool doWalk = false;
+    bool doKaras = false;
+    std::set<int> lightsActionIDs;
 
     uint64_t totalFrames = 0;
     int maxDamage = 0;
@@ -73,5 +78,5 @@ public:
 
 extern ComboFinder finder;
 
-void findCombos(void);
+void findCombos(bool doLights, bool doLateCancels, bool doWalk, bool doKaras);
 void updateComboFinder(void);

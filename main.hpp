@@ -132,7 +132,14 @@ extern bool toggleRenderUI;
 
 extern bool saveState;
 extern bool restoreState;
+
+extern bool comboFinderDoLights;
+extern bool comboFinderDoLateCancels;
+extern bool comboFinderDoWalk;
+extern bool comboFinderDoKaras;
+extern bool showComboFinder;
 extern bool runComboFinder;
+
 extern bool recordingInput;
 extern std::vector<int> recordedInput;
 extern int recordingStartFrame;

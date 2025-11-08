@@ -275,6 +275,8 @@ void Guy::UpdateActionData(void)
 
 bool Guy::RunFrame(void)
 {
+    frameTriggers.clear();
+
     if (!warudo) {
         if (debuffTimer > 0 ) {
             debuffTimer--;
@@ -1374,6 +1376,7 @@ struct TriggerCheckState {
     bool hasNormal;
     bool hasDeferred;
     bool hasAntiNormal;
+    bool late;
 };
 
 void Guy::DoTriggers(int fluffFrameBias)
@@ -1388,7 +1391,7 @@ void Guy::DoTriggers(int fluffFrameBias)
         if (hasTriggerKey) {
             for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
             {
-                if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
+                if (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame) {
                     continue;
                 }
 
@@ -1441,10 +1444,12 @@ void Guy::DoTriggers(int fluffFrameBias)
                         triggers[entryIndex].hasNormal = false;
                         triggers[entryIndex].hasDeferred = false;
                         triggers[entryIndex].hasAntiNormal = false;
+                        triggers[entryIndex].late = false;
                     }
 
                     if (!defer && !antiNormal) {
                         triggers[entryIndex].hasNormal = true;
+                        triggers[entryIndex].late = currentFrame != key["_StartFrame"] && !canAct();
 
                         if (triggerGroup == 0) {
                             freeMovement = true;
@@ -1488,6 +1493,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                         triggers[entryIndex].hasNormal = true;
                         triggers[entryIndex].hasDeferred = false;
                         triggers[entryIndex].hasAntiNormal = false;
+                        triggers[entryIndex].late = false;
                     }
                 }
             }
@@ -1523,7 +1529,15 @@ void Guy::DoTriggers(int fluffFrameBias)
             auto triggerIDString = std::to_string(triggerID);
             auto actionIDString = to_string_leading_zeroes(actionID, 4);
 
-            if (recordFrameTriggers && trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
+            bool recordThisTrigger = true;
+
+            if (!recordFrameTriggers) {
+                recordThisTrigger = false;
+            } else if (!recordLateCancels && trigState.late) {
+                recordThisTrigger = false;
+            }
+
+            if (recordThisTrigger && trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                 frameTriggers.insert(std::make_pair(actionID, styleInstall));
             }
 
@@ -3633,8 +3647,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         // we'll re-run it in RunFrame
         return true;
     }
-
-    frameTriggers.clear();
 
     bool doTriggers = true;
     if (jumpLandingDisabledFrames) {

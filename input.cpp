@@ -220,7 +220,11 @@ void updateInputs(int sizeX, int sizeY)
                     restoreState = true;
                     break;
                 case SDLK_c:
-                    runComboFinder = true;
+                    if (!showComboFinder) {
+                        showComboFinder = true;
+                    } else {
+                        runComboFinder = true;
+                    }
                     break;
                 case SDLK_p:
                     paused = !paused;
