@@ -332,6 +332,133 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
             }
         }
 
+        if (key.contains("PushCollisionKey")) {
+            for (auto& [pushBoxID, pushBox] : key["PushCollisionKey"].items()) {
+                if (!pushBox.contains("_StartFrame")) {
+                    continue;
+                }
+                PushBoxKey newKey;
+                newKey.startFrame = pushBox["_StartFrame"];
+                newKey.endFrame = pushBox["_EndFrame"];
+                newKey.condition = pushBox["Condition"];
+                newKey.offsetX = Fixed(0);
+                newKey.offsetY = Fixed(0);
+                if (pushBox.contains("RootOffset")) {
+                    newKey.offsetX = Fixed(pushBox["RootOffset"].value("X", 0));
+                    newKey.offsetY = Fixed(pushBox["RootOffset"].value("Y", 0));
+                }
+
+                int boxID = pushBox["BoxNo"];
+                auto it = rectsByIDs.find(std::make_pair(5, boxID));
+                if (it != rectsByIDs.end()) {
+                    newKey.rect = it->second;
+                    newAction.pushBoxKeys.push_back(newKey);
+                }
+            }
+        }
+
+        if (key.contains("AttackCollisionKey") || key.contains("OtherCollisionKey")) {
+            for (auto& keyName : {"AttackCollisionKey", "OtherCollisionKey"}) {
+                if (!key.contains(keyName)) {
+                    continue;
+                }
+
+                bool isOther = strcmp(keyName, "OtherCollisionKey") == 0;
+
+                for (auto& [hitBoxID, hitBox] : key[keyName].items()) {
+                    if (!hitBox.contains("_StartFrame")) {
+                        continue;
+                    }
+                    HitBoxKey newKey;
+                    newKey.startFrame = hitBox["_StartFrame"];
+                    newKey.endFrame = hitBox["_EndFrame"];
+                    newKey.condition = hitBox["Condition"];
+                    newKey.offsetX = Fixed(0);
+                    newKey.offsetY = Fixed(0);
+                    if (hitBox.contains("RootOffset")) {
+                        newKey.offsetX = Fixed(hitBox["RootOffset"].value("X", 0));
+                        newKey.offsetY = Fixed(hitBox["RootOffset"].value("Y", 0));
+                    }
+
+                    int validStyles = hitBox["_ValidStyle"];
+                    if (validStyles != 0) {
+                        newKey.hasValidStyle = true;
+                        newKey.validStyle = validStyles;
+                    }
+
+                    int collisionType = hitBox["CollisionType"];
+                    hitBoxType type = hit;
+                    int rectListID = collisionType;
+                    if (isOther) {
+                        if (collisionType == 7) {
+                            type = domain;
+                        } else if (collisionType == 10) {
+                            type = destroy_projectile;
+                        } else if (collisionType == 11) {
+                            type = direct_damage;
+                        }
+                        rectListID = 9;
+                    } else {
+                        if (collisionType == 3) {
+                            type = proximity_guard;
+                        } else if (collisionType == 2) {
+                            type = grab;
+                        } else if (collisionType == 1) {
+                            type = projectile;
+                        } else if (collisionType == 0) {
+                            type = hit;
+                        }
+                    }
+
+                    newKey.type = type;
+                    newKey.hitEntryID = hitBox["AttackDataListIndex"];
+
+                    int hitID = hitBox["HitID"];
+                    bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
+                    if (type == domain || type == direct_damage) {
+                        hasHitID = false;
+                    }
+                    if (hitID < 0) {
+                        hitID = 15;
+                    }
+                    if (hasHitID == false) {
+                        hitID = -1;
+                    }
+                    if (hitID == 15 || type == domain) {
+                        hitID = 15 + atoi(hitBoxID.c_str());
+                    }
+                    newKey.hasHitID = hasHitID;
+                    newKey.hitID = hitID;
+
+                    newKey.flags = (hitBoxFlags)0;
+                    if (hitBox.value("_IsGuardBit", false)) {
+                        int guardBit = hitBox["GuardBit"];
+                        if ((guardBit & 3) == 1) {
+                            newKey.flags = (hitBoxFlags)(newKey.flags | overhead);
+                        }
+                        if ((guardBit & 3) == 2) {
+                            newKey.flags = (hitBoxFlags)(newKey.flags | low);
+                        }
+                    }
+
+                    if (type == domain) {
+                        newAction.hitBoxKeys.push_back(newKey);
+                    } else {
+                        newKey.rects.reserve(hitBox["BoxList"].size());
+                        for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
+                            auto it = rectsByIDs.find(std::make_pair(rectListID, boxID));
+                            if (it != rectsByIDs.end()) {
+                                newKey.rects.push_back(it->second);
+                            }
+                        }
+                        if (!newKey.rects.empty() || type == proximity_guard) {
+                            newAction.hitBoxKeys.push_back(newKey);
+                        }
+                    }
+                }
+            }
+        }
+
         pRet->actions.push_back(newAction);
     }
 }
@@ -417,6 +544,10 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs);
     loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs);
+
+    for (auto& action : pRet->actions) {
+        pRet->actionsByID[std::make_pair(action.actionID, action.styleID)] = &action;
+    }
 
     return pRet;
 }

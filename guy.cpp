@@ -175,7 +175,7 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
     return true;
 }
 
-const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson)
+const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson, Action **ppAction)
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (pCharData->mapMoveStyle.find(mapIndex) == pCharData->mapMoveStyle.end()) {
@@ -185,7 +185,7 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
             return nullptr;
         }
 
-        return FindMove(actionID, parentStyleID, ppMoveJson);
+        return FindMove(actionID, parentStyleID, ppMoveJson, ppAction);
     } else {
         const char *moveName = pCharData->mapMoveStyle[mapIndex].first.c_str();
         bool commonMove = pCharData->mapMoveStyle[mapIndex].second;
@@ -193,6 +193,16 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
         if (ppMoveJson) {
             *ppMoveJson = commonMove ? &(*pCommonMovesJson)[moveName] : &(*pMovesDictJson)[moveName];
         }
+
+        if (ppAction) {
+            auto it = pCharData->actionsByID.find(mapIndex);
+            if (it != pCharData->actionsByID.end()) {
+                *ppAction = it->second;
+            } else {
+                *ppAction = nullptr;
+            }
+        }
+
         return moveName;
     }
 }
@@ -231,27 +241,16 @@ void Guy::UpdateActionData(void)
     pCurrentAction = nullptr;
     const char *foundAction = nullptr;
 
-    CharacterData *pSearchCharData = opponentAction ? pOpponent->pCharData : pCharData;
-    int searchStyleID = opponentAction ? 0 : styleInstall;
-
     if (opponentAction) {
-        foundAction = pOpponent->FindMove(currentAction, 0, &pActionJson);
+        foundAction = pOpponent->FindMove(currentAction, 0, &pActionJson, &pCurrentAction);
     } else {
-        foundAction = FindMove(currentAction, styleInstall, &pActionJson);
+        foundAction = FindMove(currentAction, styleInstall, &pActionJson, &pCurrentAction);
     }
 
     if (foundAction == nullptr) {
         log(true, "couldn't find next action, reverting to 1 - style lapsed?");
         currentAction = 1;
-        foundAction = FindMove(currentAction, styleInstall, &pActionJson);
-        searchStyleID = styleInstall;
-    }
-
-    for (auto& action : pSearchCharData->actions) {
-        if (action.actionID == currentAction && action.styleID == searchStyleID) {
-            pCurrentAction = &action;
-            break;
-        }
+        foundAction = FindMove(currentAction, styleInstall, &pActionJson, &pCurrentAction);
     }
 
     actionName = foundAction;
@@ -1730,36 +1729,77 @@ void Guy::UpdateBoxes(void)
                 renderBoxes.push_back({box.box, (box.flags & head) ? 17.5f : 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
             }
         }
-    }
-    if (pActionJson->contains("PushCollisionKey"))
-    {
-        for (auto& [pushBoxID, pushBox] : (*pActionJson)["PushCollisionKey"].items())
+
+        for (auto& pushBoxKey : pCurrentAction->pushBoxKeys)
         {
-            if ( !pushBox.contains("_StartFrame") || pushBox["_StartFrame"] > currentFrame || pushBox["_EndFrame"] <= currentFrame ) {
+            if (pushBoxKey.startFrame > currentFrame || pushBoxKey.endFrame <= currentFrame) {
                 continue;
             }
 
-            if (!CheckHitBoxCondition(pushBox["Condition"])) {
+            if (!CheckHitBoxCondition(pushBoxKey.condition)) {
                 continue;
             }
 
-            Fixed rootOffsetX = Fixed(0);
-            Fixed rootOffsetY = Fixed(0);
-            parseRootOffset( pushBox, rootOffsetX, rootOffsetY );
+            Fixed rootOffsetX = pushBoxKey.offsetX;
+            Fixed rootOffsetY = pushBoxKey.offsetY;
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY = rootOffsetY + posY + posOffsetY;
 
-            Box rect;
+            Box rect = rectToBox(pushBoxKey.rect, rootOffsetX, rootOffsetY, direction.i());
+            pushBoxes.push_back(rect);
+            renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});
+        }
 
-            if (GetRect(rect, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction.i())) {
-                pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});
+        for (auto& hitBoxKey : pCurrentAction->hitBoxKeys)
+        {
+            if (hitBoxKey.startFrame > currentFrame || hitBoxKey.endFrame <= currentFrame) {
+                continue;
+            }
+
+            if (!CheckHitBoxCondition(hitBoxKey.condition)) {
+                continue;
+            }
+
+            if (hitBoxKey.hasValidStyle && !(hitBoxKey.validStyle & (1 << styleInstall))) {
+                continue;
+            }
+
+            Fixed rootOffsetX = hitBoxKey.offsetX;
+            Fixed rootOffsetY = hitBoxKey.offsetY;
+            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+            rootOffsetY = rootOffsetY + posY + posOffsetY;
+
+            hitBoxType type = hitBoxKey.type;
+            color collisionColor = {1.0,0.0,0.0};
+            if (type == domain) {
+                collisionColor = {1.0,0.0,0.0};
+            } else if (type == destroy_projectile) {
+                collisionColor = {0.0,1.0,0.5};
+            } else if (type == proximity_guard) {
+                collisionColor = {0.5,0.5,0.5};
+            }
+
+            float thickness = 50.0;
+            if (type == proximity_guard) {
+                thickness = 5.0;
+            }
+
+            if (type == domain) {
+                Box rect = {-4096,-4096,8192,8192};
+                renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive)});
+                hitBoxes.push_back({rect, type, hitBoxKey.hitEntryID, hitBoxKey.hitID, hitBoxKey.flags});
+            } else {
+                for (auto pRect : hitBoxKey.rects) {
+                    Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+                    renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && type != proximity_guard});
+
+                    if (type == proximity_guard || hitBoxKey.hitEntryID != -1) {
+                        hitBoxes.push_back({rect, type, hitBoxKey.hitEntryID, hitBoxKey.hitID, hitBoxKey.flags});
+                    }
+                }
             }
         }
     }
-
-    DoHitBoxKey("AttackCollisionKey");
-    DoHitBoxKey("OtherCollisionKey");
 }
 
 void Guy::Render(void) {
@@ -3135,106 +3175,6 @@ bool Guy::CheckHitBoxCondition(int conditionFlag)
     // todo hit parry
 
     return conditionMet;
-}
-
-void Guy::DoHitBoxKey(const char *name)
-{
-    if (pActionJson->contains(name))
-    {
-        for (auto& [hitBoxID, hitBox] : (*pActionJson)[name].items())
-        {
-            if ( !hitBox.contains("_StartFrame") || hitBox["_StartFrame"] > currentFrame || hitBox["_EndFrame"] <= currentFrame ) {
-                continue;
-            }
-
-            if (!CheckHitBoxCondition(hitBox["Condition"])) {
-                continue;
-            }
-
-            int validStyles = hitBox["_ValidStyle"];
-            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                continue;
-            }
-
-            bool isOther = strcmp(name, "OtherCollisionKey") == 0;
-            //bool isUnique = strcmp(name, "UniqueCollisionKey") == 0;
-
-            Fixed rootOffsetX = 0;
-            Fixed rootOffsetY = 0;
-            parseRootOffset( hitBox, rootOffsetX, rootOffsetY );
-            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-            rootOffsetY += posY + posOffsetY;
-
-            Box rect={-4096,-4096,8192,8192};
-
-            for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
-                int collisionType = hitBox["CollisionType"];
-                hitBoxType type = hit;
-                color collisionColor = {1.0,0.0,0.0};
-                int rectListID = collisionType;
-                if (isOther) { 
-                    if (collisionType == 7) {
-                        type = domain;
-                    } else if (collisionType == 10) {
-                        collisionColor = {0.0,1.0,0.5};
-                        type = destroy_projectile;
-                    } else if (collisionType == 11) {
-                        type = direct_damage;
-                    }
-                    rectListID = 9;
-                } else {
-                    if (collisionType == 3 ) {
-                        collisionColor = {0.5,0.5,0.5};
-                        type = proximity_guard;
-                    } else if (collisionType == 2) {
-                        type = grab;
-                    } else if (collisionType == 1) {
-                        type = projectile;
-                    } else if (collisionType == 0) {
-                        type = hit;
-                    }
-                }
-
-                float thickness = 50.0;
-                if (type == proximity_guard) {
-                    thickness = 5.0;
-                }
-
-                if ((type == domain) || GetRect(rect, rectListID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && collisionType != 3 });
-
-                    int hitEntryID = hitBox["AttackDataListIndex"];
-                    int hitID = hitBox["HitID"];
-                    bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
-                    int flags = 0;
-                    if (hitBox.value("_IsGuardBit", false)) {
-                        int guardBit = hitBox["GuardBit"];
-                        if ((guardBit & 3) == 1) {
-                            flags |= overhead;
-                        }
-                        if ((guardBit & 3) == 2) {
-                            flags |= low;
-                        }
-                    }
-                    if (type == domain || type == direct_damage) {
-                        hasHitID = false;
-                    }
-                    if (hitID < 0) {
-                        hitID = 15; // overflow, that's the highest hit bit AFAIK
-                    }
-                    if (hasHitID == false) {
-                        hitID = -1;
-                    }
-                    if (hitID == 15 || type == domain) {
-                        hitID = 15 + atoi(hitBoxID.c_str());
-                    }
-                    if (type == proximity_guard || hitEntryID != -1) {
-                        hitBoxes.push_back({rect,type,hitEntryID,hitID,flags});
-                    }
-                }
-            }
-        }
-    }
 }
 
 void Guy::DoBranchKey(bool preHit)

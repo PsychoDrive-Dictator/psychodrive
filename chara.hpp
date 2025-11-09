@@ -187,6 +187,7 @@ struct CharacterData {
 
     std::map<int, TriggerGroup*> triggerGroupByID;
     std::map<std::pair<int, int>, Rect*> rectsByIDs;
+    std::map<std::pair<int, int>, Action*> actionsByID;
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
     std::vector<const char *> vecMoveList;

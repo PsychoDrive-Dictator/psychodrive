@@ -388,7 +388,7 @@ public:
     int *getInputOverridePtr() { return &inputOverride; }
     int *getInputIDPtr() { return &inputID; }
     int *getInputListIDPtr() { return &inputListID; }
-    const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson = nullptr);
+    const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson = nullptr, Action **ppAction = nullptr);
     nlohmann::json *findAtemi(int atemiID);
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
@@ -406,7 +406,6 @@ private:
 
     void DoBranchKey(bool preHit = false);
     bool CheckHitBoxCondition(int conditionFlag);
-    void DoHitBoxKey(const char *name);
     void DoStatusKey();
 
     void DoSwitchKey(const char *name);
