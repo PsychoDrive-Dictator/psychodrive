@@ -487,8 +487,7 @@ bool Guy::RunFrame(void)
         ignoreBodyPush = false;
         ignoreHitStop = false;
 
-        DoSwitchKey("SwitchKey");
-        DoSwitchKey("ExtSwitchKey");
+        DoSwitchKey();
 
         DoEventKey(pActionJson, currentFrame);
 
@@ -4006,58 +4005,59 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
     }
 }
 
-void Guy::DoSwitchKey(const char *name)
+void Guy::DoSwitchKey(void)
 {
-    if (pActionJson->contains(name))
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& switchKey : pCurrentAction->switchKeys)
     {
-        for (auto& [keyID, key] : (*pActionJson)[name].items())
-        {
-            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                continue;
-            }
+        if (switchKey.startFrame > currentFrame || switchKey.endFrame <= currentFrame) {
+            continue;
+        }
 
-            // only in ExtSwitchKey
-            int validStyles = key.value("_ValidStyle", 0);
-            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                continue;
-            }
+        // only in ExtSwitchKey
+        int validStyles = switchKey.validStyle;
+        if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+            continue;
+        }
 
-            int flag = key["SystemFlag"];
+        int flag = switchKey.systemFlag;
 
-            if (flag & 0x40000000) {
-                canBlock = true;
+        if (flag & 0x40000000) {
+            canBlock = true;
+        }
+        if (flag & 0x8000000) {
+            isDrive = true;
+            if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
+                pOpponent->driveScaling = true;
             }
-            if (flag & 0x8000000) {
-                isDrive = true;
-                if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
-                    pOpponent->driveScaling = true;
-                }
-            }
-            if (flag & 0x800000) {
-                punishCounterState = true;
-            }
-            if (flag & 0x400000) {
-                forceKnockDownState = true;
-            }
-            if (flag & 0x80000) {
-                ignoreBodyPush = true;
-            }
-            if (flag & 0x8) {
-                ignoreHitStop = true;
-            }
-            if (flag & 0x2) {
-                counterState = true;
-            }
-            if (flag & 0x1) {
-                throwTechable = true;
-            }
+        }
+        if (flag & 0x800000) {
+            punishCounterState = true;
+        }
+        if (flag & 0x400000) {
+            forceKnockDownState = true;
+        }
+        if (flag & 0x80000) {
+            ignoreBodyPush = true;
+        }
+        if (flag & 0x8) {
+            ignoreHitStop = true;
+        }
+        if (flag & 0x2) {
+            counterState = true;
+        }
+        if (flag & 0x1) {
+            throwTechable = true;
+        }
 
-            int operation = key["OperationFlag"];
+        int operation = switchKey.operationFlag;
 
-            if (operation & 1) {
-                log (logTransitions, "force landing op");
-                forceLanding = true;
-            }
+        if (operation & 1) {
+            log (logTransitions, "force landing op");
+            forceLanding = true;
         }
     }
 }

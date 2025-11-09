@@ -190,6 +190,12 @@ struct PlaceKey : Key {
     std::vector<PlaceKeyPos> posList;
 };
 
+struct SwitchKey : Key {
+    int systemFlag;
+    int operationFlag;
+    int validStyle = 0;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -200,6 +206,7 @@ struct Action {
     std::vector<HitBoxKey> hitBoxKeys;
     std::vector<SteerKey> steerKeys;
     std::vector<PlaceKey> placeKeys;
+    std::vector<SwitchKey> switchKeys;
 
     int activeFrame;
     int recoveryStartFrame;

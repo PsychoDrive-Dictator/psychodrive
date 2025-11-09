@@ -494,6 +494,27 @@ void loadPlaceKeys(nlohmann::json* pPlaceJson, std::vector<PlaceKey>* pOutputVec
     }
 }
 
+void loadSwitchKeys(nlohmann::json* pSwitchJson, std::vector<SwitchKey>* pOutputVector)
+{
+    if (!pSwitchJson) {
+        return;
+    }
+
+    for (auto& [switchKeyID, switchKey] : pSwitchJson->items()) {
+        if (!switchKey.contains("_StartFrame")) {
+            continue;
+        }
+        SwitchKey newKey;
+        newKey.startFrame = switchKey["_StartFrame"];
+        newKey.endFrame = switchKey["_EndFrame"];
+        newKey.systemFlag = switchKey["SystemFlag"];
+        newKey.operationFlag = switchKey["OperationFlag"];
+        newKey.validStyle = switchKey.value("_ValidStyle", 0);
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -588,6 +609,22 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         if (key.contains("PlaceKey")) {
             newAction.placeKeys.reserve(key["PlaceKey"].size() - 1);
             loadPlaceKeys(&key["PlaceKey"], &newAction.placeKeys);
+        }
+
+        size_t switchKeyCount = 0;
+        if (key.contains("SwitchKey")) {
+            switchKeyCount += key["SwitchKey"].size() - 1;
+        }
+        if (key.contains("ExtSwitchKey")) {
+            switchKeyCount += key["ExtSwitchKey"].size() - 1;
+        }
+        newAction.switchKeys.reserve(switchKeyCount);
+
+        if (key.contains("SwitchKey")) {
+            loadSwitchKeys(&key["SwitchKey"], &newAction.switchKeys);
+        }
+        if (key.contains("ExtSwitchKey")) {
+            loadSwitchKeys(&key["ExtSwitchKey"], &newAction.switchKeys);
         }
 
         pRet->actions.push_back(newAction);

@@ -401,8 +401,7 @@ private:
     void DoStatusKey();
     void DoSteerKey();
     void DoPlaceKey();
-
-    void DoSwitchKey(const char *name);
+    void DoSwitchKey();
     void DoEventKey(nlohmann::json *pAction, int frameID);
     void DoShotKey(nlohmann::json *pAction, int frameID);
 
