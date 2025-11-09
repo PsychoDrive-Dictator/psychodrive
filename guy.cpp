@@ -506,52 +506,8 @@ bool Guy::RunFrame(void)
 
         DoWorldKey();
 
-        if (pActionJson->contains("LockKey"))
-        {
-            for (auto& [keyID, key] : (*pActionJson)["LockKey"].items())
-            {
-                if (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame) {
-                    continue;
-                }
+        DoLockKey();
 
-                int type = key["Type"];
-                int param01 = key["Param01"];
-                int param02 = key["Param02"];
-
-                if (type == 1) {
-                    if (pOpponent) {
-                        pOpponent->nextAction = param01;
-                        pOpponent->nextActionOpponentAction = true;
-                        pOpponent->hitStun = 50000;
-                        pOpponent->juggleCounter = 0;
-                        pOpponent->resetHitStunOnLand = false;
-                        pOpponent->knockDown = false;
-                        // do we need to continually snap position or just at beginning?
-                        pOpponent->direction = direction;
-                        pOpponent->posX = posX;
-                        pOpponent->posY = posY;
-                        pOpponent->airborne = airborne;
-                        pOpponent->velocityX = Fixed(0);
-                        pOpponent->velocityY = Fixed(0);
-                        pOpponent->accelX = Fixed(0);
-                        pOpponent->accelY = Fixed(0);
-                        // for transition
-                        pOpponent->AdvanceFrame();
-                        // for placekey/etc
-                        pOpponent->RunFrame();
-                        pOpponent->locked = true;
-                    }
-                } else if (type == 2) {
-                    // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame
-                    // has run or not yet and it introduces ordering issues
-                    if (pendingLockHit != -1) {
-                        log(true, "weird!");
-                    }
-                    pendingLockHit = param02;
-                }
-            }
-        }
-        
         // steer/etc could have had side effects there
         UpdateBoxes();
     }
@@ -4274,6 +4230,56 @@ void Guy::DoWorldKey(void)
             default:
                 log(logUnknowns, "unknown worldkey type " + std::to_string(type));
                 break;
+        }
+    }
+}
+
+void Guy::DoLockKey(void)
+{
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& lockKey : pCurrentAction->lockKeys)
+    {
+        if (lockKey.startFrame > currentFrame || lockKey.endFrame <= currentFrame) {
+            continue;
+        }
+
+        int type = lockKey.type;
+        int param01 = lockKey.param01;
+        int param02 = lockKey.param02;
+
+        if (type == 1) {
+            if (pOpponent) {
+                pOpponent->nextAction = param01;
+                pOpponent->nextActionOpponentAction = true;
+                pOpponent->hitStun = 50000;
+                pOpponent->juggleCounter = 0;
+                pOpponent->resetHitStunOnLand = false;
+                pOpponent->knockDown = false;
+                // do we need to continually snap position or just at beginning?
+                pOpponent->direction = direction;
+                pOpponent->posX = posX;
+                pOpponent->posY = posY;
+                pOpponent->airborne = airborne;
+                pOpponent->velocityX = Fixed(0);
+                pOpponent->velocityY = Fixed(0);
+                pOpponent->accelX = Fixed(0);
+                pOpponent->accelY = Fixed(0);
+                // for transition
+                pOpponent->AdvanceFrame();
+                // for placekey/etc
+                pOpponent->RunFrame();
+                pOpponent->locked = true;
+            }
+        } else if (type == 2) {
+            // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame
+            // has run or not yet and it introduces ordering issues
+            if (pendingLockHit != -1) {
+                log(true, "weird!");
+            }
+            pendingLockHit = param02;
         }
     }
 }
