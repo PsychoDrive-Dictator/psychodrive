@@ -400,6 +400,7 @@ private:
     bool CheckHitBoxCondition(int conditionFlag);
     void DoStatusKey();
     void DoSteerKey();
+    void DoPlaceKey();
 
     void DoSwitchKey(const char *name);
     void DoEventKey(nlohmann::json *pAction, int frameID);

@@ -391,58 +391,7 @@ bool Guy::RunFrame(void)
         // assuming it doesn't stick for now
         ignoreSteerType  = -1;
 
-        if (pActionJson->contains("PlaceKey"))
-        {
-            for (auto& [placeKeyID, placeKey] : (*pActionJson)["PlaceKey"].items())
-            {
-                if ( !placeKey.contains("_StartFrame") || placeKey["_StartFrame"] > currentFrame || placeKey["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                // seems like we stop obeying palcekey after a nage hit?
-                if (nageKnockdown) {
-                    break;
-                }
-
-                Fixed offsetMatch;
-                int flag = placeKey["OptionFlag"];
-                // todo there's a bunch of other flags
-                bool cosmeticOffset = flag & 1;
-                Fixed ratio = Fixed(placeKey["Ratio"].get<double>());
-
-                if (cosmeticOffset) {
-                    continue;
-                }
-
-                for (auto& [frame, offset] : placeKey["PosList"].items()) {
-                    int keyStartFrame = placeKey["_StartFrame"];
-                    // todo implement ratio here? check on cammy spiralarrow ex as an example
-                    if (atoi(frame.c_str()) == currentFrame - keyStartFrame) {
-                        offsetMatch = Fixed(offset.get<double>());
-                        // // do we need to disambiguate which axis doesn't push? that'd be annoying
-                        // // is vertical pushback even a thing
-                        // if (curPlaceKeyDoesNotPush) {
-                        //     offsetDoesNotPush = true;
-                        // }
-                        break;
-                    }
-                    offsetMatch = Fixed(offset.get<double>());
-                }
-
-                offsetMatch *= ratio;
-                if (offsetMatch == Fixed(0) && !setPlaceX && !setPlaceY) {
-                    continue;
-                }
-
-                if (placeKey["Axis"] == 0) {
-                    posOffsetX = offsetMatch;
-                    setPlaceX = true;
-                } else if (placeKey["Axis"] == 1) {
-                    posOffsetY = offsetMatch;
-                    setPlaceY = true;
-                }
-            }
-        }
+        DoPlaceKey();
 
         noPlaceXNextFrame = false;
         noPlaceYNextFrame = false;
@@ -4317,6 +4266,63 @@ void Guy::DoSteerKey(void)
             default:
                 log(logUnknowns, "unknown steer keyoperation " + std::to_string(operationType));
                 break;
+        }
+    }
+}
+
+void Guy::DoPlaceKey(void)
+{
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& placeKey : pCurrentAction->placeKeys)
+    {
+        if (placeKey.startFrame > currentFrame || placeKey.endFrame <= currentFrame) {
+            continue;
+        }
+
+        // seems like we stop obeying palcekey after a nage hit?
+        if (nageKnockdown) {
+            break;
+        }
+
+        Fixed offsetMatch;
+        int flag = placeKey.optionFlag;
+        // todo there's a bunch of other flags
+        bool cosmeticOffset = flag & 1;
+        Fixed ratio = placeKey.ratio;
+
+        if (cosmeticOffset) {
+            continue;
+        }
+
+        for (auto& pos : placeKey.posList) {
+            int keyStartFrame = placeKey.startFrame;
+            // todo implement ratio here? check on cammy spiralarrow ex as an example
+            if (pos.frame == currentFrame - keyStartFrame) {
+                offsetMatch = pos.offset;
+                // // do we need to disambiguate which axis doesn't push? that'd be annoying
+                // // is vertical pushback even a thing
+                // if (curPlaceKeyDoesNotPush) {
+                //     offsetDoesNotPush = true;
+                // }
+                break;
+            }
+            offsetMatch = pos.offset;
+        }
+
+        offsetMatch *= ratio;
+        if (offsetMatch == Fixed(0) && !setPlaceX && !setPlaceY) {
+            continue;
+        }
+
+        if (placeKey.axis == 0) {
+            posOffsetX = offsetMatch;
+            setPlaceX = true;
+        } else if (placeKey.axis == 1) {
+            posOffsetY = offsetMatch;
+            setPlaceY = true;
         }
     }
 }

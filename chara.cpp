@@ -463,6 +463,37 @@ void loadSteerKeys(nlohmann::json* pSteerJson, std::vector<SteerKey>* pOutputVec
     }
 }
 
+void loadPlaceKeys(nlohmann::json* pPlaceJson, std::vector<PlaceKey>* pOutputVector)
+{
+    if (!pPlaceJson) {
+        return;
+    }
+
+    for (auto& [placeKeyID, placeKey] : pPlaceJson->items()) {
+        if (!placeKey.contains("_StartFrame")) {
+            continue;
+        }
+        PlaceKey newKey;
+        newKey.startFrame = placeKey["_StartFrame"];
+        newKey.endFrame = placeKey["_EndFrame"];
+        newKey.optionFlag = placeKey["OptionFlag"];
+        newKey.ratio = Fixed(placeKey["Ratio"].get<double>());
+        newKey.axis = placeKey["Axis"];
+
+        if (placeKey.contains("PosList")) {
+            newKey.posList.reserve(placeKey["PosList"].size());
+            for (auto& [frame, offset] : placeKey["PosList"].items()) {
+                PlaceKeyPos pos;
+                pos.frame = atoi(frame.c_str());
+                pos.offset = Fixed(offset.get<double>());
+                newKey.posList.push_back(pos);
+            }
+        }
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -552,6 +583,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         }
         if (key.contains("DriveSteerKey")) {
             loadSteerKeys(&key["DriveSteerKey"], &newAction.steerKeys, true);
+        }
+
+        if (key.contains("PlaceKey")) {
+            newAction.placeKeys.reserve(key["PlaceKey"].size() - 1);
+            loadPlaceKeys(&key["PlaceKey"], &newAction.placeKeys);
         }
 
         pRet->actions.push_back(newAction);

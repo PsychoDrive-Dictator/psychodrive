@@ -178,6 +178,18 @@ struct SteerKey : Key {
     bool isDrive = false;
 };
 
+struct PlaceKeyPos {
+    int frame;
+    Fixed offset;
+};
+
+struct PlaceKey : Key {
+    int optionFlag;
+    Fixed ratio;
+    int axis;
+    std::vector<PlaceKeyPos> posList;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -187,6 +199,7 @@ struct Action {
     std::vector<PushBoxKey> pushBoxKeys;
     std::vector<HitBoxKey> hitBoxKeys;
     std::vector<SteerKey> steerKeys;
+    std::vector<PlaceKey> placeKeys;
 
     int activeFrame;
     int recoveryStartFrame;
