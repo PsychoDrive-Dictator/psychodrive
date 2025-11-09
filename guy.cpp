@@ -228,7 +228,11 @@ void Guy::UpdateActionData(void)
 {
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     pActionJson = nullptr;
+    pCurrentAction = nullptr;
     const char *foundAction = nullptr;
+
+    CharacterData *pSearchCharData = opponentAction ? pOpponent->pCharData : pCharData;
+    int searchStyleID = opponentAction ? 0 : styleInstall;
 
     if (opponentAction) {
         foundAction = pOpponent->FindMove(currentAction, 0, &pActionJson);
@@ -240,6 +244,14 @@ void Guy::UpdateActionData(void)
         log(true, "couldn't find next action, reverting to 1 - style lapsed?");
         currentAction = 1;
         foundAction = FindMove(currentAction, styleInstall, &pActionJson);
+        searchStyleID = styleInstall;
+    }
+
+    for (auto& action : pSearchCharData->actions) {
+        if (action.actionID == currentAction && action.styleID == searchStyleID) {
+            pCurrentAction = &action;
+            break;
+        }
     }
 
     actionName = foundAction;
@@ -1609,6 +1621,16 @@ void Guy::DoTriggers(int fluffFrameBias)
     setDeferredTriggerIDs = keptDeferredTriggerIDs;
 }
 
+Box Guy::rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir)
+{
+    Box outBox;
+    outBox.x = Fixed(pRect->xOrig * dir - pRect->xRadius) + offsetX;
+    outBox.y = Fixed(pRect->yOrig - pRect->yRadius) + offsetY;
+    outBox.w = Fixed(pRect->xRadius * 2);
+    outBox.h = Fixed(pRect->yRadius * 2);
+    return outBox;
+}
+
 void Guy::UpdateBoxes(void)
 {
     pushBoxes.clear();
@@ -1617,7 +1639,7 @@ void Guy::UpdateBoxes(void)
     renderBoxes.clear();
     throwBoxes.clear();
 
-    if (pActionJson->contains("DamageCollisionKey"))
+    if (pCurrentAction)
     {
         bool drive = isDrive || wasDrive;
         bool parry = currentAction >= 480 && currentAction <= 489;
@@ -1626,31 +1648,26 @@ void Guy::UpdateBoxes(void)
 
         std::deque<HurtBox> newHurtBoxes;
 
-        for (auto& [hurtBoxID, hurtBox] : (*pActionJson)["DamageCollisionKey"].items())
+        for (auto& hurtBoxKey : pCurrentAction->hurtBoxKeys)
         {
-            if ( !hurtBox.contains("_StartFrame") || hurtBox["_StartFrame"] > currentFrame || hurtBox["_EndFrame"] <= currentFrame ) {
+            if (hurtBoxKey.startFrame > currentFrame || hurtBoxKey.endFrame <= currentFrame) {
                 continue;
             }
 
-            if (!CheckHitBoxCondition(hurtBox["Condition"])) {
+            if (!CheckHitBoxCondition(hurtBoxKey.condition)) {
                 continue;
             }
 
-            bool isArmor = hurtBox["_isArm"];
-            int armorID = hurtBox["AtemiDataListIndex"];
-            bool isAtemi = hurtBox["_isAtm"];
-            int immune = hurtBox["Immune"];
-            int typeFlags = hurtBox["TypeFlag"];
+            bool isArmor = hurtBoxKey.isArmor;
+            int armorID = hurtBoxKey.armorID;
+            bool isAtemi = hurtBoxKey.isAtemi;
+            int immune = hurtBoxKey.immunity;
+            int typeFlags = hurtBoxKey.flags;
 
-            Fixed rootOffsetX = Fixed(0);
-            Fixed rootOffsetY = Fixed(0);
-            parseRootOffset( hurtBox, rootOffsetX, rootOffsetY );
+            Fixed rootOffsetX = hurtBoxKey.offsetX;
+            Fixed rootOffsetY = hurtBoxKey.offsetY;
             rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
             rootOffsetY = rootOffsetY + posY + posOffsetY;
-
-
-            Box rect;
-            int magicHurtBoxID = 8; // i hate you magic array of boxes
 
             HurtBox baseBox;
             if (isArmor) {
@@ -1674,36 +1691,30 @@ void Guy::UpdateBoxes(void)
             if (immune == 11) {
                 baseBox.flags |= ground_strike_invul;
             }
-            for (auto& [boxNumber, boxID] : hurtBox["LegList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    HurtBox newBox = baseBox;
-                    newBox.box = rect;
-                    newBox.flags |= legs;
-                    newHurtBoxes.push_front(newBox);
-                }
+
+            for (auto pRect : hurtBoxKey.legRects) {
+                HurtBox newBox = baseBox;
+                newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+                newBox.flags |= legs;
+                newHurtBoxes.push_front(newBox);
             }
-            for (auto& [boxNumber, boxID] : hurtBox["BodyList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    HurtBox newBox = baseBox;
-                    newBox.box = rect;
-                    newBox.flags |= body;
-                    newHurtBoxes.push_front(newBox);
-                }
+            for (auto pRect : hurtBoxKey.bodyRects) {
+                HurtBox newBox = baseBox;
+                newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+                newBox.flags |= body;
+                newHurtBoxes.push_front(newBox);
             }
-            for (auto& [boxNumber, boxID] : hurtBox["HeadList"].items()) {
-                if (GetRect(rect, magicHurtBoxID, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    HurtBox newBox = baseBox;
-                    newBox.box = rect;
-                    newBox.flags |= head;
-                    newHurtBoxes.push_front(newBox);
-                }
+            for (auto pRect : hurtBoxKey.headRects) {
+                HurtBox newBox = baseBox;
+                newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+                newBox.flags |= head;
+                newHurtBoxes.push_front(newBox);
             }
 
-            for (auto& [boxNumber, boxID] : hurtBox["ThrowList"].items()) {
-                if (GetRect(rect, 7, boxID,rootOffsetX, rootOffsetY,direction.i())) {
-                    throwBoxes.push_back(rect);
-                    renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
-                }
+            for (auto pRect : hurtBoxKey.throwRects) {
+                Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+                throwBoxes.push_back(rect);
+                renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
             }
         }
 
@@ -1742,7 +1753,7 @@ void Guy::UpdateBoxes(void)
 
             if (GetRect(rect, 5, pushBox["BoxNo"],rootOffsetX, rootOffsetY, direction.i())) {
                 pushBoxes.push_back(rect);
-                renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});            
+                renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});
             }
         }
     }

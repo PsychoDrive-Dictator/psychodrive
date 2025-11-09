@@ -183,7 +183,6 @@ struct CharacterData {
     std::vector<Trigger> triggers;
     std::vector<TriggerGroup> triggerGroups;
     std::vector<Rect> rects;
-    std::vector<Rect> commonRects;
     std::vector<Action> actions;
 
     std::map<int, TriggerGroup*> triggerGroupByID;

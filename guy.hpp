@@ -394,6 +394,7 @@ private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
     void UpdateActionData(void);
     void UpdateBoxes(void);
+    Box rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir);
 
     void ApplyHitEffect(nlohmann::json *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
 
@@ -777,6 +778,7 @@ private:
 
     std::string actionName;
     nlohmann::json *pActionJson;
+    Action *pCurrentAction = nullptr;
 
     Simulation *pSim = nullptr;
     friend void ResolveHits(std::vector<PendingHit> &pendingHitList);

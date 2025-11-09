@@ -60,6 +60,7 @@ public:
     void Serialize(std::string &outStr);
     bool NewSim(void);
     void RenderUI(void);
+    void RenderComboMinerSetup(void);
     void AdvanceUntilComplete(void);
     void doFrameMeterDrag(void);
     void clampFrame(int &frame) {

@@ -546,7 +546,7 @@ void drawInputEditor()
 
 void drawComboFinderWindow()
 {
-    ImGui::Begin("combo finder");
+    ImGui::Begin("combo miner");
     ImGui::Checkbox("light normals", &comboFinderDoLights);
     ImGui::SameLine();
     ImGui::Checkbox("late cancels", &comboFinderDoLateCancels);
@@ -1327,6 +1327,20 @@ void SimulationController::doFrameMeterDrag(void)
     }
 }
 
+void SimulationController::RenderComboMinerSetup(void)
+{
+    ImGui::Checkbox("Light normals", &comboFinderDoLights);
+    ImGui::SameLine();
+    ImGui::Checkbox("Late cancels", &comboFinderDoLateCancels);
+    ImGui::SameLine();
+    ImGui::Checkbox("Walk", &comboFinderDoWalk);
+    ImGui::SameLine();
+    ImGui::Checkbox("Karas", &comboFinderDoKaras);
+    if (ImGui::Button("Run!")) {
+        runComboFinder = true;
+    }
+}
+
 void SimulationController::RenderUI(void)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -1351,6 +1365,9 @@ void SimulationController::RenderUI(void)
                 break;
             case 3:
                 charControllers[1].renderActionSetup(scrubberFrame);
+                break;
+            case 4:
+                RenderComboMinerSetup();
                 break;
         }
         if (maxComboCount > 0) {
@@ -1382,6 +1399,7 @@ void SimulationController::RenderUI(void)
         if (gameMode == ComboMaker) {
             vecViewLabels.push_back("P2 Setup");
             vecViewLabels.push_back("P2 Actions");
+            vecViewLabels.push_back("Combo Miner");
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
 #ifdef __EMSCRIPTEN__

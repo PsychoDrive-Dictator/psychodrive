@@ -205,17 +205,24 @@ void loadTriggerGroups(nlohmann::json* pTriggerGroupsJson, CharacterData* pRet)
     }
 }
 
-void loadRects(nlohmann::json* pRectsJson, std::vector<Rect>* pOutputVector)
+size_t countRects(nlohmann::json* pRectsJson)
 {
-    if (!pRectsJson || !pOutputVector) {
-        return;
+    if (!pRectsJson) {
+        return 0;
     }
 
     size_t rectsCount = 0;
     for (auto& [rectsListIDStr, rectsList] : pRectsJson->items()) {
         rectsCount += rectsList.size();
     }
-    pOutputVector->reserve(pOutputVector->size() + rectsCount);
+    return rectsCount;
+}
+
+void loadRects(nlohmann::json* pRectsJson, std::vector<Rect>* pOutputVector)
+{
+    if (!pRectsJson || !pOutputVector) {
+        return;
+    }
 
     for (auto& [rectsListIDStr, rectsList] : pRectsJson->items()) {
         int listID = atoi(rectsListIDStr.c_str());
@@ -359,16 +366,12 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
         pRet->triggerGroupByID[triggerGroup.id] = &triggerGroup;
     }
 
+    pRet->rects.reserve(countRects(pCommonRectsJson) + countRects(pRectsJson));
+    loadRects(pCommonRectsJson, &pRet->rects);
     loadRects(pRectsJson, &pRet->rects);
-    loadRects(pCommonRectsJson, &pRet->commonRects);
 
     for (auto& rect : pRet->rects) {
         pRet->rectsByIDs[std::make_pair(rect.listID, rect.id)] = &rect;
-    }
-
-    std::map<std::pair<int, int>, Rect*> commonRectsByIDs;
-    for (auto& rect : pRet->commonRects) {
-        commonRectsByIDs[std::make_pair(rect.listID, rect.id)] = &rect;
     }
 
     // for UI dropdown selector
@@ -413,7 +416,7 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     pRet->actions.reserve(pRet->mapMoveStyle.size());
 
     loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs);
-    loadActionsFromMoves(pCommonMovesJson, pRet, commonRectsByIDs);
+    loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs);
 
     return pRet;
 }
