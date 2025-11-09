@@ -2859,35 +2859,37 @@ void Guy::DoBranchKey(bool preHit)
         return;
     }
 
-    if (pActionJson != nullptr && pActionJson->contains("BranchKey"))
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& branchKey : pCurrentAction->branchKeys)
     {
-        for (auto& [keyID, key] : (*pActionJson)["BranchKey"].items())
-        {
-            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                continue;
-            }
+        if (branchKey.startFrame > currentFrame || branchKey.endFrame <= currentFrame) {
+            continue;
+        }
 
-            bool doBranch = false;
-            int branchType = key["Type"];
-            int64_t branchParam0 = key["Param00"];
-            int64_t branchParam1 = key["Param01"];
-            int64_t branchParam2 = key["Param02"];
-            int64_t branchParam3 = key["Param03"];
-            int64_t branchParam4 = key["Param04"];
-            int branchAction = key["Action"];
-            int branchFrame = key["ActionFrame"];
-            bool keepFrame = key["_InheritFrameX"];
+        bool doBranch = false;
+        int branchType = branchKey.type;
+        int64_t branchParam0 = branchKey.param00;
+        int64_t branchParam1 = branchKey.param01;
+        int64_t branchParam2 = branchKey.param02;
+        int64_t branchParam3 = branchKey.param03;
+        int64_t branchParam4 = branchKey.param04;
+        int branchAction = branchKey.branchAction;
+        int branchFrame = branchKey.branchFrame;
+        bool keepFrame = branchKey.keepFrame;
 
-            if (branchType <= maxBranchType) {
-                // todo high priority field maybe overrides that?
-                continue;
-            }
+        if (branchType <= maxBranchType) {
+            // todo high priority field maybe overrides that?
+            continue;
+        }
 
-            switch (branchType) {
-                case 0: // always?
-                    doBranch = true;
-                    break;
-                case 1:
+        switch (branchType) {
+            case 0: // always?
+                doBranch = true;
+                break;
+            case 1:
                     // else.. we could have 'denied' the condition because prehit, so avoid those there
                     // it seems like a hack, maybe some else branches are meant to work prehit - if so,
                     // we'll need to keep more careful track of why we might have not taken a branch
@@ -3197,50 +3199,48 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 default:
-                    std::string typeName = key["_TypesName"];
-                    log(logUnknowns, "unsupported branch id " + std::to_string(branchType) + " type " + typeName);
+                    log(logUnknowns, "unsupported branch id " + std::to_string(branchType) + " type " + branchKey.typeName);
                     break;
+        }
+
+        if (doBranch) {
+
+            if (keepFrame) {
+                int frameBias = branchFrame;
+                if (preHit) {
+                    branchFrame = currentFrame + frameBias;
+                } else {
+                    branchFrame = currentFrame + 1 + frameBias;
+                }
+                if (branchFrame < 0) {
+                    branchFrame = 0;
+                }
             }
 
-            if (doBranch) {
-
-                if (keepFrame) {
-                    int frameBias = branchFrame;
-                    if (preHit) {
-                        branchFrame = currentFrame + frameBias;
-                    } else {
-                        branchFrame = currentFrame + 1 + frameBias;
-                    }
-                    if (branchFrame < 0) {
-                        branchFrame = 0;
-                    }
-                }
-
-                if (branchAction == currentAction && keepFrame) {
-                    log(true, "noop branch - branch type inhibit?");
-                } else {
-                    if (branchAction == currentAction) {
-                        log(logBranches, "branching to frame " + std::to_string(branchFrame));
-                        currentFrame = (branchFrame && !preHit) ? branchFrame - 1 : branchFrame;
-                    } else {
-                        log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
-                        nextAction = branchAction;
-                        nextActionFrame = branchFrame;
-                        if (opponentAction) {
-                            nextActionOpponentAction = true;
-                        }
-                    }
-                    deniedLastBranch = false;
-                    keepPlace = key["_KeepPlace"];
-                }
-
-                // FALL THROUGH - there might be another branch that works later for this frame
-                // it should take precedence (if branchType higher?) - see mai's charged fan projectile
-                maxBranchType = branchType;
+            if (branchAction == currentAction && keepFrame) {
+                log(true, "noop branch - branch type inhibit?");
             } else {
-                if (branchType != 1) {
-                    deniedLastBranch = true;
+                if (branchAction == currentAction) {
+                    log(logBranches, "branching to frame " + std::to_string(branchFrame));
+                    currentFrame = (branchFrame && !preHit) ? branchFrame - 1 : branchFrame;
+                } else {
+                    log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
+                    nextAction = branchAction;
+                    nextActionFrame = branchFrame;
+                    if (opponentAction) {
+                        nextActionOpponentAction = true;
+                    }
                 }
+                deniedLastBranch = false;
+                keepPlace = branchKey.keepPlace;
+            }
+
+            // FALL THROUGH - there might be another branch that works later for this frame
+            // it should take precedence (if branchType higher?) - see mai's charged fan projectile
+            maxBranchType = branchType;
+        } else {
+            if (branchType != 1) {
+                deniedLastBranch = true;
             }
         }
     }

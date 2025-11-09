@@ -581,6 +581,35 @@ void loadLockKeys(nlohmann::json* pLockJson, std::vector<LockKey>* pOutputVector
     }
 }
 
+void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutputVector)
+{
+    if (!pBranchJson) {
+        return;
+    }
+
+    for (auto& [branchKeyID, branchKey] : pBranchJson->items()) {
+        if (!branchKey.contains("_StartFrame")) {
+            continue;
+        }
+        BranchKey newKey;
+        newKey.startFrame = branchKey["_StartFrame"];
+        newKey.endFrame = branchKey["_EndFrame"];
+        newKey.type = branchKey["Type"];
+        newKey.param00 = branchKey["Param00"];
+        newKey.param01 = branchKey["Param01"];
+        newKey.param02 = branchKey["Param02"];
+        newKey.param03 = branchKey["Param03"];
+        newKey.param04 = branchKey["Param04"];
+        newKey.branchAction = branchKey["Action"];
+        newKey.branchFrame = branchKey["ActionFrame"];
+        newKey.keepFrame = branchKey["_InheritFrameX"];
+        newKey.keepPlace = branchKey["_KeepPlace"];
+        newKey.typeName = branchKey.value("_TypesName", "");
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -706,6 +735,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         if (key.contains("LockKey")) {
             newAction.lockKeys.reserve(key["LockKey"].size() - 1);
             loadLockKeys(&key["LockKey"], &newAction.lockKeys);
+        }
+
+        if (key.contains("BranchKey")) {
+            newAction.branchKeys.reserve(key["BranchKey"].size() - 1);
+            loadBranchKeys(&key["BranchKey"], &newAction.branchKeys);
         }
 
         pRet->actions.push_back(newAction);

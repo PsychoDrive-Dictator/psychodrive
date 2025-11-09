@@ -217,6 +217,20 @@ struct LockKey : Key {
     int param02;
 };
 
+struct BranchKey : Key {
+    int type;
+    int64_t param00;
+    int64_t param01;
+    int64_t param02;
+    int64_t param03;
+    int64_t param04;
+    int branchAction;
+    int branchFrame;
+    bool keepFrame;
+    bool keepPlace;
+    std::string typeName;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -231,6 +245,7 @@ struct Action {
     std::vector<EventKey> eventKeys;
     std::vector<WorldKey> worldKeys;
     std::vector<LockKey> lockKeys;
+    std::vector<BranchKey> branchKeys;
 
     int activeFrame;
     int recoveryStartFrame;
