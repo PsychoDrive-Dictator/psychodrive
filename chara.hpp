@@ -5,6 +5,7 @@
 
 #include "json.hpp"
 #include "fixed.hpp"
+#include "main.hpp"
 
 enum InputType {
     Normal = 0,
@@ -106,6 +107,72 @@ struct Rect {
     int yRadius;
 };
 
+enum KeyType {
+    HurtBoxKeyType = 0,
+    PushBoxKeyType = 1,
+    HitBoxKeyType = 2
+};
+
+struct Key {
+    int startFrame;
+    int endFrame;
+    KeyType keyType;
+};
+
+struct BoxKey : Key {
+    int condition;
+    Fixed offsetX;
+    Fixed offsetY;
+};
+
+struct HurtBoxKey : BoxKey {
+    HurtBoxKey() { keyType = HurtBoxKeyType; }
+
+    bool isArmor = false;
+    bool isAtemi = false;
+    int armorID;
+
+    int immunity;
+    int flags;
+
+    std::vector<Rect *> headRects;
+    std::vector<Rect *> bodyRects;
+    std::vector<Rect *> legRects;
+    std::vector<Rect *> throwRects;
+};
+
+struct PushBoxKey : BoxKey {
+    PushBoxKey() { keyType = PushBoxKeyType; }
+
+    Rect *rect;
+};
+
+struct HitBoxKey : BoxKey {
+    HitBoxKey() { keyType = HitBoxKeyType; }
+
+    hitBoxType type;
+    hitBoxFlags flags;
+    int hitEntryID;
+
+    bool hasValidStyle = false;
+    int validStyle;
+
+    bool hasHitID = false;
+    int hitID;
+
+    std::vector<Rect *> rects;
+};
+
+struct Action {
+    int actionID;
+    int styleID;
+    std::string name;
+
+    std::vector<HurtBoxKey> hurtBoxKeys;
+    std::vector<PushBoxKey> pushBoxKeys;
+    std::vector<HitBoxKey> hitBoxKeys;
+};
+
 struct CharacterData {
     std::string charName;
     int charVersion;
@@ -115,6 +182,8 @@ struct CharacterData {
     std::vector<Trigger> triggers;
     std::vector<TriggerGroup> triggerGroups;
     std::vector<Rect> rects;
+    std::vector<Rect> commonRects;
+    std::vector<Action> actions;
 
     std::map<int, TriggerGroup*> triggerGroupByID;
     std::map<std::pair<int, int>, Rect*> rectsByIDs;
