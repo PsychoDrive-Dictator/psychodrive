@@ -257,6 +257,14 @@ struct Action {
     int startScale;
     int comboScale;
     int instantScale;
+
+    int projectileDataIndex = 0;
+    int inheritKindFlag = 0;
+    bool inheritHitID = false;
+    Fixed inheritAccelX = Fixed(1);
+    Fixed inheritAccelY = Fixed(1);
+    Fixed inheritVelX = Fixed(1);
+    Fixed inheritVelY = Fixed(1);
 };
 
 struct CharacterData {

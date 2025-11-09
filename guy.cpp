@@ -3747,7 +3747,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 {
     if ( nextAction != -1 )
     {
-        int oldProjDataIndex = (*pActionJson)["fab"]["Projectile"]["DataIndex"];
+        int oldProjDataIndex = pCurrentAction ? pCurrentAction->projectileDataIndex : 0;
 
         if (currentAction != nextAction) {
             currentAction = nextAction;
@@ -3791,9 +3791,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             currentFrame = pCurrentAction->actionFrameDuration - 1;
         }
 
-        nlohmann::json *pInherit = &(*pActionJson)["fab"]["Inherit"];
-
-        int inheritFlags = (*pInherit)["KindFlag"];
+        int inheritFlags = pCurrentAction ? pCurrentAction->inheritKindFlag : 0;
 
         if (!(inheritFlags & (1<<0)) && !keepPlace) {
             posX = posX + (posOffsetX * direction);
@@ -3812,7 +3810,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         setPlaceY = false;
         keepPlace = false;
 
-        bool inheritHitID = (*pInherit)["_HitID"];
+        bool inheritHitID = pCurrentAction ? pCurrentAction->inheritHitID : false;
         // see eg. 2MP into light crusher - light crusher has inherit hitID true..
         // assuming it's supposed to be for branches only
         if (!didBranch) {
@@ -3847,14 +3845,16 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             } else if (!hitStun || blocking) {
                 // should this use airborne status from previous or new action? currently previous
                 if (isDrive || getAirborne() || isProjectile) {
-                    accelX = accelX * Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
-                    accelY = accelY * Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
-                    Fixed inheritVelXRatio = Fixed((*pInherit)["Velocity"]["x"].get<double>());
-                    velocityX = inheritVelXRatio * velocityX;
-                    if (velocityX != Fixed(0) && inheritVelXRatio.data & 1) {
-                        velocityX.data |= 1;
+                    if (pCurrentAction) {
+                        accelX = accelX * pCurrentAction->inheritAccelX;
+                        accelY = accelY * pCurrentAction->inheritAccelY;
+                        Fixed inheritVelXRatio = pCurrentAction->inheritVelX;
+                        velocityX = inheritVelXRatio * velocityX;
+                        if (velocityX != Fixed(0) && inheritVelXRatio.data & 1) {
+                            velocityX.data |= 1;
+                        }
+                        velocityY = velocityY * pCurrentAction->inheritVelY;
                     }
-                    velocityY = velocityY * Fixed((*pInherit)["Velocity"]["y"].get<double>());
                 } else {
                     accelX = Fixed(0);
                     accelY = Fixed(0);
@@ -3892,7 +3892,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
 
         if (isProjectile) {
-            int newProjDataIndex = (*pActionJson)["fab"]["Projectile"]["DataIndex"];
+            int newProjDataIndex = pCurrentAction ? pCurrentAction->projectileDataIndex : 0;
             if (oldProjDataIndex != newProjDataIndex) {
                 projDataInitialized = false;
             }

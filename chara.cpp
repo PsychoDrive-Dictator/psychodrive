@@ -648,6 +648,24 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
             newAction.instantScale = 0;
         }
 
+        if (pFab->contains("Projectile")) {
+            newAction.projectileDataIndex = (*pFab)["Projectile"]["DataIndex"];
+        }
+
+        if (pFab->contains("Inherit")) {
+            nlohmann::json *pInherit = &(*pFab)["Inherit"];
+            newAction.inheritKindFlag = (*pInherit)["KindFlag"];
+            newAction.inheritHitID = (*pInherit)["_HitID"];
+            if (pInherit->contains("Accelaleration")) {
+                newAction.inheritAccelX = Fixed((*pInherit)["Accelaleration"]["x"].get<double>());
+                newAction.inheritAccelY = Fixed((*pInherit)["Accelaleration"]["y"].get<double>());
+            }
+            if (pInherit->contains("Velocity")) {
+                newAction.inheritVelX = Fixed((*pInherit)["Velocity"]["x"].get<double>());
+                newAction.inheritVelY = Fixed((*pInherit)["Velocity"]["y"].get<double>());
+            }
+        }
+
         bool exists = false;
         for (const auto& existingAction : pRet->actions) {
             if (existingAction.actionID == newAction.actionID && existingAction.styleID == newAction.styleID) {
