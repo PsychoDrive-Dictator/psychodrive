@@ -610,6 +610,40 @@ void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutput
     }
 }
 
+void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileData>* pUniqueProjectiles)
+{
+    if (!pMovesJson) {
+        return;
+    }
+
+    for (auto& [keyID, key] : pMovesJson->items()) {
+        nlohmann::json *pFab = &key["fab"];
+
+        if (pFab->contains("Projectile")) {
+            int dataIndex = (*pFab)["Projectile"]["DataIndex"];
+
+            if (pUniqueProjectiles->find(dataIndex) == pUniqueProjectiles->end()) {
+                if (key.contains("pdata")) {
+                    nlohmann::json *pProjData = &key["pdata"];
+                    ProjectileData newProj;
+                    newProj.id = dataIndex;
+                    newProj.hitCount = (*pProjData)["HitCount"];
+                    newProj.hitFlagToParent = (*pProjData)["_HitFlagToPlayer"];
+                    newProj.hitStopToParent = (*pProjData)["_HitStopToPlayer"];
+                    newProj.rangeB = (*pProjData)["RangeB"];
+                    newProj.airborne = (*pProjData)["_AirStatus"];
+                    newProj.flags = (*pProjData)["AttrX"];
+                    newProj.category = (*pProjData)["Category"];
+                    newProj.noPush = (*pProjData)["_NoPush"];
+                    newProj.lifeTime = (*pProjData)["LifeTime"];
+
+                    (*pUniqueProjectiles)[dataIndex] = newProj;
+                }
+            }
+        }
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -649,7 +683,13 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         }
 
         if (pFab->contains("Projectile")) {
-            newAction.projectileDataIndex = (*pFab)["Projectile"]["DataIndex"];
+            int dataIndex = (*pFab)["Projectile"]["DataIndex"];
+            for (auto& projData : pRet->projectileDatas) {
+                if (projData.id == dataIndex) {
+                    newAction.pProjectileData = &projData;
+                    break;
+                }
+            }
         }
 
         if (pFab->contains("Inherit")) {
@@ -842,6 +882,15 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
                 pRet->mapMoveJson[mapIndex] = &key;
             }
         }
+    }
+
+    std::map<int, ProjectileData> uniqueProjectiles;
+    loadProjectileDatas(pMovesDictJson, &uniqueProjectiles);
+    loadProjectileDatas(pCommonMovesJson, &uniqueProjectiles);
+
+    pRet->projectileDatas.reserve(uniqueProjectiles.size());
+    for (auto& [id, projData] : uniqueProjectiles) {
+        pRet->projectileDatas.push_back(projData);
     }
 
     pRet->actions.reserve(pRet->mapMoveStyle.size());

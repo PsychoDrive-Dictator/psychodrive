@@ -349,9 +349,9 @@ bool Guy::RunFrame(void)
 
     if (pActionJson != nullptr)
     {
-        if (isProjectile && !projDataInitialized && pActionJson->contains("pdata")) {
-            nlohmann::json *pProjData = &(*pActionJson)["pdata"];
-                projHitCount = (*pProjData)["HitCount"];
+        if (isProjectile && !projDataInitialized && pCurrentAction && pCurrentAction->pProjectileData) {
+            ProjectileData *pProjData = pCurrentAction->pProjectileData;
+                projHitCount = pProjData->hitCount;
                 if (projHitCount == 0) {
                     // stuff that starts at hitcount 0 is probably meant to die some other way
                     // todo implement lifetime, ranges, etc
@@ -359,12 +359,12 @@ bool Guy::RunFrame(void)
                 }
                 // log("initial hitcount " + std::to_string(projHitCount));
 
-                airborne = (*pProjData)["_AirStatus"];
-                int flagsX = (*pProjData)["AttrX"];
+                airborne = pProjData->airborne;
+                int flagsX = pProjData->flags;
                 obeyHitID = flagsX & (1<<0);
-                limitShotCategory = (*pProjData)["Category"];
-                noPush = (*pProjData)["_NoPush"];
-                projLifeTime = (*pProjData)["LifeTime"];
+                limitShotCategory = pProjData->category;
+                noPush = pProjData->noPush;
+                projLifeTime = pProjData->lifeTime;
 
                 if (projLifeTime <= 0) {
                     projLifeTime = 360;
@@ -2137,13 +2137,13 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         bool hitFlagToParent = false;
         bool hitStopToParent = false;
-        if (pGuy->isProjectile && pGuy->pActionJson->contains("pdata") && pGuy->pParent) {
+        if (pGuy->isProjectile && pGuy->pCurrentAction && pGuy->pCurrentAction->pProjectileData && pGuy->pParent) {
             // either this means "to both" - current code or touch branch checks different
             // flags - mai charged fan has a touch branch on the proj but sets this flag
             // also used by double geyser where the player has a trigger condition
             // todo checking touch branch on player would disambiguate
-            hitFlagToParent = (*pGuy->pActionJson)["pdata"]["_HitFlagToPlayer"];
-            hitStopToParent = (*pGuy->pActionJson)["pdata"]["_HitStopToPlayer"];
+            hitFlagToParent = pGuy->pCurrentAction->pProjectileData->hitFlagToParent;
+            hitStopToParent = pGuy->pCurrentAction->pProjectileData->hitStopToParent;
         }
 
         if (pendingHit.blocked) {
@@ -3320,8 +3320,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (isProjectile && pParent && pOpponent && pActionJson->contains("pdata")) {
-        int rangeB = (*pActionJson)["pdata"]["RangeB"];
+    if (isProjectile && pParent && pOpponent && pCurrentAction && pCurrentAction->pProjectileData) {
+        int rangeB = pCurrentAction->pProjectileData->rangeB;
 
         Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
         Fixed screenCenterX = bothPlayerPos / Fixed(2);
@@ -3747,7 +3747,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 {
     if ( nextAction != -1 )
     {
-        int oldProjDataIndex = pCurrentAction ? pCurrentAction->projectileDataIndex : 0;
+        ProjectileData *oldProjData = pCurrentAction ? pCurrentAction->pProjectileData : nullptr;
 
         if (currentAction != nextAction) {
             currentAction = nextAction;
@@ -3892,8 +3892,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
 
         if (isProjectile) {
-            int newProjDataIndex = pCurrentAction ? pCurrentAction->projectileDataIndex : 0;
-            if (oldProjDataIndex != newProjDataIndex) {
+            ProjectileData *newProjData = pCurrentAction ? pCurrentAction->pProjectileData : nullptr;
+            if (oldProjData != newProjData) {
                 projDataInitialized = false;
             }
         }

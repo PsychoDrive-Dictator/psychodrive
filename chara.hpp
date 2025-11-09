@@ -231,6 +231,19 @@ struct BranchKey : Key {
     std::string typeName;
 };
 
+struct ProjectileData {
+    int id;
+    int hitCount;
+    bool hitFlagToParent;
+    bool hitStopToParent;
+    int rangeB;
+    bool airborne;
+    int flags;
+    int category;
+    bool noPush;
+    int lifeTime;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -258,7 +271,7 @@ struct Action {
     int comboScale;
     int instantScale;
 
-    int projectileDataIndex = 0;
+    ProjectileData *pProjectileData = nullptr;
     int inheritKindFlag = 0;
     bool inheritHitID = false;
     Fixed inheritAccelX = Fixed(1);
@@ -277,6 +290,7 @@ struct CharacterData {
     std::vector<Trigger> triggers;
     std::vector<TriggerGroup> triggerGroups;
     std::vector<Rect> rects;
+    std::vector<ProjectileData> projectileDatas;
     std::vector<Action> actions;
 
     std::map<int, TriggerGroup*> triggerGroupByID;
