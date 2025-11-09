@@ -62,6 +62,7 @@ stolen:
 
     pSim->Clone(currentRoute.pSimSnapshot);
     pSim->frameCounter = currentRoute.simFrameProgress-1;
+    justGotNextRoute = true;
 }
 
 void ComboWorker::QueueRouteFork(std::pair<int,int> frameTrigger) {
@@ -85,7 +86,10 @@ void ComboWorker::WorkLoop(void) {
 
     while (true) {
         while (true) {
-            currentRoute.pSimSnapshot->Clone(pSim);
+            if (!justGotNextRoute) {
+                currentRoute.pSimSnapshot->Clone(pSim);
+            }
+            justGotNextRoute = false;
 
             int curInput = 0;
 

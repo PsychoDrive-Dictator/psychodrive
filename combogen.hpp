@@ -55,6 +55,7 @@ public:
     std::deque<ComboRoute> pendingRoutes;
     std::mutex mutexDoneRoutes;
     std::set<DoneRoute, DamageSort> doneRoutes;
+    bool justGotNextRoute = false;
 };
 
 class ComboFinder {
