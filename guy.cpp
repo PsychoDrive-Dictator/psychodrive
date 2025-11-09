@@ -188,10 +188,14 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
         return FindMove(actionID, parentStyleID, ppMoveJson, ppAction);
     } else {
         const char *moveName = pCharData->mapMoveStyle[mapIndex].first.c_str();
-        bool commonMove = pCharData->mapMoveStyle[mapIndex].second;
 
         if (ppMoveJson) {
-            *ppMoveJson = commonMove ? &(*pCommonMovesJson)[moveName] : &(*pMovesDictJson)[moveName];
+            auto it = pCharData->mapMoveJson.find(mapIndex);
+            if (it != pCharData->mapMoveJson.end()) {
+                *ppMoveJson = it->second;
+            } else {
+                *ppMoveJson = nullptr;
+            }
         }
 
         if (ppAction) {

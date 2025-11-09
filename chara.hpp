@@ -190,6 +190,7 @@ struct CharacterData {
     std::map<std::pair<int, int>, Action*> actionsByID;
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
+    std::map<std::pair<int, int>, nlohmann::json*> mapMoveJson;
     std::vector<const char *> vecMoveList;
 };
 

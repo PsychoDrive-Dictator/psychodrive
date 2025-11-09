@@ -522,6 +522,7 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
             }
             auto mapIndex = std::make_pair(actionID, styleID);
             pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
+            pRet->mapMoveJson[mapIndex] = &key;
         }
     }
 
@@ -536,6 +537,7 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
             auto mapIndex = std::make_pair(actionID, styleID);
             if (pRet->mapMoveStyle.find(mapIndex) == pRet->mapMoveStyle.end()) {
                 pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, true);
+                pRet->mapMoveJson[mapIndex] = &key;
             }
         }
     }
