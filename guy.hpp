@@ -76,13 +76,13 @@ public:
         }
     }
 
-    std::string *getName() { return &name; }
-    std::string getCharacter() { return character + std::to_string(version); }
+    std::string getName() { return getCharNameFromID(pCharData->charID); }
+    std::string getCharacter() { return getCharNameFromID(pCharData->charID); }
     CharacterData *getCharData() { return pCharData; }
-    int getVersion() { return version; }
+    int getVersion() { return pCharData->charVersion; }
     int getUniqueID() { return uniqueID; }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
-    std::deque<std::string> &getLogQueue() { return logQueue; }
+    std::deque<std::string> &getLogQueue() { return nc.logQueue; }
     // for opponent direction
     std::vector<GuyRef> &getMinions() { return minions; }
     Fixed getPosX() {
@@ -208,7 +208,6 @@ public:
         UpdateActionData();
         UpdateBoxes();
     }
-    std::string &getActionName() { return actionName; }
     bool getIsDrive() { return isDrive; }
     bool getCrouchingDebug() { return crouching; }
     bool getAirborneDebug() { return airborne; }
@@ -228,7 +227,6 @@ public:
     }
 
     bool enableCleanup = true;
-    bool facSimile = false;
 
     ~Guy() {
         if (!enableCleanup) {
@@ -274,14 +272,11 @@ public:
 
     Guy(void) {}
 
-    Guy(Simulation *sim, std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
+    Guy(Simulation *sim, std::string charName, int version, Fixed x, Fixed y, int startDir, color color)
     {
         pSim = sim;
         uniqueID = pSim->guyIDCounter++;
 
-        character = charName;
-        version = charVersion;
-        name = character;
         posX = startPosX = lastPosX = x;
         posY = startPosY = lastPosY = y;
         direction = startDir;
@@ -294,17 +289,17 @@ public:
             staticPlayerLoaded = true;
         }
 
-        pMovesDictJson = loadCharFile(character, version, "moves");
-        pRectsJson = loadCharFile(character, version, "rects");
-        pNamesJson = loadCharFile(character, version, "names");
-        pTriggerGroupsJson = loadCharFile(character, version, "trigger_groups");
-        pTriggersJson = loadCharFile(character, version, "triggers");
-        pCommandsJson = loadCharFile(character, version, "commands");
-        pChargeJson = loadCharFile(character, version, "charge");
-        pHitJson = loadCharFile(character, version, "hit");
-        pAtemiJson = loadCharFile(character, version, "atemi");
-        pCharInfoJson = loadCharFile(character, version, "charinfo");
-        pCharData = loadCharacter(character, version);
+        pMovesDictJson = loadCharFile(charName, version, "moves");
+        pRectsJson = loadCharFile(charName, version, "rects");
+        pNamesJson = loadCharFile(charName, version, "names");
+        pTriggerGroupsJson = loadCharFile(charName, version, "trigger_groups");
+        pTriggersJson = loadCharFile(charName, version, "triggers");
+        pCommandsJson = loadCharFile(charName, version, "commands");
+        pChargeJson = loadCharFile(charName, version, "charge");
+        pHitJson = loadCharFile(charName, version, "hit");
+        pAtemiJson = loadCharFile(charName, version, "atemi");
+        pCharInfoJson = loadCharFile(charName, version, "charinfo");
+        pCharData = loadCharacter(charName, version);
 
         pCommonMovesJson = loadCharFile("common", version, "moves");
         pCommonRectsJson = loadCharFile("common", version, "rects");
@@ -327,9 +322,6 @@ public:
         pSim = parent.pSim;
         uniqueID = pSim->guyIDCounter++;
 
-        character = parent.character;
-        version = parent.version;
-        name = character + "'s minion";
         direction = parent.direction;
         posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
         posY = parent.posY + parent.posOffsetY + posOffsetY;
@@ -422,7 +414,7 @@ private:
             // todo shouldn't be needed once we have proper speed in dmg scripts
             return false;
         }
-        if ((marginFrame != -1 && (currentFrame + frameBias) >= marginFrame) && nextAction == -1 ) {
+        if (pCurrentAction && pCurrentAction->recoveryEndFrame != -1 && (currentFrame + frameBias) >= pCurrentAction->recoveryEndFrame && nextAction == -1) {
             return true;
         }
         return false;
@@ -492,29 +484,23 @@ private:
         }
         return turnaround;
     }
+    bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
 
-    std::string name;
-    std::string character;
-    int version;
     int uniqueID = -1;
     GuyRef pOpponent = nullptr;
 
-    void log(bool log, std::string logLine)
-    {
-        if (!log) return;
-        std::string frameDiff = to_string_leading_zeroes(globalFrameCount - lastLogFrame, 3);
-        std::string curFrame = to_string_leading_zeroes(currentFrame, 3);
-        logQueue.push_back(std::to_string(currentAction) + ":" + curFrame + "(+" + frameDiff + ") " + logLine);
-        if (logQueue.size() > 15) {
-            logQueue.pop_front();
-        }
-        lastLogFrame = globalFrameCount;
-    }
+    void log(bool log, std::string logLine);
     void log(std::string logLine) { log(true, logLine ); }
-    int lastLogFrame = 0;
-    std::deque<std::string> logQueue;
 
-    bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
+    // stuff that won't get copied around when dumping simulations
+    struct noCopy
+    {
+        noCopy &operator =(__attribute__((unused)) const noCopy &rhs) { return *this; }
+
+        int lastLogFrame = 0;
+        std::deque<std::string> logQueue;
+    } nc;
+
     int neutralMove = 0;
 
     int inputOverride = 0;
@@ -636,15 +622,7 @@ private:
     bool noPlaceXNextFrame = false;
     bool noPlaceYNextFrame = false;
     int currentFrame = 0;
-    int actionFrameDuration = 0;
-    int mainFrame = 0;
-    int followFrame = 0;
-    int marginFrame = 0;
-    int actionFlags = 0;
     int loopCount = 0;
-    int loopPoint = 0;
-    int startScale = 0;
-    int comboScale = 0;
     int instantScale = 0;
     bool nextActionOpponentAction = false;
     bool opponentAction = false;
@@ -775,7 +753,6 @@ private:
 
     int debuffTimer = 0;
 
-    std::string actionName;
     nlohmann::json *pActionJson;
     Action *pCurrentAction = nullptr;
 

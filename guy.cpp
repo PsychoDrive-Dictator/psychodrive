@@ -115,6 +115,18 @@ static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operati
     }
 }
 
+void Guy::log(bool log, std::string logLine)
+{
+    if (!log) return;
+    std::string frameDiff = to_string_leading_zeroes(globalFrameCount - nc.lastLogFrame, 3);
+    std::string curFrame = to_string_leading_zeroes(currentFrame, 3);
+    nc.logQueue.push_back(std::to_string(currentAction) + ":" + curFrame + "(+" + frameDiff + ") " + logLine);
+    if (nc.logQueue.size() > 15) {
+        nc.logQueue.pop_front();
+    }
+    nc.lastLogFrame = globalFrameCount;
+}
+
 bool Guy::conditionOperator(int op, int operand, int threshold, std::string desc)
 {
     switch (op) {
@@ -257,34 +269,13 @@ void Guy::UpdateActionData(void)
         foundAction = FindMove(currentAction, styleInstall, &pActionJson, &pCurrentAction);
     }
 
-    actionName = foundAction;
-
-    nlohmann::json *pFab = &(*pActionJson)["fab"];
-    mainFrame = (*pFab)["ActionFrame"]["MainFrame"];
-    followFrame = (*pFab)["ActionFrame"]["FollowFrame"];
-    marginFrame = (*pFab)["ActionFrame"]["MarginFrame"];
-    actionFlags = (*pFab)["Category"]["Flags"];
-    actionFrameDuration = (*pFab)["Frame"];
-    loopPoint = (*pFab)["State"]["EndStateParam"];
-    if ( loopPoint == -1 ) {
-        loopPoint = 0;
-    }
-    loopCount = (*pFab)["State"]["LoopCount"];
-    hasLooped = false;
-    startScale = (*pFab)["Combo"]["_StartScaling"];
-    if (startScale == -1) {
-        startScale = 0;
-    }
-    comboScale = (*pFab)["Combo"]["ComboScaling"];
-    if (comboScale == -1) {
-        comboScale = 10;
-    }
-    instantScale = (*pFab)["Combo"]["InstScaling"];
-    if (instantScale == -1) {
-        instantScale = 0;
-    }
-    if (pOpponent && !pOpponent->comboHits) {
-        instantScale = 0;
+    if (pCurrentAction) {
+        hasLooped = false;
+        loopCount = pCurrentAction->loopCount;
+        instantScale = pCurrentAction->instantScale;
+        if (pOpponent && !pOpponent->comboHits) {
+            instantScale = 0;
+        }
     }
 }
 
@@ -2602,7 +2593,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         } else if ((hitEntryFlag & punish_counter) == punish_counter) {
             hitMarkerRadius = 45.0f;
         }
-        if (pGuy->pSim && pGuy->pSim != &defaultSim) {
+        if (pGuy->pSim != &defaultSim) {
             FrameEvent event;
             event.type = FrameEvent::Hit;
             event.hitEventData.targetID = pOtherGuy->getUniqueID();
@@ -2616,9 +2607,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->pSim->getCurrentFrameEvents().push_back(event);
         } else {
             int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
-            if (!pGuy->facSimile) {
-                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
-            }
+            addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
         }
 
         // grab or hitgrab
@@ -2859,9 +2848,9 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
         if (!blocking && applyScaling) {
             if (comboHits == 0) {
-            pendingScaling = pAttacker->startScale;
+            pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
             } else {
-                pendingScaling = pAttacker->comboScale;
+                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->comboScale : 10;
                 if (currentScaling == 100) {
                     pendingScaling += 10;
                 }
@@ -3780,7 +3769,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (currentFrame >= actionFrameDuration && nextAction == -1)
+    if (pCurrentAction && currentFrame >= pCurrentAction->actionFrameDuration && nextAction == -1)
     {
         if (currentAction >= 251 && currentAction <= 253) {
             nextAction = currentAction - 21;
@@ -3801,8 +3790,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             noVelNextFrame = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
-        } else if (!getAirborne() && !isProjectile && loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
-            currentFrame = loopPoint;
+        } else if (!getAirborne() && !isProjectile && pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
+            currentFrame = pCurrentAction->loopPoint;
             hasLooped = true;
             if (loopCount > 0) {
                 loopCount--;
@@ -4118,8 +4107,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         UpdateActionData();
 
-        if (currentFrame >= actionFrameDuration) {
-            currentFrame = actionFrameDuration - 1;
+        if (pCurrentAction && currentFrame >= pCurrentAction->actionFrameDuration) {
+            currentFrame = pCurrentAction->actionFrameDuration - 1;
         }
 
         nlohmann::json *pInherit = &(*pActionJson)["fab"]["Inherit"];

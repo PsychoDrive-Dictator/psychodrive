@@ -328,7 +328,6 @@ void Simulation::RunFrame(void) {
             }
             Guy *pGuy = simController.recordedGuysPool[simController.recordedGuysPoolIndex++];
             *pGuy = *guy;
-            pGuy->facSimile = true;
             // this is the canonical state of the guy for this frame, record boxes/state/etc here
             frame.guys[guy->getUniqueID()] = pGuy;
         }

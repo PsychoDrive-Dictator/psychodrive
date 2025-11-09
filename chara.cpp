@@ -251,9 +251,34 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
     for (auto& [keyID, key] : pMovesJson->items()) {
         Action newAction;
 
-        newAction.actionID = key["fab"]["ActionID"];
+        nlohmann::json *pFab = &key["fab"];
+
+        newAction.actionID = (*pFab)["ActionID"];
         newAction.styleID = key.value("_PL_StyleID", 0);
         newAction.name = keyID;
+
+        newAction.activeFrame = (*pFab)["ActionFrame"]["MainFrame"];
+        newAction.recoveryStartFrame = (*pFab)["ActionFrame"]["FollowFrame"];
+        newAction.recoveryEndFrame = (*pFab)["ActionFrame"]["MarginFrame"];
+        newAction.actionFlags = (*pFab)["Category"]["Flags"];
+        newAction.actionFrameDuration = (*pFab)["Frame"];
+        newAction.loopPoint = (*pFab)["State"]["EndStateParam"];
+        if (newAction.loopPoint == -1) {
+            newAction.loopPoint = 0;
+        }
+        newAction.loopCount = (*pFab)["State"]["LoopCount"];
+        newAction.startScale = (*pFab)["Combo"]["_StartScaling"];
+        if (newAction.startScale == -1) {
+            newAction.startScale = 0;
+        }
+        newAction.comboScale = (*pFab)["Combo"]["ComboScaling"];
+        if (newAction.comboScale == -1) {
+            newAction.comboScale = 10;
+        }
+        newAction.instantScale = (*pFab)["Combo"]["InstScaling"];
+        if (newAction.instantScale == -1) {
+            newAction.instantScale = 0;
+        }
 
         bool exists = false;
         for (const auto& existingAction : pRet->actions) {
@@ -483,6 +508,7 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     pRet->charName = charName;
     pRet->charVersion = charVersion;
+    pRet->charID = getCharIDFromName(charName.c_str());
 
     loadCharges(pChargeJson, pRet);
     loadCommands(pCommandsJson, pRet);

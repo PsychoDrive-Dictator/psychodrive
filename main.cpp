@@ -76,7 +76,7 @@ void makeCharEntries(void)
     charEntries.push_back({29, "elena", "Elena"});
     charEntries.push_back({30, "viper", "C. Viper"});
 
-    for (charEntry entry : charEntries ) {
+    for (charEntry &entry : charEntries ) {
         charNames.push_back(entry.name);
         charNiceNames.push_back(entry.niceName);
     }
@@ -84,13 +84,24 @@ void makeCharEntries(void)
 
 const char *getCharNameFromID(int charID)
 {
-    for (charEntry entry : charEntries ) {
+    for (charEntry &entry : charEntries ) {
         if (entry.charID == charID) {
             return entry.name;
         }
     }
 
     return nullptr;
+}
+
+int getCharIDFromName(const char *charName)
+{
+    for (charEntry &entry : charEntries) {
+        if (strcmp(entry.name, charName) == 0) {
+            return entry.charID;
+        }
+    }
+
+    return 0;
 }
 
 const char* charVersions[] = {
@@ -743,7 +754,7 @@ static void mainloop(void)
                         vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
                     }
                     if (vecPlotEntries[curPlotEntryID].strName == "") {
-                        vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName() + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
+                        vecPlotEntries[curPlotEntryID].strName = guys[0]->getCharacter() + " " + guys[0]->getActionName(guys[0]->getCurrentAction()) + " (" + std::to_string(curPlotEntryNormalStartFrame) + "f cancel)";
                         vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
                     }
                 }

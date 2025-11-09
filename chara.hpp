@@ -172,10 +172,22 @@ struct Action {
     std::vector<HurtBoxKey> hurtBoxKeys;
     std::vector<PushBoxKey> pushBoxKeys;
     std::vector<HitBoxKey> hitBoxKeys;
+
+    int activeFrame;
+    int recoveryStartFrame;
+    int recoveryEndFrame;
+    uint64_t actionFlags;
+    int actionFrameDuration;
+    int loopPoint;
+    int loopCount;
+    int startScale;
+    int comboScale;
+    int instantScale;
 };
 
 struct CharacterData {
     std::string charName;
+    int charID;
     int charVersion;
 
     std::vector<Charge> charges;
