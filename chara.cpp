@@ -541,6 +541,25 @@ void loadEventKeys(nlohmann::json* pEventJson, std::vector<EventKey>* pOutputVec
     }
 }
 
+void loadWorldKeys(nlohmann::json* pWorldJson, std::vector<WorldKey>* pOutputVector)
+{
+    if (!pWorldJson) {
+        return;
+    }
+
+    for (auto& [worldKeyID, worldKey] : pWorldJson->items()) {
+        if (!worldKey.contains("_StartFrame")) {
+            continue;
+        }
+        WorldKey newKey;
+        newKey.startFrame = worldKey["_StartFrame"];
+        newKey.endFrame = worldKey["_EndFrame"];
+        newKey.type = worldKey["Type"];
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -656,6 +675,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         if (key.contains("EventKey")) {
             newAction.eventKeys.reserve(key["EventKey"].size() - 1);
             loadEventKeys(&key["EventKey"], &newAction.eventKeys);
+        }
+
+        if (key.contains("WorldKey")) {
+            newAction.worldKeys.reserve(key["WorldKey"].size() - 1);
+            loadWorldKeys(&key["WorldKey"], &newAction.worldKeys);
         }
 
         pRet->actions.push_back(newAction);

@@ -207,6 +207,10 @@ struct EventKey : Key {
     int64_t param05;
 };
 
+struct WorldKey : Key {
+    int type;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -219,6 +223,7 @@ struct Action {
     std::vector<PlaceKey> placeKeys;
     std::vector<SwitchKey> switchKeys;
     std::vector<EventKey> eventKeys;
+    std::vector<WorldKey> worldKeys;
 
     int activeFrame;
     int recoveryStartFrame;

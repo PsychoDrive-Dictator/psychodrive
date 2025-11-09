@@ -504,60 +504,7 @@ bool Guy::RunFrame(void)
             }
         }
 
-        if (pActionJson->contains("WorldKey")) {
-            for (auto& [keyID, key] : (*pActionJson)["WorldKey"].items()) {
-                if ( !key.contains("_StartFrame") || (( key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame))) {
-                    continue;
-                }
-
-                int type = key["Type"];
-
-                switch (type) {
-                    case 1:
-                        posX = Fixed(0);
-                        posY = Fixed(0);
-                        velocityX = Fixed(0);
-                        velocityY = Fixed(0);
-                        accelX = Fixed(0);
-                        accelY = Fixed(0);
-                        break;
-                    case 0:
-                        // type 1 is sa3 vs normal? why does that matter?
-                        // todo is timer timer deduction?
-                        if (pOpponent) {
-                            pOpponent->tokiYoTomare = true;
-                            for ( auto minion : pOpponent->minions ) {
-                                minion->tokiYoTomare = true;
-                            }
-                        }
-                        for ( auto minion : minions ) {
-                            minion->tokiYoTomare = true;
-                        }
-                        break;
-                    case 5:
-                        // resume
-                        if (pOpponent) {
-                            if (pOpponent->warudo) {
-                                pOpponent->tokiWaUgokidasu = true;
-                            }
-                            for ( auto minion : pOpponent->minions ) {
-                                if (minion->warudo) {
-                                    minion->tokiWaUgokidasu = true;
-                                }
-                            }
-                        }
-                        for ( auto minion : minions ) {
-                            if (minion->warudo) {
-                                minion->tokiWaUgokidasu = true;
-                            }
-                        }
-                        break;
-                    default:
-                        log(logUnknowns, "unknown worldkey type " + std::to_string(type));
-                        break;
-                }
-            }
-        }
+        DoWorldKey();
 
         if (pActionJson->contains("LockKey"))
         {
@@ -4265,6 +4212,67 @@ void Guy::DoSteerKey(void)
                 break;
             default:
                 log(logUnknowns, "unknown steer keyoperation " + std::to_string(operationType));
+                break;
+        }
+    }
+}
+
+void Guy::DoWorldKey(void)
+{
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& worldKey : pCurrentAction->worldKeys)
+    {
+        if (worldKey.startFrame > currentFrame || worldKey.endFrame <= currentFrame) {
+            continue;
+        }
+
+        int type = worldKey.type;
+
+        switch (type) {
+            case 1:
+                posX = Fixed(0);
+                posY = Fixed(0);
+                velocityX = Fixed(0);
+                velocityY = Fixed(0);
+                accelX = Fixed(0);
+                accelY = Fixed(0);
+                break;
+            case 0:
+                // type 1 is sa3 vs normal? why does that matter?
+                // todo is timer timer deduction?
+                if (pOpponent) {
+                    pOpponent->tokiYoTomare = true;
+                    for ( auto minion : pOpponent->minions ) {
+                        minion->tokiYoTomare = true;
+                    }
+                }
+                for ( auto minion : minions ) {
+                    minion->tokiYoTomare = true;
+                }
+                break;
+            case 5:
+                // resume
+                if (pOpponent) {
+                    if (pOpponent->warudo) {
+                        pOpponent->tokiWaUgokidasu = true;
+                    }
+                    for ( auto minion : pOpponent->minions ) {
+                        if (minion->warudo) {
+                            minion->tokiWaUgokidasu = true;
+                        }
+                    }
+                }
+                for ( auto minion : minions ) {
+                    if (minion->warudo) {
+                        minion->tokiWaUgokidasu = true;
+                    }
+                }
+                break;
+            default:
+                log(logUnknowns, "unknown worldkey type " + std::to_string(type));
                 break;
         }
     }

@@ -403,6 +403,7 @@ private:
     void DoPlaceKey();
     void DoSwitchKey();
     void DoEventKey(Action *pAction, int frameID);
+    void DoWorldKey();
     void DoShotKey(nlohmann::json *pAction, int frameID);
 
     void DoInstantAction(int actionID);
