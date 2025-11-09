@@ -115,6 +115,8 @@ void loadTriggers(nlohmann::json* pTriggersJson, CharacterData* pRet)
             trigger.id = std::atoi(triggerIDStr.c_str());
             trigger.actionID = triggerData["action_id"];
 
+            trigger.validStyles = triggerData["fightstyle_flags"];
+
             nlohmann::json *pNorm = &triggerData["norm"];
             trigger.okKeyFlags = (*pNorm)["ok_key_flags"];
             trigger.okCondFlags = (*pNorm)["ok_key_cond_flags"];

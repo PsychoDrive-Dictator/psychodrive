@@ -44,8 +44,9 @@ struct Command {
 
 struct Trigger {
     int id;
-
     int actionID;
+
+    int validStyles = 0;
 
     Command *pCommandClassic = nullptr;
 

@@ -990,6 +990,10 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
 
 bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
 {
+    if ( pTrigger->validStyles != 0 && !(pTrigger->validStyles & (1 << styleInstall)) ) {
+        return false;
+    }
+
     if (!pTrigger->okKeyFlags && !pTrigger->dcExcFlags && !pTrigger->dcIncFlags) {
         // some triggers don't seem hooked to anything?
         return false;
@@ -4509,13 +4513,16 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
                             log(logUnknowns, "unknown chara event id " + std::to_string(eventID));
                             break;
                         case 36:
-                            // if (param1 == 4) {
-                            //     focus += param2;
-                            //     if (focus > maxFocus) {
-                            //         focus = maxFocus;
-                            //     }
-                            // }
                             // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
+                            if (param1 == 4 && focus != 0) { // todo poor mans burnout
+                                focus += param2;
+                                if (focus > maxFocus) {
+                                    focus = maxFocus;
+                                }
+                                if (focus < 0) {
+                                    focus = 0;
+                                }
+                            }
                             break;
                     }
                     break;
