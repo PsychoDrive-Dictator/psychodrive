@@ -164,6 +164,20 @@ struct HitBoxKey : BoxKey {
     std::vector<Rect *> rects;
 };
 
+struct SteerKey : Key {
+    int operationType;
+    int valueType;
+    Fixed fixValue;
+    Fixed targetOffsetX;
+    Fixed targetOffsetY;
+    int shotCategory;
+    int targetType;
+    int calcValueFrame;
+    int multiValueType;
+    int param;
+    bool isDrive = false;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -172,6 +186,7 @@ struct Action {
     std::vector<HurtBoxKey> hurtBoxKeys;
     std::vector<PushBoxKey> pushBoxKeys;
     std::vector<HitBoxKey> hitBoxKeys;
+    std::vector<SteerKey> steerKeys;
 
     int activeFrame;
     int recoveryStartFrame;

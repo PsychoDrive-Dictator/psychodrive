@@ -399,6 +399,7 @@ private:
     void DoBranchKey(bool preHit = false);
     bool CheckHitBoxCondition(int conditionFlag);
     void DoStatusKey();
+    void DoSteerKey();
 
     void DoSwitchKey(const char *name);
     void DoEventKey(nlohmann::json *pAction, int frameID);

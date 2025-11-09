@@ -454,178 +454,7 @@ bool Guy::RunFrame(void)
         cancelInheritAccelX = Fixed(0);
         cancelInheritAccelY = Fixed(0);
 
-        if (pActionJson->contains("SteerKey"))
-        {
-            for (auto& [steerKeyID, steerKey] : (*pActionJson)["SteerKey"].items())
-            {
-                if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int operationType = steerKey["OperationType"];
-                int valueType = steerKey["ValueType"];
-                Fixed fixValue = Fixed(steerKey["FixValue"].get<double>());
-                Fixed targetOffsetX = Fixed(steerKey["FixTargetOffsetX"].get<double>());
-                Fixed targetOffsetY = Fixed(steerKey["FixTargetOffsetY"].get<double>());
-                int shotCategory = steerKey["_ShotCategory"];
-                int targetType = steerKey["TargetType"];
-                int calcValueFrame = steerKey["CalcValueFrame"];
-                int multiValueType = steerKey["MultiValueType"];
-                int param = steerKey["Param"];
-
-                switch (operationType) {
-                    case 1:
-                    case 2:
-                    case 4:
-                    case 5:
-                        switch (valueType) {
-                            case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
-                            case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
-                            case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
-                            case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
-                        }
-                        break;
-                    case 9:
-                        switch (valueType) {
-                            case 0: if (velocityX < fixValue) velocityX = fixValue; break;
-                            case 1: if (velocityY < fixValue) velocityY = fixValue; break;
-                            case 3: if (accelX < fixValue) accelX = fixValue; break;
-                            case 4: if (accelY < fixValue) accelY = fixValue; break;
-                        }
-                        break;
-                    case 10:
-                        switch (valueType) {
-                            case 0: if (velocityX > fixValue) velocityX = fixValue; break;
-                            case 1: if (velocityY > fixValue) velocityY = fixValue; break;
-                            case 3: if (accelX > fixValue) accelX = fixValue; break;
-                            case 4: if (accelY > fixValue) accelY = fixValue; break;
-                        }
-                        break;
-                    case 11:
-                        if (ignoreSteerType != -1) {
-                            log(logUnknowns, "two ignore at same time need more code");
-                        } else {
-                            ignoreSteerType = valueType;
-                        }
-                        break;
-                    case 12:
-                        // set on cancel from current action
-                        // guessing there's also one to add on cancel too? not sure
-                        operationType = 1;
-                        switch (valueType) {
-                            case 0: doSteerKeyOperation(cancelVelocityX, fixValue,operationType); break;
-                            case 1: doSteerKeyOperation(cancelVelocityY, fixValue,operationType); break;
-                            case 3: doSteerKeyOperation(cancelAccelX, fixValue,operationType); break;
-                            case 4: doSteerKeyOperation(cancelAccelY, fixValue,operationType); break;
-                        }
-                        break;
-                    case 13:
-                        // set teleport/home target
-                        {
-                            Guy *pGuy = nullptr;
-                            if (targetType == 0) {
-                                pGuy = this;
-                            } else if (targetType == 1) {
-                                pGuy = pParent;
-                            } else if (targetType == 4) {
-                                // todo supposed to be nearest matching projectile?
-                                for ( auto minion : minions ) {
-                                    if (shotCategory & (1 << minion->limitShotCategory)) {
-                                        pGuy = minion;
-                                        break;
-                                    }
-                                }
-                            } else if (targetType == 2 || targetType == 5 || targetType == 6 || targetType == 14) {
-                                // to opponent (5 is hit target, 6 is grab target)
-                                // todo 14 is middle of opponent's collision box?
-                                pGuy = pOpponent;
-                            }
-                            if (pGuy) {
-                                homeTargetX = pGuy->getPosX() + (targetOffsetX * pGuy->direction * Fixed(-1));
-                                homeTargetY = pGuy->getPosY() + targetOffsetY;
-                            } else if (targetType == 13) {
-                                homeTargetY = targetOffsetY;
-                                if (targetOffsetX != Fixed(0)) {
-                                    log(logUnknowns, "don't know what to do with target X offset in ease to ground");
-                                }
-                            } else {
-                                log(logUnknowns, "unknown/not found set teleport/home target type " + std::to_string(targetType));
-                            }
-                            homeTargetType = targetType;
-
-                            if (param != 0) {
-                                log(logUnknowns, "unknown param in set home target " + std::to_string(param));
-                            }
-                        }
-                        break;
-                    case 15:
-                        // teleport/lerp position
-                        if (calcValueFrame == 0) {
-                            calcValueFrame = 1;
-                        }
-                        if (homeTargetType == 13) {
-                            // ease to ground over n frames - is multiValueType used for this?
-                            // if (velocityY <= Fixed(0) || calcValueFrame < 2) {
-                            //     log(logUnknowns, "unhandled case for ease to ground? vely " + std::to_string(velocityY.f()) + " t " + std::to_string(calcValueFrame));
-                            // } else
-                            {
-                                // backsolve for acceleration over time. t-1 for first term makes it line up?
-                                accelY = Fixed(-2) * (getPosY() + velocityY * Fixed(calcValueFrame - 1) - homeTargetY) / Fixed(calcValueFrame * calcValueFrame);
-                            }
-                        } else {
-                            if (multiValueType & 1) {
-                                velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame) * direction;
-                            }
-                            if (multiValueType & 2) {
-                                velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
-                            }
-                        }
-                        break;
-                    case 16:
-                        // set cancel inherit %
-                        // there's some weirdness here - kim setting 1 then 9 undoes velX in-game
-                        // this will work in practice, but there's some subtle bug to maybe match
-                        if (multiValueType & 1) {
-                            cancelInheritVelX = fixValue;
-                        }
-                        if (multiValueType & 2) {
-                            cancelInheritVelY = fixValue;
-                        }
-                        if (multiValueType & 8) {
-                            cancelInheritAccelX = fixValue;
-                        }
-                        if (multiValueType & 16) {
-                            cancelInheritAccelY = fixValue;
-                        }
-                        break;
-                    default:
-                        log(logUnknowns, "unknown steer keyoperation " + std::to_string(operationType));
-                        break;
-                }
-
-            }
-        }
-
-        if (wasDrive && pActionJson->contains("DriveSteerKey"))
-        {
-            for (auto& [steerKeyID, steerKey] : (*pActionJson)["DriveSteerKey"].items())
-            {
-                if ( !steerKey.contains("_StartFrame") || steerKey["_StartFrame"] > currentFrame || steerKey["_EndFrame"] <= currentFrame ) {
-                    continue;
-                }
-
-                int operationType = steerKey["OperationType"];
-                int valueType = steerKey["ValueType"];
-                Fixed fixValue = Fixed(steerKey["FixValue"].get<double>());
-
-                switch (valueType) {
-                    case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
-                    case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
-                    case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
-                    case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
-                }
-            }
-        }
+        DoSteerKey();
 
         if ( (accelX != Fixed(0) && prevVelX != Fixed(0) && velocityX == Fixed(0)) ) {
             // if a steerkey just set speed to 0 and there was accel, it seems to want to clear accel
@@ -4329,6 +4158,165 @@ void Guy::DoStatusKey(void)
                     }
                     break;
             }
+        }
+    }
+}
+
+void Guy::DoSteerKey(void)
+{
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& steerKey : pCurrentAction->steerKeys)
+    {
+        if (steerKey.startFrame > currentFrame || steerKey.endFrame <= currentFrame) {
+            continue;
+        }
+
+        if (steerKey.isDrive && !wasDrive) {
+            continue;
+        }
+
+        int operationType = steerKey.operationType;
+        int valueType = steerKey.valueType;
+        Fixed fixValue = steerKey.fixValue;
+        Fixed targetOffsetX = steerKey.targetOffsetX;
+        Fixed targetOffsetY = steerKey.targetOffsetY;
+        int shotCategory = steerKey.shotCategory;
+        int targetType = steerKey.targetType;
+        int calcValueFrame = steerKey.calcValueFrame;
+        int multiValueType = steerKey.multiValueType;
+        int param = steerKey.param;
+
+        switch (operationType) {
+            case 1:
+            case 2:
+            case 4:
+            case 5:
+                switch (valueType) {
+                    case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
+                    case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
+                    case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
+                    case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                }
+                break;
+            case 9:
+                switch (valueType) {
+                    case 0: if (velocityX < fixValue) velocityX = fixValue; break;
+                    case 1: if (velocityY < fixValue) velocityY = fixValue; break;
+                    case 3: if (accelX < fixValue) accelX = fixValue; break;
+                    case 4: if (accelY < fixValue) accelY = fixValue; break;
+                }
+                break;
+            case 10:
+                switch (valueType) {
+                    case 0: if (velocityX > fixValue) velocityX = fixValue; break;
+                    case 1: if (velocityY > fixValue) velocityY = fixValue; break;
+                    case 3: if (accelX > fixValue) accelX = fixValue; break;
+                    case 4: if (accelY > fixValue) accelY = fixValue; break;
+                }
+                break;
+            case 11:
+                if (ignoreSteerType != -1) {
+                    log(logUnknowns, "two ignore at same time need more code");
+                } else {
+                    ignoreSteerType = valueType;
+                }
+                break;
+            case 12:
+                // set on cancel from current action
+                // guessing there's also one to add on cancel too? not sure
+                operationType = 1;
+                switch (valueType) {
+                    case 0: doSteerKeyOperation(cancelVelocityX, fixValue,operationType); break;
+                    case 1: doSteerKeyOperation(cancelVelocityY, fixValue,operationType); break;
+                    case 3: doSteerKeyOperation(cancelAccelX, fixValue,operationType); break;
+                    case 4: doSteerKeyOperation(cancelAccelY, fixValue,operationType); break;
+                }
+                break;
+            case 13:
+                // set teleport/home target
+                {
+                    Guy *pGuy = nullptr;
+                    if (targetType == 0) {
+                        pGuy = this;
+                    } else if (targetType == 1) {
+                        pGuy = pParent;
+                    } else if (targetType == 4) {
+                        // todo supposed to be nearest matching projectile?
+                        for ( auto minion : minions ) {
+                            if (shotCategory & (1 << minion->limitShotCategory)) {
+                                pGuy = minion;
+                                break;
+                            }
+                        }
+                    } else if (targetType == 2 || targetType == 5 || targetType == 6 || targetType == 14) {
+                        // to opponent (5 is hit target, 6 is grab target)
+                        // todo 14 is middle of opponent's collision box?
+                        pGuy = pOpponent;
+                    }
+                    if (pGuy) {
+                        homeTargetX = pGuy->getPosX() + (targetOffsetX * pGuy->direction * Fixed(-1));
+                        homeTargetY = pGuy->getPosY() + targetOffsetY;
+                    } else if (targetType == 13) {
+                        homeTargetY = targetOffsetY;
+                        if (targetOffsetX != Fixed(0)) {
+                            log(logUnknowns, "don't know what to do with target X offset in ease to ground");
+                        }
+                    } else {
+                        log(logUnknowns, "unknown/not found set teleport/home target type " + std::to_string(targetType));
+                    }
+                    homeTargetType = targetType;
+
+                    if (param != 0) {
+                        log(logUnknowns, "unknown param in set home target " + std::to_string(param));
+                    }
+                }
+                break;
+            case 15:
+                // teleport/lerp position
+                if (calcValueFrame == 0) {
+                    calcValueFrame = 1;
+                }
+                if (homeTargetType == 13) {
+                    // ease to ground over n frames - is multiValueType used for this?
+                    // if (velocityY <= Fixed(0) || calcValueFrame < 2) {
+                    //     log(logUnknowns, "unhandled case for ease to ground? vely " + std::to_string(velocityY.f()) + " t " + std::to_string(calcValueFrame));
+                    // } else
+                    {
+                        // backsolve for acceleration over time. t-1 for first term makes it line up?
+                        accelY = Fixed(-2) * (getPosY() + velocityY * Fixed(calcValueFrame - 1) - homeTargetY) / Fixed(calcValueFrame * calcValueFrame);
+                    }
+                } else {
+                    if (multiValueType & 1) {
+                        velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame) * direction;
+                    }
+                    if (multiValueType & 2) {
+                        velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
+                    }
+                }
+                break;
+            case 16:
+                // set cancel inherit %
+                // there's some weirdness here - kim setting 1 then 9 undoes velX in-game
+                // this will work in practice, but there's some subtle bug to maybe match
+                if (multiValueType & 1) {
+                    cancelInheritVelX = fixValue;
+                }
+                if (multiValueType & 2) {
+                    cancelInheritVelY = fixValue;
+                }
+                if (multiValueType & 8) {
+                    cancelInheritAccelX = fixValue;
+                }
+                if (multiValueType & 16) {
+                    cancelInheritAccelY = fixValue;
+                }
+                break;
+            default:
+                log(logUnknowns, "unknown steer keyoperation " + std::to_string(operationType));
+                break;
         }
     }
 }

@@ -242,6 +242,35 @@ void loadRects(nlohmann::json* pRectsJson, std::vector<Rect>* pOutputVector)
     }
 }
 
+void loadSteerKeys(nlohmann::json* pSteerJson, std::vector<SteerKey>* pOutputVector, bool isDrive)
+{
+    if (!pSteerJson) {
+        return;
+    }
+
+    for (auto& [steerKeyID, steerKey] : pSteerJson->items()) {
+        if (!steerKey.contains("_StartFrame")) {
+            continue;
+        }
+        SteerKey newKey;
+        newKey.startFrame = steerKey["_StartFrame"];
+        newKey.endFrame = steerKey["_EndFrame"];
+        newKey.operationType = steerKey["OperationType"];
+        newKey.valueType = steerKey["ValueType"];
+        newKey.fixValue = Fixed(steerKey["FixValue"].get<double>());
+        newKey.targetOffsetX = Fixed(steerKey.value("FixTargetOffsetX", 0.0));
+        newKey.targetOffsetY = Fixed(steerKey.value("FixTargetOffsetY", 0.0));
+        newKey.shotCategory = steerKey.value("_ShotCategory", 0);
+        newKey.targetType = steerKey.value("TargetType", 0);
+        newKey.calcValueFrame = steerKey.value("CalcValueFrame", 0);
+        newKey.multiValueType = steerKey.value("MultiValueType", 0);
+        newKey.param = steerKey.value("Param", 0);
+        newKey.isDrive = isDrive;
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -482,6 +511,22 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
                     }
                 }
             }
+        }
+
+        size_t steerKeyCount = 0;
+        if (key.contains("SteerKey")) {
+            steerKeyCount += key["SteerKey"].size() - 1;
+        }
+        if (key.contains("DriveSteerKey")) {
+            steerKeyCount += key["DriveSteerKey"].size() - 1;
+        }
+        newAction.steerKeys.reserve(steerKeyCount);
+
+        if (key.contains("SteerKey")) {
+            loadSteerKeys(&key["SteerKey"], &newAction.steerKeys, false);
+        }
+        if (key.contains("DriveSteerKey")) {
+            loadSteerKeys(&key["DriveSteerKey"], &newAction.steerKeys, true);
         }
 
         pRet->actions.push_back(newAction);
