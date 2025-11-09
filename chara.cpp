@@ -515,6 +515,32 @@ void loadSwitchKeys(nlohmann::json* pSwitchJson, std::vector<SwitchKey>* pOutput
     }
 }
 
+void loadEventKeys(nlohmann::json* pEventJson, std::vector<EventKey>* pOutputVector)
+{
+    if (!pEventJson) {
+        return;
+    }
+
+    for (auto& [eventKeyID, eventKey] : pEventJson->items()) {
+        if (!eventKey.contains("_StartFrame")) {
+            continue;
+        }
+        EventKey newKey;
+        newKey.startFrame = eventKey["_StartFrame"];
+        newKey.endFrame = eventKey["_EndFrame"];
+        newKey.validStyle = eventKey.value("_ValidStyle", 0);
+        newKey.type = eventKey["Type"];
+        newKey.id = eventKey["ID"];
+        newKey.param01 = eventKey["Param01"];
+        newKey.param02 = eventKey["Param02"];
+        newKey.param03 = eventKey["Param03"];
+        newKey.param04 = eventKey["Param04"];
+        newKey.param05 = eventKey["Param05"];
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
 {
     if (!pMovesJson) {
@@ -625,6 +651,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         }
         if (key.contains("ExtSwitchKey")) {
             loadSwitchKeys(&key["ExtSwitchKey"], &newAction.switchKeys);
+        }
+
+        if (key.contains("EventKey")) {
+            newAction.eventKeys.reserve(key["EventKey"].size() - 1);
+            loadEventKeys(&key["EventKey"], &newAction.eventKeys);
         }
 
         pRet->actions.push_back(newAction);

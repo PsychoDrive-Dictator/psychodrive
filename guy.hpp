@@ -402,7 +402,7 @@ private:
     void DoSteerKey();
     void DoPlaceKey();
     void DoSwitchKey();
-    void DoEventKey(nlohmann::json *pAction, int frameID);
+    void DoEventKey(Action *pAction, int frameID);
     void DoShotKey(nlohmann::json *pAction, int frameID);
 
     void DoInstantAction(int actionID);

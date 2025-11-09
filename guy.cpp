@@ -489,7 +489,7 @@ bool Guy::RunFrame(void)
 
         DoSwitchKey();
 
-        DoEventKey(pActionJson, currentFrame);
+        DoEventKey(pCurrentAction, currentFrame);
 
         if (countingDownInstall && styleInstallFrames) {
             styleInstallFrames--;
@@ -3865,7 +3865,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         if (didBranch) {
             // kinda crazy, but do EventKey for the bumped branch frame before the transition
             // steering moves will apply twice, on purpose. is it the same for triggers? :thonk:
-            DoEventKey(pActionJson, currentFrame);
+            DoEventKey(pCurrentAction, currentFrame);
         }
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
@@ -4327,32 +4327,34 @@ void Guy::DoPlaceKey(void)
     }
 }
 
-void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
+void Guy::DoEventKey(Action *pAction, int frameID)
 {
-    if (pAction->contains("EventKey"))
+    if (!pAction) {
+        return;
+    }
+
+    for (auto& eventKey : pAction->eventKeys)
     {
-        for (auto& [keyID, key] : (*pAction)["EventKey"].items())
+        if (eventKey.startFrame > frameID || eventKey.endFrame <= frameID) {
+            continue;
+        }
+
+        int validStyles = eventKey.validStyle;
+        if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+            continue;
+        }
+
+        int eventType = eventKey.type;
+        int eventID = eventKey.id;
+        int64_t param1 = eventKey.param01;
+        int64_t param2 = eventKey.param02;
+        int64_t param3 = eventKey.param03;
+        int64_t param4 = eventKey.param04;
+        int64_t param5 = eventKey.param05;
+
+        switch (eventType)
         {
-            if ( !key.contains("_StartFrame") || key["_StartFrame"] > frameID || key["_EndFrame"] <= frameID ) {
-                continue;
-            }
-
-            int validStyles = key["_ValidStyle"];
-            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                continue;
-            }
-
-            int eventType = key["Type"];
-            int eventID = key["ID"];
-            int64_t param1 = key["Param01"];
-            int64_t param2 = key["Param02"];
-            int64_t param3 = key["Param03"];
-            int64_t param4 = key["Param04"];
-            int64_t param5 = key["Param05"];
-
-            switch (eventType)
-            {
-                case 0:
+            case 0:
                     switch (eventID) {
                         case 3:
                         case 4:
@@ -4500,7 +4502,6 @@ void Guy::DoEventKey(nlohmann::json *pAction, int frameID)
                 case 11: // commentary
                 case 5: // camera
                     break;
-            }
         }
     }
 }
@@ -4546,12 +4547,13 @@ void Guy::DoShotKey(nlohmann::json *pAction, int frameID)
 
 void Guy::DoInstantAction(int actionID)
 {
-    nlohmann::json *pInstantAction = nullptr;
-    FindMove(actionID, styleInstall, &pInstantAction);
+    nlohmann::json *pInstantActionJson = nullptr;
+    Action *pInstantAction = nullptr;
+    FindMove(actionID, styleInstall, &pInstantActionJson, &pInstantAction);
     if (pInstantAction) {
         // only ones i've seen used in those kinds of actions so far
         DoEventKey(pInstantAction, 0);
-        DoShotKey(pInstantAction, 0);
+        DoShotKey(pInstantActionJson, 0);
     } else {
         log(true, "couldn't find instant action " + std::to_string(actionID));
     }

@@ -196,6 +196,17 @@ struct SwitchKey : Key {
     int validStyle = 0;
 };
 
+struct EventKey : Key {
+    int validStyle = 0;
+    int type;
+    int id;
+    int64_t param01;
+    int64_t param02;
+    int64_t param03;
+    int64_t param04;
+    int64_t param05;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -207,6 +218,7 @@ struct Action {
     std::vector<SteerKey> steerKeys;
     std::vector<PlaceKey> placeKeys;
     std::vector<SwitchKey> switchKeys;
+    std::vector<EventKey> eventKeys;
 
     int activeFrame;
     int recoveryStartFrame;
