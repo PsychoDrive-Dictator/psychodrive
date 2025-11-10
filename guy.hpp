@@ -340,7 +340,7 @@ public:
     int *getInputOverridePtr() { return &inputOverride; }
     int *getInputIDPtr() { return &inputID; }
     int *getInputListIDPtr() { return &inputListID; }
-    const char* FindMove(int actionID, int styleID, Action **ppAction = nullptr);
+    Action* FindMove(int actionID, int styleID);
     AtemiData *findAtemi(int atemiID);
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);

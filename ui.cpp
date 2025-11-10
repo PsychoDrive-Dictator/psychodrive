@@ -813,7 +813,9 @@ void CharacterUIController::renderActionSetup(int frameIndex)
     }
     if (timelineTriggers.find(frameIndex) != timelineTriggers.end()) {
         auto &trigger = timelineTriggers[frameIndex];
-        std::string strLabel = "Delete " + std::string(pGuy->FindMove(trigger.first, trigger.second));
+        Action *pAction = pGuy->FindMove(trigger.first, trigger.second);
+        const char *actionName = pAction ? pAction->name.c_str() : "Unknown";
+        std::string strLabel = "Delete " + std::string(actionName);
         if (ImGui::Button(strLabel.c_str())) {
             timelineTriggers.erase(timelineTriggers.find(frameIndex));
             simInputsChanged = true;
@@ -824,7 +826,9 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         vecTriggers.clear();
         vecTriggerDropDownLabels.push_back("Add Action");
         for (auto &trigger : pGuy->getFrameTriggers()) {
-            vecTriggerDropDownLabels.push_back(pGuy->FindMove(trigger.first, trigger.second));
+            Action *pAction = pGuy->FindMove(trigger.first, trigger.second);
+            const char *actionName = pAction ? pAction->name.c_str() : "Unknown";
+            vecTriggerDropDownLabels.push_back(actionName);
             vecTriggers.push_back(trigger);
         }
         if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 220)) {

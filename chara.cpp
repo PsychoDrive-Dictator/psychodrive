@@ -1114,33 +1114,6 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
         }
     }
 
-    if (pMovesDictJson) {
-        for (auto& [keyID, key] : pMovesDictJson->items())
-        {
-            int actionID = key["fab"]["ActionID"];
-            int styleID = 0;
-            if (key.contains("_PL_StyleID")) {
-                styleID = key["_PL_StyleID"];
-            }
-            auto mapIndex = std::make_pair(actionID, styleID);
-            pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
-        }
-    }
-
-    if (pCommonMovesJson) {
-        for (auto& [keyID, key] : pCommonMovesJson->items())
-        {
-            int actionID = key["fab"]["ActionID"];
-            int styleID = 0;
-            if (key.contains("_PL_StyleID")) {
-                styleID = key["_PL_StyleID"];
-            }
-            auto mapIndex = std::make_pair(actionID, styleID);
-            if (pRet->mapMoveStyle.find(mapIndex) == pRet->mapMoveStyle.end()) {
-                pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, true);
-            }
-        }
-    }
 
     std::map<int, ProjectileData> uniqueProjectiles;
     loadProjectileDatas(pMovesDictJson, &uniqueProjectiles);
@@ -1168,13 +1141,12 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
         pRet->hitByID[hit.id] = &hit;
     }
 
-    pRet->actions.reserve(pRet->mapMoveStyle.size());
 
     loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
     loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
 
     for (auto& action : pRet->actions) {
-        pRet->actionsByID[std::make_pair(action.actionID, action.styleID)] = &action;
+        pRet->actionsByID[ActionRef(action.actionID, action.styleID)] = &action;
     }
 
     // delete pMovesDictJson;

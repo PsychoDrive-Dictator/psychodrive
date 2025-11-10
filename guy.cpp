@@ -174,34 +174,25 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
     return true;
 }
 
-const char* Guy::FindMove(int actionID, int styleID, Action **ppAction)
+Action* Guy::FindMove(int actionID, int styleID)
 {
-    auto mapIndex = std::make_pair(actionID, styleID);
-    if (pCharData->mapMoveStyle.find(mapIndex) == pCharData->mapMoveStyle.end()) {
-        int parentStyleID = -1;
-        if (styleID >= 0 && (size_t)styleID < pCharData->styles.size()) {
-            parentStyleID = pCharData->styles[styleID].parentStyleID;
-        }
+    ActionRef mapIndex(actionID, styleID);
+    auto it = pCharData->actionsByID.find(mapIndex);
 
-        if (parentStyleID == -1) {
-            return nullptr;
-        }
-
-        return FindMove(actionID, parentStyleID, ppAction);
-    } else {
-        const char *moveName = pCharData->mapMoveStyle[mapIndex].first.c_str();
-
-        if (ppAction) {
-            auto it = pCharData->actionsByID.find(mapIndex);
-            if (it != pCharData->actionsByID.end()) {
-                *ppAction = it->second;
-            } else {
-                *ppAction = nullptr;
-            }
-        }
-
-        return moveName;
+    if (it != pCharData->actionsByID.end()) {
+        return it->second;
     }
+
+    int parentStyleID = -1;
+    if (styleID >= 0 && (size_t)styleID < pCharData->styles.size()) {
+        parentStyleID = pCharData->styles[styleID].parentStyleID;
+    }
+
+    if (parentStyleID == -1) {
+        return nullptr;
+    }
+
+    return FindMove(actionID, parentStyleID);
 }
 
 void Guy::Input(int input)
@@ -220,8 +211,7 @@ void Guy::Input(int input)
 
 std::string Guy::getActionName(int actionID)
 {
-    Action *pAction = nullptr;
-    FindMove(actionID, styleInstall, &pAction);
+    Action *pAction = FindMove(actionID, styleInstall);
     if (pAction) {
         return pAction->name;
     }
@@ -230,19 +220,16 @@ std::string Guy::getActionName(int actionID)
 
 void Guy::UpdateActionData(void)
 {
-    pCurrentAction = nullptr;
-    const char *foundAction = nullptr;
-
     if (opponentAction) {
-        foundAction = pOpponent->FindMove(currentAction, 0, &pCurrentAction);
+        pCurrentAction = pOpponent->FindMove(currentAction, 0);
     } else {
-        foundAction = FindMove(currentAction, styleInstall, &pCurrentAction);
+        pCurrentAction = FindMove(currentAction, styleInstall);
     }
 
-    if (foundAction == nullptr) {
+    if (pCurrentAction == nullptr) {
         log(true, "couldn't find next action, reverting to 1 - style lapsed?");
         currentAction = 1;
-        foundAction = FindMove(currentAction, styleInstall, &pCurrentAction);
+        pCurrentAction = FindMove(currentAction, styleInstall);
     }
 
     if (pCurrentAction) {
@@ -1174,7 +1161,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                 continue;
             }
 
-            if (FindMove(actionID, styleInstall, nullptr) == nullptr) {
+            if (FindMove(actionID, styleInstall) == nullptr) {
                 continue;
             }
 
@@ -4564,8 +4551,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
 
 void Guy::DoInstantAction(int actionID)
 {
-    Action *pInstantAction = nullptr;
-    FindMove(actionID, styleInstall, &pInstantAction);
+    Action *pInstantAction = FindMove(actionID, styleInstall);
     if (pInstantAction) {
         // only ones i've seen used in those kinds of actions so far
         DoEventKey(pInstantAction, 0);

@@ -1,11 +1,43 @@
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <vector>
 
 #include "json.hpp"
 #include "fixed.hpp"
 #include "main.hpp"
+
+class ActionRef {
+private:
+    uint32_t packed;
+
+public:
+    ActionRef() : packed(0) {}
+    ActionRef(int actionID, int styleID)
+        : packed((uint32_t)actionID | ((uint32_t)styleID << 16)) {}
+
+    inline int actionID() const {
+        return packed & 0xFFFF;
+    }
+
+    inline int styleID() const {
+        return (packed >> 16) & 0xFFFF;
+    }
+
+    inline operator uint32_t() const {
+        return packed;
+    }
+
+    inline ActionRef& operator=(uint32_t value) {
+        packed = value;
+        return *this;
+    }
+
+    inline bool operator<(const ActionRef& other) const {
+        return packed < other.packed;
+    }
+};
 
 enum InputType {
     Normal = 0,
@@ -395,11 +427,10 @@ struct CharacterData {
 
     std::map<int, TriggerGroup*> triggerGroupByID;
     std::map<std::pair<int, int>, Rect*> rectsByIDs;
-    std::map<std::pair<int, int>, Action*> actionsByID;
+    std::map<ActionRef, Action*> actionsByID;
     std::map<int, AtemiData*> atemiByID;
     std::map<int, HitData*> hitByID;
 
-    std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
     std::vector<const char *> vecMoveList;
 };
 

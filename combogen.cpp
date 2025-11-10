@@ -223,13 +223,13 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.doKaras = doKaras;
 
     if (!finder.doLights) {
-        for (auto& [key, value] : defaultSim.simGuys[0]->getCharData()->mapMoveStyle) {
-            if (value.first.find("5LP") != std::string::npos ||
-                value.first.find("5LK") != std::string::npos ||
-                value.first.find("2LP") != std::string::npos ||
-                value.first.find("2LK") != std::string::npos)
+        for (auto& [key, action] : defaultSim.simGuys[0]->getCharData()->actionsByID) {
+            if (action->name.find("5LP") != std::string::npos ||
+                action->name.find("5LK") != std::string::npos ||
+                action->name.find("2LP") != std::string::npos ||
+                action->name.find("2LK") != std::string::npos)
             {
-                finder.lightsActionIDs.insert(key.first);
+                finder.lightsActionIDs.insert(key.actionID());
             }
         }
     }
