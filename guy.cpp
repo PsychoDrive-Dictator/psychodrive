@@ -4278,7 +4278,7 @@ void Guy::DoPlaceKey(void)
             break;
         }
 
-        Fixed offsetMatch;
+        Fixed offsetMatch = Fixed(0);
         int flag = placeKey.optionFlag;
         // todo there's a bunch of other flags
         bool cosmeticOffset = flag & 1;

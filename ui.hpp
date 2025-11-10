@@ -35,7 +35,7 @@ public:
     // ui one
     float flStartPosX;
     // real one
-    Fixed startPosX;
+    Fixed startPosX = Fixed(0);
 
     // number of frames to show behind present, eg. how far right the current frame arrow is
     static constexpr int kFrameOffset = 8;

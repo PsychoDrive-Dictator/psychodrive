@@ -38,7 +38,6 @@ public:
     }
 
     Fixed() {
-        data = 0;
     }
 
     bool operator == (const Fixed& rhs) {
@@ -184,5 +183,5 @@ public:
         return ret;
     }
 
-    int64_t data = 0;
+    int64_t data;
 };

@@ -279,6 +279,7 @@ public:
 
     Guy(Simulation *sim, std::string charName, int version, Fixed x, Fixed y, int startDir, color color)
     {
+        Initialize();
         pSim = sim;
         uniqueID = pSim->guyIDCounter++;
 
@@ -304,6 +305,7 @@ public:
 
     Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)
     {
+        Initialize();
         pSim = parent.pSim;
         uniqueID = pSim->guyIDCounter++;
 
@@ -462,32 +464,221 @@ private:
     void guyLog(bool doLog, std::string logLine);
     void guyLog(std::string logLine) { guyLog(true, logLine ); }
 
-    int uniqueID = -1;
-    GuyRef pOpponent = nullptr;
+    void Initialize() {
+        uniqueID = -1;
+        pOpponent = nullptr;
+        neutralMove = 0;
+        inputOverride = 0;
+        inputID = 0;
+        inputListID = 0;
+        deniedLastBranch = false;
+        isProjectile = false;
+        projHitCount = 0;
+        projLifeTime = 0;
+        projDataInitialized = false;
+        die = false;
+        limitShotCategory = -1;
+        noPush = false;
+        obeyHitID = false;
+        pParent = nullptr;
+        pCharData = nullptr;
+        posX = Fixed(0);
+        posY = Fixed(0);
+        direction = Fixed(1);
+        lastPosX = Fixed(0);
+        lastPosY = Fixed(0);
+        startPosX = Fixed(0);
+        startPosY = Fixed(0);
+        airborne = false;
+        landed = false;
+        forceLanding = false;
+        touchedWall = false;
+        touchedOpponent = false;
+        startsFalling = false;
+        crouching = false;
+        freeMovement = false;
+        blocking = false;
+        proxGuarded = false;
+        bounced = false;
+        didPush = false;
+        jumped = false;
+        jumpDirection = 0;
+        jumpLandingDisabledFrames = 0;
+        couldMove = false;
+        landingAdjust = 0;
+        prevPoseStatus = 0;
+        forcedPoseStatus = 0;
+        actionStatus = 0;
+        jumpStatus = 0;
+        counterState = false;
+        punishCounterState = false;
+        forceKnockDownState = false;
+        throwTechable = false;
+        canBlock = false;
+        offsetDoesNotPush = false;
+        ignoreBodyPush = false;
+        noVelNextFrame = false;
+        noAccelNextFrame = false;
+        posOffsetX = Fixed(0);
+        posOffsetY = Fixed(0);
+        setPlaceX = false;
+        setPlaceY = false;
+        velocityX = Fixed(0);
+        velocityY = Fixed(0);
+        accelX = Fixed(0);
+        accelY = Fixed(0);
+        cancelVelocityX = Fixed(0);
+        cancelVelocityY = Fixed(0);
+        cancelAccelX = Fixed(0);
+        cancelAccelY = Fixed(0);
+        cancelInheritVelX = Fixed(0);
+        cancelInheritVelY = Fixed(0);
+        cancelInheritAccelX = Fixed(0);
+        cancelInheritAccelY = Fixed(0);
+        homeTargetX = Fixed(0);
+        homeTargetY = Fixed(0);
+        homeTargetType = 0;
+        ignoreSteerType = -1;
+        maxHealth = 0;
+        health = 0;
+        maxFocus = 0;
+        focus = 0;
+        maxGauge = 0;
+        gauge = 0;
+        currentAction = 1;
+        nextAction = -1;
+        nextActionFrame = -1;
+        keepPlace = false;
+        noPlaceXNextFrame = false;
+        noPlaceYNextFrame = false;
+        currentFrame = 0;
+        loopCount = 0;
+        instantScale = 0;
+        nextActionOpponentAction = false;
+        opponentAction = false;
+        locked = false;
+        hasLooped = false;
+        superAction = false;
+        superLevel = 0;
+        styleInstall = 0;
+        styleInstallFrames = 0;
+        countingDownInstall = false;
+        airActionCounter = 0;
+        currentInput = 0;
+        framesSinceLastInput = 0;
+        canHitID = 0;
+        hitThisFrame = false;
+        hasBeenBlockedThisFrame = false;
+        hitArmorThisFrame = false;
+        hitAtemiThisFrame = false;
+        punishCounterThisFrame = false;
+        grabbedThisFrame = false;
+        hitThisMove = false;
+        hitCounterThisMove = false;
+        hitPunishCounterThisMove = false;
+        hasBeenBlockedThisMove = false;
+        hitArmorThisMove = false;
+        hitAtemiThisMove = false;
+        hitStop = 0;
+        pendingHitStop = 0;
+        timeInHitStop = 0;
+        ignoreHitStop = false;
+        tokiYoTomare = false;
+        warudo = false;
+        tokiWaUgokidasu = false;
+        scalingTriggerID = 0;
+        pAttacker = nullptr;
+        hitStun = 0;
+        resetHitStunOnLand = false;
+        resetHitStunOnTransition = false;
+        hitVelX = Fixed(0);
+        hitAccelX = Fixed(0);
+        pushBackThisFrame = Fixed(0);
+        hitReflectVelX = Fixed(0);
+        hitReflectAccelX = Fixed(0);
+        reflectThisFrame = Fixed(0);
+        deferredReflect = false;
+        noCounterPush = false;
+        beenHitThisFrame = false;
+        currentScaling = 0;
+        pendingScaling = 0;
+        driveScaling = false;
+        comboHits = 0;
+        juggleCounter = 0;
+        comboDamage = 0;
+        lastDamageScale = 0;
+        lastScalingTriggerID = 0;
+        wasHit = false;
+        resetComboCount = false;
+        pendingLockHit = nullptr;
+        knockDown = false;
+        isDown = false;
+        knockDownFrames = 0;
+        nageKnockdown = false;
+        recoverForward = false;
+        recoverReverse = false;
+        groundBounce = false;
+        groundBounceVelX = Fixed(0);
+        groundBounceVelY = Fixed(0);
+        groundBounceAccelX = Fixed(0);
+        groundBounceAccelY = Fixed(0);
+        wallBounce = false;
+        wallSplat = false;
+        wallBounceVelX = Fixed(0);
+        wallBounceVelY = Fixed(0);
+        wallBounceAccelX = Fixed(0);
+        wallBounceAccelY = Fixed(0);
+        wallStopped = false;
+        wallStopFrames = 0;
+        currentArmor = nullptr;
+        armorHitsLeft = 0;
+        armorThisFrame = false;
+        atemiThisFrame = false;
+        recoveryTiming = 0;
+        recordFrameTriggers = false;
+        recordLateCancels = false;
+        forcedTrigger = ActionRef(0, 0);
+        isDrive = false;
+        wasDrive = false;
+        charColorR = 1.0;
+        charColorG = 1.0;
+        charColorB = 1.0;
+        for (int i = 0; i < uniqueParamCount; i++) {
+            uniqueParam[i] = 0;
+        }
+        uniqueTimer = false;
+        uniqueTimerCount = 0;
+        debuffTimer = 0;
+        pCurrentAction = nullptr;
+        pSim = nullptr;
+    }
 
-    int neutralMove = 0;
+    int uniqueID;
+    GuyRef pOpponent;
 
-    int inputOverride = 0;
-    int inputID = 0;
-    int inputListID = 0;
+    int neutralMove;
 
-    bool deniedLastBranch = false;
+    int inputOverride;
+    int inputID;
+    int inputListID;
 
-    bool isProjectile = false;
-    int projHitCount = 0;
-    int projLifeTime = 0;
-    bool projDataInitialized = false;
-    bool die = false;
-    int limitShotCategory = -1;
-    bool noPush = false;
-    bool obeyHitID = false;
-    GuyRef pParent = nullptr;
+    bool deniedLastBranch;
+
+    bool isProjectile;
+    int projHitCount;
+    int projLifeTime;
+    bool projDataInitialized;
+    bool die;
+    int limitShotCategory;
+    bool noPush;
+    bool obeyHitID;
+    GuyRef pParent;
 
     CharacterData *pCharData;
 
     Fixed posX;
     Fixed posY;
-    Fixed direction = Fixed(1);
+    Fixed direction;
 
     Fixed lastPosX;
     Fixed lastPosY;
@@ -495,44 +686,44 @@ private:
     Fixed startPosX;
     Fixed startPosY;
 
-    bool airborne = false;
-    bool landed = false;
-    bool forceLanding = false;
-    bool touchedWall = false;
-    bool touchedOpponent = false;
-    bool startsFalling = false;
-    bool crouching = false;
-    bool freeMovement = false;
-    bool blocking = false;
-    bool proxGuarded = false;
-    bool bounced = false;
-    bool didPush = false;
-    bool jumped = false;
-    int jumpDirection = 0;
-    int jumpLandingDisabledFrames = 0;
-    bool couldMove = false;
+    bool airborne;
+    bool landed;
+    bool forceLanding;
+    bool touchedWall;
+    bool touchedOpponent;
+    bool startsFalling;
+    bool crouching;
+    bool freeMovement;
+    bool blocking;
+    bool proxGuarded;
+    bool bounced;
+    bool didPush;
+    bool jumped;
+    int jumpDirection;
+    int jumpLandingDisabledFrames;
+    bool couldMove;
 
-    int landingAdjust = 0;
-    int prevPoseStatus = 0;
-    int forcedPoseStatus = 0;
-    int actionStatus = 0;
-    int jumpStatus = 0;
+    int landingAdjust;
+    int prevPoseStatus;
+    int forcedPoseStatus;
+    int actionStatus;
+    int jumpStatus;
 
-    bool counterState = false;
-    bool punishCounterState = false;
-    bool forceKnockDownState = false;
+    bool counterState;
+    bool punishCounterState;
+    bool forceKnockDownState;
 
-    bool throwTechable = false;
-    bool canBlock = false;
+    bool throwTechable;
+    bool canBlock;
 
-    bool offsetDoesNotPush = false;
-    bool ignoreBodyPush = false;
-    bool noVelNextFrame = false;
-    bool noAccelNextFrame = false;
+    bool offsetDoesNotPush;
+    bool ignoreBodyPush;
+    bool noVelNextFrame;
+    bool noAccelNextFrame;
     Fixed posOffsetX;
     Fixed posOffsetY;
-    bool setPlaceX = false;
-    bool setPlaceY = false;
+    bool setPlaceX;
+    bool setPlaceY;
     Fixed velocityX;
     Fixed velocityY;
     Fixed accelX;
@@ -552,7 +743,7 @@ private:
     Fixed homeTargetY;
     int homeTargetType;
 
-    int ignoreSteerType = -1;
+    int ignoreSteerType;
 
     int maxHealth;
     int health;
@@ -563,137 +754,137 @@ private:
     int maxGauge;
     int gauge;
 
-    int currentAction = 1;
-    int nextAction = -1;
-    int nextActionFrame = -1;
-    bool keepPlace = false;
-    bool noPlaceXNextFrame = false;
-    bool noPlaceYNextFrame = false;
-    int currentFrame = 0;
-    int loopCount = 0;
-    int instantScale = 0;
-    bool nextActionOpponentAction = false;
-    bool opponentAction = false;
-    bool locked = false;
-    bool hasLooped = false;
+    int currentAction;
+    int nextAction;
+    int nextActionFrame;
+    bool keepPlace;
+    bool noPlaceXNextFrame;
+    bool noPlaceYNextFrame;
+    int currentFrame;
+    int loopCount;
+    int instantScale;
+    bool nextActionOpponentAction;
+    bool opponentAction;
+    bool locked;
+    bool hasLooped;
 
-    bool superAction = false;
-    int superLevel = 0;
+    bool superAction;
+    int superLevel;
 
     // todo round begin action needs to set that
-    int styleInstall = 0;
-    int styleInstallFrames = 0;
-    bool countingDownInstall = false;
+    int styleInstall;
+    int styleInstallFrames;
+    bool countingDownInstall;
 
-    int airActionCounter = 0;
+    int airActionCounter;
 
-    int currentInput = 0;
+    int currentInput;
     // todo could keep track of frames since any input as a further optim
-    int framesSinceLastInput = 0;
+    int framesSinceLastInput;
 
     // hitting side
-    uint64_t canHitID = 0;
-    bool hitThisFrame = false;
-    bool hasBeenBlockedThisFrame = false;
-    bool hitArmorThisFrame = false;
-    bool hitAtemiThisFrame = false;
-    bool punishCounterThisFrame = false;
-    bool grabbedThisFrame = false;
-    bool hitThisMove = false;
-    bool hitCounterThisMove = false;
-    bool hitPunishCounterThisMove = false;
-    bool hasBeenBlockedThisMove = false;
-    bool hitArmorThisMove = false;
-    bool hitAtemiThisMove = false;
+    uint64_t canHitID;
+    bool hitThisFrame;
+    bool hasBeenBlockedThisFrame;
+    bool hitArmorThisFrame;
+    bool hitAtemiThisFrame;
+    bool punishCounterThisFrame;
+    bool grabbedThisFrame;
+    bool hitThisMove;
+    bool hitCounterThisMove;
+    bool hitPunishCounterThisMove;
+    bool hasBeenBlockedThisMove;
+    bool hitArmorThisMove;
+    bool hitAtemiThisMove;
 
-    int hitStop = 0;
-    int pendingHitStop = 0;
-    int timeInHitStop = 0;
-    bool ignoreHitStop = false;
-    bool tokiYoTomare = false;
-    bool warudo = false;
-    bool tokiWaUgokidasu = false;
+    int hitStop;
+    int pendingHitStop;
+    int timeInHitStop;
+    bool ignoreHitStop;
+    bool tokiYoTomare;
+    bool warudo;
+    bool tokiWaUgokidasu;
 
-    int scalingTriggerID = 0;
+    int scalingTriggerID;
 
     // getting hit side
-    GuyRef pAttacker = nullptr;
-    int hitStun = 0;
-    bool resetHitStunOnLand = false;
-    bool resetHitStunOnTransition = false;
+    GuyRef pAttacker;
+    int hitStun;
+    bool resetHitStunOnLand;
+    bool resetHitStunOnTransition;
     Fixed hitVelX;
     Fixed hitAccelX;
     Fixed pushBackThisFrame;
     Fixed hitReflectVelX;
     Fixed hitReflectAccelX;
     Fixed reflectThisFrame;
-    bool deferredReflect = false;
-    bool noCounterPush = false;
-    bool beenHitThisFrame = false;
+    bool deferredReflect;
+    bool noCounterPush;
+    bool beenHitThisFrame;
     // 2.0 was here
-    int currentScaling = 0;
-    int pendingScaling = 0;
-    bool driveScaling = false;
-    int comboHits = 0;
-    int juggleCounter = 0;
-    int comboDamage = 0;
-    int lastDamageScale = 0;
-    int lastScalingTriggerID = 0;
-    bool wasHit = false;
-    bool resetComboCount = false;
+    int currentScaling;
+    int pendingScaling;
+    bool driveScaling;
+    int comboHits;
+    int juggleCounter;
+    int comboDamage;
+    int lastDamageScale;
+    int lastScalingTriggerID;
+    bool wasHit;
+    bool resetComboCount;
 
-    HitEntry *pendingLockHit = nullptr;
+    HitEntry *pendingLockHit;
 
-    bool knockDown = false;
-    bool isDown = false;
-    int knockDownFrames = 0;
-    bool nageKnockdown = false;
+    bool knockDown;
+    bool isDown;
+    int knockDownFrames;
+    bool nageKnockdown;
 
-    bool recoverForward = false;
-    bool recoverReverse = false;
+    bool recoverForward;
+    bool recoverReverse;
 
-    bool groundBounce = false;
+    bool groundBounce;
     Fixed groundBounceVelX;
     Fixed groundBounceVelY;
     Fixed groundBounceAccelX;
     Fixed groundBounceAccelY;
 
-    bool wallBounce = false;
-    bool wallSplat = false;
+    bool wallBounce;
+    bool wallSplat;
     Fixed wallBounceVelX;
     Fixed wallBounceVelY;
     Fixed wallBounceAccelX;
     Fixed wallBounceAccelY;
-    bool wallStopped = false;
-    int wallStopFrames = 0;
+    bool wallStopped;
+    int wallStopFrames;
 
-    AtemiData *currentArmor = nullptr;
-    int armorHitsLeft = 0;
-    bool armorThisFrame = false;
-    bool atemiThisFrame = false;
+    AtemiData *currentArmor;
+    int armorHitsLeft;
+    bool armorThisFrame;
+    bool atemiThisFrame;
 
-    int recoveryTiming = 0;
+    int recoveryTiming;
 
-    bool recordFrameTriggers = false;
-    bool recordLateCancels = false;
+    bool recordFrameTriggers;
+    bool recordLateCancels;
     ActionRef forcedTrigger;
 
-    bool isDrive = false;
-    bool wasDrive = false;
+    bool isDrive;
+    bool wasDrive;
 
-    float charColorR = 1.0;
-    float charColorG = 1.0;
-    float charColorB = 1.0;
+    float charColorR;
+    float charColorG;
+    float charColorB;
 
-    int uniqueParam[uniqueParamCount] = { 0 };
-    bool uniqueTimer = false;
-    int uniqueTimerCount = 0;
+    int uniqueParam[uniqueParamCount];
+    bool uniqueTimer;
+    int uniqueTimerCount;
 
-    int debuffTimer = 0;
+    int debuffTimer;
 
-    Action *pCurrentAction = nullptr;
+    Action *pCurrentAction;
 
-    Simulation *pSim = nullptr;
+    Simulation *pSim;
 
     struct defaultCopy
     {

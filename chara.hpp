@@ -100,7 +100,7 @@ struct Trigger {
     int vitalRatio;
 
     int rangeCondition = 0;
-    Fixed rangeParam;
+    Fixed rangeParam = Fixed(0);
 
     int stateCondition = 0;
 
@@ -202,8 +202,8 @@ struct Key {
 
 struct BoxKey : Key {
     int condition;
-    Fixed offsetX;
-    Fixed offsetY;
+    Fixed offsetX = Fixed(0);
+    Fixed offsetY = Fixed(0);
 };
 
 struct HurtBoxKey : BoxKey {
@@ -247,9 +247,9 @@ struct HitBoxKey : BoxKey {
 struct SteerKey : Key {
     int operationType;
     int valueType;
-    Fixed fixValue;
-    Fixed targetOffsetX;
-    Fixed targetOffsetY;
+    Fixed fixValue = Fixed(0);
+    Fixed targetOffsetX = Fixed(0);
+    Fixed targetOffsetY = Fixed(0);
     int shotCategory;
     int targetType;
     int calcValueFrame;
@@ -260,12 +260,12 @@ struct SteerKey : Key {
 
 struct PlaceKeyPos {
     int frame;
-    Fixed offset;
+    Fixed offset = Fixed(0);
 };
 
 struct PlaceKey : Key {
     int optionFlag;
-    Fixed ratio;
+    Fixed ratio = Fixed(0);
     int axis;
     std::vector<PlaceKeyPos> posList;
 };
@@ -315,8 +315,8 @@ struct BranchKey : Key {
 struct ShotKey : Key {
     int validStyle = 0;
     int operation;
-    Fixed posOffsetX;
-    Fixed posOffsetY;
+    Fixed posOffsetX = Fixed(0);
+    Fixed posOffsetY = Fixed(0);
     int actionId;
     int styleIdx;
 };

@@ -136,8 +136,8 @@ std::unordered_set<std::string> setCharsStarted;
 struct guyCreateInfo_t {
     std::string charName;
     int charVersion;
-    Fixed x;
-    Fixed y;
+    Fixed x = Fixed(0);
+    Fixed y = Fixed(0);
     int startDir;
     color col;
 };
