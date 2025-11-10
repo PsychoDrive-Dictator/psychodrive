@@ -47,6 +47,8 @@ struct GuyRef {
     // }
 };
 
+static const int uniqueParamCount = 5;
+
 class Guy {
 public:
     void setOpponent(Guy *pGuy) { pOpponent = pGuy; }
@@ -132,8 +134,6 @@ public:
     bool logUnknowns = true;
     bool logHits = false;
     bool logBranches = false;
-
-    static const int uniqueParamCount = 5;
 
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
@@ -327,7 +327,7 @@ public:
     }
 
     std::vector<const char *> &getMoveList() { return pCharData->vecMoveList; }
-    std::set<std::pair<int,int>> &getFrameTriggers() { return frameTriggers; }
+    std::set<ActionRef> &getFrameTriggers() { return frameTriggers; }
     void setRecordFrameTriggers(bool record, bool lateCancels) { recordFrameTriggers = record; recordLateCancels = lateCancels; }
     int getFrameMeterColorIndex();
     bool canAct() {
@@ -335,7 +335,7 @@ public:
         return canMove(a,b,c);
     }
     bool couldAct() { return couldMove; }
-    std::pair<int, int> & getForcedTrigger() { return forcedTrigger; }
+    ActionRef& getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
     int *getInputIDPtr() { return &inputID; }
@@ -449,20 +449,11 @@ private:
     }
     bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
 
-    int uniqueID = -1;
-    GuyRef pOpponent = nullptr;
-
     void guyLog(bool doLog, std::string logLine);
     void guyLog(std::string logLine) { guyLog(true, logLine ); }
 
-    // stuff that won't get copied around when dumping simulations
-    struct noCopy
-    {
-        noCopy &operator =(__attribute__((unused)) const noCopy &rhs) { return *this; }
-
-        int lastLogFrame = 0;
-        std::deque<std::string> logQueue;
-    } nc;
+    int uniqueID = -1;
+    GuyRef pOpponent = nullptr;
 
     int neutralMove = 0;
 
@@ -588,8 +579,6 @@ private:
     int airActionCounter = 0;
 
     int currentInput = 0;
-    InputBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
-    InputBuffer<int8_t, 200> directionBuffer;
 
     // hitting side
     uint64_t canHitID = 0;
@@ -674,12 +663,9 @@ private:
 
     int recoveryTiming = 0;
 
-    std::set<int> setDeferredTriggerIDs;
-
     bool recordFrameTriggers = false;
     bool recordLateCancels = false;
-    std::set<std::pair<int,int>> frameTriggers;
-    std::pair<int, int> forcedTrigger;
+    ActionRef forcedTrigger;
 
     bool isDrive = false;
     bool wasDrive = false;
@@ -697,6 +683,21 @@ private:
     Action *pCurrentAction = nullptr;
 
     Simulation *pSim = nullptr;
+
+    std::set<int> setDeferredTriggerIDs;
+    std::set<ActionRef> frameTriggers;
+    FixedBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
+    FixedBuffer<int8_t, 200> directionBuffer;
+
+    // stuff that won't get copied around when dumping simulations
+    struct noCopy
+    {
+        noCopy &operator =(__attribute__((unused)) const noCopy &rhs) { return *this; }
+
+        int lastLogFrame = 0;
+        std::deque<std::string> logQueue;
+    } nc;
+
     friend void ResolveHits(std::vector<PendingHit> &pendingHitList);
 };
 

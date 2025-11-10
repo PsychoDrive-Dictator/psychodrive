@@ -12,7 +12,7 @@
 #include "simulation.hpp"
 
 struct ComboRoute {
-    std::map<int, std::pair<int, int>> timelineTriggers;
+    std::map<int, ActionRef> timelineTriggers;
     int comboHits = 0;
     int simFrameProgress = 0;
     int guyFrameProgress = 0;
@@ -23,7 +23,7 @@ struct ComboRoute {
 };
 
 struct DoneRoute {
-    std::map<int, std::pair<int, int>> timelineTriggers;
+    std::map<int, ActionRef> timelineTriggers;
     int damage = 0;
 };
 
@@ -40,7 +40,7 @@ class ComboWorker {
 public:
     void Start(bool isFirst);
     void GetNextRoute(void);
-    void QueueRouteFork(std::pair<int,int> frameTrigger);
+    void QueueRouteFork(ActionRef frameTrigger);
     void WorkLoop(void);
 
     std::atomic<bool> idle;

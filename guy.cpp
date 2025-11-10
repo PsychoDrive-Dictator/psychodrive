@@ -645,7 +645,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
         return false;
     }
 
-    if (pTrigger->useUniqueParam && pTrigger->condParamID >= 0 && pTrigger->condParamID < Guy::uniqueParamCount) {
+    if (pTrigger->useUniqueParam && pTrigger->condParamID >= 0 && pTrigger->condParamID < uniqueParamCount) {
         if (!conditionOperator(pTrigger->condParamOp, uniqueParam[pTrigger->condParamID], pTrigger->condParamValue, "trigger unique param")) {
             return false;
         }
@@ -1167,7 +1167,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
             bool forceTrigger = false;
 
-            if (forcedTrigger == std::make_pair(actionID, styleInstall)) {
+            if (forcedTrigger == ActionRef(actionID, styleInstall)) {
                 forceTrigger = true;
             }
 
@@ -1180,7 +1180,7 @@ void Guy::DoTriggers(int fluffFrameBias)
             }
 
             if (recordThisTrigger && trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
-                frameTriggers.insert(std::make_pair(actionID, styleInstall));
+                frameTriggers.insert(ActionRef(actionID, styleInstall));
             }
 
             int initialI = 0;
@@ -3008,7 +3008,7 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 29: // unique param
-                    if (branchParam1 >= 0 && branchParam1 < Guy::uniqueParamCount) {
+                    if (branchParam1 >= 0 && branchParam1 < uniqueParamCount) {
                         doBranch = conditionOperator(branchParam2, uniqueParam[branchParam1], branchParam3, "unique param");
                     }
                     // _only_ do the branch in prehit, opposite from usual
@@ -3733,7 +3733,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     lastPosX = getPosX();
     lastPosY = getPosY();
 
-    forcedTrigger = std::make_pair(0,0);
+    forcedTrigger = ActionRef(0, 0);
 
     return true;
 }

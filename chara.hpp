@@ -37,6 +37,10 @@ public:
     inline bool operator<(const ActionRef& other) const {
         return packed < other.packed;
     }
+
+    inline bool operator==(const ActionRef& other) const {
+        return packed == other.packed;
+    }
 };
 
 enum InputType {

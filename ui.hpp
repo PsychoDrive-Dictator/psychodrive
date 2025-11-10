@@ -2,6 +2,7 @@
 
 #include <deque>
 
+#include "chara.hpp"
 #include "simulation.hpp"
 
 #include "imgui.h"
@@ -41,11 +42,11 @@ public:
     static constexpr float kHorizSpacing = 1.0;
     static constexpr float kFrameButtonWidth = 25.0;
 
-    std::map<int, std::pair<int, int>> timelineTriggers;
+    std::map<int, ActionRef> timelineTriggers;
     std::vector<inputRegion> inputRegions;
 
     std::vector<std::string> vecTriggerDropDownLabels;
-    std::vector<std::pair<int, int>> vecTriggers;
+    std::vector<ActionRef> vecTriggers;
     bool triggerAdded = false;
     int pendingTriggerAdd;
 

@@ -813,7 +813,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
     }
     if (timelineTriggers.find(frameIndex) != timelineTriggers.end()) {
         auto &trigger = timelineTriggers[frameIndex];
-        Action *pAction = pGuy->FindMove(trigger.first, trigger.second);
+        Action *pAction = pGuy->FindMove(trigger.actionID(), trigger.styleID());
         const char *actionName = pAction ? pAction->name.c_str() : "Unknown";
         std::string strLabel = "Delete " + std::string(actionName);
         if (ImGui::Button(strLabel.c_str())) {
@@ -826,7 +826,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         vecTriggers.clear();
         vecTriggerDropDownLabels.push_back("Add Action");
         for (auto &trigger : pGuy->getFrameTriggers()) {
-            Action *pAction = pGuy->FindMove(trigger.first, trigger.second);
+            Action *pAction = pGuy->FindMove(trigger.actionID(), trigger.styleID());
             const char *actionName = pAction ? pAction->name.c_str() : "Unknown";
             vecTriggerDropDownLabels.push_back(actionName);
             vecTriggers.push_back(trigger);
@@ -1659,7 +1659,7 @@ void CharacterUIController::Serialize(std::string &outStr)
 {
     outStr += std::to_string(character) + DL1 + std::to_string(charVersion) + DL1 + std::to_string(startPosX.data) + DL1;
     for (auto &i:timelineTriggers) {
-        outStr += std::to_string(i.first) + DL1 + std::to_string(i.second.first) + DL1 + std::to_string(i.second.second) + DL1;
+        outStr += std::to_string(i.first) + DL1 + std::to_string(i.second.actionID()) + DL1 + std::to_string(i.second.styleID()) + DL1;
     }
     outStr += DL1;
     for (auto &i:inputRegions) {
@@ -1708,7 +1708,7 @@ void SimulationController::Restore(std::string strSerialized)
             cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
             c = atoi(&strSerialized.c_str()[cursor]);
             cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
-            charControllers[i].timelineTriggers[a] = std::make_pair(b,c);
+            charControllers[i].timelineTriggers[a] = ActionRef(b, c);
         }
         while (true) {
             if (strSerialized.c_str()[cursor] == DL1) {

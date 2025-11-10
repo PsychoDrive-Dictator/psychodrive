@@ -65,7 +65,7 @@ stolen:
     justGotNextRoute = true;
 }
 
-void ComboWorker::QueueRouteFork(std::pair<int,int> frameTrigger) {
+void ComboWorker::QueueRouteFork(ActionRef frameTrigger) {
     // call this with mutexPendingRoutes locked!
     pendingRoutes.emplace_front();
     pendingRoutes.front() = currentRoute;
@@ -100,17 +100,17 @@ void ComboWorker::WorkLoop(void) {
             auto &forcedTrigger = pSim->simGuys[0]->getForcedTrigger();
             auto frameTrigger = currentRoute.timelineTriggers.find(pSim->frameCounter+1);
             if (frameTrigger != currentRoute.timelineTriggers.end()) {
-                if (frameTrigger->second.first > 0) {
+                if (frameTrigger->second.actionID() > 0) {
                     forcedTrigger = frameTrigger->second;
                     // rearm forward walk if we did a move
                     currentRoute.walkForward = 0;
                 } else {
-                    curInput = -frameTrigger->second.first;
+                    curInput = -frameTrigger->second.actionID();
                     if (curInput == FORWARD) {
                         currentRoute.walkForward = 1;
                     }
                 }
-                //pSim->Log(std::to_string(pSim->frameCounter+1) + " " + pSim->simGuys[0]->getActionName(forcedTrigger.first));
+                //pSim->Log(std::to_string(pSim->frameCounter+1) + " " + pSim->simGuys[0]->getActionName(forcedTrigger.actionID()));
             }
 
             pSim->simGuys[0]->Input(curInput);
@@ -132,19 +132,18 @@ void ComboWorker::WorkLoop(void) {
 
                 if ((pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) || pSim->simGuys[0]->canAct()) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
-                    //for (auto frameTrigger = pSim->simGuys[0]->getFrameTriggers().rbegin(); frameTrigger != pSim->simGuys[0]->getFrameTriggers().rend(); ++frameTrigger) {
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
-                        if (finder.doLights || (finder.lightsActionIDs.find(frameTrigger.first) == finder.lightsActionIDs.end())) {
+                        if (finder.doLights || (finder.lightsActionIDs.find(frameTrigger.actionID()) == finder.lightsActionIDs.end())) {
                             QueueRouteFork(frameTrigger);
                         }
                     }
                     if (pSim->simGuys[0]->canAct()) {
                         if (finder.doWalk && (currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
-                            QueueRouteFork(std::make_pair(-FORWARD, 0));
+                            QueueRouteFork(ActionRef(-FORWARD, 0));
                         }
-                        // QueueRouteFork(std::make_pair(-BACK, 0));
-                        // QueueRouteFork(std::make_pair(-(UP|FORWARD), 0));
-                        // QueueRouteFork(std::make_pair(-(UP|BACK), 0));
+                        // QueueRouteFork(ActionRef(-BACK, 0));
+                        // QueueRouteFork(ActionRef(-(UP|FORWARD), 0));
+                        // QueueRouteFork(ActionRef(-(UP|BACK), 0));
                     }
                 }
                 pSim->simGuys[0]->getFrameTriggers().clear();
@@ -199,10 +198,10 @@ void printRoute(const DoneRoute &route)
     std::string logEntry = std::to_string(route.damage) + " damage: ";
     for ( auto &trigger : route.timelineTriggers) {
         std::string actionDesc;
-        if (trigger.second.first < 0) {
-            renderInput(actionDesc, -trigger.second.first);
+        if (trigger.second.actionID() < 0) {
+            renderInput(actionDesc, -trigger.second.actionID());
         } else {
-            actionDesc = guys[0]->getActionName(trigger.second.first);
+            actionDesc = guys[0]->getActionName(trigger.second.actionID());
         }
         logEntry += std::to_string(trigger.first) + " " + actionDesc + " ";
     }

@@ -1,9 +1,71 @@
 #pragma once
 
+#include <cassert>
+#include <cstring>
 #include <string>
 #include <deque>
 #include "json.hpp"
 #include "fixed.hpp"
+
+template<typename T, std::size_t N, bool AssertOnOverflow = false>
+class FixedBuffer {
+private:
+    T buffer[N];
+    std::size_t count = 0;
+
+public:
+    inline void push_front(const T& value) {
+        if constexpr (AssertOnOverflow) {
+            assert(count < N);
+        }
+        std::memmove(&buffer[1], &buffer[0], (N - 1) * sizeof(T));
+        buffer[0] = value;
+        if (count < N) {
+            count++;
+        }
+    }
+
+    inline void push_back(const T& value) {
+        if constexpr (AssertOnOverflow) {
+            assert(count < N);
+        }
+        buffer[count] = value;
+        if (count < N) {
+            count++;
+        }
+    }
+
+    inline void clear() {
+        count = 0;
+    }
+
+    inline T& operator[](std::size_t index) {
+        return buffer[index];
+    }
+
+    inline const T& operator[](std::size_t index) const {
+        return buffer[index];
+    }
+
+    inline FixedBuffer& operator=(const FixedBuffer& other) {
+        if (this != &other) {
+            count = other.count;
+            if (count > 0) {
+                std::memcpy(buffer, other.buffer, count * sizeof(T));
+            }
+        }
+        return *this;
+    }
+
+    inline std::size_t size() const {
+        return count;
+    }
+
+    inline bool operator!=(const FixedBuffer& other) const {
+        if (count != other.count) return true;
+        return std::memcmp(buffer, other.buffer, count * sizeof(T)) != 0;
+    }
+};
 
 enum EGameMode {
     Batch = -1,
