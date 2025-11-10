@@ -292,6 +292,14 @@ struct ShotKey : Key {
     int styleIdx;
 };
 
+struct TriggerKey : Key {
+    int validStyle = 0;
+    int other;
+    int condition;
+    int state;
+    TriggerGroup *pTriggerGroup = nullptr;
+};
+
 struct ProjectileData {
     int id;
     int hitCount;
@@ -335,6 +343,7 @@ struct Action {
     std::vector<LockKey> lockKeys;
     std::vector<BranchKey> branchKeys;
     std::vector<ShotKey> shotKeys;
+    std::vector<TriggerKey> triggerKeys;
 
     int activeFrame;
     int recoveryStartFrame;

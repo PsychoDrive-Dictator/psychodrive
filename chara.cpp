@@ -649,6 +649,34 @@ void loadShotKeys(nlohmann::json* pShotJson, std::vector<ShotKey>* pOutputVector
     }
 }
 
+void loadTriggerKeys(nlohmann::json* pTriggerJson, std::vector<TriggerKey>* pOutputVector, std::map<int, TriggerGroup*>& triggerGroupByID)
+{
+    if (!pTriggerJson) {
+        return;
+    }
+
+    for (auto& [triggerKeyID, triggerKey] : pTriggerJson->items()) {
+        if (!triggerKey.contains("_StartFrame")) {
+            continue;
+        }
+        TriggerKey newKey;
+        newKey.startFrame = triggerKey["_StartFrame"];
+        newKey.endFrame = triggerKey["_EndFrame"];
+        newKey.validStyle = triggerKey["_ValidStyle"];
+        newKey.other = triggerKey["_Other"];
+        newKey.condition = triggerKey["_Condition"];
+        newKey.state = triggerKey["_State"];
+
+        int triggerGroupID = triggerKey["TriggerGroup"];
+        auto it = triggerGroupByID.find(triggerGroupID);
+        if (it != triggerGroupByID.end()) {
+            newKey.pTriggerGroup = it->second;
+        }
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadStyles(nlohmann::json* pCharInfoJson, std::vector<StyleData>* pOutputVector)
 {
     if (!pCharInfoJson || !pCharInfoJson->contains("Styles")) {
@@ -831,7 +859,7 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
     }
 }
 
-void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs, std::map<int, AtemiData*>& atemiByID, std::map<int, HitData*>& hitByID)
+void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs, std::map<int, AtemiData*>& atemiByID, std::map<int, HitData*>& hitByID, std::map<int, TriggerGroup*>& triggerGroupByID)
 {
     if (!pMovesJson) {
         return;
@@ -992,6 +1020,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
             loadShotKeys(&key["ShotKey"], &newAction.shotKeys);
         }
 
+        if (key.contains("TriggerKey")) {
+            newAction.triggerKeys.reserve(key["TriggerKey"].size() - 1);
+            loadTriggerKeys(&key["TriggerKey"], &newAction.triggerKeys, triggerGroupByID);
+        }
+
         pRet->actions.push_back(newAction);
     }
 }
@@ -1112,8 +1145,8 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     pRet->actions.reserve(pRet->mapMoveStyle.size());
 
-    loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID);
-    loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID);
+    loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
+    loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
 
     for (auto& action : pRet->actions) {
         pRet->actionsByID[std::make_pair(action.actionID, action.styleID)] = &action;

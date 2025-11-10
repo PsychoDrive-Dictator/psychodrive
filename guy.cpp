@@ -1075,44 +1075,40 @@ struct TriggerCheckState {
 void Guy::DoTriggers(int fluffFrameBias)
 {
     std::set<int> keptDeferredTriggerIDs;
-    bool hasTriggerKey = pActionJson->contains("TriggerKey");
+    bool hasTriggerKey = pCurrentAction && !pCurrentAction->triggerKeys.empty();
     if (hasTriggerKey || fluffFrames(fluffFrameBias))
     {
         TriggerCheckState triggers[2048] = {};
         int triggerCount = 0;
 
         if (hasTriggerKey) {
-            for (auto& [keyID, key] : (*pActionJson)["TriggerKey"].items())
+            for (auto& triggerKey : pCurrentAction->triggerKeys)
             {
-                if (!key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame) {
+                if (triggerKey.startFrame > currentFrame || triggerKey.endFrame <= currentFrame) {
                     continue;
                 }
 
-                int validStyles = key["_ValidStyle"];
-                if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
+                if (triggerKey.validStyle != 0 && !(triggerKey.validStyle & (1 << styleInstall))) {
                     continue;
                 }
 
                 // todo _Input for modern vs. classic
 
-                int other = key["_Other"];
-                bool defer = other & 1<<6;
-                int triggerGroup = key["TriggerGroup"];
-                int condition = key["_Condition"];
-                int state = key["_State"];
+                bool defer = triggerKey.other & 1<<6;
+                int condition = triggerKey.condition;
+                int state = triggerKey.state;
 
-                bool antiNormal = other & 1<<17;
+                bool antiNormal = triggerKey.other & 1<<17;
 
                 if (!defer && !CheckTriggerGroupConditions(condition, state)) {
                     continue;
                 }
 
-                auto it = pCharData->triggerGroupByID.find(triggerGroup);
-                if (it == pCharData->triggerGroupByID.end()) {
+                if (!triggerKey.pTriggerGroup) {
                     continue;
                 }
 
-                TriggerGroup *pTriggerGroup = it->second;
+                TriggerGroup *pTriggerGroup = triggerKey.pTriggerGroup;
                 for (auto& entry : pTriggerGroup->entries)
                 {
                     int actionID = entry.actionID;
@@ -1142,9 +1138,9 @@ void Guy::DoTriggers(int fluffFrameBias)
 
                     if (!defer && !antiNormal) {
                         triggers[entryIndex].hasNormal = true;
-                        triggers[entryIndex].late = currentFrame != key["_StartFrame"] && !canAct();
+                        triggers[entryIndex].late = currentFrame != triggerKey.startFrame && !canAct();
 
-                        if (triggerGroup == 0) {
+                        if (pTriggerGroup->id == 0) {
                             freeMovement = true;
                         }
                     }
