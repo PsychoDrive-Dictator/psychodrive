@@ -1,6 +1,7 @@
 #pragma once
 
 #include "json.hpp"
+#include <cstring>
 #include <deque>
 #include <string>
 #include <set>
@@ -83,7 +84,7 @@ public:
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return nc.logQueue; }
     // for opponent direction
-    std::vector<GuyRef> &getMinions() { return minions; }
+    std::vector<GuyRef> &getMinions() { return dc.minions; }
     Fixed getPosX() {
         return posX + (posOffsetX*direction);
     }
@@ -228,10 +229,10 @@ public:
             return;
         }
 
-        for (auto minion : minions) {
+        for (auto minion : dc.minions) {
             delete minion;
         }
-        minions.clear();
+        dc.minions.clear();
 
         std::vector<Guy*> *pGuyList = &guys;
         if (pSim) {
@@ -241,8 +242,8 @@ public:
 
         if (pParent) {
             // std erase when
-            const auto it = std::remove(pParent->minions.begin(), pParent->minions.end(), this);
-            pParent->minions.erase(it, pParent->minions.end());
+            const auto it = std::remove(pParent->dc.minions.begin(), pParent->dc.minions.end(), this);
+            pParent->dc.minions.erase(it, pParent->dc.minions.end());
         } else {
             const auto it = std::remove(pGuyList->begin(), pGuyList->end(), this);
             pGuyList->erase(it, pGuyList->end());
@@ -266,6 +267,15 @@ public:
     }
 
     Guy(void) {}
+
+    Guy& operator=(const Guy& other) {
+        if (this != &other) {
+            std::memcpy(&uniqueID, &other.uniqueID,
+                       reinterpret_cast<char*>(&dc) - reinterpret_cast<char*>(&uniqueID));
+            dc = other.dc;
+        }
+        return *this;
+    }
 
     Guy(Simulation *sim, std::string charName, int version, Fixed x, Fixed y, int startDir, color color)
     {
@@ -327,7 +337,7 @@ public:
     }
 
     std::vector<const char *> &getMoveList() { return pCharData->vecMoveList; }
-    std::set<ActionRef> &getFrameTriggers() { return frameTriggers; }
+    std::set<ActionRef> &getFrameTriggers() { return dc.frameTriggers; }
     void setRecordFrameTriggers(bool record, bool lateCancels) { recordFrameTriggers = record; recordLateCancels = lateCancels; }
     int getFrameMeterColorIndex();
     bool canAct() {
@@ -463,7 +473,6 @@ private:
 
     bool deniedLastBranch = false;
 
-    std::vector<GuyRef> minions;
     bool isProjectile = false;
     int projHitCount = 0;
     int projLifeTime = 0;
@@ -684,10 +693,14 @@ private:
 
     Simulation *pSim = nullptr;
 
-    std::set<int> setDeferredTriggerIDs;
-    std::set<ActionRef> frameTriggers;
-    FixedBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
-    FixedBuffer<int8_t, 200> directionBuffer;
+    struct defaultCopy
+    {
+        std::vector<GuyRef> minions;
+        std::set<int> setDeferredTriggerIDs;
+        std::set<ActionRef> frameTriggers;
+        FixedBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
+        FixedBuffer<int8_t, 200> directionBuffer;
+    } dc;
 
     // stuff that won't get copied around when dumping simulations
     struct noCopy

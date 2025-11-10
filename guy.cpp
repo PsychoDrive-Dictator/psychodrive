@@ -182,8 +182,8 @@ void Guy::Input(int input)
     }
     currentInput = input;
 
-    inputBuffer.push_front(input);
-    directionBuffer.push_front(direction.i());
+    dc.inputBuffer.push_front(input);
+    dc.directionBuffer.push_front(direction.i());
 }
 
 std::string Guy::getActionName(int actionID)
@@ -221,7 +221,7 @@ void Guy::UpdateActionData(void)
 
 bool Guy::RunFrame(void)
 {
-    frameTriggers.clear();
+    dc.frameTriggers.clear();
 
     if (!warudo) {
         if (debuffTimer > 0 ) {
@@ -630,7 +630,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
 
     if (pTrigger->limitShotCount) {
         int count = 0;
-        for ( auto minion : minions ) {
+        for ( auto minion : dc.minions ) {
             if (pTrigger->limitShotCategory & (1 << minion->limitShotCategory)) {
                 count++;
             }
@@ -749,8 +749,8 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
     bool initialMatch = false;
     // current frame + buffer
     int initialSearch = 1 + precedingTime + timeInHitStop;
-    if (inputBuffer.size() < (size_t)initialSearch) {
-        initialSearch = inputBuffer.size();
+    if (dc.inputBuffer.size() < (size_t)initialSearch) {
+        initialSearch = dc.inputBuffer.size();
     }
 
     if ((okCondFlags & 0x60) == 0x60) {
@@ -763,12 +763,12 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                 i = 0;
                 initialMatch = false;
                 while (i < initialSearch) {
-                    if (matchInput(inputBuffer[i], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
+                    if (matchInput(dc.inputBuffer[i], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
                     {
-                        if (!(inputBuffer[i] & CONSUMED)) {
+                        if (!(dc.inputBuffer[i] & CONSUMED)) {
                             atLeastOneNotConsumed = true;
                         }
-                        if (std::bitset<32>(inputBuffer[i] & okKeyFlags).count() >= 2) {
+                        if (std::bitset<32>(dc.inputBuffer[i] & okKeyFlags).count() >= 2) {
                             bothButtonsPressed = true;
                         }
                         initialMatch = true;
@@ -795,9 +795,9 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
         while (i < initialSearch)
         {
             // guile 1112 has 0s everywhere
-            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchInput(inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
+            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchInput(dc.inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
             {
-                if (!(inputBuffer[i] & CONSUMED)) {
+                if (!(dc.inputBuffer[i] & CONSUMED)) {
                     atLeastOneNotConsumed = true;
                 }
                 initialMatch = true;
@@ -855,9 +855,9 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                     int curAngle = 0;
                     int pointsForward = 0;
                     int pointsBackwards = 0;
-                    while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                    while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
                     {
-                        int bufferInput = inputBuffer[inputBufferCursor];
+                        int bufferInput = dc.inputBuffer[inputBufferCursor];
                         int targetAngle = inputAngle(bufferInput);
                         if (targetAngle) {
                             if (curAngle == 0) {
@@ -893,9 +893,9 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                         // count matching direction in input buffer, super naive but will work for testing
                         inputBufferCursor = i;
                         uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                        while (inputBufferCursor < inputBuffer.size() && inputBufferCursor < searchArea)
+                        while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
                         {
-                            if (matchInput(inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                            if (matchInput(dc.inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
                                 dirCount++;
                                 if (dirCount >= chargeFrames) {
                                     break;
@@ -919,12 +919,12 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                         break; // cancel trigger
                     }
                 } else {
-                    while (inputBufferCursor < inputBuffer.size())
+                    while (inputBufferCursor < dc.inputBuffer.size())
                     {
                         bool thismatch = false;
 
-                        int bufferInput = inputBuffer[inputBufferCursor];
-                        int bufferDirection = directionBuffer[inputBufferCursor];
+                        int bufferInput = dc.inputBuffer[inputBufferCursor];
+                        int bufferDirection = dc.directionBuffer[inputBufferCursor];
 
                         if (direction.i() != bufferDirection) {
                             bufferInput = invertDirection(bufferInput);
@@ -971,7 +971,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                     }
                 }
 
-                if (inputBufferCursor == inputBuffer.size()) {
+                if (inputBufferCursor == dc.inputBuffer.size()) {
                     // corner case - if we run out of buffer but had matched the input, finalize
                     // the match now or the trigger won't work - this can happen if you eg. have
                     // a dash input immediately at the beginning of a replay since the last match
@@ -1157,12 +1157,12 @@ void Guy::DoTriggers(int fluffFrameBias)
             }
 
             if (recordThisTrigger && trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
-                frameTriggers.insert(ActionRef(actionID, styleInstall));
+                dc.frameTriggers.insert(ActionRef(actionID, styleInstall));
             }
 
             int initialI = 0;
 
-            if (setDeferredTriggerIDs.find(triggerID) != setDeferredTriggerIDs.end()) {
+            if (dc.setDeferredTriggerIDs.find(triggerID) != dc.setDeferredTriggerIDs.end()) {
                 // check deferred trigger activation
                 if (trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                     log(logTriggers, "did deferred trigger " + std::to_string(actionID));
@@ -1170,7 +1170,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                     ExecuteTrigger(pTrigger);
 
                     // skip further triggers and cancel any delayed triggers
-                    setDeferredTriggerIDs.clear();
+                    dc.setDeferredTriggerIDs.clear();
                     keptDeferredTriggerIDs.clear();
                     break;
                 }
@@ -1190,7 +1190,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                     + " antinormal " + std::to_string(trigState.hasAntiNormal));
                 if (trigState.hasDeferred || trigState.hasAntiNormal) {
                     // queue the deferred trigger
-                    setDeferredTriggerIDs.insert(triggerID);
+                    dc.setDeferredTriggerIDs.insert(triggerID);
                     keptDeferredTriggerIDs.insert(triggerID);
                     if (trigState.hasAntiNormal) {
                         break;
@@ -1204,11 +1204,11 @@ void Guy::DoTriggers(int fluffFrameBias)
                     // otherwise chains trigger off of one input since the cancel window starts
                     // before input buffer ends
                     //int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
-                    //inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
-                    inputBuffer[initialI] |= CONSUMED;
+                    //dc.inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+                    dc.inputBuffer[initialI] |= CONSUMED;
 
                     // skip further triggers and cancel any delayed triggers
-                    setDeferredTriggerIDs.clear();
+                    dc.setDeferredTriggerIDs.clear();
                     keptDeferredTriggerIDs.clear();
                     break;
                 }
@@ -1216,12 +1216,12 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
     }
 
-    for (int id : setDeferredTriggerIDs) {
+    for (int id : dc.setDeferredTriggerIDs) {
         if (keptDeferredTriggerIDs.find(id) == keptDeferredTriggerIDs.end()) {
             log(logTriggers, "forgetting deferred trigger " + std::to_string(id));
         }
     }
-    setDeferredTriggerIDs = keptDeferredTriggerIDs;
+    dc.setDeferredTriggerIDs = keptDeferredTriggerIDs;
 }
 
 Box Guy::rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir)
@@ -2082,7 +2082,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (pendingHit.blocked && pOtherGuy->canAct()) {
                 // it seems to branch as needed between stand/crouch?
                 pOtherGuy->nextAction = 171;
-                if (!(pOtherGuy->inputBuffer[1] & BACK)) {
+                if (!(pOtherGuy->dc.inputBuffer[1] & BACK)) {
                     // immediately go into guard if you tap back in a prox guard box
                     pOtherGuy->NextAction(false, false);
                 }
@@ -3127,7 +3127,7 @@ void Guy::DoBranchKey(bool preHit)
                 case 52: // shot count
                     {
                         int count = 0;
-                        for ( auto minion : minions ) {
+                        for ( auto minion : dc.minions ) {
                             if (branchParam0 == minion->limitShotCategory) {
                                 count++;
                             }
@@ -4067,7 +4067,7 @@ void Guy::DoSteerKey(void)
                         pGuy = pParent;
                     } else if (targetType == 4) {
                         // todo supposed to be nearest matching projectile?
-                        for ( auto minion : minions ) {
+                        for ( auto minion : dc.minions ) {
                             if (shotCategory & (1 << minion->limitShotCategory)) {
                                 pGuy = minion;
                                 break;
@@ -4171,11 +4171,11 @@ void Guy::DoWorldKey(void)
                 // todo is timer timer deduction?
                 if (pOpponent) {
                     pOpponent->tokiYoTomare = true;
-                    for ( auto minion : pOpponent->minions ) {
+                    for ( auto minion : pOpponent->dc.minions ) {
                         minion->tokiYoTomare = true;
                     }
                 }
-                for ( auto minion : minions ) {
+                for ( auto minion : dc.minions ) {
                     minion->tokiYoTomare = true;
                 }
                 break;
@@ -4185,13 +4185,13 @@ void Guy::DoWorldKey(void)
                     if (pOpponent->warudo) {
                         pOpponent->tokiWaUgokidasu = true;
                     }
-                    for ( auto minion : pOpponent->minions ) {
+                    for ( auto minion : pOpponent->dc.minions ) {
                         if (minion->warudo) {
                             minion->tokiWaUgokidasu = true;
                         }
                     }
                 }
-                for ( auto minion : minions ) {
+                for ( auto minion : dc.minions ) {
                     if (minion->warudo) {
                         minion->tokiWaUgokidasu = true;
                     }
@@ -4518,9 +4518,9 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
             pNewGuy->RunFrame();
             if (pParent) {
-                pParent->minions.push_back(pNewGuy);
+                pParent->dc.minions.push_back(pNewGuy);
             } else {
-                minions.push_back(pNewGuy);
+                dc.minions.push_back(pNewGuy);
             }
         }
     }
@@ -4579,7 +4579,7 @@ void Guy::FixRefs(std::map<int,Guy*> &guysByID) {
     pParent.FixRef(guysByID);
     pAttacker.FixRef(guysByID);
 
-    for (GuyRef & minion : minions) {
+    for (GuyRef & minion : dc.minions) {
         minion.FixRef(guysByID);
     }
 }
