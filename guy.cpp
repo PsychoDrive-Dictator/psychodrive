@@ -216,11 +216,6 @@ void Guy::Input(int input)
 
     inputBuffer.push_front(input);
     directionBuffer.push_front(direction.i());
-    // how much is too much?
-    if (inputBuffer.size() > 200) {
-        inputBuffer.pop_back();
-        directionBuffer.pop_back();
-    }
 }
 
 std::string Guy::getActionName(int actionID)

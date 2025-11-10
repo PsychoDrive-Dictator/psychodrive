@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <cstring>
 #include <map>
 #include <string>
 
@@ -97,6 +99,42 @@ static inline int angleDiff(int curAngle, int futureAngle)
 	if (res < -180) return res + 360;
 	return res;
 }
+
+template<typename T, std::size_t N>
+class InputBuffer {
+private:
+    T buffer[N];
+    std::size_t count = 0;
+
+public:
+    inline void push_front(const T& value) {
+        std::memmove(&buffer[1], &buffer[0], (N - 1) * sizeof(T));
+        buffer[0] = value;
+        if (count < N) {
+            count++;
+        }
+    }
+
+    inline T& operator[](std::size_t index) {
+        return buffer[index];
+    }
+
+    inline const T& operator[](std::size_t index) const {
+        return buffer[index];
+    }
+
+    inline InputBuffer& operator=(const InputBuffer& other) {
+        if (this != &other) {
+            std::memcpy(buffer, other.buffer, N * sizeof(T));
+            count = other.count;
+        }
+        return *this;
+    }
+
+    inline std::size_t size() const {
+        return count;
+    }
+};
 
 extern std::map<int, int> currentInputMap;
 

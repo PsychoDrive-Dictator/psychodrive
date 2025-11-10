@@ -588,8 +588,8 @@ private:
     int airActionCounter = 0;
 
     int currentInput = 0;
-    std::deque<int> inputBuffer;
-    std::deque<int> directionBuffer;
+    InputBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
+    InputBuffer<int8_t, 200> directionBuffer;
 
     // hitting side
     uint64_t canHitID = 0;
