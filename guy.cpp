@@ -1053,7 +1053,7 @@ void Guy::DoTriggers(int fluffFrameBias)
     bool hasTriggerKey = pCurrentAction && !pCurrentAction->triggerKeys.empty();
     if (hasTriggerKey || fluffFrames(fluffFrameBias))
     {
-        TriggerCheckState triggers[2048] = {};
+        TriggerCheckState triggers[2048];
         int triggerCount = 0;
 
         if (hasTriggerKey) {
