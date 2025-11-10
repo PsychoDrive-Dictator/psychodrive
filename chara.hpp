@@ -10,36 +10,29 @@
 
 class ActionRef {
 private:
-    uint32_t packed;
+    int32_t actionID_;
+    int32_t styleID_;
 
 public:
-    ActionRef() : packed(0) {}
-    ActionRef(int actionID, int styleID)
-        : packed((uint32_t)actionID | ((uint32_t)styleID << 16)) {}
+    ActionRef() : actionID_(0), styleID_(0) {}
+    ActionRef(int32_t actionID, int32_t styleID)
+        : actionID_(actionID), styleID_(styleID) {}
 
-    inline int actionID() const {
-        return packed & 0xFFFF;
+    inline int32_t actionID() const {
+        return actionID_;
     }
 
-    inline int styleID() const {
-        return (packed >> 16) & 0xFFFF;
-    }
-
-    inline operator uint32_t() const {
-        return packed;
-    }
-
-    inline ActionRef& operator=(uint32_t value) {
-        packed = value;
-        return *this;
+    inline int32_t styleID() const {
+        return styleID_;
     }
 
     inline bool operator<(const ActionRef& other) const {
-        return packed < other.packed;
+        if (actionID_ != other.actionID_) return actionID_ < other.actionID_;
+        return styleID_ < other.styleID_;
     }
 
     inline bool operator==(const ActionRef& other) const {
-        return packed == other.packed;
+        return actionID_ == other.actionID_ && styleID_ == other.styleID_;
     }
 };
 
