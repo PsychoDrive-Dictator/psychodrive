@@ -610,6 +610,75 @@ void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutput
     }
 }
 
+void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
+{
+    pEntry->comboAdd = (*pHitEntryJson)["ComboAdd"];
+    pEntry->juggleFirst = (*pHitEntryJson)["Juggle1st"];
+    pEntry->juggleAdd = (*pHitEntryJson)["JuggleAdd"];
+    pEntry->juggleLimit = (*pHitEntryJson)["JuggleLimit"];
+    pEntry->hitStun = (*pHitEntryJson)["HitStun"];
+    pEntry->moveDestX = (*pHitEntryJson)["MoveDest"]["x"];
+    pEntry->moveDestY = (*pHitEntryJson)["MoveDest"]["y"];
+    pEntry->moveTime = (*pHitEntryJson)["MoveTime"];
+    pEntry->dmgValue = (*pHitEntryJson)["DmgValue"];
+    pEntry->dmgType = (*pHitEntryJson)["DmgType"];
+    pEntry->dmgKind = (*pHitEntryJson)["DmgKind"];
+    pEntry->dmgPower = (*pHitEntryJson)["DmgPower"];
+    pEntry->moveType = (*pHitEntryJson)["MoveType"];
+    pEntry->floorTime = (*pHitEntryJson)["FloorTime"];
+    pEntry->downTime = (*pHitEntryJson)["DownTime"];
+    pEntry->jimenBound = (*pHitEntryJson)["_jimen_bound"];
+    pEntry->kabeBound = (*pHitEntryJson)["_kabe_bound"];
+    pEntry->kabeTataki = (*pHitEntryJson)["_kabe_tataki"];
+    pEntry->bombBurst = pHitEntryJson->value("_bomb_burst", false);
+    pEntry->attr0 = (*pHitEntryJson)["Attr0"];
+    pEntry->attr1 = (*pHitEntryJson)["Attr1"];
+    pEntry->attr2 = (*pHitEntryJson)["Attr2"];
+    pEntry->attr3 = (*pHitEntryJson)["Attr3"];
+    pEntry->ext0 = (*pHitEntryJson)["Ext0"];
+    pEntry->hitStopOwner = (*pHitEntryJson)["HitStopOwner"];
+    pEntry->hitStopTarget = (*pHitEntryJson)["HitStopTarget"];
+    pEntry->hitmark = (*pHitEntryJson)["Hitmark"];
+    pEntry->floorDestX = (*pHitEntryJson)["FloorDest"]["x"];
+    pEntry->floorDestY = (*pHitEntryJson)["FloorDest"]["y"];
+    pEntry->wallTime = (*pHitEntryJson)["WallTime"];
+    pEntry->wallStop = (*pHitEntryJson)["WallStop"];
+    pEntry->wallDestX = (*pHitEntryJson)["WallDest"]["x"];
+    pEntry->wallDestY = (*pHitEntryJson)["WallDest"]["y"];
+}
+
+void loadHits(nlohmann::json* pHitJson, std::vector<HitData>* pOutputVector)
+{
+    if (!pHitJson) {
+        return;
+    }
+
+    for (auto& [hitID, hitData] : pHitJson->items()) {
+        HitData newHit;
+        newHit.id = std::stoi(hitID);
+
+        if (hitData.contains("common")) {
+            for (auto& [slotID, slotData] : hitData["common"].items()) {
+                int slot = std::stoi(slotID);
+                if (slot >= 0 && slot < 5) {
+                    loadHitEntry(&slotData, &newHit.common[slot]);
+                }
+            }
+        }
+
+        if (hitData.contains("param")) {
+            for (auto& [slotID, slotData] : hitData["param"].items()) {
+                int slot = std::stoi(slotID);
+                if (slot >= 0 && slot < 20) {
+                    loadHitEntry(&slotData, &newHit.param[slot]);
+                }
+            }
+        }
+
+        pOutputVector->push_back(newHit);
+    }
+}
+
 int countAtemis(nlohmann::json* pAtemiJson)
 {
     if (!pAtemiJson) {
@@ -927,6 +996,15 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     for (auto& atemi : pRet->atemis) {
         pRet->atemiByID[atemi.id] = &atemi;
+    }
+
+    if (pHitJson) {
+        pRet->hits.reserve(pHitJson->size());
+    }
+    loadHits(pHitJson, &pRet->hits);
+
+    for (auto& hit : pRet->hits) {
+        pRet->hitByID[hit.id] = &hit;
     }
 
     pRet->actions.reserve(pRet->mapMoveStyle.size());

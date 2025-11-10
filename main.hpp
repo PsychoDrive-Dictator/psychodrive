@@ -71,13 +71,14 @@ struct HurtBox {
 };
 
 class Guy;
+struct HitEntry;
 
 struct PendingHit {
     Guy *pGuyHitting;
     Guy *pGuyGettingHit;
     HitBox hitBox;
     HurtBox hurtBox;
-    nlohmann::json *pHitEntry;
+    HitEntry *pHitEntry;
     int hitEntryID;
     int hitEntryFlag;
     bool blocked;

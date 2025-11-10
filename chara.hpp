@@ -253,6 +253,48 @@ struct AtemiData {
     int resistLimit;
 };
 
+struct HitEntry {
+    int comboAdd;
+    int juggleFirst;
+    int juggleAdd;
+    int juggleLimit;
+    int hitStun;
+    int moveDestX;
+    int moveDestY;
+    int moveTime;
+    int dmgValue;
+    int dmgType;
+    int dmgKind;
+    int dmgPower;
+    int moveType;
+    int floorTime;
+    int downTime;
+    bool jimenBound;
+    bool kabeBound;
+    bool kabeTataki;
+    bool bombBurst;
+    int attr0;
+    int attr1;
+    int attr2;
+    int attr3;
+    int ext0;
+    int hitStopOwner;
+    int hitStopTarget;
+    int hitmark;
+    int floorDestX;
+    int floorDestY;
+    int wallTime;
+    int wallStop;
+    int wallDestX;
+    int wallDestY;
+};
+
+struct HitData {
+    int id;
+    HitEntry common[5];
+    HitEntry param[20];
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -301,12 +343,14 @@ struct CharacterData {
     std::vector<Rect> rects;
     std::vector<ProjectileData> projectileDatas;
     std::vector<AtemiData> atemis;
+    std::vector<HitData> hits;
     std::vector<Action> actions;
 
     std::map<int, TriggerGroup*> triggerGroupByID;
     std::map<std::pair<int, int>, Rect*> rectsByIDs;
     std::map<std::pair<int, int>, Action*> actionsByID;
     std::map<int, AtemiData*> atemiByID;
+    std::map<int, HitData*> hitByID;
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
     std::map<std::pair<int, int>, nlohmann::json*> mapMoveJson;

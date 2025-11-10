@@ -1995,27 +1995,35 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 continue;
             }
 
-            std::string hitEntryFlagString = to_string_leading_zeroes(hitEntryFlag, 2);
-            nlohmann::json *pHitEntry = nullptr;
+            HitEntry *pHitEntry = nullptr;
             int hitEntryID = hitbox.hitEntryID;
             bool bombBurst = false;
 
             if (hitbox.type != proximity_guard) {
-                pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
+                auto hitIt = pCharData->hitByID.find(hitEntryID);
+                if (hitIt == pCharData->hitByID.end()) {
+                    continue;
+                }
+                HitData *pHitData = hitIt->second;
 
                 if (isGrab) {
-                    pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
+                    pHitEntry = &pHitData->common[0];
+                } else {
+                    pHitEntry = &pHitData->param[hitEntryFlag];
                 }
 
                 // if bomb burst and found a bomb, use the next hit ID instead
-                if (pHitEntry->value("_bomb_burst", false) && pOpponent->debuffTimer) {
+                if (pHitEntry->bombBurst && pOpponent->debuffTimer) {
                     bombBurst = true;
                     hitEntryID += 1;
-                    hitIDString = to_string_leading_zeroes(hitEntryID, 3);
-                    pHitEntry = &(*pHitJson)[hitIDString]["param"][hitEntryFlagString];
+                    auto bombHitIt = pCharData->hitByID.find(hitEntryID);
+                    if (bombHitIt != pCharData->hitByID.end()) {
+                        pHitData = bombHitIt->second;
+                        pHitEntry = &pHitData->param[hitEntryFlag];
+                    }
                 }
 
-                int juggleLimit = (*pHitEntry)["JuggleLimit"];
+                int juggleLimit = pHitEntry->juggleLimit;
                 if (wasDrive) {
                     juggleLimit += 3;
                 }
@@ -2033,13 +2041,15 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     }
 
     if (pendingLockHit != -1) {
-        std::string hitIDString = to_string_leading_zeroes(pendingLockHit, 3);
-        nlohmann::json *pHitEntry = &(*pHitJson)[hitIDString]["common"]["0"];
-        // really we should save the lock target, etc.
-        if (pOpponent) {
-            pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, false);
-            pOpponent->log(pOpponent->logHits, "lock hit dt applied " + hitIDString);
-            pOpponent->locked = false;
+        auto hitIt = pCharData->hitByID.find(pendingLockHit);
+        if (hitIt != pCharData->hitByID.end()) {
+            HitEntry *pHitEntry = &hitIt->second->common[0];
+            // really we should save the lock target, etc.
+            if (pOpponent) {
+                pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, false);
+                pOpponent->log(pOpponent->logHits, "lock hit dt applied " + std::to_string(pendingLockHit));
+                pOpponent->locked = false;
+            }
         }
         pendingLockHit = -1;
     }
@@ -2065,7 +2075,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
     for (auto &pendingHit : pendingHitList) {
         HitBox &hitBox = pendingHit.hitBox;
         HurtBox &hurtBox = pendingHit.hurtBox;
-        nlohmann::json *pHitEntry = pendingHit.pHitEntry;
+        HitEntry *pHitEntry = pendingHit.pHitEntry;
         Guy *pOtherGuy = pendingHit.pGuyGettingHit;
         Guy *pGuy = pendingHit.pGuyHitting;
         int hitEntryFlag = pendingHit.hitEntryFlag;
@@ -2111,13 +2121,13 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             continue;
         }
 
-        int destX = (*pHitEntry)["MoveDest"]["x"];
-        int destY = (*pHitEntry)["MoveDest"]["y"];
-        int hitHitStun = (*pHitEntry)["HitStun"];
-        int dmgType = (*pHitEntry)["DmgType"];
-        int moveType = (*pHitEntry)["MoveType"];
-        int attr0 = (*pHitEntry)["Attr0"];
-        int hitMark = (*pHitEntry)["Hitmark"];
+        int destX = pHitEntry->moveDestX;
+        int destY = pHitEntry->moveDestY;
+        int hitHitStun = pHitEntry->hitStun;
+        int dmgType = pHitEntry->dmgType;
+        int moveType = pHitEntry->moveType;
+        int attr0 = pHitEntry->attr0;
+        int hitMark = pHitEntry->hitmark;
 
         bool isGrab = hitBox.type == grab;
 
@@ -2229,9 +2239,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, &hurtBox);
         }
 
-        int hitStopSelf = (*pHitEntry)["HitStopOwner"];
-        int hitStopTarget = (*pHitEntry)["HitStopTarget"];
-        int attr2 = (*pHitEntry)["Attr2"];
+        int hitStopSelf = pHitEntry->hitStopOwner;
+        int hitStopTarget = pHitEntry->hitStopTarget;
+        int attr2 = pHitEntry->attr2;
         // or it could be that normal throws take their value from somewhere else
         if (hitStopTarget == -1) {
             hitStopTarget = hitStopSelf;
@@ -2324,7 +2334,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->hitThisMove = true;
             if (hitFlagToParent) pGuy->pParent->hitThisMove = true;
 
-            int dmgKind = (*pHitEntry)["DmgKind"];
+            int dmgKind = pHitEntry->dmgKind;
 
             if (dmgKind == 11) {
                 pGuy->DoInstantAction(592); // IMM_VEGA_BOMB
@@ -2374,30 +2384,30 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
     }
 }
 
-void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
+void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
 {
-    int comboAdd = (*pHitEffect)["ComboAdd"];
-    int juggleFirst = (*pHitEffect)["Juggle1st"];
-    int juggleAdd = (*pHitEffect)["JuggleAdd"];
-    int hitEntryHitStun = (*pHitEffect)["HitStun"];
-    int destX = (*pHitEffect)["MoveDest"]["x"];
-    int destY = (*pHitEffect)["MoveDest"]["y"];
-    int destTime = (*pHitEffect)["MoveTime"];
-    int dmgValue = (*pHitEffect)["DmgValue"];
-    int dmgType = (*pHitEffect)["DmgType"];
-    int moveType = (*pHitEffect)["MoveType"];
-    int floorTime = (*pHitEffect)["FloorTime"];
-    int downTime = (*pHitEffect)["DownTime"];
-    bool jimenBound = (*pHitEffect)["_jimen_bound"];
-    bool kabeBound = (*pHitEffect)["_kabe_bound"];
-    bool kabeTataki = (*pHitEffect)["_kabe_tataki"];
-    int attackStrength = (*pHitEffect)["DmgPower"];
-    int attr0 = (*pHitEffect)["Attr0"];
-    int attr1 = (*pHitEffect)["Attr1"];
-    int attr3 = (*pHitEffect)["Attr3"];
-    int ext0 = (*pHitEffect)["Ext0"];
+    int comboAdd = pHitEffect->comboAdd;
+    int juggleFirst = pHitEffect->juggleFirst;
+    int juggleAdd = pHitEffect->juggleAdd;
+    int hitEntryHitStun = pHitEffect->hitStun;
+    int destX = pHitEffect->moveDestX;
+    int destY = pHitEffect->moveDestY;
+    int destTime = pHitEffect->moveTime;
+    int dmgValue = pHitEffect->dmgValue;
+    int dmgType = pHitEffect->dmgType;
+    int moveType = pHitEffect->moveType;
+    int floorTime = pHitEffect->floorTime;
+    int downTime = pHitEffect->downTime;
+    bool jimenBound = pHitEffect->jimenBound;
+    bool kabeBound = pHitEffect->kabeBound;
+    bool kabeTataki = pHitEffect->kabeTataki;
+    int attackStrength = pHitEffect->dmgPower;
+    int attr0 = pHitEffect->attr0;
+    int attr1 = pHitEffect->attr1;
+    int attr3 = pHitEffect->attr3;
+    int ext0 = pHitEffect->ext0;
 
-    int dmgKind = (*pHitEffect)["DmgKind"];
+    int dmgKind = pHitEffect->dmgKind;
     // int dmgPart = (*pHitEffect)["DmgPart"];
     // int dmgVari = (*pHitEffect)["DmgVari"];
     // int curveTargetID = hitEntry["CurveTgtID"];
@@ -2588,8 +2598,8 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
         }
 
         if (jimenBound && floorTime) {
-            int floorDestX = (*pHitEffect)["FloorDest"]["x"];
-            int floorDestY = (*pHitEffect)["FloorDest"]["y"];
+            int floorDestX = pHitEffect->floorDestX;
+            int floorDestY = pHitEffect->floorDestY;
 
             groundBounce = true;
             groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
@@ -2605,15 +2615,15 @@ void Guy::ApplyHitEffect(nlohmann::json *pHitEffect, Guy* attacker, bool applyHi
 
         wallSplat = false;
         wallBounce = false;
-        int wallTime = (*pHitEffect)["WallTime"];
+        int wallTime = pHitEffect->wallTime;
         if (kabeTataki) {
             // this can happen even if you block! blocked DI
             wallSplat = true;
-            wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 2;
+            wallStopFrames = pHitEffect->wallStop + 2;
         } else if (kabeBound && wallTime) {
-            int wallDestX = (*pHitEffect)["WallDest"]["x"];
-            int wallDestY = (*pHitEffect)["WallDest"]["y"];
-            wallStopFrames = (*pHitEffect)["WallStop"].get<int>() + 2;
+            int wallDestX = pHitEffect->wallDestX;
+            int wallDestY = pHitEffect->wallDestY;
+            wallStopFrames = pHitEffect->wallStop + 2;
 
             wallBounce = true;
             wallBounceVelX = fixDivWithBias(Fixed(-wallDestX) , Fixed(wallTime));

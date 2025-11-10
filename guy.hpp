@@ -388,7 +388,7 @@ private:
     void UpdateBoxes(void);
     Box rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir);
 
-    void ApplyHitEffect(nlohmann::json *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
+    void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
 
     void ExecuteTrigger(Trigger *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
