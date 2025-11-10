@@ -12,6 +12,7 @@
 #include "ui.hpp"
 #include "main.hpp"
 #include "input.hpp"
+#include "combogen.hpp"
 
 #include <cstdlib>
 
@@ -552,16 +553,56 @@ void drawInputEditor()
 
 void drawComboFinderWindow()
 {
-    ImGui::Begin("combo miner");
-    ImGui::Checkbox("light normals", &comboFinderDoLights);
+    ImGui::Begin("Combo Miner");
+    ImGui::Checkbox("Light normals", &comboFinderDoLights);
     ImGui::SameLine();
-    ImGui::Checkbox("late cancels", &comboFinderDoLateCancels);
+    ImGui::Checkbox("Late cancels", &comboFinderDoLateCancels);
     ImGui::SameLine();
-    ImGui::Checkbox("walk", &comboFinderDoWalk);
+    ImGui::Checkbox("Walk", &comboFinderDoWalk);
     ImGui::SameLine();
-    ImGui::Checkbox("karas", &comboFinderDoKaras);
-    if (ImGui::Button("run!")) {
+    ImGui::Checkbox("Karas", &comboFinderDoKaras);
+    if (ImGui::Button("Run!")) {
         runComboFinder = true;
+    }
+
+    if (finder.running || finder.totalFrames > 0) {
+        ImGui::Separator();
+        ImGui::Text("threads: %d", finder.threadCount);
+
+        uint64_t currentTotalFrames = finder.totalFrames;
+        if (finder.running) {
+            currentTotalFrames = 0;
+            for (auto worker : finder.workerPool) {
+                currentTotalFrames += worker->framesProcessed.load();
+            }
+        }
+
+        uint64_t fps = finder.running ? finder.currentFPS : finder.finalFPS;
+
+        ImGui::Text("frames: %s", formatWithCommas(currentTotalFrames).c_str());
+        ImGui::Text("fps: %s", formatWithCommas(fps).c_str());
+    }
+
+    if (finder.doneRoutes.size() > 0 && guys.size() > 0) {
+        ImGui::Separator();
+        ImGui::Text("Top routes:");
+
+        int routeCount = 0;
+        const int maxRoutes = 10;
+        for (auto it = finder.doneRoutes.rbegin(); it != finder.doneRoutes.rend() && routeCount < maxRoutes; ++it, ++routeCount) {
+            std::string routeStr = routeToString(*it, guys[0]);
+            ImGui::TextWrapped("%s", routeStr.c_str());
+        }
+    }
+
+    if (finder.recentRoutes.size() > 0 && guys.size() > 0) {
+        ImGui::Separator();
+        ImGui::Text("Recent routes:");
+
+        for (auto it = finder.recentRoutes.rbegin(); it != finder.recentRoutes.rend(); ++it) {
+            std::string routeStr = routeToString(*it, guys[0]);
+            ImGui::TextWrapped("%s", routeStr.c_str());
+        }
     }
 
     ImGui::End();
@@ -771,14 +812,14 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         return;
     }
 
-    Guy *pGuy = simController.pSim->getRecordedGuy(frameIndex, getSimCharSlot());
+    Guy *pGuy = simController.getRecordedGuy(frameIndex, getSimCharSlot());
 
     ImGui::Text("Navigation:");
     if (ImGui::Button("<")) {
         int searchFrame = frameIndex;
         bool foundNoWindow = false;
         while (searchFrame >= 0) {
-            Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
+            Guy *pFrameGuy = simController.getRecordedGuy(searchFrame, getSimCharSlot());
             if (pFrameGuy && !foundNoWindow && pFrameGuy->getFrameTriggers() != pGuy->getFrameTriggers()) {
                 foundNoWindow = true;
             }
@@ -798,7 +839,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         int searchFrame = frameIndex;
         bool foundNoWindow = false;
         while (searchFrame < simController.simFrameCount) {
-            Guy *pFrameGuy = simController.pSim->getRecordedGuy(searchFrame, getSimCharSlot());
+            Guy *pFrameGuy = simController.getRecordedGuy(searchFrame, getSimCharSlot());
             if (pFrameGuy && !foundNoWindow && pFrameGuy->getFrameTriggers() != pGuy->getFrameTriggers()) {
                 foundNoWindow = true;
             }
@@ -978,11 +1019,11 @@ void CharacterUIController::RenderUI(void)
         return;
     }
 
-    Guy *pGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
+    Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
 
     if (pGuy && pGuy->getOpponent()) {
         int opponentID = pGuy->getOpponent()->getUniqueID();
-        Guy *pOpponent = simController.pSim->getRecordedGuy(simController.scrubberFrame, opponentID);
+        Guy *pOpponent = simController.getRecordedGuy(simController.scrubberFrame, opponentID);
 
         if (pOpponent) {
             int comboHits = pOpponent->getComboHits();
@@ -1006,7 +1047,7 @@ static ImVec4 frameMeterColors[] = {
 
 void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
 {
-    int frameCount = simController.pSim->stateRecording.size();
+    int frameCount = simController.stateRecording.size();
 
     float cursorX = ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth) + simController.frameMeterMouseDragAmount * simController.kFrameMeterDragRatio;
     float cursorY = ImGui::GetCursorPosY();
@@ -1014,8 +1055,8 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
     ImGui::BeginDisabled();
     for (int i = 0; i < frameCount; i++) {
-        Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
-        Guy *pGuyPrevFrame = simController.pSim->getRecordedGuy(i-1, getSimCharSlot());
+        Guy *pGuy = simController.getRecordedGuy(i, getSimCharSlot());
+        Guy *pGuyPrevFrame = simController.getRecordedGuy(i-1, getSimCharSlot());
 
         if (!pGuyPrevFrame || (pGuy->getFrameTriggers().size() && (pGuyPrevFrame->getFrameTriggers() != pGuy->getFrameTriggers()))) {
             // cancel window, figure out how far it goes
@@ -1023,7 +1064,7 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
             pGuyPrevFrame = pGuy;
             while (true) {
                 j++;
-                Guy *pGuyJ = simController.pSim->getRecordedGuy(j, getSimCharSlot());
+                Guy *pGuyJ = simController.getRecordedGuy(j, getSimCharSlot());
                 if (!pGuyJ || (pGuyPrevFrame->getFrameTriggers() != pGuyJ->getFrameTriggers())) {
                     break;
                 }
@@ -1069,7 +1110,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
     ImGui::PushStyleColor(ImGuiCol_Border, kFrameButtonBorderColor);
     int sameColorCount = 0;
-    int frameCount = simController.pSim->stateRecording.size();
+    int frameCount = simController.stateRecording.size();
 
     if (!rightSide) renderFrameMeterCancelWindows(frameIndex);
 
@@ -1083,13 +1124,13 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         // walk from the end and find advantage
         int i = frameCount - 1;
         while (i > 0) {
-            Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
-            Guy *pOtherGuy = simController.pSim->getRecordedGuy(i, !getSimCharSlot());
+            Guy *pGuy = simController.getRecordedGuy(i, getSimCharSlot());
+            Guy *pOtherGuy = simController.getRecordedGuy(i, !getSimCharSlot());
             if (pGuy->getFrameMeterColorIndex() == 1 && pOtherGuy->getFrameMeterColorIndex() != 1) {
                 foundAdvantageWindow = true;
                 endAdvantageWindowFrame = i;
                 while (i > 0) {
-                    Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
+                    Guy *pGuy = simController.getRecordedGuy(i, getSimCharSlot());
                     if (pGuy->getFrameMeterColorIndex() != 1) {
                         break;
                     }
@@ -1111,8 +1152,8 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     }
 
     for (int i = 0; i < frameCount; i++) {
-        Guy *pGuy = simController.pSim->getRecordedGuy(i, getSimCharSlot());
-        Guy *pGuyNextFrame = simController.pSim->getRecordedGuy(i+1, getSimCharSlot());
+        Guy *pGuy = simController.getRecordedGuy(i, getSimCharSlot());
+        Guy *pGuyNextFrame = simController.getRecordedGuy(i+1, getSimCharSlot());
         if (i != 0) ImGui::SameLine();
 
         ImGui::PushID(i);
@@ -1217,6 +1258,12 @@ int CharacterUIController::getInput(int frameID)
     return input;
 }
 
+SimulationController::~SimulationController()
+{
+    // clear stateRecording before guyPool destructs to avoid dangling pointers
+    stateRecording.clear();
+}
+
 void SimulationController::Reset(void)
 {
     charControllers.clear();
@@ -1298,7 +1345,8 @@ bool SimulationController::NewSim(void)
         abort();
     }
 
-    pSim->recordingState = true;
+    stateRecording.clear();
+    guyPool.reset();
 
     for (int i = 0; i < charCount; i++) {
         pSim->CreateGuyFromCharController(charControllers[i]);
@@ -1308,7 +1356,6 @@ bool SimulationController::NewSim(void)
         guy->setRecordFrameTriggers(true, true);
     }
 
-    recordedGuysPoolIndex = 0;
 
     maxComboCount = 0;
     maxComboDamage = 0;
@@ -1319,6 +1366,72 @@ bool SimulationController::NewSim(void)
     }
 
     return true;
+}
+
+void SimulationController::RecordFrame(void)
+{
+    stateRecording.emplace_back();
+    RecordedFrame &frame = stateRecording[stateRecording.size()-1];
+
+    frame.sim.enableCleanup = false;
+    frame.sim.Clone(pSim, &guyPool);
+    frame.events = pSim->getCurrentFrameEvents();
+    pSim->getCurrentFrameEvents().clear();
+}
+
+Guy *SimulationController::getRecordedGuy(int frameIndex, int guyID)
+{
+    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
+        for (auto guy : stateRecording[frameIndex].sim.everyone) {
+            if (guy->getUniqueID() == guyID) {
+                return guy;
+            }
+        }
+    }
+    return nullptr;
+}
+
+void SimulationController::renderRecordedHitMarkers(int frameIndex)
+{
+    int maxMarkerAge = 10;
+    int startFrame = std::max(0, frameIndex - maxMarkerAge + 1);
+
+    if (frameIndex >= (int)stateRecording.size()) return;
+
+    for (int checkFrame = startFrame; checkFrame <= frameIndex; checkFrame++) {
+        if (checkFrame >= (int)stateRecording.size()) continue;
+        auto &histFrame = stateRecording[checkFrame];
+
+        for (const auto &event : histFrame.events) {
+            if (event.type == FrameEvent::Hit) {
+                int markerAge = frameIndex - checkFrame;
+
+                Guy* targetGuy = nullptr;
+                for (auto guy : histFrame.sim.everyone) {
+                    if (guy->getUniqueID() == event.hitEventData.targetID) {
+                        targetGuy = guy;
+                        break;
+                    }
+                }
+
+                if (targetGuy) {
+                    float worldX = targetGuy->getPosX().f() + event.hitEventData.x;
+                    float worldY = targetGuy->getPosY().f() + event.hitEventData.y;
+                    drawHitMarker(worldX, worldY, event.hitEventData.radius,
+                                 event.hitEventData.hitType, markerAge, maxMarkerAge,
+                                 event.hitEventData.dirX, event.hitEventData.dirY, event.hitEventData.seed);
+                }
+            }
+        }
+    }
+}
+
+Simulation *SimulationController::getSnapshotAtFrame(int frameIndex)
+{
+    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
+        return &stateRecording[frameIndex].sim;
+    }
+    return nullptr;
 }
 
 void SimulationController::doFrameMeterDrag(void)
@@ -1348,6 +1461,46 @@ void SimulationController::RenderComboMinerSetup(void)
     ImGui::Checkbox("Karas", &comboFinderDoKaras);
     if (ImGui::Button("Run!")) {
         runComboFinder = true;
+    }
+
+    if (finder.running || finder.totalFrames > 0) {
+        ImGui::Separator();
+        ImGui::Text("threads: %d", finder.threadCount);
+
+        uint64_t currentTotalFrames = finder.totalFrames;
+        if (finder.running) {
+            currentTotalFrames = 0;
+            for (auto worker : finder.workerPool) {
+                currentTotalFrames += worker->framesProcessed.load();
+            }
+        }
+
+        uint64_t fps = finder.running ? finder.currentFPS : finder.finalFPS;
+
+        ImGui::Text("frames: %s", formatWithCommas(currentTotalFrames).c_str());
+        ImGui::Text("fps: %s", formatWithCommas(fps).c_str());
+    }
+
+    if (finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
+        ImGui::Separator();
+        ImGui::Text("Top routes:");
+
+        int routeCount = 0;
+        const int maxRoutes = 10;
+        for (auto it = finder.doneRoutes.rbegin(); it != finder.doneRoutes.rend() && routeCount < maxRoutes; ++it, ++routeCount) {
+            std::string routeStr = routeToString(*it, pSim->simGuys[0]);
+            ImGui::TextWrapped("%s", routeStr.c_str());
+        }
+    }
+
+    if (finder.recentRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
+        ImGui::Separator();
+        ImGui::Text("Recent routes:");
+
+        for (auto it = finder.recentRoutes.rbegin(); it != finder.recentRoutes.rend(); ++it) {
+            std::string routeStr = routeToString(*it, pSim->simGuys[0]);
+            ImGui::TextWrapped("%s", routeStr.c_str());
+        }
     }
 }
 
@@ -1400,7 +1553,7 @@ void SimulationController::RenderUI(void)
 
         translateY = gameMode == Training ? 150.0 : 100.0;
     }
-    int simFrameCount = pSim ? pSim->stateRecording.size() : 0;
+    int simFrameCount = pSim ? stateRecording.size() : 0;
 
     if (gameMode != Training) {
         std::vector<std::string> vecViewLabels;
@@ -1557,6 +1710,7 @@ void SimulationController::AdvanceUntilComplete(void)
             }
         }
         pSim->RunFrame();
+        RecordFrame();
 
         for (int i = 0; i < charCount; i++) {
             Guy *pGuy = pSim->simGuys[charControllers[i].getSimCharSlot()];
@@ -1573,6 +1727,17 @@ void SimulationController::AdvanceUntilComplete(void)
             pGuy->Input(addPressBits(input, prevInput));
         }
         pSim->AdvanceFrame();
+
+        // update frame triggers after AdvanceFrame
+        RecordedFrame &frame = stateRecording[stateRecording.size()-1];
+        for (auto guy : pSim->everyone) {
+            for (auto recordedGuy : frame.sim.everyone) {
+                if (recordedGuy->getUniqueID() == guy->getUniqueID()) {
+                    recordedGuy->getFrameTriggers() = guy->getFrameTriggers();
+                    break;
+                }
+            }
+        }
         frameCount++;
 
         if (bLastFrame) {
@@ -1623,7 +1788,7 @@ void SimulationController::AdvanceUntilComplete(void)
         }
     }
 
-    simFrameCount = pSim->stateRecording.size();
+    simFrameCount = stateRecording.size();
 
     int controllerSearchForNextTrigger = -1;
 
@@ -1641,7 +1806,7 @@ void SimulationController::AdvanceUntilComplete(void)
         simController.playSpeed = 1;
         int searchFrame = scrubberFrame + 2; // skip kara cancel :/
         while (searchFrame < simFrameCount) {
-            Guy *pGuy = pSim->getRecordedGuy(searchFrame, charControllers[controllerSearchForNextTrigger].getSimCharSlot());
+            Guy *pGuy = getRecordedGuy(searchFrame, charControllers[controllerSearchForNextTrigger].getSimCharSlot());
             if (pGuy->getFrameTriggers().size()) {
                 playUntilFrame = searchFrame;
                 break;

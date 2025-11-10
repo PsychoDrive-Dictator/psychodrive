@@ -45,7 +45,7 @@ public:
 
     std::atomic<bool> idle;
     std::atomic<bool> kill;
-    uint64_t framesProcessed = 0;
+    std::atomic<uint64_t> framesProcessed = 0;
     bool first;
     std::vector<ComboWorker*> shuffledWorkerPool;
     ComboRoute currentRoute;
@@ -75,9 +75,20 @@ public:
     std::set<DoneRoute, DamageSort> doneRoutes;
 
     std::default_random_engine rng;
+
+    std::chrono::time_point<std::chrono::steady_clock> lastFPSUpdate;
+    uint64_t lastFrameCount = 0;
+    uint64_t currentFPS = 0;
+    uint64_t finalFPS = 0;
+
+    std::deque<DoneRoute> recentRoutes;
+    static constexpr int maxRecentRoutes = 10;
 };
 
 extern ComboFinder finder;
 
+std::string routeToString(const DoneRoute &route, Guy *pGuy);
+std::string formatWithCommas(uint64_t value);
+uint64_t calculateAverageFPS(void);
 void findCombos(bool doLights, bool doLateCancels, bool doWalk, bool doKaras);
 void updateComboFinder(void);

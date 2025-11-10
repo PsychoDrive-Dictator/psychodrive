@@ -4,6 +4,7 @@
 
 #include "chara.hpp"
 #include "simulation.hpp"
+#include "guy.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -56,6 +57,7 @@ public:
 class SimulationController {
 public:
     SimulationController() { Reset(); }
+    ~SimulationController();
     void Reset(void);
     void Restore(std::string strSerialized);
     void Serialize(std::string &outStr);
@@ -64,6 +66,10 @@ public:
     void RenderComboMinerSetup(void);
     void AdvanceUntilComplete(void);
     void doFrameMeterDrag(void);
+    void RecordFrame(void);
+    Guy *getRecordedGuy(int frameIndex, int guyID);
+    void renderRecordedHitMarkers(int frameIndex);
+    Simulation *getSnapshotAtFrame(int frameIndex);
     void clampFrame(int &frame) {
         if (frame < 0) {
             frame = 0;
@@ -98,8 +104,9 @@ public:
     float curMomentum;
     ImGuiID activeDragID = 0;
 
-    std::vector<Guy*> recordedGuysPool;
-    int recordedGuysPoolIndex = 0;
+    ObjectPool<Guy> guyPool{600};
+
+    std::vector<RecordedFrame> stateRecording;
 };
 
 extern SimulationController simController;

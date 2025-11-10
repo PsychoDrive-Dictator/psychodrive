@@ -30,20 +30,10 @@ struct FrameEvent {
     };
 };
 
-struct RecordedFrame {
-    std::map<int,Guy*> guys;
-    std::vector<FrameEvent> events;
-
-    Guy* findGuyByID(int uniqueID) {
-        auto it = guys.find(uniqueID);
-        return (it != guys.end()) ? it->second : nullptr;
-    }
-};
-
 class Simulation {
 public:
     ~Simulation();
-    void Clone(Simulation *pOtherSim);
+    void Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool = nullptr);
     void CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color);
     void CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int version);
     void CreateGuyFromCharController(CharacterUIController &controller);
@@ -72,10 +62,8 @@ public:
 
     void RunFrame();
     void AdvanceFrame();
+    void Render();
     std::vector<FrameEvent>& getCurrentFrameEvents() { return currentFrameEvents; }
-    Guy *getRecordedGuy(int frameIndex, int guyID);
-    void renderRecordedGuys(int frameIndex);
-    void renderRecordedHitMarkers(int frameIndex);
 
     std::vector<Guy *> everyone;
     int guyIDCounter = 0;
@@ -90,7 +78,11 @@ public:
     int firstGameStateFrame = 0;
     int replayErrors = 0;
 
-    bool recordingState = false;
-    std::vector<RecordedFrame> stateRecording;
     std::vector<FrameEvent> currentFrameEvents;
+    bool enableCleanup = true;
+};
+
+struct RecordedFrame {
+    Simulation sim;
+    std::vector<FrameEvent> events;
 };

@@ -581,8 +581,11 @@ static void mainloop(void)
         }
 
         if (!simInputsChanged) {
-            simController.pSim->renderRecordedGuys(curFrame);
-            simController.pSim->renderRecordedHitMarkers(curFrame);
+            Simulation *pFrameSim = simController.getSnapshotAtFrame(curFrame);
+            if (pFrameSim) {
+                pFrameSim->Render();
+            }
+            simController.renderRecordedHitMarkers(curFrame);
 
             if (simController.playing) {
                 simController.scrubberFrame += simController.playSpeed;
@@ -603,8 +606,8 @@ static void mainloop(void)
             }
 
             // for next frame
-            Guy *pLeftGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, 0);
-            Guy *pRightGuy = simController.pSim->getRecordedGuy(simController.scrubberFrame, 1);
+            Guy *pLeftGuy = simController.getRecordedGuy(simController.scrubberFrame, 0);
+            Guy *pRightGuy = simController.getRecordedGuy(simController.scrubberFrame, 1);
             if (!pRightGuy) {
                 pRightGuy = pLeftGuy;
             }

@@ -67,6 +67,58 @@ public:
     }
 };
 
+template<typename T>
+class ObjectPool {
+private:
+    std::vector<T*> allocated;
+    std::vector<T*> available;
+    std::vector<T*> blocks;
+    std::size_t growSize;
+
+public:
+    ObjectPool(std::size_t initialSize) : growSize(initialSize) {
+        grow();
+    }
+
+    ~ObjectPool() {
+        for (auto block : blocks) {
+            delete[] block;
+        }
+    }
+
+    T* allocate() {
+        if (available.empty()) {
+            grow();
+        }
+        T* obj = available.back();
+        available.pop_back();
+        allocated.push_back(obj);
+        return obj;
+    }
+
+    void release(T* obj) {
+        auto it = std::find(allocated.begin(), allocated.end(), obj);
+        if (it != allocated.end()) {
+            allocated.erase(it);
+            available.push_back(obj);
+        }
+    }
+
+    void reset() {
+        available.insert(available.end(), allocated.begin(), allocated.end());
+        allocated.clear();
+    }
+
+private:
+    void grow() {
+        T* block = new T[growSize];
+        blocks.push_back(block);
+        for (std::size_t i = 0; i < growSize; i++) {
+            available.push_back(&block[i]);
+        }
+    }
+};
+
 enum EGameMode {
     Batch = -1,
     Training = 0,

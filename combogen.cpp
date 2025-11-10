@@ -193,18 +193,43 @@ void ComboWorker::WorkLoop(void) {
     }
 }
 
-void printRoute(const DoneRoute &route)
+std::string formatWithCommas(uint64_t value)
 {
-    std::string logEntry = std::to_string(route.damage) + " damage: ";
+    std::stringstream formatted;
+    struct my_numpunct : std::numpunct<char> {
+        std::string do_grouping() const {return "\03";}
+    };
+    std::locale loc(std::cout.getloc(), new my_numpunct);
+    formatted.imbue(loc);
+    formatted << value;
+    return formatted.str();
+}
+
+uint64_t calculateAverageFPS(void)
+{
+    const auto end = std::chrono::steady_clock::now();
+    float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - finder.start).count() / 1000.0f;
+    return seconds > 0 ? finder.totalFrames / seconds : 0;
+}
+
+std::string routeToString(const DoneRoute &route, Guy *pGuy)
+{
+    std::string result = std::to_string(route.damage) + ": ";
     for ( auto &trigger : route.timelineTriggers) {
         std::string actionDesc;
         if (trigger.second.actionID() < 0) {
             renderInput(actionDesc, -trigger.second.actionID());
         } else {
-            actionDesc = guys[0]->getActionName(trigger.second.actionID());
+            actionDesc = pGuy->getActionName(trigger.second.actionID());
         }
-        logEntry += std::to_string(trigger.first) + " " + actionDesc + " ";
+        result += std::to_string(trigger.first) + " " + actionDesc + " ";
     }
+    return result;
+}
+
+void printRoute(const DoneRoute &route)
+{
+    std::string logEntry = routeToString(route, guys[0]);
     log(logEntry);
     fprintf(stderr, "%s\n", logEntry.c_str());
 }
@@ -257,6 +282,13 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     }
 
     finder.start = std::chrono::steady_clock::now();
+    finder.lastFPSUpdate = finder.start;
+    finder.lastFrameCount = 0;
+    finder.currentFPS = 0;
+    finder.totalFrames = 0;
+    finder.maxDamage = 0;
+    finder.doneRoutes.clear();
+    finder.recentRoutes.clear();
     log("starting on " + std::to_string(finder.threadCount) + " threads");
 
 
@@ -269,24 +301,46 @@ void updateComboFinder(void)
         return;
     }
 
+    const auto now = std::chrono::steady_clock::now();
+    float timeSinceLastFPSUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(now - finder.lastFPSUpdate).count() / 1000.0f;
+
+    if (timeSinceLastFPSUpdate >= 1.0f) {
+        uint64_t currentTotalFrames = 0;
+        for (auto worker : finder.workerPool) {
+            currentTotalFrames += worker->framesProcessed;
+        }
+        uint64_t framesDelta = currentTotalFrames - finder.lastFrameCount;
+        finder.currentFPS = framesDelta / timeSinceLastFPSUpdate;
+        finder.lastFrameCount = currentTotalFrames;
+        finder.lastFPSUpdate = now;
+    }
+
     bool allIdle = true;
     for (auto worker : finder.workerPool) {
         if (worker->mutexDoneRoutes.try_lock()) {
             std::set<DoneRoute, DamageSort> newDoneRoutes;
             std::swap(newDoneRoutes, worker->doneRoutes);
+
+            // Grab last N routes for display
+            if (newDoneRoutes.size() > 0) {
+                int skip = std::max(0, (int)newDoneRoutes.size() - finder.maxRecentRoutes);
+                auto it = newDoneRoutes.begin();
+                std::advance(it, skip);
+                finder.recentRoutes.assign(it, newDoneRoutes.end());
+            }
+
             worker->mutexDoneRoutes.unlock();
             // for (auto &route : newDoneRoutes) {
-            //     printRoute(route);
+            //     if (route.damage > finder.maxDamage) {
+            //         printRoute(route);
+            //         finder.maxDamage = route.damage;
+            //     }
             // }
             finder.doneRoutes.merge(newDoneRoutes);
         }
         if (!worker->idle) {
             allIdle = false;
         }
-    }
-    if (finder.doneRoutes.size() && finder.doneRoutes.rbegin()->damage > finder.maxDamage) {
-        printRoute(*finder.doneRoutes.rbegin());
-        finder.maxDamage = finder.doneRoutes.rbegin()->damage;
     }
     if (allIdle) {
         for (auto worker : finder.workerPool) {
@@ -323,9 +377,7 @@ void updateComboFinder(void)
         logEntry += formattedFPS.str() + " fps)";
         log(logEntry);
 
+        finder.finalFPS = framesPerSeconds;
         finder.running = false;
-        finder.totalFrames = 0;
-        finder.maxDamage = 0;
-        finder.doneRoutes.clear();
     }
 }

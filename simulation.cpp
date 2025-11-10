@@ -4,6 +4,9 @@
 #include "render.hpp"
 
 Simulation::~Simulation() {
+    if (!enableCleanup) {
+        return;
+    }
     gatherEveryone(simGuys, everyone);
     for (auto guy: everyone) {
         // don't try to massage the guys list or opponent pointers, we're deleting everything
@@ -12,7 +15,7 @@ Simulation::~Simulation() {
     }
 }
 
-void Simulation::Clone(Simulation *pOtherSim)
+void Simulation::Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool)
 {
     gatherEveryone(simGuys, everyone);
     gatherEveryone(pOtherSim->simGuys, pOtherSim->everyone);
@@ -20,15 +23,22 @@ void Simulation::Clone(Simulation *pOtherSim)
     if (everyone.size() < pOtherSim->everyone.size()) {
         int guysToAllocate = pOtherSim->everyone.size() - everyone.size();
         for (int i = 0; i < guysToAllocate; i++) {
-            Guy *newGuy = new Guy;
+            Guy *newGuy = pGuyPool ? pGuyPool->allocate() : new Guy;
+            if (pGuyPool) {
+                newGuy->enableCleanup = false;
+            }
             everyone.push_back(newGuy);
         }
     }
     if (everyone.size() > pOtherSim->everyone.size()) {
         int guysToFree = everyone.size() - pOtherSim->everyone.size();
         for (int i = 0; i < guysToFree; i++) {
-            everyone.back()->enableCleanup = false;
-            delete everyone.back();
+            if (pGuyPool) {
+                pGuyPool->release(everyone.back());
+            } else {
+                everyone.back()->enableCleanup = false;
+                delete everyone.back();
+            }
             everyone.pop_back();
         }
     }
@@ -314,24 +324,6 @@ void Simulation::RunFrame(void) {
         }
     }
 
-    if (recordingState) {
-        stateRecording.emplace_back();
-        RecordedFrame &frame = stateRecording[stateRecording.size()-1];
-        for (auto guy : everyone) {
-            if ((int)simController.recordedGuysPool.size() == simController.recordedGuysPoolIndex) {
-                // let's say a half second of action, 2 guys for 300 frames?
-                const int kPoolGrowSize = 600;
-                Guy *newGuys = new Guy[kPoolGrowSize];
-                for (int i = 0; i < kPoolGrowSize; i++) {
-                    simController.recordedGuysPool.push_back(&newGuys[i]);
-                }
-            }
-            Guy *pGuy = simController.recordedGuysPool[simController.recordedGuysPoolIndex++];
-            *pGuy = *guy;
-            // this is the canonical state of the guy for this frame, record boxes/state/etc here
-            frame.guys[guy->getUniqueID()] = pGuy;
-        }
-    }
 }
 
 void Simulation::AdvanceFrame(void)
@@ -345,60 +337,12 @@ void Simulation::AdvanceFrame(void)
             vecGuysToDelete.push_back(guy);
         }
     }
-    if (recordingState) {
-        RecordedFrame &frame = stateRecording[stateRecording.size()-1];
-        for (auto guy : everyone) {
-            // update frame triggers after AdvanceFrame() though
-            frame.guys[guy->getUniqueID()]->getFrameTriggers() = guy->getFrameTriggers();
-        }
-        frame.events = currentFrameEvents;
-        currentFrameEvents.clear();
-    }
 }
 
-void Simulation::renderRecordedGuys(int frameIndex)
+void Simulation::Render(void)
 {
-    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
-        for (auto [id, guy] : stateRecording[frameIndex].guys) {
-            guy->Render();
-        }
+    for (auto guy : everyone) {
+        guy->Render();
     }
 }
 
-Guy *Simulation::getRecordedGuy(int frameIndex, int guyID)
-{
-    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
-        for (auto [id, guy] : stateRecording[frameIndex].guys) {
-            if (id == guyID) {
-                return guy;
-            }
-        }
-    }
-    return nullptr;
-}
-
-void Simulation::renderRecordedHitMarkers(int frameIndex)
-{
-    int maxMarkerAge = 10;
-    int startFrame = std::max(0, frameIndex - maxMarkerAge + 1);
-
-    for (int checkFrame = startFrame; checkFrame <= frameIndex; checkFrame++) {
-        auto &histFrame = stateRecording[checkFrame];
-        auto &currentFrameGuys = stateRecording[frameIndex];
-
-        for (const auto &event : histFrame.events) {
-            if (event.type == FrameEvent::Hit) {
-                int markerAge = frameIndex - checkFrame;
-
-                Guy* targetGuy = currentFrameGuys.findGuyByID(event.hitEventData.targetID);
-                if (targetGuy) {
-                    float worldX = targetGuy->getPosX().f() + event.hitEventData.x;
-                    float worldY = targetGuy->getPosY().f() + event.hitEventData.y;
-                    drawHitMarker(worldX, worldY, event.hitEventData.radius,
-                                 event.hitEventData.hitType, markerAge, maxMarkerAge,
-                                 event.hitEventData.dirX, event.hitEventData.dirY, event.hitEventData.seed);
-                }
-            }
-        }
-    }
-}
