@@ -1333,7 +1333,6 @@ void Guy::UpdateBoxes(void)
             }
 
             bool isArmor = hurtBoxKey.isArmor;
-            int armorID = hurtBoxKey.armorID;
             bool isAtemi = hurtBoxKey.isAtemi;
             int immune = hurtBoxKey.immunity;
             int typeFlags = hurtBoxKey.flags;
@@ -1346,7 +1345,7 @@ void Guy::UpdateBoxes(void)
             HurtBox baseBox;
             if (isArmor) {
                 baseBox.flags |= armor;
-                baseBox.armorID = armorID;
+                baseBox.pAtemiData = hurtBoxKey.pAtemiData;
             }
             if (isAtemi) {
                 baseBox.flags |= atemi;
@@ -1462,14 +1461,14 @@ void Guy::UpdateBoxes(void)
             if (type == domain) {
                 Box rect = {-4096,-4096,8192,8192};
                 renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive)});
-                hitBoxes.push_back({rect, type, hitBoxKey.hitEntryID, hitBoxKey.hitID, hitBoxKey.flags});
+                hitBoxes.push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
             } else {
                 for (auto pRect : hitBoxKey.rects) {
                     Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
                     renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && type != proximity_guard});
 
-                    if (type == proximity_guard || hitBoxKey.hitEntryID != -1) {
-                        hitBoxes.push_back({rect, type, hitBoxKey.hitEntryID, hitBoxKey.hitID, hitBoxKey.flags});
+                    if (type == proximity_guard || hitBoxKey.pHitData != nullptr) {
+                        hitBoxes.push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
                     }
                 }
             }
@@ -1939,7 +1938,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (foundBox) {
-            std::string hitIDString = to_string_leading_zeroes(hitbox.hitEntryID, 3);
+            std::string hitIDString = to_string_leading_zeroes(hitbox.hitID, 3);
             int hitEntryFlag = 0;
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
@@ -1996,15 +1995,13 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             }
 
             HitEntry *pHitEntry = nullptr;
-            int hitEntryID = hitbox.hitEntryID;
             bool bombBurst = false;
 
             if (hitbox.type != proximity_guard) {
-                auto hitIt = pCharData->hitByID.find(hitEntryID);
-                if (hitIt == pCharData->hitByID.end()) {
+                if (!hitbox.pHitData) {
                     continue;
                 }
-                HitData *pHitData = hitIt->second;
+                HitData *pHitData = hitbox.pHitData;
 
                 if (isGrab) {
                     pHitEntry = &pHitData->common[0];
@@ -2015,8 +2012,8 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 // if bomb burst and found a bomb, use the next hit ID instead
                 if (pHitEntry->bombBurst && pOpponent->debuffTimer) {
                     bombBurst = true;
-                    hitEntryID += 1;
-                    auto bombHitIt = pCharData->hitByID.find(hitEntryID);
+                    int nextHitID = pHitData->id + 1;
+                    auto bombHitIt = pCharData->hitByID.find(nextHitID);
                     if (bombHitIt != pCharData->hitByID.end()) {
                         pHitData = bombHitIt->second;
                         pHitEntry = &pHitData->param[hitEntryFlag];
@@ -2035,23 +2032,19 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             // juggle was the last thing to check, hit is valid
             pendingHitList.push_back({
                 this, pOtherGuy, hitbox, hurtBox, pHitEntry,
-                hitEntryID, hitEntryFlag, blocked, bombBurst
+                hitEntryFlag, blocked, bombBurst
             });
         }
     }
 
-    if (pendingLockHit != -1) {
-        auto hitIt = pCharData->hitByID.find(pendingLockHit);
-        if (hitIt != pCharData->hitByID.end()) {
-            HitEntry *pHitEntry = &hitIt->second->common[0];
-            // really we should save the lock target, etc.
-            if (pOpponent) {
-                pOpponent->ApplyHitEffect(pHitEntry, this, true, true, false, false);
-                pOpponent->log(pOpponent->logHits, "lock hit dt applied " + std::to_string(pendingLockHit));
-                pOpponent->locked = false;
-            }
+    if (pendingLockHit) {
+        // really we should save the lock target, etc.
+        if (pOpponent) {
+            pOpponent->ApplyHitEffect(pendingLockHit, this, true, true, false, false);
+            pOpponent->log(pOpponent->logHits, "lock hit dt applied");
+            pOpponent->locked = false;
         }
-        pendingLockHit = -1;
+        pendingLockHit = nullptr;
     }
 }
 
@@ -2161,30 +2154,25 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         bool hitArmor = false;
         bool hitAtemi = false;
-        if (hurtBox.flags & armor && hurtBox.armorID) {
+        if (hurtBox.flags & armor && hurtBox.pAtemiData) {
             hitArmor = true;
             pGuy->hitArmorThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->hitArmorThisFrame = true;
             pGuy->hitArmorThisMove = true;
             if (hitFlagToParent) pGuy->pParent->hitArmorThisMove = true;
-            auto atemiIDString = std::to_string(hurtBox.armorID);
-            // need to pull from opponents atemi here or put in opponent method
-            AtemiData *pAtemi = pOtherGuy->findAtemi(hurtBox.armorID);
-            if (!pAtemi) {
-                pGuy->log(true, "atemi not found!! " + std::to_string(hurtBox.armorID));
-                continue;
-            }
+            AtemiData *pAtemi = hurtBox.pAtemiData;
+            auto atemiIDString = std::to_string(pAtemi->id);
 
             int armorHitStopHitted = pAtemi->targetStop;
             int armorHitStopHitter = pAtemi->ownerStop;
             int armorBreakHitStopHitted = pAtemi->targetStopShell; // ??
             int armorBreakHitStopHitter = pAtemi->ownerStopShell;
 
-            if (pOtherGuy->currentArmorID != hurtBox.armorID) {
+            if (pOtherGuy->currentArmor != pAtemi) {
                 pOtherGuy->armorHitsLeft = pAtemi->resistLimit + 1;
-                pOtherGuy->currentArmorID = hurtBox.armorID;
+                pOtherGuy->currentArmor = pAtemi;
             }
-            if ( pOtherGuy->currentArmorID == hurtBox.armorID ) {
+            if (pOtherGuy->currentArmor == pAtemi) {
                 pOtherGuy->armorHitsLeft--;
                 if (pOtherGuy->armorHitsLeft <= 0) {
                     hitArmor = false;
@@ -2345,7 +2333,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             }
 
             pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " id " + std::to_string(hitBox.hitID) +
-                " dt " + std::to_string(pendingHit.hitEntryID) + " " + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+                " dt " + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                 " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                 " moveType " + std::to_string(moveType) );
             pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
@@ -3782,7 +3770,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
         nextActionOpponentAction = false;
 
-        currentArmorID = -1; // uhhh
+        currentArmor = nullptr; // uhhh
 
         nextAction = -1;
         nextActionFrame = -1;
@@ -4252,7 +4240,6 @@ void Guy::DoLockKey(void)
 
         int type = lockKey.type;
         int param01 = lockKey.param01;
-        int param02 = lockKey.param02;
 
         if (type == 1) {
             if (pOpponent) {
@@ -4280,10 +4267,10 @@ void Guy::DoLockKey(void)
         } else if (type == 2) {
             // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame
             // has run or not yet and it introduces ordering issues
-            if (pendingLockHit != -1) {
+            if (pendingLockHit) {
                 log(true, "weird!");
             }
-            pendingLockHit = param02;
+            pendingLockHit = lockKey.pHitEntry;
         }
     }
 }

@@ -108,6 +108,57 @@ struct Rect {
     int yRadius;
 };
 
+struct AtemiData {
+    int id;
+    int targetStop;
+    int ownerStop;
+    int targetStopShell;
+    int ownerStopShell;
+    int resistLimit;
+};
+
+struct HitEntry {
+    int comboAdd;
+    int juggleFirst;
+    int juggleAdd;
+    int juggleLimit;
+    int hitStun;
+    int moveDestX;
+    int moveDestY;
+    int moveTime;
+    int dmgValue;
+    int dmgType;
+    int dmgKind;
+    int dmgPower;
+    int moveType;
+    int floorTime;
+    int downTime;
+    bool jimenBound;
+    bool kabeBound;
+    bool kabeTataki;
+    bool bombBurst;
+    int attr0;
+    int attr1;
+    int attr2;
+    int attr3;
+    int ext0;
+    int hitStopOwner;
+    int hitStopTarget;
+    int hitmark;
+    int floorDestX;
+    int floorDestY;
+    int wallTime;
+    int wallStop;
+    int wallDestX;
+    int wallDestY;
+};
+
+struct HitData {
+    int id;
+    HitEntry common[5];
+    HitEntry param[20];
+};
+
 enum KeyType {
     HurtBoxKeyType = 0,
     PushBoxKeyType = 1,
@@ -131,7 +182,7 @@ struct HurtBoxKey : BoxKey {
 
     bool isArmor = false;
     bool isAtemi = false;
-    int armorID;
+    AtemiData *pAtemiData = nullptr;
 
     int immunity;
     int flags;
@@ -153,7 +204,7 @@ struct HitBoxKey : BoxKey {
 
     hitBoxType type;
     hitBoxFlags flags;
-    int hitEntryID;
+    HitData *pHitData = nullptr;
 
     bool hasValidStyle = false;
     int validStyle;
@@ -215,6 +266,7 @@ struct LockKey : Key {
     int type;
     int param01;
     int param02;
+    HitEntry *pHitEntry = nullptr;
 };
 
 struct BranchKey : Key {
@@ -242,57 +294,6 @@ struct ProjectileData {
     int category;
     bool noPush;
     int lifeTime;
-};
-
-struct AtemiData {
-    int id;
-    int targetStop;
-    int ownerStop;
-    int targetStopShell;
-    int ownerStopShell;
-    int resistLimit;
-};
-
-struct HitEntry {
-    int comboAdd;
-    int juggleFirst;
-    int juggleAdd;
-    int juggleLimit;
-    int hitStun;
-    int moveDestX;
-    int moveDestY;
-    int moveTime;
-    int dmgValue;
-    int dmgType;
-    int dmgKind;
-    int dmgPower;
-    int moveType;
-    int floorTime;
-    int downTime;
-    bool jimenBound;
-    bool kabeBound;
-    bool kabeTataki;
-    bool bombBurst;
-    int attr0;
-    int attr1;
-    int attr2;
-    int attr3;
-    int ext0;
-    int hitStopOwner;
-    int hitStopTarget;
-    int hitmark;
-    int floorDestX;
-    int floorDestY;
-    int wallTime;
-    int wallStop;
-    int wallDestX;
-    int wallDestY;
-};
-
-struct HitData {
-    int id;
-    HitEntry common[5];
-    HitEntry param[20];
 };
 
 struct Action {

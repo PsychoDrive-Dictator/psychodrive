@@ -242,7 +242,7 @@ void loadRects(nlohmann::json* pRectsJson, std::vector<Rect>* pOutputVector)
     }
 }
 
-void loadHurtBoxKeys(nlohmann::json* pHurtBoxJson, std::vector<HurtBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
+void loadHurtBoxKeys(nlohmann::json* pHurtBoxJson, std::vector<HurtBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, std::map<int, AtemiData*>& atemiByID)
 {
     if (!pHurtBoxJson) {
         return;
@@ -267,7 +267,11 @@ void loadHurtBoxKeys(nlohmann::json* pHurtBoxJson, std::vector<HurtBoxKey>* pOut
             newKey.offsetY = Fixed(hurtBox["RootOffset"].value("Y", 0));
         }
         newKey.isArmor = hurtBox["_isArm"];
-        newKey.armorID = hurtBox["AtemiDataListIndex"];
+        int armorID = hurtBox["AtemiDataListIndex"];
+        auto atemiIt = atemiByID.find(armorID);
+        if (atemiIt != atemiByID.end()) {
+            newKey.pAtemiData = atemiIt->second;
+        }
         newKey.isAtemi = hurtBox["_isAtm"];
         newKey.immunity = hurtBox["Immune"];
         newKey.flags = hurtBox["TypeFlag"];
@@ -335,7 +339,7 @@ void loadPushBoxKeys(nlohmann::json* pPushBoxJson, std::vector<PushBoxKey>* pOut
     }
 }
 
-void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, bool isOther)
+void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, bool isOther, std::map<int, HitData*>& hitByID)
 {
     if (!pHitBoxJson) {
         return;
@@ -387,7 +391,11 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         }
 
         newKey.type = type;
-        newKey.hitEntryID = hitBox["AttackDataListIndex"];
+        int hitEntryID = hitBox["AttackDataListIndex"];
+        auto hitIt = hitByID.find(hitEntryID);
+        if (hitIt != hitByID.end()) {
+            newKey.pHitData = hitIt->second;
+        }
 
         int hitID = hitBox["HitID"];
         bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
@@ -560,7 +568,7 @@ void loadWorldKeys(nlohmann::json* pWorldJson, std::vector<WorldKey>* pOutputVec
     }
 }
 
-void loadLockKeys(nlohmann::json* pLockJson, std::vector<LockKey>* pOutputVector)
+void loadLockKeys(nlohmann::json* pLockJson, std::vector<LockKey>* pOutputVector, std::map<int, HitData*>& hitByID)
 {
     if (!pLockJson) {
         return;
@@ -576,6 +584,13 @@ void loadLockKeys(nlohmann::json* pLockJson, std::vector<LockKey>* pOutputVector
         newKey.type = lockKey["Type"];
         newKey.param01 = lockKey["Param01"];
         newKey.param02 = lockKey["Param02"];
+
+        if (newKey.type == 2) {
+            auto hitIt = hitByID.find(newKey.param02);
+            if (hitIt != hitByID.end()) {
+                newKey.pHitEntry = &hitIt->second->common[0];
+            }
+        }
 
         pOutputVector->push_back(newKey);
     }
@@ -740,7 +755,7 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
     }
 }
 
-void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
+void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::map<std::pair<int, int>, Rect*>& rectsByIDs, std::map<int, AtemiData*>& atemiByID, std::map<int, HitData*>& hitByID)
 {
     if (!pMovesJson) {
         return;
@@ -815,7 +830,7 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
 
         if (key.contains("DamageCollisionKey")) {
             newAction.hurtBoxKeys.reserve(key["DamageCollisionKey"].size() - 1);
-            loadHurtBoxKeys(&key["DamageCollisionKey"], &newAction.hurtBoxKeys, rectsByIDs);
+            loadHurtBoxKeys(&key["DamageCollisionKey"], &newAction.hurtBoxKeys, rectsByIDs, atemiByID);
         }
 
         if (key.contains("PushCollisionKey")) {
@@ -833,10 +848,10 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         newAction.hitBoxKeys.reserve(hitBoxKeyCount);
 
         if (key.contains("AttackCollisionKey")) {
-            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false);
+            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, hitByID);
         }
         if (key.contains("OtherCollisionKey")) {
-            loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true);
+            loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true, hitByID);
         }
 
         size_t steerKeyCount = 0;
@@ -888,7 +903,7 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
 
         if (key.contains("LockKey")) {
             newAction.lockKeys.reserve(key["LockKey"].size() - 1);
-            loadLockKeys(&key["LockKey"], &newAction.lockKeys);
+            loadLockKeys(&key["LockKey"], &newAction.lockKeys, hitByID);
         }
 
         if (key.contains("BranchKey")) {
@@ -1009,8 +1024,8 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     pRet->actions.reserve(pRet->mapMoveStyle.size());
 
-    loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs);
-    loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs);
+    loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID);
+    loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID);
 
     for (auto& action : pRet->actions) {
         pRet->actionsByID[std::make_pair(action.actionID, action.styleID)] = &action;

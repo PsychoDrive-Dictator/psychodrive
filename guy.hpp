@@ -697,7 +697,7 @@ private:
     bool wasHit = false;
     bool resetComboCount = false;
 
-    int pendingLockHit = -1;
+    HitEntry *pendingLockHit = nullptr;
 
     bool knockDown = false;
     bool isDown = false;
@@ -722,7 +722,7 @@ private:
     bool wallStopped = false;
     int wallStopFrames = 0;
 
-    int currentArmorID = -1;
+    AtemiData *currentArmor = nullptr;
     int armorHitsLeft = 0;
     bool armorThisFrame = false;
     bool atemiThisFrame = false;

@@ -59,19 +59,21 @@ enum hurtBoxFlags {
 struct HitBox {
     Box box;
     hitBoxType type;
-    int hitEntryID;
     int hitID;
     int flags;
+    struct HitData *pHitData = nullptr;
 };
 
 struct HurtBox {
     Box box;
     int flags = 0;
-    int armorID = 0;
+    struct AtemiData *pAtemiData = nullptr;
 };
 
 class Guy;
 struct HitEntry;
+struct AtemiData;
+struct HitData;
 
 struct PendingHit {
     Guy *pGuyHitting;
@@ -79,7 +81,6 @@ struct PendingHit {
     HitBox hitBox;
     HurtBox hurtBox;
     HitEntry *pHitEntry;
-    int hitEntryID;
     int hitEntryFlag;
     bool blocked;
     bool bombBurst;
