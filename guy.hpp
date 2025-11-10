@@ -405,7 +405,7 @@ private:
     void DoEventKey(Action *pAction, int frameID);
     void DoWorldKey();
     void DoLockKey();
-    void DoShotKey(nlohmann::json *pAction, int frameID);
+    void DoShotKey(Action *pAction, int frameID);
 
     void DoInstantAction(int actionID);
 

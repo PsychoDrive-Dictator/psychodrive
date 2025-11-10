@@ -544,7 +544,7 @@ void Guy::RunFramePostPush(void)
         return;
     }
 
-    DoShotKey(pActionJson, currentFrame);
+    DoShotKey(pCurrentAction, currentFrame);
 
     if (touchedWall && pushBackThisFrame != Fixed(0) && pOpponent && pOpponent->reflectThisFrame == Fixed(0)) {
         pOpponent->deferredReflect = true;
@@ -4511,40 +4511,38 @@ void Guy::DoEventKey(Action *pAction, int frameID)
     }
 }
 
-void Guy::DoShotKey(nlohmann::json *pAction, int frameID)
+void Guy::DoShotKey(Action *pAction, int frameID)
 {
-    if (pAction->contains("ShotKey"))
+    if (!pAction) {
+        return;
+    }
+
+    for (auto& shotKey : pAction->shotKeys)
     {
-        for (auto& [keyID, key] : (*pAction)["ShotKey"].items())
-        {
-            if ( !key.contains("_StartFrame") || key["_StartFrame"] > frameID || key["_EndFrame"] <= frameID ) {
-                continue;
+        if (shotKey.startFrame > frameID || shotKey.endFrame <= frameID) {
+            continue;
+        }
+
+        if (shotKey.validStyle != 0 && !(shotKey.validStyle & (1 << styleInstall))) {
+            continue;
+        }
+
+        if (shotKey.operation == 2) {
+            if (pParent == nullptr) {
+                log(logUnknowns, "shotkey despawn but no parent?");
             }
+            die = true;
+        } else {
+            Fixed posOffsetX = shotKey.posOffsetX * direction;
+            Fixed posOffsetY = shotKey.posOffsetY;
 
-            int validStyles = key["_ValidStyle"];
-            int operation = key["Operation"];
-
-            if ( validStyles != 0 && !(validStyles & (1 << styleInstall)) ) {
-                continue;
-            }
-
-            if (operation == 2) {
-                if (pParent == nullptr) {
-                    log(logUnknowns, "shotkey despawn but no parent?");
-                }
-                die = true;
+            // spawn new guy
+            Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
+            pNewGuy->RunFrame();
+            if (pParent) {
+                pParent->minions.push_back(pNewGuy);
             } else {
-                Fixed posOffsetX = Fixed(key["PosOffset"]["x"].get<double>()) * direction;
-                Fixed posOffsetY = Fixed(key["PosOffset"]["y"].get<double>());
-
-                // spawn new guy
-                Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, key["ActionId"].get<int>(), key["StyleIdx"].get<int>(), true);
-                pNewGuy->RunFrame();
-                if (pParent) {
-                    pParent->minions.push_back(pNewGuy);
-                } else {
-                    minions.push_back(pNewGuy);
-                }
+                minions.push_back(pNewGuy);
             }
         }
     }
@@ -4558,7 +4556,7 @@ void Guy::DoInstantAction(int actionID)
     if (pInstantAction) {
         // only ones i've seen used in those kinds of actions so far
         DoEventKey(pInstantAction, 0);
-        DoShotKey(pInstantActionJson, 0);
+        DoShotKey(pInstantAction, 0);
     } else {
         log(true, "couldn't find instant action " + std::to_string(actionID));
     }

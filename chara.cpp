@@ -625,6 +625,30 @@ void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutput
     }
 }
 
+void loadShotKeys(nlohmann::json* pShotJson, std::vector<ShotKey>* pOutputVector)
+{
+    if (!pShotJson) {
+        return;
+    }
+
+    for (auto& [shotKeyID, shotKey] : pShotJson->items()) {
+        if (!shotKey.contains("_StartFrame")) {
+            continue;
+        }
+        ShotKey newKey;
+        newKey.startFrame = shotKey["_StartFrame"];
+        newKey.endFrame = shotKey["_EndFrame"];
+        newKey.validStyle = shotKey["_ValidStyle"];
+        newKey.operation = shotKey["Operation"];
+        newKey.posOffsetX = Fixed(shotKey["PosOffset"]["x"].get<double>());
+        newKey.posOffsetY = Fixed(shotKey["PosOffset"]["y"].get<double>());
+        newKey.actionId = shotKey["ActionId"];
+        newKey.styleIdx = shotKey["StyleIdx"];
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
 {
     pEntry->comboAdd = (*pHitEntryJson)["ComboAdd"];
@@ -909,6 +933,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         if (key.contains("BranchKey")) {
             newAction.branchKeys.reserve(key["BranchKey"].size() - 1);
             loadBranchKeys(&key["BranchKey"], &newAction.branchKeys);
+        }
+
+        if (key.contains("ShotKey")) {
+            newAction.shotKeys.reserve(key["ShotKey"].size() - 1);
+            loadShotKeys(&key["ShotKey"], &newAction.shotKeys);
         }
 
         pRet->actions.push_back(newAction);

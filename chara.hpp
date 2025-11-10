@@ -283,6 +283,15 @@ struct BranchKey : Key {
     std::string typeName;
 };
 
+struct ShotKey : Key {
+    int validStyle = 0;
+    int operation;
+    Fixed posOffsetX;
+    Fixed posOffsetY;
+    int actionId;
+    int styleIdx;
+};
+
 struct ProjectileData {
     int id;
     int hitCount;
@@ -311,6 +320,7 @@ struct Action {
     std::vector<WorldKey> worldKeys;
     std::vector<LockKey> lockKeys;
     std::vector<BranchKey> branchKeys;
+    std::vector<ShotKey> shotKeys;
 
     int activeFrame;
     int recoveryStartFrame;
