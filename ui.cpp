@@ -327,16 +327,22 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         ImGui::SameLine();
         if ( ImGui::Button("switch direction") ) { pGuy->switchDirection(); }
     }
-    std::vector<HitBox> *hitBoxes = pGuy->getHitBoxes();
+    std::vector<HitBox> hitBoxes;
+    std::vector<Box> pushBoxes;
+    std::vector<HurtBox> hurtBoxes;
+    pGuy->getHitBoxes(&hitBoxes);
+    pGuy->getPushBoxes(&pushBoxes);
+    pGuy->getHurtBoxes(&hurtBoxes, nullptr);
+
     Fixed maxXHitBox = 0.0f;
-    for (auto hitbox : *hitBoxes) {
+    for (auto hitbox : hitBoxes) {
         if (hitbox.type != hitBoxType::hit) continue;
         Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
         if (hitBoxX > maxXHitBox) {
             maxXHitBox = hitBoxX;
         }
     }
-    ImGui::Text("push %zd hit %zd hit extent %.2f hurt %zd", pGuy->getPushBoxes()->size(), hitBoxes->size(), maxXHitBox.f(), pGuy->getHurtBoxes()->size());
+    ImGui::Text("push %zd hit %zd hit extent %.2f hurt %zd", pushBoxes.size(), hitBoxes.size(), maxXHitBox.f(), hurtBoxes.size());
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i hitstop %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getHitStop() );
         if (pGuy->getWarudo()) {

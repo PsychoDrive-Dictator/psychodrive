@@ -736,9 +736,10 @@ static void mainloop(void)
                     if (curPlotEntryNormalStartFrame == 0) {
                         curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
                     }
-                    std::vector<HitBox> *hitBoxes = guys[0]->getHitBoxes();
+                    std::vector<HitBox> hitBoxes;
+                    guys[0]->getHitBoxes(&hitBoxes);
                     Fixed maxXHitBox = Fixed(0);
-                    for (auto hitbox : *hitBoxes) {
+                    for (auto hitbox : hitBoxes) {
                         if (hitbox.type != hitBoxType::hit) continue;
                         Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
                         if (hitBoxX > maxXHitBox) {

@@ -192,10 +192,9 @@ public:
     int getProjHitCount() { return projHitCount; }
     int getLimitShotCategory() { return limitShotCategory; }
 
-    std::vector<Box> *getPushBoxes() { return &pushBoxes; }
-    std::vector<HitBox> *getHitBoxes() { return &hitBoxes; }
-    std::vector<HurtBox> *getHurtBoxes() { return &hurtBoxes; }
-    std::vector<Box> *getThrowBoxes() { return &throwBoxes; }
+    void getPushBoxes(std::vector<Box> *pOutPushBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
+    void getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
+    void getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pOutThrowBoxes = nullptr, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
 
     int getCurrentAction() { return currentAction; }
     int getCurrentFrame() { return currentFrame; }
@@ -203,7 +202,6 @@ public:
         currentAction = actionID;
         currentFrame = actionFrame;
         UpdateActionData();
-        UpdateBoxes();
     }
     bool getIsDrive() { return isDrive; }
     bool getCrouchingDebug() { return crouching; }
@@ -347,7 +345,6 @@ public:
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
     void UpdateActionData(void);
-    void UpdateBoxes(void);
     Box rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir);
 
     void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
@@ -676,13 +673,6 @@ private:
     bool atemiThisFrame = false;
 
     int recoveryTiming = 0;
-
-    std::vector<Box> pushBoxes;
-    std::vector<HitBox> hitBoxes;
-    std::vector<HurtBox> hurtBoxes;
-    std::vector<Box> throwBoxes;
-
-    std::vector<RenderBox> renderBoxes;
 
     std::set<int> setDeferredTriggerIDs;
 

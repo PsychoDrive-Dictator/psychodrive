@@ -488,9 +488,6 @@ bool Guy::RunFrame(void)
         DoWorldKey();
 
         DoLockKey();
-
-        // steer/etc could have had side effects there
-        UpdateBoxes();
     }
 
     return true;
@@ -1278,170 +1275,209 @@ Box Guy::rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir)
     return outBox;
 }
 
-void Guy::UpdateBoxes(void)
+void Guy::getPushBoxes(std::vector<Box> *pOutPushBoxes, std::vector<RenderBox> *pOutRenderBoxes)
 {
-    pushBoxes.clear();
-    hitBoxes.clear();
-    hurtBoxes.clear();
-    renderBoxes.clear();
-    throwBoxes.clear();
+    if (!pCurrentAction) {
+        return;
+    }
 
-    if (pCurrentAction)
+    for (auto& pushBoxKey : pCurrentAction->pushBoxKeys)
     {
-        bool drive = isDrive || wasDrive;
-        bool parry = currentAction >= 480 && currentAction <= 489;
-        // doesn't work for all chars, prolly need to find a system bit like drive
-        bool di = currentAction >= 850 && currentAction <= 859;
+        if (pushBoxKey.startFrame > currentFrame || pushBoxKey.endFrame <= currentFrame) {
+            continue;
+        }
 
-        std::deque<HurtBox> newHurtBoxes;
+        if (!CheckHitBoxCondition(pushBoxKey.condition)) {
+            continue;
+        }
 
-        for (auto& hurtBoxKey : pCurrentAction->hurtBoxKeys)
-        {
-            if (hurtBoxKey.startFrame > currentFrame || hurtBoxKey.endFrame <= currentFrame) {
-                continue;
-            }
+        Fixed rootOffsetX = pushBoxKey.offsetX;
+        Fixed rootOffsetY = pushBoxKey.offsetY;
+        rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+        rootOffsetY = rootOffsetY + posY + posOffsetY;
 
-            if (!CheckHitBoxCondition(hurtBoxKey.condition)) {
-                continue;
-            }
+        Box rect = rectToBox(pushBoxKey.rect, rootOffsetX, rootOffsetY, direction.i());
+        if (pOutPushBoxes) {
+            pOutPushBoxes->push_back(rect);
+        }
+        if (pOutRenderBoxes) {
+            pOutRenderBoxes->push_back({rect, 30.0, {0.4,0.35,0.0}});
+        }
+    }
+}
 
-            bool isArmor = hurtBoxKey.isArmor;
-            bool isAtemi = hurtBoxKey.isAtemi;
-            int immune = hurtBoxKey.immunity;
-            int typeFlags = hurtBoxKey.flags;
+void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pOutThrowBoxes, std::vector<RenderBox> *pOutRenderBoxes)
+{
+    if (!pCurrentAction) {
+        return;
+    }
 
-            Fixed rootOffsetX = hurtBoxKey.offsetX;
-            Fixed rootOffsetY = hurtBoxKey.offsetY;
-            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-            rootOffsetY = rootOffsetY + posY + posOffsetY;
+    bool drive = isDrive || wasDrive;
+    bool parry = currentAction >= 480 && currentAction <= 489;
+    // doesn't work for all chars, prolly need to find a system bit like drive
+    bool di = currentAction >= 850 && currentAction <= 859;
 
-            HurtBox baseBox;
-            if (isArmor) {
-                baseBox.flags |= armor;
-                baseBox.pAtemiData = hurtBoxKey.pAtemiData;
-            }
-            if (isAtemi) {
-                baseBox.flags |= atemi;
-            }
-            // those are from gelatin's viewer.. why are they not actual flags?
-            // every normal hurtbox has typeFlags == 3 so clearly it's not just flags
-            if (typeFlags == 1) {
-                baseBox.flags |= projectile_invul;
-            }
-            if (typeFlags == 2) {
-                baseBox.flags |= full_strike_invul;
-            }
-            if (immune == 4) {
-                baseBox.flags |= air_strike_invul;
-            }
-            if (immune == 11) {
-                baseBox.flags |= ground_strike_invul;
-            }
+    for (auto& hurtBoxKey : pCurrentAction->hurtBoxKeys)
+    {
+        if (hurtBoxKey.startFrame > currentFrame || hurtBoxKey.endFrame <= currentFrame) {
+            continue;
+        }
 
-            for (auto pRect : hurtBoxKey.legRects) {
-                HurtBox newBox = baseBox;
-                newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
-                newBox.flags |= legs;
-                newHurtBoxes.push_front(newBox);
-            }
-            for (auto pRect : hurtBoxKey.bodyRects) {
-                HurtBox newBox = baseBox;
-                newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
-                newBox.flags |= body;
-                newHurtBoxes.push_front(newBox);
-            }
-            for (auto pRect : hurtBoxKey.headRects) {
-                HurtBox newBox = baseBox;
-                newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
-                newBox.flags |= head;
-                newHurtBoxes.push_front(newBox);
-            }
+        if (!CheckHitBoxCondition(hurtBoxKey.condition)) {
+            continue;
+        }
 
-            for (auto pRect : hurtBoxKey.throwRects) {
+        bool isArmor = hurtBoxKey.isArmor;
+        bool isAtemi = hurtBoxKey.isAtemi;
+        int immune = hurtBoxKey.immunity;
+        int typeFlags = hurtBoxKey.flags;
+
+        Fixed rootOffsetX = hurtBoxKey.offsetX;
+        Fixed rootOffsetY = hurtBoxKey.offsetY;
+        rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+        rootOffsetY = rootOffsetY + posY + posOffsetY;
+
+        HurtBox baseBox;
+        if (isArmor) {
+            baseBox.flags |= armor;
+            baseBox.pAtemiData = hurtBoxKey.pAtemiData;
+        }
+        if (isAtemi) {
+            baseBox.flags |= atemi;
+        }
+        // those are from gelatin's viewer.. why are they not actual flags?
+        // every normal hurtbox has typeFlags == 3 so clearly it's not just flags
+        if (typeFlags == 1) {
+            baseBox.flags |= projectile_invul;
+        }
+        if (typeFlags == 2) {
+            baseBox.flags |= full_strike_invul;
+        }
+        if (immune == 4) {
+            baseBox.flags |= air_strike_invul;
+        }
+        if (immune == 11) {
+            baseBox.flags |= ground_strike_invul;
+        }
+
+        for (auto pRect : hurtBoxKey.legRects) {
+            HurtBox newBox = baseBox;
+            newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+            newBox.flags |= legs;
+            if (pOutHurtBoxes) {
+                pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+            }
+            if (pOutRenderBoxes) {
+                if (newBox.flags & armor) {
+                    pOutRenderBoxes->insert(pOutRenderBoxes->begin(), {newBox.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
+                } else {
+                    pOutRenderBoxes->insert(pOutRenderBoxes->begin(), {newBox.box, 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+        }
+        for (auto pRect : hurtBoxKey.bodyRects) {
+            HurtBox newBox = baseBox;
+            newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+            newBox.flags |= body;
+            if (pOutHurtBoxes) {
+                pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+            }
+            if (pOutRenderBoxes) {
+                if (newBox.flags & armor) {
+                    pOutRenderBoxes->insert(pOutRenderBoxes->begin(), {newBox.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
+                } else {
+                    pOutRenderBoxes->insert(pOutRenderBoxes->begin(), {newBox.box, 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+        }
+        for (auto pRect : hurtBoxKey.headRects) {
+            HurtBox newBox = baseBox;
+            newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+            newBox.flags |= head;
+            if (pOutHurtBoxes) {
+                pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+            }
+            if (pOutRenderBoxes) {
+                if (newBox.flags & armor) {
+                    pOutRenderBoxes->insert(pOutRenderBoxes->begin(), {newBox.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
+                } else {
+                    pOutRenderBoxes->insert(pOutRenderBoxes->begin(), {newBox.box, 17.5f, {charColorR,charColorG,charColorB}, drive,parry,di});
+                }
+            }
+        }
+
+        for (auto pRect : hurtBoxKey.throwRects) {
+            Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+            if (pOutThrowBoxes) {
+                pOutThrowBoxes->push_back(rect);
+            }
+            if (pOutRenderBoxes) {
+                pOutRenderBoxes->push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
+            }
+        }
+    }
+}
+
+void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes)
+{
+    if (!pCurrentAction) {
+        return;
+    }
+
+    bool drive = isDrive || wasDrive;
+
+    for (auto& hitBoxKey : pCurrentAction->hitBoxKeys)
+    {
+        if (hitBoxKey.startFrame > currentFrame || hitBoxKey.endFrame <= currentFrame) {
+            continue;
+        }
+
+        if (!CheckHitBoxCondition(hitBoxKey.condition)) {
+            continue;
+        }
+
+        if (hitBoxKey.hasValidStyle && !(hitBoxKey.validStyle & (1 << styleInstall))) {
+            continue;
+        }
+
+        Fixed rootOffsetX = hitBoxKey.offsetX;
+        Fixed rootOffsetY = hitBoxKey.offsetY;
+        rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+        rootOffsetY = rootOffsetY + posY + posOffsetY;
+
+        hitBoxType type = hitBoxKey.type;
+        color collisionColor = {1.0,0.0,0.0};
+        if (type == domain) {
+            collisionColor = {1.0,0.0,0.0};
+        } else if (type == destroy_projectile) {
+            collisionColor = {0.0,1.0,0.5};
+        } else if (type == proximity_guard) {
+            collisionColor = {0.5,0.5,0.5};
+        }
+
+        float thickness = 50.0;
+        if (type == proximity_guard) {
+            thickness = 5.0;
+        }
+
+        if (type == domain) {
+            Box rect = {-4096,-4096,8192,8192};
+            if (pOutRenderBoxes) {
+                pOutRenderBoxes->push_back({rect, thickness, collisionColor, drive});
+            }
+            if (pOutHitBoxes) {
+                pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
+            }
+        } else {
+            for (auto pRect : hitBoxKey.rects) {
                 Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
-                throwBoxes.push_back(rect);
-                renderBoxes.push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
-            }
-        }
+                if (pOutRenderBoxes) {
+                    pOutRenderBoxes->push_back({rect, thickness, collisionColor, drive && type != proximity_guard});
+                }
 
-        // we queued the hurtboxes in newHurtBoxes in reverse order, and now we add them to the real list
-        // hurtboxes at the end of the list are meant to be checked first, and take precedence
-        // basing that off of armor moves having the armor box at the end
-
-        for (auto box : newHurtBoxes) {
-            hurtBoxes.push_back(box);
-            if (box.flags & armor) {
-                renderBoxes.push_back({box.box, 30.0, {0.8,0.5,0.0}, drive,parry,di});
-            } else {
-                renderBoxes.push_back({box.box, (box.flags & head) ? 17.5f : 25.0f, {charColorR,charColorG,charColorB}, drive,parry,di});
-            }
-        }
-
-        for (auto& pushBoxKey : pCurrentAction->pushBoxKeys)
-        {
-            if (pushBoxKey.startFrame > currentFrame || pushBoxKey.endFrame <= currentFrame) {
-                continue;
-            }
-
-            if (!CheckHitBoxCondition(pushBoxKey.condition)) {
-                continue;
-            }
-
-            Fixed rootOffsetX = pushBoxKey.offsetX;
-            Fixed rootOffsetY = pushBoxKey.offsetY;
-            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-            rootOffsetY = rootOffsetY + posY + posOffsetY;
-
-            Box rect = rectToBox(pushBoxKey.rect, rootOffsetX, rootOffsetY, direction.i());
-            pushBoxes.push_back(rect);
-            renderBoxes.push_back({rect, 30.0, {0.4,0.35,0.0}});
-        }
-
-        for (auto& hitBoxKey : pCurrentAction->hitBoxKeys)
-        {
-            if (hitBoxKey.startFrame > currentFrame || hitBoxKey.endFrame <= currentFrame) {
-                continue;
-            }
-
-            if (!CheckHitBoxCondition(hitBoxKey.condition)) {
-                continue;
-            }
-
-            if (hitBoxKey.hasValidStyle && !(hitBoxKey.validStyle & (1 << styleInstall))) {
-                continue;
-            }
-
-            Fixed rootOffsetX = hitBoxKey.offsetX;
-            Fixed rootOffsetY = hitBoxKey.offsetY;
-            rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
-            rootOffsetY = rootOffsetY + posY + posOffsetY;
-
-            hitBoxType type = hitBoxKey.type;
-            color collisionColor = {1.0,0.0,0.0};
-            if (type == domain) {
-                collisionColor = {1.0,0.0,0.0};
-            } else if (type == destroy_projectile) {
-                collisionColor = {0.0,1.0,0.5};
-            } else if (type == proximity_guard) {
-                collisionColor = {0.5,0.5,0.5};
-            }
-
-            float thickness = 50.0;
-            if (type == proximity_guard) {
-                thickness = 5.0;
-            }
-
-            if (type == domain) {
-                Box rect = {-4096,-4096,8192,8192};
-                renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive)});
-                hitBoxes.push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
-            } else {
-                for (auto pRect : hitBoxKey.rects) {
-                    Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
-                    renderBoxes.push_back({rect, thickness, collisionColor, (isDrive || wasDrive) && type != proximity_guard});
-
-                    if (type == proximity_guard || hitBoxKey.pHitData != nullptr) {
-                        hitBoxes.push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
+                if (type == proximity_guard || hitBoxKey.pHitData != nullptr) {
+                    if (pOutHitBoxes) {
+                        pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
                     }
                 }
             }
@@ -1449,11 +1485,17 @@ void Guy::UpdateBoxes(void)
     }
 }
 
+
 void Guy::Render(void) {
     Fixed fixedX = posX + (posOffsetX * direction);
     Fixed fixedY = posY + posOffsetY;
     float x = fixedX.f();
     float y = fixedY.f();
+
+    std::vector<RenderBox> renderBoxes;
+    getHurtBoxes(nullptr, nullptr, &renderBoxes);
+    getPushBoxes(nullptr, &renderBoxes);
+    getHitBoxes(nullptr, &renderBoxes);
 
     for (auto box : renderBoxes) {
         drawHitBox(box.box,thickboxes?box.thickness:1,box.col,box.drive,box.parry,box.di);
@@ -1480,6 +1522,8 @@ int Guy::getFrameMeterColorIndex() {
     if (counterState) {
         ret = 3;
     }
+    std::vector<HitBox> hitBoxes;
+    getHitBoxes(&hitBoxes);
     for (auto &hitBox : hitBoxes) {
         if (hitBox.type != proximity_guard) {
             ret = 4;
@@ -1515,8 +1559,6 @@ bool Guy::Push(Guy *pOtherGuy)
                 hitReflectAccelX = Fixed(0);
                 hitReflectVelX = Fixed(0);
             }
-
-            UpdateBoxes();
         }
     }
     deferredReflect = false;
@@ -1526,6 +1568,11 @@ bool Guy::Push(Guy *pOtherGuy)
     // for now, maybe there's other rules
     if (isProjectile) return false;
 
+    std::vector<Box> pushBoxes;
+    std::vector<Box> otherPushBoxes;
+    getPushBoxes(&pushBoxes);
+    pOtherGuy->getPushBoxes(&otherPushBoxes);
+
     bool hasPushed = false;
     touchedOpponent = false;
     Fixed pushXLeft = 0;
@@ -1534,7 +1581,7 @@ bool Guy::Push(Guy *pOtherGuy)
 
         if (noPush) break;
 
-        for (auto otherPushBox : *pOtherGuy->getPushBoxes() ) {
+        for (auto otherPushBox : otherPushBoxes ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
                 pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
@@ -1702,8 +1749,6 @@ bool Guy::Push(Guy *pOtherGuy)
 
         touchedOpponent = true; // could be touching anyone really but can fix later
         pOtherGuy->touchedOpponent = true;
-        UpdateBoxes();
-        pOtherGuy->UpdateBoxes();
         return true;
     }
 
@@ -1785,8 +1830,6 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
             velocityX = Fixed(0);
             accelX = Fixed(0);
-
-            UpdateBoxes();
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
@@ -1810,7 +1853,6 @@ bool Guy::WorldPhysics(bool onlyFloor)
             // 1:1 pushback for opponent during lock
             if (pAttacker) {
                 pAttacker->posX += pushX;
-                pAttacker->UpdateBoxes();
             }
         }
 
@@ -1819,7 +1861,6 @@ bool Guy::WorldPhysics(bool onlyFloor)
             if (pAttacker && !pAttacker->noPush && !noCounterPush) {
                 pAttacker->reflectThisFrame = fixMax(pushX, pushBackThisFrame * Fixed(-1));
                 pAttacker->posX += pAttacker->reflectThisFrame;
-                pAttacker->UpdateBoxes();
                 pAttacker->hitReflectVelX = hitVelX * Fixed(-1);
                 pAttacker->hitReflectAccelX = hitAccelX * Fixed(-1);
                 log (logTransitions, "reflect!");
@@ -1827,8 +1868,6 @@ bool Guy::WorldPhysics(bool onlyFloor)
             hitVelX = Fixed(0);
             hitAccelX = Fixed(0);
         }
-
-        UpdateBoxes();
     }
 
     if (getPosY() - Fixed(landingAdjust) < Fixed(0) || landedByFloorPush || forceLanding)
@@ -1858,6 +1897,14 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     if (warudo || getHitStop()) return;
     if ( !pOtherGuy ) return;
 
+    std::vector<HitBox> hitBoxes;
+    std::vector<Box> otherThrowBoxes;
+    std::vector<HurtBox> otherHurtBoxes;
+    bool hasEvaluatedThrowBoxes = false;
+    bool hasEvaluatedHurtBoxes = false;
+
+    getHitBoxes(&hitBoxes);
+
     for (auto const &hitbox : hitBoxes ) {
         if (hitbox.hitID != -1 && ((1<<hitbox.hitID) & canHitID)) {
             continue;
@@ -1871,7 +1918,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         HurtBox hurtBox = {};
 
         if (isGrab) {
-            for (auto throwBox : *pOtherGuy->getThrowBoxes() ) {
+            if (!hasEvaluatedThrowBoxes) {
+                pOtherGuy->getHurtBoxes(nullptr, &otherThrowBoxes, nullptr);
+                hasEvaluatedThrowBoxes = true;
+            }
+            for (auto throwBox : otherThrowBoxes ) {
                 if (hitbox.type == domain || doBoxesHit(hitbox.box, throwBox)) {
                     foundBox = true;
                     hurtBox.box = throwBox;
@@ -1893,7 +1944,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             if (hitbox.type == domain) {
                 foundBox = true;
             } else {
-                for (auto hurtbox : *pOtherGuy->getHurtBoxes() ) {
+                if (!hasEvaluatedHurtBoxes) {
+                    pOtherGuy->getHurtBoxes(&otherHurtBoxes, nullptr);
+                    hasEvaluatedHurtBoxes = true;
+                }
+                for (auto hurtbox : otherHurtBoxes ) {
                     if (hitbox.type == hit && hurtbox.flags & full_strike_invul) {
                         continue;
                     }
@@ -2761,7 +2816,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         if (nextAction != -1) {
             NextAction(false, false);
             DoStatusKey();
-            UpdateBoxes();
             WorldPhysics(true);
         }
     }
@@ -3692,7 +3746,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
     DoStatusKey();
     WorldPhysics(true); // only floor
-    UpdateBoxes();
 
     couldMove = canMoveNow;
     lastPosX = getPosX();

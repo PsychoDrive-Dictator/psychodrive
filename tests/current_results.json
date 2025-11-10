@@ -3726,7 +3726,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 366,
+                "count": 365,
                 "firstFrame": 288,
                 "lastFrame": 907
             },
