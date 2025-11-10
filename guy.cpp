@@ -191,7 +191,10 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (pCharData->mapMoveStyle.find(mapIndex) == pCharData->mapMoveStyle.end()) {
-        int parentStyleID = (*pCharInfoJson)["Styles"][std::to_string(styleID)]["ParentStyleID"];
+        int parentStyleID = -1;
+        if (styleID >= 0 && (size_t)styleID < pCharData->styles.size()) {
+            parentStyleID = pCharData->styles[styleID].parentStyleID;
+        }
 
         if (parentStyleID == -1) {
             return nullptr;
@@ -3348,9 +3351,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         if ( airActionCounter ) {
             airActionCounter = 0;
         }
-        if (pCharInfoJson->contains("Styles")) {
-            nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
-            if ((*pStyleJson)["StyleData"]["State"]["TerminateState"] == 0x3ff1fffffff) {
+        if (styleInstall >= 0 && (size_t)styleInstall < pCharData->styles.size()) {
+            StyleData &style = pCharData->styles[styleInstall];
+            if (style.terminateState == 0x3ff1fffffff) {
                 // that apparently means landing... figure out deeper meaning later
                 ExitStyle();
             }
@@ -4565,38 +4568,36 @@ void Guy::DoInstantAction(int actionID)
 void Guy::ChangeStyle(int newStyleID) {
     // todo exit action from previous style?
     styleInstall = newStyleID;
-    nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
-    int enterActionID = -1;
-    int enterActionStyle = -1;
-    if ((*pStyleJson)["StyleData"].contains("Action")) {
-        enterActionID = (*pStyleJson)["StyleData"]["Action"]["Start"]["Action"];
-        enterActionStyle = (*pStyleJson)["StyleData"]["Action"]["Start"]["Style"];
+
+    if (newStyleID < 0 || (size_t)newStyleID >= pCharData->styles.size()) {
+        return;
     }
 
-    if (enterActionID != -1) {
-        DoInstantAction(enterActionID);
-    }
-    if (enterActionStyle != -1 && enterActionStyle != newStyleID) {
-        styleInstall = enterActionStyle; // not sure if correct - like jamie's exit action naming a diff style
+    StyleData &style = pCharData->styles[newStyleID];
+    if (style.hasStartAction) {
+        DoInstantAction(style.startActionID);
+        if (style.startActionStyle != -1 && style.startActionStyle != newStyleID) {
+            styleInstall = style.startActionStyle; // not sure if correct - like jamie's exit action naming a diff style
+        }
     }
 }
 
 void Guy::ExitStyle() {
-    nlohmann::json *pStyleJson = &(*pCharInfoJson)["Styles"][std::to_string(styleInstall)];
-    int exitActionID = -1;
-    int exitActionStyle = -1;
-    if ((*pStyleJson)["StyleData"].contains("Action")) {
-        exitActionID = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Action"];
-        exitActionStyle = (*pStyleJson)["StyleData"]["Action"]["Exit"]["Style"];
+    if (styleInstall < 0 || (size_t)styleInstall >= pCharData->styles.size()) {
+        return;
     }
 
-    if (exitActionID != -1) {
-        DoInstantAction(exitActionID);
-    }
-    if (exitActionStyle != -1 && exitActionStyle != styleInstall) {
-        styleInstall = exitActionStyle;
+    StyleData &style = pCharData->styles[styleInstall];
+
+    if (style.hasExitAction) {
+        DoInstantAction(style.exitActionID);
+        if (style.exitActionStyle != -1 && style.exitActionStyle != styleInstall) {
+            styleInstall = style.exitActionStyle;
+        } else {
+            styleInstall = style.parentStyleID;
+        }
     } else {
-        styleInstall = (*pStyleJson)["ParentStyleID"];
+        styleInstall = style.parentStyleID;
     }
 }
 

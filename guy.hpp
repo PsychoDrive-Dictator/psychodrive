@@ -312,9 +312,9 @@ public:
 
         DoTriggers();
 
-        health = maxHealth = (*pCharInfoJson)["PlData"]["Vitality"];
+        health = maxHealth = pCharData->vitality;
         focus = maxFocus = 60000;
-        gauge = maxGauge = (*pCharInfoJson)["PlData"]["Gauge"].get<int>();
+        gauge = maxGauge = pCharData->gauge;
     }
 
     Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)

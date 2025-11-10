@@ -649,6 +649,58 @@ void loadShotKeys(nlohmann::json* pShotJson, std::vector<ShotKey>* pOutputVector
     }
 }
 
+void loadStyles(nlohmann::json* pCharInfoJson, std::vector<StyleData>* pOutputVector)
+{
+    if (!pCharInfoJson || !pCharInfoJson->contains("Styles")) {
+        return;
+    }
+
+    nlohmann::json &stylesJson = (*pCharInfoJson)["Styles"];
+
+    // Find max style ID to size vector
+    int maxStyleID = -1;
+    for (auto& [styleIDStr, styleJson] : stylesJson.items()) {
+        int styleID = std::stoi(styleIDStr);
+        if (styleID > maxStyleID) {
+            maxStyleID = styleID;
+        }
+    }
+
+    if (maxStyleID >= 0) {
+        pOutputVector->reserve(maxStyleID + 1);
+        pOutputVector->resize(maxStyleID + 1);
+    }
+
+    for (auto& [styleIDStr, styleJson] : stylesJson.items()) {
+        int styleID = std::stoi(styleIDStr);
+        StyleData &newStyle = (*pOutputVector)[styleID];
+
+        newStyle.id = styleID;
+        newStyle.parentStyleID = styleJson["ParentStyleID"];
+
+        if (styleJson.contains("StyleData") && styleJson["StyleData"].contains("State") &&
+            styleJson["StyleData"]["State"].contains("TerminateState")) {
+            newStyle.terminateState = styleJson["StyleData"]["State"]["TerminateState"];
+        } else {
+            newStyle.terminateState = 0;
+        }
+
+        if (styleJson.contains("StyleData") && styleJson["StyleData"].contains("Action")) {
+            nlohmann::json &actionJson = styleJson["StyleData"]["Action"];
+            if (actionJson.contains("Start")) {
+                newStyle.hasStartAction = true;
+                newStyle.startActionID = actionJson["Start"]["Action"];
+                newStyle.startActionStyle = actionJson["Start"]["Style"];
+            }
+            if (actionJson.contains("Exit")) {
+                newStyle.hasExitAction = true;
+                newStyle.exitActionID = actionJson["Exit"]["Action"];
+                newStyle.exitActionStyle = actionJson["Exit"]["Style"];
+            }
+        }
+    }
+}
+
 void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
 {
     pEntry->comboAdd = (*pHitEntryJson)["ComboAdd"];
@@ -966,6 +1018,13 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     pRet->charName = charName;
     pRet->charVersion = charVersion;
     pRet->charID = getCharIDFromName(charName.c_str());
+
+    if (pCharInfoJson) {
+        pRet->vitality = (*pCharInfoJson)["PlData"]["Vitality"];
+        pRet->gauge = (*pCharInfoJson)["PlData"]["Gauge"].get<int>();
+    }
+
+    loadStyles(pCharInfoJson, &pRet->styles);
 
     loadCharges(pChargeJson, pRet);
     loadCommands(pCommandsJson, pRet);

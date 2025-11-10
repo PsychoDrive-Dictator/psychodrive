@@ -305,6 +305,20 @@ struct ProjectileData {
     int lifeTime;
 };
 
+struct StyleData {
+    int id;
+    int parentStyleID;
+    int64_t terminateState;
+
+    bool hasStartAction = false;
+    int startActionID;
+    int startActionStyle;
+
+    bool hasExitAction = false;
+    int exitActionID;
+    int exitActionStyle;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -347,6 +361,9 @@ struct CharacterData {
     int charID;
     int charVersion;
 
+    int vitality;
+    int gauge;
+
     std::vector<Charge> charges;
     std::vector<Command> commands;
     std::vector<Trigger> triggers;
@@ -355,6 +372,7 @@ struct CharacterData {
     std::vector<ProjectileData> projectileDatas;
     std::vector<AtemiData> atemis;
     std::vector<HitData> hits;
+    std::vector<StyleData> styles;
     std::vector<Action> actions;
 
     std::map<int, TriggerGroup*> triggerGroupByID;
