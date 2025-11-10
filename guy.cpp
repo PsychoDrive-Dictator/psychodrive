@@ -21,17 +21,6 @@
 #include <numbers>
 #include <unordered_set>
 
-nlohmann::json staticPlayer;
-bool staticPlayerLoaded = false;
-
-void parseRootOffset( nlohmann::json& keyJson, Fixed&offsetX, Fixed& offsetY)
-{
-    if ( keyJson.contains("RootOffset") && keyJson["RootOffset"].contains("X") && keyJson["RootOffset"].contains("Y") ) {
-        offsetX = Fixed(keyJson["RootOffset"]["X"].get<int>());
-        offsetY = Fixed(keyJson["RootOffset"]["Y"].get<int>());
-    }
-}
-
 bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
@@ -168,11 +157,6 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
 
     if (it != pCharData->rectsByIDs.end()) {
         pRect = it->second;
-    } else {
-        it = pCommonCharData->rectsByIDs.find(rectIndex);
-        if (it != pCommonCharData->rectsByIDs.end()) {
-            pRect = it->second;
-        }
     }
 
     if (!pRect) {
@@ -187,7 +171,7 @@ bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed of
     return true;
 }
 
-const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson, Action **ppAction)
+const char* Guy::FindMove(int actionID, int styleID, Action **ppAction)
 {
     auto mapIndex = std::make_pair(actionID, styleID);
     if (pCharData->mapMoveStyle.find(mapIndex) == pCharData->mapMoveStyle.end()) {
@@ -200,18 +184,9 @@ const char* Guy::FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson
             return nullptr;
         }
 
-        return FindMove(actionID, parentStyleID, ppMoveJson, ppAction);
+        return FindMove(actionID, parentStyleID, ppAction);
     } else {
         const char *moveName = pCharData->mapMoveStyle[mapIndex].first.c_str();
-
-        if (ppMoveJson) {
-            auto it = pCharData->mapMoveJson.find(mapIndex);
-            if (it != pCharData->mapMoveJson.end()) {
-                *ppMoveJson = it->second;
-            } else {
-                *ppMoveJson = nullptr;
-            }
-        }
 
         if (ppAction) {
             auto it = pCharData->actionsByID.find(mapIndex);
@@ -247,29 +222,30 @@ void Guy::Input(int input)
 
 std::string Guy::getActionName(int actionID)
 {
-    auto actionIDString = to_string_leading_zeroes(actionID, 4);
-    bool validAction = pNamesJson->contains(actionIDString);
-    std::string ret = validAction ? (*pNamesJson)[actionIDString] : "invalid";
-    return ret;
+    Action *pAction = nullptr;
+    FindMove(actionID, styleInstall, &pAction);
+    if (pAction) {
+        return pAction->name;
+    }
+    return "invalid";
 }
 
 void Guy::UpdateActionData(void)
 {
     auto actionIDString = to_string_leading_zeroes(currentAction, 4);
-    pActionJson = nullptr;
     pCurrentAction = nullptr;
     const char *foundAction = nullptr;
 
     if (opponentAction) {
-        foundAction = pOpponent->FindMove(currentAction, 0, &pActionJson, &pCurrentAction);
+        foundAction = pOpponent->FindMove(currentAction, 0, &pCurrentAction);
     } else {
-        foundAction = FindMove(currentAction, styleInstall, &pActionJson, &pCurrentAction);
+        foundAction = FindMove(currentAction, styleInstall, &pCurrentAction);
     }
 
     if (foundAction == nullptr) {
         log(true, "couldn't find next action, reverting to 1 - style lapsed?");
         currentAction = 1;
-        foundAction = FindMove(currentAction, styleInstall, &pActionJson, &pCurrentAction);
+        foundAction = FindMove(currentAction, styleInstall, &pCurrentAction);
     }
 
     if (pCurrentAction) {
@@ -350,7 +326,7 @@ bool Guy::RunFrame(void)
     freeMovement = false;
     proxGuarded = false;
 
-    if (pActionJson != nullptr)
+    if (pCurrentAction != nullptr)
     {
         if (isProjectile && !projDataInitialized && pCurrentAction && pCurrentAction->pProjectileData) {
             ProjectileData *pProjData = pCurrentAction->pProjectileData;
@@ -1204,8 +1180,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                 continue;
             }
 
-            nlohmann::json *pMoveJson = nullptr;
-            if (FindMove(actionID, styleInstall, &pMoveJson) == nullptr) {
+            if (FindMove(actionID, styleInstall, nullptr) == nullptr) {
                 continue;
             }
 
@@ -2052,10 +2027,6 @@ AtemiData *Guy::findAtemi(int atemiID)
     auto it = pCharData->atemiByID.find(atemiID);
     if (it != pCharData->atemiByID.end()) {
         return it->second;
-    }
-    auto commonIt = pCommonCharData->atemiByID.find(atemiID);
-    if (commonIt != pCommonCharData->atemiByID.end()) {
-        return commonIt->second;
     }
     return nullptr;
 }
@@ -3958,49 +3929,47 @@ void Guy::DoSwitchKey(void)
 
 void Guy::DoStatusKey(void)
 {
-    if (pActionJson->contains("StatusKey"))
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& statusKey : pCurrentAction->statusKeys)
     {
-        for (auto& [keyID, key] : (*pActionJson)["StatusKey"].items())
-        {
-            if ( !key.contains("_StartFrame") || key["_StartFrame"] > currentFrame || key["_EndFrame"] <= currentFrame ) {
-                continue;
-            }
+        if (statusKey.startFrame > currentFrame || statusKey.endFrame <= currentFrame) {
+            continue;
+        }
 
-            int adjust = key["LandingAdjust"];
-            if ( adjust != 0 ) {
-                landingAdjust = adjust;
-            }
-            forcedPoseStatus = key["PoseStatus"];
-            actionStatus = key["ActionStatus"];
-            jumpStatus = key["JumpStatus"];
+        if (statusKey.landingAdjust != 0) {
+            landingAdjust = statusKey.landingAdjust;
+        }
+        forcedPoseStatus = statusKey.poseStatus;
+        actionStatus = statusKey.actionStatus;
+        jumpStatus = statusKey.jumpStatus;
 
-            int sideOperation = key["Side"];
-
-            switch (sideOperation) {
-                default:
-                    log (logUnknowns, "unknown side op " + std::to_string(sideOperation));
-                    break;
-                case 0:
-                    break;
-                case 1:
-                    if (needsTurnaround()) {
-                        switchDirection();
-                    }
-                    break;
-                case 3:
+        switch (statusKey.side) {
+            default:
+                log (logUnknowns, "unknown side op " + std::to_string(statusKey.side));
+                break;
+            case 0:
+                break;
+            case 1:
+                if (needsTurnaround()) {
                     switchDirection();
-                    break;
-                case 9:
-                    if (direction != 1) {
-                        switchDirection();
-                    }
-                    break;
-                case 10:
-                    if (direction != -1) {
-                        switchDirection();
-                    }
-                    break;
-            }
+                }
+                break;
+            case 3:
+                switchDirection();
+                break;
+            case 9:
+                if (direction != 1) {
+                    switchDirection();
+                }
+                break;
+            case 10:
+                if (direction != -1) {
+                    switchDirection();
+                }
+                break;
         }
     }
 }
@@ -4549,9 +4518,8 @@ void Guy::DoShotKey(Action *pAction, int frameID)
 
 void Guy::DoInstantAction(int actionID)
 {
-    nlohmann::json *pInstantActionJson = nullptr;
     Action *pInstantAction = nullptr;
-    FindMove(actionID, styleInstall, &pInstantActionJson, &pInstantAction);
+    FindMove(actionID, styleInstall, &pInstantAction);
     if (pInstantAction) {
         // only ones i've seen used in those kinds of actions so far
         DoEventKey(pInstantAction, 0);

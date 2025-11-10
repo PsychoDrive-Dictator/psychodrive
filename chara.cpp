@@ -677,6 +677,29 @@ void loadTriggerKeys(nlohmann::json* pTriggerJson, std::vector<TriggerKey>* pOut
     }
 }
 
+void loadStatusKeys(nlohmann::json* pStatusJson, std::vector<StatusKey>* pOutputVector)
+{
+    if (!pStatusJson) {
+        return;
+    }
+
+    for (auto& [statusKeyID, statusKey] : pStatusJson->items()) {
+        if (!statusKey.contains("_StartFrame")) {
+            continue;
+        }
+        StatusKey newKey;
+        newKey.startFrame = statusKey["_StartFrame"];
+        newKey.endFrame = statusKey["_EndFrame"];
+        newKey.landingAdjust = statusKey["LandingAdjust"];
+        newKey.poseStatus = statusKey["PoseStatus"];
+        newKey.actionStatus = statusKey["ActionStatus"];
+        newKey.jumpStatus = statusKey["JumpStatus"];
+        newKey.side = statusKey["Side"];
+
+        pOutputVector->push_back(newKey);
+    }
+}
+
 void loadStyles(nlohmann::json* pCharInfoJson, std::vector<StyleData>* pOutputVector)
 {
     if (!pCharInfoJson || !pCharInfoJson->contains("Styles")) {
@@ -1025,6 +1048,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
             loadTriggerKeys(&key["TriggerKey"], &newAction.triggerKeys, triggerGroupByID);
         }
 
+        if (key.contains("StatusKey")) {
+            newAction.statusKeys.reserve(key["StatusKey"].size() - 1);
+            loadStatusKeys(&key["StatusKey"], &newAction.statusKeys);
+        }
+
         pRet->actions.push_back(newAction);
     }
 }
@@ -1033,7 +1061,6 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 {
     nlohmann::json *pMovesDictJson = loadCharFile(charName, charVersion, "moves");
     nlohmann::json *pRectsJson = loadCharFile(charName, charVersion, "rects");
-    nlohmann::json *pNamesJson = loadCharFile(charName, charVersion, "names");
     nlohmann::json *pTriggerGroupsJson = loadCharFile(charName, charVersion, "trigger_groups");
     nlohmann::json *pTriggersJson = loadCharFile(charName, charVersion, "triggers");
     nlohmann::json *pCommandsJson = loadCharFile(charName, charVersion, "commands");
@@ -1097,7 +1124,6 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
             }
             auto mapIndex = std::make_pair(actionID, styleID);
             pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, false);
-            pRet->mapMoveJson[mapIndex] = &key;
         }
     }
 
@@ -1112,7 +1138,6 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
             auto mapIndex = std::make_pair(actionID, styleID);
             if (pRet->mapMoveStyle.find(mapIndex) == pRet->mapMoveStyle.end()) {
                 pRet->mapMoveStyle[mapIndex] = std::make_pair(keyID, true);
-                pRet->mapMoveJson[mapIndex] = &key;
             }
         }
     }
@@ -1151,6 +1176,19 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     for (auto& action : pRet->actions) {
         pRet->actionsByID[std::make_pair(action.actionID, action.styleID)] = &action;
     }
+
+    // delete pMovesDictJson;
+    // delete pRectsJson;
+    // delete pTriggerGroupsJson;
+    // delete pTriggersJson;
+    // delete pCommandsJson;
+    // delete pChargeJson;
+    // delete pHitJson;
+    // delete pAtemiJson;
+    // delete pCharInfoJson;
+    // delete pCommonMovesJson;
+    // delete pCommonRectsJson;
+    // delete pCommonAtemiJson;
 
     return pRet;
 }

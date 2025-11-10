@@ -300,6 +300,14 @@ struct TriggerKey : Key {
     TriggerGroup *pTriggerGroup = nullptr;
 };
 
+struct StatusKey : Key {
+    int landingAdjust;
+    int poseStatus;
+    int actionStatus;
+    int jumpStatus;
+    int side;
+};
+
 struct ProjectileData {
     int id;
     int hitCount;
@@ -344,6 +352,7 @@ struct Action {
     std::vector<BranchKey> branchKeys;
     std::vector<ShotKey> shotKeys;
     std::vector<TriggerKey> triggerKeys;
+    std::vector<StatusKey> statusKeys;
 
     int activeFrame;
     int recoveryStartFrame;
@@ -391,7 +400,6 @@ struct CharacterData {
     std::map<int, HitData*> hitByID;
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
-    std::map<std::pair<int, int>, nlohmann::json*> mapMoveJson;
     std::vector<const char *> vecMoveList;
 };
 

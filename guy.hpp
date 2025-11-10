@@ -16,9 +16,6 @@ const Fixed wallDistance = Fixed(765.0f);
 const Fixed maxPlayerDistance = Fixed(245.0f);
 const Fixed maxProjectileDistance = Fixed(280.0f);
 
-extern nlohmann::json staticPlayer;
-extern bool staticPlayerLoaded;
-
 void ResolveHits(std::vector<PendingHit> &pendingHitList);
 
 class Guy;
@@ -284,27 +281,7 @@ public:
         charColorG = color.g;
         charColorB = color.b;
 
-        if (!staticPlayerLoaded) {
-            staticPlayer = parse_json_file("data/chars/static_player.json");
-            staticPlayerLoaded = true;
-        }
-
-        pMovesDictJson = loadCharFile(charName, version, "moves");
-        pRectsJson = loadCharFile(charName, version, "rects");
-        pNamesJson = loadCharFile(charName, version, "names");
-        pTriggerGroupsJson = loadCharFile(charName, version, "trigger_groups");
-        pTriggersJson = loadCharFile(charName, version, "triggers");
-        pCommandsJson = loadCharFile(charName, version, "commands");
-        pChargeJson = loadCharFile(charName, version, "charge");
-        pHitJson = loadCharFile(charName, version, "hit");
-        pAtemiJson = loadCharFile(charName, version, "atemi");
-        pCharInfoJson = loadCharFile(charName, version, "charinfo");
         pCharData = loadCharacter(charName, version);
-
-        pCommonMovesJson = loadCharFile("common", version, "moves");
-        pCommonRectsJson = loadCharFile("common", version, "rects");
-        pCommonAtemiJson = loadCharFile("common", version, "atemi");
-        pCommonCharData = loadCharacter("common", version);
 
         Input(0);
     
@@ -331,22 +308,7 @@ public:
         charColorG = parent.charColorG;
         charColorB = parent.charColorB;
 
-        pMovesDictJson = parent.pMovesDictJson;
-        pRectsJson = parent.pRectsJson;
-        pNamesJson = parent.pNamesJson;
-        pTriggerGroupsJson = parent.pTriggerGroupsJson;
-        pTriggersJson = parent.pTriggersJson;
-        pCommandsJson = parent.pCommandsJson;
-        pChargeJson = parent.pChargeJson;
-        pHitJson = parent.pHitJson;
-        pAtemiJson = parent.pAtemiJson;
-        pCharInfoJson = parent.pCharInfoJson;
         pCharData = parent.pCharData;
-
-        pCommonMovesJson = parent.pCommonMovesJson;
-        pCommonRectsJson = parent.pCommonRectsJson;
-        pCommonAtemiJson = parent.pCommonAtemiJson;
-        pCommonCharData = parent.pCommonCharData;
 
         pOpponent = parent.pOpponent;
 
@@ -380,7 +342,7 @@ public:
     int *getInputOverridePtr() { return &inputOverride; }
     int *getInputIDPtr() { return &inputID; }
     int *getInputListIDPtr() { return &inputListID; }
-    const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson = nullptr, Action **ppAction = nullptr);
+    const char* FindMove(int actionID, int styleID, Action **ppAction = nullptr);
     AtemiData *findAtemi(int atemiID);
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
@@ -523,22 +485,7 @@ private:
     bool obeyHitID = false;
     GuyRef pParent = nullptr;
 
-    nlohmann::json *pMovesDictJson;
-    nlohmann::json *pRectsJson;
-    nlohmann::json *pNamesJson;
-    nlohmann::json *pTriggerGroupsJson;
-    nlohmann::json *pTriggersJson;
-    nlohmann::json *pCommandsJson;
-    nlohmann::json *pChargeJson;
-    nlohmann::json *pHitJson;
-    nlohmann::json *pAtemiJson;
-    nlohmann::json *pCharInfoJson;
     CharacterData *pCharData;
-    CharacterData *pCommonCharData;
-
-    nlohmann::json *pCommonMovesJson;
-    nlohmann::json *pCommonRectsJson;
-    nlohmann::json *pCommonAtemiJson;
 
     Fixed posX;
     Fixed posY;
@@ -756,7 +703,6 @@ private:
 
     int debuffTimer = 0;
 
-    nlohmann::json *pActionJson;
     Action *pCurrentAction = nullptr;
 
     Simulation *pSim = nullptr;
