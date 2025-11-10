@@ -588,6 +588,8 @@ private:
     int airActionCounter = 0;
 
     int currentInput = 0;
+    // todo could keep track of frames since any input as a further optim
+    int framesSinceLastInput = 0;
 
     // hitting side
     uint64_t canHitID = 0;

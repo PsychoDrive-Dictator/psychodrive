@@ -180,6 +180,10 @@ void Guy::Input(int input)
     if (input == 0 && inputOverride != 0) {
         input = inputOverride;
     }
+    framesSinceLastInput++;
+    if (input != 0) {
+        framesSinceLastInput = 0;
+    }
     currentInput = input;
 
     dc.inputBuffer.push_front(input);
@@ -751,6 +755,10 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
     int initialSearch = 1 + precedingTime + timeInHitStop;
     if (dc.inputBuffer.size() < (size_t)initialSearch) {
         initialSearch = dc.inputBuffer.size();
+    }
+    // early out if no input
+    if (framesSinceLastInput > initialSearch) {
+        return false;
     }
 
     if ((okCondFlags & 0x60) == 0x60) {
