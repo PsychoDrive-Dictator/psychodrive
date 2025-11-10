@@ -151,29 +151,6 @@ bool Guy::conditionOperator(int op, int operand, int threshold, std::string desc
     return false;
 }
 
-bool Guy::GetRect(Box &outBox, int rectsPage, int boxID, Fixed offsetX, Fixed offsetY, int dir)
-{
-    Rect *pRect = nullptr;
-    auto rectIndex = std::make_pair(rectsPage, boxID);
-
-    auto it = pCharData->rectsByIDs.find(rectIndex);
-
-    if (it != pCharData->rectsByIDs.end()) {
-        pRect = it->second;
-    }
-
-    if (!pRect) {
-        return false;
-    }
-
-    outBox.x = Fixed(pRect->xOrig * dir - pRect->xRadius) + offsetX;
-    outBox.y = Fixed(pRect->yOrig - pRect->yRadius) + offsetY;
-    outBox.w = Fixed(pRect->xRadius * 2);
-    outBox.h = Fixed(pRect->yRadius * 2);
-
-    return true;
-}
-
 Action* Guy::FindMove(int actionID, int styleID)
 {
     ActionRef mapIndex(actionID, styleID);
