@@ -2045,23 +2045,17 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     }
 }
 
-nlohmann::json *Guy::findAtemi(int atemiID)
+AtemiData *Guy::findAtemi(int atemiID)
 {
-    nlohmann::json *pAtemi = nullptr;
-
-    // there's leading zeroes or not depending on how it was dumped........
-    // .............................................
-    for (auto &[keyID, key] : pAtemiJson->items()) {
-        if (atoi(keyID.c_str()) == atemiID) {
-            return &key;
-        }
+    auto it = pCharData->atemiByID.find(atemiID);
+    if (it != pCharData->atemiByID.end()) {
+        return it->second;
     }
-    for (auto &[keyID, key] : pCommonAtemiJson->items()) {
-        if (atoi(keyID.c_str()) == atemiID) {
-            return &key;
-        }
+    auto commonIt = pCommonCharData->atemiByID.find(atemiID);
+    if (commonIt != pCommonCharData->atemiByID.end()) {
+        return commonIt->second;
     }
-    return pAtemi;
+    return nullptr;
 }
 
 void ResolveHits(std::vector<PendingHit> &pendingHitList)
@@ -2165,19 +2159,19 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitFlagToParent) pGuy->pParent->hitArmorThisMove = true;
             auto atemiIDString = std::to_string(hurtBox.armorID);
             // need to pull from opponents atemi here or put in opponent method
-            nlohmann::json *pAtemi = pOtherGuy->findAtemi(hurtBox.armorID);
+            AtemiData *pAtemi = pOtherGuy->findAtemi(hurtBox.armorID);
             if (!pAtemi) {
                 pGuy->log(true, "atemi not found!! " + std::to_string(hurtBox.armorID));
                 continue;
             }
 
-            int armorHitStopHitted = (*pAtemi)["TargetStop"];
-            int armorHitStopHitter = (*pAtemi)["OwnerStop"];
-            int armorBreakHitStopHitted = (*pAtemi)["TargetStopShell"]; // ??
-            int armorBreakHitStopHitter = (*pAtemi)["OwnerStopShell"];
+            int armorHitStopHitted = pAtemi->targetStop;
+            int armorHitStopHitter = pAtemi->ownerStop;
+            int armorBreakHitStopHitted = pAtemi->targetStopShell; // ??
+            int armorBreakHitStopHitter = pAtemi->ownerStopShell;
 
             if (pOtherGuy->currentArmorID != hurtBox.armorID) {
-                pOtherGuy->armorHitsLeft = (*pAtemi)["ResistLimit"].get<int>() + 1;
+                pOtherGuy->armorHitsLeft = pAtemi->resistLimit + 1;
                 pOtherGuy->currentArmorID = hurtBox.armorID;
             }
             if ( pOtherGuy->currentArmorID == hurtBox.armorID ) {

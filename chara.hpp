@@ -244,6 +244,15 @@ struct ProjectileData {
     int lifeTime;
 };
 
+struct AtemiData {
+    int id;
+    int targetStop;
+    int ownerStop;
+    int targetStopShell;
+    int ownerStopShell;
+    int resistLimit;
+};
+
 struct Action {
     int actionID;
     int styleID;
@@ -291,11 +300,13 @@ struct CharacterData {
     std::vector<TriggerGroup> triggerGroups;
     std::vector<Rect> rects;
     std::vector<ProjectileData> projectileDatas;
+    std::vector<AtemiData> atemis;
     std::vector<Action> actions;
 
     std::map<int, TriggerGroup*> triggerGroupByID;
     std::map<std::pair<int, int>, Rect*> rectsByIDs;
     std::map<std::pair<int, int>, Action*> actionsByID;
+    std::map<int, AtemiData*> atemiByID;
 
     std::map<std::pair<int, int>, std::pair<std::string, bool>> mapMoveStyle;
     std::map<std::pair<int, int>, nlohmann::json*> mapMoveJson;

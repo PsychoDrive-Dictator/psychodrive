@@ -610,6 +610,33 @@ void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutput
     }
 }
 
+int countAtemis(nlohmann::json* pAtemiJson)
+{
+    if (!pAtemiJson) {
+        return 0;
+    }
+    return pAtemiJson->size();
+}
+
+void loadAtemis(nlohmann::json* pAtemiJson, std::vector<AtemiData>* pOutputVector)
+{
+    if (!pAtemiJson) {
+        return;
+    }
+
+    for (auto& [atemiID, atemiData] : pAtemiJson->items()) {
+        AtemiData newAtemi;
+        newAtemi.id = std::stoi(atemiID);
+        newAtemi.targetStop = atemiData["TargetStop"];
+        newAtemi.ownerStop = atemiData["OwnerStop"];
+        newAtemi.targetStopShell = atemiData["TargetStopShell"];
+        newAtemi.ownerStopShell = atemiData["OwnerStopShell"];
+        newAtemi.resistLimit = atemiData["ResistLimit"];
+
+        pOutputVector->push_back(newAtemi);
+    }
+}
+
 void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileData>* pUniqueProjectiles)
 {
     if (!pMovesJson) {
@@ -819,6 +846,7 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     nlohmann::json *pCommonMovesJson = loadCharFile("common", charVersion, "moves");
     nlohmann::json *pCommonRectsJson = loadCharFile("common", charVersion, "rects");
+    nlohmann::json *pCommonAtemiJson = loadCharFile("common", charVersion, "atemi");
 
     CharacterData *pRet = new CharacterData;
 
@@ -891,6 +919,14 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     pRet->projectileDatas.reserve(uniqueProjectiles.size());
     for (auto& [id, projData] : uniqueProjectiles) {
         pRet->projectileDatas.push_back(projData);
+    }
+
+    pRet->atemis.reserve(countAtemis(pAtemiJson) + countAtemis(pCommonAtemiJson));
+    loadAtemis(pAtemiJson, &pRet->atemis);
+    loadAtemis(pCommonAtemiJson, &pRet->atemis);
+
+    for (auto& atemi : pRet->atemis) {
+        pRet->atemiByID[atemi.id] = &atemi;
     }
 
     pRet->actions.reserve(pRet->mapMoveStyle.size());

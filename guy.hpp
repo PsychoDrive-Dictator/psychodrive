@@ -381,7 +381,7 @@ public:
     int *getInputIDPtr() { return &inputID; }
     int *getInputListIDPtr() { return &inputListID; }
     const char* FindMove(int actionID, int styleID, nlohmann::json **ppMoveJson = nullptr, Action **ppAction = nullptr);
-    nlohmann::json *findAtemi(int atemiID);
+    AtemiData *findAtemi(int atemiID);
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
     void UpdateActionData(void);
