@@ -362,6 +362,7 @@ private:
     bool CheckHitBoxCondition(int conditionFlag);
     void DoStatusKey();
     void DoSteerKey();
+    void DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType);
     void DoPlaceKey();
     void DoSwitchKey();
     void DoEventKey(Action *pAction, int frameID);
@@ -454,8 +455,8 @@ private:
     int uniqueID = -1;
     GuyRef pOpponent = nullptr;
 
-    void log(bool log, std::string logLine);
-    void log(std::string logLine) { log(true, logLine ); }
+    void guyLog(bool doLog, std::string logLine);
+    void guyLog(std::string logLine) { guyLog(true, logLine ); }
 
     // stuff that won't get copied around when dumping simulations
     struct noCopy

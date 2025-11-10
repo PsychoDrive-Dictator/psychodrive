@@ -21,6 +21,9 @@
 #include <numbers>
 #include <unordered_set>
 
+#define log(channel, string) if (channel) { guyLog(channel, string); }
+#define otherGuyLog(otherGuy, channel, string) if (channel) { otherGuy->guyLog(channel, string); }
+
 bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
@@ -79,7 +82,7 @@ bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t 
     return false;
 }
 
-static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
+void Guy::DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
 {
     switch (operationType) {
         case 4: // set sign.. ??
@@ -99,14 +102,14 @@ static inline void doSteerKeyOperation(Fixed &value, Fixed keyValue, int operati
             value = value + keyValue;
             break;
         default:
-            log("Uknown steer keyoperation!");
+            log(logUnknowns, "Uknown steer keyoperation!");
             break;
     }
 }
 
-void Guy::log(bool log, std::string logLine)
+void Guy::guyLog(bool doLog, std::string logLine)
 {
-    if (!log) return;
+    if (!doLog) return;
     std::string frameDiff = to_string_leading_zeroes(globalFrameCount - nc.lastLogFrame, 3);
     std::string curFrame = to_string_leading_zeroes(currentFrame, 3);
     nc.logQueue.push_back(std::to_string(currentAction) + ":" + curFrame + "(+" + frameDiff + ") " + logLine);
@@ -232,7 +235,6 @@ std::string Guy::getActionName(int actionID)
 
 void Guy::UpdateActionData(void)
 {
-    auto actionIDString = to_string_leading_zeroes(currentAction, 4);
     pCurrentAction = nullptr;
     const char *foundAction = nullptr;
 
@@ -1190,9 +1192,6 @@ void Guy::DoTriggers(int fluffFrameBias)
                 forceTrigger = true;
             }
 
-            auto triggerIDString = std::to_string(triggerID);
-            auto actionIDString = to_string_leading_zeroes(actionID, 4);
-
             bool recordThisTrigger = true;
 
             if (!recordFrameTriggers) {
@@ -1230,7 +1229,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                     break;
                 }
             } else if (forceTrigger || CheckTriggerCommand(pTrigger, initialI)) {
-                log(logTriggers, "trigger " + actionIDString + " " + triggerIDString + " defer " +
+                log(logTriggers, "trigger " + std::to_string(actionID) + " " + std::to_string(triggerID) + " defer " +
                     std::to_string(trigState.hasDeferred) + " normal " + std::to_string(trigState.hasNormal) +
                     + " antinormal " + std::to_string(trigState.hasAntiNormal));
                 if (trigState.hasDeferred || trigState.hasAntiNormal) {
@@ -1912,7 +1911,6 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (foundBox) {
-            std::string hitIDString = to_string_leading_zeroes(hitbox.hitID, 3);
             int hitEntryFlag = 0;
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
@@ -2015,7 +2013,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         // really we should save the lock target, etc.
         if (pOpponent) {
             pOpponent->ApplyHitEffect(pendingLockHit, this, true, true, false, false);
-            pOpponent->log(pOpponent->logHits, "lock hit dt applied");
+            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt applied");
             pOpponent->locked = false;
         }
         pendingLockHit = nullptr;
@@ -2051,7 +2049,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                     continue;
                 }
                 if (otherPendingHit.pGuyGettingHit == pGuy) {
-                    pOtherGuy->log(pOtherGuy->logHits, "trade!");
+                    otherGuyLog(pOtherGuy, pOtherGuy->logHits, "trade!");
                     trade = true;
                     // todo see simultaneous hit question thing below
                     tradeHit = otherPendingHit;
@@ -2076,7 +2074,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 }
                 pOtherGuy->blocking = true;
 
-                pOtherGuy->log(pOtherGuy->logHits, "proximity guard!");
+                otherGuyLog(pOtherGuy, pOtherGuy->logHits, "proximity guard!");
             }
             // mark them regardless, since we might prox guard on recovery later I GUESS
             pOtherGuy->proxGuarded = true;
@@ -2119,7 +2117,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitFlagToParent) pGuy->pParent->hasBeenBlockedThisFrame = true;
             pGuy->hasBeenBlockedThisMove = true;
             if (hitFlagToParent) pGuy->pParent->hasBeenBlockedThisMove = true;
-            pOtherGuy->log(pOtherGuy->logHits, "block!");
+            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "block!");
         }
 
         bool hitArmor = false;
@@ -2149,7 +2147,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                     if (pOtherGuy->armorHitsLeft == 0) {
                         pGuy->addHitStop(armorBreakHitStopHitter+1);
                         pOtherGuy->addHitStop(armorBreakHitStopHitted+1);
-                        pOtherGuy->log(pOtherGuy->logHits, "armor break!");
+                        otherGuyLog(pOtherGuy, pOtherGuy->logHits, "armor break!");
                     }
                 } else {
                     // apply gauge effects here
@@ -2161,7 +2159,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                     pOtherGuy->addHitStop(armorHitStopHitted+1);
                     // fall through to normal hit case and add hitstop there too
                     // todo does armor hitstop replace if specified?
-                    pOtherGuy->log(pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
+                    otherGuyLog(pOtherGuy, pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
                 }
             }
         }
@@ -2180,7 +2178,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->addHitStop(13+1);
             pOtherGuy->addHitStop(13+1);
 
-            pOtherGuy->log(pOtherGuy->logHits, "atemi hit!");
+            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "atemi hit!");
         }
 
         // not hitstun for initial grab hit as we dont want to recover during the lock
@@ -2302,11 +2300,11 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->debuffTimer = 0;
             }
 
-            pOtherGuy->log(pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " id " + std::to_string(hitBox.hitID) +
+            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " id " + std::to_string(hitBox.hitID) +
                 " dt " + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                 " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                 " moveType " + std::to_string(moveType) );
-            pOtherGuy->log(pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
+            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
         }
 
         // let's try to be doing the grab before time stops
@@ -2318,7 +2316,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 // For LockKey
                 pGuy->RunFrame();
             } else {
-                pGuy->log(true, "instagrab branch not found!");
+                otherGuyLog(pGuy, true, "instagrab branch not found!");
             }
         }
 
@@ -4007,10 +4005,10 @@ void Guy::DoSteerKey(void)
             case 4:
             case 5:
                 switch (valueType) {
-                    case 0: doSteerKeyOperation(velocityX, fixValue,operationType); break;
-                    case 1: doSteerKeyOperation(velocityY, fixValue,operationType); break;
-                    case 3: doSteerKeyOperation(accelX, fixValue,operationType); break;
-                    case 4: doSteerKeyOperation(accelY, fixValue,operationType); break;
+                    case 0: DoSteerKeyOperation(velocityX, fixValue,operationType); break;
+                    case 1: DoSteerKeyOperation(velocityY, fixValue,operationType); break;
+                    case 3: DoSteerKeyOperation(accelX, fixValue,operationType); break;
+                    case 4: DoSteerKeyOperation(accelY, fixValue,operationType); break;
                 }
                 break;
             case 9:
@@ -4041,10 +4039,10 @@ void Guy::DoSteerKey(void)
                 // guessing there's also one to add on cancel too? not sure
                 operationType = 1;
                 switch (valueType) {
-                    case 0: doSteerKeyOperation(cancelVelocityX, fixValue,operationType); break;
-                    case 1: doSteerKeyOperation(cancelVelocityY, fixValue,operationType); break;
-                    case 3: doSteerKeyOperation(cancelAccelX, fixValue,operationType); break;
-                    case 4: doSteerKeyOperation(cancelAccelY, fixValue,operationType); break;
+                    case 0: DoSteerKeyOperation(cancelVelocityX, fixValue,operationType); break;
+                    case 1: DoSteerKeyOperation(cancelVelocityY, fixValue,operationType); break;
+                    case 3: DoSteerKeyOperation(cancelAccelX, fixValue,operationType); break;
+                    case 4: DoSteerKeyOperation(cancelAccelY, fixValue,operationType); break;
                 }
                 break;
             case 13:
