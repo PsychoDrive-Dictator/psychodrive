@@ -16,6 +16,7 @@ ComboFinder finder;
 void ComboWorker::Start(bool isFirst) {
     idle = false;
     first = isFirst;
+    wantsRenderSnapshot = false;
 
     shuffledWorkerPool = finder.workerPool;
     std::shuffle(shuffledWorkerPool.begin(),shuffledWorkerPool.end(), finder.rng);
@@ -116,6 +117,12 @@ void ComboWorker::WorkLoop(void) {
             pSim->simGuys[0]->Input(curInput);
 
             pSim->RunFrame();
+
+            if (wantsRenderSnapshot) {
+                wantsRenderSnapshot = false;
+                std::scoped_lock lockRenderSnapshot(mutexRenderSnapshot);
+                simRenderSnapshot.Clone(pSim);
+            }
             pSim->AdvanceFrame();
             framesProcessed++;
 
@@ -139,7 +146,9 @@ void ComboWorker::WorkLoop(void) {
                     }
                     if (pSim->simGuys[0]->canAct()) {
                         if (finder.doWalk && (currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
-                            QueueRouteFork(ActionRef(-FORWARD, 0));
+                            if (pSim->simGuys[0]->getFocus() < 60000 && pSim->simGuys[0]->getFocus()) {
+                                QueueRouteFork(ActionRef(-FORWARD, 0));
+                            }
                         }
                         // QueueRouteFork(ActionRef(-BACK, 0));
                         // QueueRouteFork(ActionRef(-(UP|FORWARD), 0));
@@ -291,6 +300,9 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.recentRoutes.clear();
     log("starting on " + std::to_string(finder.threadCount) + " threads");
 
+    if (gameMode == Training && !paused) {
+        paused = true;
+    }
 
     finder.running = true;
 }
@@ -330,12 +342,12 @@ void updateComboFinder(void)
             }
 
             worker->mutexDoneRoutes.unlock();
-            // for (auto &route : newDoneRoutes) {
-            //     if (route.damage > finder.maxDamage) {
-            //         printRoute(route);
-            //         finder.maxDamage = route.damage;
-            //     }
-            // }
+            for (auto &route : newDoneRoutes) {
+                if (route.damage > finder.maxDamage) {
+                    printRoute(route);
+                    finder.maxDamage = route.damage;
+                }
+            }
             finder.doneRoutes.merge(newDoneRoutes);
         }
         if (!worker->idle) {
@@ -379,5 +391,19 @@ void updateComboFinder(void)
 
         finder.finalFPS = framesPerSeconds;
         finder.running = false;
+    }
+}
+
+void renderComboFinder(void)
+{
+    if (!finder.running) {
+        return;
+    }
+
+    int i = finder.workerPool.size();
+    for (auto worker : finder.workerPool) {
+        std::scoped_lock lockWorkerRenderSnapshot(worker->mutexRenderSnapshot);
+        worker->simRenderSnapshot.Render((i--) * -20.0f);
+        worker->wantsRenderSnapshot = true;
     }
 }

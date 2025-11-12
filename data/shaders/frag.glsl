@@ -5,6 +5,7 @@ uniform vec3 size;
 uniform vec3 offset;
 uniform vec4 in_color;
 uniform int isGrid;
+uniform int isWarudo;
 uniform int progress;
 uniform sampler2D particleTexture;
 
@@ -62,6 +63,9 @@ void main() {
             color = vec4(0.9,0.3,0.2,1.0);
         }
         //color.a = edgealpha;
+        if (isWarudo == 1) {
+            color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, 1.0);
+        }
         return;
     }
 

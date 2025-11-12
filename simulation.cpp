@@ -323,7 +323,6 @@ void Simulation::RunFrame(void) {
             }
         }
     }
-
 }
 
 void Simulation::AdvanceFrame(void)
@@ -339,10 +338,10 @@ void Simulation::AdvanceFrame(void)
     }
 }
 
-void Simulation::Render(void)
+void Simulation::Render(float z /* = 0.0 */)
 {
     for (auto guy : everyone) {
-        guy->Render();
+        guy->Render(z);
     }
 }
 

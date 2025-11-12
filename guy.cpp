@@ -1453,7 +1453,7 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
 }
 
 
-void Guy::Render(void) {
+void Guy::Render(float z /* = 0.0f */) {
     Fixed fixedX = posX + (posOffsetX * direction);
     Fixed fixedY = posY + posOffsetY;
     float x = fixedX.f();
@@ -1465,13 +1465,13 @@ void Guy::Render(void) {
     getHitBoxes(nullptr, &renderBoxes);
 
     for (auto box : renderBoxes) {
-        drawHitBox(box.box,thickboxes?box.thickness:1,box.col,box.drive,box.parry,box.di);
+        drawHitBox(box.box,thickboxes?box.thickness:1,z,box.col,box.drive,box.parry,box.di);
     }
 
     if (renderPositionAnchors) {
         float radius = 6.0;
         float thickness = thickboxes?radius:1;
-        drawBox(x-radius/2,y-radius/2,radius,radius,thickness,charColorR,charColorG,charColorB,0.2);
+        drawBox(x-radius/2,y-radius/2,radius,radius,thickness,z,charColorR,charColorG,charColorB,0.2);
         // radius = 5.0;
         // drawBox(x-radius/2,y-radius/2,radius,radius,thickness,1.0,1.0,1.0,0.2);
     }

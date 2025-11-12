@@ -53,7 +53,7 @@ public:
 
     void Render(int winX, int winY) {
         aspect = (float)winY / (float)winX;
-        drawBox( (x - radius) * winX, y * winY + (yOffset - radius) * winY / aspect, radius * 2.0 * winX, radius * 2.0 * winY / aspect, 1.0, 1.0,1.0,1.0, active ? 0.25 : 0.1);
+        drawBox( (x - radius) * winX, y * winY + (yOffset - radius) * winY / aspect, radius * 2.0 * winX, radius * 2.0 * winY / aspect, 1.0, 0.0, 1.0,1.0,1.0, active ? 0.25 : 0.1);
     }
 
 private:
@@ -105,7 +105,7 @@ public:
 
     void Render(int winX, int winY) {
         aspect = (float)winY / (float)winX;
-        drawBox( (x - innerRadius) * winX, y * winY - innerRadius * winY / aspect, innerRadius * 2.0 * winX, innerRadius * 2.0 * winY / aspect, 1.0, 1.0,1.0,1.0, 0.1);
+        drawBox( (x - innerRadius) * winX, y * winY - innerRadius * winY / aspect, innerRadius * 2.0 * winX, innerRadius * 2.0 * winY / aspect, 1.0, 0.0, 1.0,1.0,1.0, 0.1);
         float xOffset = 0.0f, yOffset = 0.0f;
         if (currentInputMap[inputSlot] & FORWARD) {
             xOffset = innerRadius / 2.0;
@@ -119,7 +119,7 @@ public:
         if (currentInputMap[inputSlot] & DOWN) {
             yOffset = -innerRadius / 2.0;
         }
-        drawBox( (x - innerRadius / 2.0 + xOffset) * winX, y * winY - (innerRadius / 2.0 + yOffset) * winY / aspect, innerRadius * winX, innerRadius * winY / aspect, 1.0, 1.0,1.0,1.0, 0.1);
+        drawBox( (x - innerRadius / 2.0 + xOffset) * winX, y * winY - (innerRadius / 2.0 + yOffset) * winY / aspect, innerRadius * winX, innerRadius * winY / aspect, 1.0, 0.0, 1.0,1.0,1.0, 0.1);
     }
 private:
     float x;

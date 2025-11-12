@@ -16,6 +16,7 @@
 #include "render.hpp"
 #include "ui.hpp"
 #include "guy.hpp"
+#include "combogen.hpp"
 
 #define STRINGIZE(x) #x
 #define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
@@ -36,6 +37,7 @@ GLuint loc_size;
 GLuint loc_offset;
 GLuint loc_color;
 GLuint loc_isgrid;
+GLuint loc_iswarudo;
 GLuint loc_progress;
 GLuint loc_particleTexture;
 
@@ -203,10 +205,10 @@ const float cube[] = {
     1.0, 1.0, 1.0,
 };
 
-void drawBoxInternal( float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront = false )
+void drawBoxInternal( float x, float y, float w, float h, float thickness, float z, float r, float g, float b, float a, bool noFront = false )
 {
     glUniform3f(loc_size, w, h, thickness);
-    glUniform3f(loc_offset, x, y, -thickness/2.0);
+    glUniform3f(loc_offset, x, y, -thickness/2.0 + z);
     glUniform4f(loc_color, r, g, b, a);
 
     glBindVertexArray(vao);
@@ -215,13 +217,13 @@ void drawBoxInternal( float x, float y, float w, float h, float thickness, float
     glDrawArrays(GL_TRIANGLES, first, count);
 }
 
-void drawBox( float x, float y, float w, float h, float thickness, float r, float g, float b, float a, bool noFront /*= false*/ )
+void drawBox( float x, float y, float w, float h, float thickness, float z, float r, float g, float b, float a, bool noFront /*= false*/ )
 {
     setIsGrid(0);
-    drawBoxInternal(x, y, w, h, thickness, r, g, b, a, noFront);
+    drawBoxInternal(x, y, w, h, thickness, z, r, g, b, a, noFront);
 }
 
-void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
+void drawHitBox(Box box, float thickness, float z, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
 {
     setIsGrid(0);
     if (isDrive || isParry || isDI ) {
@@ -239,9 +241,9 @@ void drawHitBox(Box box, float thickness, color col, bool isDrive /*= false*/, b
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBoxInternal( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,colorR,colorG,colorB,0.2);
+        drawBoxInternal( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,z,colorR,colorG,colorB,0.2);
     }
-    drawBoxInternal( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,col.r,col.g,col.b,0.2);
+    drawBoxInternal( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,z,col.r,col.g,col.b,0.2);
 }
 
 bool thickboxes = false;
@@ -656,7 +658,9 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
 
     // render stage
     setIsGrid(1);
+    glUniform1i(loc_iswarudo, finder.running);
     drawBoxInternal(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0, true);
+    glUniform1i(loc_iswarudo, 0);
 }
 
 void setScreenSpaceRenderState(int sizeX, int sizeY)
@@ -741,6 +745,7 @@ SDL_Window* initWindowRender()
     loc_offset = glGetUniformLocation(program, "offset");
     loc_color = glGetUniformLocation(program, "in_color");
     loc_isgrid = glGetUniformLocation(program, "isGrid");
+    loc_iswarudo = glGetUniformLocation(program, "isWarudo");
     loc_progress = glGetUniformLocation(program, "progress");
     loc_particleTexture = glGetUniformLocation(program, "particleTexture");
     glDeleteShader(frag);

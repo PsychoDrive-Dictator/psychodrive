@@ -23,15 +23,16 @@ struct ComboRoute {
 };
 
 struct DoneRoute {
+    // todo can shrink a lot
     std::map<int, ActionRef> timelineTriggers;
     int damage = 0;
 };
 
 struct DamageSort {
     bool operator()(DoneRoute const& lhs, DoneRoute const& rhs) const {
-        if (lhs.damage == rhs.damage) {
-            return lhs.timelineTriggers < rhs.timelineTriggers;
-        }
+        // if (lhs.damage == rhs.damage) {
+        //     return lhs.timelineTriggers < rhs.timelineTriggers;
+        // }
         return lhs.damage < rhs.damage;
     }
 };
@@ -56,6 +57,9 @@ public:
     std::mutex mutexDoneRoutes;
     std::set<DoneRoute, DamageSort> doneRoutes;
     bool justGotNextRoute = false;
+    std::atomic<bool> wantsRenderSnapshot;
+    std::mutex mutexRenderSnapshot;
+    Simulation simRenderSnapshot;
 };
 
 class ComboFinder {
@@ -92,3 +96,4 @@ std::string formatWithCommas(uint64_t value);
 uint64_t calculateAverageFPS(void);
 void findCombos(bool doLights, bool doLateCancels, bool doWalk, bool doKaras);
 void updateComboFinder(void);
+void renderComboFinder(void);

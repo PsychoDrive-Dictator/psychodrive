@@ -921,6 +921,7 @@ static void mainloop(void)
         setRenderState(clearColor, sizeX, sizeY);
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
+        renderComboFinder();
         for (auto guy : everyone) {
             guy->Render();
         }

@@ -62,7 +62,7 @@ public:
 
     void Input(int input);
     bool RunFrame(void);
-    void Render(void);
+    void Render(float z = 0.0);
     bool Push(Guy *pOtherGuy);
     void RunFramePostPush(void);
     bool WorldPhysics(bool onlyFloor = false);
