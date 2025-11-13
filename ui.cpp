@@ -145,6 +145,9 @@ bool modalDropDown(const char *label, int *pSelection, const char** ppOptions, i
 void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scaling) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    if (finder.running) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0,0.0,0.0,1.0));
+    }
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
 
     ImGui::SetNextWindowPos(ImVec2(rightSpot ? renderSizeX - 100.0f : 0, 300.0));
@@ -172,6 +175,9 @@ void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scalin
     ImGui::Text("%d (%d%%)", comboDamage, scaling);
     ImGui::End();
 
+    if (finder.running) {
+        ImGui::PopStyleColor();
+    }
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
@@ -230,7 +236,7 @@ void drawActionTimelineKeys(nlohmann::json *pAction, const char *keyName, nlohma
                         continue;
                     }
                     for (auto& [trigKeyID, trigKey] : trigGroupKey.items()) {
-                        ImGui::Text(std::string(trigKey).c_str());
+                        ImGui::Text("%s", std::string(trigKey).c_str());
                     }
                 }
             }
@@ -699,6 +705,11 @@ void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, in
     renderSizeX = sizeX;
     renderSizeY = sizeY;
     if (!toggleRenderUI) {
+        for (auto pGuy : guys) {
+            if (guys.size() >= 2 && (pGuy == guys[0] || pGuy == guys[1]) && pGuy->getOpponent() && pGuy->getOpponent()->getComboHits()) {
+                renderComboMeter(pGuy == guys[1], pGuy->getOpponent()->getComboHits(), pGuy->getOpponent()->getComboDamage(), pGuy->getOpponent()->getLastDamageScale());
+            }
+        }
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         return;
@@ -1112,7 +1123,13 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     int sameColorCount = 0;
     int frameCount = simController.stateRecording.size();
 
-    if (!rightSide) renderFrameMeterCancelWindows(frameIndex);
+    if (!rightSide) {
+        Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
+        int curAction = pGuy->getCurrentAction();
+        Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
+        ImGui::Text("%s %d/%d", pGuy->getActionName(pGuy->getCurrentAction()).c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        renderFrameMeterCancelWindows(frameIndex);
+    }
 
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (frameIndex - kFrameOffset) * (kHorizSpacing + kFrameButtonWidth) + simController.frameMeterMouseDragAmount * simController.kFrameMeterDragRatio);
     float tronglePosY = ImGui::GetCursorPosY();
@@ -1212,7 +1229,13 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         ImGui::PopID();
     }
 
-    if (rightSide) renderFrameMeterCancelWindows(frameIndex);
+    if (rightSide) {
+        renderFrameMeterCancelWindows(frameIndex);
+        Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
+        int curAction = pGuy->getCurrentAction();
+        Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
+        ImGui::Text("%s %d/%d", pGuy->getActionName(pGuy->getCurrentAction()).c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+    }
 
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();

@@ -648,7 +648,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
 #endif
 
     glViewport(0, 0, sizeX, sizeY);
-    buildProjectionMatrix(fov, (float)sizeX / (float)sizeY, 1.0, 3000.0);
+    buildProjectionMatrix(fov, (float)sizeX / (float)sizeY, 1.0, 6000.0);
     setCamera(translateX, translateY, zoom, translateX, translateY, -1000.0);
 
     glUseProgram(program);
@@ -659,7 +659,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     // render stage
     setIsGrid(1);
     glUniform1i(loc_iswarudo, finder.running);
-    drawBoxInternal(-800.0, 0.0, 1600.0, 500.0, 1000.0, 1.0,1.0,1.0,1.0, true);
+    drawBoxInternal(-800.0, 0.0, 1600.0, 500.0, 5000.0, 1.0,1.0,1.0,1.0, true);
     glUniform1i(loc_iswarudo, 0);
 }
 

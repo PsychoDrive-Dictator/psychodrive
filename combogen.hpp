@@ -12,7 +12,7 @@
 #include "simulation.hpp"
 
 struct ComboRoute {
-    std::map<int, ActionRef> timelineTriggers;
+    std::map<int16_t, ActionRef> timelineTriggers;
     int comboHits = 0;
     int simFrameProgress = 0;
     int guyFrameProgress = 0;
@@ -23,8 +23,7 @@ struct ComboRoute {
 };
 
 struct DoneRoute {
-    // todo can shrink a lot
-    std::map<int, ActionRef> timelineTriggers;
+    std::map<int16_t, ActionRef> timelineTriggers;
     int damage = 0;
 };
 
@@ -87,6 +86,12 @@ public:
 
     std::deque<DoneRoute> recentRoutes;
     static constexpr int maxRecentRoutes = 10;
+
+    Simulation startSnapshot;
+
+    bool playing = false;
+    int playingRoute = 0;
+    int startFrame = 0;
 };
 
 extern ComboFinder finder;

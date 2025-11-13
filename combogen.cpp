@@ -110,6 +110,11 @@ void ComboWorker::WorkLoop(void) {
                     if (curInput == FORWARD) {
                         currentRoute.walkForward = 1;
                     }
+                    // it's not actually input, it's direction agnostic stuff
+                    // input gets inverted, so pre-invert :/
+                    if (pSim->simGuys[0]->getDirection() < 0) {
+                        curInput = invertDirection(curInput);
+                    }
                 }
                 //pSim->Log(std::to_string(pSim->frameCounter+1) + " " + pSim->simGuys[0]->getActionName(forcedTrigger.actionID()));
             }
@@ -151,8 +156,8 @@ void ComboWorker::WorkLoop(void) {
                             }
                         }
                         // QueueRouteFork(ActionRef(-BACK, 0));
-                        // QueueRouteFork(ActionRef(-(UP|FORWARD), 0));
-                        // QueueRouteFork(ActionRef(-(UP|BACK), 0));
+                        QueueRouteFork(ActionRef(-(UP|FORWARD), 0));
+                        QueueRouteFork(ActionRef(-(UP|BACK), 0));
                     }
                 }
                 pSim->simGuys[0]->getFrameTriggers().clear();
@@ -250,6 +255,9 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
         return;
     }
 
+    finder.startSnapshot.Clone(&defaultSim);
+    finder.startFrame = globalFrameCount;
+
     finder.doLights = doLights;
     finder.doLateCancels = doLateCancels;
     finder.doWalk = doWalk;
@@ -346,6 +354,10 @@ void updateComboFinder(void)
                 if (route.damage > finder.maxDamage) {
                     printRoute(route);
                     finder.maxDamage = route.damage;
+                    defaultSim.Clone(&finder.startSnapshot);
+                    globalFrameCount = finder.startFrame;
+                    finder.playing = true;
+                    paused = false;
                 }
             }
             finder.doneRoutes.merge(newDoneRoutes);
@@ -391,6 +403,13 @@ void updateComboFinder(void)
 
         finder.finalFPS = framesPerSeconds;
         finder.running = false;
+
+        if (gameMode == Training) {
+            paused = false;
+            finder.playing = true;
+            defaultSim.Clone(&finder.startSnapshot);
+            globalFrameCount = finder.startFrame;
+        }
     }
 }
 

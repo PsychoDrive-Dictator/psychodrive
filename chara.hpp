@@ -10,8 +10,8 @@
 
 class ActionRef {
 private:
-    int32_t actionID_;
-    int32_t styleID_;
+    int16_t actionID_;
+    int16_t styleID_;
 
 public:
     ActionRef() : actionID_(0), styleID_(0) {}

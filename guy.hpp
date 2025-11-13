@@ -188,6 +188,24 @@ public:
     void setHealth(int newHealth) { health = newHealth; }
     int getFocus() { return focus; }
     int getGauge() { return gauge; }
+    void setFocus(int newFocus) {
+        focus = newFocus;
+        if (focus < 0) {
+            focus = 0;
+        }
+        if (focus > maxFocus) {
+            focus = maxFocus;
+        }
+    }
+    void setGauge(int newGauge) {
+        gauge = newGauge;
+        if (gauge < 0) {
+            gauge = 0;
+        }
+        if (gauge > maxGauge) {
+            gauge = maxGauge;
+        }
+    }
 
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }

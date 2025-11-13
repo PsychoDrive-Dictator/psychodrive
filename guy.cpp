@@ -1474,6 +1474,10 @@ void Guy::Render(float z /* = 0.0f */) {
         drawBox(x-radius/2,y-radius/2,radius,radius,thickness,z,charColorR,charColorG,charColorB,0.2);
         // radius = 5.0;
         // drawBox(x-radius/2,y-radius/2,radius,radius,thickness,1.0,1.0,1.0,0.2);
+
+        // meters
+        drawBox(x - 35.0, y - 5.0, focus / 60000.0 * 30.0, 3.0, 1.0, z, 0.20, 0.80, 0.0, 0.2);
+        drawBox(x + 5.0, y - 5.0, gauge / 30000.0 * 30.0, 3.0, 1.0, z, 0.0, 0.80, 0.80, 0.2);
     }
 }
 
@@ -1669,7 +1673,7 @@ bool Guy::Push(Guy *pOtherGuy)
                 if (replayFrameNumber != 0) {
                     frameNumber = replayFrameNumber;
                 }
-                if (pSim) {
+                if (pSim && pSim != &defaultSim) {
                     frameNumber = pSim->frameCounter;
                 }
 

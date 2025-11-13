@@ -235,6 +235,22 @@ void updateInputs(int sizeX, int sizeY)
                 case SDLK_0:
                     oneframe = true;
                     break;
+                case SDLK_BACKQUOTE:
+                    if (defaultSim.simGuys.size()) {
+                        defaultSim.simGuys[0]->setFocus(0);
+                        defaultSim.simGuys[0]->setGauge(0);
+                    }
+                    break;
+                case SDLK_1:
+                    if (defaultSim.simGuys.size()) {
+                        defaultSim.simGuys[0]->setFocus(defaultSim.simGuys[0]->getFocus() + 10000);
+                    }
+                    break;
+                case SDLK_2:
+                    if (defaultSim.simGuys.size()) {
+                        defaultSim.simGuys[0]->setGauge(defaultSim.simGuys[0]->getGauge() + 10000);
+                    }
+                    break;
                 case SDLK_F2:
                     toggleRenderUI = !toggleRenderUI;
                     break;

@@ -636,9 +636,6 @@ static void mainloop(void)
             recordedInput.push_back(currentInputMap[keyboardID]);
         }
 
-        bool hasInput = true;
-        bool runFrame = oneframe || !paused;
-
         if (saveState) {
             snapShotSim.Clone(&defaultSim);
             saveState = false;
@@ -656,6 +653,9 @@ static void mainloop(void)
             runComboFinder = false;
         }
 
+        bool hasInput = true;
+        bool runFrame = oneframe || !paused;
+
         if (playingBackInput) {
             if (runFrame) {
                 if (playBackFrame >= (int)playBackInputBuffer.size()) {
@@ -670,6 +670,25 @@ static void mainloop(void)
             }
         }
 
+        if (finder.playing && finder.doneRoutes.size() && guys.size()) {
+            const DoneRoute &playingRoute = *finder.doneRoutes.rbegin();
+            int targetFrame = globalFrameCount - finder.startFrame + 1;
+            auto frameTrigger = playingRoute.timelineTriggers.find(targetFrame);
+            if (frameTrigger != playingRoute.timelineTriggers.end()) {
+                if (frameTrigger->second.actionID() > 0) {
+                    guys[0]->getForcedTrigger() = frameTrigger->second;
+                    log("forced trigger " + std::to_string(targetFrame));
+                } else {
+                    int input = -frameTrigger->second.actionID();
+                    if (guys[0]->getDirection() < 0) {
+                        input = invertDirection(input);
+                    }
+                    guys[0]->Input(input);
+                    hasInput = false; // todo better system for this
+                }
+            }
+        }
+
         static std::vector<Guy *> everyone;
 
         if (runFrame) {
@@ -681,11 +700,9 @@ static void mainloop(void)
 
         gatherEveryone(guys, everyone);
 
-        int frameGuyCount = 0;
         if (runFrame) {
             for (auto guy : everyone) {
                 if (guy->RunFrame()) {
-                    frameGuyCount++;
                 }
             }
         }
@@ -693,11 +710,8 @@ static void mainloop(void)
         // gather everyone again in case of deletions/additions in RunFrame
         gatherEveryone(guys, everyone);
 
-        if (!replayingGameState && frameGuyCount == 0) {
-            globalFrameCount--; // don't count that frame, useful for comparing logs to frame data
-        }
-
-        if (replayingGameState && !runFrame) {
+        // time stands still if paused - surely there's a better way to do that
+        if (!runFrame) {
             globalFrameCount--;
         }
 
@@ -972,6 +986,9 @@ int main(int argc, char**argv)
         if (std::string(argv[2]).find("guile_jp_66_hit_guile_combo") != std::string::npos) {
             forcePunishCounter = true;
         }
+        if (std::string(argv[2]).find("viper_sa1_dump_route") != std::string::npos) {
+            forcePunishCounter = true;
+        }
 
         while (true) {
             dumpSim.RunFrame();
@@ -1037,6 +1054,12 @@ int main(int argc, char**argv)
         gameStateDump = parse_json_file(strDumpLoadPath);
     }
     if (gameStateDump != nullptr) {
+        if (strDumpLoadPath.find("guile_jp_66_hit_guile_combo") != std::string::npos) {
+            forcePunishCounter = true;
+        }
+        if (strDumpLoadPath.find("viper_sa1_dump_route") != std::string::npos) {
+            forcePunishCounter = true;
+        }
         int i = 0;
         while (i < (int)gameStateDump.size()) {
             if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0) {
