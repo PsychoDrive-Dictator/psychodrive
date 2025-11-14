@@ -5643,6 +5643,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "viper_sa1_dump_route_real",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 459,
+                "firstFrame": 260,
+                "lastFrame": 580
+            },
+            {
+                "count": 373,
+                "firstFrame": 183,
+                "lastFrame": 413
+            },
+            {
+                "count": 4,
+                "firstFrame": 233,
+                "lastFrame": 413
+            },
+            {
+                "count": 211,
+                "firstFrame": 183,
+                "lastFrame": 406
+            },
+            {
+                "count": 211,
+                "firstFrame": 183,
+                "lastFrame": 406
+            },
+            {
+                "count": 26,
+                "firstFrame": 195,
+                "lastFrame": 353
+            },
+            {
+                "count": 220,
+                "firstFrame": 106,
+                "lastFrame": 412
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "viper_super_jump_neutral",
         "testVersion": "36",
         "finished": true,
