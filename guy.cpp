@@ -2041,11 +2041,12 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     if (pendingLockHit) {
         // really we should save the lock target, etc.
         if (pOpponent) {
-            pOpponent->ApplyHitEffect(pendingLockHit, this, true, true, false, false);
-            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt applied");
+            HitEntry *pEntry = &pCharData->hitByID[pendingLockHit]->common[0];
+            pOpponent->ApplyHitEffect(pEntry, this, true, true, false, false);
+            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingLockHit));
             pOpponent->locked = false;
         }
-        pendingLockHit = nullptr;
+        pendingLockHit = 0;
     }
 }
 
@@ -2570,7 +2571,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
 
     if (!isDomain && applyHitStun) {
-        if (hitEntryHitStun > 0) {
+        // not sure if the right check to reset hitstun to 0 only in some cases
+        // maybe time to start adding lots of hitstun as a juggle state
+        if (hitEntryHitStun > 0 || dmgType == 21 || dmgType == 22) {
             hitStun = hitEntryHitStun + hitStunAdder;
         }
     }
@@ -4264,7 +4267,7 @@ void Guy::DoLockKey(void)
             if (pendingLockHit) {
                 log(true, "weird!");
             }
-            pendingLockHit = lockKey.pHitEntry;
+            pendingLockHit = lockKey.param02;
         }
     }
 }

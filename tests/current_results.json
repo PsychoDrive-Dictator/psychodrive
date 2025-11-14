@@ -3937,9 +3937,9 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 187,
+                "count": 128,
                 "firstFrame": 774,
-                "lastFrame": 960
+                "lastFrame": 901
             },
             {
                 "count": 187,
@@ -3947,14 +3947,14 @@ var currentResults =
                 "lastFrame": 960
             },
             {
-                "count": 124,
+                "count": 1,
                 "firstFrame": 837,
-                "lastFrame": 960
+                "lastFrame": 837
             },
             {
-                "count": 94,
-                "firstFrame": 867,
-                "lastFrame": 960
+                "count": 29,
+                "firstFrame": 838,
+                "lastFrame": 866
             },
             {
                 "count": 0,

@@ -629,7 +629,7 @@ private:
         lastScalingTriggerID = 0;
         wasHit = false;
         resetComboCount = false;
-        pendingLockHit = nullptr;
+        pendingLockHit = 0;
         knockDown = false;
         isDown = false;
         knockDownFrames = 0;
@@ -852,7 +852,7 @@ private:
     bool wasHit;
     bool resetComboCount;
 
-    HitEntry *pendingLockHit;
+    int pendingLockHit;
 
     bool knockDown;
     bool isDown;
