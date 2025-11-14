@@ -2043,7 +2043,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (pOpponent) {
             HitEntry *pEntry = &pCharData->hitByID[pendingLockHit]->common[0];
             pOpponent->ApplyHitEffect(pEntry, this, true, true, false, false);
-            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingLockHit));
+            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingLockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
             pOpponent->locked = false;
         }
         pendingLockHit = 0;
@@ -2620,13 +2620,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             wallBounceVelY -= wallBounceAccelY;
         }
 
-        if (destTime != 0) {
-            if (dmgType == 21 || dmgType == 22) {
+        //if (destTime != 0)
+        {
+            if ((dmgType == 21 || dmgType == 22) && pAttacker->pendingLockHit) {
                 // thrown? constant velocity one frame from now, ignore place/hitvel, hard knockdown after hitstun is done
                 if (!locked) {
                     log(true, "nage but not locked?");
                 }
-                if (dmgType == 21) {
+                if (dmgType == 21 && destTime != 0) {
                     // those aren't actually used but they're set in game so it quiets some warnings
                     // there's a race condition with getting them right, because the hit is applied
                     // from RunFrame -> lockkey, and the velocity will be off by one frame depending
@@ -2638,6 +2639,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 }
 
                 nageKnockdown = true;
+                knockDown = true;
+                knockDownFrames = downTime;
 
                 // commit current place offset
                 posX = posX + (posOffsetX * direction);
@@ -2647,8 +2650,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     hitStun--;
                 }
 
-                knockDown = true;
-                knockDownFrames = downTime;
+                // so AdvanceFrame knocks us down
+                if (hitStun == 0) {
+                    hitStun = 1;
+                }
 
                 if (destY != 0) {
                     if (destY > 0) {
@@ -2660,7 +2665,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                         accelY = Fixed(0);
                     }
                 }
-            } else if (!isDomain) {
+            } else if (!isDomain && destTime != 0) {
                 // generic pushback/airborne knock
                 if (!airborne) {
                     hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);

@@ -168,8 +168,12 @@ void ComboWorker::WorkLoop(void) {
                 currentRoute.lastFrameDamage = pSim->frameCounter;
             }
 
-            if (pSim->frameCounter == 2000 || (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) || (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne())) {
-                //pSim->Log("framecount " + std::to_string(pSim->frameCounter));
+            if (pSim->frameCounter == 3000) {
+                fprintf(stderr, "aaa\n");
+                break;
+            }
+
+            if ((pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) || (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne())) {
                 break;
             }
 
