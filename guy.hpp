@@ -216,6 +216,7 @@ public:
     void getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pOutThrowBoxes = nullptr, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
 
     int getCurrentAction() { return currentAction; }
+    Action *getCurrentActionPtr() { return pCurrentAction; }
     int getCurrentFrame() { return currentFrame; }
     void setAction(int actionID, int actionFrame) {
         currentAction = actionID;

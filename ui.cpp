@@ -316,7 +316,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     if (newStartPosX != startPosX) {
         pGuy->setStartPosX(Fixed(newStartPosX, true));
     }
-    ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getActionName(pGuy->getCurrentAction()).c_str());
+    ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->name.c_str());
     if (!pGuy->getProjectile()) {
         const char* states[] = { "stand", "jump", "crouch", "not you", "block", "not you", "crouch block" };
         modalDropDown("state", pGuy->getInputOverridePtr(), states, IM_ARRAYSIZE(states), 125);
@@ -1127,7 +1127,8 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
         int curAction = pGuy->getCurrentAction();
         Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
-        ImGui::Text("%s %d/%d", pGuy->getActionName(pGuy->getCurrentAction()).c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
+        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
         renderFrameMeterCancelWindows(frameIndex);
     }
 
@@ -1234,7 +1235,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
         int curAction = pGuy->getCurrentAction();
         Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
-        ImGui::Text("%s %d/%d", pGuy->getActionName(pGuy->getCurrentAction()).c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
     }
 
     ImGui::PopStyleColor();
@@ -1617,7 +1618,7 @@ void SimulationController::RenderUI(void)
     }
 
     if (simFrameCount) {
-        ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 150));
+        ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 200));
         ImGui::SetNextWindowSize(ImVec2(renderSizeX, 0));
 
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
