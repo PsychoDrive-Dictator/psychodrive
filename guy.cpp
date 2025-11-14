@@ -101,6 +101,9 @@ void Guy::DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
         case 2: // add ?
             value = value + keyValue;
             break;
+        case 3: // ratio
+            value = value * keyValue;
+            break;
         default:
             log(logUnknowns, "Uknown steer keyoperation!");
             break;
@@ -4026,6 +4029,7 @@ void Guy::DoSteerKey(void)
         switch (operationType) {
             case 1:
             case 2:
+            case 3:
             case 4:
             case 5:
                 switch (valueType) {

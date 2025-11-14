@@ -5586,12 +5586,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 310,
-                "firstFrame": 537,
+                "count": 101,
+                "firstFrame": 600,
                 "lastFrame": 700
             },
             {
-                "count": 156,
+                "count": 121,
                 "firstFrame": 520,
                 "lastFrame": 601
             },

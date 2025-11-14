@@ -30,7 +30,7 @@ characters = [
     "mai",
     "elena",
     "sagat",
-#    "viper"
+    "viper"
 ]
 
 dataPath = "./data/chars/"
@@ -111,10 +111,10 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    charWithVersion = char + "35"
+    charWithVersion = char + "36"
     hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "36"
+    charWithVersion = char + "37"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))
@@ -208,19 +208,19 @@ for char in characters:
     #                     "-" + str(switchKey["_EndFrame"]) + mismatch)
 
     # find certain SteerKey target types 
-    # nextSteerKey = 0
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "SteerKey" in move:
-    #         for key in move["SteerKey"]:
-    #             if isinstance(move["SteerKey"][key], dict) and "TargetType" in move["SteerKey"][key]:
-    #                 steerKey = move["SteerKey"][key]
-    #                 # if nextSteerKey == 1:
-    #                 #     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["OperationType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["MultiValueType"]))
-    #                 #     nextSteerKey = 0
-    #                 if steerKey["OperationType"] == 14:
-    #                     nextSteerKey = 1
-    #                     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["TargetType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["ValueType"]))
+    nextSteerKey = 0
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "SteerKey" in move:
+            for key in move["SteerKey"]:
+                if isinstance(move["SteerKey"][key], dict) and "TargetType" in move["SteerKey"][key]:
+                    steerKey = move["SteerKey"][key]
+                    # if nextSteerKey == 1:
+                    #     print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["OperationType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["MultiValueType"]))
+                    #     nextSteerKey = 0
+                    if steerKey["OperationType"] == 3:
+                        nextSteerKey = 1
+                        print(char + " " + moveID + " SteerKey TargetType op " + str(steerKey["TargetType"]) + " " + str(steerKey["FixValue"]) + " " + str(steerKey["ValueType"]))
 
     # Find moves with missing kara cancels
     # for key, value in tgroups21Json["000"].items():
@@ -248,12 +248,12 @@ for char in characters:
     #                     print(char + " " + moveID + " margin " + str(move["fab"]["ActionFrame"]["MarginFrame"]) + " end buffer " + str(trigger["_StartFrame"]))
 
     # Find triggers with certain IDs
-    for key, value in tgroups21Json.items():
-        for tkey, tvalue in value.items():
-            moveName = tvalue.split(" ")[1]
-            triggerID = int(tkey)
-            if triggerID < 50:
-                print(char, moveName, str(triggerID))
+    # for key, value in tgroups21Json.items():
+    #     for tkey, tvalue in value.items():
+    #         moveName = tvalue.split(" ")[1]
+    #         triggerID = int(tkey)
+    #         if triggerID < 50:
+    #             print(char, moveName, str(triggerID))
 
     # for moveID in moves21Json:
     #     moveIDLeft = moveID
