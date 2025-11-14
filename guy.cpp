@@ -1880,7 +1880,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     getHitBoxes(&hitBoxes);
 
     for (auto const &hitbox : hitBoxes ) {
-        if (hitbox.hitID != -1 && ((1<<hitbox.hitID) & canHitID)) {
+        if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
             continue;
         }
         if (hitbox.type == destroy_projectile) {
@@ -2300,7 +2300,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
 
         if (hitID != -1) {
-            pGuy->canHitID |= 1 << hitID;
+            pGuy->canHitID |= 1ULL << hitID;
         }
 
         if (!pOtherGuy->blocking && !hitArmor) {
