@@ -5767,6 +5767,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "viper_sa3",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 420,
+                "firstFrame": 209,
+                "lastFrame": 780
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 89,
+                "firstFrame": 632,
+                "lastFrame": 720
+            },
+            {
+                "count": 149,
+                "firstFrame": 632,
+                "lastFrame": 780
+            },
+            {
+                "count": 201,
+                "firstFrame": 520,
+                "lastFrame": 720
+            },
+            {
+                "count": 89,
+                "firstFrame": 632,
+                "lastFrame": 720
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "viper_super_jump_neutral",
         "testVersion": "36",
         "finished": true,
