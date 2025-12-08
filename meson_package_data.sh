@@ -16,3 +16,7 @@ if [[ $2 == "emscripten" ]]; then
 fi
 
 rm -r "$1"/data
+
+latest_path="$(dirname "$1")"/psychodrive-latest
+rm -f "$latest_path"
+ln -s "$1" "$latest_path"
