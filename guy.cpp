@@ -3551,11 +3551,15 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         nextAction = 1;
     }
 
+    bool crouchingNow = false;
     bool movingForward = false;
     bool movingBackward = false;
     bool canMoveNow = false;
 
-    canMoveNow = canMove(crouching, movingForward, movingBackward);
+    canMoveNow = canMove(crouchingNow, movingForward, movingBackward);
+    if (canMoveNow) {
+        crouching = crouchingNow;
+    }
     bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames && !hitStun && !blocking;
     if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
         applyFreeMovement = false;

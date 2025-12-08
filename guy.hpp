@@ -681,16 +681,91 @@ private:
     int inputID;
     int inputListID;
 
-    bool deniedLastBranch;
+    bool deniedLastBranch : 1;
+    bool isProjectile : 1;
+    bool projDataInitialized : 1;
+    bool die : 1;
+    bool noPush : 1;
+    bool obeyHitID : 1;
+    bool airborne : 1;
+    bool landed : 1;
+    bool forceLanding : 1;
+    bool touchedWall : 1;
+    bool touchedOpponent : 1;
+    bool startsFalling : 1;
+    bool crouching : 1;
+    bool freeMovement : 1;
+    bool blocking : 1;
+    bool proxGuarded : 1;
+    bool bounced : 1;
+    bool didPush : 1;
+    bool jumped : 1;
+    bool couldMove : 1;
+    bool counterState : 1;
+    bool punishCounterState : 1;
+    bool forceKnockDownState : 1;
+    bool throwTechable : 1;
+    bool canBlock : 1;
+    bool offsetDoesNotPush : 1;
+    bool ignoreBodyPush : 1;
+    bool noVelNextFrame : 1;
+    bool noAccelNextFrame : 1;
+    bool setPlaceX : 1;
+    bool setPlaceY : 1;
+    bool keepPlace : 1;
+    bool noPlaceXNextFrame : 1;
+    bool noPlaceYNextFrame : 1;
+    bool nextActionOpponentAction : 1;
+    bool opponentAction : 1;
+    bool locked : 1;
+    bool hasLooped : 1;
+    bool superAction : 1;
+    bool hitThisFrame : 1;
+    bool hasBeenBlockedThisFrame : 1;
+    bool hitArmorThisFrame : 1;
+    bool hitAtemiThisFrame : 1;
+    bool punishCounterThisFrame : 1;
+    bool grabbedThisFrame : 1;
+    bool hitThisMove : 1;
+    bool hitCounterThisMove : 1;
+    bool hitPunishCounterThisMove : 1;
+    bool hasBeenBlockedThisMove : 1;
+    bool hitArmorThisMove : 1;
+    bool hitAtemiThisMove : 1;
+    bool countingDownInstall : 1;
+    bool ignoreHitStop : 1;
+    bool tokiYoTomare : 1;
+    bool warudo : 1;
+    bool tokiWaUgokidasu : 1;
+    bool resetHitStunOnLand : 1;
+    bool resetHitStunOnTransition : 1;
+    bool deferredReflect : 1;
+    bool noCounterPush : 1;
+    bool beenHitThisFrame : 1;
+    bool driveScaling : 1;
+    bool wasHit : 1;
+    bool resetComboCount : 1;
+    bool knockDown : 1;
+    bool isDown : 1;
+    bool nageKnockdown : 1;
+    bool recoverForward : 1;
+    bool recoverReverse : 1;
+    bool wallBounce : 1;
+    bool wallSplat : 1;
+    bool groundBounce : 1;
+    bool wallStopped : 1;
+    bool armorThisFrame : 1;
+    bool atemiThisFrame : 1;
+    bool recordFrameTriggers : 1;
+    bool recordLateCancels : 1;
+    bool isDrive : 1;
+    bool wasDrive : 1;
+    bool uniqueTimer : 1;
 
-    bool isProjectile;
     int projHitCount;
     int projLifeTime;
-    bool projDataInitialized;
-    bool die;
+
     int limitShotCategory;
-    bool noPush;
-    bool obeyHitID;
     GuyRef pParent;
 
     CharacterData *pCharData;
@@ -705,22 +780,8 @@ private:
     Fixed startPosX;
     Fixed startPosY;
 
-    bool airborne;
-    bool landed;
-    bool forceLanding;
-    bool touchedWall;
-    bool touchedOpponent;
-    bool startsFalling;
-    bool crouching;
-    bool freeMovement;
-    bool blocking;
-    bool proxGuarded;
-    bool bounced;
-    bool didPush;
-    bool jumped;
     int jumpDirection;
     int jumpLandingDisabledFrames;
-    bool couldMove;
 
     int landingAdjust;
     int prevPoseStatus;
@@ -728,21 +789,9 @@ private:
     int actionStatus;
     int jumpStatus;
 
-    bool counterState;
-    bool punishCounterState;
-    bool forceKnockDownState;
-
-    bool throwTechable;
-    bool canBlock;
-
-    bool offsetDoesNotPush;
-    bool ignoreBodyPush;
-    bool noVelNextFrame;
-    bool noAccelNextFrame;
     Fixed posOffsetX;
     Fixed posOffsetY;
-    bool setPlaceX;
-    bool setPlaceY;
+
     Fixed velocityX;
     Fixed velocityY;
     Fixed accelX;
@@ -776,24 +825,14 @@ private:
     int currentAction;
     int nextAction;
     int nextActionFrame;
-    bool keepPlace;
-    bool noPlaceXNextFrame;
-    bool noPlaceYNextFrame;
     int currentFrame;
     int loopCount;
     int instantScale;
-    bool nextActionOpponentAction;
-    bool opponentAction;
-    bool locked;
-    bool hasLooped;
-
-    bool superAction;
     int superLevel;
 
     // todo round begin action needs to set that
     int styleInstall;
     int styleInstallFrames;
-    bool countingDownInstall;
 
     int airActionCounter;
 
@@ -803,100 +842,63 @@ private:
 
     // hitting side
     uint64_t canHitID;
-    bool hitThisFrame;
-    bool hasBeenBlockedThisFrame;
-    bool hitArmorThisFrame;
-    bool hitAtemiThisFrame;
-    bool punishCounterThisFrame;
-    bool grabbedThisFrame;
-    bool hitThisMove;
-    bool hitCounterThisMove;
-    bool hitPunishCounterThisMove;
-    bool hasBeenBlockedThisMove;
-    bool hitArmorThisMove;
-    bool hitAtemiThisMove;
 
     int hitStop;
     int pendingHitStop;
     int timeInHitStop;
-    bool ignoreHitStop;
-    bool tokiYoTomare;
-    bool warudo;
-    bool tokiWaUgokidasu;
 
     int scalingTriggerID;
 
     // getting hit side
     GuyRef pAttacker;
     int hitStun;
-    bool resetHitStunOnLand;
-    bool resetHitStunOnTransition;
+
     Fixed hitVelX;
     Fixed hitAccelX;
     Fixed pushBackThisFrame;
     Fixed hitReflectVelX;
     Fixed hitReflectAccelX;
     Fixed reflectThisFrame;
-    bool deferredReflect;
-    bool noCounterPush;
-    bool beenHitThisFrame;
+
     // 2.0 was here
     int currentScaling;
     int pendingScaling;
-    bool driveScaling;
+
     int comboHits;
     int juggleCounter;
     int comboDamage;
     int lastDamageScale;
     int lastScalingTriggerID;
-    bool wasHit;
-    bool resetComboCount;
 
     int pendingLockHit;
 
-    bool knockDown;
-    bool isDown;
     int knockDownFrames;
-    bool nageKnockdown;
 
-    bool recoverForward;
-    bool recoverReverse;
-
-    bool groundBounce;
     Fixed groundBounceVelX;
     Fixed groundBounceVelY;
     Fixed groundBounceAccelX;
     Fixed groundBounceAccelY;
 
-    bool wallBounce;
-    bool wallSplat;
     Fixed wallBounceVelX;
     Fixed wallBounceVelY;
     Fixed wallBounceAccelX;
     Fixed wallBounceAccelY;
-    bool wallStopped;
+
     int wallStopFrames;
 
     AtemiData *currentArmor;
     int armorHitsLeft;
-    bool armorThisFrame;
-    bool atemiThisFrame;
 
     int recoveryTiming;
 
-    bool recordFrameTriggers;
-    bool recordLateCancels;
     ActionRef forcedTrigger;
-
-    bool isDrive;
-    bool wasDrive;
 
     float charColorR;
     float charColorG;
     float charColorB;
 
     int uniqueParam[uniqueParamCount];
-    bool uniqueTimer;
+
     int uniqueTimerCount;
 
     int debuffTimer;
