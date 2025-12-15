@@ -2107,7 +2107,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 hitGuys.insert(pOtherGuy);
             }
         } else {
-            if (pendingHit.blocked && pOtherGuy->canAct()) {
+            // proximity guard
+            bool canProxGuard = pOtherGuy->canAct() || pOtherGuy->currentAction == 39 || pOtherGuy->currentAction == 40 || pOtherGuy->currentAction == 41;
+            if (pendingHit.blocked && canProxGuard) {
                 // it seems to branch as needed between stand/crouch?
                 pOtherGuy->nextAction = 171;
                 if (!(pOtherGuy->dc.inputBuffer[1] & BACK)) {
