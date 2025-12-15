@@ -373,6 +373,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_canblock_neutraljump",
+        "testVersion": "38",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 527,
+                "firstFrame": 115,
+                "lastFrame": 641
+            },
+            {
+                "count": 51,
+                "firstFrame": 306,
+                "lastFrame": 540
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 141,
+                "firstFrame": 103,
+                "lastFrame": 535
+            },
+            {
+                "count": 141,
+                "firstFrame": 103,
+                "lastFrame": 535
+            },
+            {
+                "count": 202,
+                "firstFrame": 101,
+                "lastFrame": 577
+            },
+            {
+                "count": 216,
+                "firstFrame": 115,
+                "lastFrame": 641
+            },
+            {
+                "count": 108,
+                "firstFrame": 103,
+                "lastFrame": 445
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 441,
+                "firstFrame": 103,
+                "lastFrame": 543
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_comboscaling",
         "testVersion": "33",
         "finished": true,
