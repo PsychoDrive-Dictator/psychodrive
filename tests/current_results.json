@@ -435,6 +435,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_canblock_upback_tap",
+        "testVersion": "38",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 494,
+                "firstFrame": 111,
+                "lastFrame": 435
+            },
+            {
+                "count": 246,
+                "firstFrame": 99,
+                "lastFrame": 314
+            },
+            {
+                "count": 121,
+                "firstFrame": 99,
+                "lastFrame": 314
+            },
+            {
+                "count": 108,
+                "firstFrame": 99,
+                "lastFrame": 308
+            },
+            {
+                "count": 108,
+                "firstFrame": 99,
+                "lastFrame": 308
+            },
+            {
+                "count": 208,
+                "firstFrame": 99,
+                "lastFrame": 351
+            },
+            {
+                "count": 475,
+                "firstFrame": 111,
+                "lastFrame": 435
+            },
+            {
+                "count": 110,
+                "firstFrame": 136,
+                "lastFrame": 308
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 78,
+                "firstFrame": 195,
+                "lastFrame": 311
+            },
+            {
+                "count": 44,
+                "firstFrame": 195,
+                "lastFrame": 283
+            }
+        ]
+    },
+    {
         "testName": "aa_comboscaling",
         "testVersion": "33",
         "finished": true,
