@@ -1957,7 +1957,19 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
 
             bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
-            bool otherGuyCanBlock = pOtherGuy->canAct() || pOtherGuy->blocking || pOtherGuy->currentAction == 482 || pOtherGuy->canBlock;
+            bool otherGuyCanBlock = pOtherGuy->canAct() || pOtherGuy->blocking;
+            // can block special status (some stances?)
+            if (pOtherGuy->canBlock) {
+                otherGuyCanBlock = true;
+            }
+            // but parry recovery is magic?!
+            if (pOtherGuy->currentAction == 482) {
+                otherGuyCanBlock = true;
+            }
+            // empty jump landing also magic
+            if (pOtherGuy->currentAction == 39 || pOtherGuy->currentAction == 40 || pOtherGuy->currentAction == 41) {
+                otherGuyCanBlock = true;
+            }
             if (!(pOtherGuy->currentInput & BACK)) {
                 otherGuyCanBlock = false;
             }
