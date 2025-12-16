@@ -3478,6 +3478,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             }
             // magic that seems specific to normal jumps
             noVelNextFrame = true;
+            // because of it, we won't actually be y>0, but we still need to be counted airborne
+            airborne = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
         } else if (!getAirborne() && !isProjectile && pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
