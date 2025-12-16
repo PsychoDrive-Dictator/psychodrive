@@ -1117,6 +1117,130 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_guard_tap",
+        "testVersion": "38",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1272,
+                "firstFrame": 291,
+                "lastFrame": 1562
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 39,
+                "firstFrame": 1386,
+                "lastFrame": 1424
+            },
+            {
+                "count": 39,
+                "firstFrame": 1386,
+                "lastFrame": 1424
+            },
+            {
+                "count": 180,
+                "firstFrame": 175,
+                "lastFrame": 1465
+            },
+            {
+                "count": 581,
+                "firstFrame": 150,
+                "lastFrame": 1562
+            },
+            {
+                "count": 39,
+                "firstFrame": 1386,
+                "lastFrame": 1424
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 42,
+                "firstFrame": 1386,
+                "lastFrame": 1427
+            },
+            {
+                "count": 30,
+                "firstFrame": 1386,
+                "lastFrame": 1400
+            }
+        ]
+    },
+    {
+        "testName": "aa_guard_upback",
+        "testVersion": "38",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1801,
+                "firstFrame": 144,
+                "lastFrame": 1028
+            },
+            {
+                "count": 168,
+                "firstFrame": 143,
+                "lastFrame": 500
+            },
+            {
+                "count": 122,
+                "firstFrame": 143,
+                "lastFrame": 500
+            },
+            {
+                "count": 144,
+                "firstFrame": 145,
+                "lastFrame": 496
+            },
+            {
+                "count": 144,
+                "firstFrame": 145,
+                "lastFrame": 496
+            },
+            {
+                "count": 260,
+                "firstFrame": 86,
+                "lastFrame": 911
+            },
+            {
+                "count": 458,
+                "firstFrame": 139,
+                "lastFrame": 1028
+            },
+            {
+                "count": 159,
+                "firstFrame": 145,
+                "lastFrame": 500
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 171,
+                "firstFrame": 145,
+                "lastFrame": 503
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_imperfect_parry",
         "testVersion": "30",
         "finished": true,
