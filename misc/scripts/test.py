@@ -111,10 +111,10 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
 
 for char in characters:
     dataPathWithChar = dataPath + char + "/"
-    charWithVersion = char + "37"
-    hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
-    movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "38"
+    # charWithVersion = char + "37"
+    # hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
+    # movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
+    charWithVersion = char + "39"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))

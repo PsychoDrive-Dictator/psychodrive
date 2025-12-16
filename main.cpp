@@ -122,6 +122,7 @@ const char* charVersions[] = {
     "36 - S3 Viper Update",
     "37 - S3 Viper Hotfix 1",
     "38 - S3 Viper Hotfix 2",
+    "39 - S3 December Update",
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
