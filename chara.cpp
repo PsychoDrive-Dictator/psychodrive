@@ -643,6 +643,7 @@ void loadShotKeys(nlohmann::json* pShotJson, std::vector<ShotKey>* pOutputVector
         newKey.endFrame = shotKey["_EndFrame"];
         newKey.validStyle = shotKey["_ValidStyle"];
         newKey.operation = shotKey["Operation"];
+        newKey.flags = shotKey["SpawnFlag"];
         newKey.posOffsetX = Fixed(shotKey["PosOffset"]["x"].get<double>());
         newKey.posOffsetY = Fixed(shotKey["PosOffset"]["y"].get<double>());
         newKey.actionId = shotKey["ActionId"];
@@ -872,6 +873,8 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
                     newProj.hitFlagToParent = (*pProjData)["_HitFlagToPlayer"];
                     newProj.hitStopToParent = (*pProjData)["_HitStopToPlayer"];
                     newProj.rangeB = (*pProjData)["RangeB"];
+                    newProj.wallBoxForward = Fixed((*pProjData)["WallRangeF"].get<int>());
+                    newProj.wallBoxBack = Fixed((*pProjData)["WallRangeB"].get<int>());
                     newProj.airborne = (*pProjData)["_AirStatus"];
                     newProj.flags = (*pProjData)["AttrX"];
                     newProj.category = (*pProjData)["Category"];

@@ -1732,7 +1732,7 @@ bool Guy::Push(Guy *pOtherGuy)
 bool Guy::WorldPhysics(bool onlyFloor)
 {
     bool hasPushed = false;
-    Fixed pushX = 0;
+    Fixed pushX = Fixed(0);
     bool floorpush = false;
     touchedWall = false;
     didPush = false;
@@ -1748,34 +1748,52 @@ bool Guy::WorldPhysics(bool onlyFloor)
         // Walls
         if (!onlyFloor) {
             Fixed x = getPosX();
-            if (pOpponent && !isProjectile) {
-                Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
-                Fixed screenCenterX = bothPlayerPos / Fixed(2);
-                int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
-                screenCenterX.data += fixedRemainder;
-                if (x < screenCenterX - maxPlayerDistance) {
-                    pushX = -(x - (screenCenterX - maxPlayerDistance));
-                    touchedWall = true;
-                    hasPushed = true;
+            if (!isProjectile) {
+                if (pOpponent) {
+                    Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
+                    Fixed screenCenterX = bothPlayerPos / Fixed(2);
+                    int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+                    screenCenterX.data += fixedRemainder;
+                    if (x < screenCenterX - maxPlayerDistance) {
+                        pushX = -(x - (screenCenterX - maxPlayerDistance));
+                    }
+                    if (x > screenCenterX + maxPlayerDistance) {
+                        pushX = -(x - (screenCenterX + maxPlayerDistance));
+                    }
                 }
-                if (x > screenCenterX + maxPlayerDistance) {
-                    pushX = -(x - (screenCenterX + maxPlayerDistance));
-                    touchedWall = true;
-                    hasPushed = true;
-                }
-            }
 
-            if (x < -wallDistance ) {
-                pushX = -(x - -wallDistance);
-                touchedWall = true;
-                hasPushed = true;
-            }
-            if (x > wallDistance ) {
-                pushX = -(x - wallDistance);
-                touchedWall = true;
-                hasPushed = true;
+                if (x < -wallDistance ) {
+                    pushX = -(x - -wallDistance);
+
+                }
+                if (x > wallDistance ) {
+                    pushX = -(x - wallDistance);
+                }
+            } else if (pCurrentAction->pProjectileData) {
+                Fixed &forward = pCurrentAction->pProjectileData->wallBoxForward;
+                Fixed &back = pCurrentAction->pProjectileData->wallBoxBack;
+                if (direction > Fixed(0)) {
+                    if (forward != Fixed(0) && x + forward > projWallDistance) {
+                        pushX = -(x + forward - projWallDistance);
+                    }
+                    if (back != Fixed(0) && x - back < -projWallDistance) {
+                        pushX = -(x - back - -projWallDistance);
+                    }
+                } else {
+                    if (forward != Fixed(0) && x - forward < -projWallDistance) {
+                        pushX = -(x - forward - -projWallDistance);
+                    }
+                    if (back != Fixed(0) && x + back > projWallDistance) {
+                        pushX = -(x + back - projWallDistance);
+                    }
+                }
             }
         }
+    }
+
+    if (pushX != Fixed(0)) {
+        touchedWall = true;
+        hasPushed = true;
     }
 
     // you can still be in floor contact on your way up
@@ -4558,8 +4576,18 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             Fixed posOffsetX = shotKey.posOffsetX * direction;
             Fixed posOffsetY = shotKey.posOffsetY;
 
+            bool spawnInBounds = false;
+            if (shotKey.flags == 2) {
+                spawnInBounds = true;
+            } else {
+                log(logUnknowns, "unknown shotkey flag " + std::to_string(shotKey.flags));
+            }
+
             // spawn new guy
             Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
+            if (spawnInBounds) {
+                pNewGuy->WorldPhysics();
+            }
             pNewGuy->RunFrame();
             if (pParent) {
                 pParent->dc.minions.push_back(pNewGuy);

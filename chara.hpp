@@ -315,6 +315,7 @@ struct BranchKey : Key {
 struct ShotKey : Key {
     int validStyle = 0;
     int operation;
+    int flags;
     Fixed posOffsetX = Fixed(0);
     Fixed posOffsetY = Fixed(0);
     int actionId;
@@ -343,6 +344,8 @@ struct ProjectileData {
     bool hitFlagToParent;
     bool hitStopToParent;
     int rangeB;
+    Fixed wallBoxForward;
+    Fixed wallBoxBack;
     bool airborne;
     int flags;
     int category;
