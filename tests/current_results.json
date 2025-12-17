@@ -3907,6 +3907,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "guile_uncrouchable_fhp",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1237,
+                "firstFrame": 174,
+                "lastFrame": 841
+            },
+            {
+                "count": 94,
+                "firstFrame": 259,
+                "lastFrame": 723
+            },
+            {
+                "count": 18,
+                "firstFrame": 275,
+                "lastFrame": 632
+            },
+            {
+                "count": 106,
+                "firstFrame": 259,
+                "lastFrame": 725
+            },
+            {
+                "count": 104,
+                "firstFrame": 259,
+                "lastFrame": 725
+            },
+            {
+                "count": 777,
+                "firstFrame": 141,
+                "lastFrame": 793
+            },
+            {
+                "count": 832,
+                "firstFrame": 141,
+                "lastFrame": 841
+            },
+            {
+                "count": 45,
+                "firstFrame": 612,
+                "lastFrame": 656
+            },
+            {
+                "count": 343,
+                "firstFrame": 275,
+                "lastFrame": 615
+            },
+            {
+                "count": 199,
+                "firstFrame": 255,
+                "lastFrame": 728
+            },
+            {
+                "count": 64,
+                "firstFrame": 531,
+                "lastFrame": 699
+            }
+        ]
+    },
+    {
         "testName": "honda_air_reset",
         "testVersion": "37",
         "finished": true,
@@ -5581,6 +5643,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "sagat_crouchable_meaty_tiger",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 254,
+                "firstFrame": 122,
+                "lastFrame": 375
+            },
+            {
+                "count": 61,
+                "firstFrame": 161,
+                "lastFrame": 205
+            },
+            {
+                "count": 1,
+                "firstFrame": 205,
+                "lastFrame": 205
+            },
+            {
+                "count": 52,
+                "firstFrame": 161,
+                "lastFrame": 254
+            },
+            {
+                "count": 52,
+                "firstFrame": 161,
+                "lastFrame": 254
+            },
+            {
+                "count": 30,
+                "firstFrame": 244,
+                "lastFrame": 273
+            },
+            {
+                "count": 64,
+                "firstFrame": 137,
+                "lastFrame": 280
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 10,
+                "firstFrame": 244,
+                "lastFrame": 253
+            }
+        ]
+    },
+    {
         "testName": "sagat_sa2_followup",
         "testVersion": "34",
         "finished": true,
@@ -5696,6 +5820,68 @@ var currentResults =
                 "count": 294,
                 "firstFrame": 1108,
                 "lastFrame": 1401
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "sagat_uncrouchable_meaty_tiger",
+        "testVersion": "37",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 299,
+                "firstFrame": 120,
+                "lastFrame": 418
+            },
+            {
+                "count": 61,
+                "firstFrame": 159,
+                "lastFrame": 203
+            },
+            {
+                "count": 1,
+                "firstFrame": 203,
+                "lastFrame": 203
+            },
+            {
+                "count": 41,
+                "firstFrame": 159,
+                "lastFrame": 199
+            },
+            {
+                "count": 41,
+                "firstFrame": 159,
+                "lastFrame": 199
+            },
+            {
+                "count": 11,
+                "firstFrame": 272,
+                "lastFrame": 282
+            },
+            {
+                "count": 70,
+                "firstFrame": 135,
+                "lastFrame": 298
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
