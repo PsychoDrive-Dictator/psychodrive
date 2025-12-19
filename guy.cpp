@@ -433,6 +433,7 @@ bool Guy::RunFrame(void)
         canBlock = false;
         ignoreBodyPush = false;
         ignoreHitStop = false;
+        ignoreScreenPush = false;
 
         DoSwitchKey();
 
@@ -1745,11 +1746,12 @@ bool Guy::WorldPhysics(bool onlyFloor)
             floorpush = true;
         }
 
-        // Walls
+        // walls and screen
         if (!onlyFloor) {
             Fixed x = getPosX();
             if (!isProjectile) {
-                if (pOpponent) {
+                // screen
+                if (pOpponent && !ignoreScreenPush) {
                     Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
                     Fixed screenCenterX = bothPlayerPos / Fixed(2);
                     int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
@@ -3979,6 +3981,9 @@ void Guy::DoSwitchKey(void)
         if (flag & 0x80000) {
             ignoreBodyPush = true;
         }
+        if (flag & 0x40) {
+            ignoreScreenPush = true;
+        }
         if (flag & 0x8) {
             ignoreHitStop = true;
         }
@@ -4303,6 +4308,8 @@ void Guy::DoLockKey(void)
                 // for placekey/etc
                 pOpponent->RunFrame();
                 pOpponent->locked = true;
+                // our position + their placekey might be through a wall
+                pOpponent->WorldPhysics();
             }
         } else if (type == 2) {
             // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame

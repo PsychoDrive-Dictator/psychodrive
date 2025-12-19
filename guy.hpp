@@ -709,6 +709,7 @@ private:
     bool canBlock : 1;
     bool offsetDoesNotPush : 1;
     bool ignoreBodyPush : 1;
+    bool ignoreScreenPush : 1;
     bool noVelNextFrame : 1;
     bool noAccelNextFrame : 1;
     bool setPlaceX : 1;
