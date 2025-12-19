@@ -2300,8 +2300,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 430,
-                "firstFrame": 117,
+                "count": 379,
+                "firstFrame": 119,
                 "lastFrame": 308
             },
             {
@@ -2362,8 +2362,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 352,
-                "firstFrame": 156,
+                "count": 301,
+                "firstFrame": 158,
                 "lastFrame": 354
             },
             {
@@ -2920,12 +2920,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 2938,
+                "count": 2874,
                 "firstFrame": 171,
                 "lastFrame": 1939
             },
             {
-                "count": 641,
+                "count": 640,
                 "firstFrame": 315,
                 "lastFrame": 1324
             },
@@ -2935,27 +2935,27 @@ var currentResults =
                 "lastFrame": 1171
             },
             {
-                "count": 475,
+                "count": 472,
                 "firstFrame": 315,
                 "lastFrame": 1324
             },
             {
-                "count": 475,
+                "count": 472,
                 "firstFrame": 315,
                 "lastFrame": 1324
             },
             {
-                "count": 365,
+                "count": 313,
                 "firstFrame": 251,
                 "lastFrame": 1933
             },
             {
-                "count": 738,
+                "count": 674,
                 "firstFrame": 186,
                 "lastFrame": 1939
             },
             {
-                "count": 814,
+                "count": 51,
                 "firstFrame": 634,
                 "lastFrame": 1868
             },
@@ -2965,12 +2965,12 @@ var currentResults =
                 "lastFrame": 1898
             },
             {
-                "count": 839,
+                "count": 43,
                 "firstFrame": 634,
-                "lastFrame": 1851
+                "lastFrame": 1082
             },
             {
-                "count": 38,
+                "count": 12,
                 "firstFrame": 634,
                 "lastFrame": 1087
             }
@@ -3230,17 +3230,17 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 2025,
+                "count": 1811,
                 "firstFrame": 243,
                 "lastFrame": 1219
             },
             {
-                "count": 286,
+                "count": 257,
                 "firstFrame": 387,
                 "lastFrame": 1124
             },
             {
-                "count": 42,
+                "count": 40,
                 "firstFrame": 424,
                 "lastFrame": 1124
             },
@@ -3255,12 +3255,12 @@ var currentResults =
                 "lastFrame": 1101
             },
             {
-                "count": 162,
+                "count": 172,
                 "firstFrame": 323,
                 "lastFrame": 1171
             },
             {
-                "count": 413,
+                "count": 421,
                 "firstFrame": 258,
                 "lastFrame": 1219
             },
@@ -3270,9 +3270,9 @@ var currentResults =
                 "lastFrame": 1129
             },
             {
-                "count": 2,
+                "count": 1,
                 "firstFrame": 770,
-                "lastFrame": 771
+                "lastFrame": 770
             },
             {
                 "count": 0,
@@ -3292,8 +3292,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 346,
-                "firstFrame": 652,
+                "count": 273,
+                "firstFrame": 673,
                 "lastFrame": 944
             },
             {
@@ -3416,7 +3416,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 441,
+                "count": 368,
                 "firstFrame": 286,
                 "lastFrame": 946
             },
@@ -3912,8 +3912,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1235,
-                "firstFrame": 205,
+                "count": 1184,
+                "firstFrame": 252,
                 "lastFrame": 841
             },
             {
@@ -4036,7 +4036,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 363,
+                "count": 357,
                 "firstFrame": 288,
                 "lastFrame": 907
             },
@@ -5710,8 +5710,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1508,
-                "firstFrame": 221,
+                "count": 429,
+                "firstFrame": 936,
                 "lastFrame": 1153
             },
             {
@@ -5735,12 +5735,12 @@ var currentResults =
                 "lastFrame": 1003
             },
             {
-                "count": 83,
+                "count": 61,
                 "firstFrame": 5,
                 "lastFrame": 989
             },
             {
-                "count": 164,
+                "count": 43,
                 "firstFrame": 57,
                 "lastFrame": 1008
             },
@@ -5750,9 +5750,9 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 11,
-                "firstFrame": 568,
-                "lastFrame": 578
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,

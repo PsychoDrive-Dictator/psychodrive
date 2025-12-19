@@ -325,6 +325,10 @@ bool Guy::RunFrame(void)
             noPush = false; // might be overridden below
         }
 
+        DoWorldKey();
+
+        DoLockKey();
+
         Fixed prevPosY = getPosY();
 
         if (!noPlaceXNextFrame && !setPlaceX) {
@@ -451,10 +455,6 @@ bool Guy::RunFrame(void)
                 ExitStyle();
             }
         }
-
-        DoWorldKey();
-
-        DoLockKey();
     }
 
     return true;
@@ -1843,11 +1843,14 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
     if ( hasPushed ) {
         posX += pushX;
+        // 1:1 pushback for opponent during lock, and vice versa
         if (locked) {
-            // 1:1 pushback for opponent during lock
             if (pAttacker) {
                 pAttacker->posX += pushX;
             }
+        }
+        if (pOpponent && pOpponent->locked) {
+            pOpponent->posX += pushX;
         }
 
         if (pushBackThisFrame != Fixed(0) && pushX != Fixed(0) && pushX * pushBackThisFrame < Fixed(0)) {
@@ -4294,21 +4297,25 @@ void Guy::DoLockKey(void)
                 pOpponent->juggleCounter = 0;
                 pOpponent->resetHitStunOnLand = false;
                 pOpponent->knockDown = false;
-                // do we need to continually snap position or just at beginning?
-                pOpponent->direction = direction;
-                pOpponent->posX = posX;
-                pOpponent->posY = posY;
-                pOpponent->airborne = airborne;
-                pOpponent->velocityX = Fixed(0);
-                pOpponent->velocityY = Fixed(0);
-                pOpponent->accelX = Fixed(0);
-                pOpponent->accelY = Fixed(0);
+                if (!pOpponent->locked) {
+                    // only snap position if this isn't a followup lock
+                    pOpponent->direction = direction;
+                    pOpponent->posX = getPosX();
+                    pOpponent->posY = getPosY();
+                    pOpponent->posOffsetX = Fixed(0);
+                    pOpponent->posOffsetY = Fixed(0);
+                    pOpponent->airborne = airborne;
+                    pOpponent->velocityX = Fixed(0);
+                    pOpponent->velocityY = Fixed(0);
+                    pOpponent->accelX = Fixed(0);
+                    pOpponent->accelY = Fixed(0);
+                }
                 // for transition
                 pOpponent->AdvanceFrame();
                 // for placekey/etc
                 pOpponent->RunFrame();
                 pOpponent->locked = true;
-                // our position + their placekey might be through a wall
+                // our position + their placekey might be in a wall
                 pOpponent->WorldPhysics();
             }
         } else if (type == 2) {
