@@ -773,6 +773,7 @@ void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
     pEntry->moveType = (*pHitEntryJson)["MoveType"];
     pEntry->floorTime = (*pHitEntryJson)["FloorTime"];
     pEntry->downTime = (*pHitEntryJson)["DownTime"];
+    pEntry->throwRelease = (*pHitEntryJson)["ThrowRelease"];
     pEntry->jimenBound = (*pHitEntryJson)["_jimen_bound"];
     pEntry->kabeBound = (*pHitEntryJson)["_kabe_bound"];
     pEntry->kabeTataki = (*pHitEntryJson)["_kabe_tataki"];

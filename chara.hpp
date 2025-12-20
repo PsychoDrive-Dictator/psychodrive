@@ -162,6 +162,7 @@ struct HitEntry {
     int moveType;
     int floorTime;
     int downTime;
+    int throwRelease;
     bool jimenBound;
     bool kabeBound;
     bool kabeTataki;

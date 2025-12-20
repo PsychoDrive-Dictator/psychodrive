@@ -2441,14 +2441,15 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
 
     noCounterPush = attr0 & (1<<0);
+    bool piyoBound = attr1 & (1<<2);
+    bool noBackRecovery = attr1 & (1<<6);
+    bool useParentDirection = attr1 & (1<<10);
+    bool usePositionAsDirection = attr1 & (1<<11);
     recoverForward = attr3 & (1<<0);
     recoverReverse = attr3 & (1<<1);
-    bool piyoBound = attr1 & (1<<2);
 
     pAttacker = attacker;
 
-    bool useParentDirection = attr1 & (1<<10);
-    bool usePositionAsDirection = attr1 & (1<<11);
     if (useParentDirection && attacker->pParent) {
         // for the purpose of checking direction below
         attacker = attacker->pParent;
@@ -2526,12 +2527,15 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         knockDownFrames = downTime;
     }
 
+    bool appliedAction = false;
+
     if (dmgType == 13) {
         knockDown = true;
         if (!isDomain && applyHit && piyoBound) { // ??
             knockDownFrames = 0;
             hitEntryHitStun = downTime;
             nextAction = 330;
+            appliedAction = true;
             isDown = true;
         } else {
             knockDownFrames = downTime;
@@ -2732,7 +2736,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    if (!isDomain && applyHit) {
+    if (!isDomain && applyHit && !appliedAction) {
+        int prevNextAction = nextAction;
         if (blocking) {
             nextAction = 160 + attackStrength;
             if (currentInput & DOWN) {
@@ -2772,6 +2777,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 }
             } else if (moveType == 18) {
                 nextAction = 274;
+            } else if (moveType == 15) {
+                if (pHitEffect->throwRelease != 3) {
+                    nextAction = noBackRecovery ? 339 : 338;
+                }
             } else if (moveType == 13) { // set on wall bounce
                 nextAction = 232;
             } else if (moveType == 11) {
@@ -2806,6 +2815,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     nextAction = 282;
                 } else if (moveType == 16) {
                     nextAction = 280;
+                } else if (moveType == 15) {
+                    if (pHitEffect->throwRelease != 3) {
+                        nextAction = noBackRecovery ? 351 : 350;
+                    }
                 } else if (moveType == 12 && !knockDown) {
                     nextAction = 222;
                 } else if (!locked) {
@@ -2832,11 +2845,15 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             }
         }
 
-        if (nextAction != -1) {
-            NextAction(false, false);
-            DoStatusKey();
-            WorldPhysics(true);
+        if (prevNextAction != nextAction) {
+            appliedAction = true;
         }
+    }
+
+    if (appliedAction) {
+        NextAction(false, false);
+        DoStatusKey();
+        WorldPhysics(true);
     }
 
     // fire/elec/psychopower effect
