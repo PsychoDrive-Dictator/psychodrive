@@ -2920,7 +2920,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 2895,
+                "count": 2814,
                 "firstFrame": 171,
                 "lastFrame": 1939
             },
@@ -3912,7 +3912,7 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 122,
+                "count": 50,
                 "firstFrame": 252,
                 "lastFrame": 614
             },

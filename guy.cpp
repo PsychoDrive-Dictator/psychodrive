@@ -1844,12 +1844,11 @@ bool Guy::WorldPhysics(bool onlyFloor)
     if ( hasPushed ) {
         posX += pushX;
         // 1:1 pushback for opponent during lock, and vice versa
-        if (locked) {
-            if (pAttacker) {
-                pAttacker->posX += pushX;
-            }
+        if (locked && pAttacker && !pAttacker->pendingUnlockHit) {
+            pAttacker->posX += pushX;
+            //log (logTransitions, "lock reflect " + std::to_string(pushX.f()));
         }
-        if (pOpponent && pOpponent->locked) {
+        if (pOpponent && pOpponent->locked && !pendingUnlockHit) {
             pOpponent->posX += pushX;
         }
 
@@ -2073,15 +2072,15 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
     }
 
-    if (pendingLockHit) {
+    if (pendingUnlockHit) {
         // really we should save the lock target, etc.
         if (pOpponent) {
-            HitEntry *pEntry = &pCharData->hitByID[pendingLockHit]->common[0];
+            HitEntry *pEntry = &pCharData->hitByID[pendingUnlockHit]->common[0];
             pOpponent->ApplyHitEffect(pEntry, this, true, true, false, false);
-            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingLockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
+            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
             pOpponent->locked = false;
         }
-        pendingLockHit = 0;
+        pendingUnlockHit = 0;
     }
 }
 
@@ -2663,7 +2662,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
         //if (destTime != 0)
         {
-            if ((dmgType == 21 || dmgType == 22) && pAttacker->pendingLockHit) {
+            if ((dmgType == 21 || dmgType == 22) && pAttacker->pendingUnlockHit) {
                 // thrown? constant velocity one frame from now, ignore place/hitvel, hard knockdown after hitstun is done
                 if (!locked) {
                     log(true, "nage but not locked?");
@@ -4337,10 +4336,10 @@ void Guy::DoLockKey(void)
         } else if (type == 2) {
             // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame
             // has run or not yet and it introduces ordering issues
-            if (pendingLockHit) {
+            if (pendingUnlockHit) {
                 log(true, "weird!");
             }
-            pendingLockHit = lockKey.param02;
+            pendingUnlockHit = lockKey.param02;
         }
     }
 }

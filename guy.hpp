@@ -537,6 +537,7 @@ private:
         canBlock = false;
         offsetDoesNotPush = false;
         ignoreBodyPush = false;
+        ignoreScreenPush = false;
         noVelNextFrame = false;
         noAccelNextFrame = false;
         posOffsetX = Fixed(0);
@@ -630,7 +631,7 @@ private:
         lastScalingTriggerID = 0;
         wasHit = false;
         resetComboCount = false;
-        pendingLockHit = 0;
+        pendingUnlockHit = 0;
         knockDown = false;
         isDown = false;
         knockDownFrames = 0;
@@ -872,7 +873,7 @@ private:
     int lastDamageScale;
     int lastScalingTriggerID;
 
-    int pendingLockHit;
+    int pendingUnlockHit;
 
     int knockDownFrames;
 
