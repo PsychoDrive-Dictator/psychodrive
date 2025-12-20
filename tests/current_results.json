@@ -341,13 +341,13 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 56,
-                "firstFrame": 137,
+                "count": 49,
+                "firstFrame": 190,
                 "lastFrame": 339
             },
             {
-                "count": 83,
-                "firstFrame": 137,
+                "count": 59,
+                "firstFrame": 173,
                 "lastFrame": 488
             },
             {
@@ -1209,12 +1209,12 @@ var currentResults =
                 "lastFrame": 496
             },
             {
-                "count": 260,
+                "count": 253,
                 "firstFrame": 86,
                 "lastFrame": 911
             },
             {
-                "count": 458,
+                "count": 438,
                 "firstFrame": 139,
                 "lastFrame": 1028
             },
@@ -1271,12 +1271,12 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 185,
+                "count": 176,
                 "firstFrame": 49,
                 "lastFrame": 173
             },
             {
-                "count": 509,
+                "count": 490,
                 "firstFrame": 59,
                 "lastFrame": 324
             },
@@ -3937,13 +3937,13 @@ var currentResults =
                 "lastFrame": 725
             },
             {
-                "count": 777,
-                "firstFrame": 141,
+                "count": 618,
+                "firstFrame": 259,
                 "lastFrame": 793
             },
             {
-                "count": 832,
-                "firstFrame": 141,
+                "count": 776,
+                "firstFrame": 259,
                 "lastFrame": 841
             },
             {
@@ -3957,8 +3957,8 @@ var currentResults =
                 "lastFrame": 615
             },
             {
-                "count": 199,
-                "firstFrame": 255,
+                "count": 117,
+                "firstFrame": 612,
                 "lastFrame": 728
             },
             {

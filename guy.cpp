@@ -3653,9 +3653,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
                 }
             }
         } else if ( moveInput & 4 || moveInput & 8 ) {
-            // if ((moveInput & (32+256)) == 32+256) {
-            //     nextAction = 480; // DPA_STD_START
-            // } else
             if ( moveInput & 4 && !movingBackward ) {
                 nextAction = 13; // BAS_BACKWARD_START
             }
@@ -3676,7 +3673,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {
-        nextAction = 482; // DPA_STD_END
+        if (currentAction != 480 || currentFrame >= 12) {
+            nextAction = 482; // DPA_STD_END
+        }
     }
 
     if ((canMoveNow && comboHits) || resetComboCount) {
