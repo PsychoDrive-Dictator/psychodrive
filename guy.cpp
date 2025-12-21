@@ -2067,7 +2067,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             // juggle was the last thing to check, hit is valid
             pendingHitList.push_back({
                 this, pOtherGuy, hitbox, hurtBox, pHitEntry,
-                hitEntryFlag, blocked, bombBurst
+                hitEntryFlag, hitbox.pHitData ? hitbox.pHitData->id : 0, blocked, bombBurst
             });
         }
     }
@@ -2366,8 +2366,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->debuffTimer = 0;
             }
 
-            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " id " + std::to_string(hitBox.hitID) +
-                " dt " + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " hitID " + std::to_string(hitBox.hitID) +
+                " dt " + std::to_string(pendingHit.hitDataID) + "/" + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
                 " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
                 " moveType " + std::to_string(moveType) );
             otherGuyLog(pOtherGuy, pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));

@@ -196,6 +196,7 @@ struct PendingHit {
     HurtBox hurtBox;
     HitEntry *pHitEntry;
     int hitEntryFlag;
+    int hitDataID;
     bool blocked;
     bool bombBurst;
 };
