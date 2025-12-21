@@ -326,7 +326,8 @@ bool Guy::RunFrame(void)
     reflectThisFrame = Fixed(0);
     offsetDoesNotPush = false;
     freeMovement = false;
-    proxGuarded = false;
+    hurtBoxProxGuarded = false;
+    positionProxGuarded = false;
 
     if (pCurrentAction != nullptr)
     {
@@ -2189,7 +2190,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 otherGuyLog(pOtherGuy, pOtherGuy->logHits, "proximity guard!");
             }
             // mark them regardless, since we might prox guard on recovery later I GUESS
-            pOtherGuy->proxGuarded = true;
+            pOtherGuy->hurtBoxProxGuarded = true;
             // do nothing esle with those box
             continue;
         }
@@ -3646,7 +3647,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (blocking && !hitStun && (!proxGuarded || !(currentInput & BACK))) {
+    if (blocking && !hitStun && (!hurtBoxProxGuarded || !(currentInput & BACK))) {
         // was proximity guard, can act now
         blocking = false;
         nextAction = 1;

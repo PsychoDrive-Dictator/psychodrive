@@ -518,7 +518,8 @@ private:
         crouching = false;
         freeMovement = false;
         blocking = false;
-        proxGuarded = false;
+        hurtBoxProxGuarded = false;
+        positionProxGuarded = false;
         bounced = false;
         didPush = false;
         jumped = false;
@@ -698,7 +699,8 @@ private:
     bool crouching : 1;
     bool freeMovement : 1;
     bool blocking : 1;
-    bool proxGuarded : 1;
+    bool hurtBoxProxGuarded : 1;
+    bool positionProxGuarded : 1;
     bool bounced : 1;
     bool didPush : 1;
     bool jumped : 1;

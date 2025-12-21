@@ -2047,6 +2047,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_wakeups",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1134,
+                "firstFrame": 256,
+                "lastFrame": 1204
+            },
+            {
+                "count": 54,
+                "firstFrame": 263,
+                "lastFrame": 935
+            },
+            {
+                "count": 3,
+                "firstFrame": 279,
+                "lastFrame": 935
+            },
+            {
+                "count": 45,
+                "firstFrame": 263,
+                "lastFrame": 933
+            },
+            {
+                "count": 45,
+                "firstFrame": 263,
+                "lastFrame": 933
+            },
+            {
+                "count": 227,
+                "firstFrame": 263,
+                "lastFrame": 989
+            },
+            {
+                "count": 86,
+                "firstFrame": 265,
+                "lastFrame": 934
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "akuma_drc_6hp",
         "testVersion": "33",
         "finished": true,
