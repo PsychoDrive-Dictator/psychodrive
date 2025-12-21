@@ -1611,10 +1611,12 @@ bool Guy::Push(Guy *pOtherGuy)
 
         Fixed pushNeeded = Fixed(0);
         if (getAirborne() || pOpponent->getAirborne()) {
-            if (getPosX() < pOpponent->getPosX()) {
+            // if your pushbox descends on someone else's the same frame you go behind,
+            // it seems to stay in front, hence using the last frame's position
+            if (getLastPosX() < pOpponent->getLastPosX()) {
                 pushNeeded = -pushXLeft;
             }
-            if (getPosX() > pOpponent->getPosX()) {
+            if (getLastPosX() > pOpponent->getLastPosX()) {
                 pushNeeded = -pushXRight;
             }
             if (getPosX() == pOpponent->getPosX() && direction > Fixed(0)) {
