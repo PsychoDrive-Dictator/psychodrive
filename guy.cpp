@@ -24,6 +24,40 @@
 #define log(channel, string) if (channel) { guyLog(channel, string); }
 #define otherGuyLog(otherGuy, channel, string) if (channel) { otherGuy->guyLog(channel, string); }
 
+bool doBoxesHitXAxis(Box box1, Box box2)
+{
+    if (box1.x + box1.w < box2.x) {
+        return false;
+    }
+    if (box2.x + box2.w < box1.x) {
+        return false;
+    }
+    return true;
+}
+
+bool doBoxesHitYAxis(Box box1, Box box2)
+{
+    if (box1.y + box1.h < box2.y) {
+        return false;
+    }
+    if (box2.y + box2.h < box1.y) {
+        return false;
+    }
+    return true;
+}
+
+bool doBoxesHit(Box box1, Box box2)
+{
+    if (!doBoxesHitXAxis(box1, box2)) {
+        return false;
+    }
+    if (!doBoxesHitYAxis(box1, box2)) {
+        return false;
+    }
+    //log ("boxes hit! " + std::to_string(box1.x.f() + box1.w.f() - box2.x.f()));
+    return true;
+}
+
 bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
@@ -1952,11 +1986,21 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                         continue;
                     }
                     // todo air/ground strike invul here
-                    if (doBoxesHit(hitbox.box, hurtbox.box)) {
-                        hurtBox = hurtbox;
-                        foundBox = true;
-                        break;
+                    if (hitbox.type == proximity_guard) {
+                        // prox guard boxes only consider x extents
+                        if (doBoxesHitXAxis(hitbox.box, hurtbox.box)) {
+                            hurtBox = hurtbox;
+                            foundBox = true;
+                            break;
+                        }
+                    } else {
+                        if (doBoxesHit(hitbox.box, hurtbox.box)) {
+                            hurtBox = hurtbox;
+                            foundBox = true;
+                            break;
+                        }
                     }
+
                 }
             }
         }

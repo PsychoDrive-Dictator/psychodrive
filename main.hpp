@@ -291,5 +291,3 @@ std::string readFile(const std::string &fileName);
 nlohmann::json parse_json_file(const std::string &fileName);
 nlohmann::json *loadCharFile(const std::string &charName, int version, const std::string &jsonName);
 void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color);
-
-bool doBoxesHit(Box box1, Box box2);

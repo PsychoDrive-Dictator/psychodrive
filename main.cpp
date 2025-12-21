@@ -471,24 +471,6 @@ std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
     return leading_zeros + num_str;
 }
 
-bool doBoxesHit(Box box1, Box box2)
-{
-    if (box1.x + box1.w < box2.x) {
-        return false;
-    }
-    if (box2.x + box2.w < box1.x) {
-        return false;
-    }
-    if (box1.y + box1.h < box2.y) {
-        return false;
-    }
-    if (box2.y + box2.h < box1.y) {
-        return false;
-    }
-    //log ("boxes hit! " + std::to_string(box1.x.f() + box1.w.f() - box2.x.f()));
-    return true;
-}
- 
 std::deque<std::string> logQueue;
 
 extern "C" {
