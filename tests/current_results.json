@@ -1613,6 +1613,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_prox_guard_vertical_extents",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2315,
+                "firstFrame": 173,
+                "lastFrame": 1344
+            },
+            {
+                "count": 105,
+                "firstFrame": 173,
+                "lastFrame": 1190
+            },
+            {
+                "count": 11,
+                "firstFrame": 201,
+                "lastFrame": 1190
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 406,
+                "firstFrame": 173,
+                "lastFrame": 1278
+            },
+            {
+                "count": 632,
+                "firstFrame": 173,
+                "lastFrame": 1344
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 308,
+                "firstFrame": 541,
+                "lastFrame": 1344
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_push",
         "testVersion": "26",
         "finished": true,
