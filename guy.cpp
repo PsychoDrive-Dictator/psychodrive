@@ -1857,6 +1857,8 @@ bool Guy::WorldPhysics(bool onlyFloor)
             // this is why empty jumps have a frame shaved off
             currentAction = currentAction + 3;
             currentFrame = 0;
+            currentFrameFrac = Fixed(currentFrame);
+            actionSpeed = Fixed(1);
             UpdateActionData();
 
             velocityX = Fixed(0);
@@ -3351,6 +3353,8 @@ void Guy::DoBranchKey(bool preHit)
                 if (branchAction == currentAction) {
                     log(logBranches, "branching to frame " + std::to_string(branchFrame));
                     currentFrame = (branchFrame && !preHit) ? branchFrame - 1 : branchFrame;
+                    currentFrameFrac = Fixed(currentFrame);
+                    actionSpeed = Fixed(1); // todo right?
                 } else {
                     log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
                     nextAction = branchAction;
@@ -3426,7 +3430,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             didBranch = true;
         }
     }
-    currentFrame++;
+    currentFrameFrac += actionSpeed;
+    Fixed roundedCurrentFrame = currentFrameFrac + Fixed(0.5);
+    currentFrame = roundedCurrentFrame.i();
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     if (!didTrigger && !didBranch) {
@@ -3602,6 +3608,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             nextAction = 4; // finish transition to crouch
         } else if (!getAirborne() && !isProjectile && pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
             currentFrame = pCurrentAction->loopPoint;
+            currentFrameFrac = Fixed(currentFrame);
             hasLooped = true;
             if (loopCount > 0) {
                 loopCount--;
@@ -3616,6 +3623,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             // should this apply in general, not just airborne?
             // todo can remove hitstun when we have proper speed scale for block scripts prolly?
             currentFrame--;
+            currentFrameFrac = Fixed(currentFrame);
         } else {
             nextAction = 1;
         }
@@ -3916,6 +3924,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
+        actionSpeed = Fixed(1);
+        currentFrameFrac = Fixed(currentFrame);
 
         if (!nextActionOpponentAction) {
             locked = false;
@@ -3933,6 +3943,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         if (pCurrentAction && currentFrame >= pCurrentAction->actionFrameDuration) {
             currentFrame = pCurrentAction->actionFrameDuration - 1;
+            currentFrameFrac = Fixed(currentFrame);
         }
 
         int inheritFlags = pCurrentAction ? pCurrentAction->inheritKindFlag : 0;

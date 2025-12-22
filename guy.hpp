@@ -222,6 +222,8 @@ public:
     void setAction(int actionID, int actionFrame) {
         currentAction = actionID;
         currentFrame = actionFrame;
+        currentFrameFrac = Fixed(actionFrame);
+        actionSpeed = Fixed(1);
         UpdateActionData();
     }
     bool getIsDrive() { return isDrive; }
@@ -573,6 +575,8 @@ private:
         keepPlace = false;
         noPlaceXNextFrame = false;
         noPlaceYNextFrame = false;
+        actionSpeed = Fixed(1);
+        currentFrameFrac = Fixed(0);
         currentFrame = 0;
         loopCount = 0;
         instantScale = 0;
@@ -830,6 +834,8 @@ private:
     int currentAction;
     int nextAction;
     int nextActionFrame;
+    Fixed actionSpeed;
+    Fixed currentFrameFrac;
     int currentFrame;
     int loopCount;
     int instantScale;
