@@ -159,8 +159,8 @@ enum hitBoxFlags {
     avoids_standing = 4,
     avoids_crouching = 8,
     avoids_airborne = 16,
-    only_hits_from_back = 32,
-    only_hits_from_front = 64,
+    only_hits_behind = 32,
+    only_hits_front = 64,
     only_hits_in_juggle = 128,
 };
 

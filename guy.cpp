@@ -1950,18 +1950,32 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         bool foundBox = false;
         HurtBox hurtBox = {};
 
-        if (pOtherGuy->airborne) {
-
-        } else {
-            // todo find a test for that one
-            // if (hitbox.flags & avoids_standing && !pOtherGuy->getCrouching()) {
-            //     continue;
-            // }
-            if (hitbox.flags & avoids_crouching && pOtherGuy->getCrouching()) {
-                continue;
+        if (hitbox.type != domain && hitbox.type != proximity_guard) {
+            // todo find tests for stubbed out ones
+            if (pOtherGuy->airborne) {
+                // if (hitbox.flags & avoids_airborne) {
+                //     continue;
+                // }
+            } else {
+                // if (hitbox.flags & avoids_standing && !pOtherGuy->getCrouching()) {
+                //     continue;
+                // }
+                if (hitbox.flags & avoids_crouching && pOtherGuy->getCrouching()) {
+                    continue;
+                }
+            }
+            Fixed posDiff = pOtherGuy->getPosX() - getPosX();
+            posDiff *= getDirection();
+            if (posDiff > Fixed(0)) {
+                if (hitbox.flags & only_hits_behind) {
+                    continue;
+                }
+            } else if (posDiff < Fixed(0)) {
+                if (hitbox.flags & only_hits_front) {
+                    continue;
+                }
             }
         }
-
 
         if (isGrab) {
             if (!hasEvaluatedThrowBoxes) {

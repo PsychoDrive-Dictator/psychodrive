@@ -440,10 +440,10 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
             newKey.flags = (hitBoxFlags)(newKey.flags | avoids_airborne);
         }
         if (flags & 0x100) {
-            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_from_back);
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_behind);
         }
         if (flags & 0x200) {
-            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_from_front);
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_front);
         }
         if (flags & 0x40000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_juggle);
