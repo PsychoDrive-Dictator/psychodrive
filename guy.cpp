@@ -1950,6 +1950,19 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         bool foundBox = false;
         HurtBox hurtBox = {};
 
+        if (pOtherGuy->airborne) {
+
+        } else {
+            // todo find a test for that one
+            // if (hitbox.flags & avoids_standing && !pOtherGuy->getCrouching()) {
+            //     continue;
+            // }
+            if (hitbox.flags & avoids_crouching && pOtherGuy->getCrouching()) {
+                continue;
+            }
+        }
+
+
         if (isGrab) {
             if (!hasEvaluatedThrowBoxes) {
                 pOtherGuy->getHurtBoxes(nullptr, &otherThrowBoxes, nullptr);

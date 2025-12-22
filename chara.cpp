@@ -428,6 +428,26 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
             }
         }
 
+        int flags = hitBox["KindFlag"];
+        // ty gelly the homie
+        if (flags & 0x10) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_standing);
+        }
+        if (flags & 0x20) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_crouching);
+        }
+        if (flags & 0x40) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_airborne);
+        }
+        if (flags & 0x100) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_from_back);
+        }
+        if (flags & 0x200) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_from_front);
+        }
+        if (flags & 0x40000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_juggle);
+        }
         if (type == domain) {
             pOutputVector->push_back(newKey);
         } else {
