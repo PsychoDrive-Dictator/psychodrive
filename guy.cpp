@@ -2614,6 +2614,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         if (!isDomain && applyHit && piyoBound) { // ??
             knockDownFrames = 0;
             hitEntryHitStun = downTime;
+            resetHitStunOnLand = false;
+            resetHitStunOnTransition = false;
             nextAction = 330;
             appliedAction = true;
             isDown = true;
@@ -2691,11 +2693,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         wasHit = true;
     }
 
+    bool appliedHitStun = false;
+
     if (!isDomain && applyHitStun) {
         // not sure if the right check to reset hitstun to 0 only in some cases
         // maybe time to start adding lots of hitstun as a juggle state
         if (hitEntryHitStun > 0 || dmgType == 21 || dmgType == 22) {
             hitStun = hitEntryHitStun + hitStunAdder;
+            appliedHitStun = true;
         }
     }
 
@@ -2934,6 +2939,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         NextAction(false, false);
         DoStatusKey();
         WorldPhysics(true);
+
+        if (appliedHitStun && hitStun && !resetHitStunOnLand && !resetHitStunOnTransition) {
+            actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 2), Fixed(hitStun - 2));
+        }
     }
 
     // fire/elec/psychopower effect
@@ -3430,9 +3439,16 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             didBranch = true;
         }
     }
-    currentFrameFrac += actionSpeed;
-    Fixed roundedCurrentFrame = currentFrameFrac + Fixed(0.5);
-    currentFrame = roundedCurrentFrame.i();
+    Fixed currentSpeed = actionSpeed;
+    if (currentFrame == 0) {
+        currentSpeed = Fixed(1);
+    }
+    if (currentFrame >= pCurrentAction->recoveryEndFrame) {
+        currentSpeed = Fixed(1);
+    }
+    currentFrameFrac += currentSpeed;
+    //log(true, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
+    currentFrame = currentFrameFrac.i();
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
     if (!didTrigger && !didBranch) {
