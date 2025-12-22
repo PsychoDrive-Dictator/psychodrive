@@ -3514,6 +3514,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         if ( resetHitStunOnLand ) {
             hitStun = 1;
             resetHitStunOnLand = false;
+            nextAction = 1;
         }
         if ( airActionCounter ) {
             airActionCounter = 0;
@@ -3649,10 +3650,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         } else if (blocking) {
             // ???
             nextAction = currentAction + 1;
-        } else if (hitStun || locked || airborne || (isProjectile && loopCount == -1)) {
+        } else if (locked || airborne || (isProjectile && loopCount == -1)) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
-            // todo can remove hitstun when we have proper speed scale for block scripts prolly?
             currentFrame--;
             currentFrameFrac = Fixed(currentFrame);
         } else {
@@ -3662,6 +3662,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         if (resetHitStunOnTransition) {
             hitStun = 1;
             resetHitStunOnTransition = false;
+            nextAction = 1;
         }
     }
 
@@ -3674,20 +3675,14 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         hitStun--;
         if (hitStun == 0)
         {
-            // todo need to decouple hitstun 0 from progressing to the next script
-            // damage and juggle states' scripts' speed need to be scaled to naturally
-            // end at the same time at hitstun?
             if (crouching) {
                 if (!(currentInput & DOWN)) {
                     nextAction = 6;
                 } else {
+                    // todo figure out how to preserve fluff frames there?
                     nextAction = 4;
                 }
-            } else {
-                nextAction = 1;
             }
-            // todo recover in prox guard?
-
             if (knockDown) {
                 if (knockDownFrames) {
                     hitStun = knockDownFrames;

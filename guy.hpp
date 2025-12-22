@@ -409,10 +409,12 @@ private:
 
     bool fluffFrames(int frameBias = 0) {
         if (hitStun) {
-            // todo shouldn't be needed once we have proper speed in dmg scripts
             return false;
         }
         if (pCurrentAction && pCurrentAction->recoveryEndFrame != -1 && (currentFrame + frameBias) >= pCurrentAction->recoveryEndFrame && nextAction == -1) {
+            return true;
+        }
+        if (actionInitialFrame != -1 && !hitStun) {
             return true;
         }
         return false;
