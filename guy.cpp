@@ -1859,6 +1859,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
             currentFrame = 0;
             currentFrameFrac = Fixed(currentFrame);
             actionSpeed = Fixed(1);
+            actionInitialFrame = -1;
             UpdateActionData();
 
             velocityX = Fixed(0);
@@ -3374,6 +3375,7 @@ void Guy::DoBranchKey(bool preHit)
                     currentFrame = (branchFrame && !preHit) ? branchFrame - 1 : branchFrame;
                     currentFrameFrac = Fixed(currentFrame);
                     actionSpeed = Fixed(1); // todo right?
+                    actionInitialFrame = -1;
                 } else {
                     log(logBranches, "branching to action " + std::to_string(branchAction) + " type " + std::to_string(branchType));
                     nextAction = branchAction;
@@ -3450,7 +3452,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
     Fixed currentSpeed = actionSpeed;
-    if (currentFrame == 0 && actionSpeed != Fixed(1)) {
+    if (currentFrame == 0 && actionInitialFrame != -1) {
         currentSpeed = Fixed(actionInitialFrame);
     }
     if (currentFrame >= pCurrentAction->recoveryEndFrame) {
@@ -3632,8 +3634,11 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             airborne = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
-        } else if (!getAirborne() && !isProjectile && pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) {
+        } else if (!getAirborne() && !isProjectile && ((pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) || hitStun)) {
             currentFrame = pCurrentAction->loopPoint;
+            if (currentFrame == -1) {
+                currentFrame = 0;
+            }
             currentFrameFrac = Fixed(currentFrame);
             hasLooped = true;
             if (loopCount > 0) {
@@ -3951,6 +3956,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
         actionSpeed = Fixed(1);
+        actionInitialFrame = -1;
         currentFrameFrac = Fixed(currentFrame);
 
         if (!nextActionOpponentAction) {

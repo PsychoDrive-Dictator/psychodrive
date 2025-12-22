@@ -932,9 +932,9 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         newAction.actionFlags = (*pFab)["Category"]["Flags"];
         newAction.actionFrameDuration = (*pFab)["Frame"];
         newAction.loopPoint = (*pFab)["State"]["EndStateParam"];
-        if (newAction.loopPoint == -1) {
-            newAction.loopPoint = 0;
-        }
+        // if (newAction.loopPoint == -1) {
+        //     newAction.loopPoint = 0;
+        // }
         newAction.loopCount = (*pFab)["State"]["LoopCount"];
         newAction.startScale = (*pFab)["Combo"]["_StartScaling"];
         if (newAction.startScale == -1) {

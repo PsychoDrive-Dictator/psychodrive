@@ -224,6 +224,7 @@ public:
         currentFrame = actionFrame;
         currentFrameFrac = Fixed(actionFrame);
         actionSpeed = Fixed(1);
+        actionInitialFrame = -1;
         UpdateActionData();
     }
     bool getIsDrive() { return isDrive; }
