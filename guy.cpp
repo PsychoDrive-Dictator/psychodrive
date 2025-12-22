@@ -1950,7 +1950,18 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         bool foundBox = false;
         HurtBox hurtBox = {};
 
-        if (hitbox.type != domain && hitbox.type != proximity_guard) {
+        bool applyFlags = true;
+
+        if (hitbox.type == domain) {
+            applyFlags = false;
+        }
+
+        // flags didn't seem to apply to projectile prox guard boxes, but now they do?
+        if (pCharData->charVersion >= 39 && isProjectile && hitbox.type == proximity_guard) {
+            applyFlags = false;
+        }
+
+        if (applyFlags) {
             // todo find tests for stubbed out ones
             if (pOtherGuy->airborne) {
                 // if (hitbox.flags & avoids_airborne) {
