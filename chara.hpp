@@ -155,6 +155,8 @@ struct HitEntry {
     int moveDestX;
     int moveDestY;
     int moveTime;
+    int curveOwnID;
+    int curveTargetID;
     int dmgValue;
     int dmgType;
     int dmgKind;

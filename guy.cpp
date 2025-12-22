@@ -2339,7 +2339,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (applyHit && !pendingHit.blocked) {
                 pOtherGuy->blocking = false;
             }
-            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, &hurtBox);
+            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
         }
 
         int hitStopSelf = pHitEntry->hitStopOwner;
@@ -2487,7 +2487,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
     }
 }
 
-void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox)
+void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade, HurtBox *pHurtBox)
 {
     int comboAdd = pHitEffect->comboAdd;
     int juggleFirst = pHitEffect->juggleFirst;
@@ -2941,7 +2941,17 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         WorldPhysics(true);
 
         if (appliedHitStun && hitStun && !resetHitStunOnLand && !resetHitStunOnTransition) {
-            actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 2), Fixed(hitStun - 2));
+            actionInitialFrame = pHitEffect->curveTargetID;
+            if (isTrade) {
+                actionInitialFrame = 1; // ????
+            }
+            while (actionInitialFrame > 3) {
+                actionInitialFrame -= 3; // everyone knows you do that
+            }
+            if (actionInitialFrame < 1) {
+                actionInitialFrame = 1;
+            }
+            actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 1 - actionInitialFrame), Fixed(hitStun - 2));
         }
     }
 
@@ -3440,14 +3450,14 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
     Fixed currentSpeed = actionSpeed;
-    if (currentFrame == 0) {
-        currentSpeed = Fixed(1);
+    if (currentFrame == 0 && actionSpeed != Fixed(1)) {
+        currentSpeed = Fixed(actionInitialFrame);
     }
     if (currentFrame >= pCurrentAction->recoveryEndFrame) {
         currentSpeed = Fixed(1);
     }
     currentFrameFrac += currentSpeed;
-    //log(true, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
+    log(true, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
     currentFrame = currentFrameFrac.i();
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict

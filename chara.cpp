@@ -786,6 +786,8 @@ void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
     pEntry->moveDestX = (*pHitEntryJson)["MoveDest"]["x"];
     pEntry->moveDestY = (*pHitEntryJson)["MoveDest"]["y"];
     pEntry->moveTime = (*pHitEntryJson)["MoveTime"];
+    pEntry->curveTargetID = (*pHitEntryJson)["CurveTgtID"];
+    pEntry->curveOwnID = (*pHitEntryJson)["CurveOwnID"];
     pEntry->dmgValue = (*pHitEntryJson)["DmgValue"];
     pEntry->dmgType = (*pHitEntryJson)["DmgType"];
     pEntry->dmgKind = (*pHitEntryJson)["DmgKind"];

@@ -381,7 +381,7 @@ private:
     void UpdateActionData(void);
     Box rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir);
 
-    void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, HurtBox *pHurtBox = nullptr);
+    void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade = false, HurtBox *pHurtBox = nullptr);
 
     void ExecuteTrigger(Trigger *pTrigger);
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
@@ -572,6 +572,7 @@ private:
         currentAction = 1;
         nextAction = -1;
         nextActionFrame = -1;
+        actionInitialFrame = -1;
         keepPlace = false;
         noPlaceXNextFrame = false;
         noPlaceYNextFrame = false;
@@ -834,6 +835,7 @@ private:
     int currentAction;
     int nextAction;
     int nextActionFrame;
+    int actionInitialFrame;
     Fixed actionSpeed;
     Fixed currentFrameFrac;
     int currentFrame;
