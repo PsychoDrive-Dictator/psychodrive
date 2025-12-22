@@ -3101,6 +3101,68 @@ var currentResults =
         ]
     },
     {
+        "testName": "dictator_2mk_drc_fromcorner",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 54,
+                "firstFrame": 298,
+                "lastFrame": 335
+            },
+            {
+                "count": 1,
+                "firstFrame": 335,
+                "lastFrame": 335
+            },
+            {
+                "count": 31,
+                "firstFrame": 298,
+                "lastFrame": 328
+            },
+            {
+                "count": 31,
+                "firstFrame": 298,
+                "lastFrame": 328
+            },
+            {
+                "count": 38,
+                "firstFrame": 234,
+                "lastFrame": 322
+            },
+            {
+                "count": 54,
+                "firstFrame": 248,
+                "lastFrame": 334
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "dictator_auto_detonate_setup",
         "testVersion": "26",
         "finished": true,
@@ -4391,9 +4453,9 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 195,
-                "firstFrame": 361,
-                "lastFrame": 555
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
@@ -5073,9 +5135,9 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 78,
-                "firstFrame": 366,
-                "lastFrame": 443
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,

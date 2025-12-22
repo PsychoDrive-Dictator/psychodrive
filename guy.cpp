@@ -1650,7 +1650,7 @@ bool Guy::Push(Guy *pOtherGuy)
         //     pushNeeded = -pushXLeft;
         // }
         Fixed velDiff = velocityX * direction + pOtherGuy->velocityX * pOtherGuy->direction;
-        log(logTransitions, "push needed " + std::to_string(pushNeeded.data) +
+        log(logTransitions, "push needed " + std::to_string(pushNeeded.f()) +
 " vel diff " + std::to_string(velDiff.f()) + " offset no push " + std::to_string
 (offsetDoesNotPush));
         // if (velDiff * pushNeeded < 0.0) {
@@ -2654,37 +2654,37 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         lastScalingTriggerID = pAttacker->scalingTriggerID;
     }
 
-    int effectiveScaling = currentScaling - pAttacker->instantScale;
+    Fixed effectiveScaling = Fixed(currentScaling - pAttacker->instantScale);
 
-    if (effectiveScaling < 10) {
-        effectiveScaling = 10;
+    if (effectiveScaling < Fixed(10)) {
+        effectiveScaling = Fixed(10);
     }
 
     if (driveScaling) {
-        effectiveScaling *= 0.85;
+        effectiveScaling *= Fixed(0.85,true);
     }
 
     if (pAttacker->superAction) {
-        if (pAttacker->superLevel == 1 && effectiveScaling < 30) {
-            effectiveScaling = 30;
+        if (pAttacker->superLevel == 1 && effectiveScaling < Fixed(30)) {
+            effectiveScaling = Fixed(30);
         }
-        if (pAttacker->superLevel == 2 && effectiveScaling < 40) {
-            effectiveScaling = 40;
+        if (pAttacker->superLevel == 2 && effectiveScaling < Fixed(40)) {
+            effectiveScaling = Fixed(40);
         }
-        if (pAttacker->superLevel == 3 && effectiveScaling < 50) {
-            effectiveScaling = 50;
+        if (pAttacker->superLevel == 3 && effectiveScaling < Fixed(50)) {
+            effectiveScaling = Fixed(50);
         }
     }
 
-    log(logHits, "effective scaling " + std::to_string(effectiveScaling));
-    float currentScalingFactor = effectiveScaling * 0.01f;
-
-    health -= dmgValue * currentScalingFactor;
+    Fixed damageFixed = Fixed(dmgValue) * Fixed(effectiveScaling.i()) / Fixed(100);
+    int moveDamage = damageFixed.i();
+    health -= moveDamage;
+    log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage));
 
     DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
 
-    comboDamage += dmgValue * currentScalingFactor;
-    lastDamageScale = effectiveScaling;
+    comboDamage += moveDamage;
+    lastDamageScale = effectiveScaling.i();
 
     if (applyHit) {
         if (!blocking) {
@@ -3459,7 +3459,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         currentSpeed = Fixed(1);
     }
     currentFrameFrac += currentSpeed;
-    log(true, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
+    //log(true, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
     currentFrame = currentFrameFrac.i();
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
