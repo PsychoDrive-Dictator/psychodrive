@@ -88,7 +88,7 @@ public:
         return false;
     }
 
-    Fixed operator + (const Fixed &in) {
+    Fixed operator + (const Fixed &in) const {
         Fixed ret;
         ret.data = data + in.data;
         return ret;

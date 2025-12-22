@@ -1974,6 +1974,19 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     continue;
                 }
             }
+            if (hitbox.type == proximity_guard) {
+                if (pOtherGuy->hurtBoxProxGuarded && pOtherGuy->positionProxGuarded) {
+                    // already did the worst we were going to do with those
+                    continue;
+                }
+                Fixed otherGuyPosX = pOtherGuy->getPosX();
+                Fixed boxX1, boxX2;
+                boxX1 = hitbox.box.x;
+                boxX2 = hitbox.box.x + hitbox.box.w;
+                if (otherGuyPosX >= boxX1 && otherGuyPosX < boxX2) {
+                    pOtherGuy->positionProxGuarded = true;
+                }
+            }
             if (hitbox.type == domain) {
                 foundBox = true;
             } else {
@@ -1989,12 +2002,14 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                         continue;
                     }
                     // todo air/ground strike invul here
+
                     if (hitbox.type == proximity_guard) {
-                        // prox guard boxes only consider x extents
-                        if (doBoxesHitXAxis(hitbox.box, hurtbox.box)) {
-                            hurtBox = hurtbox;
-                            foundBox = true;
-                            break;
+                        if (!pOtherGuy->hurtBoxProxGuarded) {
+                            // prox guard boxes only consider x extents
+                            if (doBoxesHitXAxis(hitbox.box, hurtbox.box)) {
+                                pOtherGuy->hurtBoxProxGuarded = true;
+                                // nothing else to do but mark
+                            }
                         }
                     } else {
                         if (doBoxesHit(hitbox.box, hurtbox.box)) {
@@ -2009,6 +2024,12 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (foundBox) {
+            if (hitbox.type == proximity_guard) {
+                // not supposed to get through!
+                log(true, "wtf!");
+                continue;
+            }
+
             int hitEntryFlag = 0;
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
@@ -2050,13 +2071,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 blocked = true;
             }
 
-            if (blocked && hitbox.type != proximity_guard) {
-                if (hitbox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
-                    blocked = false;
-                }
-                if (hitbox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
-                    blocked = false;
-                }
+            if (hitbox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
+                blocked = false;
+            }
+            if (hitbox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
+                blocked = false;
             }
 
             if (blocked) {
@@ -2079,36 +2098,34 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             HitEntry *pHitEntry = nullptr;
             bool bombBurst = false;
 
-            if (hitbox.type != proximity_guard) {
-                if (!hitbox.pHitData) {
-                    continue;
-                }
-                HitData *pHitData = hitbox.pHitData;
+            if (!hitbox.pHitData) {
+                continue;
+            }
+            HitData *pHitData = hitbox.pHitData;
 
-                if (isGrab) {
-                    pHitEntry = &pHitData->common[0];
-                } else {
+            if (isGrab) {
+                pHitEntry = &pHitData->common[0];
+            } else {
+                pHitEntry = &pHitData->param[hitEntryFlag];
+            }
+
+            // if bomb burst and found a bomb, use the next hit ID instead
+            if (pHitEntry->bombBurst && pOpponent->debuffTimer) {
+                bombBurst = true;
+                int nextHitID = pHitData->id + 1;
+                auto bombHitIt = pCharData->hitByID.find(nextHitID);
+                if (bombHitIt != pCharData->hitByID.end()) {
+                    pHitData = bombHitIt->second;
                     pHitEntry = &pHitData->param[hitEntryFlag];
                 }
+            }
 
-                // if bomb burst and found a bomb, use the next hit ID instead
-                if (pHitEntry->bombBurst && pOpponent->debuffTimer) {
-                    bombBurst = true;
-                    int nextHitID = pHitData->id + 1;
-                    auto bombHitIt = pCharData->hitByID.find(nextHitID);
-                    if (bombHitIt != pCharData->hitByID.end()) {
-                        pHitData = bombHitIt->second;
-                        pHitEntry = &pHitData->param[hitEntryFlag];
-                    }
-                }
-
-                int juggleLimit = pHitEntry->juggleLimit;
-                if (wasDrive) {
-                    juggleLimit += 3;
-                }
-                if (hitbox.type != domain && pOtherGuy->getAirborne() && pOtherGuy->juggleCounter > juggleLimit) {
-                    continue;
-                }
+            int juggleLimit = pHitEntry->juggleLimit;
+            if (wasDrive) {
+                juggleLimit += 3;
+            }
+            if (hitbox.type != domain && pOtherGuy->getAirborne() && pOtherGuy->juggleCounter > juggleLimit) {
+                continue;
             }
 
             // juggle was the last thing to check, hit is valid
@@ -2154,45 +2171,22 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         bool trade = false;
         PendingHit tradeHit;
-        if (hitBox.type != proximity_guard) {
-            for (auto &otherPendingHit : pendingHitList) {
-                if (otherPendingHit.hitBox.type == proximity_guard) {
-                    continue;
-                }
-                if (otherPendingHit.pGuyGettingHit == pGuy) {
-                    otherGuyLog(pOtherGuy, pOtherGuy->logHits, "trade!");
-                    trade = true;
-                    // todo see simultaneous hit question thing below
-                    tradeHit = otherPendingHit;
-                    break;
-                }
+        for (auto &otherPendingHit : pendingHitList) {
+            if (otherPendingHit.pGuyGettingHit == pGuy) {
+                otherGuyLog(pOtherGuy, pOtherGuy->logHits, "trade!");
+                trade = true;
+                // todo see simultaneous hit question thing below
+                tradeHit = otherPendingHit;
+                break;
             }
+        }
 
-            // for now don't hit the same guy twice
-            // todo figure out what happens when two simultaneous hits happen
-            if (hitBox.type != direct_damage && hitGuys.find(pOtherGuy) != hitGuys.end()) {
-                continue;
-            } else {
-                hitGuys.insert(pOtherGuy);
-            }
-        } else {
-            // proximity guard
-            bool canProxGuard = pOtherGuy->canAct() || pOtherGuy->currentAction == 39 || pOtherGuy->currentAction == 40 || pOtherGuy->currentAction == 41;
-            if (pendingHit.blocked && canProxGuard) {
-                // it seems to branch as needed between stand/crouch?
-                pOtherGuy->nextAction = 171;
-                if (!(pOtherGuy->dc.inputBuffer[1] & BACK)) {
-                    // immediately go into guard if you tap back in a prox guard box
-                    pOtherGuy->NextAction(false, false);
-                }
-                pOtherGuy->blocking = true;
-
-                otherGuyLog(pOtherGuy, pOtherGuy->logHits, "proximity guard!");
-            }
-            // mark them regardless, since we might prox guard on recovery later I GUESS
-            pOtherGuy->hurtBoxProxGuarded = true;
-            // do nothing esle with those box
+        // for now don't hit the same guy twice
+        // todo figure out what happens when two simultaneous hits happen
+        if (hitBox.type != direct_damage && hitGuys.find(pOtherGuy) != hitGuys.end()) {
             continue;
+        } else {
+            hitGuys.insert(pOtherGuy);
         }
 
         int destX = pHitEntry->moveDestX;
@@ -3647,6 +3641,15 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
+    bool canProxGuard = canAct() || currentAction == 39 || currentAction == 40 || currentAction == 41;
+    if (hurtBoxProxGuarded && canProxGuard && (currentInput & BACK) && !(currentInput & UP)) {
+        // it seems to branch as needed between stand/crouch?
+        nextAction = 171;
+        blocking = true;
+
+        log(logHits, "proximity guard!");
+    }
+
     if (blocking && !hitStun && (!hurtBoxProxGuarded || !(currentInput & BACK))) {
         // was proximity guard, can act now
         blocking = false;
@@ -3672,7 +3675,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     
     bool moveTurnaround = false;
 
-    // Process movement if any
+    // process movement if any
     if ( canMoveNow || applyFreeMovement)
     {
         if ( !couldMove ) {
