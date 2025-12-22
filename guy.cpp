@@ -3642,7 +3642,10 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     bool canProxGuard = canAct() || currentAction == 39 || currentAction == 40 || currentAction == 41;
-    if (hurtBoxProxGuarded && canProxGuard && (currentInput & BACK) && !(currentInput & UP)) {
+    // positionProxGuarded lets uncrouchable protection work immediately on wakeup
+    // it's possible this isn't strictly correct but in practice if there are hurtboxes the position is in there
+    bool proxGuarded = hurtBoxProxGuarded || positionProxGuarded;
+    if (proxGuarded && canProxGuard && (currentInput & BACK) && !(currentInput & UP)) {
         // it seems to branch as needed between stand/crouch?
         nextAction = 171;
         blocking = true;
@@ -3650,7 +3653,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         log(logHits, "proximity guard!");
     }
 
-    if (blocking && !hitStun && (!hurtBoxProxGuarded || !(currentInput & BACK))) {
+    if (blocking && !hitStun && (!proxGuarded || !(currentInput & BACK))) {
         // was proximity guard, can act now
         blocking = false;
         nextAction = 1;
