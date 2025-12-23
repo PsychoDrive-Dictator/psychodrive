@@ -8,6 +8,26 @@
       if (error.count == 0) return '0';
       return error.count + ' (' + error.firstFrame + '-' + error.lastFrame + ')';
     }
+    function combineErrors(errors) {
+      var combined = { count: 0, firstFrame: -1, lastFrame: -1 };
+      for (var i = 0; i < errors.length; i++) {
+        if (errors[i] == null) continue;
+        combined.count += errors[i].count;
+        if (errors[i].firstFrame != -1) {
+          if (combined.firstFrame == -1 || errors[i].firstFrame < combined.firstFrame) {
+            combined.firstFrame = errors[i].firstFrame;
+          }
+        }
+        if (errors[i].lastFrame != -1) {
+          if (combined.lastFrame == -1 || errors[i].lastFrame > combined.lastFrame) {
+            combined.lastFrame = errors[i].lastFrame;
+          }
+        }
+      }
+      return combined;
+    }
+    const warningIndices = [1, 2, 3, 4];
+    const errorIndices = [5, 6, 0, 7, 8, 9, 10, 11];
     function fillResultsTable() {
       for (var i = 0; i < newResults.length; i++) {
         const newResult = newResults[i];
@@ -31,7 +51,7 @@
         testNameCell.addEventListener('click', function() {
           navigator.clipboard.writeText(copyText);
         } );
-        
+
         testNameCell.appendChild(nameText);
 
         testNameCell = curResultRow.insertCell();
@@ -39,7 +59,39 @@
         nameText = document.createTextNode(newResult.testVersion);
         testNameCell.appendChild(nameText);
 
-        for (var error = 0; error < newResult.errorTypes.length; error++) {
+        var curWarnings = curMatchingResult ? warningIndices.map(idx => curMatchingResult.errorTypes[idx]) : [];
+        var newWarnings = warningIndices.map(idx => newResult.errorTypes[idx]);
+        var curCombined = combineErrors(curWarnings);
+        var newCombined = combineErrors(newWarnings);
+
+        curCell = curResultRow.insertCell();
+        curTextContent = formatError(curCombined);
+        text = document.createTextNode(curTextContent);
+        curCell.appendChild(text);
+
+        newCell = newResultRow.insertCell();
+        newTextContent = formatError(newCombined);
+        text = document.createTextNode(newTextContent);
+        newCell.appendChild(text);
+
+        if (curTextContent == newTextContent) {
+          if (curTextContent == '0') {
+            curCell.classList.add("complete");
+            curCell.removeChild(curCell.lastChild);
+          }
+          curCell.rowSpan = 2;
+          newCell.parentNode.removeChild(newCell);
+        } else if (curMatchingResult) {
+          if (newCombined.count > curCombined.count) {
+            newCell.classList.add("newErrors");
+          }
+          if (newCombined.count < curCombined.count) {
+            newCell.classList.add("fixedErrors");
+          }
+        }
+
+        for (var idx = 0; idx < errorIndices.length; idx++) {
+          var error = errorIndices[idx];
           curError = curMatchingResult ? curMatchingResult.errorTypes[error] : null;
           newError = newResult.errorTypes[error];
 
@@ -137,13 +189,10 @@
         <tr>
           <th scope="col">Test</th>
           <th scope="col">Version</th>
-          <th scope="col">Pos</th>
-          <th scope="col">Vel</th>
-          <th scope="col">Accel</th>
-          <th scope="col">HitVel</th>
-          <th scope="col">HitAccel</th>
+          <th scope="col">Warnings</th>
           <th scope="col">ActionID</th>
           <th scope="col">ActionFrame</th>
+          <th scope="col">Pos</th>
           <th scope="col">Combo</th>
           <th scope="col">Direction</th>
           <th scope="col">Health</th>
