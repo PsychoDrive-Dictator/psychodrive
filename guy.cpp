@@ -2341,6 +2341,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->blocking = false;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
+            pGuy->setFocus(pGuy->getFocus() + pHitEntry->focusGainOwn);
+            pGuy->setGauge(pGuy->getGauge() + pHitEntry->superGainOwn);
         }
 
         int hitStopSelf = pHitEntry->hitStopOwner;
@@ -2685,6 +2687,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     comboDamage += moveDamage;
     lastDamageScale = effectiveScaling.i();
+
+    setFocus(focus + pHitEffect->focusGainTarget);
+    setGauge(gauge + pHitEffect->superGainTarget);
 
     if (applyHit) {
         if (!blocking) {
@@ -4658,13 +4663,7 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                         case 36:
                             // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
                             if (param1 == 4 && focus != 0) { // todo poor mans burnout
-                                focus += param2;
-                                if (focus > maxFocus) {
-                                    focus = maxFocus;
-                                }
-                                if (focus < 0) {
-                                    focus = 0;
-                                }
+                                setFocus(focus + param2);
                             }
                             break;
                     }
