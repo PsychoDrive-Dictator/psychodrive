@@ -147,6 +147,8 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
         }
         simGuys[playerID]->setAction(actionID, actionFrame - 1);
         simGuys[playerID]->setHealth(playerJson["hp"]);
+        simGuys[playerID]->setFocus(playerJson.value("driveGauge", maxFocus));
+        simGuys[playerID]->setGauge(playerJson.value("superGauge", simGuys[playerID]->getCharData()->gauge));
         playerID++;
     }
 

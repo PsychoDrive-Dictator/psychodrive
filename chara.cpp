@@ -789,6 +789,10 @@ void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
     pEntry->curveTargetID = (*pHitEntryJson)["CurveTgtID"];
     pEntry->curveOwnID = (*pHitEntryJson)["CurveOwnID"];
     pEntry->dmgValue = (*pHitEntryJson)["DmgValue"];
+    pEntry->focusGainOwn = (*pHitEntryJson)["FocusOwn"];
+    pEntry->focusGainTarget = (*pHitEntryJson)["FocusTgt"];
+    pEntry->superGainOwn = (*pHitEntryJson)["SuperOwn"];
+    pEntry->superGainTarget = (*pHitEntryJson)["SuperTgt"];
     pEntry->dmgType = (*pHitEntryJson)["DmgType"];
     pEntry->dmgKind = (*pHitEntryJson)["DmgKind"];
     pEntry->dmgPower = (*pHitEntryJson)["DmgPower"];
