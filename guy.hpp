@@ -18,6 +18,8 @@ const Fixed projWallDistance = Fixed(800.0f);
 const Fixed maxPlayerDistance = Fixed(245.0f);
 const Fixed maxProjectileDistance = Fixed(280.0f);
 
+const int maxFocus = 60000;
+
 void ResolveHits(std::vector<PendingHit> &pendingHitList);
 
 class Guy;
@@ -185,7 +187,6 @@ public:
     int getLandingAdjust() { return landingAdjust; }
 
     int getHealth() { return health; }
-    int getMaxHealth() { return maxHealth; }
     void setHealth(int newHealth) { health = newHealth; }
     int getFocus() { return focus; }
     int getGauge() { return gauge; }
@@ -203,8 +204,8 @@ public:
         if (gauge < 0) {
             gauge = 0;
         }
-        if (gauge > maxGauge) {
-            gauge = maxGauge;
+        if (gauge > pCharData->gauge) {
+            gauge = pCharData->gauge;
         }
     }
 
@@ -321,9 +322,9 @@ public:
 
         DoTriggers();
 
-        health = maxHealth = pCharData->vitality;
-        focus = maxFocus = 60000;
-        gauge = maxGauge = pCharData->gauge;
+        health = pCharData->vitality;
+        focus = maxFocus;
+        gauge = pCharData->gauge;
     }
 
     Guy(Guy &parent, Fixed posOffsetX, Fixed posOffsetY, int startAction, int styleID, bool isProj)
@@ -566,11 +567,8 @@ private:
         homeTargetY = Fixed(0);
         homeTargetType = 0;
         ignoreSteerType = -1;
-        maxHealth = 0;
         health = 0;
-        maxFocus = 0;
         focus = 0;
-        maxGauge = 0;
         gauge = 0;
         currentAction = 1;
         nextAction = -1;
@@ -826,13 +824,8 @@ private:
 
     int ignoreSteerType;
 
-    int maxHealth;
     int health;
-
-    int maxFocus;
     int focus;
-
-    int maxGauge;
     int gauge;
 
     int currentAction;

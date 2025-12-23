@@ -6,6 +6,17 @@
 #include "fixed.hpp"
 #include "main.hpp"
 
+inline bool detectTrainingAutoRegen(nlohmann::json &prevPlayer, nlohmann::json &curPlayer, nlohmann::json &firstPlayer, const char *field, int maxValue)
+{
+    if (!curPlayer.contains(field)) {
+        return false;
+    }
+    int prev = prevPlayer[field];
+    int cur = curPlayer[field];
+    int first = firstPlayer[field];
+    return prev < cur && (cur == maxValue || cur == first);
+}
+
 class CharacterUIController;
 
 struct FrameEvent {
@@ -52,7 +63,8 @@ public:
         eComboCount,
         eDirection,
         eHealth,
-        eHitStop
+        eHitStop,
+        eGauge
     };
 
     void CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description );

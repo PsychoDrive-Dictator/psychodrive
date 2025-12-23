@@ -690,7 +690,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     }
 
     if (pTrigger->vitalOp != 0) {
-        float vitalRatio = (float)health / maxHealth * 100;
+        float vitalRatio = (float)health / pCharData->vitality * 100;
 
         switch (pTrigger->vitalOp) {
             case 2:
@@ -1515,8 +1515,8 @@ void Guy::Render(float z /* = 0.0f */) {
         // drawBox(x-radius/2,y-radius/2,radius,radius,thickness,1.0,1.0,1.0,0.2);
 
         // meters
-        drawBox(x - 35.0, y - 5.0, focus / 60000.0 * 30.0, 3.0, 1.0, z, 0.20, 0.80, 0.0, 0.2);
-        drawBox(x + 5.0, y - 5.0, gauge / 30000.0 * 30.0, 3.0, 1.0, z, 0.0, 0.80, 0.80, 0.2);
+        drawBox(x - 35.0, y - 5.0, focus / float(maxFocus) * 30.0, 3.0, 1.0, z, 0.20, 0.80, 0.0, 0.2);
+        drawBox(x + 5.0, y - 5.0, gauge / float(pCharData->gauge) * 30.0, 3.0, 1.0, z, 0.0, 0.80, 0.80, 0.2);
     }
 }
 

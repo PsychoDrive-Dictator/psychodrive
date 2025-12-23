@@ -273,17 +273,28 @@ void Simulation::RunFrame(void) {
                 CompareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, simGuys[i]->getDirection(), i, targetDumpFrame, eDirection, desc + " direction");
 
                 if (targetDumpFrame > 0) {
-                    // try to detect and align to training mode life auto-regen
                     nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
                     nlohmann::json &firstPlayers = gameStateDump[0]["players"];
-                    if (prevPlayers[i]["hp"] < players[i]["hp"] &&
-                        (players[i]["hp"] == simGuys[i]->getMaxHealth() || players[i]["hp"] == firstPlayers[i]["hp"])) {
+                    if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "hp", simGuys[i]->getCharData()->vitality)) {
                         simGuys[i]->setHealth(players[i]["hp"]);
+                    }
+                    if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
+                        simGuys[i]->setFocus(players[i]["driveGauge"]);
+                    }
+                    if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", simGuys[i]->getCharData()->gauge)) {
+                        simGuys[i]->setGauge(players[i]["superGauge"]);
                     }
                 }
 
                 CompareGameStateInt(players[i]["hp"], simGuys[i]->getHealth(), i, targetDumpFrame, eHealth, desc + " health");
                 CompareGameStateInt(players[i]["hitStop"], simGuys[i]->getHitStopForDump(), i, targetDumpFrame, eHitStop, desc + " hitstop");
+
+                if (players[i].contains("driveGauge")) {
+                    CompareGameStateInt(players[i]["driveGauge"], simGuys[i]->getFocus(), i, targetDumpFrame, eGauge, desc + " drive gauge");
+                }
+                if (players[i].contains("superGauge")) {
+                    CompareGameStateInt(players[i]["superGauge"], simGuys[i]->getGauge(), i, targetDumpFrame, eGauge, desc + " super gauge");
+                }
 
                 i++;
             }

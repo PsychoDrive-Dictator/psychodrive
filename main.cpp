@@ -807,17 +807,28 @@ static void mainloop(void)
                         compareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, guys[i]->getDirection(), Simulation::eDirection, desc + " direction");
 
                         if (targetDumpFrame > 0) {
-                            // try to detect and align to training mode life auto-regen
                             nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
                             nlohmann::json &firstPlayers = gameStateDump[0]["players"];
-                            if (prevPlayers[i]["hp"] < players[i]["hp"] &&
-                                (players[i]["hp"] == guys[i]->getMaxHealth() || players[i]["hp"] == firstPlayers[i]["hp"])) {
+                            if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "hp", guys[i]->getCharData()->vitality)) {
                                 guys[i]->setHealth(players[i]["hp"]);
+                            }
+                            if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
+                                guys[i]->setFocus(players[i]["driveGauge"]);
+                            }
+                            if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", guys[i]->getCharData()->gauge)) {
+                                guys[i]->setGauge(players[i]["superGauge"]);
                             }
                         }
 
                         compareGameStateInt(players[i]["hp"], guys[i]->getHealth(), Simulation::eHealth, desc + " health");
                         compareGameStateInt(players[i]["hitStop"], guys[i]->getHitStopForDump(), Simulation::eHitStop, desc + " hitstop");
+
+                        if (players[i].contains("driveGauge")) {
+                            compareGameStateInt(players[i]["driveGauge"], guys[i]->getFocus(), Simulation::eGauge, desc + " drive gauge");
+                        }
+                        if (players[i].contains("superGauge")) {
+                            compareGameStateInt(players[i]["superGauge"], guys[i]->getGauge(), Simulation::eGauge, desc + " super gauge");
+                        }
 
                         i++;
                     }
