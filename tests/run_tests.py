@@ -122,3 +122,19 @@ with open(resultsPath, "w") as outFile:
     outFile.write("var newResults =\n")
     outFile.write(json.dumps(testResults, default=str, indent=4, ensure_ascii=False))
     outFile.close()
+
+from history_utils import save_history, calculate_stats
+
+pendingPath = os.path.join(scriptDir, "test_history_pending.json")
+total_errors, total_frames = calculate_stats(testResults, testDir)
+
+if total_frames > 0:
+    save_history(pendingPath, {
+        "hash": "pending",
+        "fullHash": "pending",
+        "message": "(uncommitted)",
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "errorCount": total_errors,
+        "frameCount": total_frames,
+        "errorPercent": round(100.0 * total_errors / total_frames, 4)
+    }, "pendingEntry")

@@ -2,7 +2,148 @@
   <title>PsychoDrive Test Results</title>
   <script src="current_results.json"></script>
   <script src="new_results.json"></script>
+  <script src="test_history.json"></script>
+  <script>var pendingEntry = null;</script>
+  <script src="test_history_pending.json"></script>
   <script type="text/javascript">
+    var chartPadding = { top: 15, right: 15, bottom: 15, left: 50 };
+    var chartMaxVal = 0;
+
+    function drawChart(highlightIdx) {
+      if (typeof historyData === 'undefined' || historyData.length === 0) return;
+      if (pendingEntry && historyData[historyData.length - 1].fullHash !== 'pending') {
+        historyData.push(pendingEntry);
+      }
+
+      const canvas = document.getElementById('historyChart');
+      const ctx = canvas.getContext('2d');
+      const container = document.getElementById('chartContainer');
+
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const chartW = w - chartPadding.left - chartPadding.right;
+      const chartH = h - chartPadding.top - chartPadding.bottom;
+
+      chartMaxVal = Math.ceil(Math.max(...historyData.map(d => d.errorPercent)) / 50) * 50;
+
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#888';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'right';
+
+      for (let val = 0; val <= chartMaxVal; val += 50) {
+        const y = chartPadding.top + ((chartMaxVal - val) / chartMaxVal) * chartH;
+        ctx.beginPath();
+        ctx.moveTo(chartPadding.left, y);
+        ctx.lineTo(w - chartPadding.right, y);
+        ctx.stroke();
+        ctx.fillText(val + '%', chartPadding.left - 5, y + 4);
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#e64d33';
+      ctx.lineWidth = 3;
+
+      historyData.forEach((d, i) => {
+        const x = chartPadding.left + (i / (historyData.length - 1)) * chartW;
+        const y = chartPadding.top + ((chartMaxVal - d.errorPercent) / chartMaxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.lineTo(chartPadding.left + chartW, chartPadding.top + chartH);
+      ctx.lineTo(chartPadding.left, chartPadding.top + chartH);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(230, 77, 51, 0.1)';
+      ctx.fill();
+
+      historyData.forEach((d, i) => {
+        const x = chartPadding.left + (i / (historyData.length - 1)) * chartW;
+        const y = chartPadding.top + ((chartMaxVal - d.errorPercent) / chartMaxVal) * chartH;
+        ctx.beginPath();
+        if (i === highlightIdx) {
+          ctx.arc(x, y, 9, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+        } else {
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+        }
+        ctx.fillStyle = d.fullHash === 'pending' ? '#4f8' : '#e64d33';
+        ctx.fill();
+      });
+    }
+
+    function syncChartWidth() {
+      const table = document.getElementById('resultsTable');
+      const container = document.getElementById('chartContainer');
+      container.style.width = table.offsetWidth + 'px';
+    }
+
+    function setupChartHover() {
+      const canvas = document.getElementById('historyChart');
+      const summary = document.getElementById('chartSummary');
+
+      function handlePointer(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const chartW = canvas.width - chartPadding.left - chartPadding.right;
+        const chartH = canvas.height - chartPadding.top - chartPadding.bottom;
+
+        if (y < chartPadding.top || y > chartPadding.top + chartH ||
+            x < chartPadding.left || x > chartPadding.left + chartW) {
+          return;
+        }
+
+        const relX = (x - chartPadding.left) / chartW;
+        const idx = Math.max(0, Math.min(historyData.length - 1, Math.round(relX * (historyData.length - 1))));
+
+        const d = historyData[idx];
+        const pointX = chartPadding.left + (idx / (historyData.length - 1)) * chartW;
+        const pointY = chartPadding.top + ((chartMaxVal - d.errorPercent) / chartMaxVal) * chartH;
+        if (Math.abs(x - pointX) > 10 || Math.abs(y - pointY) > 10) {
+          return;
+        }
+        const commitLink = d.fullHash === 'pending' ? d.hash :
+          '<a href="https://github.com/PsychoDrive-Dictator/psychodrive/commit/' + d.fullHash + '" target="_blank">' + d.hash + '</a>';
+        let deltaStr = '';
+        if (idx > 0) {
+          const prev = historyData[idx - 1];
+          const delta = d.errorCount - prev.errorCount;
+          if (delta !== 0) {
+            const sign = delta > 0 ? '+' : '';
+            const cls = delta > 0 ? 'delta-worse' : 'delta-better';
+            deltaStr = ' <span class="' + cls + '">(' + sign + delta.toLocaleString() + ')</span>';
+          }
+        }
+        summary.innerHTML =
+          '<div><span class="hash">' + commitLink + '</span> <span class="message">' + d.message + '</span></div>' +
+          '<div><span class="date">' + d.date + '</span></div>' +
+          '<div><span class="stats">' + d.errorPercent.toFixed(2) + '% ' + d.errorCount.toLocaleString() + ' differences' + deltaStr + ' / ' + d.frameCount.toLocaleString() + ' frames tested</span></div>';
+
+        drawChart(idx);
+      }
+
+      canvas.addEventListener('mousemove', handlePointer);
+      canvas.addEventListener('touchstart', (e) => {
+        handlePointer(e.touches[0]);
+      });
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        handlePointer(e.touches[0]);
+      });
+    }
+
     function formatError(error) {
       if (error == null) return '-';
       if (error.count == 0) return '0';
@@ -180,11 +321,49 @@
       background-color: rgb(200, 0, 0);
       color: black;
     }
+    #chartContainer {
+      display: inline-block;
+      height: 450px;
+      background: rgb(40, 40, 40);
+      position: relative;
+    }
+    #historyChart {
+      width: 100%;
+      height: 100%;
+    }
+    #chartSummary {
+      color: #fff;
+      padding: 8px 0;
+      margin-bottom: 20px;
+      font-size: 13px;
+      text-align: left;
+    }
+    #chartSummary .hash { color: #6cf; font-family: monospace; }
+    #chartSummary .hash a { color: #6cf; }
+    #chartSummary .message { color: #fff; }
+    #chartSummary .date { color: #aaa; }
+    #chartSummary .stats { color: #aaa; }
+    #chartSummary .delta-better { color: #4f8; }
+    #chartSummary .delta-worse { color: #f44; }
+    #wrapper {
+      text-align: center;
+    }
+    #wrapper > div {
+      display: inline-block;
+      text-align: left;
+    }
   </style>
 </head>
-<body onload="fillResultsTable();">
-  <div>
-    <table id="resultsTable">
+<body onload="fillResultsTable(); syncChartWidth(); drawChart(); setupChartHover();">
+  <div id="wrapper">
+    <div>
+      <div id="chartContainer">
+        <canvas id="historyChart"></canvas>
+      </div>
+      <div id="chartSummary"></div>
+    </div>
+    <div>
+      <table id="resultsTable">
       <thead>
         <tr>
           <th scope="col">Test</th>
