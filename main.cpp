@@ -809,8 +809,10 @@ static void mainloop(void)
                         if (targetDumpFrame > 0) {
                             // try to detect and align to training mode life auto-regen
                             nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
-                            if (prevPlayers[i]["hp"] < players[i]["hp"] && players[i]["hp"] == guys[i]->getMaxHealth()) {
-                                guys[i]->setHealth(guys[i]->getMaxHealth());
+                            nlohmann::json &firstPlayers = gameStateDump[0]["players"];
+                            if (prevPlayers[i]["hp"] < players[i]["hp"] &&
+                                (players[i]["hp"] == guys[i]->getMaxHealth() || players[i]["hp"] == firstPlayers[i]["hp"])) {
+                                guys[i]->setHealth(players[i]["hp"]);
                             }
                         }
 

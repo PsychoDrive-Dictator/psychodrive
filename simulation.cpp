@@ -275,8 +275,10 @@ void Simulation::RunFrame(void) {
                 if (targetDumpFrame > 0) {
                     // try to detect and align to training mode life auto-regen
                     nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
-                    if (prevPlayers[i]["hp"] < players[i]["hp"] && players[i]["hp"] == simGuys[i]->getMaxHealth()) {
-                        simGuys[i]->setHealth(simGuys[i]->getMaxHealth());
+                    nlohmann::json &firstPlayers = gameStateDump[0]["players"];
+                    if (prevPlayers[i]["hp"] < players[i]["hp"] &&
+                        (players[i]["hp"] == simGuys[i]->getMaxHealth() || players[i]["hp"] == firstPlayers[i]["hp"])) {
+                        simGuys[i]->setHealth(players[i]["hp"]);
                     }
                 }
 
