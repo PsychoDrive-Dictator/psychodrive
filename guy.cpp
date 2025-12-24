@@ -303,6 +303,15 @@ bool Guy::RunFrame(void)
         return false;
     }
 
+    // training mode refill rule, 'action' starts and both start regen (soon)
+    // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
+    if (didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1) {
+        focusRegenCooldown = 3;
+        if (pOpponent) {
+            pOpponent->focusRegenCooldown = 3;
+        }
+    }
+
     if (uniqueTimer) {
         // might not be in the right spot, adjust if falling out of yoga float too early/late
         uniqueTimerCount++;
@@ -569,11 +578,12 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
 
     // meters
     if (pTrigger->needsFocus) {
-        focus -= pTrigger->focusCost;
-        if (focus < 0) {
-            // todo burnout if 0?
-            focus = 0;
-        }
+        setFocus(focus - pTrigger->focusCost);
+        focusRegenCooldown = 120;
+        focusRegenCooldownFrozen = true;
+    } else {
+        // if we cancel out of the od move
+        focusRegenCooldownFrozen = false;
     }
 
     if (pTrigger->needsGauge) {
@@ -2341,7 +2351,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->blocking = false;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
-            pGuy->setFocus(pGuy->getFocus() + pHitEntry->focusGainOwn);
+            if (!pOtherGuy->driveScaling) {
+                pGuy->setFocus(pGuy->getFocus() + pHitEntry->focusGainOwn);
+            }
             pGuy->setGauge(pGuy->getGauge() + pHitEntry->superGainOwn);
         }
 
@@ -2689,6 +2701,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     lastDamageScale = effectiveScaling.i();
 
     setFocus(focus + pHitEffect->focusGainTarget);
+    if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
+        // todo apparently start of hitstun except if super where it's after??
+        focusRegenCooldown = 90 + 1;
+    }
     setGauge(gauge + pHitEffect->superGainTarget);
 
     if (applyHit) {
@@ -2945,6 +2961,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         NextAction(false, false);
         DoStatusKey();
         WorldPhysics(true);
+
+        // if you get hit out of an od move?
+        focusRegenCooldownFrozen = false;
 
         if (appliedHitStun && hitStun && !resetHitStunOnLand && !resetHitStunOnTransition) {
             actionInitialFrame = pHitEffect->curveTargetID;
@@ -3420,6 +3439,29 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             warudo = true;
             tokiYoTomare = false;
         }
+
+        if (!warudo && !superFreeze && focusRegenCooldown > 0 && !focusRegenCooldownFrozen) {
+            focusRegenCooldown--;
+        }
+
+        bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
+        if (pOpponent && pOpponent->driveScaling) {
+            doRegen = false;
+        }
+        if (superFreeze) {
+            doRegen = false;
+        }
+        if (doRegen) {
+            int focusRegenAmount = 40;
+            if (hitStun) {
+                focusRegenAmount = 20;
+                // todo burnout
+            }
+            if (jumped && !landed) {
+                focusRegenAmount = 20;
+            }
+            setFocus(focus + focusRegenAmount);
+        }
     }
 
     if (getHitStop() || warudo) {
@@ -3440,7 +3482,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     int curNextAction = nextAction;
-    bool didTrigger = false;
+    didTrigger = false;
     if (doTriggers) {
         DoTriggers(1);
     }
@@ -3906,6 +3948,17 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         log (logTransitions, "nvm! current action " + std::to_string(currentAction));
     }
 
+
+    if (!didTrigger && !didBranch && didTransition && focusRegenCooldownFrozen) {
+        // if we recovered out of an OD move?
+        focusRegenCooldownFrozen = false;
+    }
+
+    // training mode refill, immediately start regen on recovery
+    // if (!couldMove && canMoveNow) {
+    //     focusRegenCooldown = 3;
+    // }
+
     if (didTrigger && didTransition) {
         scalingTriggerID++;
     }
@@ -4120,6 +4173,7 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x8000000) {
             isDrive = true;
+            focusRegenCooldown = 120; // todo right spot?
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
                 pOpponent->driveScaling = true;
             }
@@ -4378,12 +4432,17 @@ void Guy::DoWorldKey(void)
 
         switch (type) {
             case 1:
+                // super animation?
                 posX = Fixed(0);
                 posY = Fixed(0);
                 velocityX = Fixed(0);
                 velocityY = Fixed(0);
                 accelX = Fixed(0);
                 accelY = Fixed(0);
+                if (pOpponent) {
+                    pOpponent->superFreeze = true;
+                    pOpponent->focusRegenCooldown = 90 + 1 + 1; // one for the unfreeze frame
+                }
                 break;
             case 0:
                 // type 1 is sa3 vs normal? why does that matter?
@@ -4401,6 +4460,9 @@ void Guy::DoWorldKey(void)
             case 5:
                 // resume
                 if (pOpponent) {
+                    if (pOpponent->superFreeze) {
+                        pOpponent->superFreeze = false;
+                    }
                     if (pOpponent->warudo) {
                         pOpponent->tokiWaUgokidasu = true;
                     }

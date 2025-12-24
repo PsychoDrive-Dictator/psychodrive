@@ -148,6 +148,7 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
         simGuys[playerID]->setAction(actionID, actionFrame - 1);
         simGuys[playerID]->setHealth(playerJson["hp"]);
         simGuys[playerID]->setFocus(playerJson.value("driveGauge", maxFocus));
+        simGuys[playerID]->setFocusRegenCooldown(-1, false); // worst case scenario because we have no idea
         simGuys[playerID]->setGauge(playerJson.value("superGauge", simGuys[playerID]->getCharData()->gauge));
         playerID++;
     }
@@ -282,6 +283,7 @@ void Simulation::RunFrame(void) {
                     }
                     if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
                         simGuys[i]->setFocus(players[i]["driveGauge"]);
+                        simGuys[i]->setFocusRegenCooldown(-1);
                     }
                     if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", simGuys[i]->getCharData()->gauge)) {
                         simGuys[i]->setGauge(players[i]["superGauge"]);
@@ -293,6 +295,15 @@ void Simulation::RunFrame(void) {
 
                 if (players[i].contains("driveGauge")) {
                     CompareGameStateInt(players[i]["driveGauge"], simGuys[i]->getFocus(), i, targetDumpFrame, eGauge, desc + " drive gauge");
+                    // if (targetDumpFrame < 240 && (targetDumpFrame + 1) < (int)gameStateDump.size()) {
+                    //     nlohmann::json &nextPlayers = gameStateDump[targetDumpFrame+1]["players"];
+                    //     int driveDiff = nextPlayers[i]["driveGauge"].get<int>() - players[i]["driveGauge"].get<int>();
+                    //     if (driveDiff == 40 || driveDiff == 50 || driveDiff == 20 || driveDiff == 25 || driveDiff == 60 || driveDiff == 70) {
+                    //         if (!simGuys[i]->getHasFocusRegenCooldowned()) {
+                    //             simGuys[i]->setFocusRegenCooldown(1); // start regenning next frame
+                    //         }
+                    //     }
+                    // }
                 }
                 if (players[i].contains("superGauge")) {
                     CompareGameStateInt(players[i]["superGauge"], simGuys[i]->getGauge(), i, targetDumpFrame, eGauge, desc + " super gauge");

@@ -14,7 +14,7 @@ inline bool detectTrainingAutoRegen(nlohmann::json &prevPlayer, nlohmann::json &
     int prev = prevPlayer[field];
     int cur = curPlayer[field];
     int first = firstPlayer[field];
-    return prev < cur && (cur == maxValue || cur == first);
+    return prev != cur && (cur == maxValue || cur == first);
 }
 
 class CharacterUIController;

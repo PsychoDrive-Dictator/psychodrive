@@ -814,17 +814,29 @@ static void mainloop(void)
                             }
                             if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
                                 guys[i]->setFocus(players[i]["driveGauge"]);
+                                guys[i]->setFocusRegenCooldown(-1);
                             }
                             if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", guys[i]->getCharData()->gauge)) {
                                 guys[i]->setGauge(players[i]["superGauge"]);
                             }
                         }
 
+
+
                         compareGameStateInt(players[i]["hp"], guys[i]->getHealth(), Simulation::eHealth, desc + " health");
                         compareGameStateInt(players[i]["hitStop"], guys[i]->getHitStopForDump(), Simulation::eHitStop, desc + " hitstop");
 
                         if (players[i].contains("driveGauge")) {
                             compareGameStateInt(players[i]["driveGauge"], guys[i]->getFocus(), Simulation::eGauge, desc + " drive gauge");
+                            // if (targetDumpFrame < 240 && (targetDumpFrame + 1) < (int)gameStateDump.size()) {
+                            //     nlohmann::json &nextPlayers = gameStateDump[targetDumpFrame+1]["players"];
+                            //     int driveDiff = nextPlayers[i]["driveGauge"].get<int>() - players[i]["driveGauge"].get<int>();
+                            //     if (driveDiff == 40 || driveDiff == 50 || driveDiff == 20 || driveDiff == 25 || driveDiff == 60 || driveDiff == 70) {
+                            //         if (!guys[i]->getHasFocusRegenCooldowned()) {
+                            //             guys[i]->setFocusRegenCooldown(1); // start regenning next frame
+                            //         }
+                            //     }
+                            // }
                         }
                         if (players[i].contains("superGauge")) {
                             compareGameStateInt(players[i]["superGauge"], guys[i]->getGauge(), Simulation::eGauge, desc + " super gauge");
@@ -1099,6 +1111,7 @@ int main(int argc, char**argv)
             guys[playerID]->setAction(actionID, actionFrame - 1);
             guys[playerID]->setHealth(playerJson["hp"]);
             guys[playerID]->setFocus(playerJson.value("driveGauge", maxFocus));
+            guys[playerID]->setFocusRegenCooldown(-1, false);
             guys[playerID]->setGauge(playerJson.value("superGauge", guys[playerID]->getCharData()->gauge));
 
             playerID++;

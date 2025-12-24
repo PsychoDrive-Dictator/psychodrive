@@ -189,6 +189,14 @@ public:
     int getHealth() { return health; }
     void setHealth(int newHealth) { health = newHealth; }
     int getFocus() { return focus; }
+    bool getHasFocusRegenCooldowned() { return hasFocusRegenCooldowned; }
+    int getFocusRegenCoolDown() { return focusRegenCooldown; }
+    void setFocusRegenCooldown(int newCooldown, bool setFlag = true) {
+        focusRegenCooldown = newCooldown;
+        if (setFlag) {
+            hasFocusRegenCooldowned = true;
+        }
+    }
     int getGauge() { return gauge; }
     void setFocus(int newFocus) {
         focus = newFocus;
@@ -531,7 +539,8 @@ private:
         jumped = false;
         jumpDirection = 0;
         jumpLandingDisabledFrames = 0;
-        couldMove = false;
+        couldMove = true;
+        didTrigger = false;
         landingAdjust = 0;
         prevPoseStatus = 0;
         forcedPoseStatus = 0;
@@ -569,6 +578,7 @@ private:
         ignoreSteerType = -1;
         health = 0;
         focus = 0;
+        focusRegenCooldown = 0;
         gauge = 0;
         currentAction = 1;
         nextAction = -1;
@@ -675,6 +685,9 @@ private:
             uniqueParam[i] = 0;
         }
         uniqueTimer = false;
+        hasFocusRegenCooldowned = false;
+        focusRegenCooldownFrozen = false;
+        superFreeze = false;
         uniqueTimerCount = 0;
         debuffTimer = 0;
         pCurrentAction = nullptr;
@@ -711,6 +724,7 @@ private:
     bool didPush : 1;
     bool jumped : 1;
     bool couldMove : 1;
+    bool didTrigger : 1;
     bool counterState : 1;
     bool punishCounterState : 1;
     bool forceKnockDownState : 1;
@@ -772,6 +786,9 @@ private:
     bool isDrive : 1;
     bool wasDrive : 1;
     bool uniqueTimer : 1;
+    bool hasFocusRegenCooldowned : 1;
+    bool focusRegenCooldownFrozen : 1;
+    bool superFreeze : 1;
 
     int projHitCount;
     int projLifeTime;
@@ -826,6 +843,7 @@ private:
 
     int health;
     int focus;
+    int focusRegenCooldown;
     int gauge;
 
     int currentAction;

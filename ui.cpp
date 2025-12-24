@@ -349,7 +349,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
             maxXHitBox = hitBoxX;
         }
     }
-    ImGui::Text("push %zd hit %zd hit extent %.2f hurt %zd", pushBoxes.size(), hitBoxes.size(), maxXHitBox.f(), hurtBoxes.size());
+    ImGui::Text("push %zd hit %zd hit extent %.2f hurt %zd regen cooldown %d", pushBoxes.size(), hitBoxes.size(), maxXHitBox.f(), hurtBoxes.size(), pGuy->getFocusRegenCoolDown());
     if (pGuy->getProjectile()) {
         ImGui::Text("limit category %i hit count %i hitstop %i", pGuy->getLimitShotCategory(), pGuy->getProjHitCount(), pGuy->getHitStop() );
         if (pGuy->getWarudo()) {
