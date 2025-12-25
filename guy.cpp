@@ -3935,22 +3935,33 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         didBranch = true;
     }
 
+    bool didRecoveryTrigger = false;
+
     if (!didTrigger && didTransition && canMoveNow && nextAction == -1) {
         DoTriggers();
         if (nextAction != -1) {
             didTrigger = true;
+            didRecoveryTrigger = true;
         }
     }
 
     // if successful, eat this frame away and go right now
     if (nextAction != -1) {
         NextAction(didTrigger, didBranch, true);
+        didTransition = true;
         log (logTransitions, "nvm! current action " + std::to_string(currentAction));
+            if (didRecoveryTrigger) {
+            DoBranchKey(true);
+            if (nextAction != -1) {
+                didBranch = true;
+                NextAction(didTrigger, didBranch, true);
+                didTransition = true;
+            }
+        }
     }
 
-
     if (!didTrigger && !didBranch && didTransition && focusRegenCooldownFrozen) {
-        // if we recovered out of an OD move?
+        // if we recovered out of an OD move - trigger handled directly in execute
         focusRegenCooldownFrozen = false;
     }
 
@@ -3964,9 +3975,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now
-    if (!didTransition) {
-        prevPoseStatus = forcedPoseStatus;
-    }
     DoStatusKey();
     WorldPhysics(true); // only floor
 
@@ -4137,8 +4145,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
                 projDataInitialized = false;
             }
         }
-
-        prevPoseStatus = forcedPoseStatus;
 
         // careful about airborne/etc checks until call do DoStatusKey() later
         forcedPoseStatus = 0;

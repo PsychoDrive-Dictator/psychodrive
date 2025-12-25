@@ -542,7 +542,6 @@ private:
         couldMove = true;
         didTrigger = false;
         landingAdjust = 0;
-        prevPoseStatus = 0;
         forcedPoseStatus = 0;
         actionStatus = 0;
         jumpStatus = 0;
@@ -812,7 +811,6 @@ private:
     int jumpLandingDisabledFrames;
 
     int landingAdjust;
-    int prevPoseStatus;
     int forcedPoseStatus;
     int actionStatus;
     int jumpStatus;
