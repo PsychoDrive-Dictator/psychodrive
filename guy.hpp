@@ -578,6 +578,7 @@ private:
         health = 0;
         focus = 0;
         focusRegenCooldown = 0;
+        deferredFocusCost = 0;
         gauge = 0;
         currentAction = 1;
         nextAction = -1;
@@ -842,6 +843,7 @@ private:
     int health;
     int focus;
     int focusRegenCooldown;
+    int deferredFocusCost;
     int gauge;
 
     int currentAction;

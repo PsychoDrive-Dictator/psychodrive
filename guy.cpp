@@ -305,7 +305,7 @@ bool Guy::RunFrame(void)
 
     // training mode refill rule, 'action' starts and both start regen (soon)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
-    if (didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1) {
+    if (didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
         focusRegenCooldown = 3;
         if (pOpponent) {
             pOpponent->focusRegenCooldown = 3;
@@ -578,9 +578,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
 
     // meters
     if (pTrigger->needsFocus) {
-        setFocus(focus - pTrigger->focusCost);
-        focusRegenCooldown = 120;
-        focusRegenCooldownFrozen = true;
+        deferredFocusCost = pTrigger->focusCost;
     } else {
         // if we cancel out of the od move
         focusRegenCooldownFrozen = false;
@@ -3476,6 +3474,13 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         return true;
     }
 
+    if (deferredFocusCost) {
+        setFocus(focus - deferredFocusCost);
+        deferredFocusCost = 0;
+        focusRegenCooldown = 120;
+        focusRegenCooldownFrozen = true;
+    }
+
     bool doTriggers = true;
     if (jumpLandingDisabledFrames) {
         doTriggers = false;
@@ -4732,6 +4737,11 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                             // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
                             if (param1 == 4 && focus != 0) { // todo poor mans burnout
                                 setFocus(focus + param2);
+                                if (param2 < 0) {
+                                    // same as spending bar on od move
+                                    focusRegenCooldown = 120;
+                                    focusRegenCooldownFrozen = true;
+                                }
                             }
                             break;
                     }
