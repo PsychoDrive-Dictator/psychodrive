@@ -368,17 +368,41 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::SameLine();
     ImGui::Text("log:");
     ImGui::SameLine();
-    ImGui::Checkbox("unknowns", &pGuy->logUnknowns);
+    bool logUnknowns = pGuy->getLogUnknowns();
+    ImGui::Checkbox("unknowns", &logUnknowns);
+    if (logUnknowns != pGuy->getLogUnknowns()) {
+        pGuy->setLogUnknowns(logUnknowns);
+    }
     ImGui::SameLine();
-    ImGui::Checkbox("hits", &pGuy->logHits);
+    bool logHits = pGuy->getLogHits();
+    ImGui::Checkbox("hits", &logHits);
+    if (logHits != pGuy->getLogHits()) {
+        pGuy->setLogHits(logHits);
+    }
     ImGui::SameLine();
-    ImGui::Checkbox("triggers", &pGuy->logTriggers);
+    bool logTriggers = pGuy->getLogTriggers();
+    ImGui::Checkbox("triggers", &logTriggers);
+    if (logTriggers != pGuy->getLogTriggers()) {
+        pGuy->setLogTriggers(logTriggers);
+    }
     ImGui::SameLine();
-    ImGui::Checkbox("branches", &pGuy->logBranches);
+    bool logBranches = pGuy->getLogBranches();
+    ImGui::Checkbox("branches", &logBranches);
+    if (logBranches != pGuy->getLogBranches()) {
+        pGuy->setLogBranches(logBranches);
+    }
     ImGui::SameLine();
-    ImGui::Checkbox("transitions", &pGuy->logTransitions);
+    bool logTransitions = pGuy->getLogTransitions();
+    ImGui::Checkbox("transitions", &logTransitions);
+    if (logTransitions != pGuy->getLogTransitions()) {
+        pGuy->setLogTransitions(logTransitions);
+    }
     ImGui::SameLine();
-    ImGui::Checkbox("resources", &pGuy->logResources);
+    bool logResources = pGuy->getLogResources();
+    ImGui::Checkbox("resources", &logResources);
+    if (logResources != pGuy->getLogResources()) {
+        pGuy->setLogResources(logResources);
+    }
     auto logQueue = pGuy->getLogQueue();
     for (int i = logQueue.size() - 1; i >= 0; i--) {
         ImGui::Text("%s", logQueue[i].c_str());

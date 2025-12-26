@@ -136,13 +136,19 @@ public:
     void guyLog(bool doLog, std::string logLine);
     void guyLog(std::string logLine) { guyLog(true, logLine ); }
 
-    // todo compact those guys
-    bool logTransitions = false;
-    bool logTriggers = false;
-    bool logUnknowns = true;
-    bool logHits = false;
-    bool logBranches = false;
-    bool logResources = false;
+    bool getLogTransitions() { return logTransitions; }
+    void setLogTransitions(bool set) { logTransitions = set; }
+    bool getLogTriggers() { return logTriggers; }
+    void setLogTriggers(bool set) { logTriggers = set; }
+    bool getLogUnknowns() { return logUnknowns; }
+    void setLogUnknowns(bool set) { logUnknowns = set; }
+    bool getLogHits() { return logHits; }
+    void setLogHits(bool set) { logHits = set; }
+    bool getLogBranches() { return logBranches; }
+    void setLogBranches(bool set) { logBranches = set; }
+    bool getLogResources() { return logResources; }
+    void setLogResources(bool set) { logResources = set; }
+
 
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
@@ -507,6 +513,12 @@ private:
         inputOverride = 0;
         inputID = 0;
         inputListID = 0;
+        logTransitions = false;
+        logTriggers = false;
+        logUnknowns = true;
+        logHits = false;
+        logBranches = false;
+        logResources = false;
         deniedLastBranch = false;
         isProjectile = false;
         projHitCount = 0;
@@ -705,6 +717,12 @@ private:
     int inputID;
     int inputListID;
 
+    bool logTransitions : 1;
+    bool logTriggers : 1;
+    bool logUnknowns : 1;
+    bool logHits : 1;
+    bool logBranches : 1;
+    bool logResources : 1;
     bool deniedLastBranch : 1;
     bool isProjectile : 1;
     bool projDataInitialized : 1;

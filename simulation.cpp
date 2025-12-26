@@ -282,7 +282,7 @@ void Simulation::RunFrame(void) {
                         simGuys[i]->setHealth(players[i]["hp"]);
                     }
                     if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
-                        simGuys[i]->guyLog(simGuys[i]->logResources, "focus training refill detected, focus to " + std::to_string(players[i]["driveGauge"].get<int>()) + " was " + std::to_string(simGuys[i]->getFocus()));
+                        simGuys[i]->guyLog(simGuys[i]->getLogResources(), "focus training refill detected, focus to " + std::to_string(players[i]["driveGauge"].get<int>()) + " was " + std::to_string(simGuys[i]->getFocus()));
                         simGuys[i]->setFocus(players[i]["driveGauge"]);
                         simGuys[i]->setFocusRegenCooldown(-1);
                     }
