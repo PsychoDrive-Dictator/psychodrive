@@ -271,7 +271,7 @@ void updateInputs(int sizeX, int sizeY)
                     if (recordingInput == true) {
                         // so we can easily look for dupes
                         timelineToInputBuffer(playBackInputBuffer);
-                        recordingStartFrame = globalFrameCount;
+                        recordingStartFrame = defaultSim.frameCounter;
                         if (playingBackInput) {
                             playingBackInput = false;
                         }

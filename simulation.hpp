@@ -89,7 +89,6 @@ public:
     bool replayingGameStateDump = false;
     nlohmann::json gameStateDump;
     int gameStateFrame = 0;
-    int firstGameStateFrame = 0;
     int replayErrors = 0;
 
     std::vector<FrameEvent> currentFrameEvents;

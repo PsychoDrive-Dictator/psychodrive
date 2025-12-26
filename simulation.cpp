@@ -120,7 +120,8 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
 
     int i = 0;
     while (i < (int)gameStateDump.size()) {
-        if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0) {
+        if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0 &&
+            gameStateDump[i+1]["players"][0]["actionFrame"] != 0) {
             break;
         }
         i++;
@@ -153,8 +154,7 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
         playerID++;
     }
 
-    gameStateFrame = gameStateDump[i]["frameCount"];
-    firstGameStateFrame = gameStateFrame;
+    gameStateFrame = i;
 
     if (gameStateDump[i].contains("stageTimer")) {
         frameCounter = gameStateDump[i]["stageTimer"];
@@ -239,7 +239,7 @@ void Simulation::RunFrame(void) {
 
     if (replayingGameStateDump) {
         static bool firstFrame = true;
-        int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+        int targetDumpFrame = gameStateFrame;
 
         if (firstFrame) {
             firstFrame = false;
@@ -320,7 +320,6 @@ void Simulation::RunFrame(void) {
         if (targetDumpFrame >= (int)gameStateDump.size()) {
             replayingGameStateDump = false;
             gameStateFrame = 0;
-            firstGameStateFrame = 0;
             frameCounter = 0;
             Log("F;game replay finished, errors: " + std::to_string(replayErrors));
         } else {

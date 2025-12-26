@@ -147,13 +147,13 @@ void Guy::DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
 void Guy::guyLog(bool doLog, std::string logLine)
 {
     if (!doLog) return;
-    std::string frameDiff = to_string_leading_zeroes(globalFrameCount - nc.lastLogFrame, 3);
+    std::string frameDiff = to_string_leading_zeroes(pSim->frameCounter - nc.lastLogFrame, 3);
     std::string curFrame = to_string_leading_zeroes(currentFrame, 3);
     nc.logQueue.push_back(std::to_string(currentAction) + ":" + curFrame + "(+" + frameDiff + ") " + logLine);
     if (nc.logQueue.size() > 15) {
         nc.logQueue.pop_front();
     }
-    nc.lastLogFrame = globalFrameCount;
+    nc.lastLogFrame = pSim->frameCounter;
 }
 
 bool Guy::conditionOperator(int op, int operand, int threshold, std::string desc)
@@ -1725,13 +1725,7 @@ bool Guy::Push(Guy *pOtherGuy)
                 pOtherGuy->posX = pOtherGuy->posX - halfPushNeeded;
 
                 int fixedRemainder = pushNeeded.data - halfPushNeeded.data * 2;
-                int frameNumber = globalFrameCount;
-                if (replayFrameNumber != 0) {
-                    frameNumber = replayFrameNumber;
-                }
-                if (pSim && pSim != &defaultSim) {
-                    frameNumber = pSim->frameCounter;
-                }
+                int frameNumber = pSim->frameCounter;
 
                 //log(logTransitions, "fixedRemainder " + std::to_string(fixedRemainder) + " frameNum " +  std::to_string(frameNumber) + " " + getCharacter());
 
@@ -2413,7 +2407,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             event.hitEventData.dirY = 0.0f;
             pGuy->pSim->getCurrentFrameEvents().push_back(event);
         } else {
-            int hitSeed = replayFrameNumber ? replayFrameNumber : globalFrameCount + int(hitMarkerOffsetX + hitMarkerOffsetY);
+            int hitSeed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
             addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
         }
 
@@ -3832,7 +3826,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     if ( canMoveNow || applyFreeMovement)
     {
         if ( !couldMove ) {
-            recoveryTiming = globalFrameCount;
+            recoveryTiming = pSim->frameCounter;
         }
         // reset status - recovered control to neutral
         jumped = false;
@@ -3910,7 +3904,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     if (canMoveNow && wasHit) {
-        int advantage = globalFrameCount - pOpponent->recoveryTiming;
+        int advantage = pSim->frameCounter - pOpponent->recoveryTiming;
         std::string message = "recovered! adv " + std::to_string(advantage);
         log(true, message );
 

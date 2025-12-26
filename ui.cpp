@@ -674,7 +674,7 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
     for (auto i : currentInputMap) {
         ImGui::Text("input %i %i", i.first, i.second);
     }
-    ImGui::Text("frame %d", globalFrameCount);
+    ImGui::Text("frame %d", defaultSim.frameCounter);
     if (paused) {
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "PAUSED");

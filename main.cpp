@@ -262,8 +262,6 @@ void jsCharLoadCallback(char *charName)
 bool done = false;
 bool paused = false;
 bool oneframe = false;
-int globalFrameCount = 0;
-int replayFrameNumber = 0;
 bool lockCamera = true;
 bool toggleRenderUI = true;
 
@@ -287,7 +285,6 @@ int playBackFrame = 0;
 
 bool replayingGameState = false;
 int gameStateFrame = 0;
-int firstGameStateFrame = 0;
 int replayErrors = 0;
 int fatalErrorKind = -1;
 
@@ -545,7 +542,9 @@ static void mainloop(void)
     }
     frameStartTime = SDL_GetTicks();
 
-    globalFrameCount++;
+    if (!replayingGameState) {
+        defaultSim.frameCounter++;
+    }
 
     int sizeX, sizeY;
     SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);
@@ -656,7 +655,7 @@ static void mainloop(void)
 
         if (finder.playing && finder.doneRoutes.size() && guys.size()) {
             const DoneRoute &playingRoute = *finder.doneRoutes.rbegin();
-            int targetFrame = globalFrameCount - finder.startFrame + 1;
+            int targetFrame = defaultSim.frameCounter + 1;
             auto frameTrigger = playingRoute.timelineTriggers.find(targetFrame);
             if (frameTrigger != playingRoute.timelineTriggers.end()) {
                 if (frameTrigger->second.actionID() > 0) {
@@ -694,9 +693,9 @@ static void mainloop(void)
         // gather everyone again in case of deletions/additions in RunFrame
         gatherEveryone(guys, everyone);
 
-        // time stands still if paused - surely there's a better way to do that
-        if (!runFrame) {
-            globalFrameCount--;
+        // if replay, we'll update the counter from the replay
+        if (!runFrame && !replayingGameState) {
+            defaultSim.frameCounter--;
         }
 
         if (runFrame) {
@@ -727,15 +726,15 @@ static void mainloop(void)
             if (guys.size() > 0 ) {
                 if (curPlotActionID == 0 && guys[0]->getIsDrive() == true)
                 {
-                    curPlotEntryStartFrame = globalFrameCount;
+                    curPlotEntryStartFrame = defaultSim.frameCounter;
                     curPlotActionID = guys[0]->getCurrentAction();
                     vecPlotEntries.push_back({});
                     curPlotEntryID++;
                 }
-                if (curPlotActionID != 0 && guys[0]->getCurrentAction() != 1 && guys[0]->getIsDrive() == false)
+                if (curPlotActionID != 0 && !guys[0]->canAct() && guys[0]->getIsDrive() == false)
                 {
                     if (curPlotEntryNormalStartFrame == 0) {
-                        curPlotEntryNormalStartFrame = globalFrameCount - curPlotEntryStartFrame;
+                        curPlotEntryNormalStartFrame = defaultSim.frameCounter - curPlotEntryStartFrame;
                     }
                     std::vector<HitBox> hitBoxes;
                     guys[0]->getHitBoxes(&hitBoxes);
@@ -752,7 +751,7 @@ static void mainloop(void)
                     //     hasAddedData = true;
                     // }
                     if (maxXHitBox != Fixed(0) || hasAddedData) {
-                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(globalFrameCount - curPlotEntryStartFrame);
+                        vecPlotEntries[curPlotEntryID].hitBoxRangePlotX.push_back(defaultSim.frameCounter - curPlotEntryStartFrame);
                         vecPlotEntries[curPlotEntryID].hitBoxRangePlotY.push_back(maxXHitBox.f());
                     }
                     if (vecPlotEntries[curPlotEntryID].strName == "") {
@@ -760,7 +759,7 @@ static void mainloop(void)
                         vecPlotEntries[curPlotEntryID].col = guys[0]->getColor();
                     }
                 }
-                if (curPlotActionID != 0 && guys[0]->getCurrentAction() == 1) {
+                if (curPlotActionID != 0 && guys[0]->canAct()) {
                     hasAddedData = false;
                     curPlotActionID = 0;
                     curPlotEntryStartFrame = 0;
@@ -772,7 +771,7 @@ static void mainloop(void)
         if (replayingGameState) {
             if (runFrame) {
                 static bool firstFrame = true;
-                int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+                int targetDumpFrame = gameStateFrame;
                 if (firstFrame) {
                     firstFrame = false;
                 } else {
@@ -851,12 +850,10 @@ static void mainloop(void)
 
         if (replayingGameState) {
             if (runFrame) {
-                int targetDumpFrame = gameStateFrame - firstGameStateFrame;
+                int targetDumpFrame = gameStateFrame;
                 if (targetDumpFrame >= (int)gameStateDump.size()) {
                     replayingGameState = false;
                     gameStateFrame = 0;
-                    firstGameStateFrame = 0;
-                    replayFrameNumber = 0;
                     log("game replay finished, errors: " + std::to_string(replayErrors));
                 } else {
                     int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
@@ -871,7 +868,7 @@ static void mainloop(void)
                     }
 
                     if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
-                        replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
+                        defaultSim.frameCounter = gameStateDump[targetDumpFrame]["stageTimer"];
                     }
 
                     int playTimerSeconds = gameStateDump[targetDumpFrame].value("playTimer", 99);
@@ -1084,7 +1081,8 @@ int main(int argc, char**argv)
         }
         int i = 0;
         while (i < (int)gameStateDump.size()) {
-            if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0) {
+            if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0 &&
+                gameStateDump[i+1]["players"][0]["actionFrame"] != 0) {
                 break;
             }
             i++;
@@ -1135,16 +1133,13 @@ int main(int argc, char**argv)
         *guys[1]->getInputIDPtr() = replayRight;
         *guys[1]->getInputListIDPtr() = replayRight;
 
-        gameStateFrame = gameStateDump[i]["frameCount"];
-        firstGameStateFrame = gameStateFrame;
+        gameStateFrame = i;
         replayingGameState = true;
         currentInputMap[replayLeft] = 0;
         currentInputMap[replayRight] = 0;
 
-        globalFrameCount = firstGameStateFrame;
-
         if (gameStateDump[i].contains("stageTimer")) {
-            replayFrameNumber = gameStateDump[i]["stageTimer"];
+            defaultSim.frameCounter = gameStateDump[i]["stageTimer"];
         }
     } else if (loadingDump) {
         fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());

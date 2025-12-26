@@ -249,8 +249,6 @@ extern bool resetpos;
 extern bool done;
 extern bool paused;
 extern bool oneframe;
-extern int globalFrameCount;
-extern int replayFrameNumber;
 extern bool lockCamera;
 extern bool toggleRenderUI;
 

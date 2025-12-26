@@ -260,7 +260,7 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     }
 
     finder.startSnapshot.Clone(&defaultSim);
-    finder.startFrame = globalFrameCount;
+    finder.startFrame = defaultSim.frameCounter;
 
     finder.doLights = doLights;
     finder.doLateCancels = doLateCancels;
@@ -359,7 +359,7 @@ void updateComboFinder(void)
                     printRoute(route);
                     finder.maxDamage = route.damage;
                     defaultSim.Clone(&finder.startSnapshot);
-                    globalFrameCount = finder.startFrame;
+                    defaultSim.frameCounter = finder.startFrame;
                     finder.playing = true;
                     paused = false;
                 }
@@ -412,7 +412,7 @@ void updateComboFinder(void)
             paused = false;
             finder.playing = true;
             defaultSim.Clone(&finder.startSnapshot);
-            globalFrameCount = finder.startFrame;
+            defaultSim.frameCounter = finder.startFrame;
         }
     }
 }
