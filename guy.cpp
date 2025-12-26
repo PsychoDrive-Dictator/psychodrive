@@ -2191,6 +2191,9 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (pOpponent) {
             HitEntry *pEntry = &pCharData->hitByID[pendingUnlockHit]->common[0];
             pOpponent->ApplyHitEffect(pEntry, this, true, true, false, false);
+            // clamp
+            pOpponent->setFocus(pOpponent->focus);
+            pOpponent->setGauge(pOpponent->gauge);
             otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
             pOpponent->locked = false;
         }
@@ -2210,6 +2213,7 @@ AtemiData *Guy::findAtemi(int atemiID)
 void ResolveHits(std::vector<PendingHit> &pendingHitList)
 {
     std::unordered_set<Guy *> hitGuys;
+    std::unordered_set<Guy *> clampGuys;
 
     for (auto &pendingHit : pendingHitList) {
         HitBox &hitBox = pendingHit.hitBox;
@@ -2350,10 +2354,18 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->blocking = false;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
-            if (!pOtherGuy->driveScaling) {
-                pGuy->setFocus(pGuy->getFocus() + pHitEntry->focusGainOwn);
+            Guy *pResourceGuy = pGuy;
+            if (pGuy->isProjectile) {
+                pResourceGuy = pGuy->pParent;
             }
-            pGuy->setGauge(pGuy->getGauge() + pHitEntry->superGainOwn);
+            // set resources directly and mark for clamping at the end, for trades
+            if (!pOtherGuy->driveScaling) {
+                pResourceGuy->focus += pHitEntry->focusGainOwn;
+            }
+            pResourceGuy->gauge += pHitEntry->superGainOwn;
+
+            clampGuys.insert(pResourceGuy);
+            clampGuys.insert(pOtherGuy);
         }
 
         int hitStopSelf = pHitEntry->hitStopOwner;
@@ -2498,6 +2510,12 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             }
 #endif
         }
+    }
+
+    for (auto &guy : clampGuys) {
+        // clamp once everything is done, in case of trade
+        guy->setFocus(guy->focus);
+        guy->setGauge(guy->gauge);
     }
 }
 
@@ -2699,14 +2717,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     comboDamage += moveDamage;
     lastDamageScale = effectiveScaling.i();
 
-    setFocus(focus + pHitEffect->focusGainTarget);
+    focus += pHitEffect->focusGainTarget;
     log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
     if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
         // todo apparently start of hitstun except if super where it's after??
         focusRegenCooldown = 90 + 1;
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
     }
-    setGauge(gauge + pHitEffect->superGainTarget);
+    gauge += pHitEffect->superGainTarget;
 
     if (applyHit) {
         if (!blocking) {
