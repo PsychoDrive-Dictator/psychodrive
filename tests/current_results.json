@@ -7235,5 +7235,72 @@ var currentResults =
                 "lastFrame": 2014
             }
         ]
+    },
+    {
+        "testName": "zz_match_akuma_bullshit_di_steal",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 6748,
+                "firstFrame": 19,
+                "lastFrame": 2848
+            },
+            {
+                "count": 2656,
+                "firstFrame": 184,
+                "lastFrame": 2370
+            },
+            {
+                "count": 1204,
+                "firstFrame": 417,
+                "lastFrame": 2370
+            },
+            {
+                "count": 1094,
+                "firstFrame": 356,
+                "lastFrame": 2370
+            },
+            {
+                "count": 1035,
+                "firstFrame": 380,
+                "lastFrame": 2370
+            },
+            {
+                "count": 4769,
+                "firstFrame": 4,
+                "lastFrame": 2848
+            },
+            {
+                "count": 4692,
+                "firstFrame": 1,
+                "lastFrame": 2848
+            },
+            {
+                "count": 1603,
+                "firstFrame": 380,
+                "lastFrame": 2848
+            },
+            {
+                "count": 2967,
+                "firstFrame": 886,
+                "lastFrame": 2848
+            },
+            {
+                "count": 3788,
+                "firstFrame": 471,
+                "lastFrame": 2848
+            },
+            {
+                "count": 848,
+                "firstFrame": 344,
+                "lastFrame": 2274
+            },
+            {
+                "count": 7954,
+                "firstFrame": 2,
+                "lastFrame": 2848
+            }
+        ]
     }
 ]
