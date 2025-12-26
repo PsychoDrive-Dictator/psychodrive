@@ -83,6 +83,8 @@ public:
     std::vector<Guy *> vecGuysToDelete;
 
     int frameCounter = 0;
+    bool match = false;
+    bool timerStarted = false;
 
     bool replayingGameStateDump = false;
     nlohmann::json gameStateDump;

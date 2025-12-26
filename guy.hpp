@@ -462,6 +462,10 @@ private:
             ret = true;
         }
 
+        if (pSim->match && !pSim->timerStarted) {
+            ret = false;
+        }
+
         if (airborne || posY > 0.0f) {
             ret = false;
         }

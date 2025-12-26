@@ -822,8 +822,6 @@ static void mainloop(void)
                             }
                         }
 
-
-
                         compareGameStateInt(players[i]["hp"], guys[i]->getHealth(), Simulation::eHealth, desc + " health");
                         compareGameStateInt(players[i]["hitStop"], guys[i]->getHitStopForDump(), Simulation::eHitStop, desc + " hitstop");
 
@@ -874,6 +872,13 @@ static void mainloop(void)
 
                     if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
                         replayFrameNumber = gameStateDump[targetDumpFrame]["stageTimer"];
+                    }
+
+                    int playTimerSeconds = gameStateDump[targetDumpFrame].value("playTimer", 99);
+                    int playTimerFrames = gameStateDump[targetDumpFrame].value("playTimerMS", 60);
+
+                    if (defaultSim.match && (playTimerSeconds != 99 || playTimerFrames != 60)) {
+                        defaultSim.timerStarted = true;
                     }
                 }
             } else {
@@ -991,13 +996,17 @@ int main(int argc, char**argv)
         if ( argc > 3 ) {
             version = atoi(argv[3]);
         }
-        dumpSim.SetupFromGameDump(argv[2], version);
+        strDumpLoadPath = argv[2];
+        dumpSim.SetupFromGameDump(strDumpLoadPath, version);
 
-        if (std::string(argv[2]).find("guile_jp_66_hit_guile_combo") != std::string::npos) {
+        if (strDumpLoadPath.find("guile_jp_66_hit_guile_combo") != std::string::npos) {
             forcePunishCounter = true;
         }
-        if (std::string(argv[2]).find("viper_sa1_dump_route") != std::string::npos) {
+        if (strDumpLoadPath.find("viper_sa1_dump_route") != std::string::npos) {
             forcePunishCounter = true;
+        }
+        if (strDumpLoadPath.find("match") != std::string::npos) {
+            dumpSim.match = true;
         }
 
         while (true) {
@@ -1069,6 +1078,9 @@ int main(int argc, char**argv)
         }
         if (strDumpLoadPath.find("viper_sa1_dump_route") != std::string::npos) {
             forcePunishCounter = true;
+        }
+        if (strDumpLoadPath.find("match") != std::string::npos) {
+            defaultSim.match = true;
         }
         int i = 0;
         while (i < (int)gameStateDump.size()) {

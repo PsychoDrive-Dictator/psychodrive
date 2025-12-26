@@ -667,6 +667,10 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
 
 bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
 {
+    if (pSim->match && !pSim->timerStarted) {
+        return false;
+    }
+
     if ( pTrigger->validStyles != 0 && !(pTrigger->validStyles & (1 << styleInstall)) ) {
         return false;
     }
@@ -3816,6 +3820,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         applyFreeMovement = false;
     }
     if (nextAction != -1) {
+        applyFreeMovement = false;
+    }
+    if (pSim->match && !pSim->timerStarted) {
         applyFreeMovement = false;
     }
     

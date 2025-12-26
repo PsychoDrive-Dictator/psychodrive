@@ -348,6 +348,13 @@ void Simulation::RunFrame(void) {
             if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
                 frameCounter = gameStateDump[targetDumpFrame]["stageTimer"];
             }
+
+            int playTimerSeconds = gameStateDump[targetDumpFrame].value("playTimer", 99);
+            int playTimerFrames = gameStateDump[targetDumpFrame].value("playTimerMS", 60);
+
+            if (match && (playTimerSeconds != 99 || playTimerFrames != 60)) {
+                timerStarted = true;
+            }
         }
     }
 }
