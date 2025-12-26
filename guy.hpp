@@ -133,11 +133,16 @@ public:
         posY = y;
     }
 
+    void guyLog(bool doLog, std::string logLine);
+    void guyLog(std::string logLine) { guyLog(true, logLine ); }
+
+    // todo compact those guys
     bool logTransitions = false;
     bool logTriggers = false;
     bool logUnknowns = true;
     bool logHits = false;
     bool logBranches = false;
+    bool logResources = false;
 
     int getComboHits() { return comboHits; }
     int getJuggleCounter() { return juggleCounter; }
@@ -494,9 +499,6 @@ private:
         return turnaround;
     }
     bool GetRect(Box &outBox, int rectsPage, int boxID,  Fixed offsetX, Fixed offsetY, int dir);
-
-    void guyLog(bool doLog, std::string logLine);
-    void guyLog(std::string logLine) { guyLog(true, logLine ); }
 
     void Initialize() {
         uniqueID = -1;

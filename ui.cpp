@@ -377,6 +377,8 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     ImGui::Checkbox("branches", &pGuy->logBranches);
     ImGui::SameLine();
     ImGui::Checkbox("transitions", &pGuy->logTransitions);
+    ImGui::SameLine();
+    ImGui::Checkbox("resources", &pGuy->logResources);
     auto logQueue = pGuy->getLogQueue();
     for (int i = logQueue.size() - 1; i >= 0; i--) {
         ImGui::Text("%s", logQueue[i].c_str());

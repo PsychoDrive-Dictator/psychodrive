@@ -307,8 +307,10 @@ bool Guy::RunFrame(void)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
     if (didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
         focusRegenCooldown = 3;
+        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (refill action start)");
         if (pOpponent) {
             pOpponent->focusRegenCooldown = 3;
+            otherGuyLog(pOpponent, logResources, "regen cooldown " + std::to_string(pOpponent->focusRegenCooldown) + " (refill action start)");
         }
     }
 
@@ -579,9 +581,10 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     // meters
     if (pTrigger->needsFocus) {
         deferredFocusCost = pTrigger->focusCost;
-    } else {
+    } else if (focusRegenCooldownFrozen) {
         // if we cancel out of the od move
         focusRegenCooldownFrozen = false;
+        log(logResources, "regen cooldown unfrozen (cancelled out of freeze move)");
     }
 
     if (pTrigger->needsGauge) {
@@ -2699,9 +2702,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     lastDamageScale = effectiveScaling.i();
 
     setFocus(focus + pHitEffect->focusGainTarget);
+    log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
     if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
         // todo apparently start of hitstun except if super where it's after??
         focusRegenCooldown = 90 + 1;
+        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
     }
     setGauge(gauge + pHitEffect->superGainTarget);
 
@@ -2961,7 +2966,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         WorldPhysics(true);
 
         // if you get hit out of an od move?
-        focusRegenCooldownFrozen = false;
+        if (focusRegenCooldownFrozen) {
+            focusRegenCooldownFrozen = false;
+            log(logResources, "regen cooldown unfrozen (hit out of freeze move)");
+        }
 
         if (appliedHitStun && hitStun && !resetHitStunOnLand && !resetHitStunOnTransition) {
             actionInitialFrame = pHitEffect->curveTargetID;
@@ -3440,6 +3448,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
         if (!warudo && !superFreeze && focusRegenCooldown > 0 && !focusRegenCooldownFrozen) {
             focusRegenCooldown--;
+            log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
         }
 
         bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
@@ -3458,7 +3467,15 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             if (jumped && !landed) {
                 focusRegenAmount = 20;
             }
-            setFocus(focus + focusRegenAmount);
+            // deferred cost will clamp if there is one
+            // if (deferredFocusCost) {
+            //     focus += focusRegenAmount;
+            //     log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (no clamp), total " + std::to_string(focus));
+            // } else
+            {
+                setFocus(focus + focusRegenAmount);
+                log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (clamp), total " + std::to_string(focus));
+            }
         }
     }
 
@@ -3476,9 +3493,11 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
     if (deferredFocusCost) {
         setFocus(focus - deferredFocusCost);
+        log(logResources, "focus -" + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
         deferredFocusCost = 0;
         focusRegenCooldown = 120;
         focusRegenCooldownFrozen = true;
+        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
     }
 
     bool doTriggers = true;
@@ -3968,6 +3987,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     if (!didTrigger && !didBranch && didTransition && focusRegenCooldownFrozen) {
         // if we recovered out of an OD move - trigger handled directly in execute
         focusRegenCooldownFrozen = false;
+        log(logResources, "regen cooldown unfrozen (recovered out of freeze move)");
     }
 
     // training mode refill, immediately start regen on recovery
@@ -4185,6 +4205,7 @@ void Guy::DoSwitchKey(void)
         if (flag & 0x8000000) {
             isDrive = true;
             focusRegenCooldown = 120; // todo right spot?
+            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
                 pOpponent->driveScaling = true;
             }
@@ -4453,6 +4474,7 @@ void Guy::DoWorldKey(void)
                 if (pOpponent) {
                     pOpponent->superFreeze = true;
                     pOpponent->focusRegenCooldown = 90 + 1 + 1; // one for the unfreeze frame
+                    otherGuyLog(pOpponent, logResources, "regen cooldown " + std::to_string(pOpponent->focusRegenCooldown) + " (worldkey)");
                 }
                 break;
             case 0:
@@ -4737,10 +4759,12 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                             // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
                             if (param1 == 4 && focus != 0) { // todo poor mans burnout
                                 setFocus(focus + param2);
+                                log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
                                 if (param2 < 0) {
                                     // same as spending bar on od move
                                     focusRegenCooldown = 120;
                                     focusRegenCooldownFrozen = true;
+                                    log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (eventkey, frozen)");
                                 }
                             }
                             break;

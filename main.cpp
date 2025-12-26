@@ -813,6 +813,7 @@ static void mainloop(void)
                                 guys[i]->setHealth(players[i]["hp"]);
                             }
                             if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
+                                guys[i]->guyLog(guys[i]->logResources, "focus training refill detected, focus to " + std::to_string(players[i]["driveGauge"].get<int>()) + " was " + std::to_string(guys[i]->getFocus()));
                                 guys[i]->setFocus(players[i]["driveGauge"]);
                                 guys[i]->setFocusRegenCooldown(-1);
                             }
