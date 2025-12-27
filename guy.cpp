@@ -893,14 +893,14 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
             Command *pCommand = pTrigger->pCommandClassic;
 
             for (auto& variant : pCommand->variants) {
-                int inputID = variant.size() - 1;
+                int inputID = variant.inputs.size() - 1;
 
                 uint32_t inputBufferCursor = initialI;
                 i = initialI;
                 bool fail = false;
 
                 while (inputID >= 0 ) {
-                    CommandInput *pInput = &variant[inputID];
+                    CommandInput *pInput = &variant.inputs[inputID];
                     uint32_t inputOkKeyFlags = pInput->okKeyFlags;
                     uint32_t inputOkCondFlags = pInput->okCondFlags;
                     uint32_t inputNgKeyFlags = pInput->ngKeyFlags;
@@ -980,10 +980,16 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                             break; // cancel trigger
                         }
                     } else {
-                        while (inputBufferCursor < dc.inputBuffer.size())
+                        uint32_t inputSearch = lastMatchInput + numFrames + 1;
+                        if (numFrames == -1) {
+                            inputSearch = initialI + variant.totalMaxFrames + 1;
+                        }
+                        if (inputSearch > dc.inputBuffer.size()) {
+                            inputSearch = dc.inputBuffer.size();
+                        }
+                        bool matchThisInput = false;
+                        while (inputBufferCursor < inputSearch)
                         {
-                            bool thismatch = false;
-
                             int bufferInput = dc.inputBuffer[inputBufferCursor];
                             int bufferDirection = dc.directionBuffer[inputBufferCursor];
 
@@ -1005,29 +1011,49 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                                 break;
                             }
                             if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
-                                int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                                if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                    match = true;
-                                    thismatch = true;
-                                    i = inputBufferCursor;
+                                match = true;
+                                matchThisInput = true;
+                                i = inputBufferCursor;
+                                if (inputOkCondFlags & 1) {
+                                    // inclusive lever shift initial match
+                                    // turn the match into exclusive of current lever position to look for the edge of it settling here
+                                    inputOkCondFlags &= ~1;
+                                    inputOkCondFlags |= 2;
+                                    inputOkKeyFlags = bufferInput & 0xF;
                                 }
-                            }
-                            // if ( commandNo == 7 ) {
-                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
-                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " match " + std::to_string(thismatch) + " buffer " + std::to_string(bufferInput));
-                            // }
-                            if (match == true && (thismatch == false || numFrames <= 0)) {
-                                //inputBufferCursor++;
-                                inputID--;
+                            } else if (match) {
+                                match = false;
                                 break;
+                            }
+                            if (pCommand->id == 4) {
+                                guyLog(true, std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
+                                " inputbuffercursor " + std::to_string(inputBufferCursor) + " matchThisInput " + std::to_string(matchThisInput) + " buffer " + std::to_string(bufferInput));
                             }
                             inputBufferCursor++;
                         }
 
                         if (fail) {
-                            // if ( commandNo == 7 ) {
-                            //     log("fail " + std::to_string(inputBuffer[inputBufferCursor]));
-                            // }
+                            if (pCommand->id == 4) {
+                                guyLog(true, "fail " + std::to_string(dc.inputBuffer[inputBufferCursor]));
+                            }
+                            break;
+                        }
+
+                        bool pass = false;
+                        if (matchThisInput) {
+                            pass = true;
+                            if (match && inputID > 0) {
+                                // need positive edge but never not-matched until end of window
+                                // no positive edge is ok for last input?
+                                pass = false;
+                            }
+                            if (pass) {
+                                inputID--;
+                            }
+                        }
+
+                        inputBufferCursor = i + 1;
+                        if (!pass) {
                             break;
                         }
                     }

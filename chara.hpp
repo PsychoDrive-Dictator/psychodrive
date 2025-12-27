@@ -65,10 +65,15 @@ struct CommandInput {
     Charge *pCharge = nullptr;
 };
 
+struct CommandVariant {
+    int totalMaxFrames;
+    std::vector<CommandInput> inputs;
+};
+
 struct Command {
     int id;
 
-    std::vector<std::vector<CommandInput>> variants;
+    std::vector<CommandVariant> variants;
 };
 
 struct Trigger {

@@ -48,8 +48,9 @@ void loadCommands(nlohmann::json* pCommandsJson, CharacterData* pRet)
             int inputNum = variant["input_num"].get<int>();
             nlohmann::json *pInputs = &variant["inputs"];
 
-            std::vector<CommandInput> vecInputs;
-            vecInputs.reserve(inputNum);
+            CommandVariant commandVariant;
+            commandVariant.totalMaxFrames = variant["max_frame"];
+            commandVariant.inputs.reserve(inputNum);
 
             for (int i = 0; i < inputNum; i++) {
                 char inputIDStr[16];
@@ -86,10 +87,10 @@ void loadCommands(nlohmann::json* pCommandsJson, CharacterData* pRet)
                     input.pCharge = nullptr;
                 }
 
-                vecInputs.push_back(input);
+                commandVariant.inputs.push_back(input);
             }
 
-            command.variants.push_back(vecInputs);
+            command.variants.push_back(commandVariant);
         }
 
         pRet->commands.push_back(command);
