@@ -899,153 +899,152 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                 i = initialI;
                 bool fail = false;
 
-                while (inputID >= 0 )
-                {
+                while (inputID >= 0 ) {
                     CommandInput *pInput = &variant[inputID];
-                uint32_t inputOkKeyFlags = pInput->okKeyFlags;
-                uint32_t inputOkCondFlags = pInput->okCondFlags;
-                uint32_t inputNgKeyFlags = pInput->ngKeyFlags;
-                uint32_t inputNgCondFlags = pInput->ngCondFlags;
-                int numFrames = pInput->numFrames;
-                bool match = false;
-                int lastMatchInput = i;
+                    uint32_t inputOkKeyFlags = pInput->okKeyFlags;
+                    uint32_t inputOkCondFlags = pInput->okCondFlags;
+                    uint32_t inputNgKeyFlags = pInput->ngKeyFlags;
+                    uint32_t inputNgCondFlags = pInput->ngCondFlags;
+                    int numFrames = pInput->numFrames;
+                    bool match = false;
+                    int lastMatchInput = i;
 
-                if (pInput->type == InputType::Rotation) {
-                    // rotate
-                    int pointsNeeded = pInput->rotatePointsNeeded;
-                    uint32_t searchArea = inputBufferCursor + numFrames * 2; // todo, i think that's best case
-                    int curAngle = 0;
-                    int pointsForward = 0;
-                    int pointsBackwards = 0;
-                    while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
-                    {
-                        int bufferInput = dc.inputBuffer[inputBufferCursor];
-                        int targetAngle = inputAngle(bufferInput);
-                        if (targetAngle) {
-                            if (curAngle == 0) {
-                                curAngle = targetAngle;
-                            }
-                            int diff = angleDiff(curAngle, targetAngle);
-                            //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
-                            if (diff >= 90 && diff < 180) {
-                                pointsForward++;
-                                curAngle = targetAngle;
-                            }
-                            if (diff <= -90 && diff > -180) {
-                                pointsBackwards++;
-                                curAngle = targetAngle;
-                            }
-                        }
-                        inputBufferCursor++;
-                    }
-                    if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
-                        inputID--;
-                    }
-                } else if (pInput->type == InputType::ChargeRelease) {
-                    // charge release
-                    Charge *pCharge = pInput->pCharge;
-
-                    if (pCharge) {
-                        uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
-                        uint32_t inputOkCondFlags = pCharge->okCondFlags;
-                        uint32_t chargeFrames = pCharge->chargeFrames;
-                        uint32_t keepFrames = pCharge->keepFrames;
-                        uint32_t dirCount = 0;
-                        // uint32_t dirNotMatchCount = 0;
-                        // count matching direction in input buffer, super naive but will work for testing
-                        inputBufferCursor = i;
-                        uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                    if (pInput->type == InputType::Rotation) {
+                        // rotate
+                        int pointsNeeded = pInput->rotatePointsNeeded;
+                        uint32_t searchArea = inputBufferCursor + numFrames * 2; // todo, i think that's best case
+                        int curAngle = 0;
+                        int pointsForward = 0;
+                        int pointsBackwards = 0;
                         while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
                         {
-                            if (matchInput(dc.inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                dirCount++;
-                                if (dirCount >= chargeFrames) {
-                                    break;
+                            int bufferInput = dc.inputBuffer[inputBufferCursor];
+                            int targetAngle = inputAngle(bufferInput);
+                            if (targetAngle) {
+                                if (curAngle == 0) {
+                                    curAngle = targetAngle;
+                                }
+                                int diff = angleDiff(curAngle, targetAngle);
+                                //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
+                                if (diff >= 90 && diff < 180) {
+                                    pointsForward++;
+                                    curAngle = targetAngle;
+                                }
+                                if (diff <= -90 && diff > -180) {
+                                    pointsBackwards++;
+                                    curAngle = targetAngle;
                                 }
                             }
-                            // else {
-                            //     dirNotMatchCount++;
+                            inputBufferCursor++;
+                        }
+                        if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
+                            inputID--;
+                        }
+                    } else if (pInput->type == InputType::ChargeRelease) {
+                        // charge release
+                        Charge *pCharge = pInput->pCharge;
+
+                        if (pCharge) {
+                            uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
+                            uint32_t inputOkCondFlags = pCharge->okCondFlags;
+                            uint32_t chargeFrames = pCharge->chargeFrames;
+                            uint32_t keepFrames = pCharge->keepFrames;
+                            uint32_t dirCount = 0;
+                            // uint32_t dirNotMatchCount = 0;
+                            // count matching direction in input buffer, super naive but will work for testing
+                            inputBufferCursor = i;
+                            uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
+                            while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
+                            {
+                                if (matchInput(dc.inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
+                                    dirCount++;
+                                    if (dirCount >= chargeFrames) {
+                                        break;
+                                    }
+                                }
+                                // else {
+                                //     dirNotMatchCount++;
+                                // }
+                                inputBufferCursor++;
+                            }
+
+                            if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
+                                //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+                                //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+                                break; // cancel trigger
+                            }
+                            //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+                            inputID--;
+                        } else {
+                            log(true, "charge entries mismatch?");
+                            break; // cancel trigger
+                        }
+                    } else {
+                        while (inputBufferCursor < dc.inputBuffer.size())
+                        {
+                            bool thismatch = false;
+
+                            int bufferInput = dc.inputBuffer[inputBufferCursor];
+                            int bufferDirection = dc.directionBuffer[inputBufferCursor];
+
+                            if (direction.i() != bufferDirection) {
+                                bufferInput = invertDirection(bufferInput);
+                            }
+
+                            bool inputNg = false;
+
+                            if (inputNgCondFlags & 2) {
+                                if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
+                                    inputNg = true;
+                                }
+                            } else if (inputNgKeyFlags & bufferInput) {
+                                inputNg = true;
+                            }
+                            if (inputNg && !match) {
+                                fail = true;
+                                break;
+                            }
+                            if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+                                int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
+                                if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
+                                    match = true;
+                                    thismatch = true;
+                                    i = inputBufferCursor;
+                                }
+                            }
+                            // if ( commandNo == 7 ) {
+                            //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
+                            //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " match " + std::to_string(thismatch) + " buffer " + std::to_string(bufferInput));
                             // }
+                            if (match == true && (thismatch == false || numFrames <= 0)) {
+                                //inputBufferCursor++;
+                                inputID--;
+                                break;
+                            }
                             inputBufferCursor++;
                         }
 
-                        if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-                            break; // cancel trigger
-                        }
-                        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                        inputID--;
-                    } else {
-                        log(true, "charge entries mismatch?");
-                        break; // cancel trigger
-                    }
-                } else {
-                    while (inputBufferCursor < dc.inputBuffer.size())
-                    {
-                        bool thismatch = false;
-
-                        int bufferInput = dc.inputBuffer[inputBufferCursor];
-                        int bufferDirection = dc.directionBuffer[inputBufferCursor];
-
-                        if (direction.i() != bufferDirection) {
-                            bufferInput = invertDirection(bufferInput);
-                        }
-
-                        bool inputNg = false;
-
-                        if (inputNgCondFlags & 2) {
-                            if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
-                                inputNg = true;
-                            }
-                        } else if (inputNgKeyFlags & bufferInput) {
-                            inputNg = true;
-                        }
-                        if (inputNg && !match) {
-                            fail = true;
+                        if (fail) {
+                            // if ( commandNo == 7 ) {
+                            //     log("fail " + std::to_string(inputBuffer[inputBufferCursor]));
+                            // }
                             break;
                         }
-                        if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
-                            int spaceSinceLastInput = inputBufferCursor - lastMatchInput;
-                            if (numFrames <= 0 || (spaceSinceLastInput < numFrames)) {
-                                match = true;
-                                thismatch = true;
-                                i = inputBufferCursor;
-                            }
-                        }
-                        // if ( commandNo == 7 ) {
-                        //     log(std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
-                        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " match " + std::to_string(thismatch) + " buffer " + std::to_string(bufferInput));
-                        // }
-                        if (match == true && (thismatch == false || numFrames <= 0)) {
-                            //inputBufferCursor++;
+                    }
+
+                    if (inputBufferCursor == dc.inputBuffer.size()) {
+                        // corner case - if we run out of buffer but had matched the input, finalize
+                        // the match now or the trigger won't work - this can happen if you eg. have
+                        // a dash input immediately at the beginning of a replay since the last match
+                        // is a neutral input, it keeps matching all the way to the beginning of the
+                        // buffer
+                        if (match == true) {
                             inputID--;
-                            break;
                         }
-                        inputBufferCursor++;
-                    }
 
-                    if (fail) {
-                        // if ( commandNo == 7 ) {
-                        //     log("fail " + std::to_string(inputBuffer[inputBufferCursor]));
-                        // }
                         break;
                     }
                 }
-
-                if (inputBufferCursor == dc.inputBuffer.size()) {
-                    // corner case - if we run out of buffer but had matched the input, finalize
-                    // the match now or the trigger won't work - this can happen if you eg. have
-                    // a dash input immediately at the beginning of a replay since the last match
-                    // is a neutral input, it keeps matching all the way to the beginning of the
-                    // buffer
-                    if (match == true) {
-                        inputID--;
-                    }
-
-                    break;
-                }
-            }
 
                 if (inputID < 0) {
                     // ran out of matched inputs, command is OK
