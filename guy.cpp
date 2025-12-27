@@ -2379,7 +2379,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitStopSelf = 0;
             hitStopTarget = 0;
         }
-        if (trade) {
+        if (trade && hitBox.type == hit && tradeHit.hitBox.type == hit) {
+            // todo not for projectile trades? weird
             if (hitStopSelf<15) {
                 hitStopSelf = 15;
             }
