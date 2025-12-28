@@ -2135,6 +2135,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
+            // figure out test for different crouch hit entry?
+            if (pOtherGuy->getCrouching()) {
+                hitEntryFlag |= crouch;
+            }
             if (otherGuyAirborne) {
                 hitEntryFlag |= air;
             }
