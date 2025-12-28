@@ -2826,6 +2826,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
         wallSplat = false;
         wallBounce = false;
+        tumble = false;
         int wallTime = pHitEffect->wallTime;
         if (kabeTataki) {
             // this can happen even if you block! blocked DI
@@ -2842,6 +2843,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             wallBounceAccelY = fixDivWithBias(Fixed(wallDestY * -8) , Fixed(wallTime * wallTime));
             wallBounceVelY -= wallBounceAccelY;
         } else if (moveType == 69) {
+            knockDown = true;
             tumble = true;
             // todo move this into some kind of 'next vel' and debloat the guy struct
             groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
@@ -3752,7 +3754,6 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             nextAction = 289;
             tumble = false;
             hitStun = knockDownFrames; // xxx
-            knockDown = true;
             knockDownFrames = 27;
 
             velocityX = groundBounceVelX;
