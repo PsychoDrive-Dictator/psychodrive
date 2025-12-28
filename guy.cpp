@@ -1925,12 +1925,15 @@ bool Guy::WorldPhysics(bool onlyFloor)
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
 
-    if (!airborne && groundBounce) {
-        log (logTransitions, "ground bounce!");
+    if (!airborne && (groundBounce || tumble)) {
+        log (logTransitions, "ground bounce/tumble!");
         // dont let stuff below see landed/grounded
-        airborne = true;
         landed = false;
 
+        if (groundBounce) {
+            airborne = true;
+        }
+        // use this for tumble too, 'special landing needing transition'
         bounced = true;
     }
 
@@ -2639,7 +2642,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
 
     // like guile 4HK has destY but stays grounded if hits grounded
-    if (!(dmgType & 8) && !(dmgType == 21) && !airborne) {
+    if (!(dmgType & 8) && !(dmgType == 21) && !(dmgType == 32) && !airborne) {
         destY = 0;
     }
 
@@ -2834,6 +2837,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
             wallBounceAccelY = fixDivWithBias(Fixed(wallDestY * -8) , Fixed(wallTime * wallTime));
             wallBounceVelY -= wallBounceAccelY;
+        } else if (moveType == 69) {
+            tumble = true;
+            // todo move this into some kind of 'next vel' and debloat the guy struct
+            groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
+            knockDownFrames = downTime - 27;
         }
 
         //if (destTime != 0)
@@ -3716,25 +3724,36 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     if (bounced) {
-        nextAction = 350; // combo/bounce state
+        if (groundBounce) {
+            nextAction = 350; // combo/bounce state
 
-        velocityX = groundBounceVelX;
-        accelX = groundBounceAccelX;
-        velocityY = groundBounceVelY;
-        accelY = groundBounceAccelY;
+            velocityX = groundBounceVelX;
+            accelX = groundBounceAccelX;
+            velocityY = groundBounceVelY;
+            accelY = groundBounceAccelY;
 
-        resetHitStunOnLand = true;
+            resetHitStunOnLand = true;
 
-        if (recoverForward && needsTurnaround()) {
-            // todo do we need to consume something here? or leave recoverForward until final landing
-            switchDirection();
+            if (recoverForward && needsTurnaround()) {
+                // todo do we need to consume something here? or leave recoverForward until final landing
+                switchDirection();
+            }
+
+            groundBounce = false;
+            groundBounceVelX = 0.0f;
+            groundBounceAccelX = 0.0f;
+            groundBounceVelY = 0.0f;
+            groundBounceAccelY = 0.0f;
+        } else if (tumble) {
+            nextAction = 289;
+            tumble = false;
+            hitStun = knockDownFrames; // xxx
+            knockDown = true;
+            knockDownFrames = 27;
+
+            velocityX = groundBounceVelX;
+            groundBounceVelX = 0.0f;
         }
-
-        groundBounce = false;
-        groundBounceVelX = 0.0f;
-        groundBounceAccelX = 0.0f;
-        groundBounceVelY = 0.0f;
-        groundBounceAccelY = 0.0f;
 
         bounced = false;
     }

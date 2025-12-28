@@ -680,6 +680,7 @@ private:
         groundBounceAccelY = Fixed(0);
         wallBounce = false;
         wallSplat = false;
+        tumble = false;
         wallBounceVelX = Fixed(0);
         wallBounceVelY = Fixed(0);
         wallBounceAccelX = Fixed(0);
@@ -801,6 +802,7 @@ private:
     bool recoverReverse : 1;
     bool wallBounce : 1;
     bool wallSplat : 1;
+    bool tumble : 1;
     bool groundBounce : 1;
     bool wallStopped : 1;
     bool armorThisFrame : 1;
