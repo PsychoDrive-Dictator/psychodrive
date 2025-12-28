@@ -3021,12 +3021,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 734,
-                "firstFrame": 1166,
+                "count": 179,
+                "firstFrame": 1502,
                 "lastFrame": 1680
             },
             {
-                "count": 29,
+                "count": 25,
                 "firstFrame": 145,
                 "lastFrame": 1460
             },
@@ -3046,12 +3046,12 @@ var currentResults =
                 "lastFrame": 1526
             },
             {
-                "count": 162,
+                "count": 146,
                 "firstFrame": 646,
                 "lastFrame": 1564
             },
             {
-                "count": 933,
+                "count": 904,
                 "firstFrame": 616,
                 "lastFrame": 1680
             },
@@ -5026,6 +5026,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jamie_pc_roundhouse_dash_advantage",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 223,
+                "firstFrame": 243,
+                "lastFrame": 402
+            },
+            {
+                "count": 57,
+                "firstFrame": 286,
+                "lastFrame": 314
+            },
+            {
+                "count": 43,
+                "firstFrame": 272,
+                "lastFrame": 314
+            },
+            {
+                "count": 37,
+                "firstFrame": 272,
+                "lastFrame": 308
+            },
+            {
+                "count": 37,
+                "firstFrame": 272,
+                "lastFrame": 308
+            },
+            {
+                "count": 106,
+                "firstFrame": 272,
+                "lastFrame": 358
+            },
+            {
+                "count": 305,
+                "firstFrame": 223,
+                "lastFrame": 402
+            },
+            {
+                "count": 45,
+                "firstFrame": 272,
+                "lastFrame": 316
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 152,
+                "firstFrame": 197,
+                "lastFrame": 348
+            },
+            {
+                "count": 26,
+                "firstFrame": 272,
+                "lastFrame": 284
+            },
+            {
+                "count": 61,
+                "firstFrame": 288,
+                "lastFrame": 348
+            }
+        ]
+    },
+    {
         "testName": "jp_departure",
         "testVersion": "26",
         "finished": true,
@@ -6232,6 +6299,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "ryu_pc_donkey_tumble",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 538,
+                "firstFrame": 118,
+                "lastFrame": 404
+            },
+            {
+                "count": 262,
+                "firstFrame": 118,
+                "lastFrame": 279
+            },
+            {
+                "count": 179,
+                "firstFrame": 92,
+                "lastFrame": 279
+            },
+            {
+                "count": 65,
+                "firstFrame": 209,
+                "lastFrame": 273
+            },
+            {
+                "count": 65,
+                "firstFrame": 209,
+                "lastFrame": 273
+            },
+            {
+                "count": 150,
+                "firstFrame": 92,
+                "lastFrame": 265
+            },
+            {
+                "count": 113,
+                "firstFrame": 119,
+                "lastFrame": 278
+            },
+            {
+                "count": 59,
+                "firstFrame": 200,
+                "lastFrame": 288
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 30,
+                "firstFrame": 209,
+                "lastFrame": 246
+            },
+            {
+                "count": 46,
+                "firstFrame": 209,
+                "lastFrame": 254
+            },
+            {
+                "count": 32,
+                "firstFrame": 209,
+                "lastFrame": 320
+            }
+        ]
+    },
+    {
+        "testName": "ryu_pc_roundhouse_restand",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 478,
+                "firstFrame": 215,
+                "lastFrame": 646
+            },
+            {
+                "count": 147,
+                "firstFrame": 201,
+                "lastFrame": 540
+            },
+            {
+                "count": 45,
+                "firstFrame": 201,
+                "lastFrame": 540
+            },
+            {
+                "count": 54,
+                "firstFrame": 201,
+                "lastFrame": 534
+            },
+            {
+                "count": 54,
+                "firstFrame": 201,
+                "lastFrame": 534
+            },
+            {
+                "count": 108,
+                "firstFrame": 201,
+                "lastFrame": 523
+            },
+            {
+                "count": 189,
+                "firstFrame": 169,
+                "lastFrame": 539
+            },
+            {
+                "count": 7,
+                "firstFrame": 241,
+                "lastFrame": 247
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 59,
+                "firstFrame": 234,
+                "lastFrame": 574
+            }
+        ]
+    },
+    {
         "testName": "ryu_s3_lvl1",
         "testVersion": "33",
         "finished": true,
@@ -6706,44 +6907,39 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 261,
-                "firstFrame": 189,
-                "lastFrame": 424
+                "count": 12,
+                "firstFrame": 231,
+                "lastFrame": 242
             },
             {
-                "count": 51,
-                "firstFrame": 263,
-                "lastFrame": 288
-            },
-            {
-                "count": 39,
+                "count": 52,
                 "firstFrame": 250,
                 "lastFrame": 288
             },
             {
-                "count": 48,
-                "firstFrame": 230,
+                "count": 1,
+                "firstFrame": 288,
+                "lastFrame": 288
+            },
+            {
+                "count": 35,
+                "firstFrame": 250,
                 "lastFrame": 284
             },
             {
-                "count": 48,
-                "firstFrame": 230,
+                "count": 35,
+                "firstFrame": 250,
                 "lastFrame": 284
             },
             {
-                "count": 334,
+                "count": 63,
                 "firstFrame": 96,
-                "lastFrame": 364
+                "lastFrame": 249
             },
             {
-                "count": 484,
+                "count": 71,
                 "firstFrame": 122,
-                "lastFrame": 424
-            },
-            {
-                "count": 68,
-                "firstFrame": 230,
-                "lastFrame": 297
+                "lastFrame": 287
             },
             {
                 "count": 0,
@@ -6751,19 +6947,24 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 100,
-                "firstFrame": 230,
-                "lastFrame": 329
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 48,
-                "firstFrame": 230,
-                "lastFrame": 261
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 147,
-                "firstFrame": 183,
-                "lastFrame": 329
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },
@@ -7272,7 +7473,7 @@ var currentResults =
                 "lastFrame": 2848
             },
             {
-                "count": 2967,
+                "count": 2944,
                 "firstFrame": 356,
                 "lastFrame": 2848
             },
@@ -7297,7 +7498,7 @@ var currentResults =
                 "lastFrame": 2274
             },
             {
-                "count": 4156,
+                "count": 4157,
                 "firstFrame": 435,
                 "lastFrame": 2848
             }

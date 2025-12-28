@@ -908,6 +908,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                     int numFrames = pInput->numFrames;
                     bool match = false;
                     int lastMatchInput = i;
+                    bool pass = false;
 
                     if (pInput->type == InputType::Rotation) {
                         // rotate
@@ -938,7 +939,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                             inputBufferCursor++;
                         }
                         if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
-                            inputID--;
+                            pass = true;
                         }
                     } else if (pInput->type == InputType::ChargeRelease) {
                         // charge release
@@ -974,20 +975,33 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                                 break; // cancel trigger
                             }
                             //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                            inputID--;
+                            pass = true;
                         } else {
                             log(true, "charge entries mismatch?");
                             break; // cancel trigger
                         }
                     } else {
+                        bool needPositiveEdge = true;
+                        if (inputID == 0) {
+                            // no positive edge is ok for last input? maybe only direction
+                            needPositiveEdge = false;
+                        }
                         uint32_t inputSearch = lastMatchInput + numFrames + 1;
+                        if (needPositiveEdge) {
+                            inputSearch += 1; // one grace frame to look for the negative edge
+                        }
+                        // last command input before trigger input seems to have one less frame to work with
+                        if (inputID == (int)variant.inputs.size() - 1) {
+                            inputSearch -= 1;
+                        }
+                        // todo or is this fine?
                         if (numFrames == -1) {
                             inputSearch = initialI + variant.totalMaxFrames + 1;
                         }
                         if (inputSearch > dc.inputBuffer.size()) {
                             inputSearch = dc.inputBuffer.size();
                         }
-                        bool matchThisInput = false;
+                        bool matchThisFrame = false;
                         while (inputBufferCursor < inputSearch)
                         {
                             int bufferInput = dc.inputBuffer[inputBufferCursor];
@@ -998,6 +1012,9 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                             }
 
                             bool inputNg = false;
+
+                            // we venture past the allowed buffer here technically
+                            bool onlyNegativeEdge = needPositiveEdge && inputBufferCursor == inputSearch - 1;
 
                             if (inputNgCondFlags & 2) {
                                 if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
@@ -1011,8 +1028,11 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                                 break;
                             }
                             if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+                                if (onlyNegativeEdge) {
+                                    break;
+                                }
                                 match = true;
-                                matchThisInput = true;
+                                matchThisFrame = true;
                                 i = inputBufferCursor;
                                 if (inputOkCondFlags & 1) {
                                     // inclusive lever shift initial match
@@ -1022,36 +1042,36 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                                     inputOkKeyFlags = bufferInput & 0xF;
                                 }
                             } else if (match) {
-                                match = false;
+                                matchThisFrame = false;
                                 break;
                             }
-                            if (pCommand->id == 4) {
+                            if (onlyNegativeEdge) {
+                                break;
+                            }
+                            if (pCommand->id == 36) {
                                 guyLog(true, std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
-                                " inputbuffercursor " + std::to_string(inputBufferCursor) + " matchThisInput " + std::to_string(matchThisInput) + " buffer " + std::to_string(bufferInput));
+                                " inputbuffercursor " + std::to_string(inputBufferCursor) + " matchThisInput " + std::to_string(matchThisFrame) + " buffer " + std::to_string(bufferInput));
                             }
                             inputBufferCursor++;
                         }
 
                         if (fail) {
-                            if (pCommand->id == 4) {
+                            if (pCommand->id == 36) {
                                 guyLog(true, "fail " + std::to_string(dc.inputBuffer[inputBufferCursor]));
                             }
                             break;
                         }
 
-                        bool pass = false;
-                        if (matchThisInput) {
+                        pass = false;
+                        if (match) {
                             pass = true;
-                            if (match && inputID > 0) {
+                            if (matchThisFrame && needPositiveEdge) {
                                 // need positive edge but never not-matched until end of window
-                                // no positive edge is ok for last input?
                                 pass = false;
-                            }
-                            if (pass) {
-                                inputID--;
                             }
                         }
 
+                        // in strings of inclusive lever matches the last pass might pass the next one too, so don't
                         inputBufferCursor = i + 1;
                         if (!pass) {
                             break;
@@ -1064,12 +1084,15 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                         // a dash input immediately at the beginning of a replay since the last match
                         // is a neutral input, it keeps matching all the way to the beginning of the
                         // buffer
-                        if (match == true) {
-                            inputID--;
+                        if (match) {
+                            pass = true;
                         }
+                    }
 
+                    if (!pass) {
                         break;
                     }
+                    inputID--;
                 }
 
                 if (inputID < 0) {
