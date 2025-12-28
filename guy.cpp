@@ -2666,9 +2666,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         hitEntryHitStun += 4;
     }
 
-    resetHitStunOnLand = false;
-    resetHitStunOnTransition = false;
-    knockDownFrames = 3;
+    if (applyHit) {
+        resetHitStunOnLand = false;
+        resetHitStunOnTransition = false;
+        knockDown = false;
+        knockDownFrames = 3;
+    }
     if (downTime <= 1) {
         downTime = 3;
     }
