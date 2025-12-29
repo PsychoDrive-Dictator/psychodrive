@@ -2681,6 +2681,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_point_blank_wallsplat_juggle_forcepc",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 364,
+                "firstFrame": 198,
+                "lastFrame": 471
+            },
+            {
+                "count": 497,
+                "firstFrame": 205,
+                "lastFrame": 472
+            },
+            {
+                "count": 188,
+                "firstFrame": 223,
+                "lastFrame": 472
+            },
+            {
+                "count": 231,
+                "firstFrame": 190,
+                "lastFrame": 467
+            },
+            {
+                "count": 231,
+                "firstFrame": 190,
+                "lastFrame": 467
+            },
+            {
+                "count": 277,
+                "firstFrame": 137,
+                "lastFrame": 553
+            },
+            {
+                "count": 552,
+                "firstFrame": 155,
+                "lastFrame": 616
+            },
+            {
+                "count": 117,
+                "firstFrame": 365,
+                "lastFrame": 481
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 149,
+                "firstFrame": 365,
+                "lastFrame": 513
+            },
+            {
+                "count": 75,
+                "firstFrame": 309,
+                "lastFrame": 431
+            },
+            {
+                "count": 483,
+                "firstFrame": 180,
+                "lastFrame": 513
+            }
+        ]
+    },
+    {
         "testName": "cammy_air_throw",
         "testVersion": "26",
         "finished": true,
@@ -4222,7 +4289,7 @@ var currentResults =
         ]
     },
     {
-        "testName": "guile_jp_66_hit_guile_combo",
+        "testName": "guile_jp_66_hit_guile_combo_forcepc",
         "testVersion": "23",
         "finished": true,
         "errorTypes": [
@@ -6969,74 +7036,7 @@ var currentResults =
         ]
     },
     {
-        "testName": "viper_sa1_dump_route",
-        "testVersion": "38",
-        "finished": true,
-        "errorTypes": [
-            {
-                "count": 101,
-                "firstFrame": 600,
-                "lastFrame": 700
-            },
-            {
-                "count": 121,
-                "firstFrame": 520,
-                "lastFrame": 601
-            },
-            {
-                "count": 3,
-                "firstFrame": 571,
-                "lastFrame": 601
-            },
-            {
-                "count": 67,
-                "firstFrame": 520,
-                "lastFrame": 586
-            },
-            {
-                "count": 67,
-                "firstFrame": 520,
-                "lastFrame": 586
-            },
-            {
-                "count": 11,
-                "firstFrame": 532,
-                "lastFrame": 652
-            },
-            {
-                "count": 159,
-                "firstFrame": 531,
-                "lastFrame": 700
-            },
-            {
-                "count": 1,
-                "firstFrame": 610,
-                "lastFrame": 610
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 136,
-                "firstFrame": 509,
-                "lastFrame": 642
-            }
-        ]
-    },
-    {
-        "testName": "viper_sa1_dump_route_4880_gel",
+        "testName": "viper_sa1_dump_route_4880_gel_forcepc",
         "testVersion": "38",
         "finished": true,
         "errorTypes": [
@@ -7103,7 +7103,74 @@ var currentResults =
         ]
     },
     {
-        "testName": "viper_sa1_dump_route_real",
+        "testName": "viper_sa1_dump_route_forcepc",
+        "testVersion": "38",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 101,
+                "firstFrame": 600,
+                "lastFrame": 700
+            },
+            {
+                "count": 121,
+                "firstFrame": 520,
+                "lastFrame": 601
+            },
+            {
+                "count": 3,
+                "firstFrame": 571,
+                "lastFrame": 601
+            },
+            {
+                "count": 67,
+                "firstFrame": 520,
+                "lastFrame": 586
+            },
+            {
+                "count": 67,
+                "firstFrame": 520,
+                "lastFrame": 586
+            },
+            {
+                "count": 11,
+                "firstFrame": 532,
+                "lastFrame": 652
+            },
+            {
+                "count": 159,
+                "firstFrame": 531,
+                "lastFrame": 700
+            },
+            {
+                "count": 1,
+                "firstFrame": 610,
+                "lastFrame": 610
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 136,
+                "firstFrame": 509,
+                "lastFrame": 642
+            }
+        ]
+    },
+    {
+        "testName": "viper_sa1_dump_route_real_forcepc",
         "testVersion": "38",
         "finished": true,
         "errorTypes": [

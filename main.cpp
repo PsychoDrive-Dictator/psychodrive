@@ -996,10 +996,7 @@ int main(int argc, char**argv)
         strDumpLoadPath = argv[2];
         dumpSim.SetupFromGameDump(strDumpLoadPath, version);
 
-        if (strDumpLoadPath.find("guile_jp_66_hit_guile_combo") != std::string::npos) {
-            forcePunishCounter = true;
-        }
-        if (strDumpLoadPath.find("viper_sa1_dump_route") != std::string::npos) {
+        if (strDumpLoadPath.find("forcepc") != std::string::npos) {
             forcePunishCounter = true;
         }
         if (strDumpLoadPath.find("match") != std::string::npos) {
@@ -1070,10 +1067,7 @@ int main(int argc, char**argv)
         gameStateDump = parse_json_file(strDumpLoadPath);
     }
     if (gameStateDump != nullptr) {
-        if (strDumpLoadPath.find("guile_jp_66_hit_guile_combo") != std::string::npos) {
-            forcePunishCounter = true;
-        }
-        if (strDumpLoadPath.find("viper_sa1_dump_route") != std::string::npos) {
+        if (strDumpLoadPath.find("forcepc") != std::string::npos) {
             forcePunishCounter = true;
         }
         if (strDumpLoadPath.find("match") != std::string::npos) {
