@@ -487,6 +487,11 @@ private:
 
     bool onLeftWall() { return getPosX() == -wallDistance; }
     bool onRightWall() { return getPosX() == wallDistance; }
+    bool onWall() { return onLeftWall() || onRightWall(); }
+
+    bool wasOnLeftWall() { return getLastPosX() == -wallDistance; }
+    bool wasOnRightWall() { return getLastPosX() == wallDistance; }
+    bool wasOnWall() { return wasOnLeftWall() || wasOnRightWall(); }
 
     bool conditionOperator(int op, int operand, int threshold, std::string desc);
 

@@ -3692,7 +3692,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         accelY = Fixed(0);
     }
 
-    if ((wallBounce || wallSplat) && touchedWall) {
+    bool triggerWallStop = touchedWall || wasOnWall();
+
+    if ((wallBounce || wallSplat) && triggerWallStop) {
         wallStopped = wallBounce || airborne;
         if (wallSplat) {
             if (airborne) {
