@@ -3523,7 +3523,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     // more screen freeze at the exact end of hitstop
     if (!endHitStopFrame) {
         if (pendingHitStop) {
-            hitStop += pendingHitStop;
+            if (pendingHitStop > hitStop) {
+                hitStop = pendingHitStop;
+            }
             pendingHitStop = 0;
         }
         // time stops
