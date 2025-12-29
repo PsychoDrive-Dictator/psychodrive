@@ -2902,7 +2902,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 // generic pushback/airborne knock
                 if (!airborne) {
                     hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+                    if (destX < 0 && hitVelX.data & 63) {
+                        hitVelX.data -= 1;
+                    }
                     hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
+                    if (destX < 0 && hitAccelX.data & 63) {
+                        hitAccelX.data -= 1;
+                    }
                 } else {
                     hitVelX = Fixed(0);
                     hitAccelX = Fixed(0);
