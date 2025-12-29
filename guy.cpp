@@ -306,9 +306,9 @@ bool Guy::RunFrame(void)
     // training mode refill rule, 'action' starts and both start regen (soon)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
     if (didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
-        focusRegenCooldown = 3;
-        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (refill action start)");
-        if (pOpponent) {
+        if (pOpponent && !pOpponent->comboHits) {
+            focusRegenCooldown = 3;
+            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (refill action start)");
             pOpponent->focusRegenCooldown = 3;
             otherGuyLog(pOpponent, logResources, "regen cooldown " + std::to_string(pOpponent->focusRegenCooldown) + " (refill action start)");
         }
