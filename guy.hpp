@@ -604,6 +604,7 @@ private:
         deferredFocusCost = 0;
         gauge = 0;
         currentAction = 1;
+        prevAction = -1;
         nextAction = -1;
         nextActionFrame = -1;
         actionInitialFrame = -1;
@@ -878,6 +879,7 @@ private:
     int gauge;
 
     int currentAction;
+    int prevAction;
     int nextAction;
     int nextActionFrame;
     int actionInitialFrame;

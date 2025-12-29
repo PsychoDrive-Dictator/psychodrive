@@ -1261,6 +1261,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
         int curAction = pGuy->getCurrentAction();
         Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
         ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
     }
 

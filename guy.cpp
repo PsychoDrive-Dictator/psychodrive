@@ -3543,6 +3543,10 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         if (!warudo && !superFreeze && focusRegenCooldown > 0 && !focusRegenCooldownFrozen) {
             focusRegenCooldown--;
             log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
+            if (getHitStop() && focusRegenCooldown == 0) {
+                focusRegenCooldown = 1;
+                log(logResources, "final regen cooldown tick down undone bc hitstop");
+            }
         }
 
         bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
@@ -4128,6 +4132,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         ProjectileData *oldProjData = pCurrentAction ? pCurrentAction->pProjectileData : nullptr;
 
         if (currentAction != nextAction) {
+            prevAction = currentAction;
             currentAction = nextAction;
             log (logTransitions, "current action " + std::to_string(currentAction));
 
@@ -4313,7 +4318,13 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x8000000) {
             isDrive = true;
-            focusRegenCooldown = 120; // todo right spot?
+            // this key lasts until margin so i think this is good?
+            if (prevAction == 480 || prevAction == 481) {
+                // hold parry - is it really the best way to tell?
+                focusRegenCooldown = 240;
+            } else {
+                focusRegenCooldown = 120;
+            }
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
                 pOpponent->driveScaling = true;

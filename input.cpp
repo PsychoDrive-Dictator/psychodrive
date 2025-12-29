@@ -291,7 +291,9 @@ void updateInputs(int sizeX, int sizeY)
                     deleteInputs = true;
                     break;
                 case SDLK_ESCAPE:
+#if !defined(__EMSCRIPTEN__)
                     done = true;
+#endif
                     break;
             }
         }
