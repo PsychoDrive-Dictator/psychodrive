@@ -3540,7 +3540,17 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             tokiYoTomare = false;
         }
 
-        if (!warudo && !superFreeze && focusRegenCooldown > 0 && !focusRegenCooldownFrozen) {
+        bool tickRegenCooldown = true;
+        if (warudo || superFreeze) {
+            tickRegenCooldown = false;
+        }
+        if (pOpponent && (pOpponent->warudo || pOpponent->superFreeze)) {
+            tickRegenCooldown = false;
+        }
+        if (focusRegenCooldownFrozen) {
+            tickRegenCooldown = false;
+        }
+        if (tickRegenCooldown && focusRegenCooldown > 0) {
             focusRegenCooldown--;
             log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
             if (getHitStop() && focusRegenCooldown == 0) {
