@@ -277,7 +277,7 @@ bool Guy::RunFrame(bool advancingTime)
 
     if (!warudo && tokiWaUgokidasu) {
         tokiWaUgokidasu = false;
-        if (!AdvanceFrame(advancingTime, true)) {
+        if (!AdvanceFrame(advancingTime, false, true)) {
             delete this;
             return false;
         }
@@ -292,7 +292,7 @@ bool Guy::RunFrame(bool advancingTime)
         hitStop--;
         if (getHitStop() == 0) {
             // increment the frame we skipped at the beginning of hitstop
-            if (!AdvanceFrame(true, true)) {
+            if (!AdvanceFrame(true, true, false)) {
                 delete this;
                 return false;
             }
@@ -3525,23 +3525,27 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
-bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame)
+bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoFrame)
 {
     // if this is the frame that was stolen from beginning hitstop when it ends, don't
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
-    if (advancingTime && !endHitStopFrame) {
-        if (pendingHitStop) {
-            if (pendingHitStop > hitStop) {
-                hitStop = pendingHitStop;
+    if (advancingTime) {
+        if (!endHitStopFrame && !endHitStopFrame) {
+            if (pendingHitStop) {
+                if (pendingHitStop > hitStop) {
+                    hitStop = pendingHitStop;
+                }
+                pendingHitStop = 0;
             }
-            pendingHitStop = 0;
         }
-        // time stops
-        if (tokiYoTomare) {
-            warudo = true;
-            tokiYoTomare = false;
+        if (!endHitStopFrame && !endWarudoFrame) {
+            // time stops
+            if (tokiYoTomare) {
+                warudo = true;
+                tokiYoTomare = false;
+            }
         }
 
         bool tickRegenCooldown = true;
@@ -3552,6 +3556,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame)
             tickRegenCooldown = false;
         }
         if (focusRegenCooldownFrozen) {
+            tickRegenCooldown = false;
+        }
+        if (endHitStopFrame) {
             tickRegenCooldown = false;
         }
         if (tickRegenCooldown && focusRegenCooldown > 0) {
@@ -3568,6 +3575,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame)
             doRegen = false;
         }
         if (superFreeze) {
+            doRegen = false;
+        }
+        if (endHitStopFrame || endWarudoFrame) {
             doRegen = false;
         }
         if (doRegen) {

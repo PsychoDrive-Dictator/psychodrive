@@ -70,7 +70,7 @@ public:
     void RunFramePostPush(void);
     bool WorldPhysics(bool onlyFloor = false);
     void CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList);
-    bool AdvanceFrame(bool advancingTime = true, bool endHitStopFrame = false);
+    bool AdvanceFrame(bool advancingTime = true, bool endHitStopFrame = false, bool endWarudoFrame = false);
     std::string getActionName(int actionID);
 
     void addHitStop(int w) {
