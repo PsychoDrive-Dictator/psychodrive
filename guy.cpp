@@ -3903,6 +3903,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame)
                 velocityX = Fixed(0);
                 velocityY = Fixed(0);
 
+                // can't believe we have to do that, looking at you spds
+                posY = Fixed(0);
+                airborne = false;
+
                 nageKnockdown = false;
             } else {
                 blocking = false;
