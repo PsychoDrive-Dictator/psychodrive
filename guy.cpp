@@ -1106,6 +1106,8 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
     return false;
 }
 
+const int triggerCheckArraySize = 1024;
+
 struct TriggerCheckState {
     int triggerID;
     int actionID;
@@ -1122,7 +1124,7 @@ void Guy::DoTriggers(int fluffFrameBias)
     bool hasTriggerKey = pCurrentAction && !pCurrentAction->triggerKeys.empty();
     if (hasTriggerKey || fluffFrames(fluffFrameBias))
     {
-        TriggerCheckState triggers[2048];
+        TriggerCheckState triggers[triggerCheckArraySize];
         int triggerCount = 0;
 
         if (hasTriggerKey) {
@@ -1166,8 +1168,8 @@ void Guy::DoTriggers(int fluffFrameBias)
                     }
 
                     if (entryIndex == -1) {
-                        if (triggerCount >= 2048) {
-                            log(true, "WARNING: exceeded max trigger entries (2048)!");
+                        if (triggerCount >= triggerCheckArraySize) {
+                            log(true, "trigger check array overflow!!");
                             continue;
                         }
                         entryIndex = triggerCount++;
@@ -1198,8 +1200,13 @@ void Guy::DoTriggers(int fluffFrameBias)
             }
         }
 
-        if (fluffFrames(fluffFrameBias)) {
-            // add trigger group 0 in fluff frames
+        // add trigger group 0 in fluff frames and prox guard
+        bool addTriggerGroupZero = fluffFrames(fluffFrameBias);
+        if (proxGuard()) {
+            addTriggerGroupZero = true;
+        }
+
+        if (addTriggerGroupZero) {
             auto it = pCharData->triggerGroupByID.find(0);
             if (it != pCharData->triggerGroupByID.end()) {
                 TriggerGroup *pTriggerGroup = it->second;
@@ -1215,8 +1222,8 @@ void Guy::DoTriggers(int fluffFrameBias)
                     }
 
                     if (entryIndex == -1) {
-                        if (triggerCount >= 2048) {
-                            log(true, "WARNING: exceeded max trigger entries (2048)!");
+                        if (triggerCount >= triggerCheckArraySize) {
+                            log(true, "trigger check array overflow!!");
                             continue;
                         }
                         entryIndex = triggerCount++;
@@ -4122,7 +4129,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool didRecoveryTrigger = false;
 
-    if (!didTrigger && didTransition && canMoveNow && nextAction == -1) {
+    if (!didTrigger && didTransition && (canMoveNow || proxGuard()) && nextAction == -1) {
         DoTriggers();
         if (nextAction != -1) {
             didTrigger = true;

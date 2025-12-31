@@ -427,6 +427,13 @@ private:
     void ChangeStyle(int newStyleID);
     void ExitStyle();
 
+    bool proxGuard() {
+        if (blocking && !hitStun) {
+            return true;
+        }
+        return false;
+    }
+
     bool fluffFrames(int frameBias = 0) {
         if (hitStun) {
             return false;
@@ -473,8 +480,7 @@ private:
             ret = false;
         }
 
-        if (blocking && !hitStun) {
-            // prox guard
+        if (proxGuard()) {
             ret = false;
         }
 
