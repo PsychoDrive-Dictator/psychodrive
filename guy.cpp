@@ -2784,7 +2784,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
     if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
         // todo apparently start of hitstun except if super where it's after??
-        focusRegenCooldown = 90 + 1;
+        focusRegenCooldown = 90 + 1 + 1;
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
     }
     gauge += pHitEffect->superGainTarget;
