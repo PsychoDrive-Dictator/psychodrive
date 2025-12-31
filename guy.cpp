@@ -3906,7 +3906,16 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     nextAction = 330;
                     isDown = true;
                 } else {
-                    nextAction = 340;
+                    // todo what's the actual buffer and input for backroll?
+                    int searchWindow = 16;
+                    bool backroll = false;
+                    for (int i = 0; i < searchWindow; i++) {
+                        int input = dc.inputBuffer[i] & (LP+MP+HP+LK+MK+HK);
+                        if (std::bitset<32>(input).count() >= 2) {
+                            backroll = true;
+                        }
+                    }
+                    nextAction = backroll ? 344 : 340;
                     isDown = false;
                     knockDown = false;
 
