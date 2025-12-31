@@ -275,9 +275,9 @@ bool Guy::RunFrame(bool advancingTime)
         }
     }
 
-    if (advancingTime && !warudo && tokiWaUgokidasu) {
+    if (!warudo && tokiWaUgokidasu) {
         tokiWaUgokidasu = false;
-        if (!AdvanceFrame(true, true)) {
+        if (!AdvanceFrame(advancingTime, true)) {
             delete this;
             return false;
         }
@@ -1983,7 +1983,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand) {
             log(logTransitions, "hack extra landing frame");
-            AdvanceFrame(true); // only transition
+            AdvanceFrame(false); // only transition
         }
     }
 
@@ -2545,9 +2545,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->DoBranchKey();
             if (pGuy->nextAction != -1) {
                 // only transition
-                pGuy->AdvanceFrame(true);
+                pGuy->AdvanceFrame(false);
                 // only run keys
-                pGuy->RunFrame(true);
+                pGuy->RunFrame(false);
             } else {
                 otherGuyLog(pGuy, true, "instagrab branch not found!");
             }
@@ -3592,7 +3592,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame)
     }
 
     if (getHitStop() || warudo) {
-        if (advancingTime && tokiWaUgokidasu) {
+        if (tokiWaUgokidasu) {
             // time has begun to move again
             warudo = false;
             // leave tokiWaUgokidasu set for RunFrame to know this happened
@@ -4699,9 +4699,9 @@ void Guy::DoLockKey(void)
                     pOpponent->accelY = Fixed(0);
                 }
                 // for transition
-                pOpponent->AdvanceFrame(true);
+                pOpponent->AdvanceFrame(false);
                 // for placekey/etc
-                pOpponent->RunFrame(true);
+                pOpponent->RunFrame(false);
                 pOpponent->locked = true;
                 // our position + their placekey might be in a wall
                 pOpponent->WorldPhysics();
@@ -4991,7 +4991,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             if (spawnInBounds) {
                 pNewGuy->WorldPhysics();
             }
-            pNewGuy->RunFrame(true);
+            pNewGuy->RunFrame(false);
             if (pParent) {
                 pParent->dc.minions.push_back(pNewGuy);
             } else {
