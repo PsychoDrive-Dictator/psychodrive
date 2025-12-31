@@ -4618,7 +4618,11 @@ void Guy::DoWorldKey(void)
 
         switch (type) {
             case 1:
-                // super animation?
+                superAnimation = true;
+                // todo make a set of mutually exclusive scratch variables
+                // for now use anything existing to not bloat the size up
+                groundBounceVelX = getPosX();
+                groundBounceVelY = getPosY();
                 posX = Fixed(0);
                 posY = Fixed(0);
                 velocityX = Fixed(0);
@@ -4646,6 +4650,17 @@ void Guy::DoWorldKey(void)
                 break;
             case 5:
                 // resume
+                if (superAnimation) {
+                    superAnimation = false;
+                    posX = groundBounceVelX - (posOffsetX*direction);
+                    posY = groundBounceVelY;
+                    if (pOpponent && pOpponent->locked) {
+                        pOpponent->posX = posX;
+                        pOpponent->posY = posY;
+                    }
+                    groundBounceVelX = Fixed(0);
+                    groundBounceVelY = Fixed(0);
+                }
                 if (pOpponent) {
                     if (pOpponent->superFreeze) {
                         pOpponent->superFreeze = false;

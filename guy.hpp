@@ -712,6 +712,7 @@ private:
         uniqueTimer = false;
         hasFocusRegenCooldowned = false;
         focusRegenCooldownFrozen = false;
+        superAnimation = false;
         superFreeze = false;
         uniqueTimerCount = 0;
         debuffTimer = 0;
@@ -820,6 +821,7 @@ private:
     bool uniqueTimer : 1;
     bool hasFocusRegenCooldowned : 1;
     bool focusRegenCooldownFrozen : 1;
+    bool superAnimation : 1;
     bool superFreeze : 1;
 
     int projHitCount;
