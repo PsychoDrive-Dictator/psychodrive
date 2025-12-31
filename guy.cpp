@@ -1856,6 +1856,9 @@ bool Guy::WorldPhysics(bool onlyFloor)
                     if (x > screenCenterX + maxPlayerDistance) {
                         pushX = -(x - (screenCenterX + maxPlayerDistance));
                     }
+                    if (pushX != Fixed(0)) {
+                        log (logTransitions, "screen push " + std::to_string(pushX.f()));
+                    }
                 }
 
                 if (x < -wallDistance ) {
@@ -1943,6 +1946,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
     if ( hasPushed ) {
         posX += pushX;
+        log (logTransitions, "push " + std::to_string(pushX.f()));
         // 1:1 pushback for opponent during lock, and vice versa
         if (locked && pAttacker && !pAttacker->pendingUnlockHit) {
             pAttacker->posX += pushX;
