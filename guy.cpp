@@ -260,11 +260,11 @@ void Guy::UpdateActionData(void)
     }
 }
 
-bool Guy::RunFrame(void)
+bool Guy::RunFrame(bool advancingTime)
 {
     dc.frameTriggers.clear();
 
-    if (!warudo) {
+    if (advancingTime && !warudo) {
         if (debuffTimer > 0 ) {
             debuffTimer--;
         }
@@ -275,9 +275,9 @@ bool Guy::RunFrame(void)
         }
     }
 
-    if (!warudo && tokiWaUgokidasu) {
+    if (advancingTime && !warudo && tokiWaUgokidasu) {
         tokiWaUgokidasu = false;
-        if (!AdvanceFrame(true)) {
+        if (!AdvanceFrame(true, true)) {
             delete this;
             return false;
         }
@@ -287,12 +287,12 @@ bool Guy::RunFrame(void)
         return false;
     }
 
-    if (getHitStop()) {
+    if (advancingTime && getHitStop()) {
         timeInHitStop++;
         hitStop--;
         if (getHitStop() == 0) {
             // increment the frame we skipped at the beginning of hitstop
-            if (!AdvanceFrame(true)) {
+            if (!AdvanceFrame(true, true)) {
                 delete this;
                 return false;
             }
@@ -305,7 +305,7 @@ bool Guy::RunFrame(void)
 
     // training mode refill rule, 'action' starts and both start regen (soon)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
-    if (didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
+    if (advancingTime && didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
         if (pOpponent && !pOpponent->comboHits) {
             focusRegenCooldown = 3;
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (refill action start)");
@@ -314,12 +314,12 @@ bool Guy::RunFrame(void)
         }
     }
 
-    if (uniqueTimer) {
+    if (advancingTime && uniqueTimer) {
         // might not be in the right spot, adjust if falling out of yoga float too early/late
         uniqueTimerCount++;
     }
 
-    if (jumpLandingDisabledFrames) {
+    if (advancingTime && jumpLandingDisabledFrames) {
         jumpLandingDisabledFrames--;
     }
 
@@ -489,7 +489,7 @@ bool Guy::RunFrame(void)
 
         DoEventKey(pCurrentAction, currentFrame);
 
-        if (countingDownInstall && styleInstallFrames) {
+        if (advancingTime && countingDownInstall && styleInstallFrames) {
             styleInstallFrames--;
 
             if ( styleInstallFrames < 0) {
@@ -1979,7 +1979,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand) {
             log(logTransitions, "hack extra landing frame");
-            AdvanceFrame(); // todo this probably screws up thingslike bomb countdown, test
+            AdvanceFrame(true); // only transition
         }
     }
 
@@ -2540,10 +2540,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (pGuy->grabbedThisFrame && pGuy->nextAction == -1) {
             pGuy->DoBranchKey();
             if (pGuy->nextAction != -1) {
-                // For Transition
-                pGuy->AdvanceFrame();
-                // For LockKey
-                pGuy->RunFrame();
+                // only transition
+                pGuy->AdvanceFrame(true);
+                // only run keys
+                pGuy->RunFrame(true);
             } else {
                 otherGuyLog(pGuy, true, "instagrab branch not found!");
             }
@@ -3521,13 +3521,13 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
-bool Guy::AdvanceFrame(bool endHitStopFrame)
+bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame)
 {
     // if this is the frame that was stolen from beginning hitstop when it ends, don't
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
-    if (!endHitStopFrame) {
+    if (advancingTime && !endHitStopFrame) {
         if (pendingHitStop) {
             if (pendingHitStop > hitStop) {
                 hitStop = pendingHitStop;
@@ -3588,7 +3588,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
     }
 
     if (getHitStop() || warudo) {
-        if (tokiWaUgokidasu) {
+        if (advancingTime && tokiWaUgokidasu) {
             // time has begun to move again
             warudo = false;
             // leave tokiWaUgokidasu set for RunFrame to know this happened
@@ -3599,7 +3599,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         return true;
     }
 
-    if (deferredFocusCost) {
+    if (advancingTime && deferredFocusCost) {
         setFocus(focus - deferredFocusCost);
         log(logResources, "focus -" + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
         deferredFocusCost = 0;
@@ -3650,34 +3650,38 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
         }
     }
 
-    if (isProjectile && !didBranch && projHitCount == 0) {
-        return false; // die
-    }
+    if (advancingTime) {
+        if (isProjectile) {
+            if (!didBranch && projHitCount == 0) {
+                return false; // die
+            }
 
-    if (isProjectile) {
-        projLifeTime--;
-        if (projLifeTime <= 0) {
+            projLifeTime--;
+            if (projLifeTime <= 0) {
+                return false;
+            }
+
+            if (pParent && pOpponent && pCurrentAction && pCurrentAction->pProjectileData) {
+                int rangeB = pCurrentAction->pProjectileData->rangeB;
+
+                Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
+                Fixed screenCenterX = bothPlayerPos / Fixed(2);
+                int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+                screenCenterX.data += fixedRemainder;
+
+                if (getPosX() > screenCenterX + maxProjectileDistance + Fixed(rangeB) ||
+                    getPosX() < screenCenterX - maxProjectileDistance - Fixed(rangeB)) {
+                    return false;
+                }
+            }
+        }
+
+        if (die) {
             return false;
         }
     }
 
-    if (isProjectile && pParent && pOpponent && pCurrentAction && pCurrentAction->pProjectileData) {
-        int rangeB = pCurrentAction->pProjectileData->rangeB;
-
-        Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
-        Fixed screenCenterX = bothPlayerPos / Fixed(2);
-        int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
-        screenCenterX.data += fixedRemainder;
-
-        if (getPosX() > screenCenterX + maxProjectileDistance + Fixed(rangeB) ||
-            getPosX() < screenCenterX - maxProjectileDistance - Fixed(rangeB)) {
-            return false;
-        }
-    }
-
-    if (die) {
-        return false;
-    }
+    bool doHitStun = advancingTime;
 
     if (landed) {
         if (currentAction != 39 && currentAction != 40 && currentAction != 41 &&
@@ -3694,6 +3698,8 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
             hitStun = 1;
             resetHitStunOnLand = false;
             nextAction = 1;
+            // process hitstun from 1>0 below to make the transition happen
+            doHitStun = true;
         }
         if ( airActionCounter ) {
             airActionCounter = 0;
@@ -3837,7 +3843,9 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
                 loopCount--;
             }
         } else if ((isProjectile && loopCount == 0) || (pParent && !isProjectile)) {
-            return false; // die if minion at end of script
+            if (advancingTime) {
+                return false; // die if minion at end of script
+            }
         } else if (blocking) {
             // ???
             nextAction = currentAction + 1;
@@ -3859,9 +3867,7 @@ bool Guy::AdvanceFrame(bool endHitStopFrame)
 
     curNextAction = nextAction;
 
-    // first hitstun countdown happens on the same "frame" as hit, before hitstop
-    // todo that's no longer true, we play that frame after hitstop?
-    if (hitStun > 0)
+    if (doHitStun && hitStun > 0)
     {
         hitStun--;
         if (hitStun == 0)
@@ -4685,9 +4691,9 @@ void Guy::DoLockKey(void)
                     pOpponent->accelY = Fixed(0);
                 }
                 // for transition
-                pOpponent->AdvanceFrame();
+                pOpponent->AdvanceFrame(true);
                 // for placekey/etc
-                pOpponent->RunFrame();
+                pOpponent->RunFrame(true);
                 pOpponent->locked = true;
                 // our position + their placekey might be in a wall
                 pOpponent->WorldPhysics();
@@ -4977,7 +4983,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             if (spawnInBounds) {
                 pNewGuy->WorldPhysics();
             }
-            pNewGuy->RunFrame();
+            pNewGuy->RunFrame(true);
             if (pParent) {
                 pParent->dc.minions.push_back(pNewGuy);
             } else {

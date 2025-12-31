@@ -64,13 +64,13 @@ public:
     void FixRefs(std::map<int,Guy*> &guysByID);
 
     void Input(int input);
-    bool RunFrame(void);
+    bool RunFrame(bool advancingTime = true);
     void Render(float z = 0.0);
     bool Push(Guy *pOtherGuy);
     void RunFramePostPush(void);
     bool WorldPhysics(bool onlyFloor = false);
     void CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList);
-    bool AdvanceFrame(bool endHitStopFrame = false);
+    bool AdvanceFrame(bool advancingTime = true, bool endHitStopFrame = false);
     std::string getActionName(int actionID);
 
     void addHitStop(int w) {
