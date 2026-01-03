@@ -5026,6 +5026,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jamie_goro_combo_forcepc",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1480,
+                "firstFrame": 51,
+                "lastFrame": 1000
+            },
+            {
+                "count": 719,
+                "firstFrame": 125,
+                "lastFrame": 977
+            },
+            {
+                "count": 299,
+                "firstFrame": 223,
+                "lastFrame": 977
+            },
+            {
+                "count": 309,
+                "firstFrame": 125,
+                "lastFrame": 971
+            },
+            {
+                "count": 309,
+                "firstFrame": 125,
+                "lastFrame": 971
+            },
+            {
+                "count": 1356,
+                "firstFrame": 125,
+                "lastFrame": 1131
+            },
+            {
+                "count": 1745,
+                "firstFrame": 139,
+                "lastFrame": 1131
+            },
+            {
+                "count": 670,
+                "firstFrame": 319,
+                "lastFrame": 988
+            },
+            {
+                "count": 438,
+                "firstFrame": 465,
+                "lastFrame": 902
+            },
+            {
+                "count": 971,
+                "firstFrame": 50,
+                "lastFrame": 1020
+            },
+            {
+                "count": 126,
+                "firstFrame": 319,
+                "lastFrame": 951
+            },
+            {
+                "count": 1187,
+                "firstFrame": 201,
+                "lastFrame": 1020
+            }
+        ]
+    },
+    {
         "testName": "jamie_jump_cancel_landings",
         "testVersion": "33",
         "finished": true,
