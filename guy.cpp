@@ -1945,9 +1945,9 @@ bool Guy::WorldPhysics(bool onlyFloor)
         // dont let stuff below see landed/grounded
         landed = false;
 
-        if (groundBounce) {
-            airborne = true;
-        }
+        // tumble is airborne while tumbling so works for both
+        airborne = true;
+
         // use this for tumble too, 'special landing needing transition'
         bounced = true;
     }
