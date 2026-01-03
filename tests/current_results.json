@@ -5093,6 +5093,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jamie_goro_kabe_tataki_forcepc",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1846,
+                "firstFrame": 118,
+                "lastFrame": 1230
+            },
+            {
+                "count": 413,
+                "firstFrame": 67,
+                "lastFrame": 991
+            },
+            {
+                "count": 50,
+                "firstFrame": 686,
+                "lastFrame": 981
+            },
+            {
+                "count": 176,
+                "firstFrame": 67,
+                "lastFrame": 975
+            },
+            {
+                "count": 176,
+                "firstFrame": 67,
+                "lastFrame": 975
+            },
+            {
+                "count": 654,
+                "firstFrame": 94,
+                "lastFrame": 1147
+            },
+            {
+                "count": 931,
+                "firstFrame": 93,
+                "lastFrame": 1230
+            },
+            {
+                "count": 414,
+                "firstFrame": 117,
+                "lastFrame": 1105
+            },
+            {
+                "count": 9,
+                "firstFrame": 215,
+                "lastFrame": 223
+            },
+            {
+                "count": 756,
+                "firstFrame": 67,
+                "lastFrame": 1137
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 538,
+                "firstFrame": 159,
+                "lastFrame": 1137
+            }
+        ]
+    },
+    {
         "testName": "jamie_jump_cancel_landings",
         "testVersion": "33",
         "finished": true,
