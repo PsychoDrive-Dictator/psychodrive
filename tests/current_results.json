@@ -336,6 +336,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_blocked_specials",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1358,
+                "firstFrame": 164,
+                "lastFrame": 947
+            },
+            {
+                "count": 92,
+                "firstFrame": 326,
+                "lastFrame": 371
+            },
+            {
+                "count": 31,
+                "firstFrame": 326,
+                "lastFrame": 356
+            },
+            {
+                "count": 157,
+                "firstFrame": 164,
+                "lastFrame": 717
+            },
+            {
+                "count": 146,
+                "firstFrame": 175,
+                "lastFrame": 717
+            },
+            {
+                "count": 932,
+                "firstFrame": 164,
+                "lastFrame": 947
+            },
+            {
+                "count": 1155,
+                "firstFrame": 164,
+                "lastFrame": 947
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 162,
+                "firstFrame": 164,
+                "lastFrame": 325
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 90,
+                "firstFrame": 175,
+                "lastFrame": 713
+            },
+            {
+                "count": 116,
+                "firstFrame": 213,
+                "lastFrame": 729
+            }
+        ]
+    },
+    {
         "testName": "aa_canblock_cornercases",
         "testVersion": "34",
         "finished": true,
