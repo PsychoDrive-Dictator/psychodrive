@@ -330,6 +330,7 @@ bool Guy::RunFrame(bool advancingTime)
     punishCounterThisFrame = false;
     grabbedThisFrame = false;
     beenHitThisFrame = false;
+    grabAdjust = false;
     armorThisFrame = false;
     atemiThisFrame = false;
     landed = false;
@@ -2285,7 +2286,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         // really we should save the lock target, etc.
         if (pOpponent) {
             HitEntry *pEntry = &pCharData->hitByID[pendingUnlockHit]->common[0];
-            pOpponent->ApplyHitEffect(pEntry, this, true, true, false, false);
+            pOpponent->ApplyHitEffect(pEntry, this, true, false, false, false);
             // clamp
             pOpponent->setFocus(pOpponent->focus);
             pOpponent->setGauge(pOpponent->gauge);
@@ -2455,6 +2456,21 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             applyHit = false;
         }
 
+        // grab or hitgrab
+        bool hitGrab = (pHitEntry->attr2 & (1<<1));
+        if (trade) {
+            // just apply the hit on trade
+            hitGrab = false;
+        }
+        if (pendingHit.blocked || pendingHit.parried) {
+            // and on block
+            hitGrab = false;
+        }
+        if (!pOtherGuy->locked && (isGrab || hitGrab)) {
+            pGuy->grabbedThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
+        }
+
         if (!hitArmor) {
             if (applyHit && (!pendingHit.blocked && !pendingHit.parried)) {
                 pOtherGuy->blocking = false;
@@ -2462,7 +2478,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (applyHit && !pendingHit.parried) {
                 pOtherGuy->parrying = false;
             }
-            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
+            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
 
             if (pendingHit.parried) {
                 pGuy->hitVelX = pOtherGuy->hitVelX / Fixed(2);
@@ -2486,7 +2502,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         int hitStopSelf = pHitEntry->hitStopOwner;
         int hitStopTarget = pHitEntry->hitStopTarget;
-        int attr2 = pHitEntry->attr2;
         // or it could be that normal throws take their value from somewhere else
         if (hitStopTarget == -1) {
             hitStopTarget = hitStopSelf;
@@ -2541,21 +2556,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         } else {
             int hitSeed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
             addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
-        }
-
-        // grab or hitgrab
-        bool hitGrab = (attr2 & (1<<1));
-        if (trade) {
-            // just apply the hit on trade
-            hitGrab = false;
-        }
-        if (pendingHit.blocked || pendingHit.parried) {
-            // and on block
-            hitGrab = false;
-        }
-        if (!pOtherGuy->locked && (isGrab || hitGrab)) {
-            pGuy->grabbedThisFrame = true;
-            if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
         }
 
         int hitID = hitBox.hitID;
@@ -2643,7 +2643,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
     }
 }
 
-void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade, HurtBox *pHurtBox)
+void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool isGrab, bool isDrive, bool isDomain, bool isTrade, HurtBox *pHurtBox)
 {
     int comboAdd = pHitEffect->comboAdd;
     int juggleFirst = pHitEffect->juggleFirst;
@@ -2869,7 +2869,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     bool appliedHitStun = false;
 
-    if (!isDomain && applyHitStun) {
+    if (!isDomain && applyHit) {
         // not sure if the right check to reset hitstun to 0 only in some cases
         // maybe time to start adding lots of hitstun as a juggle state
         if (hitEntryHitStun > 0 || dmgType == 21 || dmgType == 22) {
@@ -2879,6 +2879,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
 
     //int origPoseStatus = getPoseStatus() - 1;
+
+    if (isGrab) {
+        grabAdjust = !(attr2 & (1<<5));
+    }
 
     if (applyHit) {
         if (destY > 0 ) {
@@ -4809,11 +4813,13 @@ void Guy::DoLockKey(void)
                 if (!pOpponent->locked) {
                     // only snap position if this isn't a followup lock
                     pOpponent->direction = direction;
-                    pOpponent->posX = getPosX();
-                    pOpponent->posY = getPosY();
-                    pOpponent->posOffsetX = Fixed(0);
-                    pOpponent->posOffsetY = Fixed(0);
-                    pOpponent->airborne = airborne;
+                    if (pOpponent->grabAdjust) {
+                        pOpponent->posX = getPosX();
+                        pOpponent->posY = getPosY();
+                        pOpponent->posOffsetX = Fixed(0);
+                        pOpponent->posOffsetY = Fixed(0);
+                        pOpponent->airborne = airborne;
+                    }
                     pOpponent->velocityX = Fixed(0);
                     pOpponent->velocityY = Fixed(0);
                     pOpponent->accelX = Fixed(0);
