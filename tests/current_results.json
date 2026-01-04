@@ -7644,37 +7644,37 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 4427,
-                "firstFrame": 1014,
+                "count": 4155,
+                "firstFrame": 1066,
                 "lastFrame": 2848
             },
             {
-                "count": 1589,
+                "count": 1549,
                 "firstFrame": 493,
                 "lastFrame": 2370
             },
             {
-                "count": 680,
+                "count": 676,
                 "firstFrame": 533,
                 "lastFrame": 2370
             },
             {
-                "count": 955,
+                "count": 862,
                 "firstFrame": 493,
                 "lastFrame": 2370
             },
             {
-                "count": 926,
+                "count": 862,
                 "firstFrame": 493,
                 "lastFrame": 2370
             },
             {
-                "count": 2780,
+                "count": 2680,
                 "firstFrame": 380,
                 "lastFrame": 2848
             },
             {
-                "count": 2793,
+                "count": 2584,
                 "firstFrame": 356,
                 "lastFrame": 2848
             },
@@ -7684,8 +7684,8 @@ var currentResults =
                 "lastFrame": 2848
             },
             {
-                "count": 1461,
-                "firstFrame": 1108,
+                "count": 1459,
+                "firstFrame": 1800,
                 "lastFrame": 2848
             },
             {
@@ -7694,12 +7694,12 @@ var currentResults =
                 "lastFrame": 2848
             },
             {
-                "count": 527,
-                "firstFrame": 1002,
+                "count": 475,
+                "firstFrame": 1547,
                 "lastFrame": 2274
             },
             {
-                "count": 4141,
+                "count": 4140,
                 "firstFrame": 627,
                 "lastFrame": 2848
             }

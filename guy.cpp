@@ -1242,6 +1242,9 @@ void Guy::DoTriggers(int fluffFrameBias)
             }
         }
 
+        // possibly need a fixed array here too if it shows up in mining profile
+        std::set<int> initialIsToConsume;
+
         std::sort(triggers, triggers + triggerCount, [](const TriggerCheckState& a, const TriggerCheckState& b) {
             return a.triggerID < b.triggerID;
         });
@@ -1312,6 +1315,11 @@ void Guy::DoTriggers(int fluffFrameBias)
                     // queue the deferred trigger
                     dc.setDeferredTriggerIDs.insert(triggerID);
                     keptDeferredTriggerIDs.insert(triggerID);
+
+                    if (!trigState.hasAntiNormal) {
+                        initialIsToConsume.insert(initialI);
+                    }
+
                     if (trigState.hasAntiNormal) {
                         break;
                     }
@@ -1333,6 +1341,10 @@ void Guy::DoTriggers(int fluffFrameBias)
                     break;
                 }
             }
+        }
+
+        for (auto &initialI : initialIsToConsume) {
+            dc.inputBuffer[initialI] |= CONSUMED;
         }
     }
 
