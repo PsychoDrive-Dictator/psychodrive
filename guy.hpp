@@ -435,6 +435,9 @@ private:
     }
 
     bool fluffFrames(int frameBias = 0) {
+        if (nextAction != -1) {
+            return false;
+        }
         if (hitStun) {
             return false;
         }
