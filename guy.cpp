@@ -2547,6 +2547,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             // just apply the hit on trade
             hitGrab = false;
         }
+        if (pendingHit.blocked || pendingHit.parried) {
+            // and on block
+            hitGrab = false;
+        }
         if (!pOtherGuy->locked && (isGrab || hitGrab)) {
             pGuy->grabbedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
