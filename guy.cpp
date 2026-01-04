@@ -2177,6 +2177,14 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 hitEntryFlag |= punish_counter;
             }
 
+            if (hitbox.flags & multi_counter) {
+                if (hitCounterThisMove) {
+                    hitEntryFlag |= counter;
+                }
+                if (hitPunishCounterThisMove) {
+                    hitEntryFlag |= punish_counter;
+                }
+            }
 
             bool otherGuyHit = pOtherGuy->hitStun && !pOtherGuy->blocking;
             bool otherGuyCanBlock = pOtherGuy->canAct() || pOtherGuy->blocking;
