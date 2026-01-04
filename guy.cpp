@@ -2882,6 +2882,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     if (isGrab) {
         grabAdjust = !(attr2 & (1<<5));
+        if (moveType == 0) {
+            destX = 0;
+            destY = 0;
+        }
     }
 
     if (applyHit) {
