@@ -550,6 +550,9 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     uint64_t flags = pTrigger->flags;
     int inst = pTrigger->comboInst;
 
+    blocking = false;
+    parrying = flags & (1ULL<<40);
+
     if (flags & (1ULL<<26)) {
         jumped = true;
 
@@ -2188,7 +2191,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 otherGuyCanBlock = false;
             }
             bool blocked = false;
-            if (pOtherGuy->blocking || otherGuyCanBlock) {
+            bool parried = false;
+            if (pOtherGuy->parrying && !isGrab) {
+                parried = true;
+            } else if (pOtherGuy->blocking || otherGuyCanBlock) {
                 blocked = true;
             }
 
@@ -2203,7 +2209,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 hitEntryFlag = block;
             }
 
-            if (isGrab && (pOtherGuy->blocking || pOtherGuy->hitStun)) {
+            if (isGrab && (pOtherGuy->blocking && pOtherGuy->hitStun)) {
                 // a grab would whiff if opponent is already in blockstun
                 continue;
             }
@@ -2226,6 +2232,8 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
             if (isGrab) {
                 pHitEntry = &pHitData->common[0];
+            } else if (parried) {
+                pHitEntry = &pHitData->common[4];
             } else {
                 pHitEntry = &pHitData->param[hitEntryFlag];
             }
@@ -2252,7 +2260,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             // juggle was the last thing to check, hit is valid
             pendingHitList.push_back({
                 this, pOtherGuy, hitbox, hurtBox, pHitEntry,
-                hitEntryFlag, hitbox.pHitData ? hitbox.pHitData->id : 0, blocked, bombBurst
+                hitEntryFlag, hitbox.pHitData ? hitbox.pHitData->id : 0, blocked, parried, bombBurst
             });
         }
     }
@@ -2343,13 +2351,24 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitStopToParent = pGuy->pCurrentAction->pProjectileData->hitStopToParent;
         }
 
-        if (pendingHit.blocked) {
+        if (pendingHit.blocked || pendingHit.parried) {
             pOtherGuy->blocking = true;
+        }
+
+        if (pendingHit.blocked) {
             pGuy->hasBeenBlockedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->hasBeenBlockedThisFrame = true;
             pGuy->hasBeenBlockedThisMove = true;
             if (hitFlagToParent) pGuy->pParent->hasBeenBlockedThisMove = true;
             otherGuyLog(pOtherGuy, pOtherGuy->logHits, "block!");
+        }
+
+        if (pendingHit.parried) {
+            pGuy->hasBeenParriedThisFrame = true;
+            if (hitFlagToParent) pGuy->pParent->hasBeenParriedThisFrame = true;
+            pGuy->hasBeenParriedThisMove = true;
+            if (hitFlagToParent) pGuy->pParent->hasBeenParriedThisMove = true;
+            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "parry!");
         }
 
         bool hitArmor = false;
@@ -2421,8 +2440,11 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
 
         if (!hitArmor) {
-            if (applyHit && !pendingHit.blocked) {
+            if (applyHit && (!pendingHit.blocked && !pendingHit.parried)) {
                 pOtherGuy->blocking = false;
+            }
+            if (applyHit && !pendingHit.parried) {
+                pOtherGuy->parrying = false;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
             Guy *pResourceGuy = pGuy;
@@ -2475,6 +2497,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (pGuy->hasBeenBlockedThisFrame) {
             hitMarkerType = 2;
             hitMarkerRadius = 30.0f;
+        } else if (pGuy->hasBeenParriedThisFrame) {
+            hitMarkerType = 2;
+            hitMarkerRadius = 60.0f;
         } else if ((hitEntryFlag & punish_counter) == punish_counter) {
             hitMarkerRadius = 45.0f;
         }
@@ -2827,6 +2852,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             airborne = true;
         }
 
+        // special ground status, ground bounce OR tumble
+        groundBounce = false;
+        tumble = false;
+
+        // special wall status, splat OR bounce (NOT exclusive from special gronud satatus)
+        wallSplat = false;
+        wallBounce = false;
+
         if (jimenBound && floorTime) {
             int floorDestX = pHitEffect->floorDestX;
             int floorDestY = pHitEffect->floorDestY;
@@ -2840,12 +2873,15 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             groundBounceAccelY = fixDivWithBias(Fixed(floorDestY * -8) , Fixed(floorTime * floorTime));
             groundBounceVelY -= groundBounceAccelY;
         } else {
-            groundBounce = false;
+            if (moveType == 69) {
+                knockDown = true;
+                tumble = true;
+                // todo move this into some kind of 'next vel' and debloat the guy struct
+                groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
+                knockDownFrames = downTime - 27;
+            }
         }
 
-        wallSplat = false;
-        wallBounce = false;
-        tumble = false;
         int wallTime = pHitEffect->wallTime;
         if (kabeTataki) {
             // this can happen even if you block! blocked DI
@@ -2861,12 +2897,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
             wallBounceAccelY = fixDivWithBias(Fixed(wallDestY * -8) , Fixed(wallTime * wallTime));
             wallBounceVelY -= wallBounceAccelY;
-        } else if (moveType == 69) {
-            knockDown = true;
-            tumble = true;
-            // todo move this into some kind of 'next vel' and debloat the guy struct
-            groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
-            knockDownFrames = downTime - 27;
         }
 
         //if (destTime != 0)
@@ -2953,9 +2983,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     if (!isDomain && applyHit && !appliedAction) {
         int prevNextAction = nextAction;
         if (blocking) {
-            nextAction = 160 + attackStrength;
-            if (currentInput & DOWN) {
-                nextAction = 174 + attackStrength;
+            if (parrying) {
+                nextAction = 483; // todo script depends on attack height?
+            } else {
+                nextAction = 160 + attackStrength;
+                if (currentInput & DOWN) {
+                    nextAction = 174 + attackStrength;
+                }
             }
         } else {
             //if (dmgType & 3) { // crumple? :/
@@ -3961,7 +3995,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         log(logHits, "proximity guard!");
     }
 
-    if (blocking && !hitStun && (!proxGuarded || !(currentInput & BACK))) {
+    if (!didTrigger && blocking && !hitStun && (!proxGuarded || !(currentInput & BACK))) {
         // was proximity guard, can act now
         blocking = false;
         nextAction = 1;
@@ -3997,6 +4031,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
         // reset status - recovered control to neutral
         jumped = false;
+        blocking = false;
         if (canMoveNow) {
             moveTurnaround = needsTurnaround(Fixed(10));
         }
@@ -4054,6 +4089,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {
         if (currentAction != 480 || currentFrame >= 12) {
+            parrying = false;
             nextAction = 482; // DPA_STD_END
         }
     }

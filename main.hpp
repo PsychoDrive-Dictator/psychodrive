@@ -204,6 +204,7 @@ struct PendingHit {
     int hitEntryFlag;
     int hitDataID;
     bool blocked;
+    bool parried;
     bool bombBurst;
 };
 

@@ -561,6 +561,7 @@ private:
         crouching = false;
         freeMovement = false;
         blocking = false;
+        parrying = false;
         hurtBoxProxGuarded = false;
         positionProxGuarded = false;
         bounced = false;
@@ -756,6 +757,7 @@ private:
     bool crouching : 1;
     bool freeMovement : 1;
     bool blocking : 1;
+    bool parrying : 1;
     bool hurtBoxProxGuarded : 1;
     bool positionProxGuarded : 1;
     bool bounced : 1;
@@ -785,6 +787,7 @@ private:
     bool superAction : 1;
     bool hitThisFrame : 1;
     bool hasBeenBlockedThisFrame : 1;
+    bool hasBeenParriedThisFrame : 1;
     bool hitArmorThisFrame : 1;
     bool hitAtemiThisFrame : 1;
     bool punishCounterThisFrame : 1;
@@ -793,6 +796,7 @@ private:
     bool hitCounterThisMove : 1;
     bool hitPunishCounterThisMove : 1;
     bool hasBeenBlockedThisMove : 1;
+    bool hasBeenParriedThisMove : 1;
     bool hitArmorThisMove : 1;
     bool hitAtemiThisMove : 1;
     bool countingDownInstall : 1;
