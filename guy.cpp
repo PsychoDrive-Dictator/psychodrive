@@ -2168,13 +2168,6 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
-            // figure out test for different crouch hit entry?
-            if (pOtherGuy->getCrouching()) {
-                hitEntryFlag |= crouch;
-            }
-            if (otherGuyAirborne) {
-                hitEntryFlag |= air;
-            }
             if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0)) {
                 hitEntryFlag |= counter;
             }
@@ -2221,6 +2214,15 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
             if (blocked) {
                 hitEntryFlag = block;
+            }
+
+            // apply those modifiers on top of the block base if needed
+            // todo find test for block+crouch
+            if (pOtherGuy->getCrouching()) {
+                hitEntryFlag |= crouch;
+            }
+            if (otherGuyAirborne) {
+                hitEntryFlag |= air;
             }
 
             if (isGrab && (pOtherGuy->blocking && pOtherGuy->hitStun)) {
