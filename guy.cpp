@@ -2663,6 +2663,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     int attackStrength = pHitEffect->dmgPower;
     int attr0 = pHitEffect->attr0;
     int attr1 = pHitEffect->attr1;
+    int attr2 = pHitEffect->attr2;
     int attr3 = pHitEffect->attr3;
     int ext0 = pHitEffect->ext0;
 

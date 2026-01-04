@@ -2949,6 +2949,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "cammy_catch_adj",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 209,
+                "firstFrame": 102,
+                "lastFrame": 267
+            },
+            {
+                "count": 24,
+                "firstFrame": 102,
+                "lastFrame": 160
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 5,
+                "firstFrame": 161,
+                "lastFrame": 165
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "cammy_ex_rev_edge",
         "testVersion": "26",
         "finished": true,
