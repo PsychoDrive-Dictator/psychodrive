@@ -2875,7 +2875,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
             groundBounce = true;
             groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
-            groundBounceAccelX = fixDivWithBias(Fixed(floorDestX) , Fixed(floorTime * 32));
+            groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
+            log(true, "floorDestX" + std::to_string(floorDestX) + " floorTime" + std::to_string(floorTime));
+            if (direction == Fixed(-1) && groundBounceAccelX.data & 63) {
+                // ??
+                groundBounceAccelX.data += 1;
+            }
             groundBounceVelX -= groundBounceAccelX;
 
             groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
