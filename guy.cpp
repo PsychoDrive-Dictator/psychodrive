@@ -2716,6 +2716,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         destY = 0;
     }
 
+    if (blocking) {
+        // todo should we remove other special status here?
+        destY = 0;
+    }
+
     if (jimenBound && !airborne) {
         jimenBound = false;
     }
