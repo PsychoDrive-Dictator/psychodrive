@@ -2447,6 +2447,13 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->parrying = false;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, applyHit, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
+
+            if (pendingHit.parried) {
+                pGuy->hitVelX = pOtherGuy->hitVelX / Fixed(2);
+                pOtherGuy->hitVelX /= Fixed(2); // todo no push? if proj
+                pGuy->hitAccelX = pOtherGuy->hitAccelX / Fixed(2);
+                pOtherGuy->hitAccelX /= Fixed(2);
+            }
             Guy *pResourceGuy = pGuy;
             if (pGuy->isProjectile) {
                 pResourceGuy = pGuy->pParent;
