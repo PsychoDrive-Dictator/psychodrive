@@ -3170,7 +3170,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             if (resetHitStunOnTransition) {
                 frameCount = pHitEffect->hitStun - 2;
             }
-            actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 1 - actionInitialFrame), Fixed(frameCount));
+            if (frameCount == 0) {
+                actionSpeed = Fixed(1);
+            } else {
+                actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 1 - actionInitialFrame), Fixed(frameCount));
+            }
         }
     }
 
@@ -4643,7 +4647,9 @@ void Guy::DoSteerKey(void)
                     }
                     if (pGuy) {
                         homeTargetX = pGuy->getPosX() + (targetOffsetX * pGuy->direction * Fixed(-1));
+                        homeTargetX = getPosX() - homeTargetX;
                         homeTargetY = pGuy->getPosY() + targetOffsetY;
+                        homeTargetY = getPosY() - homeTargetY;
                     } else if (targetType == 13) {
                         homeTargetY = targetOffsetY;
                         if (targetOffsetX != Fixed(0)) {
@@ -4675,10 +4681,10 @@ void Guy::DoSteerKey(void)
                     }
                 } else {
                     if (multiValueType & 1) {
-                        velocityX = -(getPosX() - homeTargetX) / Fixed(calcValueFrame) * direction;
+                        velocityX = -(homeTargetX) / Fixed(calcValueFrame) * direction;
                     }
                     if (multiValueType & 2) {
-                        velocityY = -(getPosY() - homeTargetY) / Fixed(calcValueFrame);
+                        velocityY = -(homeTargetY) / Fixed(calcValueFrame);
                     }
                 }
                 break;
