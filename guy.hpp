@@ -652,6 +652,7 @@ private:
         pendingHitStop = 0;
         timeInHitStop = 0;
         ignoreHitStop = false;
+        wasIgnoreHitStop = false;
         tokiYoTomare = false;
         warudo = false;
         tokiWaUgokidasu = false;
@@ -801,6 +802,7 @@ private:
     bool hitAtemiThisMove : 1;
     bool countingDownInstall : 1;
     bool ignoreHitStop : 1;
+    bool wasIgnoreHitStop : 1;
     bool tokiYoTomare : 1;
     bool warudo : 1;
     bool tokiWaUgokidasu : 1;

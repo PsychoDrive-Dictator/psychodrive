@@ -1623,7 +1623,9 @@ int Guy::getFrameMeterColorIndex() {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
-    if (warudo || getHitStop()) return false;
+    // seems like ignore hitstop bit lingers for one frame but just for push?
+    // probably symptom of an ordering difference
+    if (warudo || (getHitStop() && !wasIgnoreHitStop)) return false;
 
     // do reflect before push, since vel could be winning to push us flush against someone
     // in theory should do before wall touch too but not sure if both can be touching the
@@ -4217,6 +4219,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     couldMove = canMoveNow;
     lastPosX = getPosX();
     lastPosY = getPosY();
+    wasIgnoreHitStop = ignoreHitStop;
 
     forcedTrigger = ActionRef(0, 0);
 
