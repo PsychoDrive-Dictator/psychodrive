@@ -4326,6 +4326,11 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             DoEventKey(pCurrentAction, currentFrame);
         }
 
+        // if we transition after landing frame, reset action restriction
+        if (jumpLandingDisabledFrames < 4) {
+            jumpLandingDisabledFrames = 0;
+        }
+
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
         actionSpeed = Fixed(1);
         actionInitialFrame = -1;
