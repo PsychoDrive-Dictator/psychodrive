@@ -1104,16 +1104,16 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                         }
                     }
 
-                    if (inputBufferCursor == dc.inputBuffer.size()) {
-                        // corner case - if we run out of buffer but had matched the input, finalize
-                        // the match now or the trigger won't work - this can happen if you eg. have
-                        // a dash input immediately at the beginning of a replay since the last match
-                        // is a neutral input, it keeps matching all the way to the beginning of the
-                        // buffer
-                        if (match) {
-                            pass = true;
-                        }
-                    }
+                    // if (inputBufferCursor == dc.inputBuffer.size()) {
+                    //     // corner case - if we run out of buffer but had matched the input, finalize
+                    //     // the match now or the trigger won't work - this can happen if you eg. have
+                    //     // a dash input immediately at the beginning of a replay since the last match
+                    //     // is a neutral input, it keeps matching all the way to the beginning of the
+                    //     // buffer
+                    //     if (match) {
+                    //         pass = true;
+                    //     }
+                    // }
 
                     if (!pass) {
                         break;
