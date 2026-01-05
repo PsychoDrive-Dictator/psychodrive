@@ -793,8 +793,101 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     return true;
 }
 
-bool Guy::MatchButtonCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
-    return false;
+bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCursor, int maxSearch, bool needPositiveEdge) {
+    bool pass = false;
+    bool fail = false;
+    bool match = false;
+    uint32_t inputOkKeyFlags = pInput->okKeyFlags;
+    uint32_t inputOkCondFlags = pInput->okCondFlags;
+    int lastMatchInput = -1;
+
+    uint32_t inputSearch = inputBufferCursor + pInput->numFrames;
+    if (needPositiveEdge) {
+        inputSearch += 1; // one grace frame to look for the negative edge
+    }
+    // todo or is this fine?
+    if (pInput->numFrames == -1) {
+        inputSearch = maxSearch;
+    }
+    if (inputSearch > dc.inputBuffer.size()) {
+        inputSearch = dc.inputBuffer.size();
+    }
+    bool matchThisFrame = false;
+    while (inputBufferCursor < inputSearch)
+    {
+        int bufferInput = dc.inputBuffer[inputBufferCursor];
+        int bufferDirection = dc.directionBuffer[inputBufferCursor];
+
+        if (direction.i() != bufferDirection) {
+            bufferInput = invertDirection(bufferInput);
+        }
+
+        bool inputNg = false;
+
+        // we venture past the allowed buffer here technically
+        bool onlyNegativeEdge = needPositiveEdge && inputBufferCursor == inputSearch - 1;
+
+        if (pInput->ngCondFlags & 2) {
+            if ((bufferInput & 0xF) == (pInput->ngKeyFlags & 0xF)) {
+                inputNg = true;
+            }
+        } else if (pInput->ngKeyFlags & bufferInput) {
+            inputNg = true;
+        }
+        if (inputNg && !match) {
+            fail = true;
+            break;
+        }
+        if (!inputNg && matchFrameButton(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+            if (onlyNegativeEdge) {
+                break;
+            }
+            match = true;
+            matchThisFrame = true;
+            lastMatchInput = inputBufferCursor;
+            if (inputOkCondFlags & 1) {
+                // inclusive lever shift initial match
+                // turn the match into exclusive of current lever position to look for the edge of it settling here
+                inputOkCondFlags &= ~1;
+                inputOkCondFlags |= 2;
+                inputOkKeyFlags = bufferInput & 0xF;
+            }
+        } else if (match) {
+            matchThisFrame = false;
+            break;
+        }
+        if (onlyNegativeEdge) {
+            break;
+        }
+        // if (pCommand->id == 36) {
+        //     guyLog(true, std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
+        //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " matchThisInput " + std::to_string(matchThisFrame) + " buffer " + std::to_string(bufferInput));
+        // }
+        inputBufferCursor++;
+    }
+
+    // if (fail) {
+    //     if (pCommand->id == 36) {
+    //         guyLog(true, "fail " + std::to_string(dc.inputBuffer[inputBufferCursor]));
+    //     }
+    //     break;
+    // }
+
+    pass = false;
+    if (!fail && match) {
+        pass = true;
+        if (matchThisFrame && needPositiveEdge) {
+            // need positive edge but never not-matched until end of window
+            pass = false;
+        }
+    }
+
+    // in strings of inclusive lever matches the last pass might pass the next one too, so don't
+    if (pass && lastMatchInput != -1) {
+        inputBufferCursor = lastMatchInput + 1;
+    }
+
+    return pass;
 }
 
 bool Guy::MatchChargeCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
@@ -876,8 +969,16 @@ bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorP
     return pass;
 }
 
-bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
-    return false;
+bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, int maxSearch, bool needPositiveEdge) {
+    bool pass = false;
+    if (pCommandInput->type == InputType::Rotation) {
+        pass = MatchRotateCommandInput(pCommandInput, cursorPos);
+    } else if (pCommandInput->type == InputType::ChargeRelease) {
+        pass = MatchChargeCommandInput(pCommandInput, cursorPos);
+    } else {
+        pass = MatchNormalCommandInput(pCommandInput, cursorPos, maxSearch, needPositiveEdge);
+    }
+    return pass;
 }
 
 bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
@@ -986,134 +1087,12 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
 
             for (auto& variant : pCommand->variants) {
                 int inputID = variant.inputs.size() - 1;
-
+                int maxSearch = initialI + variant.totalMaxFrames + 1;
                 uint32_t inputBufferCursor = initialI;
-                i = initialI;
-                bool fail = false;
 
                 while (inputID >= 0 ) {
-                    CommandInput *pInput = &variant.inputs[inputID];
-                    uint32_t inputOkKeyFlags = pInput->okKeyFlags;
-                    uint32_t inputOkCondFlags = pInput->okCondFlags;
-                    uint32_t inputNgKeyFlags = pInput->ngKeyFlags;
-                    uint32_t inputNgCondFlags = pInput->ngCondFlags;
-                    int numFrames = pInput->numFrames;
-                    bool match = false;
-                    int lastMatchInput = i;
-                    bool pass = false;
-
-                    if (pInput->type == InputType::Rotation) {
-                        pass = MatchRotateCommandInput(pInput, inputBufferCursor);
-                    } else if (pInput->type == InputType::ChargeRelease) {
-                        pass = MatchChargeCommandInput(pInput, inputBufferCursor);
-                    } else {
-                        bool needPositiveEdge = true;
-                        if (inputID == 0) {
-                            // no positive edge is ok for last input? maybe only direction
-                            needPositiveEdge = false;
-                        }
-                        uint32_t inputSearch = lastMatchInput + numFrames + 1;
-                        if (needPositiveEdge) {
-                            inputSearch += 1; // one grace frame to look for the negative edge
-                        }
-                        // last command input before trigger input seems to have one less frame to work with
-                        if (inputID == (int)variant.inputs.size() - 1) {
-                            inputSearch -= 1;
-                        }
-                        // todo or is this fine?
-                        if (numFrames == -1) {
-                            inputSearch = initialI + variant.totalMaxFrames + 1;
-                        }
-                        if (inputSearch > dc.inputBuffer.size()) {
-                            inputSearch = dc.inputBuffer.size();
-                        }
-                        bool matchThisFrame = false;
-                        while (inputBufferCursor < inputSearch)
-                        {
-                            int bufferInput = dc.inputBuffer[inputBufferCursor];
-                            int bufferDirection = dc.directionBuffer[inputBufferCursor];
-
-                            if (direction.i() != bufferDirection) {
-                                bufferInput = invertDirection(bufferInput);
-                            }
-
-                            bool inputNg = false;
-
-                            // we venture past the allowed buffer here technically
-                            bool onlyNegativeEdge = needPositiveEdge && inputBufferCursor == inputSearch - 1;
-
-                            if (inputNgCondFlags & 2) {
-                                if ((bufferInput & 0xF) == (inputNgKeyFlags & 0xF)) {
-                                    inputNg = true;
-                                }
-                            } else if (inputNgKeyFlags & bufferInput) {
-                                inputNg = true;
-                            }
-                            if (inputNg && !match) {
-                                fail = true;
-                                break;
-                            }
-                            if (!inputNg && matchFrameButton(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
-                                if (onlyNegativeEdge) {
-                                    break;
-                                }
-                                match = true;
-                                matchThisFrame = true;
-                                i = inputBufferCursor;
-                                if (inputOkCondFlags & 1) {
-                                    // inclusive lever shift initial match
-                                    // turn the match into exclusive of current lever position to look for the edge of it settling here
-                                    inputOkCondFlags &= ~1;
-                                    inputOkCondFlags |= 2;
-                                    inputOkKeyFlags = bufferInput & 0xF;
-                                }
-                            } else if (match) {
-                                matchThisFrame = false;
-                                break;
-                            }
-                            if (onlyNegativeEdge) {
-                                break;
-                            }
-                            if (pCommand->id == 36) {
-                                guyLog(true, std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
-                                " inputbuffercursor " + std::to_string(inputBufferCursor) + " matchThisInput " + std::to_string(matchThisFrame) + " buffer " + std::to_string(bufferInput));
-                            }
-                            inputBufferCursor++;
-                        }
-
-                        if (fail) {
-                            if (pCommand->id == 36) {
-                                guyLog(true, "fail " + std::to_string(dc.inputBuffer[inputBufferCursor]));
-                            }
-                            break;
-                        }
-
-                        pass = false;
-                        if (match) {
-                            pass = true;
-                            if (matchThisFrame && needPositiveEdge) {
-                                // need positive edge but never not-matched until end of window
-                                pass = false;
-                            }
-                        }
-
-                        // in strings of inclusive lever matches the last pass might pass the next one too, so don't
-                        inputBufferCursor = i + 1;
-                        if (!pass) {
-                            break;
-                        }
-                    }
-
-                    // if (inputBufferCursor == dc.inputBuffer.size()) {
-                    //     // corner case - if we run out of buffer but had matched the input, finalize
-                    //     // the match now or the trigger won't work - this can happen if you eg. have
-                    //     // a dash input immediately at the beginning of a replay since the last match
-                    //     // is a neutral input, it keeps matching all the way to the beginning of the
-                    //     // buffer
-                    //     if (match) {
-                    //         pass = true;
-                    //     }
-                    // }
+                    // no positive edge for last input.. todo maybe only for normal directions?
+                    bool pass = MatchCommandInput(&variant.inputs[inputID], inputBufferCursor, maxSearch, inputID != 0);
 
                     if (!pass) {
                         break;
