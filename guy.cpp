@@ -58,7 +58,7 @@ bool doBoxesHit(Box box1, Box box2)
     return true;
 }
 
-bool matchInput( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
+bool matchFrameButton( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
     if (dcExcFlags != 0 ) {
@@ -793,6 +793,93 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     return true;
 }
 
+bool Guy::MatchButtonCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
+    return false;
+}
+
+bool Guy::MatchChargeCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
+    // charge release
+    Charge *pCharge = pCommandInput->pCharge;
+    bool pass = false;
+    uint32_t initialCursorPos = cursorPos;
+
+    if (pCharge) {
+        uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
+        uint32_t inputOkCondFlags = pCharge->okCondFlags;
+        uint32_t chargeFrames = pCharge->chargeFrames;
+        uint32_t keepFrames = pCharge->keepFrames;
+        uint32_t dirCount = 0;
+        // uint32_t dirNotMatchCount = 0;
+        // count matching direction in input buffer, super naive but will work for testing
+        uint32_t searchArea = cursorPos + chargeFrames + keepFrames;
+        while (cursorPos < dc.inputBuffer.size() && cursorPos < searchArea)
+        {
+            if (matchFrameButton(dc.inputBuffer[cursorPos], inputOkKeyFlags, inputOkCondFlags)) {
+                dirCount++;
+                if (dirCount >= chargeFrames) {
+                    break;
+                }
+            }
+            // else {
+            //     dirNotMatchCount++;
+            // }
+            cursorPos++;
+        }
+
+        if (dirCount < chargeFrames || (cursorPos - initialCursorPos) > (chargeFrames + keepFrames)) {
+            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+            pass = false;
+        } else {
+            //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+            pass = true;
+        }
+    } else {
+        log(true, "charge entries mismatch?");
+    }
+
+    return pass;
+}
+
+bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
+    // rotate
+    int pointsNeeded = pCommandInput->rotatePointsNeeded;
+    uint32_t searchArea = cursorPos + pCommandInput->numFrames * 2; // todo, i think that's best case
+    int curAngle = 0;
+    int pointsForward = 0;
+    int pointsBackwards = 0;
+    bool pass = false;
+    while (cursorPos < dc.inputBuffer.size() && cursorPos < searchArea)
+    {
+        int bufferInput = dc.inputBuffer[cursorPos];
+        int targetAngle = inputAngle(bufferInput);
+        if (targetAngle) {
+            if (curAngle == 0) {
+                curAngle = targetAngle;
+            }
+            int diff = angleDiff(curAngle, targetAngle);
+            //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
+            if (diff >= 90 && diff < 180) {
+                pointsForward++;
+                curAngle = targetAngle;
+            }
+            if (diff <= -90 && diff > -180) {
+                pointsBackwards++;
+                curAngle = targetAngle;
+            }
+        }
+        cursorPos++;
+    }
+    if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
+        pass = true;
+    }
+    return pass;
+}
+
+bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
+    return false;
+}
+
 bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
 {
     uint32_t okKeyFlags = pTrigger->okKeyFlags;
@@ -830,7 +917,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                 i = 0;
                 initialMatch = false;
                 while (i < initialSearch) {
-                    if (matchInput(dc.inputBuffer[i], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
+                    if (matchFrameButton(dc.inputBuffer[i], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
                     {
                         if (!(dc.inputBuffer[i] & CONSUMED)) {
                             atLeastOneNotConsumed = true;
@@ -862,7 +949,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
         while (i < initialSearch)
         {
             // guile 1112 has 0s everywhere
-            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchInput(dc.inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
+            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
             {
                 if (!(dc.inputBuffer[i] & CONSUMED)) {
                     atLeastOneNotConsumed = true;
@@ -916,75 +1003,9 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                     bool pass = false;
 
                     if (pInput->type == InputType::Rotation) {
-                        // rotate
-                        int pointsNeeded = pInput->rotatePointsNeeded;
-                        uint32_t searchArea = inputBufferCursor + numFrames * 2; // todo, i think that's best case
-                        int curAngle = 0;
-                        int pointsForward = 0;
-                        int pointsBackwards = 0;
-                        while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
-                        {
-                            int bufferInput = dc.inputBuffer[inputBufferCursor];
-                            int targetAngle = inputAngle(bufferInput);
-                            if (targetAngle) {
-                                if (curAngle == 0) {
-                                    curAngle = targetAngle;
-                                }
-                                int diff = angleDiff(curAngle, targetAngle);
-                                //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
-                                if (diff >= 90 && diff < 180) {
-                                    pointsForward++;
-                                    curAngle = targetAngle;
-                                }
-                                if (diff <= -90 && diff > -180) {
-                                    pointsBackwards++;
-                                    curAngle = targetAngle;
-                                }
-                            }
-                            inputBufferCursor++;
-                        }
-                        if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
-                            pass = true;
-                        }
+                        pass = MatchRotateCommandInput(pInput, inputBufferCursor);
                     } else if (pInput->type == InputType::ChargeRelease) {
-                        // charge release
-                        Charge *pCharge = pInput->pCharge;
-
-                        if (pCharge) {
-                            uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
-                            uint32_t inputOkCondFlags = pCharge->okCondFlags;
-                            uint32_t chargeFrames = pCharge->chargeFrames;
-                            uint32_t keepFrames = pCharge->keepFrames;
-                            uint32_t dirCount = 0;
-                            // uint32_t dirNotMatchCount = 0;
-                            // count matching direction in input buffer, super naive but will work for testing
-                            inputBufferCursor = i;
-                            uint32_t searchArea = inputBufferCursor + chargeFrames + keepFrames;
-                            while (inputBufferCursor < dc.inputBuffer.size() && inputBufferCursor < searchArea)
-                            {
-                                if (matchInput(dc.inputBuffer[inputBufferCursor], inputOkKeyFlags, inputOkCondFlags)) {
-                                    dirCount++;
-                                    if (dirCount >= chargeFrames) {
-                                        break;
-                                    }
-                                }
-                                // else {
-                                //     dirNotMatchCount++;
-                                // }
-                                inputBufferCursor++;
-                            }
-
-                            if (dirCount < chargeFrames || (inputBufferCursor - initialI) > (chargeFrames + keepFrames)) {
-                                //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-                                //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-                                break; // cancel trigger
-                            }
-                            //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-                            pass = true;
-                        } else {
-                            log(true, "charge entries mismatch?");
-                            break; // cancel trigger
-                        }
+                        pass = MatchChargeCommandInput(pInput, inputBufferCursor);
                     } else {
                         bool needPositiveEdge = true;
                         if (inputID == 0) {
@@ -1032,7 +1053,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
                                 fail = true;
                                 break;
                             }
-                            if (!inputNg && matchInput(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
+                            if (!inputNg && matchFrameButton(bufferInput, inputOkKeyFlags, inputOkCondFlags)) {
                                 if (onlyNegativeEdge) {
                                     break;
                                 }
