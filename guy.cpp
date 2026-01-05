@@ -992,20 +992,16 @@ bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startC
     int maxSearch = startCursorPos + pVariant->totalMaxFrames + 1;
     uint32_t inputBufferCursor = startCursorPos;
 
-    while (inputID >= 0 ) {
-        // no positive edge for last input.. todo maybe only for normal directions?
-        bool needPositiveEdge = inputID != 0;
-        bool pass = MatchCommandInput(&pVariant->inputs[inputID], inputBufferCursor, inputBufferCursor, maxSearch, needPositiveEdge);
-
-        if (!pass) {
-            break;
-        }
-        inputID--;
+    if (startInput == -1) {
+        // all done!
+        return true;
     }
 
-    if (inputID < 0) {
-        // ran out of matched inputs, command is OK
-        return true;
+    bool needPositiveEdge = inputID != 0;
+    bool pass = MatchCommandInput(&pVariant->inputs[inputID], inputBufferCursor, inputBufferCursor, maxSearch, needPositiveEdge);
+
+    if (pass) {
+        return MatchCommand(pVariant, startInput - 1, inputBufferCursor);
     }
 
     return false;
