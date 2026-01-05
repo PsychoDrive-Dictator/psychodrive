@@ -986,6 +986,31 @@ bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, ui
     return pass;
 }
 
+bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos)
+{
+    int inputID = startInput;
+    int maxSearch = startCursorPos + pVariant->totalMaxFrames + 1;
+    uint32_t inputBufferCursor = startCursorPos;
+
+    while (inputID >= 0 ) {
+        // no positive edge for last input.. todo maybe only for normal directions?
+        bool needPositiveEdge = inputID != 0;
+        bool pass = MatchCommandInput(&pVariant->inputs[inputID], inputBufferCursor, inputBufferCursor, maxSearch, needPositiveEdge);
+
+        if (!pass) {
+            break;
+        }
+        inputID--;
+    }
+
+    if (inputID < 0) {
+        // ran out of matched inputs, command is OK
+        return true;
+    }
+
+    return false;
+}
+
 bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
 {
     uint32_t okKeyFlags = pTrigger->okKeyFlags;
@@ -1091,23 +1116,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
             Command *pCommand = pTrigger->pCommandClassic;
 
             for (auto& variant : pCommand->variants) {
-                int inputID = variant.inputs.size() - 1;
-                int maxSearch = initialI + variant.totalMaxFrames + 1;
-                uint32_t inputBufferCursor = initialI;
-
-                while (inputID >= 0 ) {
-                    // no positive edge for last input.. todo maybe only for normal directions?
-                    bool needPositiveEdge = inputID != 0;
-                    bool pass = MatchCommandInput(&variant.inputs[inputID], inputBufferCursor, inputBufferCursor, maxSearch, needPositiveEdge);
-
-                    if (!pass) {
-                        break;
-                    }
-                    inputID--;
-                }
-
-                if (inputID < 0) {
-                    // ran out of matched inputs, command is OK
+                if (MatchCommand(&variant, variant.inputs.size() - 1, initialI)) {
                     return true;
                 }
             }

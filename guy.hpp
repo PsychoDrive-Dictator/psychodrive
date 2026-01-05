@@ -412,6 +412,7 @@ private:
     bool MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t maxSearch);
     bool MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t maxSearch);
     bool MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, bool needPositiveEdge);
+    bool MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos);
     bool CheckTriggerCommand(Trigger *pTrigger, int &initialI);
     void DoTriggers(int fluffFrameBias = 0);
 
