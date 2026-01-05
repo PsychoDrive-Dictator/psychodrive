@@ -988,7 +988,6 @@ bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, ui
 
 bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos)
 {
-    int inputID = startInput;
     int maxSearch = startCursorPos + pVariant->totalMaxFrames + 1;
     uint32_t inputBufferCursor = startCursorPos;
 
@@ -997,12 +996,21 @@ bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startC
         return true;
     }
 
-    bool needPositiveEdge = inputID != 0;
-    bool pass = MatchCommandInput(&pVariant->inputs[inputID], inputBufferCursor, inputBufferCursor, maxSearch, needPositiveEdge);
+    bool needPositiveEdge = startInput != 0;
+    bool pass = false;
+    do {
+        // recursive depth first search to try all combinations
+        // todo make simple walk forward an option for less lenient matching
+        pass = MatchCommandInput(&pVariant->inputs[startInput], inputBufferCursor, startCursorPos, maxSearch, needPositiveEdge);
 
-    if (pass) {
-        return MatchCommand(pVariant, startInput - 1, inputBufferCursor);
-    }
+        if (!pass) {
+            return false;
+        }
+
+        if (MatchCommand(pVariant, startInput - 1, inputBufferCursor)) {
+            return true;
+        }
+    } while (pass);
 
     return false;
 }
