@@ -200,12 +200,10 @@ public:
     int getHealth() { return health; }
     void setHealth(int newHealth) { health = newHealth; }
     int getFocus() { return focus; }
-    bool getHasFocusRegenCooldowned() { return hasFocusRegenCooldowned; }
     int getFocusRegenCoolDown() { return focusRegenCooldown; }
-    void setFocusRegenCooldown(int newCooldown, bool setFlag = true) {
-        focusRegenCooldown = newCooldown;
-        if (setFlag) {
-            hasFocusRegenCooldowned = true;
+    void setFocusRegenCooldown(int newCooldown) {
+        if (newCooldown == -1 || newCooldown > focusRegenCooldown) {
+            focusRegenCooldown = newCooldown;
         }
     }
     int getGauge() { return gauge; }
@@ -728,7 +726,6 @@ private:
             uniqueParam[i] = 0;
         }
         uniqueTimer = false;
-        hasFocusRegenCooldowned = false;
         focusRegenCooldownFrozen = false;
         superAnimation = false;
         superFreeze = false;
@@ -842,7 +839,6 @@ private:
     bool isDrive : 1;
     bool wasDrive : 1;
     bool uniqueTimer : 1;
-    bool hasFocusRegenCooldowned : 1;
     bool focusRegenCooldownFrozen : 1;
     bool superAnimation : 1;
     bool superFreeze : 1;

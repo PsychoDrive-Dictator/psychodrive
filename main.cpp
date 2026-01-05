@@ -1116,7 +1116,7 @@ int main(int argc, char**argv)
             guys[playerID]->setAction(actionID, actionFrame - 1);
             guys[playerID]->setHealth(playerJson["hp"]);
             guys[playerID]->setFocus(playerJson.value("driveGauge", maxFocus));
-            guys[playerID]->setFocusRegenCooldown(-1, false);
+            guys[playerID]->setFocusRegenCooldown(-1);
             guys[playerID]->setGauge(playerJson.value("superGauge", guys[playerID]->getCharData()->gauge));
 
             playerID++;

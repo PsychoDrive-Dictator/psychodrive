@@ -586,6 +586,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     // meters
     if (pTrigger->needsFocus) {
         deferredFocusCost = pTrigger->focusCost;
+        log(logResources, "queuing deferred cost");
     } else if (focusRegenCooldownFrozen) {
         // if we cancel out of the od move
         focusRegenCooldownFrozen = false;
@@ -2883,7 +2884,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
     if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
         // todo apparently start of hitstun except if super where it's after??
-        focusRegenCooldown = 90 + 1 + 1;
+        setFocusRegenCooldown(90 + 1 + 1);
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
     }
     gauge += pHitEffect->superGainTarget;
@@ -3657,8 +3658,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
+    int regenAmountDone = 0;
     if (advancingTime) {
-        if (!endHitStopFrame && !endHitStopFrame) {
+        if (!endHitStopFrame && !endWarudoFrame) {
             if (pendingHitStop) {
                 if (pendingHitStop > hitStop) {
                     hitStop = pendingHitStop;
@@ -3690,7 +3692,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (tickRegenCooldown && focusRegenCooldown > 0) {
             focusRegenCooldown--;
             log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
-            if (getHitStop() && focusRegenCooldown == 0) {
+            if (getHitStop() > 1 && focusRegenCooldown == 0) {
                 focusRegenCooldown = 1;
                 log(logResources, "final regen cooldown tick down undone bc hitstop");
             }
@@ -3703,9 +3705,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (superFreeze) {
             doRegen = false;
         }
-        if (endHitStopFrame || endWarudoFrame) {
+        // we do the final tick of regen in hitstop in end hitstop frame instead of hitstop == 1
+        // this way we know if we're doing a trigger or not, which might incur a cost and prevent regen
+        if (hitStop == 1 || endWarudoFrame) {
             doRegen = false;
         }
+
         if (doRegen) {
             int focusRegenAmount = 40;
             if (hitStun) {
@@ -3721,7 +3726,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             //     log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (no clamp), total " + std::to_string(focus));
             // } else
             {
+                int prevFocus = focus;
                 setFocus(focus + focusRegenAmount);
+                regenAmountDone = focus - prevFocus;
                 log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (clamp), total " + std::to_string(focus));
             }
         }
@@ -3743,7 +3750,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         setFocus(focus - deferredFocusCost);
         log(logResources, "focus -" + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
         deferredFocusCost = 0;
-        focusRegenCooldown = 120;
+        setFocusRegenCooldown(120);
         focusRegenCooldownFrozen = true;
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
     }
@@ -4279,6 +4286,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     //     focusRegenCooldown = 3;
     // }
 
+    if (deferredFocusCost && regenAmountDone) {
+        setFocus(focus - regenAmountDone);
+        log(logResources, "undoing regen from trigger!");
+    }
+
     if (didTrigger && didTransition) {
         scalingTriggerID++;
     }
@@ -4499,9 +4511,9 @@ void Guy::DoSwitchKey(void)
             // this key lasts until margin so i think this is good?
             if (prevAction == 480 || prevAction == 481) {
                 // hold parry - is it really the best way to tell?
-                focusRegenCooldown = 240;
+                setFocusRegenCooldown(240);
             } else {
-                focusRegenCooldown = 120;
+                setFocusRegenCooldown(120);
             }
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
@@ -4777,7 +4789,7 @@ void Guy::DoWorldKey(void)
                 accelY = Fixed(0);
                 if (pOpponent) {
                     pOpponent->superFreeze = true;
-                    pOpponent->focusRegenCooldown = 90 + 1 + 1; // one for the unfreeze frame
+                    setFocusRegenCooldown(90 + 1 + 1); // one for the unfreeze frame
                     otherGuyLog(pOpponent, logResources, "regen cooldown " + std::to_string(pOpponent->focusRegenCooldown) + " (worldkey)");
                 }
                 break;
@@ -5079,7 +5091,7 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                                 log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
                                 if (param2 < 0) {
                                     // same as spending bar on od move
-                                    focusRegenCooldown = 120;
+                                    setFocusRegenCooldown(120);
                                     focusRegenCooldownFrozen = true;
                                     log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (eventkey, frozen)");
                                 }
