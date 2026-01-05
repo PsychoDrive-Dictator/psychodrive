@@ -793,7 +793,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     return true;
 }
 
-bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCursor, int maxSearch, bool needPositiveEdge) {
+bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCursor, uint32_t maxSearch, bool needPositiveEdge) {
     bool pass = false;
     bool fail = false;
     bool match = false;
@@ -801,19 +801,8 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
     uint32_t inputOkCondFlags = pInput->okCondFlags;
     int lastMatchInput = -1;
 
-    uint32_t inputSearch = inputBufferCursor + pInput->numFrames;
-    if (needPositiveEdge) {
-        inputSearch += 1; // one grace frame to look for the negative edge
-    }
-    // todo or is this fine?
-    if (pInput->numFrames == -1) {
-        inputSearch = maxSearch;
-    }
-    if (inputSearch > dc.inputBuffer.size()) {
-        inputSearch = dc.inputBuffer.size();
-    }
     bool matchThisFrame = false;
-    while (inputBufferCursor < inputSearch)
+    while (inputBufferCursor < maxSearch)
     {
         int bufferInput = dc.inputBuffer[inputBufferCursor];
         int bufferDirection = dc.directionBuffer[inputBufferCursor];
@@ -825,7 +814,7 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
         bool inputNg = false;
 
         // we venture past the allowed buffer here technically
-        bool onlyNegativeEdge = needPositiveEdge && inputBufferCursor == inputSearch - 1;
+        bool onlyNegativeEdge = needPositiveEdge && inputBufferCursor == maxSearch - 1;
 
         if (pInput->ngCondFlags & 2) {
             if ((bufferInput & 0xF) == (pInput->ngKeyFlags & 0xF)) {
@@ -890,54 +879,44 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
     return pass;
 }
 
-bool Guy::MatchChargeCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
-    // charge release
-    Charge *pCharge = pCommandInput->pCharge;
+bool Guy::MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t maxSearch) {
     bool pass = false;
     uint32_t initialCursorPos = cursorPos;
-
-    if (pCharge) {
-        uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
-        uint32_t inputOkCondFlags = pCharge->okCondFlags;
-        uint32_t chargeFrames = pCharge->chargeFrames;
-        uint32_t keepFrames = pCharge->keepFrames;
-        uint32_t dirCount = 0;
-        // uint32_t dirNotMatchCount = 0;
-        // count matching direction in input buffer, super naive but will work for testing
-        uint32_t searchArea = cursorPos + chargeFrames + keepFrames;
-        while (cursorPos < dc.inputBuffer.size() && cursorPos < searchArea)
-        {
-            if (matchFrameButton(dc.inputBuffer[cursorPos], inputOkKeyFlags, inputOkCondFlags)) {
-                dirCount++;
-                if (dirCount >= chargeFrames) {
-                    break;
-                }
+    uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
+    uint32_t inputOkCondFlags = pCharge->okCondFlags;
+    uint32_t chargeFrames = pCharge->chargeFrames;
+    uint32_t keepFrames = pCharge->keepFrames;
+    uint32_t dirCount = 0;
+    // uint32_t dirNotMatchCount = 0;
+    while (cursorPos < dc.inputBuffer.size() && cursorPos < maxSearch)
+    {
+        if (matchFrameButton(dc.inputBuffer[cursorPos], inputOkKeyFlags, inputOkCondFlags)) {
+            dirCount++;
+            if (dirCount >= chargeFrames) {
+                break;
             }
-            // else {
-            //     dirNotMatchCount++;
-            // }
-            cursorPos++;
         }
+        // else {
+        //     dirNotMatchCount++;
+        // }
+        cursorPos++;
+    }
 
-        if (dirCount < chargeFrames || (cursorPos - initialCursorPos) > (chargeFrames + keepFrames)) {
-            //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-            //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-            pass = false;
-        } else {
-            //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
-            pass = true;
-        }
+    if (dirCount < chargeFrames || (cursorPos - initialCursorPos) > (chargeFrames + keepFrames)) {
+        //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
+        //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
+        pass = false;
     } else {
-        log(true, "charge entries mismatch?");
+        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+        pass = true;
     }
 
     return pass;
 }
 
-bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos) {
+bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t searchArea) {
     // rotate
     int pointsNeeded = pCommandInput->rotatePointsNeeded;
-    uint32_t searchArea = cursorPos + pCommandInput->numFrames * 2; // todo, i think that's best case
     int curAngle = 0;
     int pointsForward = 0;
     int pointsBackwards = 0;
@@ -969,14 +948,40 @@ bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorP
     return pass;
 }
 
-bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, int maxSearch, bool needPositiveEdge) {
+bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, bool needPositiveEdge) {
     bool pass = false;
+    uint32_t inputSearchArea = 0;
     if (pCommandInput->type == InputType::Rotation) {
-        pass = MatchRotateCommandInput(pCommandInput, cursorPos);
+        inputSearchArea = startSearch + pCommandInput->numFrames * 2; // todo, i think that's best case
+        // if (inputSearchArea > maxSearch) {
+        //     inputSearchArea = maxSearch;
+        // }
+        pass = MatchRotateCommandInput(pCommandInput, cursorPos, inputSearchArea);
     } else if (pCommandInput->type == InputType::ChargeRelease) {
-        pass = MatchChargeCommandInput(pCommandInput, cursorPos);
+        if (pCommandInput->pCharge) {
+            // count matching direction in input buffer, super naive but will work for testing
+            inputSearchArea = startSearch + pCommandInput->pCharge->chargeFrames + pCommandInput->pCharge->keepFrames;
+            // if (inputSearchArea > maxSearch) {
+            //     inputSearchArea = maxSearch;
+            // }
+            pass = MatchChargeCommandInput(pCommandInput->pCharge, cursorPos, inputSearchArea);
+        }
     } else {
-        pass = MatchNormalCommandInput(pCommandInput, cursorPos, maxSearch, needPositiveEdge);
+        uint32_t inputSearchArea = startSearch + pCommandInput->numFrames;
+        if (needPositiveEdge) {
+            inputSearchArea += 1; // one grace frame to look for the negative edge
+        }
+        // todo or is this fine?
+        if (pCommandInput->numFrames == -1) {
+            inputSearchArea = maxSearch;
+        }
+        if (inputSearchArea > dc.inputBuffer.size()) {
+            inputSearchArea = dc.inputBuffer.size();
+        }
+        if (inputSearchArea > maxSearch) {
+            inputSearchArea = maxSearch;
+        }
+        pass = MatchNormalCommandInput(pCommandInput, cursorPos, inputSearchArea, needPositiveEdge);
     }
     return pass;
 }
@@ -1092,7 +1097,8 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
 
                 while (inputID >= 0 ) {
                     // no positive edge for last input.. todo maybe only for normal directions?
-                    bool pass = MatchCommandInput(&variant.inputs[inputID], inputBufferCursor, maxSearch, inputID != 0);
+                    bool needPositiveEdge = inputID != 0;
+                    bool pass = MatchCommandInput(&variant.inputs[inputID], inputBufferCursor, inputBufferCursor, maxSearch, needPositiveEdge);
 
                     if (!pass) {
                         break;
