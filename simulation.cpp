@@ -278,15 +278,15 @@ void Simulation::RunFrame(void) {
                 if (targetDumpFrame > 0) {
                     nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
                     nlohmann::json &firstPlayers = gameStateDump[0]["players"];
-                    if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "hp", simGuys[i]->getCharData()->vitality)) {
+                    if (!match && detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "hp", simGuys[i]->getCharData()->vitality)) {
                         simGuys[i]->setHealth(players[i]["hp"]);
                     }
-                    if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
+                    if (!match && detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
                         simGuys[i]->guyLog(simGuys[i]->getLogResources(), "focus training refill detected, focus to " + std::to_string(players[i]["driveGauge"].get<int>()) + " was " + std::to_string(simGuys[i]->getFocus()));
                         simGuys[i]->setFocus(players[i]["driveGauge"]);
                         simGuys[i]->setFocusRegenCooldown(-1);
                     }
-                    if (detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", simGuys[i]->getCharData()->gauge)) {
+                    if (!match && detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", simGuys[i]->getCharData()->gauge)) {
                         simGuys[i]->setGauge(players[i]["superGauge"]);
                     }
                 }
