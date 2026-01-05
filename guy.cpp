@@ -327,6 +327,7 @@ bool Guy::RunFrame(bool advancingTime)
     hitArmorThisFrame = false;
     hitAtemiThisFrame = false;
     hasBeenBlockedThisFrame = false;
+    hasBeenParriedThisFrame = false;
     punishCounterThisFrame = false;
     grabbedThisFrame = false;
     beenHitThisFrame = false;
@@ -4368,6 +4369,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
                 hitCounterThisMove = false;
                 hitPunishCounterThisMove = false;
                 hasBeenBlockedThisMove = false;
+                hasBeenParriedThisMove = false;
                 hitArmorThisMove = false;
                 hitAtemiThisMove = false;
             }
