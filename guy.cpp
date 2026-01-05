@@ -3299,7 +3299,8 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 2:
-                    if (!preHit && hitThisFrame) {
+                    // any hit ever? surely that's a flag - can't find a counterexcample rn
+                    if (!preHit && pOpponent && pOpponent->comboHits) {
                         doBranch = true;
                     }
 
