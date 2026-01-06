@@ -411,7 +411,8 @@ private:
     bool MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t maxSearch);
     bool MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, bool needPositiveEdge);
     bool MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos);
-    bool CheckTriggerCommand(Trigger *pTrigger, int &initialI);
+    bool MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos);
+    bool CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI);
     void DoTriggers(int fluffFrameBias = 0);
 
     void DoBranchKey(bool preHit = false);
@@ -919,7 +920,7 @@ private:
 
     int currentInput;
     // todo could keep track of frames since any input as a further optim
-    int framesSinceLastInput;
+    uint16_t framesSinceLastInput;
 
     // hitting side
     uint64_t canHitID;

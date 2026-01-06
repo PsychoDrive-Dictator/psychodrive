@@ -1016,7 +1016,7 @@ bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startC
     return false;
 }
 
-bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
+bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
 {
     uint32_t okKeyFlags = pTrigger->okKeyFlags;
     uint32_t okCondFlags = pTrigger->okCondFlags;
@@ -1024,17 +1024,12 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
     uint32_t dcExcFlags = pTrigger->dcExcFlags;
     uint32_t dcIncFlags = pTrigger->dcIncFlags;
     int precedingTime = pTrigger->precedingTime;
-    // condflags..
-    // 10100000000100000: M oicho, but also eg. 22P - any one of three button mask?
-    // 10100000001100000: EX, so any two out of three button mask?
-    // 00100000000100000: heavy punch with one button mask
-    // 00100000001100000: normal throw, two out of two mask t
-    // 00100000010100000: taunt, 6 out of 6 in mask
-    int i = 0;
-    initialI = -1;
+
+    uint32_t initialCursorPos = cursorPos;
+    int initialI = -1;
     bool initialMatch = false;
     // current frame + buffer
-    int initialSearch = 1 + precedingTime + timeInHitStop;
+    uint32_t initialSearch = 1 + precedingTime + timeInHitStop;
     if (dc.inputBuffer.size() < (size_t)initialSearch) {
         initialSearch = dc.inputBuffer.size();
     }
@@ -1050,27 +1045,27 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
         bool atLeastOneNotConsumed = false;
         while (button <= HK) {
             if (button & okKeyFlags) {
-                i = 0;
+                cursorPos = initialCursorPos;
                 initialMatch = false;
-                while (i < initialSearch) {
-                    if (matchFrameButton(dc.inputBuffer[i], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
+                while (cursorPos < initialSearch) {
+                    if (matchFrameButton(dc.inputBuffer[cursorPos], button, 0, dcExcFlags, dcIncFlags, ngKeyFlags))
                     {
-                        if (!(dc.inputBuffer[i] & CONSUMED)) {
+                        if (!(dc.inputBuffer[cursorPos] & CONSUMED)) {
                             atLeastOneNotConsumed = true;
                         }
-                        if (std::bitset<32>(dc.inputBuffer[i] & okKeyFlags).count() >= 2) {
+                        if (std::bitset<32>(dc.inputBuffer[cursorPos] & okKeyFlags).count() >= 2) {
                             bothButtonsPressed = true;
                         }
                         initialMatch = true;
                     } else if (initialMatch == true) {
-                        i--;
+                        cursorPos--;
                         // set most recent initialI to get marked consumed?
-                        if (initialI == -1 || i < initialI) {
-                            initialI = i;
+                        if (initialI == -1 || (int)cursorPos < initialI) {
+                            initialI = cursorPos;
                         }
                         break; // break once initialMatch no longer true, set i on last true
                     }
-                    i++;
+                    cursorPos++;
                 }
                 if (initialMatch) {
                     parallelMatchesFound++;
@@ -1082,23 +1077,23 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
     } else {
         bool atLeastOneNotConsumed = false;
         bool match = false;
-        while (i < initialSearch)
+        while (cursorPos < initialSearch)
         {
-            // guile 1112 has 0s everywhere
-            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[i], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
+            // possible to be all zeroes?
+            if ((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[cursorPos], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))
             {
-                if (!(dc.inputBuffer[i] & CONSUMED)) {
+                if (!(dc.inputBuffer[cursorPos] & CONSUMED)) {
                     atLeastOneNotConsumed = true;
                 }
                 initialMatch = true;
                 match = true;
             } else if (initialMatch == true) {
-                i--;
-                initialI = i;
+                cursorPos--;
+                initialI = cursorPos;
                 match = false;
                 break; // break once initialMatch no longer true, set i on last true
             }
-            i++;
+            cursorPos++;
         }
         if (atLeastOneNotConsumed == false) {
             initialMatch = false;
@@ -1109,11 +1104,18 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, int &initialI)
         }
     }
     if (initialI == -1) {
-        initialI = i;
+        initialI = cursorPos;
     }
+    cursorPos = initialI;
+    return initialMatch;
+}
+
+bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI)
+{
+    initialI = 0;
+    bool initialMatch = MatchInitialInput(pTrigger, initialI);
     if (initialMatch)
     {
-        //  check deferral like heavy donkey into lvl3 doesnt shot hitbox
         if ( pTrigger->pCommandClassic == nullptr ) {
             // simple single-input command, initial match is enough
             return true;
@@ -1265,7 +1267,7 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
 
         // possibly need a fixed array here too if it shows up in mining profile
-        std::set<int> initialIsToConsume;
+        std::set<uint32_t> initialIsToConsume;
 
         std::sort(triggers, triggers + triggerCount, [](const TriggerCheckState& a, const TriggerCheckState& b) {
             return a.triggerID < b.triggerID;
@@ -1305,7 +1307,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                 dc.frameTriggers.insert(ActionRef(actionID, styleInstall));
             }
 
-            int initialI = 0;
+            uint32_t initialI = 0;
 
             if (dc.setDeferredTriggerIDs.find(triggerID) != dc.setDeferredTriggerIDs.end()) {
                 // check deferred trigger activation
