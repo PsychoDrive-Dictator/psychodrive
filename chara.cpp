@@ -756,25 +756,32 @@ void loadStyles(nlohmann::json* pCharInfoJson, std::vector<StyleData>* pOutputVe
 
         newStyle.id = styleID;
         newStyle.parentStyleID = styleJson["ParentStyleID"];
+        newStyle.terminateState = 0;
 
-        if (styleJson.contains("StyleData") && styleJson["StyleData"].contains("State") &&
-            styleJson["StyleData"]["State"].contains("TerminateState")) {
-            newStyle.terminateState = styleJson["StyleData"]["State"]["TerminateState"];
-        } else {
-            newStyle.terminateState = 0;
-        }
-
-        if (styleJson.contains("StyleData") && styleJson["StyleData"].contains("Action")) {
-            nlohmann::json &actionJson = styleJson["StyleData"]["Action"];
-            if (actionJson.contains("Start")) {
-                newStyle.hasStartAction = true;
-                newStyle.startActionID = actionJson["Start"]["Action"];
-                newStyle.startActionStyle = actionJson["Start"]["Style"];
+        if (styleJson.contains("StyleData")) {
+            if (styleJson["StyleData"].contains("State") &&
+                styleJson["StyleData"]["State"].contains("TerminateState")) {
+                newStyle.terminateState = styleJson["StyleData"]["State"]["TerminateState"];
             }
-            if (actionJson.contains("Exit")) {
-                newStyle.hasExitAction = true;
-                newStyle.exitActionID = actionJson["Exit"]["Action"];
-                newStyle.exitActionStyle = actionJson["Exit"]["Style"];
+
+            if (styleJson["StyleData"].contains("Action")) {
+                nlohmann::json &actionJson = styleJson["StyleData"]["Action"];
+                if (actionJson.contains("Start")) {
+                    newStyle.hasStartAction = true;
+                    newStyle.startActionID = actionJson["Start"]["Action"];
+                    newStyle.startActionStyle = actionJson["Start"]["Style"];
+                }
+                if (actionJson.contains("Exit")) {
+                    newStyle.hasExitAction = true;
+                    newStyle.exitActionID = actionJson["Exit"]["Action"];
+                    newStyle.exitActionStyle = actionJson["Exit"]["Style"];
+                }
+            }
+            if (styleJson["StyleData"].contains("Basic")) {
+                nlohmann::json &basicJson = styleJson["StyleData"]["Basic"];
+                newStyle.attackScale = basicJson.value("OffensiveScale", 100);
+                newStyle.defenseScale = basicJson.value("DefensiveScale", 100);
+                newStyle.gaugeGainRatio = basicJson.value("GaugeGainRatio", 100);
             }
         }
     }

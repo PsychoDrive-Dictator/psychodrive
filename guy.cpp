@@ -2531,7 +2531,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (!pOtherGuy->driveScaling) {
                 pResourceGuy->focus += pHitEntry->focusGainOwn;
             }
-            pResourceGuy->gauge += pHitEntry->superGainOwn;
+            // todo maybe rounding errors there? we got some with health scaling until moving to fixed
+            StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
+            int scaledSuperGain = pHitEntry->superGainOwn * style.gaugeGainRatio / 100;
+            pResourceGuy->gauge += scaledSuperGain;
 
             clampGuys.insert(pResourceGuy);
             clampGuys.insert(pOtherGuy);

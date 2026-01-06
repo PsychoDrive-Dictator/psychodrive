@@ -378,6 +378,10 @@ struct StyleData {
     bool hasExitAction = false;
     int exitActionID;
     int exitActionStyle;
+
+    int attackScale = 100;
+    int defenseScale = 100;
+    int gaugeGainRatio = 100;
 };
 
 struct Action {
