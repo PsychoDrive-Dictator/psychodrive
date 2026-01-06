@@ -1113,9 +1113,12 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
 bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI)
 {
     initialI = 0;
-    bool initialMatch = MatchInitialInput(pTrigger, initialI);
-    if (initialMatch)
-    {
+    while (true) {
+        bool initialMatch = MatchInitialInput(pTrigger, initialI);
+        if (!initialMatch) {
+            return false;
+        }
+
         if ( pTrigger->pCommandClassic == nullptr ) {
             // simple single-input command, initial match is enough
             return true;
@@ -1128,6 +1131,9 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI)
                 }
             }
         }
+
+        // command did not pass with initial match, continue walking for another potential initial match in the window
+        initialI++;
     }
 
     return false;
