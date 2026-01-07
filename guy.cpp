@@ -4097,7 +4097,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         log(logHits, "proximity guard!");
     }
 
-    if (!didTrigger && blocking && !hitStun && (!proxGuarded || !(currentInput & BACK))) {
+    if (!didTrigger && blocking && !hitStun && (!proxGuarded || !(currentInput & BACK) || (currentInput & UP))) {
         // was proximity guard, can act now
         blocking = false;
         nextAction = 1;
