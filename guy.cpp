@@ -2848,8 +2848,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         if (!blocking && applyScaling) {
             if (comboHits == 0) {
             pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
+            pendingScaling += pAttacker->instantScale;
             } else {
                 pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->comboScale : 10;
+                pendingScaling += pAttacker->instantScale;
                 if (currentScaling == 100) {
                     pendingScaling += 10;
                 }
@@ -2881,9 +2883,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    Fixed damageFixed = Fixed(dmgValue) * Fixed(effectiveScaling.i()) / Fixed(100);
     StyleData &attackerStyleData = pAttacker->pCharData->styles[pAttacker->styleInstall];
-    damageFixed = damageFixed * Fixed(attackerStyleData.attackScale) / Fixed(100);
+    effectiveScaling = Fixed(effectiveScaling.i()) * Fixed(attackerStyleData.attackScale) / Fixed(100);
+    Fixed damageFixed = Fixed(dmgValue) * Fixed(effectiveScaling.i()) / Fixed(100);
     int moveDamage = damageFixed.i();
     health -= moveDamage;
     log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage));
