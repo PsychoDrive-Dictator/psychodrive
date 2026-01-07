@@ -1971,18 +1971,29 @@ bool Guy::WorldPhysics(bool onlyFloor)
         if (!forceLanding || knockDown) {
             landed = true;
         }
-        if (currentAction == 36 || currentAction == 37 || currentAction == 38) {
-            // empty jump landing, immediate transition
-            // this is why empty jumps have a frame shaved off
-            currentAction = currentAction + 3;
-            currentFrame = 0;
-            currentFrameFrac = Fixed(currentFrame);
-            actionSpeed = Fixed(1);
-            actionInitialFrame = -1;
-            UpdateActionData();
+        if (!forceLanding) {
+            bool doEmptyLanding = currentAction == 36 || currentAction == 37 || currentAction == 38;
+            if (hitStun && !locked) {
+                // air recovery
+                doEmptyLanding = true;
+            }
+            if (doEmptyLanding) {
+                // empty jump landing, immediate transition
+                // this is why empty jumps have a frame shaved off
+                if (hitStun) {
+                    currentAction = 39;
+                } else {
+                    currentAction = currentAction + 3;
+                }
+                currentFrame = 0;
+                currentFrameFrac = Fixed(currentFrame);
+                actionSpeed = Fixed(1);
+                actionInitialFrame = -1;
+                UpdateActionData();
 
-            velocityX = Fixed(0);
-            accelX = Fixed(0);
+                velocityX = Fixed(0);
+                accelX = Fixed(0);
+            }
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
@@ -2040,7 +2051,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
     if (landed) {
         // the frame you land is supposed to instantly turn into 330
-        if (resetHitStunOnLand) {
+        if (resetHitStunOnLand && knockDown) {
             log(logTransitions, "hack extra landing frame");
             AdvanceFrame(false); // only transition
         }
@@ -3847,7 +3858,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (landed) {
         if (currentAction != 39 && currentAction != 40 && currentAction != 41 &&
-            nextAction != 39 && nextAction != 40 && nextAction != 41) {
+            nextAction != 39 && nextAction != 40 && nextAction != 41 && !hitStun) {
             // non-empty jump landing
             log(logTriggers, "disabling actions due to non-empty landing");
             jumpLandingDisabledFrames = 3 + 1; // 3, but we decrement in RunFrame
@@ -3859,7 +3870,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if ( resetHitStunOnLand ) {
             hitStun = 1;
             resetHitStunOnLand = false;
-            nextAction = 1;
             // process hitstun from 1>0 below to make the transition happen
             doHitStun = true;
         }
