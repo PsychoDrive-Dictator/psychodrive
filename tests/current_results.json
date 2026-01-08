@@ -7905,5 +7905,72 @@ var currentResults =
                 "lastFrame": 2848
             }
         ]
+    },
+    {
+        "testName": "zz_match_ed_sa2_combo",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 7624,
+                "firstFrame": 191,
+                "lastFrame": 4060
+            },
+            {
+                "count": 1853,
+                "firstFrame": 191,
+                "lastFrame": 3487
+            },
+            {
+                "count": 449,
+                "firstFrame": 399,
+                "lastFrame": 3487
+            },
+            {
+                "count": 1496,
+                "firstFrame": 239,
+                "lastFrame": 3448
+            },
+            {
+                "count": 1412,
+                "firstFrame": 239,
+                "lastFrame": 3448
+            },
+            {
+                "count": 3106,
+                "firstFrame": 191,
+                "lastFrame": 4060
+            },
+            {
+                "count": 3934,
+                "firstFrame": 191,
+                "lastFrame": 4060
+            },
+            {
+                "count": 1137,
+                "firstFrame": 445,
+                "lastFrame": 4013
+            },
+            {
+                "count": 609,
+                "firstFrame": 425,
+                "lastFrame": 3998
+            },
+            {
+                "count": 6680,
+                "firstFrame": 445,
+                "lastFrame": 4060
+            },
+            {
+                "count": 585,
+                "firstFrame": 402,
+                "lastFrame": 3447
+            },
+            {
+                "count": 12504,
+                "firstFrame": 239,
+                "lastFrame": 4060
+            }
+        ]
     }
 ]
