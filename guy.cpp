@@ -2126,15 +2126,17 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (isGrab) {
-            if (!hasEvaluatedThrowBoxes) {
-                pOtherGuy->getHurtBoxes(nullptr, &otherThrowBoxes, nullptr);
-                hasEvaluatedThrowBoxes = true;
-            }
-            for (auto throwBox : otherThrowBoxes ) {
-                if (hitbox.type == domain || doBoxesHit(hitbox.box, throwBox)) {
-                    foundBox = true;
-                    hurtBox.box = throwBox;
-                    break;
+            if (!pOtherGuy->throwProtectionFrames) {
+                if (!hasEvaluatedThrowBoxes) {
+                    pOtherGuy->getHurtBoxes(nullptr, &otherThrowBoxes, nullptr);
+                    hasEvaluatedThrowBoxes = true;
+                }
+                for (auto throwBox : otherThrowBoxes ) {
+                    if (doBoxesHit(hitbox.box, throwBox)) {
+                        foundBox = true;
+                        hurtBox.box = throwBox;
+                        break;
+                    }
                 }
             }
         } else {
@@ -4037,6 +4039,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
+    if (throwProtectionFrames) {
+        throwProtectionFrames--;
+    }
+
     curNextAction = nextAction;
 
     if (doHitStun && hitStun > 0)
@@ -4092,6 +4098,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             } else {
                 blocking = false;
                 parrying = false;
+
+                throwProtectionFrames = 2;
             }
         }
     }
