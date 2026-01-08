@@ -4091,6 +4091,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 nageKnockdown = false;
             } else {
                 blocking = false;
+                parrying = false;
             }
         }
     }
