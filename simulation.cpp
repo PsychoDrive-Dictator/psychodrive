@@ -351,7 +351,7 @@ void Simulation::RunFrame(void) {
             int playTimerSeconds = gameStateDump[targetDumpFrame].value("playTimer", 99);
             int playTimerFrames = gameStateDump[targetDumpFrame].value("playTimerMS", 60);
 
-            if (match && (playTimerSeconds != 99 || playTimerFrames != 60)) {
+            if (match && (playTimerSeconds != 99 || (playTimerFrames != 60 && playTimerFrames != 59))) {
                 timerStarted = true;
             }
         }
