@@ -874,7 +874,7 @@ static void mainloop(void)
                     int playTimerSeconds = gameStateDump[targetDumpFrame].value("playTimer", 99);
                     int playTimerFrames = gameStateDump[targetDumpFrame].value("playTimerMS", 60);
 
-                    if (defaultSim.match && (playTimerSeconds != 99 || playTimerFrames != 60)) {
+                    if (defaultSim.match && (playTimerSeconds != 99 || (playTimerFrames != 60 && playTimerFrames != 59))) {
                         defaultSim.timerStarted = true;
                     }
                 }
