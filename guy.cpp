@@ -4113,7 +4113,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                             backroll = true;
                         }
                     }
-                    nextAction = backroll ? 344 : 340;
+                    if (backroll) {
+                        nextAction = !recoverReverse ? 344 : 342;
+                    } else {
+                        nextAction = 340;
+                    }
                     // if (backroll && needsTurnaround()) {
                     //     switchDirection();
                     // }
