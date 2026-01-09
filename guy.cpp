@@ -2531,10 +2531,29 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
 
             if (pendingHit.parried) {
-                pGuy->hitVelX = pOtherGuy->hitVelX / Fixed(2);
-                pOtherGuy->hitVelX /= Fixed(2); // todo no push? if proj
-                pGuy->hitAccelX = pOtherGuy->hitAccelX / Fixed(2);
-                pOtherGuy->hitAccelX /= Fixed(2);
+                Fixed hitVel = pOtherGuy->hitVelX;
+                Fixed halfHitVel = hitVel / Fixed(2);
+                pGuy->hitVelX = halfHitVel;
+                pOtherGuy->hitVelX = halfHitVel; // todo no push? if proj
+                if (halfHitVel < 0 && halfHitVel.data & 63) {
+                    // this bias not like the others?
+                    halfHitVel.data -= 1;
+                }
+                // if (hitVel.data & 1) {
+                //     if (pGuy->pSim->frameCounter & 1) {
+                //         pGuy->hitVelX.data += 1;
+                //     } else {
+                //         pOtherGuy->hitVelX.data += 1;
+                //     }
+                // }
+                Fixed hitAccel = pOtherGuy->hitAccelX;
+                Fixed halfHitAccel = hitAccel / Fixed(2);
+                if (halfHitAccel < 0 && halfHitAccel.data & 63) {
+                    // this bias not like the others?
+                    halfHitAccel.data -= 1;
+                }
+                pGuy->hitAccelX = halfHitAccel;
+                pOtherGuy->hitAccelX = halfHitAccel;
             }
             Guy *pResourceGuy = pGuy;
             if (pGuy->isProjectile) {
@@ -2737,6 +2756,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     bool usePositionAsDirection = attr1 & (1<<11);
     recoverForward = attr3 & (1<<0);
     recoverReverse = attr3 & (1<<1);
+    // bool frontDamage = attr3 & (1<<2);
+    // bool backDamage = attr3 & (1<<3);
 
     pAttacker = attacker;
 
@@ -4075,6 +4096,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         }
                     }
                     nextAction = backroll ? 344 : 340;
+                    // if (backroll && needsTurnaround()) {
+                    //     switchDirection();
+                    // }
                     isDown = false;
                     knockDown = false;
 
