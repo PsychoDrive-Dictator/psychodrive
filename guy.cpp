@@ -555,6 +555,10 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     blocking = false;
     parrying = flags & (1ULL<<40);
 
+    if (parrying && currentInput & DOWN) {
+        nextAction = 489;
+    }
+
     if (flags & (1ULL<<26)) {
         jumped = true;
 
