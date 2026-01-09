@@ -449,9 +449,6 @@ private:
         if (pCurrentAction && pCurrentAction->recoveryEndFrame != -1 && (currentFrame + frameBias) >= pCurrentAction->recoveryEndFrame && nextAction == -1) {
             return true;
         }
-        if (actionInitialFrame != -1 && !hitStun) {
-            return true;
-        }
         return false;
     }
 
