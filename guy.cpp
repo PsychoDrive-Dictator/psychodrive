@@ -3084,6 +3084,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     hitVelX = Fixed(0);
                     hitAccelX = Fixed(0);
                     velocityX = Fixed(-destX) / Fixed(destTime);
+                    // todo not just on unlock?
+                    if (recoverReverse) {
+                        velocityX *= Fixed(-1);
+                    }
                     if (destX < 0 && velocityX.data & 63) {
                         // this bias not like the others?
                         velocityX.data += 1;
