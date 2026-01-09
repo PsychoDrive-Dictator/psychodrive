@@ -2336,14 +2336,23 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         // really we should save the lock target, etc.
         if (pOpponent) {
             HitEntry *pEntry = &pCharData->hitByID[pendingUnlockHit]->common[0];
-            pOpponent->ApplyHitEffect(pEntry, this, true, false, false, false);
-            // clamp
-            pOpponent->setFocus(pOpponent->focus);
-            pOpponent->setGauge(pOpponent->gauge);
-            otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
-            pOpponent->locked = false;
+            if (pendingUnlockHitDelayed || pEntry->floorTime == 0) {
+                pOpponent->ApplyHitEffect(pEntry, this, true, false, false, false);
+                // clamp
+                pOpponent->setFocus(pOpponent->focus);
+                pOpponent->setGauge(pOpponent->gauge);
+                otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
+                pOpponent->locked = false;
+                pendingUnlockHit = 0;
+            }
+            if (!pendingUnlockHitDelayed && pEntry->floorTime != 0) {
+                // ?????
+                // todo why does floortime matter on unlock hit? is it really what it is???
+                pendingUnlockHitDelayed = true;
+            }
+        } else {
+            pendingUnlockHit = 0;
         }
-        pendingUnlockHit = 0;
     }
 }
 
@@ -3227,8 +3236,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    // todo why does floortime matter on unlock hit? is it really what it is???
-    if (appliedAction && (!pAttacker->pendingUnlockHit || !floorTime)) {
+    if (appliedAction) {
         NextAction(false, false);
         DoStatusKey();
         WorldPhysics(true);
@@ -3262,10 +3270,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    if (pAttacker->pendingUnlockHit && floorTime) {
-        noAccelNextFrame = true;
-        noVelNextFrame = true;
-    }
+    // if (pAttacker->pendingUnlockHit && floorTime) {
+    //     noAccelNextFrame = true;
+    //     noVelNextFrame = true;
+    // }
 
     // fire/elec/psychopower effect
     // the two that seem to matter for gameplay are 9 for poison and 11 for mine

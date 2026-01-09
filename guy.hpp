@@ -731,6 +731,7 @@ private:
         focusRegenCooldownFrozen = false;
         superAnimation = false;
         superFreeze = false;
+        pendingUnlockHitDelayed = false;
         uniqueTimerCount = 0;
         debuffTimer = 0;
         pCurrentAction = nullptr;
@@ -844,6 +845,7 @@ private:
     bool focusRegenCooldownFrozen : 1;
     bool superAnimation : 1;
     bool superFreeze : 1;
+    bool pendingUnlockHitDelayed : 1;
 
     int projHitCount;
     int projLifeTime;
