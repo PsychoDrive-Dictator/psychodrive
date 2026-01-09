@@ -2757,7 +2757,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     recoverForward = attr3 & (1<<0);
     recoverReverse = attr3 & (1<<1);
     // bool frontDamage = attr3 & (1<<2);
-    // bool backDamage = attr3 & (1<<3);
+    bool backDamage = attr3 & (1<<3);
 
     pAttacker = attacker;
 
@@ -3189,8 +3189,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 } else if (moveType == 16) {
                     nextAction = 280;
                 } else if (moveType == 15) {
-                    if (pHitEffect->throwRelease != 3) {
-                        nextAction = noBackRecovery ? 351 : 350;
+                    if (destTime != 0) {
+                        nextAction = backDamage ? 351 : 350;
                     }
                 } else if (moveType == 12 && !knockDown) {
                     nextAction = 222;
@@ -3223,7 +3223,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    if (appliedAction) {
+    // todo why does floortime matter on unlock hit? is it really what it is???
+    if (appliedAction && (!pAttacker->pendingUnlockHit || !floorTime)) {
         NextAction(false, false);
         DoStatusKey();
         WorldPhysics(true);
@@ -3255,6 +3256,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 1 - actionInitialFrame), Fixed(frameCount));
             }
         }
+    }
+
+    if (pAttacker->pendingUnlockHit && floorTime) {
+        noAccelNextFrame = true;
+        noVelNextFrame = true;
     }
 
     // fire/elec/psychopower effect
