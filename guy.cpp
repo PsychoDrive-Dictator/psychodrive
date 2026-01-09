@@ -1367,6 +1367,8 @@ void Guy::DoTriggers(int fluffFrameBias)
                     // before input buffer ends
                     //int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
                     //dc.inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+
+                    lastTriggerFrame = pSim->frameCounter - initialI;
                     dc.inputBuffer[initialI] |= CONSUMED;
 
                     // skip further triggers and cancel any delayed triggers
@@ -1378,6 +1380,7 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
 
         for (auto &initialI : initialIsToConsume) {
+            lastTriggerFrame = pSim->frameCounter - initialI;
             dc.inputBuffer[initialI] |= CONSUMED;
         }
     }
@@ -2595,6 +2598,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitStopSelf = 0;
             hitStopTarget = 0;
         }
+        if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
+            hitStopSelf = 9 + 1;
+            hitStopTarget = 9 + 1;
+        }
         if (trade && hitBox.type == hit && tradeHit.hitBox.type == hit) {
             // todo not for projectile trades? weird
             if (hitStopSelf<15) {
@@ -3127,6 +3134,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         if (blocking) {
             if (parrying) {
                 nextAction = 483; // todo script depends on attack height?
+                if (pSim->frameCounter - lastTriggerFrame < 2) {
+                    // perfect
+                    nextAction = 486;
+                    hitStun = 1;
+                    hitVelX = Fixed(0);
+                    hitAccelX = Fixed(0);
+                }
             } else {
                 nextAction = 160 + attackStrength;
                 if (currentInput & DOWN) {

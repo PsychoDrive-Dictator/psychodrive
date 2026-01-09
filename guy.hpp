@@ -667,6 +667,7 @@ private:
         warudo = false;
         tokiWaUgokidasu = false;
         scalingTriggerID = 0;
+        lastTriggerFrame = 0;
         pAttacker = nullptr;
         hitStun = 0;
         resetHitStunOnLand = false;
@@ -935,6 +936,7 @@ private:
     int timeInHitStop;
 
     int scalingTriggerID;
+    int lastTriggerFrame;
 
     // getting hit side
     GuyRef pAttacker;
