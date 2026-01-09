@@ -4168,7 +4168,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    bool canProxGuard = canAct() || currentAction == 39 || currentAction == 40 || currentAction == 41;
+    bool canProxGuard = !hitStun && (canAct() || currentAction == 39 || currentAction == 40 || currentAction == 41);
     // positionProxGuarded lets uncrouchable protection work immediately on wakeup
     // it's possible this isn't strictly correct but in practice if there are hurtboxes the position is in there
     bool proxGuarded = hurtBoxProxGuarded || positionProxGuarded;
@@ -4279,7 +4279,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if ((canMoveNow && comboHits) || resetComboCount) {
+    if (((canMoveNow || canProxGuard) && comboHits) || resetComboCount) {
         if ( comboHits) {
             log(true, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
         }
