@@ -604,6 +604,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_clashes",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1983,
+                "firstFrame": 122,
+                "lastFrame": 1068
+            },
+            {
+                "count": 298,
+                "firstFrame": 124,
+                "lastFrame": 626
+            },
+            {
+                "count": 87,
+                "firstFrame": 124,
+                "lastFrame": 586
+            },
+            {
+                "count": 437,
+                "firstFrame": 115,
+                "lastFrame": 981
+            },
+            {
+                "count": 403,
+                "firstFrame": 115,
+                "lastFrame": 981
+            },
+            {
+                "count": 842,
+                "firstFrame": 115,
+                "lastFrame": 1011
+            },
+            {
+                "count": 1200,
+                "firstFrame": 115,
+                "lastFrame": 1068
+            },
+            {
+                "count": 400,
+                "firstFrame": 115,
+                "lastFrame": 981
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1088,
+                "firstFrame": 115,
+                "lastFrame": 1068
+            },
+            {
+                "count": 204,
+                "firstFrame": 115,
+                "lastFrame": 958
+            },
+            {
+                "count": 975,
+                "firstFrame": 115,
+                "lastFrame": 970
+            }
+        ]
+    },
+    {
         "testName": "aa_comboscaling",
         "testVersion": "33",
         "finished": true,
