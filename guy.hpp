@@ -449,6 +449,11 @@ private:
         if (pCurrentAction && pCurrentAction->recoveryEndFrame != -1 && (currentFrame + frameBias) >= pCurrentAction->recoveryEndFrame && nextAction == -1) {
             return true;
         }
+        // todo this was letting us move after parry
+        // need to find how to do this properly
+        // if (actionInitialFrame != -1 && !hitStun) {
+        //     return true;
+        // }
         return false;
     }
 
