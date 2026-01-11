@@ -23,13 +23,16 @@ def save_history(path, data, var_name="historyData"):
     with open(path, "w") as f:
         f.write("var " + var_name + " =\n" + json.dumps(data, indent=2) + ";\n")
 
-def calculate_stats(results, dumps_dir):
+def get_error_count(results):
     total_errors = 0
     for r in results:
         for i, error_type in enumerate(r.get("errorTypes", [])):
             if i not in SKIP_ERROR_TYPES:
                 total_errors += error_type.get("count", 0)
 
+    return total_errors
+
+def get_frame_count(results, dumps_dir):
     total_frames = 0
     for r in results:
         test_name = r["testName"]
@@ -39,6 +42,12 @@ def calculate_stats(results, dumps_dir):
             with open(test_path) as f:
                 frames = json.loads(f.read())
                 total_frames += len(frames)
+
+    return total_frames
+
+def calculate_stats(results, dumps_dir):
+    total_errors = get_error_count(results)
+    total_frames = get_frame_count(results, dumps_dir)
 
     return total_errors, total_frames
 

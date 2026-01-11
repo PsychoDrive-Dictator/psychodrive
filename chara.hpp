@@ -362,6 +362,7 @@ struct ProjectileData {
     bool airborne;
     int flags;
     int category;
+    int clashPriority;
     bool noPush;
     int lifeTime;
 };

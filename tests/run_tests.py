@@ -21,6 +21,7 @@ if os.name == 'nt':
 psychodrivePath = os.path.join(scriptDir, "..", psychodriveBin)
 
 resultsPath = os.path.join(scriptDir, "new_results.json")
+currentResultsPath = os.path.join(scriptDir, "current_results.json")
 
 tests = []
 
@@ -61,7 +62,8 @@ testResults = []
 def runTest(test):
     testPath = test['filePath']
     charVersion = test['charVersion']
-    print('running test', testPath, charVersion)
+    print('.',end='')
+    sys.stdout.flush()
     result = subprocess.run([psychodrivePath, 'run_dump', testPath, charVersion], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     newTestResult = {}
     newTestResult['testName'] = test['name']
@@ -96,10 +98,14 @@ def runTest(test):
             newTestResult['finished'] = True
     return newTestResult
 
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count())
+numThreads = multiprocessing.cpu_count()
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=numThreads)
 
 futures = []
 futuresNotDone = []
+
+print("running tests on", numThreads, "threads",end='')
+sys.stdout.flush()
 
 for test in tests:
     futures.append(executor.submit(runTest, test))
@@ -116,6 +122,8 @@ while True:
         break
     time.sleep(0.1)
 
+print("\n")
+
 testResults = sorted(testResults, key=lambda x:x['testName'])
 
 with open(resultsPath, "w") as outFile:
@@ -123,10 +131,15 @@ with open(resultsPath, "w") as outFile:
     outFile.write(json.dumps(testResults, default=str, indent=4, ensure_ascii=False))
     outFile.close()
 
-from history_utils import save_history, calculate_stats
+from history_utils import save_history, get_error_count, calculate_stats, parse_results_json
 
 pendingPath = os.path.join(scriptDir, "test_history_pending.json")
 total_errors, total_frames = calculate_stats(testResults, testDir)
+
+with open(currentResultsPath, "r") as inFileCurResults:
+    current_errors = get_error_count(parse_results_json(inFileCurResults.read()))
+
+print(total_errors - current_errors, "new errors")
 
 if total_frames > 0:
     save_history(pendingPath, {

@@ -917,6 +917,7 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
                     newProj.airborne = (*pProjData)["_AirStatus"];
                     newProj.flags = (*pProjData)["AttrX"];
                     newProj.category = (*pProjData)["Category"];
+                    newProj.clashPriority = (*pProjData)["ShotLevel"];
                     newProj.noPush = (*pProjData)["_NoPush"];
                     newProj.lifeTime = (*pProjData)["LifeTime"];
 

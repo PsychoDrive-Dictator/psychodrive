@@ -1672,6 +1672,12 @@ int Guy::getFrameMeterColorIndex() {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
+    // might need to put this at the end if we find ordering difference, but convenient for now
+    if (pOtherGuy) {
+        for (GuyRef minion : pOtherGuy->getMinions()) {
+            Push(minion);
+        }
+    }
     // seems like ignore hitstop bit lingers for one frame but just for push?
     // probably symptom of an ordering difference
     if (warudo || (getHitStop() && !wasIgnoreHitStop)) return false;
@@ -1700,7 +1706,8 @@ bool Guy::Push(Guy *pOtherGuy)
     if (didPush) return false;
     if ( !pOtherGuy ) return false;
     // for now, maybe there's other rules
-    if (isProjectile) return false;
+    if (isProjectile && !pOtherGuy->isProjectile) return false;
+    if (!isProjectile && pOtherGuy->isProjectile) return false;
 
     std::vector<Box> pushBoxes;
     std::vector<Box> otherPushBoxes;
@@ -1712,16 +1719,29 @@ bool Guy::Push(Guy *pOtherGuy)
     Fixed pushXLeft = 0;
     Fixed pushXRight = 0;
     for (auto pushbox : pushBoxes ) {
-
-        if (noPush) break;
-
         for (auto otherPushBox : otherPushBoxes ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
+                if (isProjectile && pOtherGuy->isProjectile) {
+                    // projectile clash
+                    addHitStop(10);
+                    pOtherGuy->addHitStop(10);
+                    if (pCurrentAction->pProjectileData->clashPriority < pOtherGuy->pCurrentAction->pProjectileData->clashPriority) {
+                        projHitCount--;
+                    } else if (pCurrentAction->pProjectileData->clashPriority > pOtherGuy->pCurrentAction->pProjectileData->clashPriority) {
+                        pOtherGuy->projHitCount--;
+                    } else {
+                        projHitCount--;
+                        pOtherGuy->projHitCount--;
+                    }
+                }
                 pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
                 pushXRight = fixMin(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
                 //log(logTransitions, "push left/right " + std::to_string(pushXLeft.f()) + " " + std::to_string(pushXRight.f()));
                 hasPushed = true;
+                if (noPush) {
+                    hasPushed = false;
+                }
             }
         }
     }
