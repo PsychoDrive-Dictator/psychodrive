@@ -1207,6 +1207,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_erase",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 207,
+                "firstFrame": 231,
+                "lastFrame": 659
+            },
+            {
+                "count": 67,
+                "firstFrame": 240,
+                "lastFrame": 281
+            },
+            {
+                "count": 19,
+                "firstFrame": 240,
+                "lastFrame": 281
+            },
+            {
+                "count": 77,
+                "firstFrame": 235,
+                "lastFrame": 574
+            },
+            {
+                "count": 77,
+                "firstFrame": 235,
+                "lastFrame": 574
+            },
+            {
+                "count": 177,
+                "firstFrame": 235,
+                "lastFrame": 659
+            },
+            {
+                "count": 223,
+                "firstFrame": 231,
+                "lastFrame": 659
+            },
+            {
+                "count": 62,
+                "firstFrame": 235,
+                "lastFrame": 574
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 138,
+                "firstFrame": 235,
+                "lastFrame": 659
+            },
+            {
+                "count": 37,
+                "firstFrame": 230,
+                "lastFrame": 543
+            },
+            {
+                "count": 268,
+                "firstFrame": 235,
+                "lastFrame": 659
+            }
+        ]
+    },
+    {
         "testName": "aa_grounded_trade",
         "testVersion": "33",
         "finished": true,
