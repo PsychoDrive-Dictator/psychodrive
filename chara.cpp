@@ -909,6 +909,11 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
                     ProjectileData newProj;
                     newProj.id = dataIndex;
                     newProj.hitCount = (*pProjData)["HitCount"];
+                    newProj.extraHitStop = (*pProjData)["HitAfterFrame"];
+                    // newProj.extraHitStop -= 2;
+                    // if (newProj.extraHitStop < 0) {
+                    //     newProj.extraHitStop = 0;
+                    // }
                     newProj.hitFlagToParent = (*pProjData)["_HitFlagToPlayer"];
                     newProj.hitStopToParent = (*pProjData)["_HitStopToPlayer"];
                     newProj.rangeB = (*pProjData)["RangeB"];

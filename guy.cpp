@@ -1724,16 +1724,24 @@ bool Guy::Push(Guy *pOtherGuy)
 
                 if (isProjectile && pOtherGuy->isProjectile) {
                     // projectile clash
-                    addHitStop(10);
-                    pOtherGuy->addHitStop(10);
+                    int ownHitStop = 10;
+                    int otherHitStop = 10;
                     if (pCurrentAction->pProjectileData->clashPriority < pOtherGuy->pCurrentAction->pProjectileData->clashPriority) {
                         projHitCount--;
+                        // if (projHitCount != 0) {
+                        //     otherHitStop += pOtherGuy->pCurrentAction->pProjectileData->extraHitStop;
+                        // }
                     } else if (pCurrentAction->pProjectileData->clashPriority > pOtherGuy->pCurrentAction->pProjectileData->clashPriority) {
                         pOtherGuy->projHitCount--;
+                        // if (pOtherGuy->projHitCount != 0) {
+                        //     ownHitStop += pCurrentAction->pProjectileData->extraHitStop;
+                        // }
                     } else {
                         projHitCount--;
                         pOtherGuy->projHitCount--;
                     }
+                    addHitStop(ownHitStop);
+                    pOtherGuy->addHitStop(otherHitStop);
                 }
                 pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
                 pushXRight = fixMin(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
@@ -2674,6 +2682,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         if (pGuy->isProjectile) {
             pGuy->projHitCount--;
+            // mmmm
+            //hitStopSelf += pGuy->pCurrentAction->pProjectileData->extraHitStop;
             if (hitBox.type == projectile && !pGuy->obeyHitID) {
                 hitID = -1;
             }

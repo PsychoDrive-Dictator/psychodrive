@@ -354,6 +354,7 @@ struct StatusKey : Key {
 struct ProjectileData {
     int id;
     int hitCount;
+    int extraHitStop;
     bool hitFlagToParent;
     bool hitStopToParent;
     int rangeB;
