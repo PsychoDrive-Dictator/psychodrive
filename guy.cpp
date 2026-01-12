@@ -551,7 +551,6 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     nextAction = pTrigger->actionID;
     // apply condition flags BCM.TRIGGER.TAG.NEW_ID.json to make jamie jump cancel divekick work
     uint64_t flags = pTrigger->flags;
-    int inst = pTrigger->comboInst;
 
     blocking = false;
     parrying = flags & (1ULL<<40);
@@ -2381,8 +2380,8 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
                 pOpponent->locked = false;
                 pendingUnlockHit = 0;
-            }
-            if (!pendingUnlockHitDelayed && pEntry->floorTime != 0) {
+                pendingUnlockHitDelayed = false;
+            } else if (!pendingUnlockHitDelayed && pEntry->floorTime != 0) {
                 // ?????
                 // todo why does floortime matter on unlock hit? is it really what it is???
                 pendingUnlockHitDelayed = true;
@@ -3007,7 +3006,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         // not sure if the right check to reset hitstun to 0 only in some cases
         // maybe time to start adding lots of hitstun as a juggle state
         if (hitEntryHitStun > 0 || dmgType == 21 || dmgType == 22) {
-            hitStun = hitEntryHitStun + hitStunAdder;
+            hitStun = hitEntryHitStun;
             appliedHitStun = true;
         }
     }

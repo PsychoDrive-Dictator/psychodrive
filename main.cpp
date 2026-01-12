@@ -33,7 +33,6 @@ EGameMode gameMode = Training;
 
 bool forceCounter = false;
 bool forcePunishCounter = false;
-int hitStunAdder = 0;
 
 struct charEntry {
     int charID;
@@ -262,6 +261,7 @@ void jsCharLoadCallback(char *charName)
 bool done = false;
 bool paused = false;
 bool oneframe = false;
+int runUntilFrame = 0;
 bool lockCamera = true;
 bool toggleRenderUI = true;
 
@@ -634,6 +634,17 @@ static void mainloop(void)
         if (runComboFinder) {
             findCombos(comboFinderDoLights, comboFinderDoLateCancels, comboFinderDoWalk, comboFinderDoKaras);
             runComboFinder = false;
+        }
+
+        if (runUntilFrame) {
+            if (runUntilFrame > defaultSim.frameCounter) {
+                limitRate = false;
+                paused = false;
+            } else {
+                runUntilFrame = 0;
+                paused = true;
+                limitRate = true;
+            }
         }
 
         bool hasInput = true;

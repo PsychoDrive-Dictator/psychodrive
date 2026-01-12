@@ -251,6 +251,7 @@ extern bool resetpos;
 extern bool done;
 extern bool paused;
 extern bool oneframe;
+extern int runUntilFrame;
 extern bool lockCamera;
 extern bool toggleRenderUI;
 
@@ -290,7 +291,6 @@ extern bool limitRate;
 
 extern bool forceCounter;
 extern bool forcePunishCounter;
-extern int hitStunAdder;
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 std::string readFile(const std::string &fileName);

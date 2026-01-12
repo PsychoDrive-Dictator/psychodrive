@@ -672,6 +672,9 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
         //newCharPos = randFloat() * 300 - 150.0;
     }
     for (auto i : currentInputMap) {
+        if (i.first) {
+            ImGui::SameLine();
+        }
         ImGui::Text("input %i %i", i.first, i.second);
     }
     ImGui::Text("frame %d", defaultSim.frameCounter);
@@ -695,7 +698,12 @@ void renderAdvancedUI(float frameRate, std::deque<std::string> *pLogQueue)
     if ( ImGui::Button("step one (0)") ) {
         oneframe = true;
     }
-    ImGui::SliderInt("hitstun adder", &hitStunAdder, -10, 10);
+    ImGui::SameLine();
+    char goToFrameText[32] = {};
+    snprintf(goToFrameText, sizeof(goToFrameText), "%d", runUntilFrame);
+    ImGui::SetNextItemWidth( 100.0 );
+    ImGui::InputText("##startpostext", goToFrameText, sizeof(goToFrameText));
+    runUntilFrame = atoi(goToFrameText);
     ImGui::Checkbox("force counter", &forceCounter);
     ImGui::SameLine();
     ImGui::Checkbox("force PC", &forcePunishCounter);
