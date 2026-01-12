@@ -509,7 +509,9 @@ bool Guy::RunFrame(bool advancingTime)
             setFocus(focus + deferredFocusCost);
             log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
             deferredFocusCost = 0;
-            setFocusRegenCooldown(120);
+            if (!setFocusRegenCooldown(120)) {
+                focusRegenCooldown--;
+            }
             focusRegenCooldownFrozen = true;
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
         }
@@ -566,10 +568,14 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     driveRushCancel = driveRushCancel || flags & (1ULL<<20);
     parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
     if (flags & (1ULL<<20)) {
-        setFocusRegenCooldown(120);
+        if (setFocusRegenCooldown(120)) {
+            focusRegenCooldown--;
+        }
     }
     if (flags & (1ULL<<21)) {
-        setFocusRegenCooldown(240);
+        if (setFocusRegenCooldown(240)) {
+            focusRegenCooldown--;
+        }
     }
     parrying = flags & (1ULL<<40);
 
@@ -3336,6 +3342,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         // if you get hit out of an od move?
         if (focusRegenCooldownFrozen) {
             focusRegenCooldownFrozen = false;
+            if (focusRegenCooldown) {
+                focusRegenCooldown += 2;
+            }
             log(logResources, "regen cooldown unfrozen (hit out of freeze move)");
         }
 
@@ -3824,6 +3833,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
     int regenAmountDone = 0;
+    int focusIfNotWalkForward = 0;
     if (advancingTime) {
         if (!endHitStopFrame && !endWarudoFrame) {
             if (pendingHitStop) {
@@ -3857,10 +3867,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (tickRegenCooldown && focusRegenCooldown > 0) {
             focusRegenCooldown--;
             log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
-            if (getHitStop() > 1 && focusRegenCooldown == 0) {
-                focusRegenCooldown = 1;
-                log(logResources, "final regen cooldown tick down undone bc hitstop");
-            }
+            // if (getHitStop() > 1 && focusRegenCooldown == 0) {
+            //     focusRegenCooldown = 1;
+            //     log(logResources, "final regen cooldown tick down undone bc hitstop");
+            // }
         }
 
         bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
@@ -3884,6 +3894,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             }
             if (jumped && !landed) {
                 focusRegenAmount = 20;
+            }
+            if (currentAction == 10 || (currentAction == 9 && currentFrame >= 9)) {
+                focusIfNotWalkForward = focus + focusRegenAmount;
+                focusRegenAmount *= 2;
             }
             // deferred cost will clamp if there is one
             // if (deferredFocusCost) {
@@ -4481,6 +4495,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if (deferredFocusCost && regenAmountDone) {
         setFocus(focus - regenAmountDone);
         log(logResources, "undoing regen from trigger!");
+    } else if (didTrigger && regenAmountDone && focusIfNotWalkForward) {
+        setFocus(focusIfNotWalkForward);
+        log(logResources, "undoing walkforward bonus regen from trigger!");
     }
 
     if (didTrigger && didTransition) {
@@ -5285,7 +5302,9 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                                 log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
                                 if (param2 < 0) {
                                     // same as spending bar on od move
-                                    setFocusRegenCooldown(120);
+                                    if (!setFocusRegenCooldown(120)) {
+                                        focusRegenCooldown--;
+                                    }
                                     focusRegenCooldownFrozen = true;
                                     log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (eventkey, frozen)");
                                 }

@@ -206,7 +206,6 @@ public:
             focusRegenCooldown = newCooldown;
             return true;
         }
-        focusRegenCooldown--;
         return false;
     }
     int getGauge() { return gauge; }
