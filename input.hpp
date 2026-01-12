@@ -36,6 +36,13 @@ enum InputID
 	firstJoystickID = 10,
 };
 
+#define printInput(printedInput) \
+if (input & printedInput) { \
+	if (printed) strOut += "+"; \
+	strOut += #printedInput; \
+	printed = true; \
+} \
+
 static inline void renderInput(std::string &strOut, int input)
 {
 	bool printed = false;
@@ -58,6 +65,12 @@ static inline void renderInput(std::string &strOut, int input)
 		strOut += "FORWARD";
 		printed = true;
 	}
+	printInput(LP);
+	printInput(LK);
+	printInput(MP);
+	printInput(MK);
+	printInput(HP);
+	printInput(HK);
 }
 
 static inline int invertDirection(int input)

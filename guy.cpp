@@ -3515,6 +3515,9 @@ void Guy::DoBranchKey(bool preHit)
                         if (branchParam0 == 0 && !(currentInput & branchParam1)) {
                             doBranch = true;
                         }
+                        if (recordFrameTriggers) {
+                            dc.frameTriggers.insert(ActionRef(-branchParam1, 0));
+                        }
                     }
                     if (hitStun) {
                         // guard scripts have branches to switch guard? but theyre not supposed to work?
@@ -3716,6 +3719,9 @@ void Guy::DoBranchKey(bool preHit)
                     // this is used for backthrow, the other thing for held buttons
                     if (branchParam2 == 1 && currentInput & branchParam1) {
                         doBranch = true;
+                    }
+                    if (recordFrameTriggers) {
+                        dc.frameTriggers.insert(ActionRef(-branchParam1, 0));
                     }
                     break;
                 default:

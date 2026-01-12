@@ -7304,6 +7304,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "sagat_max_charge_dp_sa3",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1908,
+                "firstFrame": 140,
+                "lastFrame": 810
+            },
+            {
+                "count": 663,
+                "firstFrame": 140,
+                "lastFrame": 810
+            },
+            {
+                "count": 129,
+                "firstFrame": 140,
+                "lastFrame": 674
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1148,
+                "firstFrame": 237,
+                "lastFrame": 810
+            },
+            {
+                "count": 1148,
+                "firstFrame": 237,
+                "lastFrame": 810
+            },
+            {
+                "count": 574,
+                "firstFrame": 237,
+                "lastFrame": 810
+            },
+            {
+                "count": 272,
+                "firstFrame": 365,
+                "lastFrame": 810
+            },
+            {
+                "count": 490,
+                "firstFrame": 237,
+                "lastFrame": 726
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 490,
+                "firstFrame": 237,
+                "lastFrame": 726
+            }
+        ]
+    },
+    {
         "testName": "sagat_sa2_followup",
         "testVersion": "34",
         "finished": true,
