@@ -504,6 +504,15 @@ bool Guy::RunFrame(bool advancingTime)
                 ExitStyle();
             }
         }
+
+        if (advancingTime && deferredFocusCost < 0 && !pOpponent->warudo) {
+            setFocus(focus + deferredFocusCost);
+            log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
+            deferredFocusCost = 0;
+            setFocusRegenCooldown(120);
+            focusRegenCooldownFrozen = true;
+            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
+        }
     }
 
     return true;
@@ -3886,13 +3895,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         return true;
     }
 
-    if (advancingTime && deferredFocusCost) {
-        setFocus(focus - deferredFocusCost);
-        log(logResources, "focus -" + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
-        deferredFocusCost = 0;
-        setFocusRegenCooldown(120);
-        focusRegenCooldownFrozen = true;
-        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
+    if (advancingTime && deferredFocusCost > 0) {
+        deferredFocusCost = -deferredFocusCost;
     }
 
     bool doTriggers = true;
