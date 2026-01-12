@@ -201,10 +201,12 @@ public:
     void setHealth(int newHealth) { health = newHealth; }
     int getFocus() { return focus; }
     int getFocusRegenCoolDown() { return focusRegenCooldown; }
-    void setFocusRegenCooldown(int newCooldown) {
+    bool setFocusRegenCooldown(int newCooldown) {
         if (newCooldown == -1 || newCooldown > focusRegenCooldown) {
             focusRegenCooldown = newCooldown;
+            return true;
         }
+        return false;
     }
     int getGauge() { return gauge; }
     void setFocus(int newFocus) {

@@ -3872,7 +3872,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
         if (doRegen) {
             int focusRegenAmount = 40;
-            if (hitStun) {
+            if (hitStun > 1) {
                 focusRegenAmount = 20;
                 // todo burnout
             }
