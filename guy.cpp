@@ -306,7 +306,7 @@ bool Guy::RunFrame(bool advancingTime)
 
     // training mode refill rule, 'action' starts and both start regen (soon)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
-    if (advancingTime && didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
+    if (!pSim->match && advancingTime && didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
         if (pOpponent && !pOpponent->comboHits) {
             focusRegenCooldown = 3;
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (refill action start)");
@@ -565,6 +565,12 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     // one-way, reset on combo end
     driveRushCancel = driveRushCancel || flags & (1ULL<<20);
     parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
+    if (flags & (1ULL<<20)) {
+        setFocusRegenCooldown(120);
+    }
+    if (flags & (1ULL<<21)) {
+        setFocusRegenCooldown(240);
+    }
     parrying = flags & (1ULL<<40);
 
     if (parrying && currentInput & DOWN) {
@@ -3836,7 +3842,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
 
         bool tickRegenCooldown = true;
-        if (warudo || superFreeze) {
+        if ((warudo && !tokiWaUgokidasu) || superFreeze) {
             tickRegenCooldown = false;
         }
         if (pOpponent && (pOpponent->warudo || pOpponent->superFreeze)) {
@@ -3845,7 +3851,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (focusRegenCooldownFrozen) {
             tickRegenCooldown = false;
         }
-        if (endHitStopFrame) {
+        if (endHitStopFrame || endWarudoFrame) {
             tickRegenCooldown = false;
         }
         if (tickRegenCooldown && focusRegenCooldown > 0) {
@@ -4697,12 +4703,12 @@ void Guy::DoSwitchKey(void)
         if (flag & 0x8000000) {
             isDrive = true;
             // this key lasts until margin so i think this is good?
-            if (prevAction == 480 || prevAction == 481) {
-                // hold parry - is it really the best way to tell?
-                setFocusRegenCooldown(240);
-            } else {
-                setFocusRegenCooldown(120);
-            }
+            // if (prevAction == 480 || prevAction == 481) {
+            //     // hold parry - is it really the best way to tell?
+            //     setFocusRegenCooldown(238);
+            // } else {
+            //     setFocusRegenCooldown(120);
+            // }
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
                 pOpponent->driveScaling = true;
