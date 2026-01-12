@@ -562,6 +562,9 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     uint64_t flags = pTrigger->flags;
 
     blocking = false;
+    // one-way, reset on combo end
+    driveRushCancel = driveRushCancel || flags & (1ULL<<20);
+    parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
     parrying = flags & (1ULL<<40);
 
     if (parrying && currentInput & DOWN) {
@@ -2628,7 +2631,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pResourceGuy = pGuy->pParent;
             }
             // set resources directly and mark for clamping at the end, for trades
-            if (!pOtherGuy->driveScaling) {
+            if (!pResourceGuy->driveRushCancel && !pOtherGuy->driveScaling) {
                 pResourceGuy->focus += pHitEntry->focusGainOwn;
             }
             // todo maybe rounding errors there? we got some with health scaling until moving to fixed
@@ -3848,7 +3851,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
 
         bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
-        if (pOpponent && pOpponent->driveScaling) {
+        if (driveRushCancel || (pOpponent && pOpponent->driveScaling)) {
             doRegen = false;
         }
         if (superFreeze) {
@@ -4359,6 +4362,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         driveScaling = false;
         resetComboCount = false;
         lastDamageScale = 0;
+        if (pOpponent) {
+            pOpponent->driveRushCancel = false;
+            pOpponent->parryDriveRush = false;
+        }
     }
 
     if (canMoveNow && wasHit) {

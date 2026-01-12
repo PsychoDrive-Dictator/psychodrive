@@ -686,6 +686,8 @@ private:
         currentScaling = 0;
         pendingScaling = 0;
         driveScaling = false;
+        parryDriveRush = false;
+        driveRushCancel = false;
         comboHits = 0;
         juggleCounter = 0;
         comboDamage = 0;
@@ -827,6 +829,8 @@ private:
     bool noCounterPush : 1;
     bool beenHitThisFrame : 1;
     bool driveScaling : 1;
+    bool parryDriveRush : 1;
+    bool driveRushCancel : 1;
     bool wasHit : 1;
     bool resetComboCount : 1;
     bool knockDown : 1;
