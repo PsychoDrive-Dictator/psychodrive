@@ -804,6 +804,15 @@ void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
     pEntry->focusGainTarget = (*pHitEntryJson)["FocusTgt"];
     pEntry->superGainOwn = (*pHitEntryJson)["SuperOwn"];
     pEntry->superGainTarget = (*pHitEntryJson)["SuperTgt"];
+    pEntry->parryGain = (*pHitEntryJson)["DriveNorm"];
+    pEntry->perfectParryGain = (*pHitEntryJson)["DriveJust"];
+    if (pEntry->parryGain == 65535) {
+        pEntry->parryGain = 10000;
+    }
+    if (pEntry->perfectParryGain == 65535) {
+        pEntry->perfectParryGain = 10000;
+    }
+    pEntry->superGainTarget = (*pHitEntryJson)["SuperTgt"];
     pEntry->dmgType = (*pHitEntryJson)["DmgType"];
     pEntry->dmgKind = (*pHitEntryJson)["DmgKind"];
     pEntry->dmgPower = (*pHitEntryJson)["DmgPower"];

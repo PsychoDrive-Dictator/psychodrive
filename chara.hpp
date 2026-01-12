@@ -167,6 +167,8 @@ struct HitEntry {
     int focusGainTarget;
     int superGainOwn;
     int superGainTarget;
+    int parryGain;
+    int perfectParryGain;
     int dmgType;
     int dmgKind;
     int dmgPower;

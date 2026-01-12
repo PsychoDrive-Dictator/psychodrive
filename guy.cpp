@@ -2611,6 +2611,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 }
                 pGuy->hitAccelX = halfHitAccel;
                 pOtherGuy->hitAccelX = halfHitAccel;
+
+                pOtherGuy->focus += pHitEntry->parryGain;
             }
             Guy *pResourceGuy = pGuy;
             if (pGuy->isProjectile) {
