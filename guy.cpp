@@ -2399,6 +2399,8 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 // clamp
                 pOpponent->setFocus(pOpponent->focus);
                 pOpponent->setGauge(pOpponent->gauge);
+                setFocus(focus);
+                setGauge(gauge);
                 otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
                 pOpponent->locked = false;
                 pendingUnlockHit = 0;
@@ -2626,20 +2628,12 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
                 pOtherGuy->focus += pHitEntry->parryGain;
             }
-            Guy *pResourceGuy = pGuy;
-            if (pGuy->isProjectile) {
-                pResourceGuy = pGuy->pParent;
-            }
-            // set resources directly and mark for clamping at the end, for trades
-            if (!pResourceGuy->driveRushCancel && !pOtherGuy->driveScaling) {
-                pResourceGuy->focus += pHitEntry->focusGainOwn;
-            }
-            // todo maybe rounding errors there? we got some with health scaling until moving to fixed
-            StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
-            int scaledSuperGain = pHitEntry->superGainOwn * style.gaugeGainRatio / 100;
-            pResourceGuy->gauge += scaledSuperGain;
 
-            clampGuys.insert(pResourceGuy);
+            if (pGuy->isProjectile) {
+                clampGuys.insert(pGuy->pParent);
+            } else {
+                clampGuys.insert(pGuy);
+            }
             clampGuys.insert(pOtherGuy);
         }
 
@@ -3018,6 +3012,19 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
     }
     gauge += pHitEffect->superGainTarget;
+
+    Guy *pResourceGuy = pAttacker;
+    if (pAttacker->isProjectile) {
+        pResourceGuy = pAttacker->pParent;
+    }
+    // set resources directly, will be clamped by caller, for trades
+    if (!pResourceGuy->driveRushCancel && !driveScaling) {
+        pResourceGuy->focus += pHitEffect->focusGainOwn;
+    }
+    // todo maybe rounding errors there? we got some with health scaling until moving to fixed
+    StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
+    int scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
+    pResourceGuy->gauge += scaledSuperGain;
 
     if (applyHit) {
         if (!blocking) {
@@ -4234,6 +4241,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         // todo grace period here?
                         successfulParry = false;
                     }
+                }
+
+                if (pOpponent) {
+                    pOpponent->driveRushCancel = false;
+                    pOpponent->parryDriveRush = false;
                 }
 
                 throwProtectionFrames = 2;
