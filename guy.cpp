@@ -2183,7 +2183,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     // todo is real otg a thing?
                     continue;
                 }
-                if (pOtherGuy->airborne && pOtherGuy->hitStun && !pOtherGuy->knockDown) {
+                if (pOtherGuy->airborne && pOtherGuy->hitStun && !pOtherGuy->knockDown && !pOtherGuy->locked) {
                     // air recovery
                     continue;
                 }
@@ -2229,6 +2229,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                         if (doBoxesHit(hitbox.box, hurtbox.box)) {
                             hurtBox = hurtbox;
                             foundBox = true;
+                            //log(logHits, "foundbox");
                             break;
                         }
                     }
@@ -2318,11 +2319,8 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 continue;
             }
 
-            if ((hitbox.type == domain && !pOtherGuy->locked) ||
-                (hitbox.type != domain && pOtherGuy->locked)) {
-                // only domain when locked and domain only when locked
-                // todo check if that's right, eg. see if jp can still combo out of grab
-                // proabbly yes because it's actually the unlock juggle he comboes from?
+            if (hitbox.type == domain && !pOtherGuy->locked) {
+                // domain only when locked, other things can hit during lock
                 continue;
             }
 
@@ -2562,7 +2560,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             // and on block
             hitGrab = false;
         }
-        if (!pOtherGuy->locked && (isGrab || hitGrab)) {
+        if ((isGrab || hitGrab)) {
             pGuy->grabbedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
         }
@@ -2734,7 +2732,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (pGuy->nextAction != -1) {
                 // only transition
                 pGuy->AdvanceFrame(false);
-                // only run keys
+                // only run keys, force position reset as this is a new hit
+                pOtherGuy->locked = false;
                 pGuy->RunFrame(false);
             } else {
                 otherGuyLog(pGuy, true, "instagrab branch not found!");
