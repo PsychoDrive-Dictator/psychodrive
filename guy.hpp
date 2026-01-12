@@ -440,6 +440,9 @@ private:
     }
 
     bool fluffFrames(int frameBias = 0) {
+        if (successfulParry && (currentAction == 482 || nextAction == 482)) {
+            return true;
+        }
         if (nextAction != -1) {
             return false;
         }
@@ -449,11 +452,6 @@ private:
         if (pCurrentAction && pCurrentAction->recoveryEndFrame != -1 && (currentFrame + frameBias) >= pCurrentAction->recoveryEndFrame && nextAction == -1) {
             return true;
         }
-        // todo this was letting us move after parry
-        // need to find how to do this properly
-        // if (actionInitialFrame != -1 && !hitStun) {
-        //     return true;
-        // }
         return false;
     }
 
@@ -572,6 +570,7 @@ private:
         freeMovement = false;
         blocking = false;
         parrying = false;
+        successfulParry = false;
         hurtBoxProxGuarded = false;
         positionProxGuarded = false;
         bounced = false;
@@ -773,6 +772,7 @@ private:
     bool freeMovement : 1;
     bool blocking : 1;
     bool parrying : 1;
+    bool successfulParry : 1;
     bool hurtBoxProxGuarded : 1;
     bool positionProxGuarded : 1;
     bool bounced : 1;

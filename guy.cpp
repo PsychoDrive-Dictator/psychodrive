@@ -559,6 +559,10 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         nextAction = 489;
     }
 
+    if (parrying) {
+        successfulParry = false;
+    }
+
     if (flags & (1ULL<<26)) {
         jumped = true;
 
@@ -1034,7 +1038,12 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
     int initialI = -1;
     bool initialMatch = false;
     // current frame + buffer
-    uint32_t initialSearch = 1 + precedingTime + timeInHitStop;
+    int hitStopTime = timeInHitStop;
+    uint32_t initialSearch = 1 + precedingTime + hitStopTime;
+    if (pTrigger->flags & (1ULL<<40)) {
+        // don't buffer parry specifically? i don't think so
+        initialSearch = 1;
+    }
     if (dc.inputBuffer.size() < (size_t)initialSearch) {
         initialSearch = dc.inputBuffer.size();
     }
@@ -1091,6 +1100,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
                     atLeastOneNotConsumed = true;
                 }
                 initialMatch = true;
+                initialI = cursorPos;
                 match = true;
             } else if (initialMatch == true) {
                 cursorPos--;
@@ -2009,7 +2019,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
         }
         if (!forceLanding) {
             bool doEmptyLanding = currentAction == 36 || currentAction == 37 || currentAction == 38;
-            if (hitStun && !locked) {
+            if (hitStun && !locked && !knockDown) {
                 // air recovery
                 doEmptyLanding = true;
             }
@@ -2481,6 +2491,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pGuy->hasBeenParriedThisMove = true;
             if (hitFlagToParent) pGuy->pParent->hasBeenParriedThisMove = true;
             otherGuyLog(pOtherGuy, pOtherGuy->logHits, "parry!");
+
+            pOtherGuy->successfulParry = true;
         }
 
         bool hitArmor = false;
@@ -2628,6 +2640,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitStopTarget = 0;
         }
         if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
+            // perfect
             hitStopSelf = 9 + 1;
             hitStopTarget = 9 + 1;
         }
@@ -4125,6 +4138,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             // should this apply in general, not just airborne?
             currentFrame--;
             currentFrameFrac = Fixed(currentFrame);
+        } else if (parrying) {
+            nextAction = 481;
         } else {
             nextAction = 1;
         }
@@ -4176,9 +4191,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     } else {
                         nextAction = 340;
                     }
-                    // if (backroll && needsTurnaround()) {
-                    //     switchDirection();
-                    // }
+                    if (backroll && needsTurnaround()) {
+                        switchDirection();
+                    }
                     isDown = false;
                     knockDown = false;
 
@@ -4201,7 +4216,16 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 nageKnockdown = false;
             } else {
                 blocking = false;
-                parrying = false;
+                if (parrying) {
+                    if ((currentInput & (32+256)) != 32+256) {
+                        nextAction = 482;
+                        parrying = false;
+                    } else {
+                        // entering a new parry, clear successful bit
+                        // todo grace period here?
+                        successfulParry = false;
+                    }
+                }
 
                 throwProtectionFrames = 2;
             }
@@ -4312,7 +4336,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if ( nextAction == -1 && (currentAction == 480 || currentAction == 481) && (currentInput & (32+256)) != 32+256) {
+    if (!hitStun && parrying && (currentInput & (32+256)) != 32+256) {
         if (currentAction != 480 || currentFrame >= 12) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
@@ -4402,7 +4426,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if (nextAction != -1) {
         NextAction(didTrigger, didBranch, true);
         didTransition = true;
-        log (logTransitions, "nvm! current action " + std::to_string(currentAction));
             if (didRecoveryTrigger) {
             DoBranchKey(true);
             if (nextAction != -1) {
@@ -4456,7 +4479,9 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         if (currentAction != nextAction) {
             prevAction = currentAction;
             currentAction = nextAction;
-            log (logTransitions, "current action " + std::to_string(currentAction));
+            std::string prefix = "current action ";
+            if (bElide) prefix = "nvm! " + prefix;
+            log (logTransitions, prefix + std::to_string(currentAction));
 
             if (styleInstallFrames && !countingDownInstall) {
                 // start counting down on wakeup after install super?
