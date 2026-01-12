@@ -119,12 +119,12 @@ for char in characters:
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))
 
-    for hitID in hits21Json:
-        hitParam = hits21Json[hitID]["param"]
-        # check movetime vs hitstun
-        for param in hitParam:
-            if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
-                print("movetime != hitstun")
+    # for hitID in hits21Json:
+    #     hitParam = hits21Json[hitID]["param"]
+    #     # check movetime vs hitstun
+    #     for param in hitParam:
+    #         if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
+    #             print("movetime != hitstun")
         # check burnout block is -4 compared to normal block
         #checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
         #checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
@@ -136,16 +136,16 @@ for char in characters:
         # checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
 
     # find hitboxes with certain flags
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "AttackCollisionKey" in move:
-    #         for key in move["AttackCollisionKey"]:
-    #             if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
-    #                 attackKey = move["AttackCollisionKey"][key]
-    #                 if attackKey["Condition"] & 2048:
-    #                     print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
-    #                           " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
-    #                           " condition " + str(attackKey["Condition"]))
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "AttackCollisionKey" in move:
+            for key in move["AttackCollisionKey"]:
+                if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
+                    attackKey = move["AttackCollisionKey"][key]
+                    if attackKey["KindFlag"] & (1<<25):
+                        print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
+                              " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
+                              " condition " + hex(attackKey["Condition"]) + " kind " + hex(attackKey["KindFlag"]))
 
     # find certain branches
     # for moveID in moves21Json:

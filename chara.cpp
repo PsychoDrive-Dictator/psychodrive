@@ -447,7 +447,7 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
             newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_front);
         }
         if (flags & 0x40000) {
-            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_juggle);
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
         }
         if (flags & 0x100000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | multi_counter);

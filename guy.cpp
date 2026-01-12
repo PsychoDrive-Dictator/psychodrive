@@ -2134,18 +2134,20 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (applyFlags) {
-            // todo find tests for stubbed out ones
             if (pOtherGuy->airborne) {
-                // if (hitbox.flags & avoids_airborne) {
-                //     continue;
-                // }
+                if (hitbox.flags & avoids_airborne) {
+                    continue;
+                }
             } else {
-                // if (hitbox.flags & avoids_standing && !pOtherGuy->getCrouching()) {
-                //     continue;
-                // }
+                if (hitbox.flags & avoids_standing && !pOtherGuy->getCrouching()) {
+                    continue;
+                }
                 if (hitbox.flags & avoids_crouching && pOtherGuy->getCrouching()) {
                     continue;
                 }
+            }
+            if (hitbox.flags & only_hits_in_combo && pOtherGuy->hitStun == 0) {
+                continue;
             }
             Fixed posDiff = pOtherGuy->getPosX() - getPosX();
             posDiff *= getDirection();
