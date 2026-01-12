@@ -2935,7 +2935,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
-    if (applyHit) {
+    if (applyHit && !blocking) {
         if (comboHits == 0) {
             currentScaling = 100;
             pendingScaling = 0;
@@ -2948,7 +2948,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             pendingScaling = 0;
         }
 
-        if (!blocking && applyScaling) {
+        if (applyScaling) {
             if (comboHits == 0) {
                 pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
                 pendingScaling += attackerInstantScale;
