@@ -633,7 +633,8 @@ private:
         currentFrameFrac = Fixed(0);
         currentFrame = 0;
         loopCount = 0;
-        instantScale = 0;
+        triggerInstantScale = 0;
+        actionInstantScale = 0;
         nextActionOpponentAction = false;
         opponentAction = false;
         locked = false;
@@ -917,7 +918,8 @@ private:
     Fixed currentFrameFrac;
     int currentFrame;
     int loopCount;
-    int instantScale;
+    int triggerInstantScale;
+    int actionInstantScale;
     int superLevel;
 
     // todo round begin action needs to set that

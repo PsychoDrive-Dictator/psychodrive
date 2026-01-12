@@ -253,9 +253,10 @@ void Guy::UpdateActionData(void)
     if (pCurrentAction) {
         hasLooped = false;
         loopCount = pCurrentAction->loopCount;
-        instantScale = pCurrentAction->instantScale;
+
+        actionInstantScale = pCurrentAction->instantScale;
         if (pOpponent && !pOpponent->comboHits) {
-            instantScale = 0;
+            actionInstantScale = 0;
         }
     }
 }
@@ -573,10 +574,11 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         log(logTransitions, "forced jump status from trigger, direction " + std::to_string(jumpDirection));
     }
 
-    if (inst) {
-        instantScale = inst;
+    if (pTrigger->comboInst) {
+        triggerInstantScale = pTrigger->comboInst;
         if (pOpponent && !pOpponent->comboHits) {
-            instantScale = 0;
+            // todo is this right if projectiles hit out of order?
+            triggerInstantScale = 0;
         }
     }
 
@@ -2917,6 +2919,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         //resetHitStunOnTransition = true;
     }
 
+    int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
+
     if (applyHit) {
         if (comboHits == 0) {
             currentScaling = 100;
@@ -2932,11 +2936,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
         if (!blocking && applyScaling) {
             if (comboHits == 0) {
-            pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
-            pendingScaling += pAttacker->instantScale;
+                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
+                pendingScaling += attackerInstantScale;
             } else {
                 pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->comboScale : 10;
-                pendingScaling += pAttacker->instantScale;
+                pendingScaling += attackerInstantScale;
                 if (currentScaling == 100) {
                     pendingScaling += 10;
                 }
@@ -2946,7 +2950,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         lastScalingTriggerID = pAttacker->scalingTriggerID;
     }
 
-    Fixed effectiveScaling = Fixed(currentScaling - pAttacker->instantScale);
+    Fixed effectiveScaling = Fixed(currentScaling - attackerInstantScale);
 
     if (effectiveScaling < Fixed(10)) {
         effectiveScaling = Fixed(10);
