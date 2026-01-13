@@ -2920,8 +2920,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
         if (forceKnockDownState || dmgType == 11 || dmgType == 15 || isDrive) {
             knockDown = true;
+            // slide velocity while on the ground?
+            groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime);
         } else {
             knockDown = false;
+            groundBounceVelX = Fixed(0);
         }
     }
 
@@ -4207,10 +4210,27 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 }
             }
             if (knockDown) {
+                Fixed prevVelX = velocityX;
+                accelX = Fixed(0);
+                accelY = Fixed(0);
+                velocityX = Fixed(0);
+                velocityY = Fixed(0);
+
+                // can't believe we have to do that, looking at you spds
+                posY = Fixed(0);
+                airborne = false;
+
+                nageKnockdown = false;
+
                 if (knockDownFrames) {
                     hitStun = knockDownFrames;
                     knockDownFrames = 0;
                     nextAction = 330;
+                    if (groundBounceVelX != Fixed(0)) {
+                        // slide
+                        velocityX = groundBounceVelX;
+                        groundBounceVelX = Fixed(0);
+                    }
                     isDown = true;
                 } else {
                     // todo what's the actual buffer and input for backroll?
@@ -4227,6 +4247,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     } else {
                         nextAction = 340;
                     }
+                    if (prevVelX != Fixed(0)) {
+                        // one last slide tic
+                        posX = posX + (prevVelX * direction);
+                    }
                     if (backroll && needsTurnaround()) {
                         switchDirection();
                     }
@@ -4239,17 +4263,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 if (recoverForward && needsTurnaround()) {
                     switchDirection();
                 }
-
-                accelX = Fixed(0);
-                accelY = Fixed(0);
-                velocityX = Fixed(0);
-                velocityY = Fixed(0);
-
-                // can't believe we have to do that, looking at you spds
-                posY = Fixed(0);
-                airborne = false;
-
-                nageKnockdown = false;
             } else {
                 blocking = false;
                 if (parrying) {
