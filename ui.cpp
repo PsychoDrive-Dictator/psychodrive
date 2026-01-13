@@ -357,7 +357,11 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
             ImGui::Text("warudo");
         }
     } else {
-        ImGui::Text("health %i focus %i gauge %i unique %s debuff %i style %i install %i timer %i", pGuy->getHealth(), pGuy->getFocus(), pGuy->getGauge(), pGuy->getUniqueParam().c_str(), pGuy->getDebuffTimer(), pGuy->getStyle(), pGuy->getInstallFrames(), pGuy->getUniqueTimer());
+        int focus = pGuy->getFocus();
+        if (pGuy->getBurnout()) {
+            focus *= -1;
+        }
+        ImGui::Text("health %i focus %i gauge %i unique %s debuff %i style %i install %i timer %i", pGuy->getHealth(), focus, pGuy->getGauge(), pGuy->getUniqueParam().c_str(), pGuy->getDebuffTimer(), pGuy->getStyle(), pGuy->getInstallFrames(), pGuy->getUniqueTimer());
         ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i hitstop %i down %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getHitStop(), pGuy->getIsDown());
         if (pGuy->getWarudo()) {
             ImGui::SameLine();

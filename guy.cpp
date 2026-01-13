@@ -272,7 +272,7 @@ bool Guy::RunFrame(bool advancingTime)
 {
     dc.frameTriggers.clear();
 
-    if (parryFreeze) {
+    if (parryFreeze || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) {
         return false;
     }
 
@@ -533,7 +533,7 @@ bool Guy::RunFrame(bool advancingTime)
 
 void Guy::RunFramePostPush(void)
 {
-    if (parryFreeze || warudo) {
+    if (parryFreeze || warudo || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) {
         return;
     }
 
@@ -2145,7 +2145,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
 void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 {
-    if (parryFreeze || warudo || getHitStop()) return;
+    if (parryFreeze || warudo || getHitStop() || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) return;
     if ( !pOtherGuy ) return;
 
     std::vector<HitBox> hitBoxes;
@@ -2348,7 +2348,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             }
 
             if (blocked) {
-                hitEntryFlag = block;
+                hitEntryFlag = pOtherGuy->burnout ? special : block;
             }
 
             // apply those modifiers on top of the block base if needed
@@ -2777,13 +2777,12 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (pendingHit.bombBurst) {
                 pOtherGuy->debuffTimer = 0;
             }
-
-            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " hitID " + std::to_string(hitBox.hitID) +
-                " dt " + std::to_string(pendingHit.hitDataID) + "/" + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
-                " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
-                " moveType " + std::to_string(moveType) );
-            otherGuyLog(pOtherGuy, pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
         }
+        otherGuyLog(pOtherGuy, pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " hitID " + std::to_string(hitBox.hitID) +
+            " dt " + std::to_string(pendingHit.hitDataID) + "/" + std::to_string(hitEntryFlag) + " destX " + std::to_string(destX) + " destY " + std::to_string(destY) +
+            " hitStun " + std::to_string(hitHitStun) + " dmgType " + std::to_string(dmgType) +
+            " moveType " + std::to_string(moveType) );
+        otherGuyLog(pOtherGuy, pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
 
         // let's try to be doing the grab before time stops
         if (pGuy->grabbedThisFrame && pGuy->nextAction == -1) {
@@ -2979,6 +2978,15 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         //resetHitStunOnTransition = true;
     }
 
+    if (dmgType == 31) {
+        kabeTataki = true;
+    }
+
+    if (dmgType == 27) {
+        kabeTataki = true;
+        stunSplat = true;
+    }
+
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
     if (applyHit && !blocking) {
@@ -3140,6 +3148,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             // this can happen even if you block! blocked DI
             wallSplat = true;
             wallStopFrames = pHitEffect->wallStop + 2;
+            if (stunSplat) {
+                wallStopFrames = 30;
+            }
         } else if (kabeBound && wallTime) {
             int wallDestX = pHitEffect->wallDestX;
             int wallDestY = pHitEffect->wallDestY;
@@ -3856,6 +3867,10 @@ void Guy::DoBranchKey(bool preHit)
 
 bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoFrame)
 {
+    if (pOpponent && pOpponent->wallStopped && pOpponent->stunned) {
+        return true;
+    }
+
     if (parryFreeze) {
         parryFreeze--;
     }
@@ -4068,6 +4083,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
+    if (currentAction == 294 && (landed || !airborne)) {
+        nextAction = 353;
+        resetHitStunOnTransition = true;
+        knockDown = true;
+    }
+
     if (wallStopped) {
         velocityX = Fixed(0);
         velocityY = Fixed(0);
@@ -4077,32 +4098,51 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool triggerWallStop = touchedWall || wasOnWall();
 
-    if ((wallBounce || wallSplat) && triggerWallStop) {
+    if ((wallBounce || wallSplat) && triggerWallStop && !stunned) {
+        if (wallSplat && stunSplat && burnout) {
+            stunned = true;
+        }
         wallStopped = wallBounce || airborne;
         if (wallSplat) {
             if (airborne) {
+                // todo what's the burnout stun sequence there?
                 nextAction = 285;
             } else {
-                nextAction = 145;
+                if (stunned) {
+                    nextAction = 293;
+                } else {
+                    nextAction = 145;
+                    resetHitStunOnTransition = true;
+                    knockDown = true;
+                    wallSplat = false;
+                }
                 // crumple
                 blocking = false;
                 hitStun = 50000;
-                resetHitStunOnTransition = true;
-                wallSplat = false;
-                knockDown = true;
+                stunSplat = false;
             }
         } else {
             nextAction = 256;
         }
     }
 
+    if (stunned && currentAction == 293 && currentFrame == 6) {
+        wallStopped = true;
+    }
+
     if (wallStopped) {
         wallStopFrames--;
         if (wallStopFrames <= 0) {
             if (wallSplat) {
-                nextAction = 287;
+                if (stunned) {
+                    nextAction = 294;
+                } else {
+                    nextAction = 287;
+                }
                 wallSplat = false;
-                accelY.data = -39497; // todo -0.6ish ? magic gravity constant?
+                if (airborne) {
+                    accelY.data = -39497; // todo -0.6ish ? magic gravity constant?
+                }
             } else {
                 nextAction = 235; // combo/bounce state
 
@@ -4204,7 +4244,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         } else if (blocking) {
             // ???
             nextAction = currentAction + 1;
-        } else if (locked || airborne || (isProjectile && loopCount == -1)) {
+        } else if (wallStopped || locked || airborne || (isProjectile && loopCount == -1)) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
             currentFrame--;
@@ -4462,6 +4502,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         pAttacker = nullptr;
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
+        stunSplat = false;
 
         wasHit = false;
 

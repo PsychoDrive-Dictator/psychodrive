@@ -200,6 +200,7 @@ public:
     int getHealth() { return health; }
     void setHealth(int newHealth) { health = newHealth; }
     int getFocus() { return focus; }
+    bool getBurnout() { return burnout; }
     int getFocusRegenCoolDown() { return focusRegenCooldown; }
     bool setFocusRegenCooldown(int newCooldown) {
         if (newCooldown == -1 || newCooldown > focusRegenCooldown) {
@@ -212,9 +213,11 @@ public:
     void setFocus(int newFocus) {
         focus = newFocus;
         if (focus < 0) {
+            burnout = true;
             focus = 0;
         }
         if (focus > maxFocus) {
+            burnout = false;
             focus = maxFocus;
         }
     }
@@ -713,6 +716,8 @@ private:
         groundBounceAccelY = Fixed(0);
         wallBounce = false;
         wallSplat = false;
+        stunSplat = false;
+        stunned = false;
         tumble = false;
         wallBounceVelX = Fixed(0);
         wallBounceVelY = Fixed(0);
@@ -738,6 +743,7 @@ private:
         }
         uniqueTimer = false;
         focusRegenCooldownFrozen = false;
+        burnout = false;
         superAnimation = false;
         superFreeze = false;
         pendingUnlockHitDelayed = false;
@@ -844,6 +850,8 @@ private:
     bool recoverReverse : 1;
     bool wallBounce : 1;
     bool wallSplat : 1;
+    bool stunSplat : 1;
+    bool stunned : 1;
     bool tumble : 1;
     bool groundBounce : 1;
     bool wallStopped : 1;
@@ -855,6 +863,7 @@ private:
     bool wasDrive : 1;
     bool uniqueTimer : 1;
     bool focusRegenCooldownFrozen : 1;
+    bool burnout : 1;
     bool superAnimation : 1;
     bool superFreeze : 1;
     bool pendingUnlockHitDelayed : 1;
