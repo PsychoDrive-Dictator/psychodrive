@@ -1066,6 +1066,8 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
     uint32_t initialSearch = 1 + precedingTime + hitStopTime;
     if (pTrigger->flags & (1ULL<<40)) {
         // don't buffer parry specifically? i don't think so
+        // todo this is wrong as it creates the wrong search point for PP
+        // do normal search but still check that held input is current
         initialSearch = 1;
     }
     if (dc.inputBuffer.size() < (size_t)initialSearch) {
@@ -2663,6 +2665,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             // perfect
             hitStopSelf = 9 + 1;
             hitStopTarget = 9 + 1;
+
+            // todo only on projectile
+            // make conditional when we implement strike pp hitstop above
+            pOtherGuy->parryHoldFreebieFrames = 13; // ?
         }
         if (trade && hitBox.type == hit && tradeHit.hitBox.type == hit) {
             // todo not for projectile trades? weird
@@ -4271,8 +4277,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         parrying = false;
                     } else {
                         // entering a new parry, clear successful bit
-                        // todo grace period here?
-                        successfulParry = false;
+                        if (!parryHoldFreebieFrames) {
+                            successfulParry = false;
+                        }
                     }
                 }
 
@@ -4394,6 +4401,13 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (currentAction != 480 || currentFrame >= 12) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
+        }
+    }
+
+    if (parrying && parryHoldFreebieFrames) {
+        parryHoldFreebieFrames--;
+        if (!parryHoldFreebieFrames) {
+            successfulParry = false;
         }
     }
 

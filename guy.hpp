@@ -581,6 +581,7 @@ private:
         jumpDirection = 0;
         jumpLandingDisabledFrames = 0;
         throwProtectionFrames = 0;
+        parryHoldFreebieFrames = 0;
         couldMove = true;
         didTrigger = false;
         landingAdjust = 0;
@@ -879,6 +880,8 @@ private:
     int jumpLandingDisabledFrames;
 
     int throwProtectionFrames;
+
+    int parryHoldFreebieFrames;
 
     int landingAdjust;
     int forcedPoseStatus;

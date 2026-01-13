@@ -8314,12 +8314,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 6257,
-                "firstFrame": 583,
+                "count": 6078,
+                "firstFrame": 735,
                 "lastFrame": 3474
             },
             {
-                "count": 2478,
+                "count": 2472,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
@@ -8329,22 +8329,22 @@ var currentResults =
                 "lastFrame": 3096
             },
             {
-                "count": 1531,
+                "count": 1529,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
             {
-                "count": 1514,
+                "count": 1512,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
             {
-                "count": 3885,
+                "count": 3856,
                 "firstFrame": 204,
                 "lastFrame": 3474
             },
             {
-                "count": 3716,
+                "count": 3682,
                 "firstFrame": 203,
                 "lastFrame": 3474
             },
