@@ -24,6 +24,7 @@ enum Input
 	MK_pressed = 16384,
 	HK_pressed = 32768,
 	CONSUMED = 65536,
+	FROZEN = 131072,
 };
 
 enum InputID

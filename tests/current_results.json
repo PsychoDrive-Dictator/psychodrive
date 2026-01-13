@@ -8314,12 +8314,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 3760,
+                "count": 3591,
                 "firstFrame": 1141,
                 "lastFrame": 3474
             },
             {
-                "count": 1960,
+                "count": 1959,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
@@ -8339,7 +8339,7 @@ var currentResults =
                 "lastFrame": 3096
             },
             {
-                "count": 2941,
+                "count": 2910,
                 "firstFrame": 204,
                 "lastFrame": 3474
             },

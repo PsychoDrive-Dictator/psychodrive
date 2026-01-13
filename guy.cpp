@@ -223,6 +223,10 @@ void Guy::Input(int input)
     }
     currentInput = input;
 
+    if (warudo) {
+        input |= FROZEN;
+    }
+
     dc.inputBuffer.push_front(input);
     dc.directionBuffer.push_front(direction.i());
 }
@@ -4268,6 +4272,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     bool backroll = false;
                     for (int i = 0; i < searchWindow; i++) {
                         int input = dc.inputBuffer[i] & (LP+MP+HP+LK+MK+HK);
+                        if (dc.inputBuffer[i] & FROZEN) {
+                            searchWindow++;
+                            //log(true, "extending backroll window frozen " + std::to_string(searchWindow));
+                        }
                         if (std::bitset<32>(input).count() >= 2) {
                             backroll = true;
                         }
