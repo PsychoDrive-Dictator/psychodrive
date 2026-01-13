@@ -431,6 +431,7 @@ private:
     void DoWorldKey();
     void DoLockKey();
     void DoShotKey(Action *pAction, int frameID);
+    void DoFocusRegen(bool endWarudoFrame);
 
     void DoInstantAction(int actionID);
 

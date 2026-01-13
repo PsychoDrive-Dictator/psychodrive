@@ -3865,6 +3865,42 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
+void Guy::DoFocusRegen(bool endWarudoFrame)
+{
+    bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
+    if (driveRushCancel || (pOpponent && pOpponent->driveScaling)) {
+        doRegen = false;
+    }
+    if (superFreeze) {
+        doRegen = false;
+    }
+    // we do the final tick of regen in hitstop in end hitstop frame instead of hitstop == 1
+    // this way we know if we're doing a trigger or not, which might incur a cost and prevent regen
+    if (hitStop == 1 || endWarudoFrame) {
+        doRegen = false;
+    }
+
+    if (doRegen) {
+        // the hitstun and walk forward frame may be off by one in hitstop
+        // but they shouldn't happen in hitstop..
+        int focusRegenAmount = 40;
+
+        if (hitStun) {
+            focusRegenAmount = 20;
+            // todo burnout
+        }
+        if (jumped && getAirborne() && !landed) {
+            focusRegenAmount = 20;
+        }
+        if (currentAction == 10 || (currentAction == 9 && currentFrame >= 10)) {
+            focusRegenAmount *= 2;
+        }
+
+        setFocus(focus + focusRegenAmount);
+        log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (clamp), total " + std::to_string(focus));
+    }
+}
+
 bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoFrame)
 {
     if (pOpponent && pOpponent->wallStopped && pOpponent->stunned) {
@@ -3882,8 +3918,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
-    int regenAmountDone = 0;
-    int focusIfNotWalkForward = 0;
     if (advancingTime) {
         if (!endHitStopFrame && !endWarudoFrame) {
             if (pendingHitStop) {
@@ -3922,45 +3956,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             //     log(logResources, "final regen cooldown tick down undone bc hitstop");
             // }
         }
-
-        bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
-        if (driveRushCancel || (pOpponent && pOpponent->driveScaling)) {
-            doRegen = false;
-        }
-        if (superFreeze) {
-            doRegen = false;
-        }
-        // we do the final tick of regen in hitstop in end hitstop frame instead of hitstop == 1
-        // this way we know if we're doing a trigger or not, which might incur a cost and prevent regen
-        if (hitStop == 1 || endWarudoFrame) {
-            doRegen = false;
-        }
-
-        if (doRegen) {
-            int focusRegenAmount = 40;
-            if (hitStun > 1) {
-                focusRegenAmount = 20;
-                // todo burnout
-            }
-            if (jumped && !landed) {
-                focusRegenAmount = 20;
-            }
-            if (currentAction == 10 || (currentAction == 9 && currentFrame >= 9)) {
-                focusIfNotWalkForward = focus + focusRegenAmount;
-                focusRegenAmount *= 2;
-            }
-            // deferred cost will clamp if there is one
-            // if (deferredFocusCost) {
-            //     focus += focusRegenAmount;
-            //     log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (no clamp), total " + std::to_string(focus));
-            // } else
-            {
-                int prevFocus = focus;
-                setFocus(focus + focusRegenAmount);
-                regenAmountDone = focus - prevFocus;
-                log(logResources, "focus regen +" + std::to_string(focusRegenAmount) + " (clamp), total " + std::to_string(focus));
-            }
-        }
     }
 
     if (getHitStop() || warudo) {
@@ -3972,6 +3967,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers
         // we'll re-run it in RunFrame
+        if (advancingTime) {
+            DoFocusRegen(endWarudoFrame);
+        }
+
         return true;
     }
 
@@ -4585,16 +4584,20 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     //     focusRegenCooldown = 3;
     // }
 
-    if (deferredFocusCost && regenAmountDone) {
-        setFocus(focus - regenAmountDone);
-        log(logResources, "undoing regen from trigger!");
-    } else if (didTrigger && regenAmountDone && focusIfNotWalkForward) {
-        setFocus(focusIfNotWalkForward);
-        log(logResources, "undoing walkforward bonus regen from trigger!");
-    }
+    // if (deferredFocusCost && regenAmountDone) {
+    //     setFocus(focus - regenAmountDone);
+    //     log(logResources, "undoing regen from trigger!");
+    // } else if (didTrigger && regenAmountDone && focusIfNotWalkForward) {
+    //     setFocus(focusIfNotWalkForward);
+    //     log(logResources, "undoing walkforward bonus regen from trigger!");
+    // }
 
     if (didTrigger && didTransition) {
         scalingTriggerID++;
+    }
+
+    if (advancingTime) {
+        DoFocusRegen(endWarudoFrame);
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now
