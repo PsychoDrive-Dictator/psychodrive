@@ -211,7 +211,11 @@ Action* Guy::FindMove(int actionID, int styleID)
 
 void Guy::Input(int input)
 {
-    if (direction.i() < 0) {
+    int directionToUse = direction.i();
+    if (needsTurnaround()) {
+        directionToUse *= -1;
+    }
+    if (directionToUse < 0) {
         input = invertDirection(input);
     }
     if (input == 0 && inputOverride != 0) {
@@ -228,7 +232,6 @@ void Guy::Input(int input)
     }
 
     dc.inputBuffer.push_front(input);
-    dc.directionBuffer.push_front(direction.i());
 }
 
 std::string Guy::getActionName(int actionID)
@@ -847,11 +850,6 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
     while (inputBufferCursor < maxSearch)
     {
         int bufferInput = dc.inputBuffer[inputBufferCursor];
-        int bufferDirection = dc.directionBuffer[inputBufferCursor];
-
-        if (direction.i() != bufferDirection) {
-            bufferInput = invertDirection(bufferInput);
-        }
 
         bool inputNg = false;
 
@@ -4379,11 +4377,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
 
         int moveInput = currentInput;
-
-        if (moveTurnaround) {
-            moveInput = invertDirection(moveInput);
-        }
-
         bool crouchingFluffFrames = forcedPoseStatus == 2 && fluffFrames();
 
         if ( moveInput & 1 ) {
