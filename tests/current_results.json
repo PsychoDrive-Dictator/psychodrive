@@ -8314,62 +8314,62 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 3591,
+                "count": 2989,
                 "firstFrame": 1141,
                 "lastFrame": 3474
             },
             {
-                "count": 1959,
+                "count": 1447,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
             {
-                "count": 908,
+                "count": 722,
                 "firstFrame": 223,
                 "lastFrame": 3096
             },
             {
-                "count": 930,
+                "count": 876,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
             {
-                "count": 913,
+                "count": 876,
                 "firstFrame": 187,
                 "lastFrame": 3096
             },
             {
-                "count": 2910,
+                "count": 2701,
                 "firstFrame": 204,
                 "lastFrame": 3474
             },
             {
-                "count": 2564,
+                "count": 2587,
                 "firstFrame": 203,
                 "lastFrame": 3474
             },
             {
-                "count": 1057,
-                "firstFrame": 2181,
+                "count": 1192,
+                "firstFrame": 2182,
                 "lastFrame": 3474
             },
             {
-                "count": 2211,
-                "firstFrame": 2173,
+                "count": 384,
+                "firstFrame": 2182,
                 "lastFrame": 3474
             },
             {
-                "count": 2481,
+                "count": 3296,
                 "firstFrame": 1217,
                 "lastFrame": 3474
             },
             {
-                "count": 508,
-                "firstFrame": 2133,
+                "count": 564,
+                "firstFrame": 2182,
                 "lastFrame": 2998
             },
             {
-                "count": 10086,
+                "count": 9778,
                 "firstFrame": 425,
                 "lastFrame": 3474
             }

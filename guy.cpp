@@ -2194,7 +2194,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     continue;
                 }
             }
-            if (hitbox.flags & only_hits_in_combo && pOtherGuy->hitStun == 0) {
+            if (hitbox.flags & only_hits_in_combo && (pOtherGuy->hitStun == 0 || pOtherGuy->blocking)) {
                 continue;
             }
             Fixed posDiff = pOtherGuy->getPosX() - getPosX();
