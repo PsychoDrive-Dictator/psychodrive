@@ -1014,6 +1014,7 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.pose = cplayer.pose_st
   playerDump.hp = cplayer.vital_new
   playerDump.driveGauge = cplayer.focus_new
+  playerDump.driveCooldown = cplayer.focus_wait
   playerDump.superGauge = cplayer:getSuperGauge()
   playerDump.comboCount = cplayer.combo_cnt
   playerDump.hitStop = cplayer.hit_stop

@@ -8307,5 +8307,72 @@ var currentResults =
                 "lastFrame": 4060
             }
         ]
+    },
+    {
+        "testName": "zz_match_sagat_terry",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 7059,
+                "firstFrame": 224,
+                "lastFrame": 3474
+            },
+            {
+                "count": 2494,
+                "firstFrame": 187,
+                "lastFrame": 3096
+            },
+            {
+                "count": 1135,
+                "firstFrame": 223,
+                "lastFrame": 3096
+            },
+            {
+                "count": 1528,
+                "firstFrame": 187,
+                "lastFrame": 3096
+            },
+            {
+                "count": 1511,
+                "firstFrame": 187,
+                "lastFrame": 3096
+            },
+            {
+                "count": 3885,
+                "firstFrame": 204,
+                "lastFrame": 3474
+            },
+            {
+                "count": 3716,
+                "firstFrame": 203,
+                "lastFrame": 3474
+            },
+            {
+                "count": 1795,
+                "firstFrame": 1217,
+                "lastFrame": 3474
+            },
+            {
+                "count": 2211,
+                "firstFrame": 2173,
+                "lastFrame": 3474
+            },
+            {
+                "count": 4253,
+                "firstFrame": 1217,
+                "lastFrame": 3474
+            },
+            {
+                "count": 996,
+                "firstFrame": 1140,
+                "lastFrame": 2998
+            },
+            {
+                "count": 10370,
+                "firstFrame": 425,
+                "lastFrame": 3474
+            }
+        ]
     }
 ]
