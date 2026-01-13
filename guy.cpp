@@ -2101,11 +2101,14 @@ bool Guy::WorldPhysics(bool onlyFloor)
         if (pushBackThisFrame != Fixed(0) && pushX != Fixed(0) && pushX * pushBackThisFrame < Fixed(0)) {
             // touched the wall during pushback
             if (pAttacker && !pAttacker->noPush && !noCounterPush) {
-                pAttacker->reflectThisFrame = fixMax(pushX, pushBackThisFrame * Fixed(-1));
+                pAttacker->reflectThisFrame = fixMin(fixAbs(pushX), fixAbs(pushBackThisFrame));
+                if (pushX < Fixed(0)) {
+                    pAttacker->reflectThisFrame *= Fixed(-1);
+                }
                 pAttacker->posX += pAttacker->reflectThisFrame;
                 pAttacker->hitReflectVelX = hitVelX * Fixed(-1);
                 pAttacker->hitReflectAccelX = hitAccelX * Fixed(-1);
-                log (logTransitions, "reflect!");
+                log(logTransitions, "start reflect! initial " + std::to_string(pAttacker->reflectThisFrame.f()));
             }
             hitVelX = Fixed(0);
             hitAccelX = Fixed(0);
