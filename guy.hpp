@@ -159,7 +159,7 @@ public:
         }
         return hitStop;
     }
-    bool getWarudo() { return warudo; }
+    bool getWarudo() { return warudo || parryFreeze; }
     bool getIsDown() { return isDown; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
@@ -582,6 +582,7 @@ private:
         jumpLandingDisabledFrames = 0;
         throwProtectionFrames = 0;
         parryHoldFreebieFrames = 0;
+        parryFreeze = 0;
         couldMove = true;
         didTrigger = false;
         landingAdjust = 0;
@@ -882,6 +883,7 @@ private:
     int throwProtectionFrames;
 
     int parryHoldFreebieFrames;
+    int parryFreeze;
 
     int landingAdjust;
     int forcedPoseStatus;

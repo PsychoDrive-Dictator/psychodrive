@@ -265,6 +265,10 @@ bool Guy::RunFrame(bool advancingTime)
 {
     dc.frameTriggers.clear();
 
+    if (parryFreeze) {
+        return false;
+    }
+
     if (advancingTime && !warudo) {
         if (debuffTimer > 0 ) {
             debuffTimer--;
@@ -522,7 +526,7 @@ bool Guy::RunFrame(bool advancingTime)
 
 void Guy::RunFramePostPush(void)
 {
-    if (warudo) {
+    if (parryFreeze || warudo) {
         return;
     }
 
@@ -2139,7 +2143,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
 void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 {
-    if (warudo || getHitStop()) return;
+    if (parryFreeze || warudo || getHitStop()) return;
     if ( !pOtherGuy ) return;
 
     std::vector<HitBox> hitBoxes;
@@ -2456,7 +2460,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         int hitEntryFlag = pendingHit.hitEntryFlag;
 
         bool trade = false;
-        PendingHit tradeHit;
+        PendingHit tradeHit = {};
         for (auto &otherPendingHit : pendingHitList) {
             if (otherPendingHit.pGuyGettingHit == pGuy) {
                 otherGuyLog(pOtherGuy, pOtherGuy->logHits, "trade!");
@@ -2666,12 +2670,22 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         }
         if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
             // perfect
-            hitStopSelf = 9 + 1;
-            hitStopTarget = 9 + 1;
+            bool parryAsStrike = hitBox.type == hit;
+            if (pGuy->isProjectile && pGuy->pCurrentAction->pProjectileData->flags & (1<<30)) {
+                parryAsStrike = true;
+            }
+            if (!parryAsStrike) {
+                hitStopSelf = 9 + 1;
+                hitStopTarget = 9 + 1;
 
-            // todo only on projectile
-            // make conditional when we implement strike pp hitstop above
-            pOtherGuy->parryHoldFreebieFrames = 13; // ?
+                pOtherGuy->parryHoldFreebieFrames = 13; // ?
+            } else {
+                //hitStopSelf = 1;
+                hitStopTarget = 1;
+                for (auto guy : pGuy->pSim->everyone) {
+                    guy->parryFreeze = 61;
+                }
+            }
         }
         if (trade && hitBox.type == hit && tradeHit.hitBox.type == hit) {
             // todo not for projectile trades? weird
@@ -3840,6 +3854,13 @@ void Guy::DoBranchKey(bool preHit)
 
 bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoFrame)
 {
+    if (parryFreeze) {
+        parryFreeze--;
+    }
+
+    if (parryFreeze) {
+        return true;
+    }
     // if this is the frame that was stolen from beginning hitstop when it ends, don't
     // add pending hitstop yet, so we can play it out fully, in case hitstop got added
     // again just now - lots of DR cancels want one frame to play out when they add

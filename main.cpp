@@ -683,8 +683,6 @@ static void mainloop(void)
             }
         }
 
-        static std::vector<Guy *> everyone;
-
         if (runFrame) {
             for (auto guy : vecGuysToDelete) {
                 delete guy;
@@ -692,17 +690,17 @@ static void mainloop(void)
             vecGuysToDelete.clear();
         }
 
-        gatherEveryone(guys, everyone);
+        gatherEveryone(guys, defaultSim.everyone);
 
         if (runFrame) {
-            for (auto guy : everyone) {
+            for (auto guy : defaultSim.everyone) {
                 if (guy->RunFrame()) {
                 }
             }
         }
 
         // gather everyone again in case of deletions/additions in RunFrame
-        gatherEveryone(guys, everyone);
+        gatherEveryone(guys, defaultSim.everyone);
 
         // if replay, we'll update the counter from the replay
         if (!runFrame && !replayingGameState) {
@@ -710,23 +708,23 @@ static void mainloop(void)
         }
 
         if (runFrame) {
-            for (auto guy : everyone) {
+            for (auto guy : defaultSim.everyone) {
                 guy->WorldPhysics();
             }
-            for (auto guy : everyone) {
+            for (auto guy : defaultSim.everyone) {
                 guy->Push(guy->getOpponent());
             }
 
-            for (auto guy : everyone) {
+            for (auto guy : defaultSim.everyone) {
                 guy->RunFramePostPush();
             }
 
             // gather everyone again in case of deletions/additions in RunFramePostPush
-            gatherEveryone(guys, everyone);
+            gatherEveryone(guys, defaultSim.everyone);
 
             std::vector<PendingHit> pendingHitList;
 
-            for (auto guy : everyone) {
+            for (auto guy : defaultSim.everyone) {
                 guy->CheckHit(guy->getOpponent(), pendingHitList);
             }
 
@@ -905,7 +903,7 @@ static void mainloop(void)
         }
 
         if (runFrame) {
-            for (auto guy : everyone) {
+            for (auto guy : defaultSim.everyone) {
                 bool die = !guy->AdvanceFrame();
 
                 if (die) {
@@ -938,20 +936,20 @@ static void mainloop(void)
         //log("zoom " + std::to_string(zoom) + " translateX " + std::to_string(translateX) + " translateY " + std::to_string(translateY));
 
         // gather everyone again in case of deletions/additions in renderUI
-        everyone.clear(); 
+        defaultSim.everyone.clear(); 
         for (auto guy : guys) {
-            everyone.push_back(guy);
+            defaultSim.everyone.push_back(guy);
             for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
+                defaultSim.everyone.push_back(minion);
             }
         }
 
         // gather everyone again in case of deletions/additions in renderUI
-        everyone.clear();
+        defaultSim.everyone.clear();
         for (auto guy : guys) {
-            everyone.push_back(guy);
+            defaultSim.everyone.push_back(guy);
             for ( auto minion : guy->getMinions() ) {
-                everyone.push_back(minion);
+                defaultSim.everyone.push_back(minion);
             }
         }
 
@@ -959,7 +957,7 @@ static void mainloop(void)
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
         renderComboFinder();
-        for (auto guy : everyone) {
+        for (auto guy : defaultSim.everyone) {
             guy->Render();
         }
 

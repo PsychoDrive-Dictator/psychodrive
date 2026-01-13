@@ -364,6 +364,7 @@ struct ProjectileData {
     Fixed wallBoxBack;
     bool airborne;
     int flags;
+    int flagsExt;
     int category;
     int clashPriority;
     bool noPush;

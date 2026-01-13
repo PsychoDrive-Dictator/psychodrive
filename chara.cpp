@@ -929,7 +929,8 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
                     newProj.wallBoxForward = Fixed((*pProjData)["WallRangeF"].get<int>());
                     newProj.wallBoxBack = Fixed((*pProjData)["WallRangeB"].get<int>());
                     newProj.airborne = (*pProjData)["_AirStatus"];
-                    newProj.flags = (*pProjData)["AttrX"];
+                    newProj.flags = (*pProjData)["Attr0"];
+                    newProj.flagsExt = (*pProjData)["AttrX"];
                     newProj.category = (*pProjData)["Category"];
                     newProj.clashPriority = (*pProjData)["ShotLevel"];
                     newProj.noPush = (*pProjData)["_NoPush"];
