@@ -2705,6 +2705,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 for (auto guy : pGuy->pSim->everyone) {
                     guy->parryFreeze = 61;
                 }
+                pOtherGuy->pOpponent->perfectScaling = true;
             }
         }
         if (trade && hitBox.type == hit && tradeHit.hitBox.type == hit) {
@@ -3057,6 +3058,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     if (driveScaling) {
         effectiveScaling *= Fixed(0.85,true);
+    }
+    if (perfectScaling) {
+        effectiveScaling *= Fixed(0.50,true);
     }
 
     if (pAttacker->superAction) {
@@ -4536,6 +4540,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             pOpponent->driveRushCancel = false;
             pOpponent->parryDriveRush = false;
         }
+    }
+
+    if (canMoveNow) {
+        perfectScaling = false;
     }
 
     if (canMoveNow && wasHit) {
