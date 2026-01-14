@@ -549,10 +549,6 @@ void Guy::RunFramePostPush(void)
         DoFocusRegen(false);
     //}
 
-    if (getHitStop()) {
-        return;
-    }
-
     if (deferredFocusCost < 0 && !pOpponent->warudo) {
         setFocus(focus + deferredFocusCost);
         log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
@@ -563,6 +559,12 @@ void Guy::RunFramePostPush(void)
         focusRegenCooldownFrozen = true;
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
     }
+
+    if (getHitStop()) {
+        return;
+    }
+
+
 
     DoShotKey(pCurrentAction, currentFrame);
 
@@ -2825,6 +2827,19 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
     }
 
     for (auto &guy : clampGuys) {
+        if (guy->deferredFocusCost) {
+            if (guy->deferredFocusCost < 0) {
+                guy->deferredFocusCost *= -1;
+            }
+            guy->setFocus(guy->focus - guy->deferredFocusCost);
+            //log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
+            guy->deferredFocusCost = 0;
+            if (!guy->setFocusRegenCooldown(120)) {
+                guy->focusRegenCooldown--;
+            }
+            guy->focusRegenCooldownFrozen = true;
+            //log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
+        }
         // clamp once everything is done, in case of trade
         guy->setFocus(guy->focus);
         guy->setGauge(guy->gauge);
@@ -3967,6 +3982,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
+    if (advancingTime && deferredFocusCost > 0) {
+        log(logResources, "inverting deferred cost");
+        deferredFocusCost = -deferredFocusCost;
+    }
+
     if (getHitStop() || warudo) {
         if (tokiWaUgokidasu) {
             // time has begun to move again
@@ -3981,10 +4001,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         // }
 
         return true;
-    }
-
-    if (advancingTime && deferredFocusCost > 0) {
-        deferredFocusCost = -deferredFocusCost;
     }
 
     bool doTriggers = true;
