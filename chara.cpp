@@ -895,6 +895,8 @@ void loadAtemis(nlohmann::json* pAtemiJson, std::vector<AtemiData>* pOutputVecto
         newAtemi.targetStopShell = atemiData["TargetStopShell"];
         newAtemi.ownerStopShell = atemiData["OwnerStopShell"];
         newAtemi.resistLimit = atemiData["ResistLimit"];
+        newAtemi.damageRatio = atemiData["DamageRatio"];
+        newAtemi.recoverRatio = atemiData["RecoverRatio"];
 
         pOutputVector->push_back(newAtemi);
     }

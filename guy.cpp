@@ -2562,8 +2562,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                         otherGuyLog(pOtherGuy, pOtherGuy->logHits, "armor break!");
                     }
                 } else {
-                    // apply gauge effects here
-
                     pOtherGuy->armorThisFrame = true;
 
                     // todo there's TargetStopAdd too
@@ -2595,8 +2593,13 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
         if (hitArmor || hitAtemi) {
             // undo conter/PC if hit armor
-            hitEntryFlag = hitEntryFlag & ~(punish_counter+counter);
+            hitEntryFlag = hitEntryFlag & ~(punish_counter|counter);
             pHitEntry = &hitBox.pHitData->param[hitEntryFlag];
+        }
+
+        if (hitArmor && !hitAtemi) {
+            //otherGuyLog(pOtherGuy, true, std::to_string(pHitEntry->dmgValue) + " " + std::to_string(hurtBox.pAtemiData->damageRatio));
+            pOtherGuy->health -= pHitEntry->dmgValue * hurtBox.pAtemiData->damageRatio / 100;
         }
 
         int destX = pHitEntry->moveDestX;
