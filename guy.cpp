@@ -515,17 +515,6 @@ bool Guy::RunFrame(bool advancingTime)
                 ExitStyle();
             }
         }
-
-        if (advancingTime && deferredFocusCost < 0 && !pOpponent->warudo) {
-            setFocus(focus + deferredFocusCost);
-            log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
-            deferredFocusCost = 0;
-            if (!setFocusRegenCooldown(120)) {
-                focusRegenCooldown--;
-            }
-            focusRegenCooldownFrozen = true;
-            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
-        }
     }
 
     return true;
@@ -556,8 +545,23 @@ void Guy::RunFramePostPush(void)
         pOpponent->hitVelX -= pOpponent->hitAccelX;
     }
 
+    //if (advancingTime) {
+        DoFocusRegen(false);
+    //}
+
     if (getHitStop()) {
         return;
+    }
+
+    if (deferredFocusCost < 0 && !pOpponent->warudo) {
+        setFocus(focus + deferredFocusCost);
+        log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
+        deferredFocusCost = 0;
+        if (!setFocusRegenCooldown(120)) {
+            focusRegenCooldown--;
+        }
+        focusRegenCooldownFrozen = true;
+        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
     }
 
     DoShotKey(pCurrentAction, currentFrame);
@@ -3876,9 +3880,9 @@ void Guy::DoFocusRegen(bool endWarudoFrame)
     }
     // we do the final tick of regen in hitstop in end hitstop frame instead of hitstop == 1
     // this way we know if we're doing a trigger or not, which might incur a cost and prevent regen
-    if (hitStop == 1 || endWarudoFrame) {
-        doRegen = false;
-    }
+    // if (hitStop) {
+    //     doRegen = false;
+    // }
 
     if (doRegen) {
         // the hitstun and walk forward frame may be off by one in hitstop
@@ -3889,7 +3893,7 @@ void Guy::DoFocusRegen(bool endWarudoFrame)
             focusRegenAmount = 20;
             // todo burnout
         }
-        if (jumped && getAirborne() && !landed) {
+        if (jumped && getAirborne()) {
             focusRegenAmount = 20;
         }
         if (currentAction == 10 || (currentAction == 9 && currentFrame >= 10)) {
@@ -3967,9 +3971,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers
         // we'll re-run it in RunFrame
-        if (advancingTime) {
-            DoFocusRegen(endWarudoFrame);
-        }
+        // if (advancingTime) {
+        //     DoFocusRegen(endWarudoFrame);
+        // }
 
         return true;
     }
@@ -4596,9 +4600,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         scalingTriggerID++;
     }
 
-    if (advancingTime) {
-        DoFocusRegen(endWarudoFrame);
-    }
+
 
     // if we need landing adjust/etc during hitStop, need this updated now
     DoStatusKey();
