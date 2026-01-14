@@ -3943,10 +3943,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
     if (advancingTime) {
+        bool appliedPendingHitstop = false;
         if (!endHitStopFrame && !endWarudoFrame) {
             if (pendingHitStop) {
                 if (pendingHitStop > hitStop) {
                     hitStop = pendingHitStop;
+                    appliedPendingHitstop = true;
                 }
                 pendingHitStop = 0;
             }
