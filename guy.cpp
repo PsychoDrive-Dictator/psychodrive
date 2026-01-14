@@ -2653,7 +2653,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pGuy->hitAccelX = halfHitAccel;
                 pOtherGuy->hitAccelX = halfHitAccel;
 
-                pOtherGuy->focus += pHitEntry->parryGain;
+                // find the parry gains in common[0], weird
+                pOtherGuy->focus += hitBox.pHitData->common[0].parryGain;
             }
 
             if (pGuy->isProjectile) {
@@ -3056,12 +3057,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     comboDamage += moveDamage;
     lastDamageScale = effectiveScaling.i();
 
-    focus += pHitEffect->focusGainTarget;
-    log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
-    if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
-        // todo apparently start of hitstun except if super where it's after??
-        setFocusRegenCooldown(90 + 1 + 1);
-        log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
+    if (!parrying) {
+        focus += pHitEffect->focusGainTarget;
+        log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
+        if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
+            // todo apparently start of hitstun except if super where it's after??
+            setFocusRegenCooldown(90 + 1 + 1);
+            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
+        }
     }
     gauge += pHitEffect->superGainTarget;
 
