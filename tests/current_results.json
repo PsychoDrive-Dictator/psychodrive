@@ -5897,6 +5897,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jp_od_amnesia_double_ghost_redux",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 497,
+                "firstFrame": 84,
+                "lastFrame": 1049
+            },
+            {
+                "count": 411,
+                "firstFrame": 196,
+                "lastFrame": 531
+            },
+            {
+                "count": 1,
+                "firstFrame": 531,
+                "lastFrame": 531
+            },
+            {
+                "count": 321,
+                "firstFrame": 196,
+                "lastFrame": 531
+            },
+            {
+                "count": 321,
+                "firstFrame": 196,
+                "lastFrame": 531
+            },
+            {
+                "count": 141,
+                "firstFrame": 61,
+                "lastFrame": 985
+            },
+            {
+                "count": 260,
+                "firstFrame": 211,
+                "lastFrame": 531
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 822,
+                "firstFrame": 196,
+                "lastFrame": 1017
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 248,
+                "firstFrame": 440,
+                "lastFrame": 1017
+            }
+        ]
+    },
+    {
         "testName": "jp_wallbounce_bnb",
         "testVersion": "26",
         "finished": true,

@@ -2488,14 +2488,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             hitGuys.insert(pOtherGuy);
         }
 
-        int destX = pHitEntry->moveDestX;
-        int destY = pHitEntry->moveDestY;
-        int hitHitStun = pHitEntry->hitStun;
-        int dmgType = pHitEntry->dmgType;
-        int moveType = pHitEntry->moveType;
-        int attr0 = pHitEntry->attr0;
-        int hitMark = pHitEntry->hitmark;
-
         bool isGrab = hitBox.type == grab;
 
         // todo make this configurable pluggable rule
@@ -2594,12 +2586,26 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitFlagToParent) pGuy->pParent->hitAtemiThisMove = true;
             pOtherGuy->atemiThisFrame = true;
 
-            // is that hardcoded on atemi? not sure if the number is right
-            pGuy->addHitStop(13+1);
-            pOtherGuy->addHitStop(13+1);
+            // // is that hardcoded on atemi? not sure if the number is right
+            // pGuy->addHitStop(13+1);
+            // pOtherGuy->addHitStop(13+1);
 
             otherGuyLog(pOtherGuy, pOtherGuy->logHits, "atemi hit!");
         }
+
+        if (hitArmor || hitAtemi) {
+            // undo conter/PC if hit armor
+            hitEntryFlag = hitEntryFlag & ~(punish_counter+counter);
+            pHitEntry = &hitBox.pHitData->param[hitEntryFlag];
+        }
+
+        int destX = pHitEntry->moveDestX;
+        int destY = pHitEntry->moveDestY;
+        int hitHitStun = pHitEntry->hitStun;
+        int dmgType = pHitEntry->dmgType;
+        int moveType = pHitEntry->moveType;
+        int attr0 = pHitEntry->attr0;
+        int hitMark = pHitEntry->hitmark;
 
         // not hitstun for initial grab hit as we dont want to recover during the lock
         bool applyHit = !isGrab;
@@ -2675,10 +2681,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (hitStopTarget == -1) {
             hitStopTarget = hitStopSelf;
         }
-        if (hitAtemi) {
-            hitStopSelf = 0;
-            hitStopTarget = 0;
-        }
+        // if (hitAtemi) {
+        //     hitStopSelf = 0;
+        //     hitStopTarget = 0;
+        // }
         if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
             // perfect
             bool parryAsStrike = hitBox.type == hit;

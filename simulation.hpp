@@ -64,7 +64,8 @@ public:
         eDirection,
         eHealth,
         eHitStop,
-        eGauge
+        eGauge,
+        eFocusRegen
     };
 
     void CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description );

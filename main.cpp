@@ -849,6 +849,10 @@ static void mainloop(void)
                             compareGameStateInt(players[i]["superGauge"], guys[i]->getGauge(), Simulation::eGauge, desc + " super gauge");
                         }
 
+                        if (players[i].contains("driveCooldown")) {
+                            compareGameStateInt(players[i]["driveCooldown"], guys[i]->getFocusRegenCoolDown(), Simulation::eFocusRegen, desc + " drive cooldown");
+                        }
+
                         i++;
                     }
 
