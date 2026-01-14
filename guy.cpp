@@ -600,6 +600,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
 
     if (parrying) {
         successfulParry = false;
+        subjectToParryRecovery = true;
     }
 
     if (flags & (1ULL<<26)) {
@@ -2534,6 +2535,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             otherGuyLog(pOtherGuy, pOtherGuy->logHits, "parry!");
 
             pOtherGuy->successfulParry = true;
+            pOtherGuy->subjectToParryRecovery = false;
         }
 
         bool hitArmor = false;
@@ -4351,10 +4353,15 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     if ((currentInput & (32+256)) != 32+256) {
                         nextAction = 482;
                         parrying = false;
+                        if (successfulParry) {
+                            // override to lower amount without helper
+                            focusRegenCooldown = 20 + 1;
+                            focusRegenCooldownFrozen = false;
+                        }
                     } else {
                         // entering a new parry, clear successful bit
                         if (!parryHoldFreebieFrames) {
-                            successfulParry = false;
+                            subjectToParryRecovery = true;
                         }
                     }
                 }
@@ -4472,13 +4479,19 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (currentAction != 480 || currentFrame >= 12) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
+
+            if (successfulParry) {
+                // override to lower amount without helper
+                focusRegenCooldown = 20 + 1;
+                focusRegenCooldownFrozen = false;
+            }
         }
     }
 
     if (parrying && parryHoldFreebieFrames) {
         parryHoldFreebieFrames--;
         if (!parryHoldFreebieFrames) {
-            successfulParry = false;
+            subjectToParryRecovery = true;
         }
     }
 

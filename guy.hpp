@@ -446,7 +446,7 @@ private:
     }
 
     bool fluffFrames(int frameBias = 0) {
-        if (successfulParry && (currentAction == 482 || nextAction == 482)) {
+        if (!subjectToParryRecovery && (currentAction == 482 || nextAction == 482)) {
             return true;
         }
         if (nextAction != -1) {
@@ -577,6 +577,7 @@ private:
         blocking = false;
         parrying = false;
         successfulParry = false;
+        subjectToParryRecovery = false;
         hurtBoxProxGuarded = false;
         positionProxGuarded = false;
         bounced = false;
@@ -786,6 +787,7 @@ private:
     bool blocking : 1;
     bool parrying : 1;
     bool successfulParry : 1;
+    bool subjectToParryRecovery : 1;
     bool hurtBoxProxGuarded : 1;
     bool positionProxGuarded : 1;
     bool bounced : 1;
