@@ -625,6 +625,8 @@ private:
         homeTargetType = 0;
         ignoreSteerType = -1;
         health = 0;
+        recoverableHealth = 0;
+        recoverableHealthCooldown = 0;
         focus = 0;
         focusRegenCooldown = 0;
         deferredFocusCost = 0;
@@ -929,6 +931,8 @@ private:
     int ignoreSteerType;
 
     int health;
+    int recoverableHealth;
+    int recoverableHealthCooldown;
     int focus;
     int focusRegenCooldown;
     int deferredFocusCost;

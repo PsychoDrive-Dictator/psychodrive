@@ -549,6 +549,22 @@ void Guy::RunFramePostPush(void)
         DoFocusRegen(false);
     //}
 
+    if (recoverableHealthCooldown) {
+        recoverableHealthCooldown--;
+    }
+
+    if (recoverableHealth && !recoverableHealthCooldown) {
+        recoverableHealth -= 2;
+        health += 2;
+        if (recoverableHealth < 0) {
+            health += recoverableHealth;
+        }
+        if (health > pCharData->vitality) {
+            health = pCharData->vitality;
+        }
+    }
+
+
     if (deferredFocusCost < 0 && !pOpponent->warudo) {
         setFocus(focus + deferredFocusCost);
         log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
@@ -2600,6 +2616,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         if (hitArmor && !hitAtemi) {
             //otherGuyLog(pOtherGuy, true, std::to_string(pHitEntry->dmgValue) + " " + std::to_string(hurtBox.pAtemiData->damageRatio));
             pOtherGuy->health -= pHitEntry->dmgValue * hurtBox.pAtemiData->damageRatio / 100;
+            pOtherGuy->recoverableHealth += pHitEntry->dmgValue * hurtBox.pAtemiData->recoverRatio / 100;
+            pOtherGuy->recoverableHealthCooldown = 120;
         }
 
         int destX = pHitEntry->moveDestX;
