@@ -3039,7 +3039,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
-    if (applyHit && !blocking) {
+    if (applyHit && !blocking && dmgValue) {
         if (comboHits == 0) {
             currentScaling = 100;
             pendingScaling = 0;
@@ -3049,6 +3049,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
         if (pendingScaling && applyScaling) {
             currentScaling -= pendingScaling;
+            log(logHits, "applied " + std::to_string(pendingScaling) + " pending scaling")
             pendingScaling = 0;
         }
 
@@ -3063,6 +3064,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     pendingScaling += 10;
                 }
             }
+            log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
         }
 
         lastScalingTriggerID = pAttacker->scalingTriggerID;
