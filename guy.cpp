@@ -2810,6 +2810,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             int dmgKind = pHitEntry->dmgKind;
 
             if (dmgKind == 11) {
+                // uhhhhhh
+                pGuy->scalingTriggerID++;
+                pGuy->appliedScaling = false;
                 pGuy->DoInstantAction(592); // IMM_VEGA_BOMB
             }
 
@@ -3047,7 +3050,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             pendingScaling = 0;
         }
 
-        bool applyScaling = pAttacker->scalingTriggerID != lastScalingTriggerID;
+        bool applyScaling = !pAttacker->appliedScaling;
 
         if (pendingScaling && applyScaling) {
             currentScaling -= pendingScaling;
@@ -3069,7 +3072,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
         }
 
-        lastScalingTriggerID = pAttacker->scalingTriggerID;
+        pAttacker->appliedScaling = true;
+        if (pAttacker->isProjectile && pAttacker->scalingTriggerID == pAttacker->pParent->scalingTriggerID) {
+            // might need to find siblings too eventually?
+            pAttacker->pParent->appliedScaling = true;
+        }
     }
 
     Fixed effectiveScaling = Fixed(currentScaling - attackerInstantScale);
@@ -4671,9 +4678,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (didTrigger && didTransition) {
         scalingTriggerID++;
+        appliedScaling = false;
     }
-
-
 
     // if we need landing adjust/etc during hitStop, need this updated now
     DoStatusKey();

@@ -372,6 +372,7 @@ public:
         styleInstall = styleID;
 
         scalingTriggerID = parent.scalingTriggerID;
+        appliedScaling = parent.appliedScaling;
 
         isProjectile = isProj;
         projHitCount = -1; // unset yet, is in the first action
@@ -680,6 +681,7 @@ private:
         warudo = false;
         tokiWaUgokidasu = false;
         scalingTriggerID = 0;
+        appliedScaling = false;
         lastTriggerFrame = 0;
         pAttacker = nullptr;
         hitStun = 0;
@@ -874,6 +876,7 @@ private:
     bool superAnimation : 1;
     bool superFreeze : 1;
     bool pendingUnlockHitDelayed : 1;
+    bool appliedScaling : 1;
 
     int projHitCount;
     int projLifeTime;
