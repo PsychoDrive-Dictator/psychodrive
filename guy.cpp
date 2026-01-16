@@ -564,7 +564,6 @@ void Guy::RunFramePostPush(void)
         }
     }
 
-
     if (deferredFocusCost < 0 && !pOpponent->warudo) {
         setFocus(focus + deferredFocusCost);
         log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
@@ -3041,7 +3040,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
-    if (applyHit && !blocking && dmgValue) {
+    if (applyHit && dmgValue) {
         if (comboHits == 0) {
             currentScaling = 100;
             pendingScaling = 0;
