@@ -2618,6 +2618,8 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pOtherGuy->health -= pHitEntry->dmgValue * hurtBox.pAtemiData->damageRatio / 100;
             pOtherGuy->recoverableHealth += pHitEntry->dmgValue * hurtBox.pAtemiData->recoverRatio / 100;
             pOtherGuy->recoverableHealthCooldown = 120;
+            // we don't call ApplyHitEffect so do this by hand?
+            pOtherGuy->comboHits += pHitEntry->comboAdd;
         }
 
         int destX = pHitEntry->moveDestX;
