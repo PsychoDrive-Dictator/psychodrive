@@ -373,6 +373,8 @@ public:
 
         scalingTriggerID = parent.scalingTriggerID;
         appliedScaling = parent.appliedScaling;
+        superAction = parent.superAction;
+        superLevel = parent.superLevel;
 
         isProjectile = isProj;
         projHitCount = -1; // unset yet, is in the first action
