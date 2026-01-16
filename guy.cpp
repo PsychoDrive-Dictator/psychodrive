@@ -2810,9 +2810,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             int dmgKind = pHitEntry->dmgKind;
 
             if (dmgKind == 11) {
-                // uhhhhhh
-                pGuy->scalingTriggerID++;
-                pGuy->appliedScaling = false;
                 pGuy->DoInstantAction(592); // IMM_VEGA_BOMB
             }
 
@@ -4568,6 +4565,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (pOpponent) {
             pOpponent->driveRushCancel = false;
             pOpponent->parryDriveRush = false;
+            pOpponent->appliedScaling = false;
+            for (Guy *pMinion : pOpponent->getMinions()) {
+                pMinion->appliedScaling = false;
+            }
         }
     }
 
