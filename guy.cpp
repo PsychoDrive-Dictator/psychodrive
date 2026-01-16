@@ -553,7 +553,7 @@ void Guy::RunFramePostPush(void)
         recoverableHealthCooldown--;
     }
 
-    if (recoverableHealth && !recoverableHealthCooldown) {
+    if (recoverableHealth && !recoverableHealthCooldown && (!pOpponent || !pOpponent->warudo)) {
         recoverableHealth -= 2;
         health += 2;
         if (recoverableHealth < 0) {
