@@ -3021,18 +3021,18 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 378,
-                "firstFrame": 119,
+                "count": 252,
+                "firstFrame": 168,
                 "lastFrame": 308
             },
             {
-                "count": 215,
-                "firstFrame": 119,
+                "count": 141,
+                "firstFrame": 155,
                 "lastFrame": 308
             },
             {
-                "count": 139,
-                "firstFrame": 119,
+                "count": 68,
+                "firstFrame": 155,
                 "lastFrame": 308
             },
             {
@@ -3041,34 +3041,34 @@ var currentResults =
                 "lastFrame": 192
             },
             {
-                "count": 18,
+                "count": 17,
                 "firstFrame": 167,
                 "lastFrame": 192
             },
             {
-                "count": 63,
-                "firstFrame": 156,
+                "count": 62,
+                "firstFrame": 178,
                 "lastFrame": 308
             },
             {
-                "count": 306,
-                "firstFrame": 156,
+                "count": 131,
+                "firstFrame": 178,
                 "lastFrame": 308
             },
             {
                 "count": 15,
-                "firstFrame": 156,
+                "firstFrame": 189,
                 "lastFrame": 203
             },
             {
-                "count": 14,
-                "firstFrame": 220,
+                "count": 15,
+                "firstFrame": 219,
                 "lastFrame": 233
             },
             {
-                "count": 1,
-                "firstFrame": 156,
-                "lastFrame": 156
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
@@ -3088,18 +3088,18 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 301,
-                "firstFrame": 158,
+                "count": 174,
+                "firstFrame": 207,
                 "lastFrame": 354
             },
             {
-                "count": 130,
-                "firstFrame": 158,
-                "lastFrame": 271
+                "count": 55,
+                "firstFrame": 194,
+                "lastFrame": 242
             },
             {
-                "count": 109,
-                "firstFrame": 158,
+                "count": 36,
+                "firstFrame": 194,
                 "lastFrame": 233
             },
             {
@@ -3108,34 +3108,34 @@ var currentResults =
                 "lastFrame": 231
             },
             {
-                "count": 18,
+                "count": 17,
                 "firstFrame": 206,
                 "lastFrame": 231
             },
             {
-                "count": 43,
-                "firstFrame": 195,
+                "count": 41,
+                "firstFrame": 217,
                 "lastFrame": 272
             },
             {
-                "count": 320,
-                "firstFrame": 195,
+                "count": 138,
+                "firstFrame": 217,
                 "lastFrame": 354
             },
             {
                 "count": 15,
-                "firstFrame": 195,
+                "firstFrame": 228,
                 "lastFrame": 242
             },
             {
-                "count": 14,
-                "firstFrame": 259,
+                "count": 15,
+                "firstFrame": 258,
                 "lastFrame": 272
             },
             {
-                "count": 1,
-                "firstFrame": 195,
-                "lastFrame": 195
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,

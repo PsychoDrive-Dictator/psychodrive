@@ -5099,6 +5099,7 @@ void Guy::DoSteerKey(void)
                         log(logUnknowns, "unknown/not found set teleport/home target type " + std::to_string(targetType));
                     }
                     homeTargetType = targetType;
+                    homeTargetFrame = currentFrame;
 
                     if (param != 0) {
                         log(logUnknowns, "unknown param in set home target " + std::to_string(param));
@@ -5116,8 +5117,9 @@ void Guy::DoSteerKey(void)
                     //     log(logUnknowns, "unhandled case for ease to ground? vely " + std::to_string(velocityY.f()) + " t " + std::to_string(calcValueFrame));
                     // } else
                     {
-                        // backsolve for acceleration over time. t-1 for first term makes it line up?
-                        accelY = Fixed(-2) * (getPosY() + velocityY * Fixed(calcValueFrame - 1) - homeTargetY) / Fixed(calcValueFrame * calcValueFrame);
+                        // backsolve for acceleration over time.
+                        int firstFrameTerm = calcValueFrame - (currentFrame - homeTargetFrame);
+                        accelY = Fixed(-2) * (getPosY() + velocityY * Fixed(firstFrameTerm) - homeTargetY) / Fixed(calcValueFrame * calcValueFrame);
                     }
                 } else {
                     if (multiValueType & 1) {

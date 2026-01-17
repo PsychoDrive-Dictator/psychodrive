@@ -626,6 +626,7 @@ private:
         homeTargetX = Fixed(0);
         homeTargetY = Fixed(0);
         homeTargetType = 0;
+        homeTargetFrame = 0;
         ignoreSteerType = -1;
         health = 0;
         recoverableHealth = 0;
@@ -932,6 +933,7 @@ private:
     Fixed homeTargetX;
     Fixed homeTargetY;
     int homeTargetType;
+    int homeTargetFrame;
 
     int ignoreSteerType;
 
