@@ -2712,7 +2712,15 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->pOpponent->perfectScaling = true;
             }
         }
-        if (trade && hitBox.type == hit && tradeHit.hitBox.type == hit) {
+        bool tradeHitStop = trade;
+        if (hitBox.type != hit || tradeHit.hitBox.type != hit) {
+            tradeHitStop = false;
+        }
+        if (hurtBox.flags & armor || tradeHit.hurtBox.flags & armor) {
+            // todo that won't work for armor break, we need to compute that stuff ahead of trade maybe
+            tradeHitStop = false;
+        }
+        if (tradeHitStop) {
             // todo not for projectile trades? weird
             if (hitStopSelf<15) {
                 hitStopSelf = 15;
