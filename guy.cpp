@@ -2152,7 +2152,7 @@ bool Guy::WorldPhysics(bool onlyFloor)
         posOffsetY = Fixed(0);
     }
 
-    if (landed) {
+    if (landed || (bounced && tumble)) {
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand && knockDown) {
             log(logTransitions, "hack extra landing frame");
