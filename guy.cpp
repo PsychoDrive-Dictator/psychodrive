@@ -4248,8 +4248,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         } else if (tumble) {
             nextAction = 289;
             tumble = false;
-            hitStun = knockDownFrames; // xxx
-            knockDownFrames = 27;
+            hitStun = knockDownFrames + 1;
+            knockDownFrames = 27 - 1;
 
             velocityX = groundBounceVelX;
             groundBounceVelX = 0.0f;
