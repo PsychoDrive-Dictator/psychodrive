@@ -2485,9 +2485,9 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1108,
+                "count": 12,
                 "firstFrame": 256,
-                "lastFrame": 1204
+                "lastFrame": 917
             },
             {
                 "count": 54,
@@ -2510,9 +2510,9 @@ var currentResults =
                 "lastFrame": 933
             },
             {
-                "count": 179,
+                "count": 105,
                 "firstFrame": 279,
-                "lastFrame": 989
+                "lastFrame": 959
             },
             {
                 "count": 42,

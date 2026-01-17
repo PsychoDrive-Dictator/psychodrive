@@ -2919,8 +2919,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     bool usePositionAsDirection = attr1 & (1<<11);
     recoverForward = attr3 & (1<<0);
     recoverReverse = attr3 & (1<<1);
-    // bool frontDamage = attr3 & (1<<2);
-    bool backDamage = attr3 & (1<<3);
+    frontDamage = attr3 & (1<<2);
+    backDamage = attr3 & (1<<3);
 
     pAttacker = attacker;
 
@@ -4388,6 +4388,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     }
                     if (backroll) {
                         nextAction = !recoverReverse ? 344 : 342;
+                        if (backDamage) {
+                            nextAction += 1;
+                        }
                     } else {
                         nextAction = 340;
                     }
