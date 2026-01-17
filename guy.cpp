@@ -5172,9 +5172,9 @@ void Guy::DoWorldKey(void)
                 // todo make a set of mutually exclusive scratch variables
                 // for now use anything existing to not bloat the size up
                 groundBounceVelX = getPosX();
-                groundBounceVelY = getPosY();
+                //groundBounceVelY = getPosY();
                 posX = Fixed(0);
-                posY = Fixed(0);
+                //posY = Fixed(0);
                 velocityX = Fixed(0);
                 velocityY = Fixed(0);
                 accelX = Fixed(0);
@@ -5203,13 +5203,13 @@ void Guy::DoWorldKey(void)
                 if (superAnimation) {
                     superAnimation = false;
                     posX = groundBounceVelX - (posOffsetX*direction);
-                    posY = groundBounceVelY;
+                    //posY = groundBounceVelY;
                     if (pOpponent && pOpponent->locked) {
                         pOpponent->posX = posX;
-                        pOpponent->posY = posY;
+                        //pOpponent->posY = posY;
                     }
                     groundBounceVelX = Fixed(0);
-                    groundBounceVelY = Fixed(0);
+                    //groundBounceVelY = Fixed(0);
                 }
                 if (pOpponent) {
                     if (pOpponent->superFreeze) {
