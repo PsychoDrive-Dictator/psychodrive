@@ -3103,6 +3103,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     Fixed damageFixed = Fixed(dmgValue) * Fixed(effectiveScaling.i()) / Fixed(100);
     int moveDamage = damageFixed.i();
     health -= moveDamage;
+    recoverableHealth = 0;
     log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage));
 
     DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
