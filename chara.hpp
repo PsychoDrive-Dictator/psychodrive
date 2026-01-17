@@ -148,6 +148,8 @@ struct AtemiData {
     int ownerStop;
     int targetStopShell;
     int ownerStopShell;
+    int targetStopAdd;
+    int ownerStopAdd;
     int resistLimit;
     int damageRatio;
     int recoverRatio;

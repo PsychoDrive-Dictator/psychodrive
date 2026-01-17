@@ -2558,11 +2558,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             AtemiData *pAtemi = hurtBox.pAtemiData;
             auto atemiIDString = std::to_string(pAtemi->id);
 
-            int armorHitStopHitted = pAtemi->targetStop;
-            int armorHitStopHitter = pAtemi->ownerStop;
-            int armorBreakHitStopHitted = pAtemi->targetStopShell; // ??
-            int armorBreakHitStopHitter = pAtemi->ownerStopShell;
-
             if (pOtherGuy->currentArmor != pAtemi) {
                 pOtherGuy->armorHitsLeft = pAtemi->resistLimit + 1;
                 pOtherGuy->currentArmor = pAtemi;
@@ -2572,18 +2567,11 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 if (pOtherGuy->armorHitsLeft <= 0) {
                     hitArmor = false;
                     if (pOtherGuy->armorHitsLeft == 0) {
-                        pGuy->addHitStop(armorBreakHitStopHitter+1);
-                        pOtherGuy->addHitStop(armorBreakHitStopHitted+1);
                         otherGuyLog(pOtherGuy, pOtherGuy->logHits, "armor break!");
                     }
                 } else {
                     pOtherGuy->armorThisFrame = true;
-
-                    // todo there's TargetStopAdd too
-                    pGuy->addHitStop(armorHitStopHitter+1);
-                    pOtherGuy->addHitStop(armorHitStopHitted+1);
-                    // fall through to normal hit case and add hitstop there too
-                    // todo does armor hitstop replace if specified?
+                    // hit stop will be replaced/added down
                     otherGuyLog(pOtherGuy, pOtherGuy->logHits, "armor hit! atemi id " + atemiIDString);
                 }
             }
@@ -2735,6 +2723,16 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitStopTarget<15) {
                 hitStopTarget = 15;
             }
+        }
+        if (hitArmor && !hitAtemi) {
+            if (hurtBox.pAtemiData->ownerStop != -1) {
+                hitStopTarget = hurtBox.pAtemiData->ownerStop;
+            }
+            if (hurtBox.pAtemiData->targetStop != -1) {
+                hitStopSelf = hurtBox.pAtemiData->targetStop;
+            }
+            hitStopTarget += hurtBox.pAtemiData->ownerStopAdd;
+            hitStopSelf += hurtBox.pAtemiData->targetStopAdd;
         }
         Box hitIntersection;
         hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
