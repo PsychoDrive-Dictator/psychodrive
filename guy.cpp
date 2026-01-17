@@ -832,19 +832,16 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     }
 
     // meters
-    if (gameMode == Training) {
-        // todo implement regen so it stops breaks tests
-        if (pTrigger->needsFocus) {
-            if (focus == 0) {
-                // no need to check cost here as we can bottom out this bar
-                return false;
-            }
+    if (pTrigger->needsFocus) {
+        if (focus == 0) {
+            // no need to check cost here as we can bottom out this bar
+            return false;
         }
+    }
 
-        if (pTrigger->needsGauge) {
-            if (gauge < pTrigger->gaugeCost) {
-                return false;
-            }
+    if (pTrigger->needsGauge) {
+        if (gauge < pTrigger->gaugeCost) {
+            return false;
         }
     }
 
