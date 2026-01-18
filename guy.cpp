@@ -4642,7 +4642,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool didRecoveryTrigger = false;
 
-    if (!didTrigger && didTransition && (canMoveNow || proxGuard()) && nextAction == -1) {
+    if (!didTrigger && didTransition && (canMoveNow || proxGuard())) {
         DoTriggers();
         if (nextAction != -1) {
             didTrigger = true;
