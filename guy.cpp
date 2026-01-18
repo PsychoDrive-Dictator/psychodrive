@@ -4822,68 +4822,66 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             canHitID = 0;
         }
 
-        if (!bElide) {
-            // only reset on doing a trigger - skull diver trigger is on hit, but the hit
-            // happens on a prior script, and it doesn't have inherit HitInfo, so it's not that
-            // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch, check what that's about
-            if (!didBranch) {
-                hitThisMove = false;
-                hitCounterThisMove = false;
-                hitPunishCounterThisMove = false;
-                hasBeenBlockedThisMove = false;
-                hasBeenParriedThisMove = false;
-                hitArmorThisMove = false;
-                hitAtemiThisMove = false;
-            }
-
-            if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
-                cancelInheritAccelX != Fixed(0) || cancelInheritAccelY != Fixed(0)) {
-                velocityX = velocityX * cancelInheritVelX;
-                velocityY = velocityY * cancelInheritVelY;
-                accelX = accelX * cancelInheritAccelX;
-                accelY = accelY * cancelInheritAccelY;
-                noAccelNextFrame = true; // see kim TP into normal..
-                // not sure if we should pick and choose here, assume the steer-driven one wins for now
-            } else if (!hitStun || blocking) {
-                // should this use airborne status from previous or new action? currently previous
-                if (isDrive || getAirborne() || isProjectile) {
-                    if (pCurrentAction) {
-                        accelX = accelX * pCurrentAction->inheritAccelX;
-                        accelY = accelY * pCurrentAction->inheritAccelY;
-                        Fixed inheritVelXRatio = pCurrentAction->inheritVelX;
-                        velocityX = inheritVelXRatio * velocityX;
-                        if (velocityX != Fixed(0) && inheritVelXRatio.data & 1) {
-                            velocityX.data |= 1;
-                        }
-                        velocityY = velocityY * pCurrentAction->inheritVelY;
-                    }
-                } else {
-                    accelX = Fixed(0);
-                    accelY = Fixed(0);
-                    velocityX = Fixed(0);
-                    velocityY = Fixed(0);
-                }
-            }
-
-            if (didTrigger) {
-                if (cancelAccelX != Fixed(0)) {
-                    accelX = cancelAccelX;
-                }
-                if (cancelAccelY != Fixed(0)) {
-                    accelY = cancelAccelY;
-                }
-                if (cancelVelocityX != Fixed(0)) {
-                    velocityX = cancelVelocityX;
-                }
-                if (cancelVelocityY != Fixed(0)) {
-                    velocityY = cancelVelocityY;
-                }
-            }
-            cancelAccelX = Fixed(0);
-            cancelAccelY = Fixed(0);
-            cancelVelocityX = Fixed(0);
-            cancelVelocityY = Fixed(0);
+        // only reset on doing a trigger - skull diver trigger is on hit, but the hit
+        // happens on a prior script, and it doesn't have inherit HitInfo, so it's not that
+        // todo SPA_HEADPRESS_P_OD_HIT(2) has both inherit hitinfo and a touch branch, check what that's about
+        if (!didBranch) {
+            hitThisMove = false;
+            hitCounterThisMove = false;
+            hitPunishCounterThisMove = false;
+            hasBeenBlockedThisMove = false;
+            hasBeenParriedThisMove = false;
+            hitArmorThisMove = false;
+            hitAtemiThisMove = false;
         }
+
+        if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
+            cancelInheritAccelX != Fixed(0) || cancelInheritAccelY != Fixed(0)) {
+            velocityX = velocityX * cancelInheritVelX;
+            velocityY = velocityY * cancelInheritVelY;
+            accelX = accelX * cancelInheritAccelX;
+            accelY = accelY * cancelInheritAccelY;
+            noAccelNextFrame = true; // see kim TP into normal..
+            // not sure if we should pick and choose here, assume the steer-driven one wins for now
+        } else if (!hitStun || blocking) {
+            // should this use airborne status from previous or new action? currently previous
+            if (isDrive || getAirborne() || isProjectile || didBranch) {
+                if (pCurrentAction) {
+                    accelX = accelX * pCurrentAction->inheritAccelX;
+                    accelY = accelY * pCurrentAction->inheritAccelY;
+                    Fixed inheritVelXRatio = pCurrentAction->inheritVelX;
+                    velocityX = inheritVelXRatio * velocityX;
+                    if (velocityX != Fixed(0) && inheritVelXRatio.data & 1) {
+                        velocityX.data |= 1;
+                    }
+                    velocityY = velocityY * pCurrentAction->inheritVelY;
+                }
+            } else {
+                accelX = Fixed(0);
+                accelY = Fixed(0);
+                velocityX = Fixed(0);
+                velocityY = Fixed(0);
+            }
+        }
+
+        if (didTrigger) {
+            if (cancelAccelX != Fixed(0)) {
+                accelX = cancelAccelX;
+            }
+            if (cancelAccelY != Fixed(0)) {
+                accelY = cancelAccelY;
+            }
+            if (cancelVelocityX != Fixed(0)) {
+                velocityX = cancelVelocityX;
+            }
+            if (cancelVelocityY != Fixed(0)) {
+                velocityY = cancelVelocityY;
+            }
+        }
+        cancelAccelX = Fixed(0);
+        cancelAccelY = Fixed(0);
+        cancelVelocityX = Fixed(0);
+        cancelVelocityY = Fixed(0);
 
         if (isDrive && wasDrive) {
             isDrive = false;
