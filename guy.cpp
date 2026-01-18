@@ -3861,12 +3861,20 @@ void Guy::DoBranchKey(bool preHit)
                 case 52: // shot count
                     {
                         int count = 0;
-                        for ( auto minion : dc.minions ) {
+                        Guy *pGuyMinions = this;
+                        if (isProjectile && pParent) {
+                            pGuyMinions = pParent;
+                        }
+                        for ( auto minion : pGuyMinions->dc.minions ) {
                             if (branchParam0 == minion->limitShotCategory) {
                                 count++;
                             }
                         }
                         doBranch = conditionOperator(branchParam1, count, branchParam2, "shot count");
+
+                        if (preHit) {
+                            doBranch = false;
+                        }
                     }
                     break;
                 case 54: // touch, but really 'hit' with condition flags..
