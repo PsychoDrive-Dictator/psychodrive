@@ -3111,6 +3111,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     recoverableHealth = 0;
     log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage));
 
+    if (health < 0) {
+        health = 0;
+        // attr1 & (1<<4) for delaying finish?
+    }
+
+    // todo if health 0 mark finish here?
+
     DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
 
     comboDamage += moveDamage;
