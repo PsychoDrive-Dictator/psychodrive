@@ -759,6 +759,7 @@ private:
         superAnimation = false;
         superFreeze = false;
         pendingUnlockHitDelayed = false;
+        alreadyDeadButDoesNotKnow = false;
         uniqueTimerCount = 0;
         debuffTimer = 0;
         pCurrentAction = nullptr;
@@ -884,6 +885,7 @@ private:
     bool superFreeze : 1;
     bool pendingUnlockHitDelayed : 1;
     bool appliedScaling : 1;
+    bool alreadyDeadButDoesNotKnow : 1;
 
     int projHitCount;
     int projLifeTime;

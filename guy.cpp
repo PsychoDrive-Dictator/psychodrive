@@ -3107,13 +3107,21 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     effectiveScaling = Fixed(effectiveScaling.i()) * Fixed(attackerStyleData.attackScale) / Fixed(100);
     Fixed damageFixed = Fixed(dmgValue) * Fixed(effectiveScaling.i()) / Fixed(100);
     int moveDamage = damageFixed.i();
+    int prevHealth = health;
     health -= moveDamage;
+    if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
+        health = 0;
+    }
     recoverableHealth = 0;
     log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage));
 
     if (health < 0) {
-        health = 0;
-        // attr1 & (1<<4) for delaying finish?
+        if (prevHealth && attr1 & (1<<4)) {
+            health = 1;
+            alreadyDeadButDoesNotKnow = true;
+        } else {
+            health = 0;
+        }
     }
 
     // todo if health 0 mark finish here?
