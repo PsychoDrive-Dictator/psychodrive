@@ -596,6 +596,9 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     uint64_t flags = pTrigger->flags;
 
     blocking = false;
+    bool normalAttack = flags & (1ULL<<11);
+    bool uniqueAttack = flags & (1ULL<<12);
+    bool specialAttack = flags & (1ULL<<13);
     // one-way, reset on combo end
     driveRushCancel = driveRushCancel || flags & (1ULL<<20);
     parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
@@ -608,6 +611,16 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         if (setFocusRegenCooldown(240)) {
             focusRegenCooldown--;
         }
+    }
+    if (specialAttack) {
+        isDrive = false;
+        wasDrive = false;
+    }
+    if (isDrive && (normalAttack || uniqueAttack)) {
+        wasDrive = true;
+    }
+    if (!isDrive) {
+        wasDrive = false;
     }
     parrying = flags & (1ULL<<40);
 
@@ -4504,6 +4517,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         jumped = false;
         blocking = false;
         if (canMoveNow) {
+            isDrive = false;
+            wasDrive = false;
             moveTurnaround = needsTurnaround(Fixed(10));
         }
 
@@ -4868,14 +4883,10 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             cancelAccelY = Fixed(0);
             cancelVelocityX = Fixed(0);
             cancelVelocityY = Fixed(0);
+        }
 
-            if (isDrive == true) {
-                isDrive = false;
-                // at some point make it so we cant drive specials
-                wasDrive = true;
-            } else {
-                wasDrive = false;
-            }
+        if (isDrive && wasDrive) {
+            isDrive = false;
         }
 
         if (isProjectile) {
