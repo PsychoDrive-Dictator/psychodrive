@@ -8242,6 +8242,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_luke_jp",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 6659,
+                "firstFrame": 146,
+                "lastFrame": 3244
+            },
+            {
+                "count": 1806,
+                "firstFrame": 79,
+                "lastFrame": 2956
+            },
+            {
+                "count": 650,
+                "firstFrame": 107,
+                "lastFrame": 2928
+            },
+            {
+                "count": 1461,
+                "firstFrame": 79,
+                "lastFrame": 2908
+            },
+            {
+                "count": 1444,
+                "firstFrame": 79,
+                "lastFrame": 2908
+            },
+            {
+                "count": 3820,
+                "firstFrame": 79,
+                "lastFrame": 3244
+            },
+            {
+                "count": 4771,
+                "firstFrame": 86,
+                "lastFrame": 3244
+            },
+            {
+                "count": 1279,
+                "firstFrame": 253,
+                "lastFrame": 3137
+            },
+            {
+                "count": 1193,
+                "firstFrame": 902,
+                "lastFrame": 3244
+            },
+            {
+                "count": 5970,
+                "firstFrame": 253,
+                "lastFrame": 3244
+            },
+            {
+                "count": 1106,
+                "firstFrame": 155,
+                "lastFrame": 2967
+            },
+            {
+                "count": 12354,
+                "firstFrame": 155,
+                "lastFrame": 3244
+            }
+        ]
+    },
+    {
         "testName": "zz_match_sagat_terry",
         "testVersion": "39",
         "finished": true,
