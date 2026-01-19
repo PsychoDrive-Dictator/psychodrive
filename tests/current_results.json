@@ -1748,14 +1748,9 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 319,
+                "count": 293,
                 "firstFrame": 274,
-                "lastFrame": 957
-            },
-            {
-                "count": 87,
-                "firstFrame": 289,
-                "lastFrame": 429
+                "lastFrame": 733
             },
             {
                 "count": 0,
@@ -1763,24 +1758,29 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 174,
-                "firstFrame": 342,
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 199,
+                "firstFrame": 264,
                 "lastFrame": 727
             },
             {
-                "count": 174,
-                "firstFrame": 342,
+                "count": 199,
+                "firstFrame": 264,
                 "lastFrame": 727
             },
             {
-                "count": 463,
+                "count": 324,
                 "firstFrame": 264,
-                "lastFrame": 959
+                "lastFrame": 934
             },
             {
-                "count": 486,
+                "count": 105,
                 "firstFrame": 274,
-                "lastFrame": 1059
+                "lastFrame": 726
             },
             {
                 "count": 0,
@@ -1798,14 +1798,14 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 273,
-                "firstFrame": 264,
-                "lastFrame": 937
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 52,
-                "firstFrame": 342,
-                "lastFrame": 393
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },

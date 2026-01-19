@@ -2696,12 +2696,24 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             }
             bool didPerfect = true;
             if (parryAsStrike) {
-                //hitStopSelf = 1;
-                hitStopTarget = 1;
-                for (auto guy : pGuy->pSim->everyone) {
-                    guy->parryFreeze = 61;
+                bool semiPerfect = false;
+                if (hitBox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
+                    semiPerfect = true;
                 }
-                pOtherGuy->pOpponent->perfectScaling = true;
+                if (hitBox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
+                    semiPerfect = true;
+                }
+                if (semiPerfect) { // demoted to regular parry
+                    didPerfect = false;
+                    // todo some gauge shit here?
+                } else {
+                    hitStopSelf = 0;
+                    hitStopTarget = 1;
+                    for (auto guy : pGuy->pSim->everyone) {
+                        guy->parryFreeze = 61;
+                    }
+                    pOtherGuy->pOpponent->perfectScaling = true;
+                }
             } else { // projectile pp
                 hitStopSelf = 9 + 1;
                 hitStopTarget = 9 + 1;
