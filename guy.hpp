@@ -17,6 +17,7 @@ const Fixed wallDistance = Fixed(765.0f);
 const Fixed projWallDistance = Fixed(800.0f);
 const Fixed maxPlayerDistance = Fixed(245.0f);
 const Fixed maxProjectileDistance = Fixed(280.0f);
+const Fixed maxScreenCenterDisplacement = Fixed(550);
 
 const int maxFocus = 60000;
 
@@ -68,7 +69,7 @@ public:
     void Render(float z = 0.0);
     bool Push(Guy *pOtherGuy);
     void RunFramePostPush(void);
-    bool WorldPhysics(bool onlyFloor = false);
+    bool WorldPhysics(bool onlyFloor = false, bool projBoundaries = false);
     void CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList);
     bool AdvanceFrame(bool advancingTime = true, bool endHitStopFrame = false, bool endWarudoFrame = false);
     std::string getActionName(int actionID);

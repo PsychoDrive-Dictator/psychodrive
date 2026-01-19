@@ -1988,7 +1988,7 @@ bool Guy::Push(Guy *pOtherGuy)
     return false;
 }
 
-bool Guy::WorldPhysics(bool onlyFloor)
+bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
 {
     bool hasPushed = false;
     Fixed pushX = Fixed(0);
@@ -2011,14 +2011,17 @@ bool Guy::WorldPhysics(bool onlyFloor)
 
         // walls and screen
         if (!onlyFloor) {
+            Fixed bothPlayerPos = pOpponent->lastPosX + (isProjectile ? pParent->lastPosX : lastPosX);
+            Fixed screenCenterX = bothPlayerPos / Fixed(2);
+            int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+            screenCenterX.data += fixedRemainder;
+            screenCenterX = fixMax(-maxScreenCenterDisplacement, screenCenterX);
+            screenCenterX = fixMin(maxScreenCenterDisplacement, screenCenterX);
+
             Fixed x = getPosX();
             if (!isProjectile) {
                 // screen
                 if (pOpponent && !ignoreScreenPush) {
-                    Fixed bothPlayerPos = pOpponent->lastPosX + lastPosX;
-                    Fixed screenCenterX = bothPlayerPos / Fixed(2);
-                    int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
-                    screenCenterX.data += fixedRemainder;
                     if (x < screenCenterX - maxPlayerDistance) {
                         pushX = -(x - (screenCenterX - maxPlayerDistance));
                     }
@@ -2041,18 +2044,42 @@ bool Guy::WorldPhysics(bool onlyFloor)
                 Fixed &forward = pCurrentAction->pProjectileData->wallBoxForward;
                 Fixed &back = pCurrentAction->pProjectileData->wallBoxBack;
                 if (direction > Fixed(0)) {
-                    if (forward != Fixed(0) && x + forward > projWallDistance) {
-                        pushX = -(x + forward - projWallDistance);
+                    if (forward != Fixed(0)) {
+                        Fixed nose = x + forward;
+                        if (nose > projWallDistance) {
+                            pushX = -(nose - projWallDistance);
+                        }
+                        if (projBoundaries && nose > screenCenterX + maxProjectileDistance) {
+                            pushX = -(nose - (screenCenterX + maxProjectileDistance));
+                        }
                     }
-                    if (back != Fixed(0) && x - back < -projWallDistance) {
-                        pushX = -(x - back - -projWallDistance);
+                    if (back != Fixed(0)) {
+                        Fixed tail = x - back;
+                        if (tail < -projWallDistance) {
+                            pushX = -(tail - -projWallDistance);
+                        }
+                        if (projBoundaries && tail < screenCenterX - maxProjectileDistance) {
+                            pushX = -(tail - (screenCenterX - maxProjectileDistance));
+                        }
                     }
                 } else {
-                    if (forward != Fixed(0) && x - forward < -projWallDistance) {
-                        pushX = -(x - forward - -projWallDistance);
+                    if (forward != Fixed(0)) {
+                        Fixed nose = x - forward;
+                        if (nose < -projWallDistance) {
+                            pushX = -(nose - -projWallDistance);
+                        }
+                        if (projBoundaries && nose < screenCenterX - maxProjectileDistance) {
+                            pushX = -(nose - (screenCenterX - maxProjectileDistance));
+                        }
                     }
-                    if (back != Fixed(0) && x + back > projWallDistance) {
-                        pushX = -(x + back - projWallDistance);
+                    if (back != Fixed(0)) {
+                        Fixed tail = x + back;
+                        if (tail > projWallDistance) {
+                            pushX = -(tail - projWallDistance);
+                        }
+                        if (projBoundaries && tail > screenCenterX + maxProjectileDistance) {
+                            pushX = -(tail - (screenCenterX + maxProjectileDistance));
+                        }
                     }
                 }
             }
@@ -3967,7 +3994,7 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
-void Guy::DoFocusRegen(bool endWarudoFrame)
+void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
 {
     bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
     if (driveRushCancel || (pOpponent && pOpponent->driveScaling)) {
@@ -4021,12 +4048,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // again just now - lots of DR cancels want one frame to play out when they add
     // more screen freeze at the exact end of hitstop
     if (advancingTime) {
-        bool appliedPendingHitstop = false;
+        //bool appliedPendingHitstop = false;
         if (!endHitStopFrame && !endWarudoFrame) {
             if (pendingHitStop) {
                 if (pendingHitStop > hitStop) {
                     hitStop = pendingHitStop;
-                    appliedPendingHitstop = true;
+                    //appliedPendingHitstop = true;
                 }
                 pendingHitStop = 0;
             }
@@ -4139,14 +4166,18 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             if (pParent && pOpponent && pCurrentAction && pCurrentAction->pProjectileData) {
                 int rangeB = pCurrentAction->pProjectileData->rangeB;
 
-                Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
-                Fixed screenCenterX = bothPlayerPos / Fixed(2);
-                int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
-                screenCenterX.data += fixedRemainder;
+                if (rangeB) {
+                    Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
+                    Fixed screenCenterX = bothPlayerPos / Fixed(2);
+                    int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+                    screenCenterX.data += fixedRemainder;
+                    screenCenterX = fixMax(-maxScreenCenterDisplacement, screenCenterX);
+                    screenCenterX = fixMin(maxScreenCenterDisplacement, screenCenterX);
 
-                if (getPosX() > screenCenterX + maxProjectileDistance + Fixed(rangeB) ||
-                    getPosX() < screenCenterX - maxProjectileDistance - Fixed(rangeB)) {
-                    return false;
+                    if (getPosX() > screenCenterX + maxProjectileDistance + Fixed(rangeB) ||
+                        getPosX() < screenCenterX - maxProjectileDistance - Fixed(rangeB)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -5605,7 +5636,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             // spawn new guy
             Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
             if (spawnInBounds) {
-                pNewGuy->WorldPhysics();
+                pNewGuy->WorldPhysics(false, true);
             }
             pNewGuy->RunFrame(false);
             if (pParent) {
