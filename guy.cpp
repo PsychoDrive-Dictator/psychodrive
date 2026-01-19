@@ -5389,6 +5389,9 @@ void Guy::DoPlaceKey(void)
         return;
     }
 
+    bool setXThisFrame = false;
+    bool setYThisFrame = false;
+
     for (auto& placeKey : pCurrentAction->placeKeys)
     {
         if (placeKey.startFrame > currentFrame || placeKey.endFrame <= currentFrame) {
@@ -5431,11 +5434,21 @@ void Guy::DoPlaceKey(void)
         }
 
         if (placeKey.axis == 0) {
-            posOffsetX = offsetMatch;
+            if (setXThisFrame) {
+                posOffsetX += offsetMatch;
+            } else {
+                posOffsetX = offsetMatch;
+            }
             setPlaceX = true;
+            setXThisFrame = true;
         } else if (placeKey.axis == 1) {
-            posOffsetY = offsetMatch;
+            if (setYThisFrame) {
+                posOffsetY += offsetMatch;
+            } else {
+                posOffsetY = offsetMatch;
+            }
             setPlaceY = true;
+            setYThisFrame = true;
         }
     }
 }
