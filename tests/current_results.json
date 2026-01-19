@@ -1542,73 +1542,6 @@ var currentResults =
         ]
     },
     {
-        "testName": "aa_imperfect_parry",
-        "testVersion": "30",
-        "finished": true,
-        "errorTypes": [
-            {
-                "count": 256,
-                "firstFrame": 69,
-                "lastFrame": 324
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 176,
-                "firstFrame": 49,
-                "lastFrame": 173
-            },
-            {
-                "count": 488,
-                "firstFrame": 59,
-                "lastFrame": 324
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 26,
-                "firstFrame": 74,
-                "lastFrame": 86
-            },
-            {
-                "count": 312,
-                "firstFrame": 13,
-                "lastFrame": 324
-            }
-        ]
-    },
-    {
         "testName": "aa_jump_landing_triggers",
         "testVersion": "33",
         "finished": true,
@@ -1810,14 +1743,44 @@ var currentResults =
         ]
     },
     {
-        "testName": "aa_parry",
-        "testVersion": "30",
+        "testName": "aa_parries",
+        "testVersion": "39",
         "finished": true,
         "errorTypes": [
             {
-                "count": 251,
-                "firstFrame": 73,
-                "lastFrame": 323
+                "count": 319,
+                "firstFrame": 274,
+                "lastFrame": 957
+            },
+            {
+                "count": 87,
+                "firstFrame": 289,
+                "lastFrame": 429
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 174,
+                "firstFrame": 342,
+                "lastFrame": 727
+            },
+            {
+                "count": 174,
+                "firstFrame": 342,
+                "lastFrame": 727
+            },
+            {
+                "count": 463,
+                "firstFrame": 264,
+                "lastFrame": 959
+            },
+            {
+                "count": 486,
+                "firstFrame": 274,
+                "lastFrame": 1059
             },
             {
                 "count": 0,
@@ -1835,110 +1798,13 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
+                "count": 273,
+                "firstFrame": 264,
+                "lastFrame": 937
             },
             {
-                "count": 154,
-                "firstFrame": 53,
-                "lastFrame": 173
-            },
-            {
-                "count": 285,
-                "firstFrame": 63,
-                "lastFrame": 323
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 26,
-                "firstFrame": 78,
-                "lastFrame": 90
-            },
-            {
-                "count": 311,
-                "firstFrame": 13,
-                "lastFrame": 323
-            }
-        ]
-    },
-    {
-        "testName": "aa_perfect_parry",
-        "testVersion": "30",
-        "finished": true,
-        "errorTypes": [
-            {
-                "count": 297,
-                "firstFrame": 97,
-                "lastFrame": 393
-            },
-            {
-                "count": 2,
-                "firstFrame": 99,
-                "lastFrame": 100
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 233,
-                "firstFrame": 77,
-                "lastFrame": 244
-            },
-            {
-                "count": 589,
-                "firstFrame": 87,
-                "lastFrame": 393
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
-            },
-            {
-                "count": 61,
-                "firstFrame": 102,
-                "lastFrame": 162
-            },
-            {
-                "count": 381,
-                "firstFrame": 13,
+                "count": 52,
+                "firstFrame": 342,
                 "lastFrame": 393
             }
         ]
