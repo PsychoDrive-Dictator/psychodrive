@@ -8247,12 +8247,12 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 4984,
+                "count": 4935,
                 "firstFrame": 225,
                 "lastFrame": 3244
             },
             {
-                "count": 2145,
+                "count": 2101,
                 "firstFrame": 79,
                 "lastFrame": 3072
             },

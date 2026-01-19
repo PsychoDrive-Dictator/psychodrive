@@ -3361,6 +3361,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     if (destX < 0 && hitAccelX.data & 63) {
                         hitAccelX.data -= 1;
                     }
+                    velocityX = Fixed(0);
+                    accelX = Fixed(0);
                 } else {
                     hitVelX = Fixed(0);
                     hitAccelX = Fixed(0);
