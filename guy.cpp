@@ -340,6 +340,7 @@ bool Guy::RunFrame(bool advancingTime)
     hitAtemiThisFrame = false;
     hasBeenBlockedThisFrame = false;
     hasBeenParriedThisFrame = false;
+    hasBeenPerfectParriedThisFrame = false;
     punishCounterThisFrame = false;
     grabbedThisFrame = false;
     beenHitThisFrame = false;
@@ -2578,6 +2579,10 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitFlagToParent) pGuy->pParent->hasBeenParriedThisFrame = true;
             pGuy->hasBeenParriedThisMove = true;
             if (hitFlagToParent) pGuy->pParent->hasBeenParriedThisMove = true;
+            pGuy->hasBeenPerfectParriedThisFrame = false;
+            if (hitFlagToParent) pGuy->pParent->hasBeenPerfectParriedThisFrame = false;
+            pGuy->hasBeenPerfectParriedThisMove = false;
+            if (hitFlagToParent) pGuy->pParent->hasBeenPerfectParriedThisMove = false;
             otherGuyLog(pOtherGuy, pOtherGuy->logHits, "parry!");
 
             pOtherGuy->successfulParry = true;
@@ -2676,6 +2681,40 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
         }
 
+        int hitStopSelf = pHitEntry->hitStopOwner;
+        int hitStopTarget = pHitEntry->hitStopTarget;
+        // or it could be that normal throws take their value from somewhere else
+        if (hitStopTarget == -1) {
+            hitStopTarget = hitStopSelf;
+        }
+
+        if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
+            // perfect
+            bool parryAsStrike = hitBox.type == hit;
+            if (pGuy->isProjectile && pGuy->pCurrentAction->pProjectileData->flags & (1<<30)) {
+                parryAsStrike = true;
+            }
+            bool didPerfect = true;
+            if (parryAsStrike) {
+                //hitStopSelf = 1;
+                hitStopTarget = 1;
+                for (auto guy : pGuy->pSim->everyone) {
+                    guy->parryFreeze = 61;
+                }
+                pOtherGuy->pOpponent->perfectScaling = true;
+            } else { // projectile pp
+                hitStopSelf = 9 + 1;
+                hitStopTarget = 9 + 1;
+                pOtherGuy->parryHoldFreebieFrames = 13; // ?
+            }
+            if (didPerfect) {
+                pGuy->hasBeenPerfectParriedThisFrame = true;
+                if (hitFlagToParent) pGuy->pParent->hasBeenPerfectParriedThisFrame = true;
+                pGuy->hasBeenPerfectParriedThisMove = true;
+                if (hitFlagToParent) pGuy->pParent->hasBeenPerfectParriedThisMove = true;
+            }
+        }
+
         if (!hitArmor) {
             if (applyHit && (!pendingHit.blocked && !pendingHit.parried)) {
                 pOtherGuy->blocking = false;
@@ -2722,36 +2761,6 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             clampGuys.insert(pOtherGuy);
         }
 
-        int hitStopSelf = pHitEntry->hitStopOwner;
-        int hitStopTarget = pHitEntry->hitStopTarget;
-        // or it could be that normal throws take their value from somewhere else
-        if (hitStopTarget == -1) {
-            hitStopTarget = hitStopSelf;
-        }
-        // if (hitAtemi) {
-        //     hitStopSelf = 0;
-        //     hitStopTarget = 0;
-        // }
-        if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
-            // perfect
-            bool parryAsStrike = hitBox.type == hit;
-            if (pGuy->isProjectile && pGuy->pCurrentAction->pProjectileData->flags & (1<<30)) {
-                parryAsStrike = true;
-            }
-            if (!parryAsStrike) {
-                hitStopSelf = 9 + 1;
-                hitStopTarget = 9 + 1;
-
-                pOtherGuy->parryHoldFreebieFrames = 13; // ?
-            } else {
-                //hitStopSelf = 1;
-                hitStopTarget = 1;
-                for (auto guy : pGuy->pSim->everyone) {
-                    guy->parryFreeze = 61;
-                }
-                pOtherGuy->pOpponent->perfectScaling = true;
-            }
-        }
         bool tradeHitStop = trade;
         if (hitBox.type != hit || tradeHit.hitBox.type != hit) {
             tradeHitStop = false;
@@ -3374,8 +3383,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         if (blocking) {
             if (parrying) {
                 nextAction = 483; // todo script depends on attack height?
-                if (pSim->frameCounter - lastTriggerFrame < 2) {
-                    // perfect
+                if (pAttacker->hasBeenPerfectParriedThisFrame) {
                     nextAction = 486;
                     hitStun = 1;
                     hitVelX = Fixed(0);
@@ -4870,6 +4878,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             hitPunishCounterThisMove = false;
             hasBeenBlockedThisMove = false;
             hasBeenParriedThisMove = false;
+            hasBeenPerfectParriedThisMove = false;
             hitArmorThisMove = false;
             hitAtemiThisMove = false;
         }

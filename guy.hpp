@@ -830,6 +830,7 @@ private:
     bool hitThisFrame : 1;
     bool hasBeenBlockedThisFrame : 1;
     bool hasBeenParriedThisFrame : 1;
+    bool hasBeenPerfectParriedThisFrame : 1;
     bool hitArmorThisFrame : 1;
     bool hitAtemiThisFrame : 1;
     bool punishCounterThisFrame : 1;
@@ -840,6 +841,7 @@ private:
     bool hitPunishCounterThisMove : 1;
     bool hasBeenBlockedThisMove : 1;
     bool hasBeenParriedThisMove : 1;
+    bool hasBeenPerfectParriedThisMove : 1;
     bool hitArmorThisMove : 1;
     bool hitAtemiThisMove : 1;
     bool countingDownInstall : 1;
