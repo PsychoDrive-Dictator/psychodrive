@@ -4369,9 +4369,13 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
+    bool disableMovement = false;
     if (pCurrentAction && currentFrame >= pCurrentAction->actionFrameDuration && nextAction == -1)
     {
-        if (currentAction >= 251 && currentAction <= 253) {
+        if (currentAction == 320 || currentAction == 321) {
+            disableMovement = true; // movement disabled the frame you come out of tech?
+            nextAction = 1;
+        } else if (currentAction >= 251 && currentAction <= 253) {
             nextAction = currentAction - 21;
         } else if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
@@ -4561,9 +4565,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     bool canMoveNow = false;
 
     canMoveNow = canMove(crouchingNow, movingForward, movingBackward);
-    if (canMoveNow) {
-        crouching = crouchingNow;
-    }
     bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames && !hitStun && !blocking;
     if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
         applyFreeMovement = false;
@@ -4574,7 +4575,16 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if (pSim->match && !pSim->timerStarted) {
         applyFreeMovement = false;
     }
+
+    if (disableMovement) {
+        canMoveNow = false;
+        applyFreeMovement = false;
+    }
     
+    if (canMoveNow) {
+        crouching = crouchingNow;
+    }
+
     bool moveTurnaround = false;
 
     // process movement if any
