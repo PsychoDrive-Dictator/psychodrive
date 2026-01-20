@@ -5108,9 +5108,7 @@ void Guy::DoStatusKey(void)
             continue;
         }
 
-        if (statusKey.landingAdjust != 0) {
-            landingAdjust = statusKey.landingAdjust;
-        }
+        landingAdjust = statusKey.landingAdjust;
         forcedPoseStatus = statusKey.poseStatus;
         actionStatus = statusKey.actionStatus;
         jumpStatus = statusKey.jumpStatus;
