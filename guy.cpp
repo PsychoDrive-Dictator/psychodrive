@@ -4529,7 +4529,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 }
 
                 throwProtectionFrames = 2;
-                log (logTransitions, "throw protection applied!");
+                log (logTransitions, "2f throw protection applied!");
             }
         }
     }
@@ -4692,6 +4692,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         stunSplat = false;
 
         wasHit = false;
+
+        if (!throwProtectionFrames) {
+            // if we didnt just recover out of hitstun, apply the generic 1f 
+            throwProtectionFrames = 1;
+            log (logTransitions, "1f throw protection applied!");
+        }
 
         if (neutralMove != 0) {
             std::string moveString = pCharData->vecMoveList[neutralMove];
