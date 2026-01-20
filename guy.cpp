@@ -3335,9 +3335,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     hitStun--;
                 }
 
-                // so AdvanceFrame knocks us down
                 if (hitStun == 0) {
-                    hitStun = 1;
+                    hitStun = 1; // so AdvanceFrame knocks us down
+                }
+
+                if (dmgType == 22 && hitStun == 1) {
+                    AdvanceFrame(true); // need advance time to go from 1 to 0..
+                    log(logHits, "advanced after nage unlock?");
+                    appliedAction = true;
                 }
 
                 if (destY != 0) {
@@ -4524,6 +4529,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 }
 
                 throwProtectionFrames = 2;
+                log (logTransitions, "throw protection applied!");
             }
         }
     }
