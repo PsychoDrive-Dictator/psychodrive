@@ -3848,18 +3848,22 @@ void Guy::DoBranchKey(bool preHit)
                         int offsetY = (branchParam1 & 0xFFFF0000) >> 16;
                         if (offsetY > 0x8000) offsetY = -(0xFFFF - offsetY);
 
+                        // this is weird, but some ghosts are off by one if not for it
+                        Fixed opponentPosX = pOpponent->getPosX() + (pOpponent->velocityX * pOpponent->direction);
+                        Fixed opponentPosY = pOpponent->getPosY() + pOpponent->velocityY;
+
                         // and?
                         if (branchParam0 == 0 &&
-                            (fixAbs(pOpponent->getPosX() - Fixed(offsetX) - getPosX()) < Fixed(distX) &&
-                            fixAbs(pOpponent->getPosY() - Fixed(offsetY) - getPosY()) < Fixed(distY))) {
+                            (fixAbs(opponentPosX - Fixed(offsetX) - getPosX()) < Fixed(distX) &&
+                            fixAbs(opponentPosY - Fixed(offsetY) - getPosY()) < Fixed(distY))) {
                             doBranch = true;
                         }
 
                         // or? no idea
                         // there's also branchParam3 that's 0 or 1 - they're both called AREA_ALL?
                         if (branchParam0 == 1 &&
-                            (fixAbs(pOpponent->getPosX() - Fixed(offsetX) - getPosX()) < Fixed(distX) ||
-                            fixAbs(pOpponent->getPosY() - Fixed(offsetY) - getPosY()) < Fixed(distY))) {
+                            (fixAbs(opponentPosX - Fixed(offsetX) - getPosX()) < Fixed(distX) ||
+                            fixAbs(opponentPosY - Fixed(offsetY) - getPosY()) < Fixed(distY))) {
                             doBranch = true;
                         }
                     }
