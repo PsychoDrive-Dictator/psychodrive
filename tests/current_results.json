@@ -6299,6 +6299,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "luke_normal_throw",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 244,
+                "firstFrame": 263,
+                "lastFrame": 629
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 58,
+                "firstFrame": 279,
+                "lastFrame": 629
+            },
+            {
+                "count": 6,
+                "firstFrame": 279,
+                "lastFrame": 629
+            },
+            {
+                "count": 198,
+                "firstFrame": 213,
+                "lastFrame": 670
+            },
+            {
+                "count": 388,
+                "firstFrame": 98,
+                "lastFrame": 746
+            },
+            {
+                "count": 8,
+                "firstFrame": 233,
+                "lastFrame": 629
+            },
+            {
+                "count": 2,
+                "firstFrame": 213,
+                "lastFrame": 511
+            },
+            {
+                "count": 4,
+                "firstFrame": 279,
+                "lastFrame": 592
+            },
+            {
+                "count": 104,
+                "firstFrame": 279,
+                "lastFrame": 604
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "mai_cartwheel_landing",
         "testVersion": "33",
         "finished": true,
