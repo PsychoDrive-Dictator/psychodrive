@@ -4502,7 +4502,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             } else {
                 blocking = false;
                 if (parrying) {
-                    if ((currentInput & (32+256)) != 32+256) {
+                    if (burnout || (currentInput & (32+256)) != 32+256) {
                         nextAction = 482;
                         parrying = false;
                         if (successfulParry) {
@@ -4629,8 +4629,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (!hitStun && parrying && (currentInput & (32+256)) != 32+256) {
-        if (currentAction != 480 || currentFrame >= 12) {
+    if (!hitStun && parrying && (burnout || (currentInput & (32+256)) != 32+256)) {
+        if (burnout || currentAction != 480 || currentFrame >= 12) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
 
