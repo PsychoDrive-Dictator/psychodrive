@@ -3553,6 +3553,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             if (actionInitialFrame < 1) {
                 actionInitialFrame = 1;
             }
+            if (pHitEffect->curveTargetID == 10) {
+                // is it just a table? ....
+                actionInitialFrame = 3;
+            }
             log(logTransitions, "action initial frame " + std::to_string(actionInitialFrame));
             int frameCount = hitStun - 2;
             if (resetHitStunOnTransition) {
