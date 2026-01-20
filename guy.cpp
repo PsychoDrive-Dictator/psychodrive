@@ -5740,9 +5740,10 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             Fixed posOffsetY = shotKey.posOffsetY;
 
             bool spawnInBounds = false;
-            if (shotKey.flags == 2) {
+            if (shotKey.flags & 2) {
                 spawnInBounds = true;
-            } else {
+            }
+            if (shotKey.flags & ~(2|16)) {
                 log(logUnknowns, "unknown shotkey flag " + std::to_string(shotKey.flags));
             }
 
@@ -5750,6 +5751,10 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
             if (spawnInBounds) {
                 pNewGuy->WorldPhysics(false, true);
+            }
+            if (shotKey.flags & 16) {
+                pNewGuy->scalingTriggerID++;
+                pNewGuy->appliedScaling = false;
             }
             pNewGuy->RunFrame(false);
             if (pParent) {
