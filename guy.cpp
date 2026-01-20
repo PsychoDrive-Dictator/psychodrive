@@ -3542,7 +3542,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             log(logResources, "regen cooldown unfrozen (hit out of freeze move)");
         }
 
-        if (appliedHitStun && hitStun && !resetHitStunOnLand) {
+        if (appliedHitStun && hitStun) {
             actionInitialFrame = pHitEffect->curveTargetID;
             if (isTrade) {
                 actionInitialFrame = 1; // ????
@@ -3553,9 +3553,16 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             if (actionInitialFrame < 1) {
                 actionInitialFrame = 1;
             }
+            log(logTransitions, "action initial frame " + std::to_string(actionInitialFrame));
             int frameCount = hitStun - 2;
             if (resetHitStunOnTransition) {
                 frameCount = pHitEffect->hitStun - 2;
+            }
+            if (resetHitStunOnLand) {
+                frameCount = 0;
+            }
+            if (frameCount < 0) { 
+                frameCount = 0;
             }
             if (frameCount == 0) {
                 actionSpeed = Fixed(1);
@@ -4169,8 +4176,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     Fixed currentSpeed = actionSpeed;
     if (currentFrame == 0 && actionInitialFrame != -1) {
         currentSpeed = Fixed(actionInitialFrame);
-    }
-    if (currentFrame >= (pCurrentAction->recoveryEndFrame - 1)) {
+        actionInitialFrame = -1;
+    } else if (currentFrame >= (pCurrentAction->recoveryEndFrame - 1)) {
         currentSpeed = Fixed(1);
     }
     currentFrameFrac += currentSpeed;
