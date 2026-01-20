@@ -2720,7 +2720,14 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                 if (hitFlagToParent) pGuy->pParent->hasBeenPerfectParriedThisMove = true;
             }
         }
-
+        if (pOtherGuy->forceKnockDownState && !pOtherGuy->comboHits) {
+            if (hitStopSelf) {
+                hitStopSelf += 5;
+            }
+            if (hitStopTarget) {
+                hitStopTarget += 5;
+            }
+        }
         if (!hitArmor) {
             if (applyHit && (!pendingHit.blocked && !pendingHit.parried)) {
                 pOtherGuy->blocking = false;
