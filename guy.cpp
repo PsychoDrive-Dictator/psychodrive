@@ -538,12 +538,6 @@ void Guy::RunFramePostPush(void)
         if (needsTurnaround()) {
             switchDirection();
         }
-        hitVelX = Fixed(-13) * direction;
-        hitAccelX = Fixed(1) * direction;
-        hitVelX -= hitAccelX;
-        pOpponent->hitVelX = Fixed(-13) * pOpponent->direction;
-        pOpponent->hitAccelX = Fixed(1) * pOpponent->direction;
-        pOpponent->hitVelX -= pOpponent->hitAccelX;
     }
 
     //if (advancingTime) {
@@ -4733,9 +4727,33 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         nextAction = crouching ? 8 : 7;
     }
 
+    bool doingThrowTech = false;
+    Fixed throwTechOrigin = Fixed(0);
+    if (nextAction == 321) {
+        // if we're about to get throw teched.. do placekey at the bumped frame to determine origin
+        DoPlaceKey();
+        doingThrowTech = true;
+        throwTechOrigin = getPosX();
+    }
+
     if (nextAction != -1) {
         NextAction(didTrigger, didBranch);
         didTransition = true;
+    }
+
+    if (doingThrowTech) {
+        posX = throwTechOrigin + Fixed(50);
+        if (pOpponent) {
+            // think this should be pretty ordering impervious at this stage?
+            pOpponent->posX = throwTechOrigin - Fixed(50);
+            pOpponent->posOffsetX = Fixed(0);
+        }
+    }
+
+    // throw tech delayed pushback
+    if ((currentAction == 321 || currentAction == 320) && currentFrame == 1) {
+        hitVelX = Fixed(-13) * direction;
+        hitAccelX = Fixed(1) * direction;
     }
 
     if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
