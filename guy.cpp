@@ -2734,6 +2734,15 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (applyHit && !pendingHit.parried) {
                 pOtherGuy->parrying = false;
             }
+            HitEntry clonedEntry;
+            if (hitEntryFlag & special && !(hitEntryFlag & counter)) {
+                // stupid, but apparently burnout block takes pushback value from normal block???
+                int newHitFlag = hitEntryFlag & ~special;
+                newHitFlag |= block;
+                clonedEntry = *pHitEntry;
+                clonedEntry.moveTime = hitBox.pHitData->param[newHitFlag].moveTime;
+                pHitEntry = &clonedEntry;
+            }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
 
             if (pendingHit.parried) {
