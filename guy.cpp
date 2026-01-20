@@ -3786,6 +3786,10 @@ void Guy::DoBranchKey(bool preHit)
                         // guard scripts have branches to switch guard? but theyre not supposed to work?
                         doBranch = false;
                     }
+                    if (!preHit) {
+                        // we take new input before advanceframe, check command post-bump only
+                        doBranch = false;
+                    }
                     break;
                 case 21: // armor
                     if (armorThisFrame) {
