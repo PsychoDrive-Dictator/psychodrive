@@ -3096,6 +3096,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         //resetHitStunOnTransition = true;
     }
 
+    if (dmgType == 30 && blocking) {
+        kabeTataki = false;
+    }
+
     if (dmgType == 31) {
         kabeTataki = true;
     }
