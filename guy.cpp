@@ -3199,7 +3199,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     comboDamage += moveDamage;
     lastDamageScale = effectiveScaling.i();
 
-    if (!parrying) {
+    if (!parrying && (!burnout || pHitEffect->focusGainTarget > 0)) {
         focus += pHitEffect->focusGainTarget;
         log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
         if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
