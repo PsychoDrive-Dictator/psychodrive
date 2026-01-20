@@ -4782,10 +4782,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     if (doingThrowTech) {
-        posX = throwTechOrigin + Fixed(50);
+        posX = throwTechOrigin + (Fixed(50) * -direction);
         if (pOpponent) {
             // think this should be pretty ordering impervious at this stage?
-            pOpponent->posX = throwTechOrigin - Fixed(50);
+            pOpponent->posX = throwTechOrigin + (Fixed(50) * direction);
             pOpponent->posOffsetX = Fixed(0);
         }
     }
