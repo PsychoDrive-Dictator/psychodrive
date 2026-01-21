@@ -2749,7 +2749,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (pendingHit.parried) {
                 Fixed hitVel = pOtherGuy->hitVelX;
                 Fixed halfHitVel = hitVel / Fixed(2);
-                pGuy->hitVelX = halfHitVel;
+                pGuy->hitVelX = -halfHitVel;
                 pOtherGuy->hitVelX = halfHitVel; // todo no push? if proj
                 if (halfHitVel < 0 && halfHitVel.data & 63) {
                     // this bias not like the others?
@@ -2768,7 +2768,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
                     // this bias not like the others?
                     halfHitAccel.data -= 1;
                 }
-                pGuy->hitAccelX = halfHitAccel;
+                pGuy->hitAccelX = -halfHitAccel;
                 pOtherGuy->hitAccelX = halfHitAccel;
 
                 // find the parry gains in common[0], weird
@@ -2985,7 +2985,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     noCounterPush = attr0 & (1<<0);
     bool piyoBound = attr1 & (1<<2);
-    bool noBackRecovery = attr1 & (1<<6);
+    noBackRecovery = attr1 & (1<<6);
     bool useParentDirection = attr1 & (1<<10);
     bool usePositionAsDirection = attr1 & (1<<11);
     recoverForward = attr3 & (1<<0);
@@ -4512,10 +4512,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     }
                     isDown = true;
                 } else {
-                    // todo what's the actual buffer and input for backroll?
                     int searchWindow = 16;
                     bool backroll = false;
-                    for (int i = 0; i < searchWindow; i++) {
+                    for (int i = 0; i < searchWindow && !noBackRecovery; i++) {
                         int input = dc.inputBuffer[i] & (LP+MP+HP+LK+MK+HK);
                         if (dc.inputBuffer[i] & FROZEN) {
                             searchWindow++;

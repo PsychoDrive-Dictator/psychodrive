@@ -720,6 +720,7 @@ private:
         nageKnockdown = false;
         recoverForward = false;
         recoverReverse = false;
+        noBackRecovery = false;
         frontDamage = false;
         backDamage = false;
         groundBounce = false;
@@ -866,6 +867,7 @@ private:
     bool nageKnockdown : 1;
     bool recoverForward : 1;
     bool recoverReverse : 1;
+    bool noBackRecovery : 1;
     bool frontDamage : 1;
     bool backDamage : 1;
     bool wallBounce : 1;
