@@ -3137,6 +3137,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         stunSplat = true;
     }
 
+    if (attr0 & (1<<9) && comboHits) {
+        kabeBound = false;
+        kabeTataki = false;
+    }
+
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
     if (applyHit && dmgValue) {

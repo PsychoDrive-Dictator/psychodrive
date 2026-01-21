@@ -8515,43 +8515,43 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 3531,
+                "count": 1656,
                 "firstFrame": 1312,
                 "lastFrame": 3007
             },
             {
-                "count": 1050,
+                "count": 746,
                 "firstFrame": 680,
                 "lastFrame": 2899
             },
             {
-                "count": 368,
+                "count": 96,
                 "firstFrame": 727,
                 "lastFrame": 2885
             },
             {
-                "count": 794,
+                "count": 539,
                 "firstFrame": 680,
                 "lastFrame": 2879
             },
             {
-                "count": 808,
+                "count": 553,
                 "firstFrame": 680,
                 "lastFrame": 2879
             },
             {
-                "count": 1831,
+                "count": 827,
                 "firstFrame": 266,
                 "lastFrame": 3007
             },
             {
-                "count": 1704,
+                "count": 609,
                 "firstFrame": 707,
                 "lastFrame": 3007
             },
             {
-                "count": 564,
-                "firstFrame": 2060,
+                "count": 59,
+                "firstFrame": 2841,
                 "lastFrame": 2899
             },
             {
@@ -8560,17 +8560,17 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 2052,
+                "count": 1244,
                 "firstFrame": 1764,
                 "lastFrame": 3007
             },
             {
-                "count": 341,
-                "firstFrame": 2060,
-                "lastFrame": 2784
+                "count": 26,
+                "firstFrame": 2801,
+                "lastFrame": 2813
             },
             {
-                "count": 4521,
+                "count": 3290,
                 "firstFrame": 1528,
                 "lastFrame": 3007
             }
