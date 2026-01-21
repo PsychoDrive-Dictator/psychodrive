@@ -4503,6 +4503,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         // slide
                         velocityX = groundBounceVelX;
                         groundBounceVelX = Fixed(0);
+                        if (nageKnockdown) {
+                            // one last slide tic from whatever previous vel
+                            posX = posX + (prevVelX * direction);
+                            // we slide one tic early, so go against the next frame worth's :/
+                            posX = posX + (velocityX * direction * -1);
+                        }
                     }
                     isDown = true;
                 } else {
