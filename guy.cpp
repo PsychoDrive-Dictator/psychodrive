@@ -3302,6 +3302,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         wallSplat = false;
         wallBounce = false;
 
+        wallStopped = false;
+        wallStopFrames = false;
+
         if (jimenBound && floorTime) {
             int floorDestX = pHitEffect->floorDestX;
             int floorDestY = pHitEffect->floorDestY;
