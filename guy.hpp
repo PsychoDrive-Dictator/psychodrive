@@ -160,7 +160,7 @@ public:
         }
         return hitStop;
     }
-    bool getWarudo() { return warudo || parryFreeze; }
+    bool getWarudo() { return (warudo || parryFreeze) && !ignoreWarudo; }
     bool getIsDown() { return isDown; }
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
@@ -681,6 +681,7 @@ private:
         timeInHitStop = 0;
         ignoreHitStop = false;
         wasIgnoreHitStop = false;
+        ignoreWarudo = false;
         tokiYoTomare = false;
         warudo = false;
         tokiWaUgokidasu = false;
@@ -848,6 +849,7 @@ private:
     bool countingDownInstall : 1;
     bool ignoreHitStop : 1;
     bool wasIgnoreHitStop : 1;
+    bool ignoreWarudo : 1;
     bool tokiYoTomare : 1;
     bool warudo : 1;
     bool tokiWaUgokidasu : 1;

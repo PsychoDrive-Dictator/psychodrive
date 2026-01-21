@@ -282,7 +282,7 @@ bool Guy::RunFrame(bool advancingTime)
         return false;
     }
 
-    if (advancingTime && !warudo) {
+    if (advancingTime && !getWarudo()) {
         if (debuffTimer > 0 ) {
             debuffTimer--;
         }
@@ -301,7 +301,7 @@ bool Guy::RunFrame(bool advancingTime)
         }
     }
 
-    if (warudo) {
+    if (getWarudo()) {
         return false;
     }
 
@@ -4159,10 +4159,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
 
         bool tickRegenCooldown = true;
-        if ((warudo && !tokiWaUgokidasu) || superFreeze) {
+        if ((getWarudo() && !tokiWaUgokidasu) || superFreeze) {
             tickRegenCooldown = false;
         }
-        if (pOpponent && (pOpponent->warudo || pOpponent->superFreeze)) {
+        if (pOpponent && (pOpponent->getWarudo() || pOpponent->superFreeze)) {
             tickRegenCooldown = false;
         }
         if (focusRegenCooldownFrozen) {
@@ -4186,7 +4186,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         deferredFocusCost = -deferredFocusCost;
     }
 
-    if (getHitStop() || warudo) {
+    if (getHitStop() || getWarudo()) {
         if (tokiWaUgokidasu) {
             // time has begun to move again
             warudo = false;
@@ -5786,12 +5786,15 @@ void Guy::DoShotKey(Action *pAction, int frameID)
             if (shotKey.flags & 2) {
                 spawnInBounds = true;
             }
-            if (shotKey.flags & ~(2|16)) {
+            if (shotKey.flags & ~(2|4|16)) {
                 log(logUnknowns, "unknown shotkey flag " + std::to_string(shotKey.flags));
             }
 
             // spawn new guy
             Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
+            if (shotKey.flags & 4) {
+                pNewGuy->ignoreWarudo = true;
+            }
             if (spawnInBounds) {
                 pNewGuy->WorldPhysics(false, true);
             }
@@ -5799,7 +5802,9 @@ void Guy::DoShotKey(Action *pAction, int frameID)
                 pNewGuy->scalingTriggerID++;
                 pNewGuy->appliedScaling = false;
             }
-            pNewGuy->RunFrame(false);
+            // run initial frame on behalf of sim loop here because it wasn't included this frame
+            pNewGuy->RunFrame(true);
+            pNewGuy->RunFramePostPush();
             if (pParent) {
                 pParent->dc.minions.push_back(pNewGuy);
             } else {
