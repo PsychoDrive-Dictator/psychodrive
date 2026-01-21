@@ -96,6 +96,12 @@ bool matchFrameButton( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uin
         return false;
     }
 
+    if (okCondFlags & 1) {
+        if (((input & 0xF) & (okKeyFlags & 0xF)) == (okKeyFlags & 0xF)) {
+            return true; // match exact direction with slop
+        }
+        return false;
+    }
     uint32_t match = okKeyFlags & input;
 
     if (okCondFlags & 0x80) {
@@ -1155,6 +1161,13 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
                 initialMatch = true;
                 initialI = cursorPos;
                 match = true;
+                if (okCondFlags & 1 && okCondFlags & 1024) {
+                    // inclusive lever shift initial match
+                    // turn the match into exclusive of current lever position to look for the edge of it settling here
+                    okCondFlags &= ~1;
+                    okCondFlags |= 2;
+                    okKeyFlags = dc.inputBuffer[cursorPos] & 0xF;
+                }
             } else if (initialMatch == true) {
                 cursorPos--;
                 initialI = cursorPos;
