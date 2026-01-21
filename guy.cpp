@@ -3152,7 +3152,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
         if (pendingScaling && applyScaling) {
             currentScaling -= pendingScaling;
-            log(logHits, "applied " + std::to_string(pendingScaling) + " pending scaling")
+            log(logHits, "applied " + std::to_string(pendingScaling) + " pending scaling current" + std::to_string(currentScaling));
             pendingScaling = 0;
         }
 
@@ -3171,9 +3171,15 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
 
         pAttacker->appliedScaling = true;
-        if (pAttacker->isProjectile && pAttacker->scalingTriggerID == pAttacker->pParent->scalingTriggerID) {
-            // might need to find siblings too eventually?
-            pAttacker->pParent->appliedScaling = true;
+        if (pAttacker->isProjectile && pAttacker->pParent) {
+            if (pAttacker->pParent->scalingTriggerID == pAttacker->scalingTriggerID) {
+                pAttacker->pParent->appliedScaling = true;
+            }
+            for (Guy *pAttackerSibling : pAttacker->pParent->getMinions()) {
+                if (pAttackerSibling->scalingTriggerID == pAttacker->scalingTriggerID) {
+                    pAttackerSibling->appliedScaling = true;
+                }
+            }
         }
     }
 
