@@ -3188,6 +3188,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 }
             }
         }
+        for (Guy *pAttackerMinion : pAttacker->getMinions()) {
+            if (pAttackerMinion->scalingTriggerID == pAttacker->scalingTriggerID) {
+                pAttackerMinion->appliedScaling = true;
+            }
+        }
     }
 
     Fixed effectiveScaling = Fixed(currentScaling - attackerInstantScale);
@@ -4918,7 +4923,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // }
 
     if (didTrigger && didTransition) {
-        scalingTriggerID++;
+        AdvanceScalingTriggerID();
         appliedScaling = false;
     }
 
@@ -4934,6 +4939,21 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     forcedTrigger = ActionRef(0, 0);
 
     return true;
+}
+
+void Guy::AdvanceScalingTriggerID()
+{
+    Guy *pStart = this;
+    if (isProjectile && pParent) {
+        pStart = pParent;
+    }
+    int maxTeamScalingTriggerID = pStart->scalingTriggerID;
+    for (Guy *pMinion : pStart->getMinions()) {
+        if (pMinion->scalingTriggerID > maxTeamScalingTriggerID) {
+            maxTeamScalingTriggerID = pMinion->scalingTriggerID;
+        }
+    }
+    scalingTriggerID = maxTeamScalingTriggerID + 1;
 }
 
 void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
@@ -5825,7 +5845,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
                 pNewGuy->WorldPhysics(false, true);
             }
             if (shotKey.flags & 16) {
-                pNewGuy->scalingTriggerID++;
+                AdvanceScalingTriggerID();
                 pNewGuy->appliedScaling = false;
             }
             // run initial frame on behalf of sim loop here because it wasn't included this frame

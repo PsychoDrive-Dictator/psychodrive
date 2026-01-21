@@ -165,6 +165,7 @@ public:
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     int getLastDamageScale() { return lastDamageScale; }
+    bool getAppliedScaling() { return appliedScaling; }
     std::string getUniqueParam() {
         std::string ret;
         for ( int i = 0; i < uniqueParamCount; i++) {
@@ -439,6 +440,7 @@ private:
     void DoFocusRegen(bool endWarudoFrame);
 
     void DoInstantAction(int actionID);
+    void AdvanceScalingTriggerID();
 
     void ChangeStyle(int newStyleID);
     void ExitStyle();
