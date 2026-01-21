@@ -4804,6 +4804,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if ((currentAction == 321 || currentAction == 320) && currentFrame == 1) {
         hitVelX = Fixed(-13) * direction;
         hitAccelX = Fixed(1) * direction;
+
+        if (currentAction == 320) {
+            setGauge(gauge + 1000);
+            setFocus(focus + 10000);
+        }
     }
 
     if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
