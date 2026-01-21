@@ -8560,9 +8560,9 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 1158,
-                "firstFrame": 1850,
-                "lastFrame": 3007
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 26,

@@ -3170,7 +3170,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
         }
 
+        if (pAttacker->scalingTriggerID != lastScalingTriggerID && !applyScaling) {
+            // the combo has moved past that attack, so the instant scale is baked in
+            attackerInstantScale = 0;
+        }
         pAttacker->appliedScaling = true;
+        if (applyScaling) {
+            lastScalingTriggerID = pAttacker->scalingTriggerID;
+        }
         if (pAttacker->isProjectile && pAttacker->pParent) {
             if (pAttacker->pParent->scalingTriggerID == pAttacker->scalingTriggerID) {
                 pAttacker->pParent->appliedScaling = true;
@@ -3218,7 +3225,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         health = 0;
     }
     recoverableHealth = 0;
-    log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage));
+    log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
 
     if (health < 0) {
         if (prevHealth && attr1 & (1<<4)) {
