@@ -3203,10 +3203,19 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     // todo if health 0 mark finish here?
 
-    DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
+    if (moveDamage > 0) {
+        // look for minions to delete on damage
+        for (auto &minion: getMinions()) {
+            if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
+                minion->die = true;
+            }
+        }
 
-    comboDamage += moveDamage;
-    lastDamageScale = effectiveScaling.i();
+        comboDamage += moveDamage;
+        lastDamageScale = effectiveScaling.i();
+
+        DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
+    }
 
     if (!parrying && (!burnout || pHitEffect->focusGainTarget > 0)) {
         focus += pHitEffect->focusGainTarget;
