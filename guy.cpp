@@ -5195,6 +5195,11 @@ void Guy::DoStatusKey(void)
                     switchDirection();
                 }
                 break;
+            case 11:
+                if (pParent && direction != pParent->direction) {
+                    switchDirection();
+                }
+                break;
         }
     }
 }
@@ -5803,6 +5808,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
                 pNewGuy->appliedScaling = false;
             }
             // run initial frame on behalf of sim loop here because it wasn't included this frame
+            pNewGuy->DoStatusKey();
             pNewGuy->RunFrame(true);
             pNewGuy->RunFramePostPush();
             if (pParent) {
