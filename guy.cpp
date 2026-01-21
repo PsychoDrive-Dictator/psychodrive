@@ -1097,12 +1097,6 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
     // current frame + buffer
     int hitStopTime = timeInHitStop;
     uint32_t initialSearch = 1 + precedingTime + hitStopTime;
-    if (pTrigger->flags & (1ULL<<40)) {
-        // don't buffer parry specifically? i don't think so
-        // todo this is wrong as it creates the wrong search point for PP
-        // do normal search but still check that held input is current
-        initialSearch = 1;
-    }
     if (dc.inputBuffer.size() < (size_t)initialSearch) {
         initialSearch = dc.inputBuffer.size();
     }
@@ -1181,6 +1175,18 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         initialI = cursorPos;
     }
     cursorPos = initialI;
+    if (okKeyFlags == 0) {
+        if (dcExcFlags != 0 ) {
+            if ((dcExcFlags & currentInput) != dcExcFlags) {
+                return false;
+            }
+        }
+        if (dcIncFlags != 0 ) {
+            if (!(dcIncFlags & currentInput)) {
+                return false;
+            }
+        }
+    }
     return initialMatch;
 }
 
