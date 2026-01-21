@@ -3416,9 +3416,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     if (destX < 0 && hitVelX.data & 63) {
                         hitVelX.data -= 1;
                     }
-                    hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
-                    if (destX < 0 && hitAccelX.data & 63) {
+                    hitAccelX = Fixed(hitVelDirection.i() * destX * 2) / Fixed(destTime * destTime);
+                    if (hitAccelX < 0 && hitAccelX.data & 127 && destX > 0) {
                         hitAccelX.data -= 1;
+                    } else if (hitAccelX > 0 && hitAccelX.data & 127 && destX > 0) {
+                        hitAccelX.data += 1;
                     }
                     velocityX = Fixed(0);
                     accelX = Fixed(0);
