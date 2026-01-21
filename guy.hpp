@@ -372,6 +372,7 @@ public:
         currentAction = startAction;
         styleInstall = styleID;
 
+        triggerInstantScale = parent.triggerInstantScale;
         scalingTriggerID = parent.scalingTriggerID;
         appliedScaling = parent.appliedScaling;
         superAction = parent.superAction;

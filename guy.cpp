@@ -648,12 +648,10 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         log(logTransitions, "forced jump status from trigger, direction " + std::to_string(jumpDirection));
     }
 
-    if (pTrigger->comboInst) {
-        triggerInstantScale = pTrigger->comboInst;
-        if (pOpponent && !pOpponent->comboHits) {
-            // todo is this right if projectiles hit out of order?
-            triggerInstantScale = 0;
-        }
+    triggerInstantScale = pTrigger->comboInst;
+    if (pOpponent && !pOpponent->comboHits) {
+        // todo is this right if projectiles hit out of order?
+        triggerInstantScale = 0;
     }
 
     superAction = flags & (1ULL<<15);
