@@ -2999,6 +2999,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         // for the purpose of checking direction below
         attacker = attacker->pParent;
     }
+
+    bool doSwitchDirection = applyHit;
+    if (dmgType == 21 || dmgType == 22) {
+        doSwitchDirection = false; // grab type hits that happen even as unlock
+        usePositionAsDirection = true;
+    }
+
     Fixed attackerDirection = attacker->direction;
     if (usePositionAsDirection) {
         attackerDirection = attacker->direction;
@@ -3010,11 +3017,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     // in a real crossup, hitvel will go opposite the direction of the hit player
     if (!attacker->isProjectile && pAttacker->needsTurnaround(Fixed(10))) {
         attackerDirection *= Fixed(-1);
-    }
-
-    bool doSwitchDirection = applyHit;
-    if (dmgType == 21 || dmgType == 22) {
-        doSwitchDirection = false; // grab type hits that happen even as unlock
     }
 
     if (doSwitchDirection && !recoverReverse && !isDomain && direction == attackerDirection) {
@@ -3340,6 +3342,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 nageKnockdown = true;
                 knockDown = true;
                 knockDownFrames = downTime;
+                // the bounddest for this is always positive
+                groundBounceVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
 
                 // commit current place offset
                 posX = posX + (posOffsetX * direction);
@@ -4491,8 +4495,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 posY = Fixed(0);
                 airborne = false;
 
-                nageKnockdown = false;
-
                 if (knockDownFrames) {
                     hitStun = knockDownFrames;
                     knockDownFrames = 0;
@@ -4538,8 +4540,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     resetComboCount = true;
                 }
 
+                nageKnockdown = false;
+
                 if (recoverForward && needsTurnaround()) {
                     switchDirection();
+                    velocityX *= Fixed(-1);
                 }
             } else {
                 blocking = false;
