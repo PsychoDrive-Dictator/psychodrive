@@ -3441,7 +3441,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 }
 
                 if (dmgType == 22 && hitStun == 1) {
-                    AdvanceFrame(true); // need advance time to go from 1 to 0..
+                    AdvanceFrame(false);
                     log(logHits, "advanced after nage unlock?");
                     appliedAction = true;
                 }
@@ -4342,7 +4342,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    bool doHitStun = advancingTime;
+    bool doHitStun = advancingTime || hitStun == 1;
 
     if (landed) {
         if (currentAction != 39 && currentAction != 40 && currentAction != 41 &&
@@ -4941,7 +4941,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (((!didTrigger && !didBranch && didTransition && currentAction != 482) || canMoveNow) && focusRegenCooldownFrozen) {
+    if (((!didTrigger && !didBranch && didTransition && currentAction != 482) || canMoveNow) && focusRegenCooldownFrozen && advancingTime) {
         // if we recovered out of an OD move - trigger handled directly in execute
         focusRegenCooldownFrozen = false;
         log(logResources, "regen cooldown unfrozen (recovered out of freeze move)");
