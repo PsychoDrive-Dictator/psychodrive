@@ -569,7 +569,7 @@ void Guy::RunFramePostPush(void)
         setFocus(focus + deferredFocusCost);
         log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
         deferredFocusCost = 0;
-        if (!setFocusRegenCooldown(120)) {
+        if (!setFocusRegenCooldown(parrying?240:120)) {
             focusRegenCooldown--;
         }
         focusRegenCooldownFrozen = true;
@@ -604,6 +604,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
     bool dash = flags & (1ULL<<22) || flags & (1ULL<<23);
     bool jump = flags & (1ULL<<26);
+    parrying = flags & (1ULL<<40);
 
     // if (flags & (1ULL<<20)) {
     //     if (setFocusRegenCooldown(120)) {
@@ -625,7 +626,6 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     if (!isDrive) {
         wasDrive = false;
     }
-    parrying = flags & (1ULL<<40);
 
     if (parrying && currentInput & DOWN) {
         nextAction = 489;
@@ -667,7 +667,8 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     if (pTrigger->needsFocus) {
         deferredFocusCost = pTrigger->focusCost;
         log(logResources, "queuing deferred cost");
-    } else if (focusRegenCooldownFrozen) {
+    }
+    if (focusRegenCooldownFrozen) {
         // if we cancel out of the od move
         focusRegenCooldownFrozen = false;
         // for some reason first-frame cancel of dash doesn't do that...
@@ -2960,7 +2961,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             guy->setFocus(guy->focus - guy->deferredFocusCost);
             //log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
             guy->deferredFocusCost = 0;
-            if (!guy->setFocusRegenCooldown(120)) {
+            if (!guy->setFocusRegenCooldown(guy->parrying?240:120)) {
                 guy->focusRegenCooldown--;
             }
             guy->focusRegenCooldownFrozen = true;
@@ -5768,7 +5769,7 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                                 log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
                                 if (param2 < 0) {
                                     // same as spending bar on od move
-                                    if (!setFocusRegenCooldown(120)) {
+                                    if (!setFocusRegenCooldown(parrying?240:120)) {
                                         focusRegenCooldown--;
                                     }
                                     focusRegenCooldownFrozen = true;
