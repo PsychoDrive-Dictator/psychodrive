@@ -2669,6 +2669,27 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             pOtherGuy->recoverableHealthCooldown = 120;
             // we don't call ApplyHitEffect so do this by hand?
             pOtherGuy->comboHits += pHitEntry->comboAdd;
+
+            Guy *pResourceGuy = pGuy;
+            if (pGuy->isProjectile) {
+                pResourceGuy = pGuy->pParent;
+            }
+            // set resources directly, will be clamped later for trades
+            if (!pResourceGuy->driveRushCancel && !pOtherGuy->driveScaling) {
+                int scaledFocusGain = pHitEntry->focusGainOwn;
+                if (pOtherGuy->perfectScaling) {
+                    scaledFocusGain = scaledFocusGain * 50 / 100;
+                }
+                pResourceGuy->focus += scaledFocusGain;
+            }
+            // todo maybe rounding errors there? we got some with health scaling until moving to fixed
+            StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
+            int scaledSuperGain = pHitEntry->superGainOwn * style.gaugeGainRatio / 100;
+            if (pOtherGuy->perfectScaling) {
+                scaledSuperGain = scaledSuperGain * 80 / 100;
+            }
+            pResourceGuy->gauge += scaledSuperGain;
+            clampGuys.insert(pResourceGuy);
         }
 
         int destX = pHitEntry->moveDestX;
