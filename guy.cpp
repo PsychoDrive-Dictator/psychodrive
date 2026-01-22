@@ -3264,12 +3264,16 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
     }
 
+    bool appliedCoolDown = false;
     if (!parrying && (!burnout || pHitEffect->focusGainTarget > 0)) {
         focus += pHitEffect->focusGainTarget;
         log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
         if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
             // todo apparently start of hitstun except if super where it's after??
-            setFocusRegenCooldown(90 + 1);
+            if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
+                focusRegenCooldown++; // it freezes for one frame but doesn't apply
+            }
+            appliedCoolDown = true;
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
         }
     }
