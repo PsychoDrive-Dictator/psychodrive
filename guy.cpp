@@ -547,7 +547,9 @@ void Guy::RunFramePostPush(void)
     }
 
     //if (advancingTime) {
+    if (!wallStopped || !stunned) {
         DoFocusRegen(false);
+    }
     //}
 
     if (recoverableHealthCooldown) {
