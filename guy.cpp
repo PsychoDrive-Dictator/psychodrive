@@ -325,9 +325,9 @@ bool Guy::RunFrame(bool advancingTime)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
     if (!pSim->match && advancingTime && didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
         if (pOpponent && !pOpponent->comboHits) {
-            focusRegenCooldown = 3;
+            focusRegenCooldown = 2;
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (refill action start)");
-            pOpponent->focusRegenCooldown = 3;
+            pOpponent->focusRegenCooldown = 2;
             otherGuyLog(pOpponent, logResources, "regen cooldown " + std::to_string(pOpponent->focusRegenCooldown) + " (refill action start)");
         }
     }
@@ -593,7 +593,6 @@ void Guy::RunFramePostPush(void)
 void Guy::ExecuteTrigger(Trigger *pTrigger)
 {
     nextAction = pTrigger->actionID;
-    // apply condition flags BCM.TRIGGER.TAG.NEW_ID.json to make jamie jump cancel divekick work
     uint64_t flags = pTrigger->flags;
 
     blocking = false;
@@ -603,11 +602,14 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     // one-way, reset on combo end
     driveRushCancel = driveRushCancel || flags & (1ULL<<20);
     parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
-    if (flags & (1ULL<<20)) {
-        if (setFocusRegenCooldown(120)) {
-            focusRegenCooldown--;
-        }
-    }
+    bool dash = flags & (1ULL<<22) || flags & (1ULL<<23);
+    bool jump = flags & (1ULL<<26);
+
+    // if (flags & (1ULL<<20)) {
+    //     if (setFocusRegenCooldown(120)) {
+    //         focusRegenCooldown--;
+    //     }
+    // }
     if (flags & (1ULL<<21)) {
         if (setFocusRegenCooldown(240)) {
             focusRegenCooldown--;
@@ -634,7 +636,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         subjectToParryRecovery = true;
     }
 
-    if (flags & (1ULL<<26)) {
+    if (jump) {
         jumped = true;
 
         if (flags & (1ULL<<46)) {
@@ -668,6 +670,10 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     } else if (focusRegenCooldownFrozen) {
         // if we cancel out of the od move
         focusRegenCooldownFrozen = false;
+        // for some reason first-frame cancel of dash doesn't do that...
+        if ((!jump && !dash) && focusRegenCooldown) {
+            focusRegenCooldown--;
+        }
         log(logResources, "regen cooldown unfrozen (cancelled out of freeze move)");
     }
 
@@ -3262,7 +3268,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
         if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
             // todo apparently start of hitstun except if super where it's after??
-            setFocusRegenCooldown(90 + 1 + 1);
+            setFocusRegenCooldown(90 + 1);
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
         }
     }
@@ -3602,7 +3608,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         if (focusRegenCooldownFrozen) {
             focusRegenCooldownFrozen = false;
             if (focusRegenCooldown) {
-                focusRegenCooldown += 2;
+                focusRegenCooldown++;
             }
             log(logResources, "regen cooldown unfrozen (hit out of freeze move)");
         }
@@ -4114,7 +4120,7 @@ void Guy::DoBranchKey(bool preHit)
 
 void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
 {
-    bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0;
+    bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0 && !focusRegenCooldownTicking;
     if (driveRushCancel || (pOpponent && pOpponent->driveScaling)) {
         doRegen = false;
     }
@@ -4197,13 +4203,21 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (endHitStopFrame || endWarudoFrame) {
             tickRegenCooldown = false;
         }
-        if (tickRegenCooldown && focusRegenCooldown > 0) {
-            focusRegenCooldown--;
-            log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
-            // if (getHitStop() > 1 && focusRegenCooldown == 0) {
-            //     focusRegenCooldown = 1;
-            //     log(logResources, "final regen cooldown tick down undone bc hitstop");
-            // }
+        if (deferredFocusCost) {
+            tickRegenCooldown = false;
+        }
+        if (tickRegenCooldown) {
+            if (focusRegenCooldown > 0) {
+                focusRegenCooldown--;
+                focusRegenCooldownTicking = true;
+                log(logResources, "regen cooldown tick down " + std::to_string(focusRegenCooldown));
+                // if (getHitStop() > 1 && focusRegenCooldown == 0) {
+                //     focusRegenCooldown = 1;
+                //     log(logResources, "final regen cooldown tick down undone bc hitstop");
+                // }
+            } else {
+                focusRegenCooldownTicking = false;
+            }
         }
     }
 
@@ -4613,7 +4627,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         parrying = false;
                         if (successfulParry) {
                             // override to lower amount without helper
-                            focusRegenCooldown = 20 + 1;
+                            focusRegenCooldown = 20;
                             focusRegenCooldownFrozen = false;
                         }
                     } else {
@@ -4749,7 +4763,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
             if (successfulParry) {
                 // override to lower amount without helper
-                focusRegenCooldown = 20 + 1;
+                focusRegenCooldown = 20;
                 focusRegenCooldownFrozen = false;
             }
         }
@@ -4840,6 +4854,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         throwTechOrigin = getPosX();
     }
 
+    // transition point!
     if (nextAction != -1) {
         NextAction(didTrigger, didBranch);
         didTransition = true;
@@ -4903,7 +4918,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (!didTrigger && !didBranch && didTransition && focusRegenCooldownFrozen) {
+    if (((!didTrigger && !didBranch && didTransition) || canMoveNow) && focusRegenCooldownFrozen) {
         // if we recovered out of an OD move - trigger handled directly in execute
         focusRegenCooldownFrozen = false;
         log(logResources, "regen cooldown unfrozen (recovered out of freeze move)");
@@ -5159,7 +5174,7 @@ void Guy::DoSwitchKey(void)
             // } else {
             //     setFocusRegenCooldown(120);
             // }
-            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
+            //log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
                 pOpponent->driveScaling = true;
             }

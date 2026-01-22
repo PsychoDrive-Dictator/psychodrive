@@ -761,6 +761,7 @@ private:
         }
         uniqueTimer = false;
         focusRegenCooldownFrozen = false;
+        focusRegenCooldownTicking = false;
         burnout = false;
         superAnimation = false;
         superFreeze = false;
@@ -890,6 +891,7 @@ private:
     bool wasDrive : 1;
     bool uniqueTimer : 1;
     bool focusRegenCooldownFrozen : 1;
+    bool focusRegenCooldownTicking : 1;
     bool burnout : 1;
     bool superAnimation : 1;
     bool superFreeze : 1;
