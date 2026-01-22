@@ -3264,10 +3264,14 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
     }
 
-    if (!parrying && (!burnout || pHitEffect->focusGainTarget > 0)) {
-        focus += pHitEffect->focusGainTarget;
-        log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
-        if (pHitEffect->focusGainTarget < 0 && !superFreeze) {
+    int scaledFocusGain = pHitEffect->focusGainTarget;
+    if (!parrying && (!burnout || scaledFocusGain > 0)) {
+        if (perfectScaling && scaledFocusGain < 0) {
+            scaledFocusGain = scaledFocusGain * 50 / 100;
+        }
+        focus += scaledFocusGain;
+        log(logResources, "focus " + std::to_string(scaledFocusGain) + " (hit), total " + std::to_string(focus));
+        if (scaledFocusGain < 0 && !superFreeze) {
             // todo apparently start of hitstun except if super where it's after??
             if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
                 focusRegenCooldown++; // it freezes for one frame but doesn't apply
@@ -3275,7 +3279,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
         }
     }
-    gauge += pHitEffect->superGainTarget;
+    int scaledSuperGain = pHitEffect->superGainTarget;
+    if (perfectScaling) {
+        scaledSuperGain = scaledSuperGain * 80 / 100;
+    }
+    gauge += scaledSuperGain;
 
     Guy *pResourceGuy = pAttacker;
     if (pAttacker->isProjectile) {
@@ -3283,11 +3291,18 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
     // set resources directly, will be clamped by caller, for trades
     if (!pResourceGuy->driveRushCancel && !driveScaling) {
-        pResourceGuy->focus += pHitEffect->focusGainOwn;
+        scaledFocusGain = pHitEffect->focusGainOwn;
+        if (perfectScaling) {
+            scaledFocusGain = scaledFocusGain * 50 / 100;
+        }
+        pResourceGuy->focus += scaledFocusGain;
     }
     // todo maybe rounding errors there? we got some with health scaling until moving to fixed
     StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
-    int scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
+    scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
+    if (perfectScaling) {
+        scaledSuperGain = scaledSuperGain * 80 / 100;
+    }
     pResourceGuy->gauge += scaledSuperGain;
 
     if (applyHit) {
