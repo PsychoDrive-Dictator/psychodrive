@@ -3264,7 +3264,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
     }
 
-    bool appliedCoolDown = false;
     if (!parrying && (!burnout || pHitEffect->focusGainTarget > 0)) {
         focus += pHitEffect->focusGainTarget;
         log(logResources, "focus " + std::to_string(pHitEffect->focusGainTarget) + " (hit), total " + std::to_string(focus));
@@ -3273,7 +3272,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
                 focusRegenCooldown++; // it freezes for one frame but doesn't apply
             }
-            appliedCoolDown = true;
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
         }
     }
@@ -3606,7 +3604,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     if (appliedAction) {
         NextAction(false, false);
-        DoStatusKey();
         WorldPhysics(true);
 
         // if you get hit out of an od move?
@@ -4147,7 +4144,7 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
             focusRegenAmount = 20;
             // todo burnout
         }
-        if (jumped && getAirborne()) {
+        if (getAirborne()) {
             focusRegenAmount = 20;
         }
         if (currentAction == 10 || (currentAction == 9 && currentFrame >= 10)) {
@@ -5144,6 +5141,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         actionStatus = 0;
         jumpStatus = 0;
         landingAdjust = 0;
+        DoStatusKey();
     }
 }
 
