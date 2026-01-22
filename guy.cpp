@@ -4896,11 +4896,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if ((currentAction == 321 || currentAction == 320) && currentFrame == 1) {
         hitVelX = Fixed(-13) * direction;
         hitAccelX = Fixed(1) * direction;
-
-        if (currentAction == 320) {
-            setGauge(gauge + 1000);
-            setFocus(focus + 10000);
-        }
     }
 
     if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
@@ -5786,8 +5781,9 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                             log(logUnknowns, "unknown chara event id " + std::to_string(eventID));
                             break;
                         case 36:
-                            // todo gauge add - see walk forward, etc - param1 is type of bar? 4 for drive
-                            if (param1 == 4 && focus != 0) { // todo poor mans burnout
+                            if (param1 == 2) {
+                                setGauge(gauge + param2);
+                            } else if (param1 == 4) {
                                 setFocus(focus + param2);
                                 log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
                                 if (param2 < 0 && (!parrying || !successfulParry)) {
