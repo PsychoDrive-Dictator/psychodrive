@@ -4920,7 +4920,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (((!didTrigger && !didBranch && didTransition) || canMoveNow) && focusRegenCooldownFrozen) {
+    if (((!didTrigger && !didBranch && didTransition && currentAction != 482) || canMoveNow) && focusRegenCooldownFrozen) {
         // if we recovered out of an OD move - trigger handled directly in execute
         focusRegenCooldownFrozen = false;
         log(logResources, "regen cooldown unfrozen (recovered out of freeze move)");
@@ -5772,7 +5772,7 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                                 if (param2 < 0) {
                                     // same as spending bar on od move
                                     if (!setFocusRegenCooldown(parrying?240:120)) {
-                                        focusRegenCooldown--;
+                                        //focusRegenCooldown--;
                                     }
                                     focusRegenCooldownFrozen = true;
                                     log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (eventkey, frozen)");
