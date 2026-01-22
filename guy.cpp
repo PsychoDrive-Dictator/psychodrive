@@ -4162,7 +4162,7 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
         // but they shouldn't happen in hitstop..
         int focusRegenAmount = burnout ? 50 : 40;
 
-        if (hitStun) {
+        if (hitStun && !blocking) {
             focusRegenAmount = burnout ? 25 : 20;
         }
         if (getAirborne()) {
