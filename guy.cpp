@@ -569,10 +569,12 @@ void Guy::RunFramePostPush(void)
         setFocus(focus + deferredFocusCost);
         log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
         deferredFocusCost = 0;
-        if (!setFocusRegenCooldown(parrying?240:120)) {
-            focusRegenCooldown--;
+        if (!parrying || !successfulParry) {
+            if (!setFocusRegenCooldown(parrying?240:120)) {
+                focusRegenCooldown--;
+            }
+            focusRegenCooldownFrozen = true;
         }
-        focusRegenCooldownFrozen = true;
         log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
     }
 
@@ -2797,6 +2799,9 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
 
                 // find the parry gains in common[0], weird
                 pOtherGuy->focus += hitBox.pHitData->common[0].parryGain;
+
+                pOtherGuy->focusRegenCooldown = 20;
+                pOtherGuy->focusRegenCooldownFrozen = true;
             }
 
             if (pGuy->isProjectile) {
@@ -2961,10 +2966,12 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             guy->setFocus(guy->focus - guy->deferredFocusCost);
             //log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
             guy->deferredFocusCost = 0;
-            if (!guy->setFocusRegenCooldown(guy->parrying?240:120)) {
-                guy->focusRegenCooldown--;
+            if (!guy->parrying || !guy->successfulParry) {
+                if (!guy->setFocusRegenCooldown(guy->parrying?240:120)) {
+                    guy->focusRegenCooldown--;
+                }
+                guy->focusRegenCooldownFrozen = true;
             }
-            guy->focusRegenCooldownFrozen = true;
             //log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (deferred spend, frozen)");
         }
         // clamp once everything is done, in case of trade
@@ -4642,9 +4649,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         nextAction = 482;
                         parrying = false;
                         if (successfulParry) {
-                            // override to lower amount without helper
-                            focusRegenCooldown = 20;
-                            focusRegenCooldownFrozen = false;
+                            // // override to lower amount without helper
+                            // focusRegenCooldown = 20;
+                            // focusRegenCooldownFrozen = false;
                         }
                     } else {
                         // entering a new parry, clear successful bit
@@ -4662,6 +4669,26 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 throwProtectionFrames = 2;
                 log (logTransitions, "2f throw protection applied!");
             }
+        }
+    }
+
+    if (!hitStun && parrying && (burnout || (currentInput & (32+256)) != 32+256)) {
+        if (burnout || currentAction != 480 || currentFrame >= 12) {
+            parrying = false;
+            nextAction = 482; // DPA_STD_END
+
+            if (successfulParry) {
+                // // override to lower amount without helper
+                // focusRegenCooldown = 20;
+                // focusRegenCooldownFrozen = false;
+            }
+        }
+    }
+
+    if (parrying && parryHoldFreebieFrames) {
+        parryHoldFreebieFrames--;
+        if (!parryHoldFreebieFrames) {
+            subjectToParryRecovery = true;
         }
     }
 
@@ -4769,26 +4796,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             if (!(moveInput & 2) && (crouching || getCrouching()) && currentAction != 6) {
                 nextAction = 6;
             }
-        }
-    }
-
-    if (!hitStun && parrying && (burnout || (currentInput & (32+256)) != 32+256)) {
-        if (burnout || currentAction != 480 || currentFrame >= 12) {
-            parrying = false;
-            nextAction = 482; // DPA_STD_END
-
-            if (successfulParry) {
-                // override to lower amount without helper
-                focusRegenCooldown = 20;
-                focusRegenCooldownFrozen = false;
-            }
-        }
-    }
-
-    if (parrying && parryHoldFreebieFrames) {
-        parryHoldFreebieFrames--;
-        if (!parryHoldFreebieFrames) {
-            subjectToParryRecovery = true;
         }
     }
 
@@ -5783,7 +5790,7 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                             if (param1 == 4 && focus != 0) { // todo poor mans burnout
                                 setFocus(focus + param2);
                                 log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
-                                if (param2 < 0) {
+                                if (param2 < 0 && (!parrying || !successfulParry)) {
                                     // same as spending bar on od move
                                     if (!setFocusRegenCooldown(parrying?240:120)) {
                                         //focusRegenCooldown--;
