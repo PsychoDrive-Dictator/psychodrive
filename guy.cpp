@@ -4138,11 +4138,10 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
     if (doRegen) {
         // the hitstun and walk forward frame may be off by one in hitstop
         // but they shouldn't happen in hitstop..
-        int focusRegenAmount = 40;
+        int focusRegenAmount = burnout ? 50 : 40;
 
         if (hitStun) {
-            focusRegenAmount = 20;
-            // todo burnout
+            focusRegenAmount = burnout ? 25 : 20;
         }
         if (getAirborne()) {
             focusRegenAmount = 20;
