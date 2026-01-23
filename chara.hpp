@@ -59,6 +59,8 @@ struct CommandInput {
     uint32_t okCondFlags;
     uint32_t ngKeyFlags;
     uint32_t ngCondFlags;
+    uint32_t failKeyFlags;
+    uint32_t failCondFlags;
 
     int rotatePointsNeeded;
 

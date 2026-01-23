@@ -67,6 +67,8 @@ void loadCommands(nlohmann::json* pCommandsJson, CharacterData* pRet)
                 input.okCondFlags = (*pInputNorm)["ok_key_cond_check_flags"];
                 input.ngKeyFlags = (*pInputNorm)["ng_key_flags"];
                 input.ngCondFlags = (*pInputNorm)["ng_key_cond_check_flags"];
+                input.failKeyFlags = (*pInputNorm)["ignore_key_flags"];
+                input.failCondFlags = (*pInputNorm)["ignore_key_cond_check_flags"];
 
                 if (input.type == InputType::Rotation) {
                     input.rotatePointsNeeded = (*pInput)["rotate"]["point"];

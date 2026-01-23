@@ -895,6 +895,7 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
         int bufferInput = dc.inputBuffer[inputBufferCursor];
 
         bool inputNg = false;
+        bool inputFail = false;
 
         // we venture past the allowed buffer here technically
         bool onlyNegativeEdge = needPositiveEdge && inputBufferCursor == maxSearch - 1;
@@ -906,7 +907,14 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
         } else if (pInput->ngKeyFlags & bufferInput) {
             inputNg = true;
         }
-        if (inputNg && !match) {
+        if (pInput->failCondFlags & 2) {
+            if ((bufferInput & 0xF) == (pInput->failKeyFlags & 0xF)) {
+                inputFail = true;
+            }
+        } else if (pInput->failKeyFlags & bufferInput) {
+            inputFail = true;
+        }
+        if (inputFail && !match) {
             fail = true;
             break;
         }
