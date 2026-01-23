@@ -631,7 +631,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         wasDrive = false;
     }
 
-    if (parrying && currentInput & DOWN) {
+    if (parrying && getCrouching()) {
         nextAction = 489;
     }
 
@@ -4709,7 +4709,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     if (!hitStun && parrying && (burnout || (currentInput & (32+256)) != 32+256)) {
-        if (burnout || currentAction != 480 || currentFrame >= 12) {
+        if (burnout || (currentAction != 480 && currentAction != 489) || currentFrame >= 12) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
 
