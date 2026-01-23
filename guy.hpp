@@ -343,6 +343,7 @@ public:
         Input(0);
     
         UpdateActionData();
+        DoInstantAction(581); // IMM_ROUND_INIT - todo find better spot later
 
         DoTriggers();
 
