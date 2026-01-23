@@ -8309,6 +8309,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_guile_chunli",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 7126,
+                "firstFrame": 308,
+                "lastFrame": 3770
+            },
+            {
+                "count": 1278,
+                "firstFrame": 392,
+                "lastFrame": 3644
+            },
+            {
+                "count": 543,
+                "firstFrame": 570,
+                "lastFrame": 3630
+            },
+            {
+                "count": 1347,
+                "firstFrame": 299,
+                "lastFrame": 3624
+            },
+            {
+                "count": 1234,
+                "firstFrame": 299,
+                "lastFrame": 3624
+            },
+            {
+                "count": 3233,
+                "firstFrame": 290,
+                "lastFrame": 3770
+            },
+            {
+                "count": 3739,
+                "firstFrame": 298,
+                "lastFrame": 3770
+            },
+            {
+                "count": 1040,
+                "firstFrame": 353,
+                "lastFrame": 3644
+            },
+            {
+                "count": 1463,
+                "firstFrame": 485,
+                "lastFrame": 3770
+            },
+            {
+                "count": 6602,
+                "firstFrame": 353,
+                "lastFrame": 3770
+            },
+            {
+                "count": 812,
+                "firstFrame": 353,
+                "lastFrame": 3575
+            },
+            {
+                "count": 12907,
+                "firstFrame": 298,
+                "lastFrame": 3770
+            }
+        ]
+    },
+    {
         "testName": "zz_match_luke_jp",
         "testVersion": "39",
         "finished": true,
