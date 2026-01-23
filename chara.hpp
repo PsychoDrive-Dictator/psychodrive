@@ -210,10 +210,20 @@ struct HitData {
     HitEntry param[20];
 };
 
+struct UniqueBoxOp {
+    int op = 0;
+    int opParam0;
+    int opParam1;
+    int opParam2;
+    int opParam3;
+    int opParam4;
+};
+
 enum KeyType {
     HurtBoxKeyType = 0,
     PushBoxKeyType = 1,
-    HitBoxKeyType = 2
+    HitBoxKeyType = 2,
+    UniqueBoxKeyType = 3,
 };
 
 struct Key {
@@ -263,6 +273,15 @@ struct HitBoxKey : BoxKey {
     bool hasHitID = false;
     int hitID;
 
+    std::vector<Rect *> rects;
+};
+
+struct UniqueBoxKey : BoxKey {
+    UniqueBoxKey() { keyType = UniqueBoxKeyType; }
+
+    bool uniquePitcher = false;
+
+    std::vector<UniqueBoxOp> ops;
     std::vector<Rect *> rects;
 };
 
@@ -405,6 +424,7 @@ struct Action {
     std::vector<HurtBoxKey> hurtBoxKeys;
     std::vector<PushBoxKey> pushBoxKeys;
     std::vector<HitBoxKey> hitBoxKeys;
+    std::vector<UniqueBoxKey> uniqueBoxKeys;
     std::vector<SteerKey> steerKeys;
     std::vector<PlaceKey> placeKeys;
     std::vector<SwitchKey> switchKeys;

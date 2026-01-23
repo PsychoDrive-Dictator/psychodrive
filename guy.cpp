@@ -1699,8 +1699,6 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
             collisionColor = {0.0,1.0,0.5};
         } else if (type == proximity_guard) {
             collisionColor = {0.5,0.5,0.5};
-        } else if (type == unique) {
-            collisionColor = {0.0,0.5,0.0};
         }
 
         float thickness = 50.0;
@@ -1733,6 +1731,41 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
     }
 }
 
+void Guy::getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes)
+{
+    if (!pCurrentAction) {
+        return;
+    }
+
+    for (auto& hitBoxKey : pCurrentAction->uniqueBoxKeys)
+    {
+        if (hitBoxKey.startFrame > currentFrame || hitBoxKey.endFrame <= currentFrame) {
+            continue;
+        }
+
+        if (!CheckHitBoxCondition(hitBoxKey.condition)) {
+            continue;
+        }
+
+        Fixed rootOffsetX = hitBoxKey.offsetX;
+        Fixed rootOffsetY = hitBoxKey.offsetY;
+        rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
+        rootOffsetY = rootOffsetY + posY + posOffsetY;
+
+        color boxColor = {0.0,4.0,0.0};
+
+        for (auto pRect : hitBoxKey.rects) {
+            Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+            if (pOutRenderBoxes) {
+                pOutRenderBoxes->push_back({rect, 50.0, boxColor, false});
+            }
+            if (pOutHitBoxes) {
+                pOutHitBoxes->push_back({rect, hitBoxKey.uniquePitcher, &hitBoxKey.ops});
+            }
+        }
+    }
+}
+
 
 void Guy::Render(float z /* = 0.0f */) {
     Fixed fixedX = posX + (posOffsetX * direction);
@@ -1744,6 +1777,7 @@ void Guy::Render(float z /* = 0.0f */) {
     getHurtBoxes(nullptr, nullptr, &renderBoxes);
     getPushBoxes(nullptr, &renderBoxes);
     getHitBoxes(nullptr, &renderBoxes);
+    getUniqueBoxes(nullptr, &renderBoxes);
 
     for (auto box : renderBoxes) {
         drawHitBox(box.box,thickboxes?box.thickness:1,z,box.col,box.drive,box.parry,box.di);
@@ -2260,11 +2294,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
     getHitBoxes(&hitBoxes);
 
-    if (isProjectile && hitSpanFrames) {
-        return;
-    }
-
     for (auto const &hitbox : hitBoxes ) {
+        if ((hitbox.type == hit || hitbox.type == projectile || hitbox.type == grab) && isProjectile && hitSpanFrames) {
+            continue;
+        }
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
             continue;
         }
@@ -2561,7 +2594,7 @@ AtemiData *Guy::findAtemi(int atemiID)
     return nullptr;
 }
 
-void ResolveHits(std::vector<PendingHit> &pendingHitList)
+void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 {
     std::unordered_set<Guy *> hitGuys;
     std::unordered_set<Guy *> clampGuys;
@@ -3033,6 +3066,61 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
         // clamp once everything is done, in case of trade
         guy->setFocus(guy->focus);
         guy->setGauge(guy->gauge);
+    }
+
+    // do unique interactions now
+    std::unordered_set<Guy*> pitchers;
+    std::unordered_set<Guy*> catchers;
+
+    for (Guy *guy : pSim->everyone) {
+        std::vector<UniqueBox> uniqueBoxes;
+        guy->getUniqueBoxes(&uniqueBoxes);
+        for (UniqueBox &box : uniqueBoxes) {
+            if (box.uniquePitcher) {
+                pitchers.insert(guy);
+            } else {
+                catchers.insert(guy);
+            }
+        }
+    }
+
+    for (Guy *pitcher : pitchers) {
+        for (Guy *catcher : catchers) {
+            std::vector<UniqueBox> uniqueBoxesPitcher;
+            pitcher->getUniqueBoxes(&uniqueBoxesPitcher);
+            std::vector<UniqueBox> uniqueBoxesCatcher;
+            catcher->getUniqueBoxes(&uniqueBoxesCatcher);
+
+            for (UniqueBox &pitcherBox : uniqueBoxesPitcher) {
+                if (!pitcherBox.uniquePitcher) {
+                    continue;
+                }
+                for (UniqueBox &catcherBox : uniqueBoxesCatcher) {
+                    if (catcherBox.uniquePitcher) {
+                        continue;
+                    }
+                    if (doBoxesHit(pitcherBox.box, catcherBox.box)) {
+                        for (UniqueBoxOp &op : *pitcherBox.pOps) {
+                            if (op.op == 1) {
+                                Guy *pGuyUniqueParamOp = pitcher;
+                                if (pitcher->pParent) {
+                                    pGuyUniqueParamOp = pitcher->pParent;
+                                }
+                                if (op.opParam0) {
+                                    if (op.opParam1 == 0) {
+                                        pGuyUniqueParamOp->uniqueParam[op.opParam0-1] = op.opParam2;
+                                    } else if (op.opParam1 == 1) { 
+                                        pGuyUniqueParamOp->uniqueParam[op.opParam0-1] += op.opParam2;
+                                    }
+                                } else {
+                                    pGuyUniqueParamOp->guyLog(true, "aa? not off by 1?");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -3959,13 +4047,19 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 29: // unique param
-                    if (branchParam1 >= 0 && branchParam1 < uniqueParamCount) {
-                        doBranch = conditionOperator(branchParam2, uniqueParam[branchParam1], branchParam3, "unique param");
-                    }
-                    // _only_ do the branch in prehit, opposite from usual
-                    // needs checked before we've evaluated the eventkey that can bump unique
-                    if (!preHit) {
-                        doBranch = false;
+                    {
+                        Guy *pGuyUniqueParamOp = this;
+                        if (pParent) {
+                            pGuyUniqueParamOp = pParent;
+                        }
+                        if (branchParam1 >= 0 && branchParam1 < uniqueParamCount) {
+                            doBranch = conditionOperator(branchParam2, pGuyUniqueParamOp->uniqueParam[branchParam1], branchParam3, "unique param");
+                        }
+                        // _only_ do the branch in prehit, opposite from usual
+                        // needs checked before we've evaluated the eventkey that can bump unique
+                        if (!preHit) {
+                            doBranch = false;
+                        }
                     }
                     break;
                 case 30: // unique timer

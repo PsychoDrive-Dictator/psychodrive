@@ -728,7 +728,7 @@ static void mainloop(void)
                 guy->CheckHit(guy->getOpponent(), pendingHitList);
             }
 
-            ResolveHits(pendingHitList);
+            ResolveHits(&defaultSim, pendingHitList);
 
             static bool hasAddedData = false;
             // update plot range if we're doing that

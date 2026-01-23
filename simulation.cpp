@@ -235,7 +235,7 @@ void Simulation::RunFrame(void) {
         guy->CheckHit(guy->getOpponent(), pendingHitList);
     }
 
-    ResolveHits(pendingHitList);
+    ResolveHits(this, pendingHitList);
 
     if (replayingGameStateDump) {
         static bool firstFrame = true;

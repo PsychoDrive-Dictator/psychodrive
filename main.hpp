@@ -151,7 +151,6 @@ enum hitBoxType {
     destroy_projectile = 5,
     proximity_guard = 6,
     direct_damage = 7,
-    unique = 8,
 };
 
 enum hitBoxFlags {
@@ -184,6 +183,12 @@ struct HitBox {
     int hitID;
     int flags;
     struct HitData *pHitData = nullptr;
+};
+
+struct UniqueBox {
+    Box box;
+    bool uniquePitcher;
+    std::vector<struct UniqueBoxOp> *pOps;
 };
 
 struct HurtBox {

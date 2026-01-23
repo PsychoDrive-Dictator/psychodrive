@@ -343,7 +343,7 @@ void loadPushBoxKeys(nlohmann::json* pPushBoxJson, std::vector<PushBoxKey>* pOut
     }
 }
 
-void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, bool isOther, bool isUnique, std::map<int, HitData*>& hitByID)
+void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, bool isOther, std::map<int, HitData*>& hitByID)
 {
     if (!pHitBoxJson) {
         return;
@@ -371,97 +371,90 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         }
 
         hitBoxType type = hit;
-        int rectListID = 0;
-        if (!isUnique) {
-            int collisionType = hitBox["CollisionType"];
-            rectListID = collisionType;
+        int collisionType = hitBox["CollisionType"];
+        int rectListID = collisionType;
 
-            if (isOther) {
-                if (collisionType == 7) {
-                    type = domain;
-                } else if (collisionType == 10) {
-                    type = destroy_projectile;
-                } else if (collisionType == 11) {
-                    type = direct_damage;
-                }
-                rectListID = 9;
-            } else {
-                if (collisionType == 3) {
-                    type = proximity_guard;
-                } else if (collisionType == 2) {
-                    type = grab;
-                } else if (collisionType == 1) {
-                    type = projectile;
-                } else if (collisionType == 0) {
-                    type = hit;
-                }
+        if (isOther) {
+            if (collisionType == 7) {
+                type = domain;
+            } else if (collisionType == 10) {
+                type = destroy_projectile;
+            } else if (collisionType == 11) {
+                type = direct_damage;
             }
-
-            newKey.type = type;
-            int hitEntryID = hitBox["AttackDataListIndex"];
-            auto hitIt = hitByID.find(hitEntryID);
-            if (hitIt != hitByID.end()) {
-                newKey.pHitData = hitIt->second;
-            }
-
-            int hitID = hitBox["HitID"];
-            bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
-            if (type == domain || type == direct_damage) {
-                hasHitID = false;
-            }
-            if (hitID < 0) {
-                hitID = 15;
-            }
-            if (hasHitID == false) {
-                hitID = -1;
-            }
-            if (hitID == 15 || type == domain) {
-                hitID = 15 + atoi(hitBoxID.c_str());
-                if (hitID >= 64) {
-                    log("hitID overflow for domain boxes!");
-                }
-            }
-            newKey.hasHitID = hasHitID;
-            newKey.hitID = hitID;
-
-            newKey.flags = (hitBoxFlags)0;
-            if (hitBox.value("_IsGuardBit", false)) {
-                int guardBit = hitBox["GuardBit"];
-                if ((guardBit & 3) == 1) {
-                    newKey.flags = (hitBoxFlags)(newKey.flags | overhead);
-                }
-                if ((guardBit & 3) == 2) {
-                    newKey.flags = (hitBoxFlags)(newKey.flags | low);
-                }
-            }
-
-            int flags = hitBox["KindFlag"];
-            // ty gelly the homie
-            if (flags & 0x10) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | avoids_standing);
-            }
-            if (flags & 0x20) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | avoids_crouching);
-            }
-            if (flags & 0x40) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | avoids_airborne);
-            }
-            if (flags & 0x100) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_behind);
-            }
-            if (flags & 0x200) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_front);
-            }
-            if (flags & 0x40000) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
-            }
-            if (flags & 0x100000) {
-                newKey.flags = (hitBoxFlags)(newKey.flags | multi_counter);
-            }
+            rectListID = 9;
         } else {
-            type = unique;
-            newKey.type = type;
-            rectListID = 6;
+            if (collisionType == 3) {
+                type = proximity_guard;
+            } else if (collisionType == 2) {
+                type = grab;
+            } else if (collisionType == 1) {
+                type = projectile;
+            } else if (collisionType == 0) {
+                type = hit;
+            }
+        }
+
+        newKey.type = type;
+        int hitEntryID = hitBox["AttackDataListIndex"];
+        auto hitIt = hitByID.find(hitEntryID);
+        if (hitIt != hitByID.end()) {
+            newKey.pHitData = hitIt->second;
+        }
+
+        int hitID = hitBox["HitID"];
+        bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
+        if (type == domain || type == direct_damage) {
+            hasHitID = false;
+        }
+        if (hitID < 0) {
+            hitID = 15;
+        }
+        if (hasHitID == false) {
+            hitID = -1;
+        }
+        if (hitID == 15 || type == domain) {
+            hitID = 15 + atoi(hitBoxID.c_str());
+            if (hitID >= 64) {
+                log("hitID overflow for domain boxes!");
+            }
+        }
+        newKey.hasHitID = hasHitID;
+        newKey.hitID = hitID;
+
+        newKey.flags = (hitBoxFlags)0;
+        if (hitBox.value("_IsGuardBit", false)) {
+            int guardBit = hitBox["GuardBit"];
+            if ((guardBit & 3) == 1) {
+                newKey.flags = (hitBoxFlags)(newKey.flags | overhead);
+            }
+            if ((guardBit & 3) == 2) {
+                newKey.flags = (hitBoxFlags)(newKey.flags | low);
+            }
+        }
+
+        int flags = hitBox["KindFlag"];
+        // ty gelly the homie
+        if (flags & 0x10) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_standing);
+        }
+        if (flags & 0x20) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_crouching);
+        }
+        if (flags & 0x40) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_airborne);
+        }
+        if (flags & 0x100) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_behind);
+        }
+        if (flags & 0x200) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_front);
+        }
+        if (flags & 0x40000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
+        }
+        if (flags & 0x100000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | multi_counter);
         }
         if (type == domain) {
             pOutputVector->push_back(newKey);
@@ -476,6 +469,56 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
             if (!newKey.rects.empty() || type == proximity_guard) {
                 pOutputVector->push_back(newKey);
             }
+        }
+    }
+}
+
+void loadUniqueBoxKeys(nlohmann::json* pHitBoxJson, std::vector<UniqueBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs)
+{
+    if (!pHitBoxJson) {
+        return;
+    }
+
+    for (auto& [hitBoxID, hitBox] : pHitBoxJson->items()) {
+        if (!hitBox.contains("_StartFrame")) {
+            continue;
+        }
+        UniqueBoxKey newKey;
+        newKey.startFrame = hitBox["_StartFrame"];
+        newKey.endFrame = hitBox["_EndFrame"];
+        newKey.condition = hitBox["Condition"];
+        newKey.offsetX = Fixed(0);
+        newKey.offsetY = Fixed(0);
+        if (hitBox.contains("RootOffset")) {
+            newKey.offsetX = Fixed(hitBox["RootOffset"].value("X", 0));
+            newKey.offsetY = Fixed(hitBox["RootOffset"].value("Y", 0));
+        }
+
+        int rectListID = 6;
+
+        newKey.uniquePitcher = hitBox["CheckType"] == 0;
+
+        newKey.ops.reserve(hitBox["Datas"].size());
+        for (auto& [dataID, dataOp] : hitBox["Datas"].items()) {
+            UniqueBoxOp newOp;
+            newOp.op = dataOp["OpeType"];
+            newOp.opParam0 = dataOp["Param00"];
+            newOp.opParam1 = dataOp["Param01"];
+            newOp.opParam2 = dataOp["Param02"];
+            newOp.opParam3 = dataOp["Param03"];
+            newOp.opParam4 = dataOp["Param04"];
+            newKey.ops.push_back(newOp);
+        }
+
+        newKey.rects.reserve(hitBox["BoxList"].size());
+        for (auto& [boxNumber, boxID] : hitBox["BoxList"].items()) {
+            auto it = rectsByIDs.find(std::make_pair(rectListID, boxID));
+            if (it != rectsByIDs.end()) {
+                newKey.rects.push_back(it->second);
+            }
+        }
+        if (!newKey.rects.empty()) {
+            pOutputVector->push_back(newKey);
         }
     }
 }
@@ -1049,19 +1092,18 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         if (key.contains("OtherCollisionKey")) {
             hitBoxKeyCount += key["OtherCollisionKey"].size() - 1;
         }
-        if (key.contains("UniqueCollisionKey")) {
-            hitBoxKeyCount += key["UniqueCollisionKey"].size() - 1;
-        }
         newAction.hitBoxKeys.reserve(hitBoxKeyCount);
 
         if (key.contains("AttackCollisionKey")) {
-            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, false, hitByID);
+            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, hitByID);
         }
         if (key.contains("OtherCollisionKey")) {
-            loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true, false, hitByID);
+            loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true, hitByID);
         }
+
         if (key.contains("UniqueCollisionKey")) {
-            loadHitBoxKeys(&key["UniqueCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, true, hitByID);
+            newAction.uniqueBoxKeys.reserve(key["UniqueCollisionKey"].size() - 1);
+            loadUniqueBoxKeys(&key["UniqueCollisionKey"], &newAction.uniqueBoxKeys, rectsByIDs);
         }
 
         size_t steerKeyCount = 0;

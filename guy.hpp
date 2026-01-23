@@ -21,7 +21,7 @@ const Fixed maxScreenCenterDisplacement = Fixed(550);
 
 const int maxFocus = 60000;
 
-void ResolveHits(std::vector<PendingHit> &pendingHitList);
+void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList);
 
 class Guy;
 
@@ -239,6 +239,7 @@ public:
 
     void getPushBoxes(std::vector<Box> *pOutPushBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
     void getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
+    void getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
     void getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pOutThrowBoxes = nullptr, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
 
     int getCurrentAction() { return currentAction; }
@@ -1080,7 +1081,7 @@ private:
         std::deque<std::string> logQueue;
     } nc;
 
-    friend void ResolveHits(std::vector<PendingHit> &pendingHitList);
+    friend void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList);
 };
 
 static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> &vecOutEveryone)
