@@ -2034,7 +2034,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
             landThreshold = Fixed(0);
         }
 
-        if (getPosY() - Fixed(landingAdjust) < landThreshold) {
+        if (getPosY() - Fixed(landingAdjust) <= landThreshold) {
             //log("floorpush pos");
             floorpush = true;
         }
