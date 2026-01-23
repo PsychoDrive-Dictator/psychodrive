@@ -2691,13 +2691,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (pOtherGuy->perfectScaling) {
                 scaledSuperGain = scaledSuperGain * 80 / 100;
             }
-            int superGainScaling = pResourceGuy->triggerSuperGainScaling;
-            for (Guy *pMinion : pResourceGuy->getMinions()) {
-                if (pMinion->triggerSuperGainScaling < superGainScaling) {
-                    superGainScaling = pMinion->triggerSuperGainScaling;
-                }
-            }
-            scaledSuperGain = scaledSuperGain * superGainScaling / 100;
+            scaledSuperGain = scaledSuperGain * pOtherGuy->superGainScaling / 100;
             pResourceGuy->gauge += scaledSuperGain;
             clampGuys.insert(pResourceGuy);
         }
@@ -3215,6 +3209,16 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
         }
 
+        Guy *pResourceGuy = pAttacker->pParent ? pAttacker->pParent : pAttacker;
+        if (pResourceGuy->triggerSuperGainScaling < superGainScaling) {
+            superGainScaling = pResourceGuy->triggerSuperGainScaling;
+        }
+        for (Guy *pResourceMinion : pResourceGuy->getMinions()) {
+            if (pResourceMinion->triggerSuperGainScaling < superGainScaling) {
+                superGainScaling = pResourceMinion->triggerSuperGainScaling;
+            }
+        }
+
         if (pAttacker->scalingTriggerID != lastScalingTriggerID && !applyScaling) {
             // the combo has moved past that attack, so the instant scale is baked in
             attackerInstantScale = 0;
@@ -3340,12 +3344,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
     if (perfectScaling) {
         scaledSuperGain = scaledSuperGain * 80 / 100;
-    }
-    int superGainScaling = pResourceGuy->triggerSuperGainScaling;
-    for (Guy *pMinion : pResourceGuy->getMinions()) {
-        if (pMinion->triggerSuperGainScaling < superGainScaling) {
-            superGainScaling = pMinion->triggerSuperGainScaling;
-        }
     }
     scaledSuperGain = scaledSuperGain * superGainScaling / 100;
     pResourceGuy->gauge += scaledSuperGain;
@@ -4845,6 +4843,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         comboHits = 0;
         currentScaling = 0;
         driveScaling = false;
+        superGainScaling = 100;
         resetComboCount = false;
         lastDamageScale = 0;
         if (pOpponent) {

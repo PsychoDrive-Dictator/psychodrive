@@ -709,6 +709,7 @@ private:
         currentScaling = 0;
         pendingScaling = 0;
         driveScaling = false;
+        superGainScaling = 100;
         perfectScaling = false;
         parryDriveRush = false;
         driveRushCancel = false;
@@ -1013,6 +1014,7 @@ private:
     // 2.0 was here
     int currentScaling;
     int pendingScaling;
+    int superGainScaling;
 
     int comboHits;
     int juggleCounter;
