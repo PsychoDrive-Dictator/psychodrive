@@ -151,6 +151,7 @@ enum hitBoxType {
     destroy_projectile = 5,
     proximity_guard = 6,
     direct_damage = 7,
+    unique = 8,
 };
 
 enum hitBoxFlags {

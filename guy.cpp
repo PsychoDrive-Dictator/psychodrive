@@ -1699,6 +1699,8 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
             collisionColor = {0.0,1.0,0.5};
         } else if (type == proximity_guard) {
             collisionColor = {0.5,0.5,0.5};
+        } else if (type == unique) {
+            collisionColor = {0.0,0.5,0.0};
         }
 
         float thickness = 50.0;
