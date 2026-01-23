@@ -3399,6 +3399,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     if (applyHit) {
         if (destY > 0 ) {
             airborne = true;
+            // todo this might be too late if they had knockdown state on.. we can delay extra landing transition if so
+            landed = false;
         }
 
         // special ground status, ground bounce OR tumble
