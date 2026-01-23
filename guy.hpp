@@ -684,6 +684,7 @@ private:
         hitStop = 0;
         pendingHitStop = 0;
         timeInHitStop = 0;
+        hitSpanFrames = 0;
         ignoreHitStop = false;
         wasIgnoreHitStop = false;
         ignoreWarudo = false;
@@ -996,6 +997,7 @@ private:
     int hitStop;
     int pendingHitStop;
     int timeInHitStop;
+    int hitSpanFrames;
 
     int scalingTriggerID;
     int lastTriggerFrame;

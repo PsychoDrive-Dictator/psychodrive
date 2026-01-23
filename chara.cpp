@@ -942,6 +942,7 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
                     newProj.clashPriority = (*pProjData)["ShotLevel"];
                     newProj.noPush = (*pProjData)["_NoPush"];
                     newProj.lifeTime = (*pProjData)["LifeTime"];
+                    newProj.hitSpan = (*pProjData)["HitSpan"];
 
                     (*pUniqueProjectiles)[dataIndex] = newProj;
                 }

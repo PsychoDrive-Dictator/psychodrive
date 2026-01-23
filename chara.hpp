@@ -376,6 +376,7 @@ struct ProjectileData {
     int clashPriority;
     bool noPush;
     int lifeTime;
+    int hitSpan;
 };
 
 struct StyleData {

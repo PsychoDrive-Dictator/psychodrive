@@ -321,6 +321,10 @@ bool Guy::RunFrame(bool advancingTime)
         return false;
     }
 
+    if (hitSpanFrames) {
+        hitSpanFrames--;
+    }
+
     // training mode refill rule, 'action' starts and both start regen (soon)
     // not in AdvanceFrame because that's where cooldown decreases and there's a sequencing issue if we do both there
     if (!pSim->match && advancingTime && didTrigger && currentAction != 17 && currentAction != 18 && focusRegenCooldown == -1 && !deferredFocusCost) {
@@ -373,6 +377,7 @@ bool Guy::RunFrame(bool advancingTime)
                 }
                 // log("initial hitcount " + std::to_string(projHitCount));
 
+                hitSpanFrames = 0;
                 airborne = pProjData->airborne;
                 int flagsX = pProjData->flags;
                 obeyHitID = flagsX & (1<<0);
@@ -2253,6 +2258,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
     getHitBoxes(&hitBoxes);
 
+    if (isProjectile && hitSpanFrames) {
+        return;
+    }
+
     for (auto const &hitbox : hitBoxes ) {
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
             continue;
@@ -2931,6 +2940,7 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (hitBox.type == projectile && !pGuy->obeyHitID) {
                 hitID = -1;
             }
+            pGuy->hitSpanFrames = pGuy->pCurrentAction->pProjectileData->hitSpan;
         }
 
         if (hitID != -1) {
