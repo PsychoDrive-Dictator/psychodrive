@@ -374,6 +374,7 @@ public:
         styleInstall = styleID;
 
         triggerInstantScale = parent.triggerInstantScale;
+        triggerSuperGainScaling = parent.triggerSuperGainScaling;
         scalingTriggerID = parent.scalingTriggerID;
         appliedScaling = parent.appliedScaling;
         superAction = parent.superAction;
@@ -652,6 +653,7 @@ private:
         currentFrame = 0;
         loopCount = 0;
         triggerInstantScale = 0;
+        triggerSuperGainScaling = 100;
         actionInstantScale = 0;
         nextActionOpponentAction = false;
         opponentAction = false;
@@ -974,6 +976,7 @@ private:
     int loopCount;
     int triggerInstantScale;
     int actionInstantScale;
+    int triggerSuperGainScaling;
     int superLevel;
 
     // todo round begin action needs to set that

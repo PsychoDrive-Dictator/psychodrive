@@ -162,6 +162,7 @@ void loadTriggers(nlohmann::json* pTriggersJson, CharacterData* pRet)
             trigger.gaugeCost = triggerData["gauge_consume"];
 
             trigger.comboInst = triggerData["combo_inst"];
+            trigger.comboSuperScaling = triggerData["combo_sp_gain"];
 
             trigger.flags = triggerData["category_flags"];
 

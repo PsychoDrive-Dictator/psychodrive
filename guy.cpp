@@ -659,6 +659,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         // todo is this right if projectiles hit out of order?
         triggerInstantScale = 0;
     }
+    triggerSuperGainScaling = pTrigger->comboSuperScaling;
 
     superAction = flags & (1ULL<<15);
     superLevel = 0;
@@ -2690,6 +2691,13 @@ void ResolveHits(std::vector<PendingHit> &pendingHitList)
             if (pOtherGuy->perfectScaling) {
                 scaledSuperGain = scaledSuperGain * 80 / 100;
             }
+            int superGainScaling = pResourceGuy->triggerSuperGainScaling;
+            for (Guy *pMinion : pResourceGuy->getMinions()) {
+                if (pMinion->triggerSuperGainScaling < superGainScaling) {
+                    superGainScaling = pMinion->triggerSuperGainScaling;
+                }
+            }
+            scaledSuperGain = scaledSuperGain * superGainScaling / 100;
             pResourceGuy->gauge += scaledSuperGain;
             clampGuys.insert(pResourceGuy);
         }
@@ -3333,6 +3341,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     if (perfectScaling) {
         scaledSuperGain = scaledSuperGain * 80 / 100;
     }
+    int superGainScaling = pResourceGuy->triggerSuperGainScaling;
+    for (Guy *pMinion : pResourceGuy->getMinions()) {
+        if (pMinion->triggerSuperGainScaling < superGainScaling) {
+            superGainScaling = pMinion->triggerSuperGainScaling;
+        }
+    }
+    scaledSuperGain = scaledSuperGain * superGainScaling / 100;
     pResourceGuy->gauge += scaledSuperGain;
 
     if (applyHit) {

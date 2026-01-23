@@ -116,6 +116,7 @@ struct Trigger {
     int gaugeCost;
 
     int comboInst;
+    int comboSuperScaling;
 
     int64_t flags = 0;
 };
