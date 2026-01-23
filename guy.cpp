@@ -2358,7 +2358,12 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     if (hitbox.type == projectile && hurtbox.flags & projectile_invul) {
                         continue;
                     }
-                    // todo air/ground strike invul here
+                    if (hurtbox.flags & air_strike_invul && getAirborne()) {
+                        continue;
+                    }
+                    if (hurtbox.flags & ground_strike_invul && !getAirborne()) {
+                        continue;
+                    }
 
                     if (hitbox.type == proximity_guard) {
                         if (!pOtherGuy->hurtBoxProxGuarded) {
