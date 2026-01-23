@@ -1106,7 +1106,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
     uint32_t dcExcFlags = pTrigger->dcExcFlags;
     uint32_t dcIncFlags = pTrigger->dcIncFlags;
     int precedingTime = pTrigger->precedingTime;
-
+    bool match = false;
     uint32_t initialCursorPos = cursorPos;
     int initialI = -1;
     bool initialMatch = false;
@@ -1159,7 +1159,6 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         initialMatch = atLeastOneNotConsumed && bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
         bool atLeastOneNotConsumed = false;
-        bool match = false;
         while (cursorPos < initialSearch)
         {
             // possible to be all zeroes?
@@ -1184,6 +1183,10 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
                 match = false;
                 break; // break once initialMatch no longer true, set i on last true
             }
+            if (dc.inputBuffer[cursorPos] & FROZEN) {
+                initialSearch++;
+                //log(true, "extending backroll window frozen " + std::to_string(searchWindow));
+            }
             cursorPos++;
         }
         if (atLeastOneNotConsumed == false) {
@@ -1198,19 +1201,22 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         initialI = cursorPos;
     }
     cursorPos = initialI;
-    if (okKeyFlags == 0) {
-        if (dcExcFlags != 0 ) {
-            if ((dcExcFlags & currentInput) != dcExcFlags) {
-                return false;
+    // there's some weirdness here - parry can be buffered sometimes?
+    if (match || !(pTrigger->flags & (1ULL<<40))) {
+        if (okKeyFlags == 0) {
+            if (dcExcFlags != 0 ) {
+                if ((dcExcFlags & currentInput) != dcExcFlags) {
+                    return false;
+                }
             }
-        }
-        if (dcIncFlags != 0 ) {
-            if (!(dcIncFlags & currentInput)) {
-                return false;
+            if (dcIncFlags != 0 ) {
+                if (!(dcIncFlags & currentInput)) {
+                    return false;
+                }
             }
         }
     }
-    return initialMatch;
+        return initialMatch;
 }
 
 bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI)
@@ -4709,7 +4715,14 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     if (!hitStun && parrying && (burnout || (currentInput & (32+256)) != 32+256)) {
-        if (burnout || (currentAction != 480 && currentAction != 489) || currentFrame >= 12) {
+        bool underMinimumTime = true;
+        if ((currentAction != 480 && currentAction != 489) || currentFrame >= 12) {
+            underMinimumTime = false;
+        }
+        if (nextAction == 480 || nextAction == 489) {
+            underMinimumTime = true;
+        }
+        if (burnout || !underMinimumTime) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
 
