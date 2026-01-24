@@ -671,6 +671,7 @@ private:
         currentInput = 0;
         framesSinceLastInput = 0;
         canHitID = 0;
+        uniqueOpsAppliedMask = 0;
         hitThisFrame = false;
         hasBeenBlockedThisFrame = false;
         hitArmorThisFrame = false;
@@ -1015,6 +1016,7 @@ private:
     Fixed hitReflectVelX;
     Fixed hitReflectAccelX;
     Fixed reflectThisFrame;
+    int uniqueOpsAppliedMask;
 
     // 2.0 was here
     int currentScaling;

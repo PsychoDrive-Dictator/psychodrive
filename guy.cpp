@@ -659,6 +659,8 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
         log(logTransitions, "forced jump status from trigger, direction " + std::to_string(jumpDirection));
     }
 
+    uniqueOpsAppliedMask = 0;
+
     triggerInstantScale = pTrigger->comboInst;
     if (pOpponent && !pOpponent->comboHits) {
         // todo is this right if projectiles hit out of order?
@@ -3103,8 +3105,14 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                         continue;
                     }
                     if (doBoxesHit(pitcherBox.box, catcherBox.box)) {
-                        catcher->ApplyUniqueBoxOps(pitcherBox, pitcher);
-                        pitcher->ApplyUniqueBoxOps(catcherBox, catcher);
+                        if (((catcher->uniqueOpsAppliedMask & pitcherBox.checkMask) != pitcherBox.checkMask) ||
+                            ((pitcher->uniqueOpsAppliedMask & catcherBox.checkMask) != catcherBox.checkMask)) {
+                            catcher->ApplyUniqueBoxOps(pitcherBox, pitcher);
+                            pitcher->ApplyUniqueBoxOps(catcherBox, catcher);
+                        }
+
+                        pitcher->uniqueOpsAppliedMask |= catcherBox.checkMask;
+                        catcher->uniqueOpsAppliedMask |= pitcherBox.checkMask;
                     }
                 }
             }
@@ -3114,9 +3122,9 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 
 void Guy::ApplyUniqueBoxOps(UniqueBox &box, Guy *src)
 {
+    Guy *pGuyUniqueParamOp = box.holderIsTarget ? this : src;
     for (UniqueBoxOp &op : *box.pOps) {
         if (op.op == 1) {
-            Guy *pGuyUniqueParamOp = box.holderIsTarget ? this : src;
             if (op.opParam0) {
                 if (op.opParam1 == 0) {
                     pGuyUniqueParamOp->uniqueParam[op.opParam0-1] = op.opParam2;
@@ -3124,7 +3132,17 @@ void Guy::ApplyUniqueBoxOps(UniqueBox &box, Guy *src)
                     pGuyUniqueParamOp->uniqueParam[op.opParam0-1] += op.opParam2;
                 }
             }
-        } else if (op.op != 0) {
+        } else if (op.op == 2) {
+            pGuyUniqueParamOp->velocityX.data += op.opParam0;
+            pGuyUniqueParamOp->velocityY.data += op.opParam1;
+            pGuyUniqueParamOp->accelX.data += op.opParam2;
+            pGuyUniqueParamOp->accelY.data += op.opParam3;
+        } else if (op.op == 3) {
+            // inertia?
+            //pGuyUniqueParamOp->cancelInheritVelX.data = op.opParam0;
+        } else if (op.op == 8) {
+            pGuyUniqueParamOp->DoInstantAction(op.opParam4);
+        } else if (op.op != 0 && op.op != 9) { // nop and.. hitmarker?
             log(logUnknowns, "unknown unique op " + std::to_string(op.op));
         }
     }
@@ -4931,6 +4949,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if ( moveInput & 1 ) {
 
             jumped = true;
+            // jump is trigger-ish - anything else we should do here?
+            uniqueOpsAppliedMask = 0;
 
             if ( moveInput & 4 ) {
                 jumpDirection = -1;
