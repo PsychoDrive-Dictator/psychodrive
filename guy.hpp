@@ -434,10 +434,10 @@ private:
     bool CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias = 0);
 
     bool MatchNormalCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t maxSearch, bool needPositiveEdge);
-    bool MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t maxSearch);
+    bool MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t maxSearch, uint32_t initialI);
     bool MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t maxSearch);
-    bool MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, bool needPositiveEdge);
-    bool MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos);
+    bool MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, uint32_t initialI, bool needPositiveEdge);
+    bool MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos, uint32_t initialI);
     bool MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos);
     bool CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI);
     void DoTriggers(int fluffFrameBias = 0);

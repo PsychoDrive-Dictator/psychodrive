@@ -977,15 +977,14 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
     return pass;
 }
 
-bool Guy::MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t maxSearch) {
+bool Guy::MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t maxSearch, uint32_t initialI) {
     bool pass = false;
-    uint32_t initialCursorPos = cursorPos;
     uint32_t inputOkKeyFlags = pCharge->okKeyFlags;
     uint32_t inputOkCondFlags = pCharge->okCondFlags;
     uint32_t chargeFrames = pCharge->chargeFrames;
     uint32_t keepFrames = pCharge->keepFrames;
     uint32_t dirCount = 0;
-    // uint32_t dirNotMatchCount = 0;
+    maxSearch = initialI + chargeFrames + keepFrames;
     while (cursorPos < dc.inputBuffer.size() && cursorPos < maxSearch)
     {
         if (matchFrameButton(dc.inputBuffer[cursorPos], inputOkKeyFlags, inputOkCondFlags)) {
@@ -994,18 +993,13 @@ bool Guy::MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t
                 break;
             }
         }
-        // else {
-        //     dirNotMatchCount++;
-        // }
+        else {
+            dirCount = 0;
+        }
         cursorPos++;
     }
 
-    if (dirCount < chargeFrames || (cursorPos - initialCursorPos) > (chargeFrames + keepFrames)) {
-        //log("not quite charged " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " chargeFrame " + std::to_string(chargeFrames) +
-        //"keep frame " + std::to_string(keepFrames) + " beginningCharge " + std::to_string(inputBufferCursor)  + " chargeConsumed " + std::to_string(initialI));
-        pass = false;
-    } else {
-        //log("allowed charge " + std::to_string(chargeID) + " dirCount " + std::to_string(dirCount) + " began " + std::to_string(inputBufferCursor) + " consumed " + std::to_string(initialI));
+    if (dirCount >= chargeFrames) {
         pass = true;
     }
 
@@ -1046,7 +1040,7 @@ bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorP
     return pass;
 }
 
-bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, bool needPositiveEdge) {
+bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, uint32_t initialI, bool needPositiveEdge) {
     bool pass = false;
     uint32_t inputSearchArea = 0;
     if (pCommandInput->type == InputType::Rotation) {
@@ -1057,12 +1051,7 @@ bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, ui
         pass = MatchRotateCommandInput(pCommandInput, cursorPos, inputSearchArea);
     } else if (pCommandInput->type == InputType::ChargeRelease) {
         if (pCommandInput->pCharge) {
-            // count matching direction in input buffer, super naive but will work for testing
-            inputSearchArea = startSearch + pCommandInput->pCharge->chargeFrames + pCommandInput->pCharge->keepFrames;
-            // if (inputSearchArea > maxSearch) {
-            //     inputSearchArea = maxSearch;
-            // }
-            pass = MatchChargeCommandInput(pCommandInput->pCharge, cursorPos, inputSearchArea);
+            pass = MatchChargeCommandInput(pCommandInput->pCharge, cursorPos, maxSearch, initialI);
         }
     } else {
         uint32_t inputSearchArea = startSearch + pCommandInput->numFrames;
@@ -1084,7 +1073,7 @@ bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, ui
     return pass;
 }
 
-bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos)
+bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startCursorPos, uint32_t initialI)
 {
     int maxSearch = startCursorPos + pVariant->totalMaxFrames + 1;
     uint32_t inputBufferCursor = startCursorPos;
@@ -1099,13 +1088,13 @@ bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startC
     do {
         // recursive depth first search to try all combinations
         // todo make simple walk forward an option for less lenient matching
-        pass = MatchCommandInput(&pVariant->inputs[startInput], inputBufferCursor, startCursorPos, maxSearch, needPositiveEdge);
+        pass = MatchCommandInput(&pVariant->inputs[startInput], inputBufferCursor, startCursorPos, maxSearch, initialI, needPositiveEdge);
 
         if (!pass) {
             return false;
         }
 
-        if (MatchCommand(pVariant, startInput - 1, inputBufferCursor)) {
+        if (MatchCommand(pVariant, startInput - 1, inputBufferCursor, initialI)) {
             return true;
         }
     } while (pass);
@@ -1250,7 +1239,7 @@ bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI)
             Command *pCommand = pTrigger->pCommandClassic;
 
             for (auto& variant : pCommand->variants) {
-                if (MatchCommand(&variant, variant.inputs.size() - 1, initialI)) {
+                if (MatchCommand(&variant, variant.inputs.size() - 1, initialI, initialI)) {
                     return true;
                 }
             }

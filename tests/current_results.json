@@ -8314,42 +8314,42 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1333,
+                "count": 1310,
                 "firstFrame": 563,
                 "lastFrame": 3770
             },
             {
-                "count": 611,
+                "count": 508,
                 "firstFrame": 570,
                 "lastFrame": 3644
             },
             {
-                "count": 225,
+                "count": 179,
                 "firstFrame": 586,
                 "lastFrame": 3630
             },
             {
-                "count": 642,
+                "count": 501,
                 "firstFrame": 299,
                 "lastFrame": 3624
             },
             {
-                "count": 622,
+                "count": 501,
                 "firstFrame": 299,
                 "lastFrame": 3624
             },
             {
-                "count": 1469,
+                "count": 1148,
                 "firstFrame": 299,
                 "lastFrame": 3770
             },
             {
-                "count": 1078,
+                "count": 710,
                 "firstFrame": 483,
                 "lastFrame": 3770
             },
             {
-                "count": 251,
+                "count": 66,
                 "firstFrame": 3101,
                 "lastFrame": 3644
             },
@@ -8359,17 +8359,17 @@ var currentResults =
                 "lastFrame": 701
             },
             {
-                "count": 876,
-                "firstFrame": 3268,
-                "lastFrame": 3770
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 167,
+                "count": 61,
                 "firstFrame": 2765,
                 "lastFrame": 3575
             },
             {
-                "count": 2450,
+                "count": 1947,
                 "firstFrame": 2494,
                 "lastFrame": 3770
             }
