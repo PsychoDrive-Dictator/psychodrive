@@ -2092,7 +2092,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
 
         // walls and screen
         if (!onlyFloor) {
-            Fixed bothPlayerPos = pOpponent->lastPosX + (isProjectile ? pParent->lastPosX : lastPosX);
+            Fixed bothPlayerPos = pOpponent->getLastPosX(true) + (isProjectile ? pParent->getLastPosX(true) : getLastPosX(true));
             Fixed screenCenterX = bothPlayerPos / Fixed(2);
             int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
             screenCenterX.data += fixedRemainder;
@@ -3612,6 +3612,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 // commit current place offset
                 posX = posX + (posOffsetX * direction);
                 posOffsetX = Fixed(0);
+                bgOffsetX = Fixed(0);
 
                 if (hitStun > 1) {
                     hitStun--;
@@ -4505,7 +4506,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 int rangeB = pCurrentAction->pProjectileData->rangeB;
 
                 if (rangeB) {
-                    Fixed bothPlayerPos = pParent->pOpponent->lastPosX + pParent->lastPosX;
+                    Fixed bothPlayerPos = pParent->pOpponent->getLastPosX(true) + pParent->getLastPosX(true);
                     Fixed screenCenterX = bothPlayerPos / Fixed(2);
                     int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
                     screenCenterX.data += fixedRemainder;
@@ -5082,6 +5083,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             // think this should be pretty ordering impervious at this stage?
             pOpponent->posX = throwTechOrigin + (Fixed(50) * direction);
             pOpponent->posOffsetX = Fixed(0);
+            pOpponent->bgOffsetX = Fixed(0);
         }
     }
 
@@ -5160,6 +5162,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     couldMove = canMoveNow;
     lastPosX = getPosX();
     lastPosY = getPosY();
+    lastBGPlaceX = bgOffsetX;
+    lastBGPlaceY = bgOffsetY;
+    lastDirection = direction;
     wasIgnoreHitStop = ignoreHitStop;
 
     forcedTrigger = ActionRef(0, 0);
@@ -5247,12 +5252,14 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         if (!(inheritFlags & (1<<0)) && !keepPlace) {
             posX = posX + (posOffsetX * direction);
             posOffsetX = Fixed(0);
+            bgOffsetX = Fixed(0);
         } else {
             noPlaceXNextFrame = true;
         }
         if (!(inheritFlags & (1<<1)) && !keepPlace) {
             posY = posY + posOffsetY;
             posOffsetY = Fixed(0);
+            bgOffsetY = Fixed(0);
         } else {
             noPlaceYNextFrame = true;
         }
@@ -5752,6 +5759,8 @@ void Guy::DoLockKey(void)
                         pOpponent->posY = getPosY();
                         pOpponent->posOffsetX = Fixed(0);
                         pOpponent->posOffsetY = Fixed(0);
+                        pOpponent->bgOffsetX = Fixed(0);
+                        pOpponent->bgOffsetY = Fixed(0);
                         pOpponent->airborne = airborne;
                     }
                     pOpponent->velocityX = Fixed(0);
@@ -5784,8 +5793,10 @@ void Guy::DoPlaceKey(void)
         return;
     }
 
-    bool setXThisFrame = false;
-    bool setYThisFrame = false;
+    bool setNormalXThisFrame = false;
+    bool setNormalYThisFrame = false;
+    bool setBGXThisFrame = false;
+    bool setBGYThisFrame = false;
 
     for (auto& placeKey : pCurrentAction->placeKeys)
     {
@@ -5808,6 +5819,11 @@ void Guy::DoPlaceKey(void)
             continue;
         }
 
+        bool *setXThisFrame = placeKey.bgOnly ? &setBGXThisFrame : &setNormalXThisFrame;
+        bool *setYThisFrame = placeKey.bgOnly ? &setBGYThisFrame : &setNormalYThisFrame;
+        Fixed *offsetX = placeKey.bgOnly ? &bgOffsetX : &posOffsetX;
+        Fixed *offsetY = placeKey.bgOnly ? &bgOffsetY : &posOffsetY;
+
         for (auto& pos : placeKey.posList) {
             int keyStartFrame = placeKey.startFrame;
             // todo implement ratio here? check on cammy spiralarrow ex as an example
@@ -5824,26 +5840,30 @@ void Guy::DoPlaceKey(void)
         }
 
         offsetMatch *= ratio;
-        if (offsetMatch == Fixed(0) && !setPlaceX && !setPlaceY) {
+        if (offsetMatch == Fixed(0) && !placeKey.bgOnly && !setPlaceX && !setPlaceY) {
             continue;
         }
 
         if (placeKey.axis == 0) {
-            if (setXThisFrame) {
-                posOffsetX += offsetMatch;
+            if (*setXThisFrame) {
+                *offsetX += offsetMatch;
             } else {
-                posOffsetX = offsetMatch;
+                *offsetX = offsetMatch;
             }
-            setPlaceX = true;
-            setXThisFrame = true;
+            if (!placeKey.bgOnly) {
+                setPlaceX = true;
+            }
+            *setXThisFrame = true;
         } else if (placeKey.axis == 1) {
-            if (setYThisFrame) {
-                posOffsetY += offsetMatch;
+            if (*setYThisFrame) {
+                *offsetY += offsetMatch;
             } else {
-                posOffsetY = offsetMatch;
+                *offsetY = offsetMatch;
             }
-            setPlaceY = true;
-            setYThisFrame = true;
+            if (!placeKey.bgOnly) {
+                setPlaceY = true;
+            }
+            *setYThisFrame = true;
         }
     }
 }

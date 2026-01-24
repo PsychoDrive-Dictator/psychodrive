@@ -310,6 +310,7 @@ struct PlaceKey : Key {
     int optionFlag;
     Fixed ratio = Fixed(0);
     int axis;
+    bool bgOnly = false;
     std::vector<PlaceKeyPos> posList;
 };
 

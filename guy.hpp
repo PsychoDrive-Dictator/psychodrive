@@ -89,13 +89,23 @@ public:
     std::deque<std::string> &getLogQueue() { return nc.logQueue; }
     // for opponent direction
     std::vector<GuyRef> &getMinions() { return dc.minions; }
-    Fixed getPosX() {
-        return posX + (posOffsetX*direction);
+    Fixed getPosX(bool forWall = false) {
+        Fixed ret = posX + (posOffsetX*direction);
+        if (forWall) {
+            ret += bgOffsetX * direction;
+        }
+        return ret;
     }
     Fixed getPosY() {
         return posY + posOffsetY;
     }
-    Fixed getLastPosX() { return lastPosX; }
+    Fixed getLastPosX(bool forWall = false) { 
+        Fixed ret = lastPosX;
+        if (forWall) {
+            ret += lastBGPlaceX * lastDirection;
+        }
+        return ret;
+    }
     Fixed getLastPosY() { return lastPosY; }
     int getDirection() { return direction.i(); }
     int getCurrentInput() { return currentInput; }
@@ -116,6 +126,8 @@ public:
         posY = startPosY;
         lastPosX = posX;
         lastPosY = posY;
+        lastBGPlaceX = Fixed(0);
+        lastBGPlaceY = Fixed(0);
 
         airborne = false;
         landed = false;
@@ -124,6 +136,8 @@ public:
 
         posOffsetX = 0.0f;
         posOffsetY = 0.0f;
+        bgOffsetX = 0.0f;
+        bgOffsetY = 0.0f;
         velocityX = 0.0f;
         velocityY = 0.0f;
         accelX = 0.0f;
@@ -573,8 +587,11 @@ private:
         posX = Fixed(0);
         posY = Fixed(0);
         direction = Fixed(1);
+        lastDirection = Fixed(1);
         lastPosX = Fixed(0);
         lastPosY = Fixed(0);
+        lastBGPlaceX = Fixed(0);
+        lastBGPlaceY = Fixed(0);
         startPosX = Fixed(0);
         startPosY = Fixed(0);
         airborne = false;
@@ -617,6 +634,8 @@ private:
         noAccelNextFrame = false;
         posOffsetX = Fixed(0);
         posOffsetY = Fixed(0);
+        bgOffsetX = Fixed(0);
+        bgOffsetY = Fixed(0);
         setPlaceX = false;
         setPlaceY = false;
         velocityX = Fixed(0);
@@ -918,9 +937,12 @@ private:
     Fixed posX;
     Fixed posY;
     Fixed direction;
+    Fixed lastDirection;
 
     Fixed lastPosX;
     Fixed lastPosY;
+    Fixed lastBGPlaceX;
+    Fixed lastBGPlaceY;
 
     Fixed startPosX;
     Fixed startPosY;
@@ -940,6 +962,8 @@ private:
 
     Fixed posOffsetX;
     Fixed posOffsetY;
+    Fixed bgOffsetX;
+    Fixed bgOffsetY;
 
     Fixed velocityX;
     Fixed velocityY;

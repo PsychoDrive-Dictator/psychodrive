@@ -554,7 +554,7 @@ void loadSteerKeys(nlohmann::json* pSteerJson, std::vector<SteerKey>* pOutputVec
     }
 }
 
-void loadPlaceKeys(nlohmann::json* pPlaceJson, std::vector<PlaceKey>* pOutputVector)
+void loadPlaceKeys(nlohmann::json* pPlaceJson, std::vector<PlaceKey>* pOutputVector, bool isBG)
 {
     if (!pPlaceJson) {
         return;
@@ -567,9 +567,10 @@ void loadPlaceKeys(nlohmann::json* pPlaceJson, std::vector<PlaceKey>* pOutputVec
         PlaceKey newKey;
         newKey.startFrame = placeKey["_StartFrame"];
         newKey.endFrame = placeKey["_EndFrame"];
-        newKey.optionFlag = placeKey["OptionFlag"];
-        newKey.ratio = Fixed(placeKey["Ratio"].get<double>());
-        newKey.axis = placeKey["Axis"];
+        newKey.optionFlag = placeKey.value("OptionFlag", 0);
+        newKey.ratio = Fixed(placeKey.value<double>("Ratio", 1.0));
+        newKey.axis = placeKey.value("Axis", 0);
+        newKey.bgOnly = isBG;
 
         if (placeKey.contains("PosList")) {
             newKey.posList.reserve(placeKey["PosList"].size());
@@ -1124,9 +1125,18 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
             loadSteerKeys(&key["DriveSteerKey"], &newAction.steerKeys, true);
         }
 
+        size_t placeKeyCount = 0;
         if (key.contains("PlaceKey")) {
-            newAction.placeKeys.reserve(key["PlaceKey"].size() - 1);
-            loadPlaceKeys(&key["PlaceKey"], &newAction.placeKeys);
+            placeKeyCount += key["PlaceKey"].size() - 1;
+        }
+        if (key.contains("BGPlaceKey")) {
+            placeKeyCount += key["BGPlaceKey"].size() - 1;
+        }
+        if (key.contains("PlaceKey")) {
+            loadPlaceKeys(&key["PlaceKey"], &newAction.placeKeys, false);
+        }
+        if (key.contains("BGPlaceKey")) {
+            loadPlaceKeys(&key["BGPlaceKey"], &newAction.placeKeys, true);
         }
 
         size_t switchKeyCount = 0;
