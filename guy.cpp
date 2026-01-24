@@ -787,7 +787,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
         }
     }
 
-    if (pTrigger->limitShotCount) {
+    if (pTrigger->limitShotCount > 0) {
         int count = 0;
         for ( auto minion : dc.minions ) {
             if (pTrigger->limitShotCategory & (1 << minion->limitShotCategory)) {
@@ -799,7 +799,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
         }
     }
 
-    if (pTrigger->airActionCountLimit) {
+    if (pTrigger->airActionCountLimit > 0) {
         if (airActionCounter >= pTrigger->airActionCountLimit) {
             return false;
         }
