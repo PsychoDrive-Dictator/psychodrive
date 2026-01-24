@@ -595,12 +595,12 @@ static void mainloop(void)
                 pRightGuy = pLeftGuy;
             }
             if (lockCamera && pLeftGuy) {
-                translateX = (pRightGuy->getLastPosX().f() + pLeftGuy->getLastPosX().f()) / 2.0f;
+                translateX = (pRightGuy->getLastPosX(true).f() + pLeftGuy->getLastPosX(true).f()) / 2.0f;
                 translateX = fmin(translateX, 550.0);
                 translateX = fmax(translateX, -550.0);
 
                 // first find required camera distance to have both guys in view horizontally
-                float distGuys = fabs( pRightGuy->getLastPosX().f() - pLeftGuy->getLastPosX().f() );
+                float distGuys = fabs( pRightGuy->getLastPosX(true).f() - pLeftGuy->getLastPosX(true).f() );
                 distGuys += 200.0; // account for some buffer behind
                 float angleRad = fov / 2.0 * std::numbers::pi / 180.0;
                 // zoom is adjacent edge, equals opposite over tan(ang)
@@ -918,12 +918,12 @@ static void mainloop(void)
 
         // find camera position if we have 2 guys
         if (lockCamera && guys.size() >= 2) {
-            translateX = (guys[1]->getLastPosX().f() + guys[0]->getLastPosX().f()) / 2.0f;
+            translateX = (guys[1]->getLastPosX(true).f() + guys[0]->getLastPosX(true).f()) / 2.0f;
             translateX = fmin(translateX, 550.0);
             translateX = fmax(translateX, -550.0);
 
             // first find required camera distance to have both guys in view horizontally
-            float distGuys = fabs( guys[1]->getLastPosX().f() - guys[0]->getLastPosX().f() );
+            float distGuys = fabs( guys[1]->getLastPosX(true).f() - guys[0]->getLastPosX(true).f() );
             distGuys += 200.0; // account for some buffer behind
             float angleRad = fov / 2.0 * std::numbers::pi / 180.0;
             // zoom is adjacent edge, equals opposite over tan(ang)

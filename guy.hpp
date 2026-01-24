@@ -17,7 +17,7 @@ const Fixed wallDistance = Fixed(765.0f);
 const Fixed projWallDistance = Fixed(800.0f);
 const Fixed maxPlayerDistance = Fixed(245.0f);
 const Fixed maxProjectileDistance = Fixed(280.0f);
-const Fixed maxScreenCenterDisplacement = Fixed(550);
+const Fixed maxScreenCenterDisplacement = Fixed(520);
 
 const int maxFocus = 60000;
 
@@ -127,7 +127,6 @@ public:
         lastPosX = posX;
         lastPosY = posY;
         lastBGPlaceX = Fixed(0);
-        lastBGPlaceY = Fixed(0);
 
         airborne = false;
         landed = false;
@@ -137,7 +136,6 @@ public:
         posOffsetX = 0.0f;
         posOffsetY = 0.0f;
         bgOffsetX = 0.0f;
-        bgOffsetY = 0.0f;
         velocityX = 0.0f;
         velocityY = 0.0f;
         accelX = 0.0f;
@@ -530,12 +528,12 @@ private:
         return ret;
     }
 
-    bool onLeftWall() { return getPosX() == -wallDistance; }
-    bool onRightWall() { return getPosX() == wallDistance; }
+    bool onLeftWall() { return getPosX(true) == -wallDistance; }
+    bool onRightWall() { return getPosX(true) == wallDistance; }
     bool onWall() { return onLeftWall() || onRightWall(); }
 
-    bool wasOnLeftWall() { return getLastPosX() == -wallDistance; }
-    bool wasOnRightWall() { return getLastPosX() == wallDistance; }
+    bool wasOnLeftWall() { return getLastPosX(true) == -wallDistance; }
+    bool wasOnRightWall() { return getLastPosX(true) == wallDistance; }
     bool wasOnWall() { return wasOnLeftWall() || wasOnRightWall(); }
 
     bool conditionOperator(int op, int operand, int threshold, std::string desc);
@@ -591,7 +589,6 @@ private:
         lastPosX = Fixed(0);
         lastPosY = Fixed(0);
         lastBGPlaceX = Fixed(0);
-        lastBGPlaceY = Fixed(0);
         startPosX = Fixed(0);
         startPosY = Fixed(0);
         airborne = false;
@@ -635,7 +632,6 @@ private:
         posOffsetX = Fixed(0);
         posOffsetY = Fixed(0);
         bgOffsetX = Fixed(0);
-        bgOffsetY = Fixed(0);
         setPlaceX = false;
         setPlaceY = false;
         velocityX = Fixed(0);
@@ -942,7 +938,6 @@ private:
     Fixed lastPosX;
     Fixed lastPosY;
     Fixed lastBGPlaceX;
-    Fixed lastBGPlaceY;
 
     Fixed startPosX;
     Fixed startPosY;
@@ -963,7 +958,6 @@ private:
     Fixed posOffsetX;
     Fixed posOffsetY;
     Fixed bgOffsetX;
-    Fixed bgOffsetY;
 
     Fixed velocityX;
     Fixed velocityY;

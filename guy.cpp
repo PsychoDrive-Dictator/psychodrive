@@ -2092,12 +2092,21 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
 
         // walls and screen
         if (!onlyFloor) {
-            Fixed bothPlayerPos = pOpponent->getLastPosX(true) + (isProjectile ? pParent->getLastPosX(true) : getLastPosX(true));
+            Guy *pScreenGuyOne = pOpponent;
+            Guy *pScreenGuyTwo = isProjectile ? pParent.pGuy : this;
+            Fixed bothPlayerPos = pScreenGuyOne->getLastPosX(true) + pScreenGuyTwo->getLastPosX(true);
             Fixed screenCenterX = bothPlayerPos / Fixed(2);
             int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
             screenCenterX.data += fixedRemainder;
+            //log(true, "screencenter " + std::to_string(screenCenterX.f()));
             screenCenterX = fixMax(-maxScreenCenterDisplacement, screenCenterX);
             screenCenterX = fixMin(maxScreenCenterDisplacement, screenCenterX);
+            if (pScreenGuyOne->onLeftWall() || pScreenGuyTwo->onLeftWall()) {
+                screenCenterX = -maxScreenCenterDisplacement;
+            }
+            if (pScreenGuyOne->onRightWall() || pScreenGuyTwo->onRightWall()) {
+                screenCenterX = maxScreenCenterDisplacement;
+            }
 
             Fixed x = getPosX();
             if (!isProjectile) {
@@ -2116,7 +2125,6 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
 
                 if (x < -wallDistance ) {
                     pushX = -(x - -wallDistance);
-
                 }
                 if (x > wallDistance ) {
                     pushX = -(x - wallDistance);
@@ -5163,7 +5171,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     lastPosX = getPosX();
     lastPosY = getPosY();
     lastBGPlaceX = bgOffsetX;
-    lastBGPlaceY = bgOffsetY;
     lastDirection = direction;
     wasIgnoreHitStop = ignoreHitStop;
 
@@ -5252,14 +5259,12 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         if (!(inheritFlags & (1<<0)) && !keepPlace) {
             posX = posX + (posOffsetX * direction);
             posOffsetX = Fixed(0);
-            bgOffsetX = Fixed(0);
         } else {
             noPlaceXNextFrame = true;
         }
         if (!(inheritFlags & (1<<1)) && !keepPlace) {
             posY = posY + posOffsetY;
             posOffsetY = Fixed(0);
-            bgOffsetY = Fixed(0);
         } else {
             noPlaceYNextFrame = true;
         }
@@ -5267,6 +5272,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         setPlaceX = false;
         setPlaceY = false;
         keepPlace = false;
+        bgOffsetX = Fixed(0);
 
         bool inheritHitID = pCurrentAction ? pCurrentAction->inheritHitID : false;
         // see eg. 2MP into light crusher - light crusher has inherit hitID true..
@@ -5760,7 +5766,6 @@ void Guy::DoLockKey(void)
                         pOpponent->posOffsetX = Fixed(0);
                         pOpponent->posOffsetY = Fixed(0);
                         pOpponent->bgOffsetX = Fixed(0);
-                        pOpponent->bgOffsetY = Fixed(0);
                         pOpponent->airborne = airborne;
                     }
                     pOpponent->velocityX = Fixed(0);
@@ -5822,11 +5827,10 @@ void Guy::DoPlaceKey(void)
         bool *setXThisFrame = placeKey.bgOnly ? &setBGXThisFrame : &setNormalXThisFrame;
         bool *setYThisFrame = placeKey.bgOnly ? &setBGYThisFrame : &setNormalYThisFrame;
         Fixed *offsetX = placeKey.bgOnly ? &bgOffsetX : &posOffsetX;
-        Fixed *offsetY = placeKey.bgOnly ? &bgOffsetY : &posOffsetY;
+        Fixed *offsetY = &posOffsetY;
 
         for (auto& pos : placeKey.posList) {
             int keyStartFrame = placeKey.startFrame;
-            // todo implement ratio here? check on cammy spiralarrow ex as an example
             if (pos.frame == currentFrame - keyStartFrame) {
                 offsetMatch = pos.offset;
                 // // do we need to disambiguate which axis doesn't push? that'd be annoying
