@@ -1752,7 +1752,7 @@ void Guy::getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<Rende
         rootOffsetX = posX + ((rootOffsetX + posOffsetX) * direction);
         rootOffsetY = rootOffsetY + posY + posOffsetY;
 
-        color boxColor = {0.0,4.0,0.0};
+        color boxColor = hitBoxKey.uniquePitcher ? color(0.3,0.496,0.5) : color(0.422,0.265,0.429);
 
         for (auto pRect : hitBoxKey.rects) {
             Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
@@ -1760,7 +1760,7 @@ void Guy::getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<Rende
                 pOutRenderBoxes->push_back({rect, 50.0, boxColor, false});
             }
             if (pOutHitBoxes) {
-                pOutHitBoxes->push_back({rect, hitBoxKey.uniquePitcher, &hitBoxKey.ops});
+                pOutHitBoxes->push_back({rect, hitBoxKey.checkMask, hitBoxKey.uniquePitcher, hitBoxKey.applyOpToTarget, &hitBoxKey.ops});
             }
         }
     }
@@ -3099,27 +3099,33 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                     if (catcherBox.uniquePitcher) {
                         continue;
                     }
+                    if (!(pitcherBox.checkMask & catcherBox.checkMask)) {
+                        continue;
+                    }
                     if (doBoxesHit(pitcherBox.box, catcherBox.box)) {
-                        for (UniqueBoxOp &op : *pitcherBox.pOps) {
-                            if (op.op == 1) {
-                                Guy *pGuyUniqueParamOp = pitcher;
-                                if (pitcher->pParent) {
-                                    pGuyUniqueParamOp = pitcher->pParent;
-                                }
-                                if (op.opParam0) {
-                                    if (op.opParam1 == 0) {
-                                        pGuyUniqueParamOp->uniqueParam[op.opParam0-1] = op.opParam2;
-                                    } else if (op.opParam1 == 1) { 
-                                        pGuyUniqueParamOp->uniqueParam[op.opParam0-1] += op.opParam2;
-                                    }
-                                } else {
-                                    pGuyUniqueParamOp->guyLog(true, "aa? not off by 1?");
-                                }
-                            }
-                        }
+                        catcher->ApplyUniqueBoxOps(pitcherBox, pitcher);
+                        pitcher->ApplyUniqueBoxOps(catcherBox, catcher);
                     }
                 }
             }
+        }
+    }
+}
+
+void Guy::ApplyUniqueBoxOps(UniqueBox &box, Guy *src)
+{
+    for (UniqueBoxOp &op : *box.pOps) {
+        if (op.op == 1) {
+            Guy *pGuyUniqueParamOp = box.holderIsTarget ? this : src;
+            if (op.opParam0) {
+                if (op.opParam1 == 0) {
+                    pGuyUniqueParamOp->uniqueParam[op.opParam0-1] = op.opParam2;
+                } else if (op.opParam1 == 1) { 
+                    pGuyUniqueParamOp->uniqueParam[op.opParam0-1] += op.opParam2;
+                }
+            }
+        } else if (op.op != 0) {
+            log(logUnknowns, "unknown unique op " + std::to_string(op.op));
         }
     }
 }
@@ -4048,12 +4054,8 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 29: // unique param
                     {
-                        Guy *pGuyUniqueParamOp = this;
-                        if (pParent) {
-                            pGuyUniqueParamOp = pParent;
-                        }
                         if (branchParam1 >= 0 && branchParam1 < uniqueParamCount) {
-                            doBranch = conditionOperator(branchParam2, pGuyUniqueParamOp->uniqueParam[branchParam1], branchParam3, "unique param");
+                            doBranch = conditionOperator(branchParam2, uniqueParam[branchParam1], branchParam3, "unique param");
                         }
                         // _only_ do the branch in prehit, opposite from usual
                         // needs checked before we've evaluated the eventkey that can bump unique

@@ -496,7 +496,9 @@ void loadUniqueBoxKeys(nlohmann::json* pHitBoxJson, std::vector<UniqueBoxKey>* p
 
         int rectListID = 6;
 
+        newKey.checkMask = hitBox["CheckFlags"];
         newKey.uniquePitcher = hitBox["CheckType"] == 0;
+        newKey.applyOpToTarget = hitBox["PropHolder"] == 1;
 
         newKey.ops.reserve(hitBox["Datas"].size());
         for (auto& [dataID, dataOp] : hitBox["Datas"].items()) {

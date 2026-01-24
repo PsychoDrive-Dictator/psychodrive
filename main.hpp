@@ -187,7 +187,9 @@ struct HitBox {
 
 struct UniqueBox {
     Box box;
+    int checkMask;
     bool uniquePitcher;
+    bool holderIsTarget;
     std::vector<struct UniqueBoxOp> *pOps;
 };
 

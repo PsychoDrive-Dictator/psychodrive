@@ -279,7 +279,9 @@ struct HitBoxKey : BoxKey {
 struct UniqueBoxKey : BoxKey {
     UniqueBoxKey() { keyType = UniqueBoxKeyType; }
 
+    int checkMask = 0;
     bool uniquePitcher = false;
+    bool applyOpToTarget = false;
 
     std::vector<UniqueBoxOp> ops;
     std::vector<Rect *> rects;
