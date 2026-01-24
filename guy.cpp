@@ -572,7 +572,7 @@ void Guy::RunFramePostPush(void)
         }
     }
 
-    if (deferredFocusCost < 0 && !pOpponent->warudo) {
+    if (deferredFocusCost < 0 && (!pOpponent || !pOpponent->warudo)) {
         setFocus(focus + deferredFocusCost);
         log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
         deferredFocusCost = 0;
@@ -2081,20 +2081,23 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
 
         // walls and screen
         if (!onlyFloor) {
-            Guy *pScreenGuyOne = pOpponent;
-            Guy *pScreenGuyTwo = isProjectile ? pParent.pGuy : this;
-            Fixed bothPlayerPos = pScreenGuyOne->getLastPosX(true) + pScreenGuyTwo->getLastPosX(true);
-            Fixed screenCenterX = bothPlayerPos / Fixed(2);
-            int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
-            screenCenterX.data += fixedRemainder;
-            //log(true, "screencenter " + std::to_string(screenCenterX.f()));
-            screenCenterX = fixMax(-maxScreenCenterDisplacement, screenCenterX);
-            screenCenterX = fixMin(maxScreenCenterDisplacement, screenCenterX);
-            if (pScreenGuyOne->onLeftWall() || pScreenGuyTwo->onLeftWall()) {
-                screenCenterX = -maxScreenCenterDisplacement;
-            }
-            if (pScreenGuyOne->onRightWall() || pScreenGuyTwo->onRightWall()) {
-                screenCenterX = maxScreenCenterDisplacement;
+            Fixed screenCenterX = Fixed(0);
+            if (pOpponent) {
+                Guy *pScreenGuyOne = pOpponent;
+                Guy *pScreenGuyTwo = isProjectile ? pParent.pGuy : this;
+                Fixed bothPlayerPos = pScreenGuyOne->getLastPosX(true) + pScreenGuyTwo->getLastPosX(true);
+                screenCenterX = bothPlayerPos / Fixed(2);
+                int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
+                screenCenterX.data += fixedRemainder;
+                //log(true, "screencenter " + std::to_string(screenCenterX.f()));
+                screenCenterX = fixMax(-maxScreenCenterDisplacement, screenCenterX);
+                screenCenterX = fixMin(maxScreenCenterDisplacement, screenCenterX);
+                if (pScreenGuyOne->onLeftWall() || pScreenGuyTwo->onLeftWall()) {
+                    screenCenterX = -maxScreenCenterDisplacement;
+                }
+                if (pScreenGuyOne->onRightWall() || pScreenGuyTwo->onRightWall()) {
+                    screenCenterX = maxScreenCenterDisplacement;
+                }
             }
 
             Fixed x = getPosX();
@@ -2118,7 +2121,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                 if (x > wallDistance ) {
                     pushX = -(x - wallDistance);
                 }
-            } else if (pCurrentAction->pProjectileData) {
+            } else if (pCurrentAction->pProjectileData && pOpponent) {
                 Fixed &forward = pCurrentAction->pProjectileData->wallBoxForward;
                 Fixed &back = pCurrentAction->pProjectileData->wallBoxBack;
                 if (direction > Fixed(0)) {
@@ -3638,6 +3641,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             } else if (!isDomain && destTime != 0) {
                 // generic pushback/airborne knock
                 if (!airborne) {
+                    // if (parrying && !pAttacker->isProjectile) {
+                    //     destX -= 1; // ??????? in the higuchi replay it's for sure like that
+                    // }
                     hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
                     if (destX < 0 && hitVelX.data & 63) {
                         hitVelX.data -= 1;
@@ -4349,6 +4355,7 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
         if (hitStun && !blocking) {
             focusRegenAmount = burnout ? 25 : 20;
         }
+        // magic walking forward for 10f rule - there might be a 'walk forward' tag we can use instead?
         if (currentAction == 10 || (currentAction == 9 && currentFrame >= 10)) {
             focusRegenAmount *= 2;
         }
