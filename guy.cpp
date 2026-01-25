@@ -2201,6 +2201,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                     // air recovery landing
                     hitStun = 1;
                     strikeProtectionFrames = 1;
+                    resetComboCount = true;
                 } else {
                     nextAction = currentAction + 3;
                 }
