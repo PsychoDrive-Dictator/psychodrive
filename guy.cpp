@@ -3465,6 +3465,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     if (perfectScaling) {
         scaledSuperGain = scaledSuperGain * 80 / 100;
     }
+    scaledSuperGain = scaledSuperGain * pCharData->styles[styleInstall].gaugeGainRatio / 100;
     gauge += scaledSuperGain;
 
     Guy *pResourceGuy = pAttacker;
