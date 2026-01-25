@@ -1092,7 +1092,6 @@ private:
         std::set<int> setDeferredTriggerIDs;
         std::set<ActionRef> frameTriggers;
         FixedBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
-        FixedBuffer<int8_t, 200> directionBuffer;
     } dc;
 
     // stuff that won't get copied around when dumping simulations
