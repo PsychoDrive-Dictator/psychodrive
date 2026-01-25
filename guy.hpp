@@ -453,7 +453,7 @@ private:
     void DoWorldKey();
     void DoLockKey();
     void DoShotKey(Action *pAction, int frameID);
-    void DoFocusRegen(bool endWarudoFrame);
+    void DoFocusRegen();
 
     void DoInstantAction(int actionID);
     void AdvanceScalingTriggerID();

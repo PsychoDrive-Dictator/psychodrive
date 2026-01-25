@@ -538,6 +538,10 @@ void Guy::RunFramePostPush(void)
         return;
     }
 
+    if (!wallStopped || !stunned) {
+        DoFocusRegen();
+    }
+
     // throw tech - do it before AdvanceFrame to prevent sequencing issue
     // todo modern
     if (locked && pOpponent && pOpponent->throwTechable && (currentInput & (LP+LK)) == LP+LK && nextAction == -1) {
@@ -550,12 +554,6 @@ void Guy::RunFramePostPush(void)
             switchDirection();
         }
     }
-
-    //if (advancingTime) {
-    if (!wallStopped || !stunned) {
-        DoFocusRegen(false);
-    }
-    //}
 
     if (recoverableHealthCooldown) {
         recoverableHealthCooldown--;
@@ -4328,7 +4326,7 @@ void Guy::DoBranchKey(bool preHit)
     }
 }
 
-void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
+void Guy::DoFocusRegen()
 {
     bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0 && !focusRegenCooldownTicking;
     if (driveRushCancel || (pOpponent && (pOpponent->driveScaling || pOpponent->warudo))) {
@@ -4337,15 +4335,8 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
     if (superFreeze) {
         doRegen = false;
     }
-    // we do the final tick of regen in hitstop in end hitstop frame instead of hitstop == 1
-    // this way we know if we're doing a trigger or not, which might incur a cost and prevent regen
-    // if (hitStop) {
-    //     doRegen = false;
-    // }
 
     if (doRegen) {
-        // the hitstun and walk forward frame may be off by one in hitstop
-        // but they shouldn't happen in hitstop..
         int focusRegenAmount = burnout ? 50 : 40;
 
         if (getAirborne()) {
@@ -4353,7 +4344,11 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
             //log(logResources, "focus regen airborne");
         }
         if (hitStun && !blocking && (currentAction != 39)) {
-            focusRegenAmount = burnout ? 25 : 20;
+            bool burnoutState = burnout;
+            if (opponentAction) {
+                burnoutState = false;
+            }
+            focusRegenAmount = burnoutState ? 25 : 20;
             //log(logResources, "focus regen hitstun");
         }
         // magic walking forward for 10f rule - there might be a 'walk forward' tag we can use instead?
@@ -4447,10 +4442,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         // if we just entered hitstop, don't go to next frame right now
         // we want to have a chance to get hitstop input before triggers
         // we'll re-run it in RunFrame
-        // if (advancingTime) {
-        //     DoFocusRegen(endWarudoFrame);
-        // }
-
         return true;
     }
 
