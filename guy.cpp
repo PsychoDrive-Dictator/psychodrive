@@ -4330,10 +4330,10 @@ void Guy::DoBranchKey(bool preHit)
 void Guy::DoFocusRegen()
 {
     bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0 && !focusRegenCooldownTicking;
-    if (driveRushCancel || (pOpponent && (pOpponent->driveScaling || pOpponent->warudo))) {
+    if ((!superAnimation || !pSim->match) && (driveRushCancel || (pOpponent && pOpponent->driveScaling))) {
         doRegen = false;
     }
-    if (superFreeze) {
+    if (superFreeze || (pOpponent && pOpponent->warudo)) {
         doRegen = false;
     }
 
