@@ -2199,18 +2199,14 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                 // empty jump landing, immediate transition
                 // this is why empty jumps have a frame shaved off
                 if (hitStun) {
-                    currentAction = 39;
+                    nextAction = 39;
+                    // air recovery landing
+                    hitStun = 1;
+                    strikeProtectionFrames = 1;
                 } else {
-                    currentAction = currentAction + 3;
+                    nextAction = currentAction + 3;
                 }
-                currentFrame = 0;
-                currentFrameFrac = Fixed(currentFrame);
-                actionSpeed = Fixed(1);
-                actionInitialFrame = -1;
-                UpdateActionData();
-
-                velocityX = Fixed(0);
-                accelX = Fixed(0);
+                AdvanceFrame(false);
             }
         }
         log (logTransitions, "landed " + std::to_string(hitStun));
@@ -2374,6 +2370,9 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 }
                 if (pOtherGuy->airborne && pOtherGuy->hitStun && !pOtherGuy->knockDown && !pOtherGuy->locked) {
                     // air recovery
+                    continue;
+                }
+                if (pOtherGuy->strikeProtectionFrames) {
                     continue;
                 }
             }
@@ -4351,9 +4350,11 @@ void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
 
         if (getAirborne()) {
             focusRegenAmount = 20;
+            //log(logResources, "focus regen airborne");
         }
-        if (hitStun && !blocking) {
+        if (hitStun && !blocking && (currentAction != 39)) {
             focusRegenAmount = burnout ? 25 : 20;
+            //log(logResources, "focus regen hitstun");
         }
         // magic walking forward for 10f rule - there might be a 'walk forward' tag we can use instead?
         if (currentAction == 10 || (currentAction == 9 && currentFrame >= 10)) {
@@ -4744,8 +4745,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (throwProtectionFrames) {
+    if (advancingTime && throwProtectionFrames) {
         throwProtectionFrames--;
+    }
+
+    if (advancingTime && strikeProtectionFrames) {
+        strikeProtectionFrames--;
     }
 
     curNextAction = nextAction;

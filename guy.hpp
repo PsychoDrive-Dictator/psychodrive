@@ -611,6 +611,7 @@ private:
         jumpDirection = 0;
         jumpLandingDisabledFrames = 0;
         throwProtectionFrames = 0;
+        strikeProtectionFrames = 0;
         parryHoldFreebieFrames = 0;
         parryFreeze = 0;
         couldMove = true;
@@ -946,6 +947,7 @@ private:
     int jumpLandingDisabledFrames;
 
     int throwProtectionFrames;
+    int strikeProtectionFrames;
 
     int parryHoldFreebieFrames;
     int parryFreeze;
