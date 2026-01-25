@@ -4332,7 +4332,7 @@ void Guy::DoBranchKey(bool preHit)
 void Guy::DoFocusRegen(__attribute__((unused)) bool endWarudoFrame)
 {
     bool doRegen = (!warudo || tokiWaUgokidasu) && focusRegenCooldown == 0 && !focusRegenCooldownTicking;
-    if (driveRushCancel || (pOpponent && pOpponent->driveScaling)) {
+    if (driveRushCancel || (pOpponent && (pOpponent->driveScaling || pOpponent->warudo))) {
         doRegen = false;
     }
     if (superFreeze) {
