@@ -5674,6 +5674,9 @@ void Guy::DoWorldKey(void)
                     setFocusRegenCooldown(90 + 1 + 1); // one for the unfreeze frame
                     otherGuyLog(pOpponent, logResources, "regen cooldown " + std::to_string(pOpponent->focusRegenCooldown) + " (worldkey)");
                 }
+                focusRegenCooldown = 0;
+                focusRegenCooldownFrozen = false;
+                focusRegenCooldownTicking = false;
                 break;
             case 0:
                 // type 1 is sa3 vs normal? why does that matter?
