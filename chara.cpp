@@ -1132,6 +1132,8 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         if (key.contains("BGPlaceKey")) {
             placeKeyCount += key["BGPlaceKey"].size() - 1;
         }
+        newAction.placeKeys.reserve(placeKeyCount);
+
         if (key.contains("PlaceKey")) {
             loadPlaceKeys(&key["PlaceKey"], &newAction.placeKeys, false);
         }
