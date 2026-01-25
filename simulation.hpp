@@ -85,6 +85,7 @@ public:
 
     int frameCounter = 0;
     bool match = false;
+    bool finished = false;
     bool timerStarted = false;
 
     bool replayingGameStateDump = false;

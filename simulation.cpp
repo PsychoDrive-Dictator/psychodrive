@@ -248,6 +248,15 @@ void Simulation::RunFrame(void) {
             int i = 0;
             while (i < 2) {
                 std::string desc = "player " + std::to_string(i);
+
+                if (!finished && players[i]["hp"] == 0 && players[i]["hp"] == simGuys[i]->getHealth()) {
+                    finished = true;
+                }
+
+                if (finished) {
+                    break;
+                }
+
                 // some tests have a first frame from before state reset?
                 if (targetDumpFrame > 1) {
                     CompareGameStateFixed(Fixed(players[i]["posX"].get<double>()), simGuys[i]->getPosX(), i, targetDumpFrame, ePos, desc + " pos X");

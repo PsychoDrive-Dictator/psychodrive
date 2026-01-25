@@ -788,6 +788,15 @@ static void mainloop(void)
                     int i = 0;
                     while (i < 2) {
                         std::string desc = "player " + std::to_string(i);
+
+                        if (!defaultSim.finished && players[i]["hp"] == 0 && players[i]["hp"] == guys[i]->getHealth()) {
+                            defaultSim.finished = true;
+                        }
+
+                        if (defaultSim.finished) {
+                            break;
+                        }
+
                         if (targetDumpFrame > 1) {
                             compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), Simulation::ePos, desc + " pos X");
                             compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), Simulation::ePos, desc + " pos Y");
