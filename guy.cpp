@@ -3522,68 +3522,70 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
 
     if (applyHit) {
-        if (destY > 0 ) {
+        if (destY > 0 && !isDomain) {
             airborne = true;
             // todo this might be too late if they had knockdown state on.. we can delay extra landing transition if so
             landed = false;
         }
 
-        // special ground status, ground bounce OR tumble
-        groundBounce = false;
-        tumble = false;
+        if (!isDomain) {
+            // special ground status, ground bounce OR tumble
+            groundBounce = false;
+            tumble = false;
 
-        // special wall status, splat OR bounce (NOT exclusive from special gronud satatus)
-        wallSplat = false;
-        wallBounce = false;
+            // special wall status, splat OR bounce (NOT exclusive from special gronud satatus)
+            wallSplat = false;
+            wallBounce = false;
 
-        wallStopped = false;
-        wallStopFrames = false;
+            wallStopped = false;
+            wallStopFrames = false;
 
-        if (jimenBound && floorTime) {
-            int floorDestX = pHitEffect->floorDestX;
-            int floorDestY = pHitEffect->floorDestY;
+            if (jimenBound && floorTime) {
+                int floorDestX = pHitEffect->floorDestX;
+                int floorDestY = pHitEffect->floorDestY;
 
-            groundBounce = true;
-            groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
-            groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
-            log(true, "floorDestX" + std::to_string(floorDestX) + " floorTime" + std::to_string(floorTime));
-            if (direction == Fixed(-1) && groundBounceAccelX.data & 63) {
-                // ??
-                groundBounceAccelX.data += 1;
+                groundBounce = true;
+                groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
+                groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
+                log(true, "floorDestX" + std::to_string(floorDestX) + " floorTime" + std::to_string(floorTime));
+                if (direction == Fixed(-1) && groundBounceAccelX.data & 63) {
+                    // ??
+                    groundBounceAccelX.data += 1;
+                }
+                groundBounceVelX -= groundBounceAccelX;
+
+                groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
+                groundBounceAccelY = fixDivWithBias(Fixed(floorDestY * -8) , Fixed(floorTime * floorTime));
+                groundBounceVelY -= groundBounceAccelY;
+            } else {
+                if (moveType == 69) {
+                    knockDown = true;
+                    tumble = true;
+                    // todo move this into some kind of 'next vel' and debloat the guy struct
+                    groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
+                    knockDownFrames = downTime - 27;
+                }
             }
-            groundBounceVelX -= groundBounceAccelX;
 
-            groundBounceVelY = Fixed(floorDestY * 4) / Fixed(floorTime);
-            groundBounceAccelY = fixDivWithBias(Fixed(floorDestY * -8) , Fixed(floorTime * floorTime));
-            groundBounceVelY -= groundBounceAccelY;
-        } else {
-            if (moveType == 69) {
-                knockDown = true;
-                tumble = true;
-                // todo move this into some kind of 'next vel' and debloat the guy struct
-                groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
-                knockDownFrames = downTime - 27;
+            int wallTime = pHitEffect->wallTime;
+            if (kabeTataki) {
+                // this can happen even if you block! blocked DI
+                wallSplat = true;
+                wallStopFrames = pHitEffect->wallStop + 2;
+                if (stunSplat) {
+                    wallStopFrames = 30;
+                }
+            } else if (kabeBound && wallTime) {
+                int wallDestX = pHitEffect->wallDestX;
+                int wallDestY = pHitEffect->wallDestY;
+                wallStopFrames = pHitEffect->wallStop + 2;
+
+                wallBounce = true;
+                wallBounceVelX = fixDivWithBias(Fixed(-wallDestX) , Fixed(wallTime));
+                wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
+                wallBounceAccelY = fixDivWithBias(Fixed(wallDestY * -8) , Fixed(wallTime * wallTime));
+                wallBounceVelY -= wallBounceAccelY;
             }
-        }
-
-        int wallTime = pHitEffect->wallTime;
-        if (kabeTataki) {
-            // this can happen even if you block! blocked DI
-            wallSplat = true;
-            wallStopFrames = pHitEffect->wallStop + 2;
-            if (stunSplat) {
-                wallStopFrames = 30;
-            }
-        } else if (kabeBound && wallTime) {
-            int wallDestX = pHitEffect->wallDestX;
-            int wallDestY = pHitEffect->wallDestY;
-            wallStopFrames = pHitEffect->wallStop + 2;
-
-            wallBounce = true;
-            wallBounceVelX = fixDivWithBias(Fixed(-wallDestX) , Fixed(wallTime));
-            wallBounceVelY = Fixed(wallDestY * 4) / Fixed(wallTime);
-            wallBounceAccelY = fixDivWithBias(Fixed(wallDestY * -8) , Fixed(wallTime * wallTime));
-            wallBounceVelY -= wallBounceAccelY;
         }
 
         //if (destTime != 0)
