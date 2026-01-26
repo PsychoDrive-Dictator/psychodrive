@@ -2211,8 +2211,8 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
         log (logTransitions, "landed " + std::to_string(hitStun));
     }
 
-    if (!airborne && (groundBounce || tumble)) {
-        log (logTransitions, "ground bounce/tumble!");
+    if (!airborne && (groundBounce || tumble || slide)) {
+        log (logTransitions, "ground bounce/tumble/slide!");
         // dont let stuff below see landed/grounded
         landed = false;
 
@@ -2265,7 +2265,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
         posOffsetY = Fixed(0);
     }
 
-    if (landed || (bounced && tumble)) {
+    if (landed || (bounced && (tumble || slide))) {
         // the frame you land is supposed to instantly turn into 330
         if (resetHitStunOnLand && knockDown) {
             log(logTransitions, "hack extra landing frame");
@@ -3197,7 +3197,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         attacker = attacker->pParent;
     }
 
-    bool doSwitchDirection = applyHit;
+    bool doSwitchDirection = applyHit && !isGrab;
     if (dmgType == 21 || dmgType == 22) {
         doSwitchDirection = false; // grab type hits that happen even as unlock
         usePositionAsDirection = true;
@@ -3253,73 +3253,77 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     if (downTime <= 1) {
         downTime = 3;
     }
-    if (destY != 0 && !isDomain)
-    {
-        // this is set on honda airborne hands
-        // juggle state, just add a bunch of hitstun
-        hitEntryHitStun += 500000;
-        resetHitStunOnLand = true;
+    if (applyHit && !isGrab) {
+        if (destY != 0 && !isDomain)
+        {
+            // this is set on honda airborne hands
+            // juggle state, just add a bunch of hitstun
+            hitEntryHitStun += 500000;
+            resetHitStunOnLand = true;
 
-        knockDownFrames = downTime;
+            knockDownFrames = downTime;
 
-        if (forceKnockDownState || dmgType == 11 || dmgType == 15 || isDrive) {
-            knockDown = true;
-            // slide velocity while on the ground?
-            groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime);
-        } else {
-            knockDown = false;
-            groundBounceVelX = Fixed(0);
+            if (forceKnockDownState || dmgType == 11 || dmgType == 15 || isDrive) {
+                knockDown = true;
+                // slide velocity while on the ground?
+                groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime);
+            } else {
+                knockDown = false;
+                groundBounceVelX = Fixed(0);
+            }
         }
-    }
 
-    if (moveType == 11 || moveType == 10 || moveType == 18) { // crumples, hkds
-        hitEntryHitStun += 500000;
-        resetHitStunOnTransition = true;
-        knockDown = true;
-        knockDownFrames = downTime;
+        if (moveType == 11 || moveType == 10 || moveType == 18) { // crumples, hkds
+            hitEntryHitStun += 500000;
+            resetHitStunOnTransition = true;
+            knockDown = true;
+            knockDownFrames = downTime;
+        }
     }
 
     bool appliedAction = false;
 
-    if (dmgType == 13) {
-        knockDown = true;
-        if (!isDomain && applyHit && piyoBound) { // ??
-            knockDownFrames = 0;
-            hitEntryHitStun = downTime;
-            resetHitStunOnLand = false;
-            resetHitStunOnTransition = false;
-            nextAction = 330;
-            appliedAction = true;
-            isDown = true;
-        } else {
-            knockDownFrames = downTime;
+    if (applyHit && !isGrab) {
+        if (dmgType == 13) {
+            knockDown = true;
+            if (!isDomain && applyHit && piyoBound) { // ??
+                knockDownFrames = 0;
+                hitEntryHitStun = downTime;
+                resetHitStunOnLand = false;
+                resetHitStunOnTransition = false;
+                nextAction = 330;
+                appliedAction = true;
+                isDown = true;
+            } else {
+                knockDownFrames = downTime;
+            }
+
+            //resetHitStunOnTransition = true;
         }
 
-        //resetHitStunOnTransition = true;
-    }
+        if (jimenBound && !airborne) {
+            jimenBound = false;
+            // it stays on the ground one more frame in lieu of a ground bounce?
+            knockDownFrames += 1;
+        }
 
-    if (jimenBound && !airborne) {
-        jimenBound = false;
-        // it stays on the ground one more frame in lieu of a ground bounce?
-        knockDownFrames += 1;
-    }
+        if (dmgType == 30 && blocking) {
+            kabeTataki = false;
+        }
 
-    if (dmgType == 30 && blocking) {
-        kabeTataki = false;
-    }
+        if (dmgType == 31) {
+            kabeTataki = true;
+        }
 
-    if (dmgType == 31) {
-        kabeTataki = true;
-    }
+        if (dmgType == 27) {
+            kabeTataki = true;
+            stunSplat = true;
+        }
 
-    if (dmgType == 27) {
-        kabeTataki = true;
-        stunSplat = true;
-    }
-
-    if (attr0 & (1<<9) && comboHits) {
-        kabeBound = false;
-        kabeTataki = false;
+        if (attr0 & (1<<9) && comboHits) {
+            kabeBound = false;
+            kabeTataki = false;
+        }
     }
 
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
@@ -3528,18 +3532,19 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             landed = false;
         }
 
-        if (!isDomain) {
-            // special ground status, ground bounce OR tumble
-            groundBounce = false;
-            tumble = false;
+        // special ground status, ground bounce OR tumble OR slide
+        groundBounce = false;
+        tumble = false;
+        slide = false;
 
-            // special wall status, splat OR bounce (NOT exclusive from special gronud satatus)
-            wallSplat = false;
-            wallBounce = false;
+        // special wall status, splat OR bounce (NOT exclusive from special gronud satatus)
+        wallSplat = false;
+        wallBounce = false;
 
-            wallStopped = false;
-            wallStopFrames = false;
+        wallStopped = false;
+        wallStopFrames = false;
 
+        if (!isDomain && !isGrab) {
             if (jimenBound && floorTime) {
                 int floorDestX = pHitEffect->floorDestX;
                 int floorDestY = pHitEffect->floorDestY;
@@ -3564,6 +3569,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     // todo move this into some kind of 'next vel' and debloat the guy struct
                     groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
                     knockDownFrames = downTime - 27;
+                }
+                if (moveType == 9 || moveType == 19) {
+                    knockDown = true;
+                    slide = true;
+                    groundBounceVelX = Fixed(-pHitEffect->boundDest * 2) / Fixed(28);
+                    groundBounceAccelX = fixDivWithBias(Fixed(pHitEffect->boundDest * 2), Fixed(28 * 28));
+                    knockDownFrames = downTime + destTime;
                 }
             }
 
@@ -3641,7 +3653,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                         accelY = Fixed(0);
                     }
                 }
-            } else if (!isDomain && destTime != 0) {
+            } else if (!isDomain && destTime != 0 && moveType != 9) {
                 // generic pushback/airborne knock
                 if (!airborne) {
                     // if (parrying && !pAttacker->isProjectile) {
@@ -3688,7 +3700,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    if (!isDomain && applyHit && !appliedAction) {
+    if (!isDomain && applyHit && !appliedAction && !isGrab) {
         int prevNextAction = nextAction;
         if (blocking) {
             if (parrying) {
@@ -4467,7 +4479,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     curNextAction = nextAction;
     bool didBranch = false;
-    if (!didTrigger) {
+    if (!didTrigger && nextAction == -1) {
         DoBranchKey();
         if (nextAction != curNextAction) {
             didBranch = true;
@@ -4485,7 +4497,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     currentFrame = currentFrameFrac.i();
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
-    if (!didTrigger && !didBranch) {
+    if (!didTrigger && !didBranch && nextAction == -1) {
         curNextAction = nextAction;
         DoBranchKey(true);
         if (nextAction != curNextAction) {
@@ -4637,6 +4649,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
+    bool doSlideBounce = false;
+
     if (bounced) {
         if (groundBounce) {
             nextAction = 350; // combo/bounce state
@@ -4666,9 +4680,20 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
             velocityX = groundBounceVelX;
             groundBounceVelX = 0.0f;
+        } else if (slide) {
+            doSlideBounce = true;
         }
 
         bounced = false;
+    }
+
+    if (slide && (doSlideBounce || !airborne)) {
+        nextAction = 333;
+        slide = false;
+        hitStun = knockDownFrames;
+        knockDownFrames = 9;
+
+        // we'll delayed set the vel later in advance
     }
 
     if (currentAction == 33 && jumpDirection == 0 && currentInput & 1 ) {
@@ -4873,12 +4898,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (burnout || !underMinimumTime) {
             parrying = false;
             nextAction = 482; // DPA_STD_END
-
-            if (successfulParry) {
-                // // override to lower amount without helper
-                // focusRegenCooldown = 20;
-                // focusRegenCooldownFrozen = false;
-            }
         }
     }
 
@@ -5099,6 +5118,14 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         hitAccelX = Fixed(1) * direction;
     }
 
+    if (currentAction == 333 && currentFrame == 2) {
+        velocityX = groundBounceVelX;
+        accelX = groundBounceAccelX;
+
+        groundBounceVelX = Fixed(0);
+        groundBounceAccelX = Fixed(0);
+    }
+
     if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
         switchDirection();
     }
@@ -5146,14 +5173,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     // training mode refill, immediately start regen on recovery
     // if (!couldMove && canMoveNow) {
     //     focusRegenCooldown = 3;
-    // }
-
-    // if (deferredFocusCost && regenAmountDone) {
-    //     setFocus(focus - regenAmountDone);
-    //     log(logResources, "undoing regen from trigger!");
-    // } else if (didTrigger && regenAmountDone && focusIfNotWalkForward) {
-    //     setFocus(focusIfNotWalkForward);
-    //     log(logResources, "undoing walkforward bonus regen from trigger!");
     // }
 
     if (didTrigger && didTransition) {

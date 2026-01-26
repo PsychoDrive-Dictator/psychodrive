@@ -761,6 +761,7 @@ private:
         stunSplat = false;
         stunned = false;
         tumble = false;
+        slide = false;
         wallBounceVelX = Fixed(0);
         wallBounceVelY = Fixed(0);
         wallBounceAccelX = Fixed(0);
@@ -905,6 +906,7 @@ private:
     bool stunSplat : 1;
     bool stunned : 1;
     bool tumble : 1;
+    bool slide : 1;
     bool groundBounce : 1;
     bool wallStopped : 1;
     bool armorThisFrame : 1;
