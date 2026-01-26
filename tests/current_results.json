@@ -8510,6 +8510,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_rashid_deejay",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 8353,
+                "firstFrame": 145,
+                "lastFrame": 3912
+            },
+            {
+                "count": 2467,
+                "firstFrame": 224,
+                "lastFrame": 3912
+            },
+            {
+                "count": 870,
+                "firstFrame": 355,
+                "lastFrame": 3470
+            },
+            {
+                "count": 1999,
+                "firstFrame": 134,
+                "lastFrame": 3908
+            },
+            {
+                "count": 1974,
+                "firstFrame": 134,
+                "lastFrame": 3908
+            },
+            {
+                "count": 5368,
+                "firstFrame": 134,
+                "lastFrame": 3912
+            },
+            {
+                "count": 5277,
+                "firstFrame": 353,
+                "lastFrame": 3912
+            },
+            {
+                "count": 1733,
+                "firstFrame": 378,
+                "lastFrame": 3912
+            },
+            {
+                "count": 4402,
+                "firstFrame": 353,
+                "lastFrame": 3912
+            },
+            {
+                "count": 7006,
+                "firstFrame": 378,
+                "lastFrame": 3912
+            },
+            {
+                "count": 1415,
+                "firstFrame": 353,
+                "lastFrame": 3890
+            },
+            {
+                "count": 13318,
+                "firstFrame": 378,
+                "lastFrame": 3912
+            }
+        ]
+    },
+    {
+        "testName": "zz_match_rashid_deejay_r3",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 8437,
+                "firstFrame": 137,
+                "lastFrame": 4010
+            },
+            {
+                "count": 2244,
+                "firstFrame": 137,
+                "lastFrame": 3920
+            },
+            {
+                "count": 964,
+                "firstFrame": 191,
+                "lastFrame": 3906
+            },
+            {
+                "count": 2291,
+                "firstFrame": 145,
+                "lastFrame": 3902
+            },
+            {
+                "count": 2270,
+                "firstFrame": 145,
+                "lastFrame": 3902
+            },
+            {
+                "count": 5522,
+                "firstFrame": 104,
+                "lastFrame": 4010
+            },
+            {
+                "count": 5616,
+                "firstFrame": 125,
+                "lastFrame": 4010
+            },
+            {
+                "count": 1980,
+                "firstFrame": 161,
+                "lastFrame": 3920
+            },
+            {
+                "count": 2172,
+                "firstFrame": 408,
+                "lastFrame": 2997
+            },
+            {
+                "count": 6933,
+                "firstFrame": 161,
+                "lastFrame": 4010
+            },
+            {
+                "count": 1591,
+                "firstFrame": 145,
+                "lastFrame": 3834
+            },
+            {
+                "count": 12532,
+                "firstFrame": 145,
+                "lastFrame": 4010
+            }
+        ]
+    },
+    {
         "testName": "zz_match_sagat_terry",
         "testVersion": "39",
         "finished": true,
