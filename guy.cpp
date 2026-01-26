@@ -3385,42 +3385,42 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    Fixed effectiveScaling = Fixed(currentScaling - attackerInstantScale);
+    int effectiveScaling = currentScaling - attackerInstantScale;
 
-    if (effectiveScaling < Fixed(10)) {
-        effectiveScaling = Fixed(10);
-    }
-
-    if (driveScaling) {
-        effectiveScaling *= Fixed(0.85,true);
-    }
-    if (perfectScaling) {
-        effectiveScaling *= Fixed(0.50,true);
-    }
-
-    if (pAttacker->superAction) {
-        if (pAttacker->superLevel == 1 && effectiveScaling < Fixed(30)) {
-            effectiveScaling = Fixed(30);
-        }
-        if (pAttacker->superLevel == 2 && effectiveScaling < Fixed(40)) {
-            effectiveScaling = Fixed(40);
-        }
-        if (pAttacker->superLevel == 3 && effectiveScaling < Fixed(50)) {
-            effectiveScaling = Fixed(50);
-        }
+    if (effectiveScaling < 10) {
+        effectiveScaling = 10;
     }
 
     StyleData &attackerStyleData = pAttacker->pCharData->styles[pAttacker->styleInstall];
-    effectiveScaling = Fixed(effectiveScaling.i()) * Fixed(attackerStyleData.attackScale) / Fixed(100);
-    Fixed damageFixed = Fixed(dmgValue) * Fixed(effectiveScaling.i()) / Fixed(100);
-    int moveDamage = damageFixed.i();
+    effectiveScaling = effectiveScaling * attackerStyleData.attackScale / 100;
+
+    if (driveScaling) {
+        effectiveScaling = effectiveScaling * 85 / 100;
+    }
+    if (perfectScaling) {
+        effectiveScaling = effectiveScaling * 50 / 100;
+    }
+
+    if (pAttacker->superAction) {
+        if (pAttacker->superLevel == 1 && effectiveScaling < 30) {
+            effectiveScaling = 30;
+        }
+        if (pAttacker->superLevel == 2 && effectiveScaling < 40) {
+            effectiveScaling = 40;
+        }
+        if (pAttacker->superLevel == 3 && effectiveScaling < 50) {
+            effectiveScaling = 50;
+        }
+    }
+
+    int moveDamage = dmgValue * effectiveScaling / 100;
     int prevHealth = health;
     health -= moveDamage;
     if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
         health = 0;
     }
     recoverableHealth = 0;
-    log(logHits, "effective scaling " + std::to_string(effectiveScaling.f()) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
+    log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
 
     if (health < 0) {
         if (prevHealth && attr1 & (1<<4)) {
@@ -3442,7 +3442,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
 
         comboDamage += moveDamage;
-        lastDamageScale = effectiveScaling.i();
+        lastDamageScale = effectiveScaling;
 
         DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
     }

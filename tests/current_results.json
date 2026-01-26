@@ -5277,9 +5277,9 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 702,
-                "firstFrame": 319,
-                "lastFrame": 1020
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
