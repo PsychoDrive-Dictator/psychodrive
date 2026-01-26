@@ -3231,10 +3231,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         destY = 0;
     }
 
-    if (jimenBound && !airborne) {
-        jimenBound = false;
-    }
-
     // if going airborne, start counting juggle
     bool startingJuggle = (!airborne && destY != 0) || (airborne && comboHits == 0);
     if (!isDomain && applyHit && startingJuggle) {
@@ -3300,6 +3296,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
 
         //resetHitStunOnTransition = true;
+    }
+
+    if (jimenBound && !airborne) {
+        jimenBound = false;
+        // it stays on the ground one more frame in lieu of a ground bounce?
+        knockDownFrames += 1;
     }
 
     if (dmgType == 30 && blocking) {
