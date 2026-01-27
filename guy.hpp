@@ -792,6 +792,7 @@ private:
         superFreeze = false;
         pendingUnlockHitDelayed = false;
         alreadyDeadButDoesNotKnow = false;
+        moveStartPos = Fixed(0);
         uniqueTimerCount = 0;
         debuffTimer = 0;
         pCurrentAction = nullptr;
@@ -1039,6 +1040,8 @@ private:
     Fixed hitReflectAccelX;
     Fixed reflectThisFrame;
     int uniqueOpsAppliedMask;
+
+    Fixed moveStartPos;
 
     // 2.0 was here
     int currentScaling;

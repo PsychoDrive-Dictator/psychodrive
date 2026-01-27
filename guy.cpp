@@ -603,6 +603,8 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
     uint64_t flags = pTrigger->flags;
 
     blocking = false;
+    moveStartPos = getPosX();
+
     bool normalAttack = flags & (1ULL<<11);
     bool uniqueAttack = flags & (1ULL<<12);
     bool specialAttack = flags & (1ULL<<13);
@@ -1708,7 +1710,11 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
             }
         } else {
             for (auto pRect : hitBoxKey.rects) {
-                Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+                Fixed rootOffsetToUse = rootOffsetX;
+                if (hitBoxKey.flags & fixed_position) {
+                    rootOffsetToUse = moveStartPos + hitBoxKey.offsetX * direction;
+                }
+                Box rect = rectToBox(pRect, rootOffsetToUse, rootOffsetY, direction.i());
                 if (pOutRenderBoxes) {
                     pOutRenderBoxes->push_back({rect, thickness, collisionColor, drive && type != proximity_guard});
                 }

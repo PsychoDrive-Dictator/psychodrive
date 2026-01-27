@@ -163,6 +163,7 @@ enum hitBoxFlags {
     only_hits_front = 64,
     only_hits_in_combo = 128,
     multi_counter = 256,
+    fixed_position = 512,
 };
 
 enum hurtBoxFlags {
