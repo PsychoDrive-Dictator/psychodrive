@@ -1541,7 +1541,7 @@ void Guy::getPushBoxes(std::vector<Box> *pOutPushBoxes, std::vector<RenderBox> *
     }
 }
 
-void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pOutThrowBoxes, std::vector<RenderBox> *pOutRenderBoxes)
+void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox> *pOutThrowBoxes, std::vector<RenderBox> *pOutRenderBoxes)
 {
     if (!pCurrentAction) {
         return;
@@ -1580,19 +1580,21 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pO
         if (isAtemi) {
             baseBox.flags |= atemi;
         }
-        // those are from gelatin's viewer.. why are they not actual flags?
-        // every normal hurtbox has typeFlags == 3 so clearly it's not just flags
-        if (typeFlags == 1) {
-            baseBox.flags |= projectile_invul;
+        // reverse hitbox type, which ones they interact with
+        if (!(typeFlags & 1)) {
+            baseBox.flags |= invul_hit;
         }
-        if (typeFlags == 2) {
-            baseBox.flags |= full_strike_invul;
+        if (!(typeFlags & 2)) {
+            baseBox.flags |= invul_projectile;
         }
-        if (immune == 4) {
-            baseBox.flags |= air_strike_invul;
+        if (immune & (1<<0)) {
+            baseBox.flags |= invul_standing_opponent;
         }
-        if (immune == 11) {
-            baseBox.flags |= ground_strike_invul;
+        if (immune & (1<<1)) {
+            baseBox.flags |= invul_crouching_opponent;
+        }
+        if (immune & (1<<2)) {
+            baseBox.flags |= invul_airborne_opponent;
         }
 
         for (auto pRect : hurtBoxKey.legRects) {
@@ -1642,12 +1644,13 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<Box> *pO
         }
 
         for (auto pRect : hurtBoxKey.throwRects) {
-            Box rect = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
+            HurtBox newBox = baseBox;
+            newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
             if (pOutThrowBoxes) {
-                pOutThrowBoxes->push_back(rect);
+                pOutThrowBoxes->push_back(newBox);
             }
             if (pOutRenderBoxes) {
-                pOutRenderBoxes->push_back({rect, 35.0, {0.15,0.20,0.8}, drive,parry,di});
+                pOutRenderBoxes->push_back({newBox.box, 35.0, {0.15,0.20,0.8}, drive,parry,di});
             }
         }
     }
@@ -2284,7 +2287,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     if ( !pOtherGuy ) return;
 
     std::vector<HitBox> hitBoxes;
-    std::vector<Box> otherThrowBoxes;
+    std::vector<HurtBox> otherThrowBoxes;
     std::vector<HurtBox> otherHurtBoxes;
     bool hasEvaluatedThrowBoxes = false;
     bool hasEvaluatedHurtBoxes = false;
@@ -2353,9 +2356,22 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     hasEvaluatedThrowBoxes = true;
                 }
                 for (auto throwBox : otherThrowBoxes ) {
-                    if (doBoxesHit(hitbox.box, throwBox)) {
+                    if (getAirborne()) {
+                        if (throwBox.flags & invul_airborne_opponent) {
+                            continue;
+                        }
+                    } else if (getCrouching()) {
+                        if (throwBox.flags & invul_crouching_opponent) {
+                            continue;
+                        }
+                    } else {
+                        if (throwBox.flags & invul_standing_opponent) {
+                            continue;
+                        }
+                    }
+                    if (doBoxesHit(hitbox.box, throwBox.box)) {
                         foundBox = true;
-                        hurtBox.box = throwBox;
+                        hurtBox.box = throwBox.box;
                         break;
                     }
                 }
@@ -2396,17 +2412,24 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     hasEvaluatedHurtBoxes = true;
                 }
                 for (auto hurtbox : otherHurtBoxes ) {
-                    if (hitbox.type == hit && hurtbox.flags & full_strike_invul) {
+                    if (hitbox.type == hit && hurtbox.flags & invul_hit) {
                         continue;
                     }
-                    if (hitbox.type == projectile && hurtbox.flags & projectile_invul) {
+                    if (hitbox.type == projectile && hurtbox.flags & invul_projectile) {
                         continue;
                     }
-                    if (hurtbox.flags & air_strike_invul && getAirborne()) {
-                        continue;
-                    }
-                    if (hurtbox.flags & ground_strike_invul && !getAirborne()) {
-                        continue;
+                    if (getAirborne()) {
+                        if (hurtbox.flags & invul_airborne_opponent) {
+                            continue;
+                        }
+                    } else if (getCrouching()) {
+                        if (hurtBox.flags & invul_crouching_opponent) {
+                            continue;
+                        }
+                    } else {
+                        if (hurtBox.flags & invul_standing_opponent) {
+                            continue;
+                        }
                     }
 
                     if (hitbox.type == proximity_guard) {

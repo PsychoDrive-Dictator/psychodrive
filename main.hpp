@@ -166,15 +166,16 @@ enum hitBoxFlags {
 };
 
 enum hurtBoxFlags {
-    full_strike_invul = 1,
-    projectile_invul = 2,
-    air_strike_invul = 4,
-    ground_strike_invul = 8,
-    armor = 16,
-    atemi = 32,
-    head = 64,
-    body = 128,
-    legs = 256,
+    invul_hit = 1,
+    invul_projectile = 2,
+    invul_standing_opponent = 4,
+    invul_crouching_opponent = 8,
+    invul_airborne_opponent = 16,
+    armor = 32,
+    atemi = 64,
+    head = 128,
+    body = 256,
+    legs = 512,
 };
 
 struct HitBox {
