@@ -877,11 +877,6 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1064,
-                "firstFrame": 139,
-                "lastFrame": 670
-            },
-            {
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
@@ -897,24 +892,24 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 0,
-                "firstFrame": -1,
-                "lastFrame": -1
+                "count": 98,
+                "firstFrame": 113,
+                "lastFrame": 161
             },
             {
-                "count": 266,
-                "firstFrame": 139,
+                "count": 98,
+                "firstFrame": 113,
+                "lastFrame": 161
+            },
+            {
+                "count": 62,
+                "firstFrame": 579,
                 "lastFrame": 640
             },
             {
-                "count": 133,
-                "firstFrame": 329,
+                "count": 5,
+                "firstFrame": 594,
                 "lastFrame": 598
-            },
-            {
-                "count": 126,
-                "firstFrame": 113,
-                "lastFrame": 175
             },
             {
                 "count": 0,
@@ -922,9 +917,14 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 1036,
-                "firstFrame": 113,
-                "lastFrame": 630
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 52,
@@ -932,9 +932,9 @@ var currentResults =
                 "lastFrame": 138
             },
             {
-                "count": 60,
-                "firstFrame": 329,
-                "lastFrame": 388
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },

@@ -426,7 +426,7 @@ private:
     void UpdateActionData(void);
     Box rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir);
 
-    void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade = false, HurtBox *pHurtBox = nullptr);
+    void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade = false, bool isClash = false, HurtBox *pHurtBox = nullptr);
     void ApplyUniqueBoxOps(UniqueBox &box, Guy *src);
     void ExecuteTrigger(Trigger *pTrigger);
 
@@ -792,7 +792,6 @@ private:
         superFreeze = false;
         pendingUnlockHitDelayed = false;
         alreadyDeadButDoesNotKnow = false;
-        activatedScreenFreezeBox = false;
         moveStartPos = Fixed(0);
         uniqueTimerCount = 0;
         debuffTimer = 0;
@@ -926,7 +925,6 @@ private:
     bool pendingUnlockHitDelayed : 1;
     bool appliedScaling : 1;
     bool alreadyDeadButDoesNotKnow : 1;
-    bool activatedScreenFreezeBox : 1;
 
     int projHitCount;
     int projLifeTime;

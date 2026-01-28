@@ -1698,6 +1698,8 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
             collisionColor = {0.5,0.5,0.5};
         } else if (type == screen_freeze) {
             collisionColor = {0.0,0.4,0.9};
+        } else if (type == clash) {
+            collisionColor = {0.0,0.7,0.2};
         }
 
         float thickness = 50.0;
@@ -2310,7 +2312,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
             continue;
         }
-        if (hitbox.type == destroy_projectile || hitbox.type == clash) {
+        if (hitbox.type == destroy_projectile) {
             // todo right now we do nothing with those
             continue;
         }
@@ -2456,27 +2458,51 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                             hurtBox = hurtbox;
                             foundBox = true;
                             //log(logHits, "foundbox");
-                            break; // todo probably not quite right - there's an ordering to other boxes?
+                            break; // don't do further hitboxes from us
                         }
                     }
                 }
             } else if (hitbox.type == screen_freeze) {
-                if (activatedScreenFreezeBox || pOtherGuy->activatedScreenFreezeBox) {
-                    continue;
-                }
                 // those want other screen_freeze boxes
                 // those tend to come in 1s so probably not worth trying to recycle the vec?
-                log(true, "screen freeze left");
                 std::vector<HitBox> otherFreezeBoxes;
                 pOtherGuy->getHitBoxes(&otherFreezeBoxes, nullptr, hitBoxType::screen_freeze);
-                for (auto freezeBox : otherFreezeBoxes ) {
-                    log(true, "screen freeze right");
+                for (auto const & freezeBox : otherFreezeBoxes ) {
                     if (doBoxesHit(hitbox.box, freezeBox.box)) {
-                        log(true, "screen freeze hit");
                         parryFreeze += 61;
                         pOtherGuy->parryFreeze += 61;
-                        activatedScreenFreezeBox = true;
-                        pOtherGuy->activatedScreenFreezeBox = true;
+
+                        if (hitbox.hitID != -1) {
+                            canHitID |= 1ULL << hitbox.hitID;
+                        }
+                        if (freezeBox.hitID != -1) {
+                            pOtherGuy->canHitID |= 1ULL << freezeBox.hitID;
+                        }
+                    }
+                }
+            } else if (hitbox.type == clash) {
+                // those want other clash boxes
+                std::vector<HitBox> otherClashBoxes;
+                pOtherGuy->getHitBoxes(&otherClashBoxes, nullptr, hitBoxType::clash);
+                for (auto const & clashBox : otherClashBoxes ) {
+                    if (doBoxesHit(hitbox.box, clashBox.box)) {
+                        // in reality there is one more frame of hitstop but movement mysteriously starts 1f before hitstop ends
+                        // we do one frame less of hitstop and we hold here for 1f, which equates to the same thing (right???)
+                        ApplyHitEffect(&clashBox.pHitData->param[0], pOtherGuy, false, false, false, false, false, true);
+                        addHitStop(clashBox.pHitData->param[0].hitStopTarget+1);
+                        currentFrameFrac -= Fixed(1);
+
+                        pOtherGuy->ApplyHitEffect(&hitbox.pHitData->param[0], this, false, false, false, false, false, true);
+                        pOtherGuy->addHitStop(hitbox.pHitData->param[0].hitStopTarget+1);
+                        pOtherGuy->currentFrameFrac -= Fixed(1);
+
+                        if (hitbox.hitID != -1) {
+                            canHitID |= 1ULL << hitbox.hitID;
+                        }
+
+                        if (clashBox.hitID != -1) {
+                            pOtherGuy->canHitID |= 1ULL << clashBox.hitID;
+                        }
                     }
                 }
             }
@@ -2911,7 +2937,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 clonedEntry.moveTime = hitBox.pHitData->param[newHitFlag].moveTime;
                 pHitEntry = &clonedEntry;
             }
-            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, &hurtBox);
+            pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, false, &hurtBox);
 
             if (pendingHit.parried) {
                 Fixed hitVel = pOtherGuy->hitVelX;
@@ -3199,7 +3225,7 @@ void Guy::ApplyUniqueBoxOps(UniqueBox &box, Guy *src)
     }
 }
 
-void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool isGrab, bool isDrive, bool isDomain, bool isTrade, HurtBox *pHurtBox)
+void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool isGrab, bool isDrive, bool isDomain, bool isTrade, bool isClash, HurtBox *pHurtBox)
 {
     int comboAdd = pHitEffect->comboAdd;
     int juggleFirst = pHitEffect->juggleFirst;
@@ -3279,7 +3305,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         destY = 0;
     }
 
-    if (blocking) {
+    if (blocking || isClash) {
         // todo should we remove other special status here?
         destY = 0;
     }
@@ -3472,82 +3498,84 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    int moveDamage = dmgValue * effectiveScaling / 100;
-    int prevHealth = health;
-    health -= moveDamage;
-    if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
-        health = 0;
-    }
-    recoverableHealth = 0;
-    log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
-
-    if (health < 0) {
-        if (prevHealth && attr1 & (1<<4)) {
-            health = 1;
-            alreadyDeadButDoesNotKnow = true;
-        } else {
+    if (!isClash) {
+        int moveDamage = dmgValue * effectiveScaling / 100;
+        int prevHealth = health;
+        health -= moveDamage;
+        if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
             health = 0;
         }
-    }
+        recoverableHealth = 0;
+        log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
 
-    // todo if health 0 mark finish here?
-
-    if (moveDamage > 0) {
-        // look for minions to delete on damage
-        for (auto &minion: getMinions()) {
-            if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
-                minion->die = true;
+        if (health < 0) {
+            if (prevHealth && attr1 & (1<<4)) {
+                health = 1;
+                alreadyDeadButDoesNotKnow = true;
+            } else {
+                health = 0;
             }
         }
 
-        comboDamage += moveDamage;
-        lastDamageScale = effectiveScaling;
+        // todo if health 0 mark finish here?
 
-        DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
-    }
-
-    int scaledFocusGain = pHitEffect->focusGainTarget;
-    if (!parrying && (!burnout || scaledFocusGain > 0)) {
-        if (perfectScaling && scaledFocusGain < 0) {
-            scaledFocusGain = scaledFocusGain * 50 / 100;
-        }
-        focus += scaledFocusGain;
-        log(logResources, "focus " + std::to_string(scaledFocusGain) + " (hit), total " + std::to_string(focus));
-        if (scaledFocusGain < 0 && !superFreeze) {
-            // todo apparently start of hitstun except if super where it's after??
-            if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
-                focusRegenCooldown++; // it freezes for one frame but doesn't apply
+        if (moveDamage > 0) {
+            // look for minions to delete on damage
+            for (auto &minion: getMinions()) {
+                if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
+                    minion->die = true;
+                }
             }
-            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
-        }
-    }
-    int scaledSuperGain = pHitEffect->superGainTarget;
-    if (perfectScaling) {
-        scaledSuperGain = scaledSuperGain * 80 / 100;
-    }
-    scaledSuperGain = scaledSuperGain * pCharData->styles[styleInstall].gaugeGainRatio / 100;
-    gauge += scaledSuperGain;
 
-    Guy *pResourceGuy = pAttacker;
-    if (pAttacker->isProjectile) {
-        pResourceGuy = pAttacker->pParent;
-    }
-    // set resources directly, will be clamped by caller, for trades
-    if (!pResourceGuy->driveRushCancel && !driveScaling) {
-        scaledFocusGain = pHitEffect->focusGainOwn;
+            comboDamage += moveDamage;
+            lastDamageScale = effectiveScaling;
+
+            DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
+        }
+
+        int scaledFocusGain = pHitEffect->focusGainTarget;
+        if (!parrying && (!burnout || scaledFocusGain > 0)) {
+            if (perfectScaling && scaledFocusGain < 0) {
+                scaledFocusGain = scaledFocusGain * 50 / 100;
+            }
+            focus += scaledFocusGain;
+            log(logResources, "focus " + std::to_string(scaledFocusGain) + " (hit), total " + std::to_string(focus));
+            if (scaledFocusGain < 0 && !superFreeze) {
+                // todo apparently start of hitstun except if super where it's after??
+                if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
+                    focusRegenCooldown++; // it freezes for one frame but doesn't apply
+                }
+                log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
+            }
+        }
+        int scaledSuperGain = pHitEffect->superGainTarget;
         if (perfectScaling) {
-            scaledFocusGain = scaledFocusGain * 50 / 100;
+            scaledSuperGain = scaledSuperGain * 80 / 100;
         }
-        pResourceGuy->focus += scaledFocusGain;
+        scaledSuperGain = scaledSuperGain * pCharData->styles[styleInstall].gaugeGainRatio / 100;
+        gauge += scaledSuperGain;
+
+        Guy *pResourceGuy = pAttacker;
+        if (pAttacker->isProjectile) {
+            pResourceGuy = pAttacker->pParent;
+        }
+        // set resources directly, will be clamped by caller, for trades
+        if (!pResourceGuy->driveRushCancel && !driveScaling) {
+            scaledFocusGain = pHitEffect->focusGainOwn;
+            if (perfectScaling) {
+                scaledFocusGain = scaledFocusGain * 50 / 100;
+            }
+            pResourceGuy->focus += scaledFocusGain;
+        }
+        // todo maybe rounding errors there? we got some with health scaling until moving to fixed
+        StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
+        scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
+        if (perfectScaling) {
+            scaledSuperGain = scaledSuperGain * 80 / 100;
+        }
+        scaledSuperGain = scaledSuperGain * superGainScaling / 100;
+        pResourceGuy->gauge += scaledSuperGain;
     }
-    // todo maybe rounding errors there? we got some with health scaling until moving to fixed
-    StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
-    scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
-    if (perfectScaling) {
-        scaledSuperGain = scaledSuperGain * 80 / 100;
-    }
-    scaledSuperGain = scaledSuperGain * superGainScaling / 100;
-    pResourceGuy->gauge += scaledSuperGain;
 
     if (applyHit) {
         if (!blocking) {
@@ -3559,7 +3587,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
     bool appliedHitStun = false;
 
-    if (!isDomain && applyHit) {
+    if (!isDomain && (applyHit || isClash)) {
         // not sure if the right check to reset hitstun to 0 only in some cases
         // maybe time to start adding lots of hitstun as a juggle state
         if (hitEntryHitStun > 0 || dmgType == 21 || dmgType == 22) {
@@ -3578,7 +3606,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         }
     }
 
-    if (applyHit) {
+    if (applyHit || isClash) {
         if (destY > 0 && !isDomain) {
             airborne = true;
             // todo this might be too late if they had knockdown state on.. we can delay extra landing transition if so
@@ -5093,7 +5121,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (canMoveNow) {
         perfectScaling = false;
-        activatedScreenFreezeBox = false;
     }
 
     if (canMoveNow && wasHit) {

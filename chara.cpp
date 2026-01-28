@@ -412,9 +412,6 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
 
         int hitID = hitBox["HitID"];
         bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
-        if (isOther) {
-            hasHitID = false;
-        }
         if (hitID < 0) {
             hitID = 15;
         }
@@ -478,7 +475,7 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
                     newKey.rects.push_back(it->second);
                 }
             }
-            if (!newKey.rects.empty() || type == proximity_guard) {
+            if (!newKey.rects.empty()) {
                 pOutputVector->push_back(newKey);
             }
         }
@@ -1109,11 +1106,11 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         }
         newAction.hitBoxKeys.reserve(hitBoxKeyCount);
 
-        if (key.contains("AttackCollisionKey")) {
-            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, hitByID);
-        }
         if (key.contains("OtherCollisionKey")) {
             loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true, hitByID);
+        }
+        if (key.contains("AttackCollisionKey")) {
+            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, hitByID);
         }
 
         if (key.contains("UniqueCollisionKey")) {
