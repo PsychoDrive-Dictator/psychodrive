@@ -792,6 +792,7 @@ private:
         superFreeze = false;
         pendingUnlockHitDelayed = false;
         alreadyDeadButDoesNotKnow = false;
+        activatedScreenFreezeBox = false;
         moveStartPos = Fixed(0);
         uniqueTimerCount = 0;
         debuffTimer = 0;
@@ -925,6 +926,7 @@ private:
     bool pendingUnlockHitDelayed : 1;
     bool appliedScaling : 1;
     bool alreadyDeadButDoesNotKnow : 1;
+    bool activatedScreenFreezeBox : 1;
 
     int projHitCount;
     int projLifeTime;

@@ -1696,6 +1696,8 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
             collisionColor = {0.0,1.0,0.5};
         } else if (type == proximity_guard) {
             collisionColor = {0.5,0.5,0.5};
+        } else if (type == screen_freeze) {
+            collisionColor = {0.0,0.4,0.9};
         }
 
         float thickness = 50.0;
@@ -1722,10 +1724,8 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
                     pOutRenderBoxes->push_back({rect, thickness, collisionColor, drive && type != proximity_guard});
                 }
 
-                if (type == proximity_guard || hitBoxKey.pHitData != nullptr) {
-                    if (pOutHitBoxes) {
-                        pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
-                    }
+                if (pOutHitBoxes) {
+                    pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
                 }
             }
         }
@@ -2456,11 +2456,14 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                             hurtBox = hurtbox;
                             foundBox = true;
                             //log(logHits, "foundbox");
-                            break;
+                            break; // todo probably not quite right - there's an ordering to other boxes?
                         }
                     }
                 }
             } else if (hitbox.type == screen_freeze) {
+                if (activatedScreenFreezeBox || pOtherGuy->activatedScreenFreezeBox) {
+                    continue;
+                }
                 // those want other screen_freeze boxes
                 // those tend to come in 1s so probably not worth trying to recycle the vec?
                 log(true, "screen freeze left");
@@ -2472,6 +2475,8 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                         log(true, "screen freeze hit");
                         parryFreeze += 61;
                         pOtherGuy->parryFreeze += 61;
+                        activatedScreenFreezeBox = true;
+                        pOtherGuy->activatedScreenFreezeBox = true;
                     }
                 }
             }
@@ -5088,6 +5093,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (canMoveNow) {
         perfectScaling = false;
+        activatedScreenFreezeBox = false;
     }
 
     if (canMoveNow && wasHit) {
