@@ -872,6 +872,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_di_edgecases",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1198,
+                "firstFrame": 42,
+                "lastFrame": 670
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 146,
+                "firstFrame": 379,
+                "lastFrame": 535
+            },
+            {
+                "count": 122,
+                "firstFrame": 379,
+                "lastFrame": 535
+            },
+            {
+                "count": 643,
+                "firstFrame": 79,
+                "lastFrame": 640
+            },
+            {
+                "count": 1191,
+                "firstFrame": 42,
+                "lastFrame": 670
+            },
+            {
+                "count": 366,
+                "firstFrame": 53,
+                "lastFrame": 598
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 956,
+                "firstFrame": 53,
+                "lastFrame": 630
+            },
+            {
+                "count": 347,
+                "firstFrame": 53,
+                "lastFrame": 510
+            },
+            {
+                "count": 435,
+                "firstFrame": 379,
+                "lastFrame": 670
+            }
+        ]
+    },
+    {
         "testName": "aa_di_splats",
         "testVersion": "34",
         "finished": true,

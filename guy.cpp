@@ -1658,7 +1658,7 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox>
     }
 }
 
-void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes)
+void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes, hitBoxType typeFilter)
 {
     if (!pCurrentAction) {
         return;
@@ -1668,6 +1668,9 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
 
     for (auto& hitBoxKey : pCurrentAction->hitBoxKeys)
     {
+        if (typeFilter != none && hitBoxKey.type != typeFilter) {
+            continue;
+        }
         if (hitBoxKey.startFrame > currentFrame || hitBoxKey.endFrame <= currentFrame) {
             continue;
         }
@@ -2300,14 +2303,14 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
     getHitBoxes(&hitBoxes);
 
-    for (auto const &hitbox : hitBoxes ) {
+    for (auto const &hitbox : hitBoxes) {
         if ((hitbox.type == hit || hitbox.type == projectile || hitbox.type == grab) && isProjectile && hitSpanFrames) {
             continue;
         }
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
             continue;
         }
-        if (hitbox.type == destroy_projectile) {
+        if (hitbox.type == destroy_projectile || hitbox.type == clash) {
             // todo right now we do nothing with those
             continue;
         }
@@ -2383,7 +2386,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 }
             }
         } else {
-            // not grab - hit (for now)
+            // everything except grab
             if (hitbox.type == hit || hitbox.type == projectile) {
                 if (pOtherGuy->isDown) {
                     // todo is real otg a thing?
@@ -2411,13 +2414,15 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 }
             }
             if (hitbox.type == domain) {
+                // todo maybe filter by grab target?
                 foundBox = true;
-            } else {
+            } else if (hitbox.type == hit || hitbox.type == projectile || hitbox.type == proximity_guard || hitbox.type == direct_damage) {
+                // those want hurtboxes
                 if (!hasEvaluatedHurtBoxes) {
                     pOtherGuy->getHurtBoxes(&otherHurtBoxes, nullptr);
                     hasEvaluatedHurtBoxes = true;
                 }
-                for (auto hurtbox : otherHurtBoxes ) {
+                for (auto const&hurtbox : otherHurtBoxes ) {
                     if (hitbox.type == hit && hurtbox.flags & invul_hit) {
                         continue;
                     }
@@ -2454,15 +2459,29 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                             break;
                         }
                     }
-
+                }
+            } else if (hitbox.type == screen_freeze) {
+                // those want other screen_freeze boxes
+                // those tend to come in 1s so probably not worth trying to recycle the vec?
+                log(true, "screen freeze left");
+                std::vector<HitBox> otherFreezeBoxes;
+                pOtherGuy->getHitBoxes(&otherFreezeBoxes, nullptr, hitBoxType::screen_freeze);
+                for (auto freezeBox : otherFreezeBoxes ) {
+                    log(true, "screen freeze right");
+                    if (doBoxesHit(hitbox.box, freezeBox.box)) {
+                        log(true, "screen freeze hit");
+                        parryFreeze += 61;
+                        pOtherGuy->parryFreeze += 61;
+                    }
                 }
             }
         }
 
         if (foundBox) {
-            if (hitbox.type == proximity_guard) {
+            if (hitbox.type != hit && hitbox.type != projectile && hitbox.type != grab && hitbox.type != domain && hitbox.type != direct_damage) {
                 // not supposed to get through!
-                log(true, "wtf!");
+                exit(0);
+                log(true, "wtf! " + std::to_string(hitbox.type));
                 continue;
             }
 

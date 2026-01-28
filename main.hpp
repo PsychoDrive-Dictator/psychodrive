@@ -129,7 +129,7 @@ enum EGameMode {
 enum hitentryflags {
     crouch = 1,
     air = 2,
-    special = 4, // todo this is also burnout
+    special = 4,
     counter = 8,
     block = 16,
     otg = crouch|air,
@@ -144,6 +144,7 @@ struct Box {
 };
 
 enum hitBoxType {
+    none = 0,
     hit = 1,
     grab = 2,
     projectile = 3,
@@ -151,6 +152,8 @@ enum hitBoxType {
     destroy_projectile = 5,
     proximity_guard = 6,
     direct_damage = 7,
+    clash = 8,
+    screen_freeze = 9,
 };
 
 enum hitBoxFlags {

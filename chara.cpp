@@ -377,10 +377,16 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         if (isOther) {
             if (collisionType == 7) {
                 type = domain;
+            } else if (collisionType == 8) {
+                type = screen_freeze;
+            } else if (collisionType == 9) {
+                type = clash;
             } else if (collisionType == 10) {
                 type = destroy_projectile;
             } else if (collisionType == 11) {
                 type = direct_damage;
+            } else {
+                continue;
             }
             rectListID = 9;
         } else {
@@ -392,6 +398,8 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
                 type = projectile;
             } else if (collisionType == 0) {
                 type = hit;
+            } else {
+                continue;
             }
         }
 
@@ -404,7 +412,7 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
 
         int hitID = hitBox["HitID"];
         bool hasHitID = hitBox.value("_IsHitID", hitBox.value("_UseHitID", false));
-        if (type == domain || type == direct_damage) {
+        if (isOther) {
             hasHitID = false;
         }
         if (hitID < 0) {

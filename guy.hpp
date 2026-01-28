@@ -250,7 +250,7 @@ public:
     int getLimitShotCategory() { return limitShotCategory; }
 
     void getPushBoxes(std::vector<Box> *pOutPushBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
-    void getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
+    void getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr, hitBoxType typeFilter = hitBoxType::none);
     void getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
     void getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox> *pOutThrowBoxes = nullptr, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
 
