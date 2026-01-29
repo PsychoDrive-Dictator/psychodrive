@@ -3275,6 +3275,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         juggleFirst = 0;
     }
 
+    if (!hitStun) {
+        // in case the previous 'combo start' was an armor hit or something
+        comboHits = 0;
+    }
+
     noCounterPush = attr0 & (1<<0);
     bool piyoBound = attr1 & (1<<2);
     noBackRecovery = attr1 & (1<<6);
