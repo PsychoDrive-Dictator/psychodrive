@@ -1129,7 +1129,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         int parallelMatchesFound = 0;
         int button = LP;
         bool bothButtonsPressed = false;
-        bool atLeastOneNotConsumed = false;
+        bool atLeastOneNotConsumed = true; // todo disable this for now - is it a flag?
         while (button <= HK) {
             if (button & okKeyFlags) {
                 cursorPos = initialCursorPos;

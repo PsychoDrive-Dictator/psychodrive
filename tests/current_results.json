@@ -3619,6 +3619,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "dhalsim_instant_air_fb",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 4,
+                "firstFrame": 149,
+                "lastFrame": 507
+            },
+            {
+                "count": 4,
+                "firstFrame": 149,
+                "lastFrame": 507
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 234,
+                "firstFrame": 93,
+                "lastFrame": 683
+            }
+        ]
+    },
+    {
         "testName": "dict_dict_light_backfist_heavy_backfist",
         "testVersion": "26",
         "finished": true,
@@ -8314,42 +8381,42 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 2922,
+                "count": 2772,
                 "firstFrame": 139,
                 "lastFrame": 1913
             },
             {
-                "count": 550,
+                "count": 411,
                 "firstFrame": 340,
                 "lastFrame": 1864
             },
             {
-                "count": 322,
+                "count": 246,
                 "firstFrame": 340,
                 "lastFrame": 1850
             },
             {
-                "count": 337,
+                "count": 326,
                 "firstFrame": 228,
                 "lastFrame": 1844
             },
             {
-                "count": 321,
+                "count": 310,
                 "firstFrame": 228,
                 "lastFrame": 1844
             },
             {
-                "count": 770,
+                "count": 667,
                 "firstFrame": 228,
                 "lastFrame": 1913
             },
             {
-                "count": 868,
+                "count": 689,
                 "firstFrame": 207,
                 "lastFrame": 1913
             },
             {
-                "count": 366,
+                "count": 305,
                 "firstFrame": 228,
                 "lastFrame": 1864
             },
@@ -8364,12 +8431,12 @@ var currentResults =
                 "lastFrame": 1913
             },
             {
-                "count": 161,
+                "count": 134,
                 "firstFrame": 228,
                 "lastFrame": 1795
             },
             {
-                "count": 2775,
+                "count": 2658,
                 "firstFrame": 228,
                 "lastFrame": 1913
             }
