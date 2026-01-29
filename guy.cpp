@@ -510,6 +510,7 @@ bool Guy::RunFrame(bool advancingTime)
         ignoreBodyPush = false;
         ignoreHitStop = false;
         ignoreScreenPush = false;
+        teleported = false;
 
         DoSwitchKey();
 
@@ -1921,14 +1922,24 @@ bool Guy::Push(Guy *pOtherGuy)
 
         Fixed pushNeeded = Fixed(0);
         if (getAirborne() || pOpponent->getAirborne()) {
-            // if your pushbox descends on someone else's the same frame you go behind,
-            // it seems to stay in front, hence using the last frame's position
-            if (getLastPosX() < pOpponent->getLastPosX()) {
-                pushNeeded = -pushXLeft;
+            if (teleported) {
+                if (getPosX() < pOpponent->getPosX()) {
+                    pushNeeded = -pushXLeft;
+                }
+                if (getPosX() > pOpponent->getPosX()) {
+                    pushNeeded = -pushXRight;
+                }
+            } else {
+                // if your pushbox descends on someone else's the same frame you land behind,
+                // it seems to stay in front, hence using the last frame's position
+                if (getLastPosX() < pOpponent->getLastPosX()) {
+                    pushNeeded = -pushXLeft;
+                }
+                if (getLastPosX() > pOpponent->getLastPosX()) {
+                    pushNeeded = -pushXRight;
+                }
             }
-            if (getLastPosX() > pOpponent->getLastPosX()) {
-                pushNeeded = -pushXRight;
-            }
+
             if (getPosX() == pOpponent->getPosX() && direction > Fixed(0)) {
                 pushNeeded = -pushXLeft;
             }
@@ -6025,6 +6036,7 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                             }
                             if (pOffsetGuy) {
                                 posX = pOffsetGuy->getPosX() + posOffset * direction;
+                                teleported = true;
                             } else {
                                 log(true, "offset broken");
                             }

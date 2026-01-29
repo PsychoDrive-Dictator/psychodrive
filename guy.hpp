@@ -626,6 +626,7 @@ private:
         throwTechable = false;
         canBlock = false;
         offsetDoesNotPush = false;
+        teleported = false;
         ignoreBodyPush = false;
         ignoreScreenPush = false;
         noVelNextFrame = false;
@@ -845,6 +846,7 @@ private:
     bool throwTechable : 1;
     bool canBlock : 1;
     bool offsetDoesNotPush : 1;
+    bool teleported : 1;
     bool ignoreBodyPush : 1;
     bool ignoreScreenPush : 1;
     bool noVelNextFrame : 1;
