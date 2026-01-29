@@ -2838,6 +2838,11 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             clampGuys.insert(pResourceGuy);
         }
 
+        if (hitArmor || hitAtemi) {
+            // hitstop comes from block entry??
+            pHitEntry = &hitBox.pHitData->param[block];
+        }
+
         int destX = pHitEntry->moveDestX;
         int destY = pHitEntry->moveDestY;
         int hitHitStun = pHitEntry->hitStun;
