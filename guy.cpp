@@ -2838,13 +2838,13 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 }
                 pResourceGuy->focus += scaledFocusGain;
             }
-            // todo maybe rounding errors there? we got some with health scaling until moving to fixed
+
             StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
             int scaledSuperGain = pHitEntry->superGainOwn * style.gaugeGainRatio / 100;
             if (pOtherGuy->perfectScaling) {
                 scaledSuperGain = scaledSuperGain * 80 / 100;
             }
-            scaledSuperGain = scaledSuperGain * pOtherGuy->superGainScaling / 100;
+            scaledSuperGain = scaledSuperGain * pResourceGuy->superGainScaling / 100;
             pResourceGuy->gauge += scaledSuperGain;
             clampGuys.insert(pResourceGuy);
         }
