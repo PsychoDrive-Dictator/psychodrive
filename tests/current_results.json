@@ -8309,6 +8309,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_dhalsim_ken",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 3785,
+                "firstFrame": 139,
+                "lastFrame": 1913
+            },
+            {
+                "count": 826,
+                "firstFrame": 340,
+                "lastFrame": 1864
+            },
+            {
+                "count": 525,
+                "firstFrame": 340,
+                "lastFrame": 1850
+            },
+            {
+                "count": 660,
+                "firstFrame": 228,
+                "lastFrame": 1844
+            },
+            {
+                "count": 620,
+                "firstFrame": 228,
+                "lastFrame": 1844
+            },
+            {
+                "count": 1680,
+                "firstFrame": 228,
+                "lastFrame": 1913
+            },
+            {
+                "count": 1867,
+                "firstFrame": 207,
+                "lastFrame": 1913
+            },
+            {
+                "count": 663,
+                "firstFrame": 228,
+                "lastFrame": 1864
+            },
+            {
+                "count": 383,
+                "firstFrame": 1711,
+                "lastFrame": 1913
+            },
+            {
+                "count": 1345,
+                "firstFrame": 228,
+                "lastFrame": 1913
+            },
+            {
+                "count": 566,
+                "firstFrame": 228,
+                "lastFrame": 1795
+            },
+            {
+                "count": 4246,
+                "firstFrame": 228,
+                "lastFrame": 1913
+            }
+        ]
+    },
+    {
         "testName": "zz_match_ed_sa2_combo",
         "testVersion": "39",
         "finished": true,
