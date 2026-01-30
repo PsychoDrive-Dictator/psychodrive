@@ -965,6 +965,7 @@ void loadAtemis(nlohmann::json* pAtemiJson, std::vector<AtemiData>* pOutputVecto
         newAtemi.resistLimit = atemiData["ResistLimit"];
         newAtemi.damageRatio = atemiData["DamageRatio"];
         newAtemi.recoverRatio = atemiData["RecoverRatio"];
+        newAtemi.superRatio = atemiData["GaugeRatio"];
 
         pOutputVector->push_back(newAtemi);
     }

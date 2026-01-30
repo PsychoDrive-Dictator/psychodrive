@@ -2831,6 +2831,8 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pResourceGuy = pGuy->pParent;
             }
             // set resources directly, will be clamped later for trades
+
+            // focus hitter
             if (!pResourceGuy->driveRushCancel && !pOtherGuy->driveScaling) {
                 int scaledFocusGain = pHitEntry->focusGainOwn;
                 if (pOtherGuy->perfectScaling) {
@@ -2839,8 +2841,18 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pResourceGuy->focus += scaledFocusGain;
             }
 
+            // super target
+            int scaledSuperGain = pHitEntry->superGainTarget;
+            if (pOtherGuy->perfectScaling) {
+                scaledSuperGain = scaledSuperGain * 80 / 100;
+            }
+            scaledSuperGain = scaledSuperGain * pOtherGuy->pCharData->styles[pOtherGuy->styleInstall].gaugeGainRatio / 100;
+            scaledSuperGain = scaledSuperGain * hurtBox.pAtemiData->superRatio / 100;
+            pOtherGuy->gauge += scaledSuperGain;
+
+            // super hitter
             StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
-            int scaledSuperGain = pHitEntry->superGainOwn * style.gaugeGainRatio / 100;
+            scaledSuperGain = pHitEntry->superGainOwn * style.gaugeGainRatio / 100;
             if (pOtherGuy->perfectScaling) {
                 scaledSuperGain = scaledSuperGain * 80 / 100;
             }
@@ -3588,7 +3600,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             }
             pResourceGuy->focus += scaledFocusGain;
         }
-        // todo maybe rounding errors there? we got some with health scaling until moving to fixed
         StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
         scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
         if (perfectScaling) {

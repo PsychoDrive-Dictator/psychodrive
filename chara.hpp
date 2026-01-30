@@ -156,6 +156,7 @@ struct AtemiData {
     int resistLimit;
     int damageRatio;
     int recoverRatio;
+    int superRatio;
 };
 
 struct HitEntry {
