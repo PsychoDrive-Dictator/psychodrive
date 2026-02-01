@@ -1880,7 +1880,8 @@ bool Guy::Push(Guy *pOtherGuy)
         for (auto otherPushBox : otherPushBoxes ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
 
-                if (isProjectile && pOtherGuy->isProjectile) {
+                // check hitcount in case we already clashed but still in hitstop
+                if (isProjectile && projHitCount > 0 && pOtherGuy->isProjectile && pOtherGuy->projHitCount > 0) {
                     // projectile clash
                     int ownHitStop = 10;
                     int otherHitStop = 10;
