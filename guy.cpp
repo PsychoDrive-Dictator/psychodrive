@@ -3414,7 +3414,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             //resetHitStunOnTransition = true;
         }
 
-        if (jimenBound && !airborne) {
+        if (jimenBound && !pHitEffect->floorDestY) {
             jimenBound = false;
             // it stays on the ground one more frame in lieu of a ground bounce?
             knockDownFrames += 1;
@@ -3663,6 +3663,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 int floorDestX = pHitEffect->floorDestX;
                 int floorDestY = pHitEffect->floorDestY;
 
+                if (backDamage) {
+                    floorDestX *= -1;
+                }
+
                 groundBounce = true;
                 groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
                 groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
@@ -3736,7 +3740,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 knockDown = true;
                 knockDownFrames = downTime;
                 // the bounddest for this is always positive
-                groundBounceVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
+                if (!groundBounce) {
+                    groundBounceVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
+                }
 
                 // commit current place offset
                 posX = posX + (posOffsetX * direction);
@@ -3983,6 +3989,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 actionSpeed = fixDivWithBias(Fixed(pCurrentAction->recoveryEndFrame - 1 - actionInitialFrame), Fixed(frameCount));
             }
         }
+    }
+
+    if (jimenBound && !airborne) {
+        AdvanceFrame(false);
+        //posX += velocityX * direction;
     }
 
     // if (pAttacker->pendingUnlockHit && floorTime) {
@@ -4765,15 +4776,19 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool doSlideBounce = false;
 
-    if (bounced) {
+    if (bounced || !airborne) {
         if (groundBounce) {
             nextAction = 350; // combo/bounce state
+            if (backDamage) {
+                nextAction = 351;
+            }
 
             velocityX = groundBounceVelX;
             accelX = groundBounceAccelX;
             velocityY = groundBounceVelY;
             accelY = groundBounceAccelY;
 
+            hitStun += 500000;
             resetHitStunOnLand = true;
 
             if (recoverForward && needsTurnaround()) {
