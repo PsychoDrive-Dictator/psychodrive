@@ -1867,6 +1867,16 @@ bool Guy::Push(Guy *pOtherGuy)
     if (isProjectile && !pOtherGuy->isProjectile) return false;
     if (!isProjectile && pOtherGuy->isProjectile) return false;
 
+
+    if (isProjectile) {
+        if (projHitCount < 0 || pOtherGuy->projHitCount < 0) {
+            return false;
+        }
+        if (getHitStop() || pOtherGuy->getHitStop()) {
+            return false;
+        }
+    }
+
     std::vector<Box> pushBoxes;
     std::vector<Box> otherPushBoxes;
     getPushBoxes(&pushBoxes);
