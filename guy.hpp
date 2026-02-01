@@ -745,6 +745,7 @@ private:
         pendingUnlockHit = 0;
         knockDown = false;
         isDown = false;
+        knockDownFrameCounter = 0;
         knockDownFrames = 0;
         nageKnockdown = false;
         recoverForward = false;
@@ -1059,6 +1060,7 @@ private:
     int pendingUnlockHit;
 
     int knockDownFrames;
+    int knockDownFrameCounter;
 
     Fixed groundBounceVelX;
     Fixed groundBounceVelY;

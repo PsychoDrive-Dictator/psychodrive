@@ -3404,6 +3404,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                 resetHitStunOnLand = false;
                 resetHitStunOnTransition = false;
                 nextAction = 330;
+                knockDownFrameCounter = pSim->frameCounter;
                 appliedAction = true;
                 isDown = true;
             } else {
@@ -4918,6 +4919,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     hitStun = knockDownFrames;
                     knockDownFrames = 0;
                     nextAction = 330;
+                    knockDownFrameCounter = pSim->frameCounter;
                     if (groundBounceVelX != Fixed(0)) {
                         // slide
                         velocityX = groundBounceVelX;
@@ -4931,7 +4933,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     }
                     isDown = true;
                 } else {
-                    int searchWindow = 16;
+                    int searchWindow = 11;
+                    if (knockDownFrameCounter != 0) {
+                        searchWindow += pSim->frameCounter - knockDownFrameCounter;
+                        knockDownFrameCounter = 0;
+                    }
                     bool backroll = false;
                     for (int i = 0; i < searchWindow && !noBackRecovery; i++) {
                         int input = dc.inputBuffer[i] & (LP+MP+HP+LK+MK+HK);
