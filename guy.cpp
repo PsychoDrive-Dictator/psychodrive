@@ -3384,6 +3384,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         resetHitStunOnTransition = false;
         knockDown = false;
         knockDownFrames = 3;
+
+        if (moveType == 1) {
+            crouching = false;
+        }
     }
     if (downTime <= 1) {
         downTime = 3;
