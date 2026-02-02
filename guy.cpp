@@ -2872,6 +2872,8 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             }
             scaledSuperGain = scaledSuperGain * pResourceGuy->superGainScaling / 100;
             pResourceGuy->gauge += scaledSuperGain;
+
+            clampGuys.insert(pOtherGuy);
             clampGuys.insert(pResourceGuy);
         }
 
