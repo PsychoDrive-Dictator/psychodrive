@@ -604,6 +604,8 @@ void Guy::RunFramePostPush(void)
 
 void Guy::ExecuteTrigger(Trigger *pTrigger)
 {
+    pLastTrigger = pTrigger;
+
     nextAction = pTrigger->actionID;
     uint64_t flags = pTrigger->flags;
 
@@ -5317,9 +5319,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool didRecoveryTrigger = false;
 
+    curNextAction = nextAction;
     if (!didTrigger && didTransition && (canMoveNow || proxGuard())) {
         DoTriggers();
-        if (nextAction != -1) {
+        if (nextAction != curNextAction) {
             didTrigger = true;
             didRecoveryTrigger = true;
         }
@@ -5350,7 +5353,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     //     focusRegenCooldown = 3;
     // }
 
-    if (didTrigger && didTransition) {
+    if (didTrigger && didTransition && pLastTrigger->advanceCombo) {
         AdvanceScalingTriggerID();
         appliedScaling = false;
     }

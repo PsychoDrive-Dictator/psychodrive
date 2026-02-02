@@ -140,6 +140,7 @@ void loadTriggers(nlohmann::json* pTriggersJson, CharacterData* pRet)
             }
 
             trigger.useUniqueParam = triggerData["_UseUniqueParam"].get<bool>();
+            trigger.advanceCombo = !triggerData["_NotResetComboID"].get<bool>();
             trigger.condParamID = triggerData["cond_param_id"];
             trigger.condParamOp = triggerData["cond_param_ope"];
             trigger.condParamValue = triggerData["cond_param_value"];

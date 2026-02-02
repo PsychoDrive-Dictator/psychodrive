@@ -94,6 +94,7 @@ struct Trigger {
     int precedingTime;
 
     bool useUniqueParam = false;
+    bool advanceCombo = true;
     int condParamID;
     int condParamOp;
     int condParamValue;

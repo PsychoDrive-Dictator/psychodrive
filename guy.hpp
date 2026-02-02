@@ -717,6 +717,7 @@ private:
         appliedScaling = false;
         lastTriggerFrame = 0;
         lastTriggerInput = 0;
+        pLastTrigger = nullptr;
         pAttacker = nullptr;
         hitStun = 0;
         resetHitStunOnLand = false;
@@ -1035,6 +1036,7 @@ private:
     int scalingTriggerID;
     int lastTriggerFrame;
     uint32_t lastTriggerInput;
+    Trigger *pLastTrigger;
 
     // getting hit side
     GuyRef pAttacker;
