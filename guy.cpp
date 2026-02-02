@@ -414,7 +414,10 @@ bool Guy::RunFrame(bool advancingTime)
         // assuming it doesn't stick for now
         ignoreSteerType  = -1;
 
-        DoPlaceKey();
+        // if we're already unlocked from opponent action, don't advance place
+        if (!pOpponent || !pOpponent->pendingUnlockHitDelayed) {
+            DoPlaceKey();
+        }
 
         noPlaceXNextFrame = false;
         noPlaceYNextFrame = false;
