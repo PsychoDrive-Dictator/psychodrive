@@ -3370,8 +3370,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     bool startingJuggle = (!airborne && destY != 0) || (airborne && comboHits == 0);
     if (!isDomain && applyHit && startingJuggle) {
         juggleCounter = juggleFirst;
-    }
-    if (!isDomain && applyHit && airborne) {
+    } else if (!isDomain && applyHit && airborne) {
         juggleCounter += juggleAdd;
     }
 
