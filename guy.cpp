@@ -3705,11 +3705,20 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     knockDownFrames = downTime - 27;
                 }
                 if (moveType == 9 || moveType == 19) {
-                    knockDown = true;
-                    slide = true;
+
                     groundBounceVelX = Fixed(-pHitEffect->boundDest * 2) / Fixed(28);
                     groundBounceAccelX = fixDivWithBias(Fixed(pHitEffect->boundDest * 2), Fixed(28 * 28));
-                    knockDownFrames = downTime + destTime;
+
+                    if (moveType == 9) {
+                        // grounded transition
+                        nextAction = 332;
+                        appliedAction = true;
+                        knockDownFrames = downTime + destTime;
+                    } else {
+                        knockDown = true;
+                        slide = true;
+                        knockDownFrames = 31;
+                    }
                 }
             }
 
@@ -4838,7 +4847,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         hitStun = knockDownFrames;
         knockDownFrames = 9;
 
-        // we'll delayed set the vel later in advance
+        velocityX = groundBounceVelX;
+        accelX = groundBounceAccelX;
+
+        groundBounceVelX = Fixed(0);
+        groundBounceAccelX = Fixed(0);
     }
 
     if (currentAction == 33 && jumpDirection == 0 && currentInput & 1 ) {
@@ -4853,7 +4866,21 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     bool disableMovement = false;
     if (pCurrentAction && currentFrame >= pCurrentAction->actionFrameDuration && nextAction == -1)
     {
-        if (currentAction == 320 || currentAction == 321) {
+        if (currentAction == 332) {
+            nextAction = 333;
+            knockDown = true;
+            hitStun = knockDownFrames;
+            knockDownFrames = 8;
+
+            velocityX = groundBounceVelX;
+            accelX = groundBounceAccelX;
+
+            groundBounceVelX = Fixed(0);
+            groundBounceAccelX = Fixed(0);
+
+            noVelNextFrame = true;
+            velocityX -= accelX;
+        } else if (currentAction == 320 || currentAction == 321) {
             disableMovement = true; // movement disabled the frame you come out of tech?
             nextAction = 1;
         } else if (currentAction >= 251 && currentAction <= 253) {
@@ -5266,14 +5293,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if ((currentAction == 321 || currentAction == 320) && currentFrame == 1) {
         hitVelX = Fixed(-13) * direction;
         hitAccelX = Fixed(1) * direction;
-    }
-
-    if (currentAction == 333 && currentFrame == 2) {
-        velocityX = groundBounceVelX;
-        accelX = groundBounceAccelX;
-
-        groundBounceVelX = Fixed(0);
-        groundBounceAccelX = Fixed(0);
     }
 
     if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
