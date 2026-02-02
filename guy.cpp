@@ -1483,6 +1483,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
                     lastTriggerFrame = pSim->frameCounter - initialI;
                     dc.inputBuffer[initialI] |= CONSUMED;
+                    lastTriggerInput = dc.inputBuffer[initialI];
 
                     // skip further triggers and cancel any delayed triggers
                     dc.setDeferredTriggerIDs.clear();
@@ -1495,6 +1496,9 @@ void Guy::DoTriggers(int fluffFrameBias)
         for (auto &initialI : initialIsToConsume) {
             lastTriggerFrame = pSim->frameCounter - initialI;
             dc.inputBuffer[initialI] |= CONSUMED;
+            // if someone uses both trigger input branch and multiple ambiguous deferred triggers,
+            // we have to start remembering trigger input per kept deferred trigger
+            lastTriggerInput = dc.inputBuffer[initialI];
         }
     }
 
@@ -4436,12 +4440,13 @@ void Guy::DoBranchKey(bool preHit)
                 case 63:
                     // what's the difference between this and 20?
                     // this is used for backthrow, the other thing for held buttons
-                    if (branchParam2 == 1 && currentInput & branchParam1) {
+                    if (branchParam2 == 1 && lastTriggerInput & branchParam1) {
                         doBranch = true;
                     }
-                    if (recordFrameTriggers) {
-                        dc.frameTriggers.insert(ActionRef(-branchParam1, 0));
-                    }
+                    // todo fix this maybe at some point..
+                    // if (recordFrameTriggers) {
+                    //     dc.frameTriggers.insert(ActionRef(-branchParam1, 0));
+                    // }
                     break;
                 default:
                     log(logUnknowns, "unsupported branch id " + std::to_string(branchType) + " type " + branchKey.typeName);
@@ -5578,14 +5583,6 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x8000000) {
             isDrive = true;
-            // this key lasts until margin so i think this is good?
-            // if (prevAction == 480 || prevAction == 481) {
-            //     // hold parry - is it really the best way to tell?
-            //     setFocusRegenCooldown(238);
-            // } else {
-            //     setFocusRegenCooldown(120);
-            // }
-            //log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (switchkey drive)");
             if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
                 pOpponent->driveScaling = true;
             }
