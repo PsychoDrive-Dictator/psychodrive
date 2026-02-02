@@ -629,6 +629,7 @@ private:
         teleported = false;
         ignoreBodyPush = false;
         ignoreScreenPush = false;
+        ignoreCornerPushback = false;
         noVelNextFrame = false;
         noAccelNextFrame = false;
         posOffsetX = Fixed(0);
@@ -851,6 +852,7 @@ private:
     bool teleported : 1;
     bool ignoreBodyPush : 1;
     bool ignoreScreenPush : 1;
+    bool ignoreCornerPushback : 1;
     bool noVelNextFrame : 1;
     bool noAccelNextFrame : 1;
     bool setPlaceX : 1;

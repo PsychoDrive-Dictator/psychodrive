@@ -513,6 +513,7 @@ bool Guy::RunFrame(bool advancingTime)
         ignoreBodyPush = false;
         ignoreHitStop = false;
         ignoreScreenPush = false;
+        ignoreCornerPushback = false;
         teleported = false;
 
         DoSwitchKey();
@@ -2274,11 +2275,11 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
         posX += pushX;
         log (logTransitions, "push " + std::to_string(pushX.f()));
         // 1:1 pushback for opponent during lock, and vice versa
-        if (locked && pAttacker && !pAttacker->pendingUnlockHit) {
+        if (locked && pAttacker && !pAttacker->pendingUnlockHit && !pAttacker->ignoreCornerPushback) {
             pAttacker->posX += pushX;
             //log (logTransitions, "lock reflect " + std::to_string(pushX.f()));
         }
-        if (pOpponent && pOpponent->locked && !pendingUnlockHit) {
+        if (pOpponent && pOpponent->locked && !pendingUnlockHit && !pOpponent->ignoreCornerPushback) {
             pOpponent->posX += pushX;
         }
 
@@ -5549,7 +5550,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             }
         }
 
-        // careful about airborne/etc checks until call do DoStatusKey() later
         forcedPoseStatus = 0;
         actionStatus = 0;
         jumpStatus = 0;
@@ -5580,6 +5580,9 @@ void Guy::DoSwitchKey(void)
 
         if (flag & 0x40000000) {
             canBlock = true;
+        }
+        if (flag & 0x10000000) {
+            ignoreCornerPushback = true;
         }
         if (flag & 0x8000000) {
             isDrive = true;
