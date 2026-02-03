@@ -3341,13 +3341,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     Fixed attackerDirection = attacker->direction;
     if (usePositionAsDirection) {
         attackerDirection = attacker->direction;
-        if (pAttacker->needsTurnaround(Fixed(0))) {
+        if (attacker->needsTurnaround(Fixed(0))) {
             attackerDirection *= Fixed(-1);
         }
     }
     Fixed hitVelDirection = attackerDirection * Fixed(-1);
     // in a real crossup, hitvel will go opposite the direction of the hit player
-    if (!attacker->isProjectile && pAttacker->needsTurnaround(Fixed(10))) {
+    if (!attacker->isProjectile && attacker->needsTurnaround(Fixed(10))) {
         attackerDirection *= Fixed(-1);
     }
 
