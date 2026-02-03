@@ -3351,11 +3351,19 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         attackerDirection *= Fixed(-1);
     }
 
-    if (doSwitchDirection && !recoverReverse && !isDomain && direction == attackerDirection) {
+    log(logHits, "recoverForward " + std::to_string(recoverForward) + " recoverReverse " + std::to_string(recoverReverse) +
+                 " frontDamage " + std::to_string(frontDamage) + " backDamage " + std::to_string(backDamage));
+
+    if (doSwitchDirection && (!recoverReverse || backDamage) && !isDomain && direction == attackerDirection) {
         // like in a sideswitch combo
         switchDirection();
+        log(logHits, "hit switchDirection!");
     }
-
+    // if (doSwitchDirection && recoverReverse && !isDomain && direction != attackerDirection) {
+    //     // like in a sideswitch combo
+    //     switchDirection();
+    //     log(logHits, "hit reverse switchDirection!");
+    // }
     // like guile 4HK has destY but stays grounded if hits grounded
     if (!(dmgType & 8) && !(dmgType == 21) && !(dmgType == 32) && !airborne) {
         destY = 0;
@@ -3715,9 +3723,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     knockDownFrames = downTime - 27;
                 }
                 if (moveType == 9 || moveType == 19) {
+                    int boundDest = pHitEffect->boundDest;
+                    if (backDamage) {
+                        boundDest *= -1;
+                    }
 
-                    groundBounceVelX = Fixed(-pHitEffect->boundDest * 2) / Fixed(28);
-                    groundBounceAccelX = fixDivWithBias(Fixed(pHitEffect->boundDest * 2), Fixed(28 * 28));
+                    groundBounceVelX = Fixed(-boundDest * 2) / Fixed(28);
+                    groundBounceAccelX = fixDivWithBias(Fixed(boundDest * 2), Fixed(28 * 28));
 
                     if (moveType == 9) {
                         // grounded transition
