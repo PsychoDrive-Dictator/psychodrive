@@ -5368,9 +5368,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     //     focusRegenCooldown = 3;
     // }
 
-    if (didTrigger && didTransition && pLastTrigger->advanceCombo) {
-        AdvanceScalingTriggerID();
-        appliedScaling = false;
+    if (didTrigger && didTransition) {
+        hitStun = 0;
+        if (pLastTrigger->advanceCombo) {
+            AdvanceScalingTriggerID();
+            appliedScaling = false;
+        }
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now
