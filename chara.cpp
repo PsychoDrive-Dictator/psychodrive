@@ -1321,6 +1321,16 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
 
 CharacterData *loadCharacter(std::string charName, int charVersion)
 {
+    int versionSlot = findCharVersionSlot(charVersion);
+    while (versionSlot >= 0) {
+        int version = atoi(charVersions[versionSlot]);
+        std::string cookedPath = "data/cooked/" + charName + std::to_string(version) + ".bin";
+        if (std::filesystem::exists(cookedPath)) {
+            return loadCookedCharacter(cookedPath, charVersion);
+        }
+        versionSlot--;
+    }
+
     nlohmann::json *pMovesDictJson = loadCharFile(charName, charVersion, "moves");
     nlohmann::json *pRectsJson = loadCharFile(charName, charVersion, "rects");
     nlohmann::json *pTriggerGroupsJson = loadCharFile(charName, charVersion, "trigger_groups");
@@ -1413,6 +1423,992 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
 
     mapCharFileLoader.clear();
     closeZipFiles();
+
+    return pRet;
+}
+
+static void writeU32(std::ofstream &f, uint32_t v) { f.write((char*)&v, 4); }
+static void writeU64(std::ofstream &f, uint64_t v) { f.write((char*)&v, 8); }
+static void writeI32(std::ofstream &f, int32_t v) { f.write((char*)&v, 4); }
+static void writeI64(std::ofstream &f, int64_t v) { f.write((char*)&v, 8); }
+static void writeBool(std::ofstream &f, bool v) { uint8_t b = v ? 1 : 0; f.write((char*)&b, 1); }
+static void writeFixed(std::ofstream &f, Fixed v) { writeI64(f, v.data); }
+static void writeString(std::ofstream &f, const std::string &s) {
+    writeU32(f, s.size());
+    f.write(s.data(), s.size());
+}
+
+static uint32_t readU32(std::ifstream &f) { uint32_t v; f.read((char*)&v, 4); return v; }
+static uint64_t readU64(std::ifstream &f) { uint64_t v; f.read((char*)&v, 8); return v; }
+static int32_t readI32(std::ifstream &f) { int32_t v; f.read((char*)&v, 4); return v; }
+static int64_t readI64(std::ifstream &f) { int64_t v; f.read((char*)&v, 8); return v; }
+static bool readBool(std::ifstream &f) { uint8_t b; f.read((char*)&b, 1); return b != 0; }
+static Fixed readFixed(std::ifstream &f) { Fixed v; v.data = readI64(f); return v; }
+static std::string readString(std::ifstream &f) {
+    uint32_t len = readU32(f);
+    std::string s(len, '\0');
+    f.read(s.data(), len);
+    return s;
+}
+
+template<typename T>
+static int32_t ptrToIndex(T* ptr, const std::vector<T>& vec) {
+    if (!ptr) return -1;
+    for (size_t i = 0; i < vec.size(); i++) {
+        if (&vec[i] == ptr) return (int32_t)i;
+    }
+    return -1;
+}
+
+template<typename T>
+static T* indexToPtr(int32_t idx, std::vector<T>& vec) {
+    if (idx < 0 || idx >= (int32_t)vec.size()) return nullptr;
+    return &vec[idx];
+}
+
+static int32_t rectPtrToIndex(Rect* ptr, const std::vector<Rect>& rects) {
+    return ptrToIndex(ptr, rects);
+}
+
+static int32_t hitEntryPtrToIndex(HitEntry* ptr, const std::vector<HitData>& hits) {
+    if (!ptr) return -1;
+    for (size_t i = 0; i < hits.size(); i++) {
+        for (int j = 0; j < 5; j++) {
+            if (&hits[i].common[j] == ptr) return (int32_t)(i * 25 + j);
+        }
+        for (int j = 0; j < 20; j++) {
+            if (&hits[i].param[j] == ptr) return (int32_t)(i * 25 + 5 + j);
+        }
+    }
+    return -1;
+}
+
+static HitEntry* indexToHitEntryPtr(int32_t idx, std::vector<HitData>& hits) {
+    if (idx < 0) return nullptr;
+    int hitIdx = idx / 25;
+    int slot = idx % 25;
+    if (hitIdx >= (int)hits.size()) return nullptr;
+    if (slot < 5) return &hits[hitIdx].common[slot];
+    return &hits[hitIdx].param[slot - 5];
+}
+
+bool cookCharacter(CharacterData* pData, const std::string& path)
+{
+    std::ofstream f(path, std::ios::binary);
+    if (!f) return false;
+
+    writeString(f, pData->charName);
+    writeI32(f, pData->charID);
+    writeI32(f, pData->vitality);
+    writeI32(f, pData->gauge);
+
+    writeU32(f, pData->charges.size());
+    for (auto& charge : pData->charges) {
+        writeI32(f, charge.id);
+        writeU32(f, charge.okKeyFlags);
+        writeU32(f, charge.okCondFlags);
+        writeI32(f, charge.chargeFrames);
+        writeI32(f, charge.keepFrames);
+    }
+
+    writeU32(f, pData->commands.size());
+    for (auto& cmd : pData->commands) {
+        writeI32(f, cmd.id);
+        writeU32(f, cmd.variants.size());
+        for (auto& variant : cmd.variants) {
+            writeI32(f, variant.totalMaxFrames);
+            writeU32(f, variant.inputs.size());
+            for (auto& input : variant.inputs) {
+                writeI32(f, (int32_t)input.type);
+                writeI32(f, input.numFrames);
+                writeU32(f, input.okKeyFlags);
+                writeU32(f, input.okCondFlags);
+                writeU32(f, input.ngKeyFlags);
+                writeU32(f, input.ngCondFlags);
+                writeU32(f, input.failKeyFlags);
+                writeU32(f, input.failCondFlags);
+                writeI32(f, input.rotatePointsNeeded);
+                writeI32(f, ptrToIndex(input.pCharge, pData->charges));
+            }
+        }
+    }
+
+    writeU32(f, pData->triggers.size());
+    for (auto& trigger : pData->triggers) {
+        writeI32(f, trigger.id);
+        writeI32(f, trigger.actionID);
+        writeI32(f, trigger.validStyles);
+        writeI32(f, ptrToIndex(trigger.pCommandClassic, pData->commands));
+        writeI32(f, trigger.okKeyFlags);
+        writeI32(f, trigger.okCondFlags);
+        writeI32(f, trigger.ngKeyFlags);
+        writeI32(f, trigger.dcExcFlags);
+        writeI32(f, trigger.dcIncFlags);
+        writeI32(f, trigger.precedingTime);
+        writeBool(f, trigger.useUniqueParam);
+        writeBool(f, trigger.advanceCombo);
+        writeI32(f, trigger.condParamID);
+        writeI32(f, trigger.condParamOp);
+        writeI32(f, trigger.condParamValue);
+        writeI32(f, trigger.limitShotCount);
+        writeI32(f, trigger.limitShotCategory);
+        writeI32(f, trigger.airActionCountLimit);
+        writeI32(f, trigger.vitalOp);
+        writeI32(f, trigger.vitalRatio);
+        writeI32(f, trigger.rangeCondition);
+        writeFixed(f, trigger.rangeParam);
+        writeI32(f, trigger.stateCondition);
+        writeBool(f, trigger.needsFocus);
+        writeI32(f, trigger.focusCost);
+        writeBool(f, trigger.needsGauge);
+        writeI32(f, trigger.gaugeCost);
+        writeI32(f, trigger.comboInst);
+        writeI32(f, trigger.comboSuperScaling);
+        writeI64(f, trigger.flags);
+    }
+
+    writeU32(f, pData->triggerGroups.size());
+    for (auto& tg : pData->triggerGroups) {
+        writeI32(f, tg.id);
+        writeU32(f, tg.entries.size());
+        for (auto& entry : tg.entries) {
+            writeI32(f, entry.actionID);
+            writeI32(f, entry.triggerID);
+            writeI32(f, ptrToIndex(entry.pTrigger, pData->triggers));
+        }
+    }
+
+    writeU32(f, pData->rects.size());
+    for (auto& rect : pData->rects) {
+        writeI32(f, rect.listID);
+        writeI32(f, rect.id);
+        writeI32(f, rect.xOrig);
+        writeI32(f, rect.yOrig);
+        writeI32(f, rect.xRadius);
+        writeI32(f, rect.yRadius);
+    }
+
+    writeU32(f, pData->projectileDatas.size());
+    for (auto& proj : pData->projectileDatas) {
+        writeI32(f, proj.id);
+        writeI32(f, proj.hitCount);
+        writeI32(f, proj.extraHitStop);
+        writeBool(f, proj.hitFlagToParent);
+        writeBool(f, proj.hitStopToParent);
+        writeI32(f, proj.rangeB);
+        writeFixed(f, proj.wallBoxForward);
+        writeFixed(f, proj.wallBoxBack);
+        writeBool(f, proj.airborne);
+        writeI32(f, proj.flags);
+        writeI32(f, proj.flagsExt);
+        writeI32(f, proj.category);
+        writeI32(f, proj.clashPriority);
+        writeBool(f, proj.noPush);
+        writeI32(f, proj.lifeTime);
+        writeI32(f, proj.hitSpan);
+    }
+
+    writeU32(f, pData->atemis.size());
+    for (auto& atemi : pData->atemis) {
+        writeI32(f, atemi.id);
+        writeI32(f, atemi.targetStop);
+        writeI32(f, atemi.ownerStop);
+        writeI32(f, atemi.targetStopShell);
+        writeI32(f, atemi.ownerStopShell);
+        writeI32(f, atemi.targetStopAdd);
+        writeI32(f, atemi.ownerStopAdd);
+        writeI32(f, atemi.resistLimit);
+        writeI32(f, atemi.damageRatio);
+        writeI32(f, atemi.recoverRatio);
+        writeI32(f, atemi.superRatio);
+    }
+
+    auto writeHitEntry = [&](const HitEntry& e) {
+        writeI32(f, e.comboAdd);
+        writeI32(f, e.juggleFirst);
+        writeI32(f, e.juggleAdd);
+        writeI32(f, e.juggleLimit);
+        writeI32(f, e.hitStun);
+        writeI32(f, e.moveDestX);
+        writeI32(f, e.moveDestY);
+        writeI32(f, e.moveTime);
+        writeI32(f, e.curveOwnID);
+        writeI32(f, e.curveTargetID);
+        writeI32(f, e.dmgValue);
+        writeI32(f, e.focusGainOwn);
+        writeI32(f, e.focusGainTarget);
+        writeI32(f, e.superGainOwn);
+        writeI32(f, e.superGainTarget);
+        writeI32(f, e.parryGain);
+        writeI32(f, e.perfectParryGain);
+        writeI32(f, e.dmgType);
+        writeI32(f, e.dmgKind);
+        writeI32(f, e.dmgPower);
+        writeI32(f, e.moveType);
+        writeI32(f, e.floorTime);
+        writeI32(f, e.downTime);
+        writeI32(f, e.boundDest);
+        writeI32(f, e.throwRelease);
+        writeBool(f, e.jimenBound);
+        writeBool(f, e.kabeBound);
+        writeBool(f, e.kabeTataki);
+        writeBool(f, e.bombBurst);
+        writeI32(f, e.attr0);
+        writeI32(f, e.attr1);
+        writeI32(f, e.attr2);
+        writeI32(f, e.attr3);
+        writeI32(f, e.ext0);
+        writeI32(f, e.hitStopOwner);
+        writeI32(f, e.hitStopTarget);
+        writeI32(f, e.hitmark);
+        writeI32(f, e.floorDestX);
+        writeI32(f, e.floorDestY);
+        writeI32(f, e.wallTime);
+        writeI32(f, e.wallStop);
+        writeI32(f, e.wallDestX);
+        writeI32(f, e.wallDestY);
+    };
+
+    writeU32(f, pData->hits.size());
+    for (auto& hit : pData->hits) {
+        writeI32(f, hit.id);
+        for (int i = 0; i < 5; i++) writeHitEntry(hit.common[i]);
+        for (int i = 0; i < 20; i++) writeHitEntry(hit.param[i]);
+    }
+
+    writeU32(f, pData->styles.size());
+    for (auto& style : pData->styles) {
+        writeI32(f, style.id);
+        writeI32(f, style.parentStyleID);
+        writeI64(f, style.terminateState);
+        writeBool(f, style.hasStartAction);
+        writeI32(f, style.startActionID);
+        writeI32(f, style.startActionStyle);
+        writeBool(f, style.hasExitAction);
+        writeI32(f, style.exitActionID);
+        writeI32(f, style.exitActionStyle);
+        writeI32(f, style.attackScale);
+        writeI32(f, style.defenseScale);
+        writeI32(f, style.gaugeGainRatio);
+    }
+
+    auto writeBoxKeyBase = [&](const BoxKey& k) {
+        writeI32(f, k.startFrame);
+        writeI32(f, k.endFrame);
+        writeI32(f, k.condition);
+        writeFixed(f, k.offsetX);
+        writeFixed(f, k.offsetY);
+    };
+
+    auto writeRectPtrVec = [&](const std::vector<Rect*>& rects) {
+        writeU32(f, rects.size());
+        for (auto* r : rects) writeI32(f, rectPtrToIndex(r, pData->rects));
+    };
+
+    writeU32(f, pData->actions.size());
+    for (auto& action : pData->actions) {
+        writeI32(f, action.actionID);
+        writeI32(f, action.styleID);
+        writeString(f, action.name);
+
+        writeU32(f, action.hurtBoxKeys.size());
+        for (auto& k : action.hurtBoxKeys) {
+            writeBoxKeyBase(k);
+            writeBool(f, k.isArmor);
+            writeBool(f, k.isAtemi);
+            writeI32(f, ptrToIndex(k.pAtemiData, pData->atemis));
+            writeI32(f, k.immunity);
+            writeI32(f, k.flags);
+            writeRectPtrVec(k.headRects);
+            writeRectPtrVec(k.bodyRects);
+            writeRectPtrVec(k.legRects);
+            writeRectPtrVec(k.throwRects);
+        }
+
+        writeU32(f, action.pushBoxKeys.size());
+        for (auto& k : action.pushBoxKeys) {
+            writeBoxKeyBase(k);
+            writeI32(f, rectPtrToIndex(k.rect, pData->rects));
+        }
+
+        writeU32(f, action.hitBoxKeys.size());
+        for (auto& k : action.hitBoxKeys) {
+            writeBoxKeyBase(k);
+            writeI32(f, (int32_t)k.type);
+            writeI32(f, (int32_t)k.flags);
+            writeI32(f, ptrToIndex(k.pHitData, pData->hits));
+            writeBool(f, k.hasValidStyle);
+            writeI32(f, k.validStyle);
+            writeBool(f, k.hasHitID);
+            writeI32(f, k.hitID);
+            writeRectPtrVec(k.rects);
+        }
+
+        writeU32(f, action.uniqueBoxKeys.size());
+        for (auto& k : action.uniqueBoxKeys) {
+            writeBoxKeyBase(k);
+            writeI32(f, k.checkMask);
+            writeBool(f, k.uniquePitcher);
+            writeBool(f, k.applyOpToTarget);
+            writeU32(f, k.ops.size());
+            for (auto& op : k.ops) {
+                writeI32(f, op.op);
+                writeI32(f, op.opParam0);
+                writeI32(f, op.opParam1);
+                writeI32(f, op.opParam2);
+                writeI32(f, op.opParam3);
+                writeI32(f, op.opParam4);
+            }
+            writeRectPtrVec(k.rects);
+        }
+
+        writeU32(f, action.steerKeys.size());
+        for (auto& k : action.steerKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.operationType);
+            writeI32(f, k.valueType);
+            writeFixed(f, k.fixValue);
+            writeFixed(f, k.targetOffsetX);
+            writeFixed(f, k.targetOffsetY);
+            writeI32(f, k.shotCategory);
+            writeI32(f, k.targetType);
+            writeI32(f, k.calcValueFrame);
+            writeI32(f, k.multiValueType);
+            writeI32(f, k.param);
+            writeBool(f, k.isDrive);
+        }
+
+        writeU32(f, action.placeKeys.size());
+        for (auto& k : action.placeKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.optionFlag);
+            writeFixed(f, k.ratio);
+            writeI32(f, k.axis);
+            writeBool(f, k.bgOnly);
+            writeU32(f, k.posList.size());
+            for (auto& pos : k.posList) {
+                writeI32(f, pos.frame);
+                writeFixed(f, pos.offset);
+            }
+        }
+
+        writeU32(f, action.switchKeys.size());
+        for (auto& k : action.switchKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.systemFlag);
+            writeI32(f, k.operationFlag);
+            writeI32(f, k.validStyle);
+        }
+
+        writeU32(f, action.eventKeys.size());
+        for (auto& k : action.eventKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.validStyle);
+            writeI32(f, k.type);
+            writeI32(f, k.id);
+            writeI64(f, k.param01);
+            writeI64(f, k.param02);
+            writeI64(f, k.param03);
+            writeI64(f, k.param04);
+            writeI64(f, k.param05);
+        }
+
+        writeU32(f, action.worldKeys.size());
+        for (auto& k : action.worldKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.type);
+        }
+
+        writeU32(f, action.lockKeys.size());
+        for (auto& k : action.lockKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.type);
+            writeI32(f, k.param01);
+            writeI32(f, k.param02);
+            writeI32(f, hitEntryPtrToIndex(k.pHitEntry, pData->hits));
+        }
+
+        writeU32(f, action.branchKeys.size());
+        for (auto& k : action.branchKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.type);
+            writeI64(f, k.param00);
+            writeI64(f, k.param01);
+            writeI64(f, k.param02);
+            writeI64(f, k.param03);
+            writeI64(f, k.param04);
+            writeI32(f, k.branchAction);
+            writeI32(f, k.branchFrame);
+            writeBool(f, k.keepFrame);
+            writeBool(f, k.keepPlace);
+            writeString(f, k.typeName);
+        }
+
+        writeU32(f, action.shotKeys.size());
+        for (auto& k : action.shotKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.validStyle);
+            writeI32(f, k.operation);
+            writeI32(f, k.flags);
+            writeFixed(f, k.posOffsetX);
+            writeFixed(f, k.posOffsetY);
+            writeI32(f, k.actionId);
+            writeI32(f, k.styleIdx);
+        }
+
+        writeU32(f, action.triggerKeys.size());
+        for (auto& k : action.triggerKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.validStyle);
+            writeI32(f, k.other);
+            writeI32(f, k.condition);
+            writeI32(f, k.state);
+            writeI32(f, ptrToIndex(k.pTriggerGroup, pData->triggerGroups));
+        }
+
+        writeU32(f, action.statusKeys.size());
+        for (auto& k : action.statusKeys) {
+            writeI32(f, k.startFrame);
+            writeI32(f, k.endFrame);
+            writeI32(f, k.landingAdjust);
+            writeI32(f, k.poseStatus);
+            writeI32(f, k.actionStatus);
+            writeI32(f, k.jumpStatus);
+            writeI32(f, k.side);
+        }
+
+        writeI32(f, action.activeFrame);
+        writeI32(f, action.recoveryStartFrame);
+        writeI32(f, action.recoveryEndFrame);
+        writeU64(f, action.actionFlags);
+        writeI32(f, action.actionFrameDuration);
+        writeI32(f, action.loopPoint);
+        writeI32(f, action.loopCount);
+        writeI32(f, action.startScale);
+        writeI32(f, action.comboScale);
+        writeI32(f, action.instantScale);
+        writeI32(f, ptrToIndex(action.pProjectileData, pData->projectileDatas));
+        writeI32(f, action.inheritKindFlag);
+        writeBool(f, action.inheritHitID);
+        writeFixed(f, action.inheritAccelX);
+        writeFixed(f, action.inheritAccelY);
+        writeFixed(f, action.inheritVelX);
+        writeFixed(f, action.inheritVelY);
+    }
+
+    writeU32(f, pData->vecMoveList.size());
+    for (auto* str : pData->vecMoveList) {
+        writeString(f, str ? str : "");
+    }
+
+    return true;
+}
+
+CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
+{
+    std::ifstream f(path, std::ios::binary);
+    if (!f) return nullptr;
+
+    CharacterData* pRet = new CharacterData;
+
+    pRet->charName = readString(f);
+    pRet->charID = readI32(f);
+    pRet->charVersion = charVersion;
+    pRet->vitality = readI32(f);
+    pRet->gauge = readI32(f);
+
+    uint32_t chargeCount = readU32(f);
+    pRet->charges.resize(chargeCount);
+    for (auto& charge : pRet->charges) {
+        charge.id = readI32(f);
+        charge.okKeyFlags = readU32(f);
+        charge.okCondFlags = readU32(f);
+        charge.chargeFrames = readI32(f);
+        charge.keepFrames = readI32(f);
+    }
+
+    uint32_t commandCount = readU32(f);
+    pRet->commands.resize(commandCount);
+    for (auto& cmd : pRet->commands) {
+        cmd.id = readI32(f);
+        uint32_t variantCount = readU32(f);
+        cmd.variants.resize(variantCount);
+        for (auto& variant : cmd.variants) {
+            variant.totalMaxFrames = readI32(f);
+            uint32_t inputCount = readU32(f);
+            variant.inputs.resize(inputCount);
+            for (auto& input : variant.inputs) {
+                input.type = (InputType)readI32(f);
+                input.numFrames = readI32(f);
+                input.okKeyFlags = readU32(f);
+                input.okCondFlags = readU32(f);
+                input.ngKeyFlags = readU32(f);
+                input.ngCondFlags = readU32(f);
+                input.failKeyFlags = readU32(f);
+                input.failCondFlags = readU32(f);
+                input.rotatePointsNeeded = readI32(f);
+                input.pCharge = indexToPtr(readI32(f), pRet->charges);
+            }
+        }
+    }
+
+    uint32_t triggerCount = readU32(f);
+    pRet->triggers.resize(triggerCount);
+    std::vector<int32_t> triggerCommandIndices(triggerCount);
+    for (size_t i = 0; i < triggerCount; i++) {
+        auto& trigger = pRet->triggers[i];
+        trigger.id = readI32(f);
+        trigger.actionID = readI32(f);
+        trigger.validStyles = readI32(f);
+        triggerCommandIndices[i] = readI32(f);
+        trigger.okKeyFlags = readI32(f);
+        trigger.okCondFlags = readI32(f);
+        trigger.ngKeyFlags = readI32(f);
+        trigger.dcExcFlags = readI32(f);
+        trigger.dcIncFlags = readI32(f);
+        trigger.precedingTime = readI32(f);
+        trigger.useUniqueParam = readBool(f);
+        trigger.advanceCombo = readBool(f);
+        trigger.condParamID = readI32(f);
+        trigger.condParamOp = readI32(f);
+        trigger.condParamValue = readI32(f);
+        trigger.limitShotCount = readI32(f);
+        trigger.limitShotCategory = readI32(f);
+        trigger.airActionCountLimit = readI32(f);
+        trigger.vitalOp = readI32(f);
+        trigger.vitalRatio = readI32(f);
+        trigger.rangeCondition = readI32(f);
+        trigger.rangeParam = readFixed(f);
+        trigger.stateCondition = readI32(f);
+        trigger.needsFocus = readBool(f);
+        trigger.focusCost = readI32(f);
+        trigger.needsGauge = readBool(f);
+        trigger.gaugeCost = readI32(f);
+        trigger.comboInst = readI32(f);
+        trigger.comboSuperScaling = readI32(f);
+        trigger.flags = readI64(f);
+    }
+    for (size_t i = 0; i < triggerCount; i++) {
+        pRet->triggers[i].pCommandClassic = indexToPtr(triggerCommandIndices[i], pRet->commands);
+    }
+
+    uint32_t triggerGroupCount = readU32(f);
+    pRet->triggerGroups.resize(triggerGroupCount);
+    for (auto& tg : pRet->triggerGroups) {
+        tg.id = readI32(f);
+        uint32_t entryCount = readU32(f);
+        tg.entries.resize(entryCount);
+        for (auto& entry : tg.entries) {
+            entry.actionID = readI32(f);
+            entry.triggerID = readI32(f);
+            entry.pTrigger = indexToPtr(readI32(f), pRet->triggers);
+        }
+    }
+
+    for (auto& tg : pRet->triggerGroups) {
+        pRet->triggerGroupByID[tg.id] = &tg;
+    }
+
+    uint32_t rectCount = readU32(f);
+    pRet->rects.resize(rectCount);
+    for (auto& rect : pRet->rects) {
+        rect.listID = readI32(f);
+        rect.id = readI32(f);
+        rect.xOrig = readI32(f);
+        rect.yOrig = readI32(f);
+        rect.xRadius = readI32(f);
+        rect.yRadius = readI32(f);
+    }
+
+    for (auto& rect : pRet->rects) {
+        pRet->rectsByIDs[std::make_pair(rect.listID, rect.id)] = &rect;
+    }
+
+    uint32_t projCount = readU32(f);
+    pRet->projectileDatas.resize(projCount);
+    for (auto& proj : pRet->projectileDatas) {
+        proj.id = readI32(f);
+        proj.hitCount = readI32(f);
+        proj.extraHitStop = readI32(f);
+        proj.hitFlagToParent = readBool(f);
+        proj.hitStopToParent = readBool(f);
+        proj.rangeB = readI32(f);
+        proj.wallBoxForward = readFixed(f);
+        proj.wallBoxBack = readFixed(f);
+        proj.airborne = readBool(f);
+        proj.flags = readI32(f);
+        proj.flagsExt = readI32(f);
+        proj.category = readI32(f);
+        proj.clashPriority = readI32(f);
+        proj.noPush = readBool(f);
+        proj.lifeTime = readI32(f);
+        proj.hitSpan = readI32(f);
+    }
+
+    uint32_t atemiCount = readU32(f);
+    pRet->atemis.resize(atemiCount);
+    for (auto& atemi : pRet->atemis) {
+        atemi.id = readI32(f);
+        atemi.targetStop = readI32(f);
+        atemi.ownerStop = readI32(f);
+        atemi.targetStopShell = readI32(f);
+        atemi.ownerStopShell = readI32(f);
+        atemi.targetStopAdd = readI32(f);
+        atemi.ownerStopAdd = readI32(f);
+        atemi.resistLimit = readI32(f);
+        atemi.damageRatio = readI32(f);
+        atemi.recoverRatio = readI32(f);
+        atemi.superRatio = readI32(f);
+    }
+
+    for (auto& atemi : pRet->atemis) {
+        pRet->atemiByID[atemi.id] = &atemi;
+    }
+
+    auto readHitEntry = [&](HitEntry& e) {
+        e.comboAdd = readI32(f);
+        e.juggleFirst = readI32(f);
+        e.juggleAdd = readI32(f);
+        e.juggleLimit = readI32(f);
+        e.hitStun = readI32(f);
+        e.moveDestX = readI32(f);
+        e.moveDestY = readI32(f);
+        e.moveTime = readI32(f);
+        e.curveOwnID = readI32(f);
+        e.curveTargetID = readI32(f);
+        e.dmgValue = readI32(f);
+        e.focusGainOwn = readI32(f);
+        e.focusGainTarget = readI32(f);
+        e.superGainOwn = readI32(f);
+        e.superGainTarget = readI32(f);
+        e.parryGain = readI32(f);
+        e.perfectParryGain = readI32(f);
+        e.dmgType = readI32(f);
+        e.dmgKind = readI32(f);
+        e.dmgPower = readI32(f);
+        e.moveType = readI32(f);
+        e.floorTime = readI32(f);
+        e.downTime = readI32(f);
+        e.boundDest = readI32(f);
+        e.throwRelease = readI32(f);
+        e.jimenBound = readBool(f);
+        e.kabeBound = readBool(f);
+        e.kabeTataki = readBool(f);
+        e.bombBurst = readBool(f);
+        e.attr0 = readI32(f);
+        e.attr1 = readI32(f);
+        e.attr2 = readI32(f);
+        e.attr3 = readI32(f);
+        e.ext0 = readI32(f);
+        e.hitStopOwner = readI32(f);
+        e.hitStopTarget = readI32(f);
+        e.hitmark = readI32(f);
+        e.floorDestX = readI32(f);
+        e.floorDestY = readI32(f);
+        e.wallTime = readI32(f);
+        e.wallStop = readI32(f);
+        e.wallDestX = readI32(f);
+        e.wallDestY = readI32(f);
+    };
+
+    uint32_t hitCount = readU32(f);
+    pRet->hits.resize(hitCount);
+    for (auto& hit : pRet->hits) {
+        hit.id = readI32(f);
+        for (int i = 0; i < 5; i++) readHitEntry(hit.common[i]);
+        for (int i = 0; i < 20; i++) readHitEntry(hit.param[i]);
+    }
+
+    for (auto& hit : pRet->hits) {
+        pRet->hitByID[hit.id] = &hit;
+    }
+
+    uint32_t styleCount = readU32(f);
+    pRet->styles.resize(styleCount);
+    for (auto& style : pRet->styles) {
+        style.id = readI32(f);
+        style.parentStyleID = readI32(f);
+        style.terminateState = readI64(f);
+        style.hasStartAction = readBool(f);
+        style.startActionID = readI32(f);
+        style.startActionStyle = readI32(f);
+        style.hasExitAction = readBool(f);
+        style.exitActionID = readI32(f);
+        style.exitActionStyle = readI32(f);
+        style.attackScale = readI32(f);
+        style.defenseScale = readI32(f);
+        style.gaugeGainRatio = readI32(f);
+    }
+
+    auto readBoxKeyBase = [&](BoxKey& k) {
+        k.startFrame = readI32(f);
+        k.endFrame = readI32(f);
+        k.condition = readI32(f);
+        k.offsetX = readFixed(f);
+        k.offsetY = readFixed(f);
+    };
+
+    auto readRectPtrVec = [&](std::vector<Rect*>& rects) {
+        uint32_t count = readU32(f);
+        rects.resize(count);
+        for (auto& r : rects) r = indexToPtr(readI32(f), pRet->rects);
+    };
+
+    uint32_t actionCount = readU32(f);
+    pRet->actions.resize(actionCount);
+    std::vector<int32_t> actionProjIndices(actionCount);
+    std::vector<std::vector<int32_t>> actionLockKeyHitEntryIndices(actionCount);
+    std::vector<std::vector<int32_t>> actionTriggerKeyGroupIndices(actionCount);
+
+    for (size_t ai = 0; ai < actionCount; ai++) {
+        auto& action = pRet->actions[ai];
+        action.actionID = readI32(f);
+        action.styleID = readI32(f);
+        action.name = readString(f);
+
+        uint32_t hurtBoxKeyCount = readU32(f);
+        action.hurtBoxKeys.resize(hurtBoxKeyCount);
+        for (auto& k : action.hurtBoxKeys) {
+            readBoxKeyBase(k);
+            k.isArmor = readBool(f);
+            k.isAtemi = readBool(f);
+            k.pAtemiData = indexToPtr(readI32(f), pRet->atemis);
+            k.immunity = readI32(f);
+            k.flags = readI32(f);
+            readRectPtrVec(k.headRects);
+            readRectPtrVec(k.bodyRects);
+            readRectPtrVec(k.legRects);
+            readRectPtrVec(k.throwRects);
+        }
+
+        uint32_t pushBoxKeyCount = readU32(f);
+        action.pushBoxKeys.resize(pushBoxKeyCount);
+        for (auto& k : action.pushBoxKeys) {
+            readBoxKeyBase(k);
+            k.rect = indexToPtr(readI32(f), pRet->rects);
+        }
+
+        uint32_t hitBoxKeyCount = readU32(f);
+        action.hitBoxKeys.resize(hitBoxKeyCount);
+        for (auto& k : action.hitBoxKeys) {
+            readBoxKeyBase(k);
+            k.type = (hitBoxType)readI32(f);
+            k.flags = (hitBoxFlags)readI32(f);
+            k.pHitData = indexToPtr(readI32(f), pRet->hits);
+            k.hasValidStyle = readBool(f);
+            k.validStyle = readI32(f);
+            k.hasHitID = readBool(f);
+            k.hitID = readI32(f);
+            readRectPtrVec(k.rects);
+        }
+
+        uint32_t uniqueBoxKeyCount = readU32(f);
+        action.uniqueBoxKeys.resize(uniqueBoxKeyCount);
+        for (auto& k : action.uniqueBoxKeys) {
+            readBoxKeyBase(k);
+            k.checkMask = readI32(f);
+            k.uniquePitcher = readBool(f);
+            k.applyOpToTarget = readBool(f);
+            uint32_t opCount = readU32(f);
+            k.ops.resize(opCount);
+            for (auto& op : k.ops) {
+                op.op = readI32(f);
+                op.opParam0 = readI32(f);
+                op.opParam1 = readI32(f);
+                op.opParam2 = readI32(f);
+                op.opParam3 = readI32(f);
+                op.opParam4 = readI32(f);
+            }
+            readRectPtrVec(k.rects);
+        }
+
+        uint32_t steerKeyCount = readU32(f);
+        action.steerKeys.resize(steerKeyCount);
+        for (auto& k : action.steerKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.operationType = readI32(f);
+            k.valueType = readI32(f);
+            k.fixValue = readFixed(f);
+            k.targetOffsetX = readFixed(f);
+            k.targetOffsetY = readFixed(f);
+            k.shotCategory = readI32(f);
+            k.targetType = readI32(f);
+            k.calcValueFrame = readI32(f);
+            k.multiValueType = readI32(f);
+            k.param = readI32(f);
+            k.isDrive = readBool(f);
+        }
+
+        uint32_t placeKeyCount = readU32(f);
+        action.placeKeys.resize(placeKeyCount);
+        for (auto& k : action.placeKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.optionFlag = readI32(f);
+            k.ratio = readFixed(f);
+            k.axis = readI32(f);
+            k.bgOnly = readBool(f);
+            uint32_t posCount = readU32(f);
+            k.posList.resize(posCount);
+            for (auto& pos : k.posList) {
+                pos.frame = readI32(f);
+                pos.offset = readFixed(f);
+            }
+        }
+
+        uint32_t switchKeyCount = readU32(f);
+        action.switchKeys.resize(switchKeyCount);
+        for (auto& k : action.switchKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.systemFlag = readI32(f);
+            k.operationFlag = readI32(f);
+            k.validStyle = readI32(f);
+        }
+
+        uint32_t eventKeyCount = readU32(f);
+        action.eventKeys.resize(eventKeyCount);
+        for (auto& k : action.eventKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.validStyle = readI32(f);
+            k.type = readI32(f);
+            k.id = readI32(f);
+            k.param01 = readI64(f);
+            k.param02 = readI64(f);
+            k.param03 = readI64(f);
+            k.param04 = readI64(f);
+            k.param05 = readI64(f);
+        }
+
+        uint32_t worldKeyCount = readU32(f);
+        action.worldKeys.resize(worldKeyCount);
+        for (auto& k : action.worldKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.type = readI32(f);
+        }
+
+        uint32_t lockKeyCount = readU32(f);
+        action.lockKeys.resize(lockKeyCount);
+        actionLockKeyHitEntryIndices[ai].resize(lockKeyCount);
+        for (size_t li = 0; li < lockKeyCount; li++) {
+            auto& k = action.lockKeys[li];
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.type = readI32(f);
+            k.param01 = readI32(f);
+            k.param02 = readI32(f);
+            actionLockKeyHitEntryIndices[ai][li] = readI32(f);
+        }
+
+        uint32_t branchKeyCount = readU32(f);
+        action.branchKeys.resize(branchKeyCount);
+        for (auto& k : action.branchKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.type = readI32(f);
+            k.param00 = readI64(f);
+            k.param01 = readI64(f);
+            k.param02 = readI64(f);
+            k.param03 = readI64(f);
+            k.param04 = readI64(f);
+            k.branchAction = readI32(f);
+            k.branchFrame = readI32(f);
+            k.keepFrame = readBool(f);
+            k.keepPlace = readBool(f);
+            k.typeName = readString(f);
+        }
+
+        uint32_t shotKeyCount = readU32(f);
+        action.shotKeys.resize(shotKeyCount);
+        for (auto& k : action.shotKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.validStyle = readI32(f);
+            k.operation = readI32(f);
+            k.flags = readI32(f);
+            k.posOffsetX = readFixed(f);
+            k.posOffsetY = readFixed(f);
+            k.actionId = readI32(f);
+            k.styleIdx = readI32(f);
+        }
+
+        uint32_t triggerKeyCount = readU32(f);
+        action.triggerKeys.resize(triggerKeyCount);
+        actionTriggerKeyGroupIndices[ai].resize(triggerKeyCount);
+        for (size_t ti = 0; ti < triggerKeyCount; ti++) {
+            auto& k = action.triggerKeys[ti];
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.validStyle = readI32(f);
+            k.other = readI32(f);
+            k.condition = readI32(f);
+            k.state = readI32(f);
+            actionTriggerKeyGroupIndices[ai][ti] = readI32(f);
+        }
+
+        uint32_t statusKeyCount = readU32(f);
+        action.statusKeys.resize(statusKeyCount);
+        for (auto& k : action.statusKeys) {
+            k.startFrame = readI32(f);
+            k.endFrame = readI32(f);
+            k.landingAdjust = readI32(f);
+            k.poseStatus = readI32(f);
+            k.actionStatus = readI32(f);
+            k.jumpStatus = readI32(f);
+            k.side = readI32(f);
+        }
+
+        action.activeFrame = readI32(f);
+        action.recoveryStartFrame = readI32(f);
+        action.recoveryEndFrame = readI32(f);
+        action.actionFlags = readU64(f);
+        action.actionFrameDuration = readI32(f);
+        action.loopPoint = readI32(f);
+        action.loopCount = readI32(f);
+        action.startScale = readI32(f);
+        action.comboScale = readI32(f);
+        action.instantScale = readI32(f);
+        actionProjIndices[ai] = readI32(f);
+        action.inheritKindFlag = readI32(f);
+        action.inheritHitID = readBool(f);
+        action.inheritAccelX = readFixed(f);
+        action.inheritAccelY = readFixed(f);
+        action.inheritVelX = readFixed(f);
+        action.inheritVelY = readFixed(f);
+    }
+
+    for (size_t ai = 0; ai < actionCount; ai++) {
+        pRet->actions[ai].pProjectileData = indexToPtr(actionProjIndices[ai], pRet->projectileDatas);
+        for (size_t li = 0; li < pRet->actions[ai].lockKeys.size(); li++) {
+            pRet->actions[ai].lockKeys[li].pHitEntry = indexToHitEntryPtr(actionLockKeyHitEntryIndices[ai][li], pRet->hits);
+        }
+        for (size_t ti = 0; ti < pRet->actions[ai].triggerKeys.size(); ti++) {
+            pRet->actions[ai].triggerKeys[ti].pTriggerGroup = indexToPtr(actionTriggerKeyGroupIndices[ai][ti], pRet->triggerGroups);
+        }
+    }
+
+    for (auto& action : pRet->actions) {
+        pRet->actionsByID[ActionRef(action.actionID, action.styleID)] = &action;
+    }
+
+    uint32_t moveListCount = readU32(f);
+    pRet->vecMoveList.resize(moveListCount);
+    for (auto& str : pRet->vecMoveList) {
+        std::string s = readString(f);
+        str = strdup(s.c_str());
+    }
 
     return pRet;
 }

@@ -490,3 +490,5 @@ struct CharacterData {
 };
 
 CharacterData *loadCharacter(std::string charName, int charVersion);
+bool cookCharacter(CharacterData* pData, const std::string& path);
+CharacterData* loadCookedCharacter(const std::string& path, int charVersion);

@@ -27,6 +27,7 @@
 #include "input.hpp"
 #include "render.hpp"
 #include "combogen.hpp"
+#include "chara.hpp"
 
 EGameMode gameMode = Training;
 
@@ -929,6 +930,29 @@ int main(int argc, char**argv)
                 exit(0);
             }
         }
+    }
+
+    if (argc > 2 && std::string(argv[1]) == "cook") {
+        std::string outputPath = argv[2];
+        if (outputPath.back() != '/') outputPath += '/';
+        std::filesystem::create_directories(outputPath);
+
+        for (int vi = 0; vi < charVersionCount; vi++) {
+            int version = atoi(charVersions[vi]);
+            for (auto& entry : charEntries) {
+                std::string outFile = outputPath + entry.name + std::to_string(version) + ".bin";
+                printf("cooking %s\n", outFile.c_str());
+                CharacterData* pData = loadCharacter(entry.name, version);
+                if (!pData) continue;
+
+                if (cookCharacter(pData, outFile)) {
+                } else {
+                    printf("failed to cook");
+                }
+                delete pData;
+            }
+        }
+        exit(0);
     }
 
     if ( argc > 2 && std::string(argv[1]) == "load_dump") {
