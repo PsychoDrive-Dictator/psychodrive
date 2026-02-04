@@ -19,7 +19,6 @@
 #include <SDL_opengl.h>
 
 #include "json.hpp"
-#include "zip.h"
 
 #include "simulation.hpp"
 #include "guy.hpp"
@@ -352,108 +351,6 @@ nlohmann::json parse_json_file(const std::string &fileName)
     std::string fileText = readFile(fileName);
     if (fileText == "") return nullptr;
     return nlohmann::json::parse(fileText);
-}
-
-std::unordered_map<std::string, struct zip_t*> charZipFiles;
-
-bool charFileExists(const std::string &path, const std::string &charName, const std::string &charFileName)
-{
-    // check loose files first
-    std::string filePath = path + charFileName;
-    if (std::filesystem::exists(filePath))
-        return true;
-
-    // check in possible char zip next
-
-    // try loading char zip if we haven't tried yet 
-    if (charZipFiles.find(charName) == charZipFiles.end()) {
-        std::string zipFileName = path + charName + ".zip";
-        struct zip_t *zip = zip_open(zipFileName.c_str(), 0, 'r');
-        charZipFiles[charName] = zip;
-    }
-
-    struct zip_t *zip = charZipFiles[charName];
-    if (zip) {
-        // check for file in char zip
-        int err = zip_entry_open(zip, charFileName.c_str());
-        if (err == 0) {
-            zip_entry_close(zip);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-int findCharVersionSlot(int version)
-{
-    int versionSlot = charVersionCount - 1;
-    while (versionSlot >= 0) {
-        if (atoi(charVersions[versionSlot]) == version) {
-            break;
-        }
-        versionSlot--;
-    }
-
-    return versionSlot;
-}
-
-nlohmann::json *loadCharFile(const std::string &charName, int version, const std::string &jsonName)
-{
-    std::string charPath = "data/chars/" + charName + "/";
-    std::string charFileName;
-    bool foundFile = false;
-
-    // find initial version slot for passed version number
-    int versionSlot = findCharVersionSlot(version);
-    if (versionSlot < 0) {
-        return nullptr;
-    }
-    while (versionSlot >= 0) {
-        charFileName = charName + std::to_string(atoi(charVersions[versionSlot])) + "_" + jsonName + ".json";
-        if (charFileExists(charPath, charName, charFileName)) {
-            foundFile = true;
-            break;
-        }
-        versionSlot--;
-    }
-    if (!foundFile) {
-        return nullptr;
-    }
-
-    static std::unordered_map<std::string, nlohmann::json> mapCharFileLoader;
-
-    if (mapCharFileLoader.find(charFileName) == mapCharFileLoader.end()) {
-        bool loaded = false;
-        // try loading from loose file first
-        std::string looseFileName = charPath + charFileName;
-        if (std::filesystem::exists(looseFileName)) {
-            mapCharFileLoader[charFileName] = parse_json_file(looseFileName);
-            loaded = true;
-        } else {
-            // now zip
-            struct zip_t *zip = charZipFiles[charName];
-            if (zip) {
-                size_t bufSize;
-                int err = zip_entry_open(zip, charFileName.c_str());
-                if (err == 0) {
-                    std::string destString;
-                    bufSize = zip_entry_size(zip);
-                    destString.resize(bufSize);
-                    zip_entry_noallocread(zip, (void*)destString.c_str(), bufSize);
-                    mapCharFileLoader[charFileName] = nlohmann::json::parse(destString);
-                    loaded = true;
-                    zip_entry_close(zip);
-                }
-            }
-        }
-        if (loaded == false) {
-            // really shouldn't happen since charFileExists said there was something
-            mapCharFileLoader[charFileName] = nullptr;
-        }
-    }
-
-    return &mapCharFileLoader[charFileName];
 }
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
