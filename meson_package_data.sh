@@ -1,18 +1,20 @@
 #!/bin/bash
 set -e
 
-rsync -avx "$MESON_SOURCE_ROOT"/data "$1"/
-for chardir in $(find "$1"/data/chars -maxdepth 1 -mindepth 1 -type d); do
-    char=$(basename "$chardir")
-    zip -j "$chardir"/"$char".zip "$chardir"/*.json
-    rm "$chardir"/*.json
-    if [[ $2 == "emscripten" ]]; then
-        /usr/lib/emsdk/upstream/emscripten/tools/file_packager "$1"/psychodrive_char_"$char".data --js-output="$1"/psychodrive_char_"$char".js --embed "$1"/data/chars/"$char"@./data/chars/"$char"
-    fi
-done
+mkdir -p "$1"/data/cooked
+cd "$MESON_SOURCE_ROOT"
+python3 "$MESON_SOURCE_ROOT"/cook_all.py "$1"/data/cooked "$MESON_SOURCE_ROOT"/psychodrive
+
+rsync -avx --exclude='chars' "$MESON_SOURCE_ROOT"/data "$1"/
 
 if [[ $2 == "emscripten" ]]; then
-    /usr/lib/emsdk/upstream/emscripten/tools/file_packager "$1"/psychodrive_files.data --js-output="$1"/psychodrive_files.js --exclude \*chars\* --embed "$1"/data@./data
+    for binfile in "$1"/data/cooked/*.bin; do
+        charver=$(basename "$binfile" .bin)
+        /usr/lib/emsdk/upstream/emscripten/tools/file_packager "$1"/psychodrive_char_"$charver".data --js-output="$1"/psychodrive_char_"$charver".js --embed "$binfile"@./data/cooked/"$(basename "$binfile")" &
+    done
+    wait
+
+    /usr/lib/emsdk/upstream/emscripten/tools/file_packager "$1"/psychodrive_files.data --js-output="$1"/psychodrive_files.js --exclude \*cooked\* --embed "$1"/data@./data
 fi
 
 rm -r "$1"/data

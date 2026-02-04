@@ -1387,8 +1387,9 @@ bool SimulationController::NewSim(void)
 
     for (int i = 0; i < charCount; i++) {
         const char *charName = charNames[charControllers[i].character];
-        if (!isCharLoaded(charName)) {
-            requestCharDownload(charName);
+        int charVersion = atoi(charVersions[charControllers[i].charVersion]);
+        if (!isCharLoaded(charName, charVersion)) {
+            requestCharDownload(charName, charVersion);
             charsLoaded = false;
         }
     }

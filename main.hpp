@@ -249,8 +249,8 @@ int getCharIDFromName(const char *charName);
 extern const char* charVersions[];
 extern const int charVersionCount;
 
-bool isCharLoaded(std::string charName);
-void requestCharDownload(std::string charName);
+bool isCharLoaded(const std::string& charName, int charVersion);
+void requestCharDownload(const std::string& charName, int charVersion);
 
 extern float startPos1;
 extern float startPos2;

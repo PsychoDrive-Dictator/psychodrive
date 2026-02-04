@@ -162,56 +162,62 @@ void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int s
     defaultSim.simGuys.push_back(pNewGuy);
 }
 
-bool isCharLoaded(std::string charName)
+bool isCharLoaded(const std::string& charName, int charVersion)
 {
     if (charName == "") {
         return false;
     }
 #ifdef __EMSCRIPTEN__
-    return setCharsLoaded.find(charName) != setCharsLoaded.end();
+    std::string charSpec = charName + std::to_string(charVersion);
+    return setCharsLoaded.find(charSpec) != setCharsLoaded.end();
 #else
+    (void)charVersion;
     return true;
 #endif
 }
 
-void requestCharDownload(std::string charName)
+void requestCharDownload(const std::string& charName, int charVersion)
 {
     if (charName == "") {
         return;
     }
-#ifdef __EMSCRIPTEN__
-    if (isCharLoaded(charName)) {
+#ifndef __EMSCRIPTEN__
+    (void)charVersion;
+#else
+    std::string charSpec = charName + std::to_string(charVersion);
+    if (setCharsLoaded.find(charSpec) != setCharsLoaded.end()) {
         return;
     }
-    if (setCharsStarted.find(charName) != setCharsStarted.end()) {
+    if (setCharsStarted.find(charSpec) != setCharsStarted.end()) {
         return;
     }
-    log("downloading " + std::string(charName));
-    setCharsStarted.insert(charName);
+    log("downloading " + charSpec);
+    setCharsStarted.insert(charSpec);
     EM_ASM({
         var script = document.createElement('script');
-        var charName = UTF8ToString($0);
+        var charSpec = UTF8ToString($0);
         script.onload = function () {
             Module.ccall('jsCharLoadCallback',
             null,
             ['string'],
-            [charName]);
+            [charSpec]);
         };
-        script.src = './psychodrive_char_' + charName + '.js';
+        script.src = './psychodrive_char_' + charSpec + '.js';
         script.async = true;
 
         document.head.appendChild(script);
-    }, charName.c_str());
+    }, charSpec.c_str());
 #endif
 }
 
 void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
 #ifdef __EMSCRIPTEN__
-    if (setCharsLoaded.find(charName) == setCharsLoaded.end()) {
+    std::string charSpec = charName + std::to_string(charVersion);
+    if (setCharsLoaded.find(charSpec) == setCharsLoaded.end()) {
         bool needDownload = true;
-        for (auto deferred : vecDeferredCreateGuys) {
-            if (deferred.charName == charName)
+        for (auto& deferred : vecDeferredCreateGuys) {
+            if (deferred.charName == charName && deferred.charVersion == charVersion)
                 needDownload = false;
         }
 
@@ -220,7 +226,7 @@ void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int star
         if (!needDownload)
             return;
 
-        requestCharDownload(charName);
+        requestCharDownload(charName, charVersion);
     } else {
         createGuyNow(charName, charVersion, x, y, startDir, color);
     }
@@ -233,8 +239,9 @@ void doDeferredCreateGuys(void)
 {
     std::vector<guyCreateInfo_t> vecDeferredNotDoneYet;
     if (newCharLoaded) {
-        for (auto deferredCreate : vecDeferredCreateGuys) {
-            if (setCharsLoaded.find(deferredCreate.charName) != setCharsLoaded.end()) {
+        for (auto& deferredCreate : vecDeferredCreateGuys) {
+            std::string charSpec = deferredCreate.charName + std::to_string(deferredCreate.charVersion);
+            if (setCharsLoaded.find(charSpec) != setCharsLoaded.end()) {
                 createGuyNow(deferredCreate.charName, deferredCreate.charVersion, deferredCreate.x, deferredCreate.y, deferredCreate.startDir, deferredCreate.col);
             } else {
                 vecDeferredNotDoneYet.push_back(deferredCreate);
@@ -247,11 +254,11 @@ void doDeferredCreateGuys(void)
 
 extern "C" {
 
-void jsCharLoadCallback(char *charName)
+void jsCharLoadCallback(char *charVerKey)
 {
-    log(std::string(charName) + " download complete");
-    if (setCharsLoaded.find(charName) == setCharsLoaded.end()) {
-        setCharsLoaded.insert(charName);
+    log(std::string(charVerKey) + " download complete");
+    if (setCharsLoaded.find(charVerKey) == setCharsLoaded.end()) {
+        setCharsLoaded.insert(charVerKey);
         newCharLoaded = true;
     }
 }
@@ -932,26 +939,33 @@ int main(int argc, char**argv)
         }
     }
 
-    if (argc > 2 && std::string(argv[1]) == "cook") {
-        std::string outputPath = argv[2];
-        if (outputPath.back() != '/') outputPath += '/';
-        std::filesystem::create_directories(outputPath);
-
-        for (int vi = 0; vi < charVersionCount; vi++) {
-            int version = atoi(charVersions[vi]);
-            for (auto& entry : charEntries) {
-                std::string outFile = outputPath + entry.name + std::to_string(version) + ".bin";
-                printf("cooking %s\n", outFile.c_str());
-                CharacterData* pData = loadCharacter(entry.name, version);
-                if (!pData) continue;
-
-                if (cookCharacter(pData, outFile)) {
-                } else {
-                    printf("failed to cook");
-                }
-                delete pData;
-            }
+    if (argc > 1 && std::string(argv[1]) == "printversions") {
+        for (int i = 0; i < charVersionCount; i++) {
+            printf("%d\n", atoi(charVersions[i]));
         }
+        exit(0);
+    }
+
+    if (argc > 3 && std::string(argv[1]) == "cook") {
+        char* charSpec = argv[2];
+        std::string outFile = argv[3];
+
+        std::string charName;
+        int version = atoi(charVersions[charVersionCount - 1]);
+        extractCharVersion(charSpec, charName, version);
+
+        CharacterData* pData = loadCharacter(charName, version);
+        if (!pData) {
+            fprintf(stderr, "failed to load %s v%d\n", charName.c_str(), version);
+            exit(1);
+        }
+
+        if (!cookCharacter(pData, outFile)) {
+            fprintf(stderr, "failed to cook %s v%d\n", charName.c_str(), version);
+            exit(1);
+        }
+
+        delete pData;
         exit(0);
     }
 
