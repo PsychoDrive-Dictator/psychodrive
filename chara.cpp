@@ -2,10 +2,12 @@
 #include "main.hpp"
 #include <string>
 #include <cstdlib>
+#include <fstream>
 
 #include "zip.h"
 
 std::unordered_map<std::string, struct zip_t*> charZipFiles;
+std::unordered_map<std::string, nlohmann::json> mapCharFileLoader;
 
 bool charFileExists(const std::string &path, const std::string &charName, const std::string &charFileName)
 {
@@ -34,6 +36,14 @@ bool charFileExists(const std::string &path, const std::string &charName, const 
     }
 
     return false;
+}
+
+void closeZipFiles()
+{
+    for (auto zip : charZipFiles) {
+        zip_close(zip.second);
+    }
+    charZipFiles.clear();
 }
 
 int findCharVersionSlot(int version)
@@ -71,8 +81,6 @@ nlohmann::json *loadCharFile(const std::string &charName, int version, const std
     if (!foundFile) {
         return nullptr;
     }
-
-    static std::unordered_map<std::string, nlohmann::json> mapCharFileLoader;
 
     if (mapCharFileLoader.find(charFileName) == mapCharFileLoader.end()) {
         bool loaded = false;
@@ -1403,18 +1411,8 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
         pRet->actionsByID[ActionRef(action.actionID, action.styleID)] = &action;
     }
 
-    // delete pMovesDictJson;
-    // delete pRectsJson;
-    // delete pTriggerGroupsJson;
-    // delete pTriggersJson;
-    // delete pCommandsJson;
-    // delete pChargeJson;
-    // delete pHitJson;
-    // delete pAtemiJson;
-    // delete pCharInfoJson;
-    // delete pCommonMovesJson;
-    // delete pCommonRectsJson;
-    // delete pCommonAtemiJson;
+    mapCharFileLoader.clear();
+    closeZipFiles();
 
     return pRet;
 }
