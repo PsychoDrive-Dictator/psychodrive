@@ -630,6 +630,7 @@ private:
         ignoreBodyPush = false;
         ignoreScreenPush = false;
         ignoreCornerPushback = false;
+        inputIgnoresOpponentDirection = false;
         noVelNextFrame = false;
         noAccelNextFrame = false;
         posOffsetX = Fixed(0);
@@ -854,6 +855,7 @@ private:
     bool ignoreBodyPush : 1;
     bool ignoreScreenPush : 1;
     bool ignoreCornerPushback : 1;
+    bool inputIgnoresOpponentDirection : 1;
     bool noVelNextFrame : 1;
     bool noAccelNextFrame : 1;
     bool setPlaceX : 1;

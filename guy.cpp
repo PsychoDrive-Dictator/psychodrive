@@ -218,7 +218,7 @@ Action* Guy::FindMove(int actionID, int styleID)
 void Guy::Input(int input)
 {
     int directionToUse = direction.i();
-    if (needsTurnaround()) {
+    if (needsTurnaround() && !inputIgnoresOpponentDirection) {
         directionToUse *= -1;
     }
     if (directionToUse < 0) {
@@ -514,6 +514,7 @@ bool Guy::RunFrame(bool advancingTime)
         ignoreHitStop = false;
         ignoreScreenPush = false;
         ignoreCornerPushback = false;
+        inputIgnoresOpponentDirection = false;
         teleported = false;
 
         DoSwitchKey();
@@ -1360,6 +1361,9 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
 
         if (addTriggerGroupZero) {
+
+            freeMovement = true;
+
             auto it = pCharData->triggerGroupByID.find(0);
             if (it != pCharData->triggerGroupByID.end()) {
                 TriggerGroup *pTriggerGroup = it->second;
@@ -5318,7 +5322,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         hitAccelX = Fixed(1) * direction;
     }
 
-    if (moveTurnaround || (needsTurnaround() && (didTrigger && !airborne && !wasDrive))) {
+    if (moveTurnaround || (needsTurnaround() && (didTrigger && (canMoveNow || freeMovement)))) {
         switchDirection();
     }
 
@@ -5457,8 +5461,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         nextAction = -1;
         nextActionFrame = -1;
-
-        freeMovement = false;
 
         UpdateActionData();
 
@@ -5599,6 +5601,9 @@ void Guy::DoSwitchKey(void)
 
         int flag = switchKey.systemFlag;
 
+        if (flag & 0x80000000) {
+            inputIgnoresOpponentDirection = true;
+        }
         if (flag & 0x40000000) {
             canBlock = true;
         }
