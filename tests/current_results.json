@@ -6031,6 +6031,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ken_run_tatsu_hit_behind",
+        "testVersion": "39",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 969,
+                "firstFrame": 130,
+                "lastFrame": 543
+            },
+            {
+                "count": 414,
+                "firstFrame": 69,
+                "lastFrame": 248
+            },
+            {
+                "count": 104,
+                "firstFrame": 145,
+                "lastFrame": 248
+            },
+            {
+                "count": 166,
+                "firstFrame": 69,
+                "lastFrame": 239
+            },
+            {
+                "count": 166,
+                "firstFrame": 69,
+                "lastFrame": 239
+            },
+            {
+                "count": 297,
+                "firstFrame": 101,
+                "lastFrame": 299
+            },
+            {
+                "count": 827,
+                "firstFrame": 101,
+                "lastFrame": 543
+            },
+            {
+                "count": 113,
+                "firstFrame": 145,
+                "lastFrame": 257
+            },
+            {
+                "count": 33,
+                "firstFrame": 129,
+                "lastFrame": 161
+            },
+            {
+                "count": 145,
+                "firstFrame": 145,
+                "lastFrame": 289
+            },
+            {
+                "count": 48,
+                "firstFrame": 145,
+                "lastFrame": 209
+            },
+            {
+                "count": 1121,
+                "firstFrame": 145,
+                "lastFrame": 543
+            }
+        ]
+    },
+    {
         "testName": "ken_throw_p1_p2_side",
         "testVersion": "39",
         "finished": true,
