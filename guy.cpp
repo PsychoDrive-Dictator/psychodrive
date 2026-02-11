@@ -872,7 +872,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
 
     // meters
     if (pTrigger->needsFocus) {
-        if (focus == 0) {
+        if (focus == 0 || burnout) {
             // no need to check cost here as we can bottom out this bar
             return false;
         }
