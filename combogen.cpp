@@ -173,7 +173,7 @@ void ComboWorker::WorkLoop(void) {
                 break;
             }
 
-            if ((pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) || (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne())) {
+            if ((pSim->simGuys[1]->getComboHits() == 0 && pSim->simGuys[1]->canAct()) || (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) || (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne())) {
                 break;
             }
 
