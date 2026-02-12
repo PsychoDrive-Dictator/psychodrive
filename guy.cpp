@@ -1619,7 +1619,11 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox>
             newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
             newBox.flags |= legs;
             if (pOutHurtBoxes) {
-                pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+                if (newBox.flags & armor) {
+                    pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+                } else {
+                    pOutHurtBoxes->insert(pOutHurtBoxes->end(), newBox);
+                }
             }
             if (pOutRenderBoxes) {
                 if (newBox.flags & armor) {
@@ -1634,7 +1638,11 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox>
             newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
             newBox.flags |= body;
             if (pOutHurtBoxes) {
-                pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+                if (newBox.flags & armor) {
+                    pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+                } else {
+                    pOutHurtBoxes->insert(pOutHurtBoxes->end(), newBox);
+                }
             }
             if (pOutRenderBoxes) {
                 if (newBox.flags & armor) {
@@ -1649,7 +1657,11 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox>
             newBox.box = rectToBox(pRect, rootOffsetX, rootOffsetY, direction.i());
             newBox.flags |= head;
             if (pOutHurtBoxes) {
-                pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+                if (newBox.flags & armor) {
+                    pOutHurtBoxes->insert(pOutHurtBoxes->begin(), newBox);
+                } else {
+                    pOutHurtBoxes->insert(pOutHurtBoxes->end(), newBox);
+                }
             }
             if (pOutRenderBoxes) {
                 if (newBox.flags & armor) {
