@@ -4268,6 +4268,7 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 21: // armor
+                    // param1: 1 strike 2 proj?
                     if (armorThisFrame) {
                         doBranch = true;
                     }

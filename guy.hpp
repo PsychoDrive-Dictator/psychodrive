@@ -224,15 +224,20 @@ public:
         return false;
     }
     int getGauge() { return gauge; }
-    void setFocus(int newFocus) {
+    void setFocus(int newFocus, bool clearBurnout = false) {
         focus = newFocus;
         if (focus < 0) {
-            burnout = true;
             focus = 0;
+        }
+        if (focus == 0) {
+            burnout = true;
         }
         if (focus > maxFocus) {
             burnout = false;
             focus = maxFocus;
+        }
+        if (clearBurnout) {
+            burnout = false;
         }
     }
     void setGauge(int newGauge) {

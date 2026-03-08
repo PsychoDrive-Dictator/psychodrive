@@ -243,7 +243,7 @@ void updateInputs(int sizeX, int sizeY)
                     break;
                 case SDLK_1:
                     if (defaultSim.simGuys.size()) {
-                        defaultSim.simGuys[0]->setFocus(defaultSim.simGuys[0]->getFocus() + 10000);
+                        defaultSim.simGuys[0]->setFocus(defaultSim.simGuys[0]->getFocus() + 10000, true);
                     }
                     break;
                 case SDLK_2:

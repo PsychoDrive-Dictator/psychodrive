@@ -142,10 +142,26 @@ for char in characters:
             for key in move["AttackCollisionKey"]:
                 if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
                     attackKey = move["AttackCollisionKey"][key]
-                    if attackKey["KindFlag"] & (1<<25):
+                    if attackKey["KindFlag"] & 33554432:
                         print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
                               " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
                               " condition " + hex(attackKey["Condition"]) + " kind " + hex(attackKey["KindFlag"]))
+
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "OtherCollisionKey" in move:
+    #         for key in move["OtherCollisionKey"]:
+    #             if isinstance(move["OtherCollisionKey"][key], dict) and "CollisionType" in move["OtherCollisionKey"][key]:
+    #                 attackKey = move["OtherCollisionKey"][key]
+    #                 if attackKey["CollisionType"] == 10:
+    #                     print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
+    #                           " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
+    #                           " condition " + hex(attackKey["Condition"]) + " kind " + hex(attackKey["KindFlag"]))
+
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "UniqueCollisionKey" in move:
+    #         print(char + " " + moveID)
 
     # find certain branches
     # for moveID in moves21Json:
