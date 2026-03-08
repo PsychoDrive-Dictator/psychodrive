@@ -343,7 +343,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
 
     Fixed maxXHitBox = 0.0f;
     for (auto hitbox : hitBoxes) {
-        if (hitbox.type != hitBoxType::hit) continue;
+        if (hitbox.type != hitBoxType::hit && hitbox.type != hitBoxType::grab) continue;
         Fixed hitBoxX = hitbox.box.x + hitbox.box.w;
         if (hitBoxX > maxXHitBox) {
             maxXHitBox = hitBoxX;
