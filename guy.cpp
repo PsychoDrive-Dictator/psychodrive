@@ -5270,6 +5270,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
         stunSplat = false;
+        if (stunned) {
+            burnout = false;
+            stunned = false;
+            focus = maxFocus;
+        }
 
         wasHit = false;
 
