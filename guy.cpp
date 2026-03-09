@@ -4156,13 +4156,16 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 2:
-                    // any hit ever? surely that's a flag - can't find a counterexcample rn
-                    if (!preHit && pOpponent && pOpponent->comboHits) {
-                        doBranch = true;
+                    {
+                        // is atemi/armor right or this this for guard branch below?
+                        bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove || hitArmorThisMove || hitAtemiThisMove;
+                        if (!preHit && anyHitThisMove) {
+                            doBranch = true;
+                        }
                     }
-
                     break;
                 case 4:
+                    // todo parry too right?
                     if (hasBeenBlockedThisMove) {
                         doBranch = true;
                     }
