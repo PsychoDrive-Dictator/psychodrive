@@ -1271,10 +1271,9 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     if (rightSide) {
         renderFrameMeterCancelWindows(frameIndex);
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
-        int curAction = pGuy->getCurrentAction();
-        Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
+        Action *pAction = pGuy->getCurrentActionPtr();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
-        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        ImGui::Text("%s %d/%d", pAction->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
     }
 
     ImGui::PopStyleColor();

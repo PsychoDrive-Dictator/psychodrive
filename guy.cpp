@@ -708,17 +708,6 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
 
 bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
 {
-    // condition bits
-    // bit 0 = on hit
-    // bit 1 = on block
-    // bit 2 = on whiff
-    // bit 3 = on armor
-    // bit 10 is set almost everywhere, but unknown as of yet (PP?)
-    // bit 11 = on counter/atemi
-    // bit 12 = on parry
-
-    // is 'this move' really broadly correct? or only for defers
-    // maybe that's what mystery bit 10 governs
     bool conditionMet = false;
     bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
     if ( conditionFlag & (1<<0) && anyHitThisMove) {
@@ -727,19 +716,24 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
     if ( conditionFlag & (1<<1) && hasBeenBlockedThisMove) {
         conditionMet = true;
     }
-    // todo don't forget to add 'not parried' there
     if ( conditionFlag & (1<<2) &&
         (!anyHitThisMove && !hasBeenBlockedThisMove &&
-        !hitAtemiThisMove && !hitArmorThisMove)) {
+        !hitAtemiThisMove && !hitArmorThisMove &&
+        !hasBeenParriedThisMove && !hasBeenPerfectParriedThisMove)) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<3) && hitArmorThisMove) {
         conditionMet = true;
     }
+    if ( conditionFlag & (1<<10) && hasBeenPerfectParriedThisMove) {
+        conditionMet = true;
+    }
     if ( conditionFlag & (1<<11) && hitAtemiThisMove) {
         conditionMet = true;
     }
-    // todo hit parry
+    if ( conditionFlag & (1<<12) && hasBeenParriedThisMove) {
+        conditionMet = true;
+    }
 
     if (!conditionMet) {
         return false;
@@ -4080,30 +4074,32 @@ bool Guy::CheckHitBoxCondition(int conditionFlag)
     bool conditionMet = false;
     bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
     if ( conditionFlag & (1<<0) && hitThisMove) {
-        // just normal hit ?
         conditionMet = true;
     }
     if ( conditionFlag & (1<<1) && hasBeenBlockedThisMove) {
         conditionMet = true;
     }
-    // todo don't forget to add 'not parried' there
     if ( conditionFlag & (1<<2) &&
         (!anyHitThisMove && !hasBeenBlockedThisMove &&
-        !hitAtemiThisMove && !hitArmorThisMove)) {
+        !hitAtemiThisMove && !hitArmorThisMove &&
+        !hasBeenParriedThisMove && !hasBeenPerfectParriedThisMove)) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<3) && (hitCounterThisMove || hitPunishCounterThisMove)) {
         conditionMet = true;
     }
-    // 1<<4 parry?
+    if ( conditionFlag & (1<<4) && hasBeenParriedThisMove) {
+        conditionMet = true;
+    }
     if ( conditionFlag & (1<<5) && hitAtemiThisMove) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<6) && hitArmorThisMove) {
         conditionMet = true;
     }
-    // 1<<7 PP
-    // todo hit parry
+    if ( conditionFlag & (1<<7) && hasBeenPerfectParriedThisMove) {
+        conditionMet = true;
+    }
 
     return conditionMet;
 }
@@ -4469,7 +4465,12 @@ void Guy::DoBranchKey(bool preHit)
                     if (branchParam0 & (1<<5) && hitArmorThisMove) {
                         doBranch = true;
                     }
-                    // todo 6 and 7 parry and PP
+                    if (branchParam0 & (1<<6) && hasBeenParriedThisMove) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 & (1<<7) && hasBeenPerfectParriedThisMove) {
+                        doBranch = true;
+                    }
 
                     if (preHit) {
                         doBranch = false;
