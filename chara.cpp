@@ -512,6 +512,12 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         if (flags & 0x200) {
             newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_front);
         }
+        if (flags & 0x1000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | ignore_atemi);
+        }
+        if (flags & 0x8000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | ignore_armor);
+        }
         if (flags & 0x40000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
         }

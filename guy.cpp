@@ -2804,7 +2804,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 
         bool hitArmor = false;
         bool hitAtemi = false;
-        if (hurtBox.flags & armor && hurtBox.pAtemiData) {
+        if (hurtBox.flags & armor && hurtBox.pAtemiData && !(pendingHit.hitBox.flags & ignore_armor)) {
             hitArmor = true;
             pGuy->hitArmorThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->hitArmorThisFrame = true;
@@ -2832,7 +2832,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             }
         }
 
-        if (hurtBox.flags & atemi) {
+        if (hurtBox.flags & atemi && !(pendingHit.hitBox.flags & ignore_atemi)) {
             // like armor except onthing really happens beyond setting the flag
             hitArmor = true;
             hitAtemi = true;
