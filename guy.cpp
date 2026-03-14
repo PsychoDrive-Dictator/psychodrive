@@ -776,6 +776,16 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
         return false;
     }
 
+    if (hitStun) {
+        if (blocking) {
+            if (!(pTrigger->flags & (1ULL<<39ULL))) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     if ( pTrigger->validStyles != 0 && !(pTrigger->validStyles & (1 << styleInstall)) ) {
         return false;
     }
