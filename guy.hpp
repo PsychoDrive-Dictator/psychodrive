@@ -808,6 +808,7 @@ private:
         debuffTimer = 0;
         pCurrentAction = nullptr;
         pSim = nullptr;
+        lastHitType = none;
     }
 
     int uniqueID;
@@ -1048,6 +1049,7 @@ private:
     // getting hit side
     GuyRef pAttacker;
     int hitStun;
+    hitBoxType lastHitType;
 
     Fixed hitVelX;
     Fixed hitAccelX;

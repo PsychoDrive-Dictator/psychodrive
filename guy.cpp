@@ -2999,6 +2999,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pHitEntry = &clonedEntry;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, false, &hurtBox);
+            pOtherGuy->lastHitType = hitBox.type;
 
             if (pendingHit.parried) {
                 Fixed hitVel = pOtherGuy->hitVelX;
@@ -4267,9 +4268,16 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 21: // armor
-                    // param1: 1 strike 2 proj?
                     if (armorThisFrame) {
-                        doBranch = true;
+                        if (branchParam1 == 0) {
+                            doBranch = true;
+                        }
+                        if (branchParam1 & 1 && lastHitType == hit) {
+                            doBranch = true;
+                        }
+                        if (branchParam1 & 2 && lastHitType == projectile) {
+                            doBranch = true;
+                        }
                     }
                     break;
                 case 22: // atemi/counter
