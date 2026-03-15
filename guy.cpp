@@ -2992,6 +2992,9 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 hitStopTarget += 5;
             }
         }
+
+        pOtherGuy->lastHitType = hitBox.type;
+
         if (!hitArmor) {
             if (applyHit && (!pendingHit.blocked && !pendingHit.parried)) {
                 pOtherGuy->blocking = false;
@@ -3009,7 +3012,6 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pHitEntry = &clonedEntry;
             }
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, false, &hurtBox);
-            pOtherGuy->lastHitType = hitBox.type;
 
             if (pendingHit.parried) {
                 Fixed hitVel = pOtherGuy->hitVelX;
