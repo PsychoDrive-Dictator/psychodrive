@@ -2949,6 +2949,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "alex_turnaround_condition",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1624,
+                "firstFrame": 190,
+                "lastFrame": 1008
+            },
+            {
+                "count": 37,
+                "firstFrame": 246,
+                "lastFrame": 426
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 105,
+                "firstFrame": 190,
+                "lastFrame": 713
+            },
+            {
+                "count": 105,
+                "firstFrame": 190,
+                "lastFrame": 713
+            },
+            {
+                "count": 1260,
+                "firstFrame": 96,
+                "lastFrame": 847
+            },
+            {
+                "count": 1621,
+                "firstFrame": 190,
+                "lastFrame": 1008
+            },
+            {
+                "count": 491,
+                "firstFrame": 224,
+                "lastFrame": 731
+            },
+            {
+                "count": 489,
+                "firstFrame": 190,
+                "lastFrame": 713
+            },
+            {
+                "count": 367,
+                "firstFrame": 339,
+                "lastFrame": 763
+            },
+            {
+                "count": 74,
+                "firstFrame": 357,
+                "lastFrame": 497
+            },
+            {
+                "count": 1340,
+                "firstFrame": 339,
+                "lastFrame": 1008
+            }
+        ]
+    },
+    {
         "testName": "cammy_air_throw",
         "testVersion": "26",
         "finished": true,
