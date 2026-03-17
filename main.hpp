@@ -169,6 +169,8 @@ enum hitBoxFlags {
     fixed_position = 512,
     ignore_armor = 1024,
     ignore_atemi = 2048,
+    avoids_facing_opponent = 4096,
+    avoids_backturned_opponent = 8192,
 };
 
 enum hurtBoxFlags {

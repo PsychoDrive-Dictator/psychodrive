@@ -527,6 +527,12 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         if (flags & 0x800000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | fixed_position);
         }
+        if (flags & 0x4000000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_facing_opponent);
+        }
+        if (flags & 0x8000000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | avoids_backturned_opponent);
+        }
 
         if (type == domain) {
             pOutputVector->push_back(newKey);

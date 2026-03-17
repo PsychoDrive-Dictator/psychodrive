@@ -2410,6 +2410,12 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                     continue;
                 }
             }
+            if (hitbox.flags & avoids_facing_opponent && !pOtherGuy->needsTurnaround()) {
+                continue;
+            }
+            if (hitbox.flags & avoids_backturned_opponent && pOtherGuy->needsTurnaround()) {
+                continue;
+            }
         }
 
         if (isGrab) {
