@@ -3465,7 +3465,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     if (applyHit && !isGrab) {
         if (dmgType == 13) {
             knockDown = true;
-            if (!isDomain && applyHit && piyoBound) { // ??
+            bool doKnockDown = destY == 0 && pHitEffect->throwRelease == 1; // ?
+            if (moveType == 15 && destTime != 0) {
+                doKnockDown = false; // this overrides that, looks like
+            }
+            if (!isDomain && applyHit && (piyoBound || doKnockDown)) { // ??
                 knockDownFrames = 0;
                 hitEntryHitStun = downTime;
                 resetHitStunOnLand = false;
