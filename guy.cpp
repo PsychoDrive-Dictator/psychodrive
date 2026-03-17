@@ -3388,6 +3388,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         switchDirection();
         log(logHits, "hit switchDirection!");
     }
+    if (doSwitchDirection && recoverReverse && direction != attacker->direction) {
+        log(logHits, "reverse facing hit switchDirection!");
+        switchDirection();
+    }
     // if (doSwitchDirection && recoverReverse && !isDomain && direction != attackerDirection) {
     //     // like in a sideswitch combo
     //     switchDirection();
