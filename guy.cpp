@@ -3933,7 +3933,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             //         nextAction = dmActID;
             //     }
 
-            if (moveType == 72) {
+            if (moveType == 75) {
+                nextAction = 296;
+            } else if (moveType == 72) {
                 if (attackStrength >= 2) {
                     nextAction = 268;
                 } else {

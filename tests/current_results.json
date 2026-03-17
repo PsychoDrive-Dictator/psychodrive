@@ -2979,14 +2979,14 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 161,
+                "count": 126,
                 "firstFrame": 96,
                 "lastFrame": 773
             },
             {
-                "count": 18,
-                "firstFrame": 469,
-                "lastFrame": 486
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
