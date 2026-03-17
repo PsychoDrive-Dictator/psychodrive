@@ -3,7 +3,7 @@ set -e
 
 mkdir -p "$1"/data/cooked
 cd "$MESON_SOURCE_ROOT"
-python3 "$MESON_SOURCE_ROOT"/cook_all.py "$1"/data/cooked "$MESON_SOURCE_ROOT"/psychodrive
+python3 "$MESON_SOURCE_ROOT"/misc/scripts/cook_all_chars.py "$1"/data/cooked "$MESON_SOURCE_ROOT"/psychodrive
 
 rsync -avx --exclude='chars' "$MESON_SOURCE_ROOT"/data "$1"/
 

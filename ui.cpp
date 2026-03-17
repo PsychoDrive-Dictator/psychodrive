@@ -1332,7 +1332,7 @@ void SimulationController::Reset(void)
     charControllers.emplace_back();
     charControllers.emplace_back();
 
-    charControllers[0].character = 27;
+    charControllers[0].character = 28;
     charControllers[0].charVersion = charVersionCount - 1;
     charControllers[0].charColor = { 1.0, 1.0, 1.0 };
     charControllers[1].character = 0;

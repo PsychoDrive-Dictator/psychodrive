@@ -1,0 +1,421 @@
+{
+    "000": {
+        "000": "17 BAS_DASH_F",
+        "001": "18 BAS_DASH_B",
+        "003": "600 ATK_5LP",
+        "004": "612 ATK_5LK",
+        "005": "604 ATK_5MP",
+        "006": "614 ATK_5MK",
+        "007": "608 ATK_5HP_MAX",
+        "008": "616 ATK_5HK_MAX",
+        "010": "621 ATK_2LP",
+        "011": "633 ATK_2LK",
+        "012": "625 ATK_2MP",
+        "013": "638 ATK_2MK",
+        "014": "628 ATK_2HP",
+        "015": "640 ATK_2HK",
+        "024": "670 ATK_6MP",
+        "025": "671 ATK_4MK",
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "119": "957 ATK_S_STD_CRH",
+        "149": "480 DPA_STD_START",
+        "155": "715 NGS",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "186": "913 SPA_SP1_NGS(3)",
+        "188": "903 SPA_SP0_H_OD(1)",
+        "192": "1495 DEM_APPEAL_01(1)",
+        "200": "1100 _1100",
+        "204": "1104 _1104",
+        "207": "1107 _1107"
+    },
+    "001": {
+        "017": "645 ATK_8LP",
+        "018": "648 ATK_8LK",
+        "019": "646 ATK_8MP",
+        "020": "649 ATK_8MK",
+        "021": "647 ATK_8HP",
+        "022": "650 ATK_8HK"
+    },
+    "002": {
+        "017": "645 ATK_8LP",
+        "018": "648 ATK_8LK",
+        "019": "646 ATK_8MP",
+        "020": "649 ATK_8MK",
+        "021": "647 ATK_8HP",
+        "022": "650 ATK_8HK"
+    },
+    "003": {
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "119": "957 ATK_S_STD_CRH",
+        "149": "480 DPA_STD_START",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "178": "1242 START_HIT(1)",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "186": "913 SPA_SP1_NGS(3)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    },
+    "004": {
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "119": "957 ATK_S_STD_CRH",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    },
+    "005": {
+        "001": "18 BAS_DASH_B",
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "119": "957 ATK_S_STD_CRH",
+        "149": "480 DPA_STD_START",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "175": "1230 START_HIT",
+        "176": "1230 START_HIT",
+        "178": "1242 START_HIT(1)",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    },
+    "010": {
+        "150": "500 ATK_CTA_RUSH",
+        "151": "500 ATK_CTA_RUSH"
+    },
+    "011": {
+        "163": "850 ATK_CTA_4"
+    },
+    "012": {
+        "017": "645 ATK_8LP",
+        "018": "648 ATK_8LK",
+        "019": "646 ATK_8MP",
+        "020": "649 ATK_8MK",
+        "021": "647 ATK_8HP",
+        "022": "650 ATK_8HK"
+    },
+    "015": {
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "119": "957 ATK_S_STD_CRH",
+        "149": "480 DPA_STD_START",
+        "155": "715 NGS",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "186": "913 SPA_SP1_NGS(3)",
+        "188": "903 SPA_SP0_H_OD(1)",
+        "192": "1495 DEM_APPEAL_01(1)"
+    },
+    "016": {
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "155": "715 NGS",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    },
+    "017": {
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    },
+    "018": {
+        "187": "928 SPA_SP1_NGS(5)"
+    },
+    "023": {
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "186": "913 SPA_SP1_NGS(3)"
+    },
+    "024": {
+        "055": "988 ATK_S_NGS_Near",
+        "056": "993 ATK_S_NGS_Far"
+    },
+    "028": {
+        "149": "480 DPA_STD_START"
+    },
+    "032": {
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    },
+    "033": {
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)"
+    },
+    "034": {
+        "030": "601 ATK_5LP_B",
+        "032": "622 ATK_2LP_B",
+        "034": "634 ATK_2LK_B"
+    },
+    "035": {
+        "031": "602 ATK_5LP_C",
+        "033": "623 ATK_2LP_C",
+        "035": "635 ATK_2LK_C"
+    },
+    "037": {
+        "037": "636 ATK_2LK_HK"
+    },
+    "038": {
+        "038": "606 ATK_5MP_B"
+    },
+    "039": {
+        "027": "653 ATK_92HP_Start"
+    },
+    "042": {
+        "067": "501 ATK_CTA_RUSH(1)",
+        "152": "501 ATK_CTA_RUSH(1)"
+    },
+    "050": {
+        "174": "1215 SAA_2_KATAYOKU_START"
+    },
+    "052": {
+        "173": "1208 SAA2_NGS",
+        "175": "1230 START_HIT",
+        "178": "1242 START_HIT(1)"
+    },
+    "053": {
+        "175": "1230 START_HIT",
+        "178": "1242 START_HIT(1)"
+    },
+    "060": {
+        "164": "852 ATK_CTA_4(2)"
+    },
+    "070": {
+        "026": "672 ATK_4MK_SP0_H",
+        "103": "923 SPA_SP1_NGS(4)",
+        "187": "928 SPA_SP1_NGS(5)"
+    },
+    "073": {
+        "121": "958 ATK_S_STD_CRH_cancel"
+    },
+    "074": {
+        "120": "959 ATK_S_STD_CRH_5HK_cancel"
+    },
+    "075": {
+        "045": "970 ATK_S_LP",
+        "047": "973 ATK_S_MP",
+        "048": "976 ATK_S_HP_MAX",
+        "049": "978 ATK_S_LK_START",
+        "051": "980 ATK_S_MK",
+        "053": "982 ATK_S_HK",
+        "055": "988 ATK_S_NGS_Near",
+        "056": "993 ATK_S_NGS_Far",
+        "057": "967 ATK_S_DASH_ATTACK"
+    },
+    "076": {
+        "049": "978 ATK_S_LK_START",
+        "051": "980 ATK_S_MK"
+    },
+    "077": {
+        "050": "979 ATK_S_LK_START(1)",
+        "052": "981 ATK_S_MK(1)"
+    },
+    "078": {
+        "040": "962 ATK_S_DASH_F",
+        "041": "964 ATK_S_DASH_B"
+    },
+    "079": {
+        "057": "967 ATK_S_DASH_ATTACK"
+    },
+    "080": {
+        "047": "973 ATK_S_MP",
+        "048": "976 ATK_S_HP_MAX",
+        "050": "979 ATK_S_LK_START(1)",
+        "051": "980 ATK_S_MK",
+        "053": "982 ATK_S_HK",
+        "056": "993 ATK_S_NGS_Far"
+    },
+    "081": {
+        "046": "971 ATK_S_LP_B"
+    },
+    "082": {
+        "045": "970 ATK_S_LP"
+    },
+    "084": {
+        "017": "645 ATK_8LP",
+        "018": "648 ATK_8LK",
+        "019": "646 ATK_8MP",
+        "020": "649 ATK_8MK",
+        "021": "647 ATK_8HP",
+        "022": "650 ATK_8HK",
+        "028": "653 ATK_92HP_Start"
+    },
+    "086": {
+        "054": "983 ATK_S_HK_HK"
+    },
+    "123": {
+        "003": "600 ATK_5LP",
+        "004": "612 ATK_5LK",
+        "005": "604 ATK_5MP",
+        "006": "614 ATK_5MK",
+        "007": "608 ATK_5HP_MAX",
+        "008": "616 ATK_5HK_MAX",
+        "010": "621 ATK_2LP",
+        "011": "633 ATK_2LK",
+        "012": "625 ATK_2MP",
+        "013": "638 ATK_2MK",
+        "014": "628 ATK_2HP",
+        "015": "640 ATK_2HK",
+        "024": "670 ATK_6MP",
+        "025": "671 ATK_4MK",
+        "090": "900 SPA_SP0_L",
+        "091": "901 SPA_SP0_M",
+        "092": "901 SPA_SP0_M",
+        "093": "902 SPA_SP0_H_OD",
+        "096": "937 SPA_AirKneeSmash_L",
+        "097": "938 SPA_AirKneeSmash_L(1)",
+        "098": "939 SPA_AirKneeSmash_H",
+        "104": "910 SPA_SP1_NGS",
+        "105": "911 SPA_SP1_NGS(1)",
+        "106": "912 SPA_SP1_NGS(2)",
+        "113": "900 SPA_SP0_L",
+        "114": "901 SPA_SP0_M",
+        "115": "902 SPA_SP0_H_OD",
+        "119": "957 ATK_S_STD_CRH",
+        "155": "715 NGS",
+        "161": "855 ATK_CTA",
+        "170": "1200 SAA1",
+        "172": "1208 SAA2_NGS",
+        "176": "1230 START_HIT",
+        "179": "1242 START_HIT(1)",
+        "182": "903 SPA_SP0_H_OD(1)",
+        "183": "903 SPA_SP0_H_OD(1)",
+        "184": "940 SPA_AirKneeSmash_H(1)",
+        "185": "940 SPA_AirKneeSmash_H(1)",
+        "186": "913 SPA_SP1_NGS(3)",
+        "188": "903 SPA_SP0_H_OD(1)"
+    }
+}
