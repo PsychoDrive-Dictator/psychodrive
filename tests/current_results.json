@@ -2949,6 +2949,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "alex_normal_grab",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1,
+                "firstFrame": 176,
+                "lastFrame": 176
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 142,
+                "firstFrame": 182,
+                "lastFrame": 323
+            },
+            {
+                "count": 111,
+                "firstFrame": 197,
+                "lastFrame": 323
+            },
+            {
+                "count": 127,
+                "firstFrame": 197,
+                "lastFrame": 323
+            },
+            {
+                "count": 97,
+                "firstFrame": 227,
+                "lastFrame": 323
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "alex_turnaround_condition",
         "testVersion": "40",
         "finished": true,

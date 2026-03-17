@@ -173,7 +173,18 @@ void ComboWorker::WorkLoop(void) {
                 break;
             }
 
-            if ((pSim->simGuys[1]->getComboHits() == 0 && pSim->simGuys[1]->canAct()) || (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) || (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne())) {
+            // reinstate this when we've saved whether opponent could act on search start
+            // if (pSim->simGuys[1]->getComboHits() == 0 && pSim->simGuys[1]->canAct()) {
+            //     break;
+            // }
+
+            // combo count has reset, end the search
+            if (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) {
+                break;
+            }
+
+            // opponent knocked down, end the search
+            if (pSim->simGuys[1]->getIsDown() && !pSim->simGuys[1]->getAirborne()) {
                 break;
             }
 
