@@ -10,6 +10,7 @@
 
 #include "combogen.hpp"
 #include "main.hpp"
+#include "ui.hpp"
 
 ComboFinder finder;
 
@@ -23,7 +24,7 @@ void ComboWorker::Start(bool isFirst) {
 
     pSim = new Simulation;
     if (first) {
-        pSim->Clone(&defaultSim);
+        pSim->Clone(&finder.startSnapshot);
         pSim->simGuys[0]->setRecordFrameTriggers(true, finder.doLateCancels);
 
         currentRoute.pSimSnapshot = new Simulation;
@@ -168,7 +169,7 @@ void ComboWorker::WorkLoop(void) {
                 currentRoute.lastFrameDamage = pSim->frameCounter;
             }
 
-            if (pSim->frameCounter - finder.startFrame >= 3000) {
+            if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 3000) {
                 fprintf(stderr, "aaa\n");
                 break;
             }
@@ -270,8 +271,20 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
         return;
     }
 
-    finder.startSnapshot.Clone(&defaultSim);
-    finder.startFrame = defaultSim.frameCounter;
+    CharacterData *pComboCharData = nullptr;
+    if (gameMode == Training) {
+        finder.startSnapshot.Clone(&defaultSim);
+        pComboCharData = defaultSim.simGuys[0]->getCharData();
+    } else {
+        int startFrame = simController.scrubberFrame - 1;
+        finder.startSnapshot.Clone(simController.getSnapshotAtFrame(startFrame));
+        pComboCharData = simController.getRecordedGuy(0, 0)->getCharData();
+
+        finder.startTimelineTriggers = simController.charControllers[0].timelineTriggers;
+        std::erase_if(finder.startTimelineTriggers, [startFrame](const auto& item) {
+            return item.first >= startFrame;
+        });
+    }
 
     finder.doLights = doLights;
     finder.doLateCancels = doLateCancels;
@@ -279,7 +292,7 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.doKaras = doKaras;
 
     if (!finder.doLights) {
-        for (auto& [key, action] : defaultSim.simGuys[0]->getCharData()->actionsByID) {
+        for (auto& [key, action] : pComboCharData->actionsByID) {
             if (action->name.find("5LP") != std::string::npos ||
                 action->name.find("5LK") != std::string::npos ||
                 action->name.find("2LP") != std::string::npos ||
@@ -370,7 +383,6 @@ void updateComboFinder(void)
                     printRoute(route);
                     finder.maxDamage = route.damage;
                     defaultSim.Clone(&finder.startSnapshot);
-                    defaultSim.frameCounter = finder.startFrame;
                     finder.playing = true;
                     paused = false;
                 }
@@ -423,7 +435,6 @@ void updateComboFinder(void)
             paused = false;
             finder.playing = true;
             defaultSim.Clone(&finder.startSnapshot);
-            defaultSim.frameCounter = finder.startFrame;
         }
     }
 }

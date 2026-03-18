@@ -88,10 +88,10 @@ public:
     static constexpr int maxRecentRoutes = 10;
 
     Simulation startSnapshot;
+    std::map<int, ActionRef> startTimelineTriggers;
 
     bool playing = false;
     int playingRoute = 0;
-    int startFrame = 0;
 };
 
 extern ComboFinder finder;

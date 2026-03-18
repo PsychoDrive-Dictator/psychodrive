@@ -1277,14 +1277,9 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
 
 CharacterData *loadCharacter(std::string charName, int charVersion)
 {
-    int versionSlot = findCharVersionSlot(charVersion);
-    while (versionSlot >= 0) {
-        int version = atoi(charVersions[versionSlot]);
-        std::string cookedPath = "data/cooked/" + charName + std::to_string(version) + ".bin";
-        if (std::filesystem::exists(cookedPath)) {
-            return loadCookedCharacter(cookedPath, charVersion);
-        }
-        versionSlot--;
+    std::string cookedPath = "data/cooked/" + charName + std::to_string(charVersion) + ".bin";
+    if (std::filesystem::exists(cookedPath)) {
+        return loadCookedCharacter(cookedPath, charVersion);
     }
 
     nlohmann::json *pMovesDictJson = loadCharFile(charName, charVersion, "moves");

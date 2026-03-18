@@ -1552,6 +1552,18 @@ void SimulationController::RenderComboMinerSetup(void)
         const int maxRoutes = 10;
         for (auto it = finder.doneRoutes.rbegin(); it != finder.doneRoutes.rend() && routeCount < maxRoutes; ++it, ++routeCount) {
             std::string routeStr = routeToString(*it, pSim->simGuys[0]);
+            ImGui::PushID(routeCount);
+            if (ImGui::Button("Load")) {
+                simController.charControllers[0].timelineTriggers.clear();
+                simController.charControllers[0].timelineTriggers = finder.startTimelineTriggers;
+                for (auto & trigger : it->timelineTriggers) {
+                    simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
+                }
+                simInputsChanged = true;
+                simController.charControllers[0].changed = true;
+            }
+            ImGui::PopID();
+            ImGui::SameLine();
             ImGui::TextWrapped("%s", routeStr.c_str());
         }
     }

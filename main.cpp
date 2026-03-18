@@ -458,6 +458,13 @@ static void mainloop(void)
 
     updateInputs(sizeX, sizeY);
 
+    updateComboFinder();
+
+    if (runComboFinder) {
+        findCombos(comboFinderDoLights, comboFinderDoLateCancels, comboFinderDoWalk, comboFinderDoKaras);
+        runComboFinder = false;
+    }
+
     if (gameMode != Training) {
         setRenderState(clearColor, sizeX, sizeY);
         int curFrame = simController.scrubberFrame; // before ui changes it
@@ -534,13 +541,6 @@ static void mainloop(void)
         if (restoreState) {
             defaultSim.Clone(&snapShotSim);
             restoreState = false;
-        }
-
-        updateComboFinder();
-
-        if (runComboFinder) {
-            findCombos(comboFinderDoLights, comboFinderDoLateCancels, comboFinderDoWalk, comboFinderDoKaras);
-            runComboFinder = false;
         }
 
         if (runUntilFrame) {
