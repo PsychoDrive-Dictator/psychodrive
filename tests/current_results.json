@@ -2949,6 +2949,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "alex_input_branches",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2342,
+                "firstFrame": 156,
+                "lastFrame": 1321
+            },
+            {
+                "count": 169,
+                "firstFrame": 273,
+                "lastFrame": 590
+            },
+            {
+                "count": 98,
+                "firstFrame": 754,
+                "lastFrame": 851
+            },
+            {
+                "count": 179,
+                "firstFrame": 156,
+                "lastFrame": 552
+            },
+            {
+                "count": 179,
+                "firstFrame": 156,
+                "lastFrame": 552
+            },
+            {
+                "count": 1999,
+                "firstFrame": 208,
+                "lastFrame": 1253
+            },
+            {
+                "count": 2133,
+                "firstFrame": 208,
+                "lastFrame": 1321
+            },
+            {
+                "count": 686,
+                "firstFrame": 322,
+                "lastFrame": 1185
+            },
+            {
+                "count": 1021,
+                "firstFrame": 384,
+                "lastFrame": 1321
+            },
+            {
+                "count": 818,
+                "firstFrame": 322,
+                "lastFrame": 1217
+            },
+            {
+                "count": 30,
+                "firstFrame": 520,
+                "lastFrame": 534
+            },
+            {
+                "count": 1537,
+                "firstFrame": 427,
+                "lastFrame": 1217
+            }
+        ]
+    },
+    {
+        "testName": "alex_knockdown",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 115,
+                "firstFrame": 120,
+                "lastFrame": 234
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 115,
+                "firstFrame": 120,
+                "lastFrame": 234
+            },
+            {
+                "count": 101,
+                "firstFrame": 134,
+                "lastFrame": 234
+            },
+            {
+                "count": 76,
+                "firstFrame": 99,
+                "lastFrame": 174
+            },
+            {
+                "count": 117,
+                "firstFrame": 118,
+                "lastFrame": 234
+            },
+            {
+                "count": 7,
+                "firstFrame": 127,
+                "lastFrame": 133
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "alex_normal_grab",
         "testVersion": "40",
         "finished": true,
