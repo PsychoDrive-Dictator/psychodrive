@@ -1692,7 +1692,7 @@ void Guy::getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox>
     }
 }
 
-void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes, hitBoxType typeFilter)
+void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes, hitBoxType typeFilter, hitBoxType typeExclude)
 {
     if (!pCurrentAction) {
         return;
@@ -1703,6 +1703,9 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
     for (auto& hitBoxKey : pCurrentAction->hitBoxKeys)
     {
         if (typeFilter != none && hitBoxKey.type != typeFilter) {
+            continue;
+        }
+        if (typeExclude != none && hitBoxKey.type == typeExclude) {
             continue;
         }
         if (hitBoxKey.startFrame > currentFrame || hitBoxKey.endFrame <= currentFrame) {
@@ -1804,7 +1807,7 @@ void Guy::getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<Rende
 }
 
 
-void Guy::Render(float z /* = 0.0f */) {
+void Guy::Render(float z /* = 0.0f */, bool showDomain) {
     Fixed fixedX = posX + (posOffsetX * direction);
     Fixed fixedY = posY + posOffsetY;
     float x = fixedX.f();
@@ -1813,7 +1816,7 @@ void Guy::Render(float z /* = 0.0f */) {
     std::vector<RenderBox> renderBoxes;
     getHurtBoxes(nullptr, nullptr, &renderBoxes);
     getPushBoxes(nullptr, &renderBoxes);
-    getHitBoxes(nullptr, &renderBoxes);
+    getHitBoxes(nullptr, &renderBoxes, hitBoxType::none, showDomain ? hitBoxType::none : hitBoxType::domain);
     getUniqueBoxes(nullptr, &renderBoxes);
 
     for (auto box : renderBoxes) {

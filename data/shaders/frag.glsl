@@ -57,15 +57,20 @@ void main() {
         if (mod(abs(vertex_pos.x), divisor) < 5.0 ||
             (vertex_pos.y > 0.0 && mod(abs(vertex_pos.y), divisor) < 5.0) ||
             (mod(abs(vertex_pos.z), divisor) < 5.0)) {
-            color = vec4(0.3,0.3,0.3,1.0);
+            if (isWarudo == 1) {
+                color = vec4(0.35, 0.0, 0.35, 1.0);
+            } else {
+                color = vec4(0.3,0.3,0.3,1.0);
+            }
         }
         if (abs(vertex_pos.x) < 1.0 || abs(vertex_pos.z) < 1.0) {
-            color = vec4(0.9,0.3,0.2,1.0);
+            if (isWarudo == 1) {
+                color = vec4(0.9, 0.0, 0.9, 1.0);
+            } else {
+                color = vec4(0.9,0.3,0.2,1.0);
+            }
         }
         //color.a = edgealpha;
-        if (isWarudo == 1) {
-            color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, 1.0);
-        }
         return;
     }
 

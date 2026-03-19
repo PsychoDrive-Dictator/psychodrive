@@ -145,9 +145,9 @@ bool modalDropDown(const char *label, int *pSelection, const char** ppOptions, i
 void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scaling) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    if (finder.running) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0,0.0,0.0,1.0));
-    }
+    // if (finder.running) {
+    //     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0,0.0,0.0,1.0));
+    // }
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
 
     ImGui::SetNextWindowPos(ImVec2(rightSpot ? renderSizeX - 100.0f : 0, 300.0));
@@ -175,9 +175,9 @@ void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scalin
     ImGui::Text("%d (%d%%)", comboDamage, scaling);
     ImGui::End();
 
-    if (finder.running) {
-        ImGui::PopStyleColor();
-    }
+    // if (finder.running) {
+    //     ImGui::PopStyleColor();
+    // }
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();

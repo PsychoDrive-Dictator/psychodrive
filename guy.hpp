@@ -66,7 +66,7 @@ public:
 
     void Input(int input);
     bool RunFrame(bool advancingTime = true);
-    void Render(float z = 0.0);
+    void Render(float z = 0.0, bool showDomain = true);
     bool Push(Guy *pOtherGuy);
     void RunFramePostPush(void);
     bool WorldPhysics(bool onlyFloor = false, bool projBoundaries = false);
@@ -256,7 +256,7 @@ public:
     int getLimitShotCategory() { return limitShotCategory; }
 
     void getPushBoxes(std::vector<Box> *pOutPushBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
-    void getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr, hitBoxType typeFilter = hitBoxType::none);
+    void getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr, hitBoxType typeFilter = hitBoxType::none, hitBoxType typeExclude = hitBoxType::none);
     void getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
     void getHurtBoxes(std::vector<HurtBox> *pOutHurtBoxes, std::vector<HurtBox> *pOutThrowBoxes = nullptr, std::vector<RenderBox> *pOutRenderBoxes = nullptr);
 

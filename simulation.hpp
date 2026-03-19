@@ -75,7 +75,7 @@ public:
 
     void RunFrame();
     void AdvanceFrame();
-    void Render(float z = 0.0f);
+    void Render(float z = 0.0f, bool showDomain = true);
     std::vector<FrameEvent>& getCurrentFrameEvents() { return currentFrameEvents; }
 
     std::vector<Guy *> everyone;

@@ -479,6 +479,7 @@ static void mainloop(void)
 
         if (!simInputsChanged) {
             Simulation *pFrameSim = simController.getSnapshotAtFrame(curFrame);
+            renderComboFinder();
             if (pFrameSim) {
                 pFrameSim->Render();
             }

@@ -388,10 +388,10 @@ void Simulation::AdvanceFrame(void)
     }
 }
 
-void Simulation::Render(float z /* = 0.0 */)
+void Simulation::Render(float z /* = 0.0 */, bool showDomain)
 {
     for (auto guy : everyone) {
-        guy->Render(z);
+        guy->Render(z, showDomain);
     }
 }
 
