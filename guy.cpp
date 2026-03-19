@@ -713,15 +713,14 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
 bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
 {
     bool conditionMet = false;
-    bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
-    if ( conditionFlag & (1<<0) && anyHitThisMove) {
+    if ( conditionFlag & (1<<0) && hitThisMove) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<1) && hasBeenBlockedThisMove) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<2) &&
-        (!anyHitThisMove && !hasBeenBlockedThisMove &&
+        (!hitThisMove && !hasBeenBlockedThisMove &&
         !hitAtemiThisMove && !hitArmorThisMove &&
         !hasBeenParriedThisMove && !hasBeenPerfectParriedThisMove)) {
         conditionMet = true;
@@ -3156,10 +3155,12 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pGuy->hitCounterThisMove = true;
                 if (hitFlagToParent) pGuy->pParent->hitCounterThisMove = true;
             }
-            pGuy->hitThisFrame = true;
-            if (hitFlagToParent) pGuy->pParent->hitThisFrame = true;
-            pGuy->hitThisMove = true;
-            if (hitFlagToParent) pGuy->pParent->hitThisMove = true;
+            if (!isGrab && !hitGrab && hitBox.type != domain && hitBox.type != direct_damage) {
+                pGuy->hitThisFrame = true;
+                if (hitFlagToParent) pGuy->pParent->hitThisFrame = true;
+                pGuy->hitThisMove = true;
+                if (hitFlagToParent) pGuy->pParent->hitThisMove = true;
+            }
 
             int dmgKind = pHitEntry->dmgKind;
 
@@ -4107,7 +4108,6 @@ bool Guy::CheckHitBoxCondition(int conditionFlag)
         return true;
     }
     bool conditionMet = false;
-    bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove;
     if ( conditionFlag & (1<<0) && hitThisMove) {
         conditionMet = true;
     }
@@ -4115,7 +4115,7 @@ bool Guy::CheckHitBoxCondition(int conditionFlag)
         conditionMet = true;
     }
     if ( conditionFlag & (1<<2) &&
-        (!anyHitThisMove && !hasBeenBlockedThisMove &&
+        (!hitThisMove && !hasBeenBlockedThisMove &&
         !hitAtemiThisMove && !hitArmorThisMove &&
         !hasBeenParriedThisMove && !hasBeenPerfectParriedThisMove)) {
         conditionMet = true;
@@ -4189,8 +4189,7 @@ void Guy::DoBranchKey(bool preHit)
                 case 2:
                     {
                         // is atemi/armor right or this this for guard branch below?
-                        bool anyHitThisMove = hitThisMove || hitCounterThisMove || hitPunishCounterThisMove || hitArmorThisMove || hitAtemiThisMove;
-                        if (!preHit && anyHitThisMove) {
+                        if (!preHit && hitThisMove) {
                             doBranch = true;
                         }
                     }
