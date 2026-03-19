@@ -257,11 +257,13 @@ std::string routeToString(const DoneRoute &route, Guy *pGuy)
     return result;
 }
 
-void printRoute(const DoneRoute &route)
+void printRoute(const DoneRoute &route, Guy *pGuy)
 {
-    std::string logEntry = routeToString(route, guys[0]);
+    std::string logEntry = routeToString(route, pGuy);
     log(logEntry);
+#if !defined(__EMSCRIPTEN__)
     fprintf(stderr, "%s\n", logEntry.c_str());
+#endif
 }
 
 void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk = false, bool doKaras = false)
@@ -309,10 +311,6 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     }
 #ifdef __EMSCRIPTEN__
     finder.threadCount = emscripten_num_logical_cores()-1;
-    // this seems to scale upwards of that, but browsers run out of memory way quicker right now
-    if (finder.threadCount > 32) {
-        finder.threadCount = 32;
-    }
 #endif
 
     for (int i = 0; i < finder.threadCount; i++) {
@@ -380,11 +378,13 @@ void updateComboFinder(void)
             worker->mutexDoneRoutes.unlock();
             for (auto &route : newDoneRoutes) {
                 if (route.damage > finder.maxDamage) {
-                    printRoute(route);
+                    printRoute(route, finder.startSnapshot.simGuys[0]);
                     finder.maxDamage = route.damage;
-                    defaultSim.Clone(&finder.startSnapshot);
-                    finder.playing = true;
-                    paused = false;
+                    if (gameMode == Training) {
+                        defaultSim.Clone(&finder.startSnapshot);
+                        finder.playing = true;
+                        paused = false;
+                    }
                 }
             }
             finder.doneRoutes.merge(newDoneRoutes);
