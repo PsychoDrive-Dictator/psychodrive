@@ -5,6 +5,7 @@
 #include <fstream>
 
 std::unordered_map<std::string, nlohmann::json> mapCharFileLoader;
+std::unordered_map<std::string, CharacterData*> mapCharDataLoader;
 
 bool charFileExists(const std::string &path, const std::string &charFileName)
 {
@@ -1277,9 +1278,13 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
 
 CharacterData *loadCharacter(std::string charName, int charVersion)
 {
-    std::string cookedPath = "data/cooked/" + charName + std::to_string(charVersion) + ".bin";
+    std::string charSpec = charName + std::to_string(charVersion);
+    std::string cookedPath = "data/cooked/" + charSpec + ".bin";
     if (std::filesystem::exists(cookedPath)) {
-        return loadCookedCharacter(cookedPath, charVersion);
+        if (mapCharDataLoader.find(charSpec) == mapCharDataLoader.end()) {
+            mapCharDataLoader[charSpec] = loadCookedCharacter(cookedPath, charVersion);
+        }
+        return mapCharDataLoader[charSpec];
     }
 
     nlohmann::json *pMovesDictJson = loadCharFile(charName, charVersion, "moves");
@@ -1371,8 +1376,6 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     for (auto& action : pRet->actions) {
         pRet->actionsByID[ActionRef(action.actionID, action.styleID)] = &action;
     }
-
-    mapCharFileLoader.clear();
 
     return pRet;
 }
