@@ -3217,6 +3217,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "bison_crumple_od_stomp_combo_forcepc",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1007,
+                "firstFrame": 188,
+                "lastFrame": 1031
+            },
+            {
+                "count": 368,
+                "firstFrame": 182,
+                "lastFrame": 938
+            },
+            {
+                "count": 67,
+                "firstFrame": 188,
+                "lastFrame": 938
+            },
+            {
+                "count": 185,
+                "firstFrame": 190,
+                "lastFrame": 936
+            },
+            {
+                "count": 185,
+                "firstFrame": 190,
+                "lastFrame": 936
+            },
+            {
+                "count": 754,
+                "firstFrame": 188,
+                "lastFrame": 1031
+            },
+            {
+                "count": 959,
+                "firstFrame": 188,
+                "lastFrame": 1031
+            },
+            {
+                "count": 287,
+                "firstFrame": 224,
+                "lastFrame": 942
+            },
+            {
+                "count": 158,
+                "firstFrame": 749,
+                "lastFrame": 906
+            },
+            {
+                "count": 316,
+                "firstFrame": 659,
+                "lastFrame": 974
+            },
+            {
+                "count": 74,
+                "firstFrame": 659,
+                "lastFrame": 873
+            },
+            {
+                "count": 970,
+                "firstFrame": 224,
+                "lastFrame": 974
+            }
+        ]
+    },
+    {
         "testName": "cammy_air_throw",
         "testVersion": "26",
         "finished": true,
