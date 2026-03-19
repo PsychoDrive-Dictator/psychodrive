@@ -196,18 +196,18 @@ void requestCharDownload(const std::string& charName, int charVersion)
     log("downloading " + charSpec);
     setCharsStarted.insert(charSpec);
     EM_ASM({
-        var script = document.createElement('script');
         var charSpec = UTF8ToString($0);
-        script.onload = function () {
-            Module.ccall('jsCharLoadCallback',
-            null,
-            ['string'],
-            [charSpec]);
-        };
-        script.src = './psychodrive_char_' + charSpec + '.js';
-        script.async = true;
+        var url = charSpec + '.bin';
 
-        document.head.appendChild(script);
+        fetch(url).then(function(response) {
+            return response.arrayBuffer();
+        }).then(function(buffer) {
+            var data = new Uint8Array(buffer);
+            try { FS.mkdir('data'); } catch(e) {}
+            try { FS.mkdir('data/cooked'); } catch(e) {}
+            FS.writeFile('data/cooked/' + url, data);
+            Module.ccall('jsCharLoadCallback', null, ['string'], [charSpec]);
+        });
     }, charSpec.c_str());
 #endif
 }
