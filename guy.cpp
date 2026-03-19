@@ -217,7 +217,11 @@ Action* Guy::FindMove(int actionID, int styleID)
 
 void Guy::Input(int input)
 {
+    currentInputOwnerSpace = input;
     int directionToUse = direction.i();
+    if (directionToUse < 0) {
+        currentInputOwnerSpace = invertDirection(currentInputOwnerSpace);
+    }
     if (needsTurnaround() && !inputIgnoresOpponentDirection) {
         directionToUse *= -1;
     }
@@ -4278,10 +4282,10 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 20:
                     if (branchParam3 == 1 || branchParam3 == 0) { // classic controls? is 0 catchall?
-                        if (branchParam0 == 1 && (currentInput & branchParam1)) {
+                        if (branchParam0 == 1 && (currentInputOwnerSpace & branchParam1)) {
                             doBranch = true;
                         }
-                        if (branchParam0 == 0 && !(currentInput & branchParam1)) {
+                        if (branchParam0 == 0 && !(currentInputOwnerSpace & branchParam1)) {
                             doBranch = true;
                         }
                         if (recordFrameTriggers) {

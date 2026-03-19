@@ -693,6 +693,7 @@ private:
         countingDownInstall = false;
         airActionCounter = 0;
         currentInput = 0;
+        currentInputOwnerSpace = 0;
         framesSinceLastInput = 0;
         canHitID = 0;
         uniqueOpsAppliedMask = 0;
@@ -1030,6 +1031,7 @@ private:
     int airActionCounter;
 
     int currentInput;
+    int currentInputOwnerSpace;
     // todo could keep track of frames since any input as a further optim
     uint16_t framesSinceLastInput;
 
