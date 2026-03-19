@@ -108,6 +108,14 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
 
     int version = atoi(charVersions[controller.charVersion]);
     CreateGuy(charName, version, controller.startPosX, Fixed(0), controller.rightSide ? -1 : 1, controller.charColor);
+
+    Guy *pGuy = simGuys[controller.getSimCharSlot()];
+    if (controller.buffLevel) {
+        pGuy->getUniqueParam(0) = controller.buffLevel;
+        if (controller.buffLevel < (int)(pGuy->getCharData()->styles.size())) {
+            pGuy->ChangeStyle(controller.buffLevel);
+        }
+    }
 }
 
 

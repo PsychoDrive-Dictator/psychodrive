@@ -178,7 +178,7 @@ public:
     int getComboDamage() { return comboDamage; }
     int getLastDamageScale() { return lastDamageScale; }
     bool getAppliedScaling() { return appliedScaling; }
-    std::string getUniqueParam() {
+    std::string getUniqueParamsString() {
         std::string ret;
         for ( int i = 0; i < uniqueParamCount; i++) {
             ret += std::to_string(uniqueParam[i]);
@@ -188,6 +188,7 @@ public:
         }
         return ret;
     }
+    int &getUniqueParam(int index) { return uniqueParam[index]; }
     int getDebuffTimer() { return debuffTimer; }
     int getStyle() { return styleInstall; }
     int getInstallFrames() { return styleInstallFrames; }
@@ -426,6 +427,7 @@ public:
     int *getInputListIDPtr() { return &inputListID; }
     Action* FindMove(int actionID, int styleID);
     AtemiData *findAtemi(int atemiID);
+    void ChangeStyle(int newStyleID);
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
     void UpdateActionData(void);
@@ -463,7 +465,6 @@ private:
     void DoInstantAction(int actionID);
     void AdvanceScalingTriggerID();
 
-    void ChangeStyle(int newStyleID);
     void ExitStyle();
 
     bool proxGuard() {

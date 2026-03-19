@@ -361,7 +361,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         if (pGuy->getBurnout()) {
             focus *= -1;
         }
-        ImGui::Text("health %i focus %i gauge %i unique %s debuff %i style %i install %i timer %i", pGuy->getHealth(), focus, pGuy->getGauge(), pGuy->getUniqueParam().c_str(), pGuy->getDebuffTimer(), pGuy->getStyle(), pGuy->getInstallFrames(), pGuy->getUniqueTimer());
+        ImGui::Text("health %i focus %i gauge %i unique %s debuff %i style %i install %i timer %i", pGuy->getHealth(), focus, pGuy->getGauge(), pGuy->getUniqueParamsString().c_str(), pGuy->getDebuffTimer(), pGuy->getStyle(), pGuy->getInstallFrames(), pGuy->getUniqueTimer());
         ImGui::Text("COMBO HITS %i damage %i hitstun %i juggle %i hitstop %i down %i", pGuy->getComboHits(), pGuy->getComboDamage(), pGuy->getHitStun(), pGuy->getJuggleCounter(), pGuy->getHitStop(), pGuy->getIsDown());
         if (pGuy->getWarudo()) {
             ImGui::SameLine();
@@ -823,13 +823,11 @@ void CharacterUIController::renderCharSetup(void)
 {
     if (modalDropDown("##char", &character, charNiceNames, 207)) {
         simInputsChanged = true;
-        changed = true;
         timelineTriggers.clear();
     }
     ImGui::SameLine();
     if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 35)) {
         simInputsChanged = true;
-        changed = true;
         timelineTriggers.clear();
     }
 
@@ -846,12 +844,21 @@ void CharacterUIController::renderCharSetup(void)
                 newStartPosX = atof(startPosTest);
             }
         }
+        if (ImGui::Checkbox("Counter", &forceCounter) ) {
+            simInputsChanged = true;
+        }
+        if (ImGui::Checkbox("Punish Counter", &forcePunishCounter) ) {
+            simInputsChanged = true;
+        }
         if (newStartPosX != flStartPosX) {
             flStartPosX = newStartPosX;
             startPosX = Fixed(flStartPosX, true);
             simInputsChanged = true;
-            changed = true;
         }
+    }
+
+    if (ImGui::SliderInt("Buff Level", &buffLevel, 0, 4) ) {
+        simInputsChanged = true;
     }
 }
 
@@ -1163,10 +1170,8 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
 
     if (!rightSide) {
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
-        int curAction = pGuy->getCurrentAction();
-        Action *pAction = pGuy->getCharData()->actionsByID[{curAction, pGuy->getStyle()}];
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
-        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->actionFrameDuration);
         renderFrameMeterCancelWindows(frameIndex);
     }
 
