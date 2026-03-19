@@ -3452,7 +3452,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             }
         }
 
-        if (moveType == 11 || moveType == 10 || moveType == 18) { // crumples, hkds
+        if (moveType == 11 || moveType == 10 || moveType == 18 || moveType == 74) { // crumples, hkds
             hitEntryHitStun += 500000;
             resetHitStunOnTransition = true;
             knockDown = true;
@@ -3939,6 +3939,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
 
             if (moveType == 75) {
                 nextAction = 296;
+            } else if (moveType == 74) {
+                nextAction = 258;
             } else if (moveType == 72) {
                 if (attackStrength >= 2) {
                     nextAction = 268;

@@ -3046,19 +3046,19 @@ var currentResults =
                 "lastFrame": 234
             },
             {
-                "count": 76,
-                "firstFrame": 99,
-                "lastFrame": 174
+                "count": 50,
+                "firstFrame": 119,
+                "lastFrame": 168
             },
             {
-                "count": 117,
-                "firstFrame": 118,
-                "lastFrame": 234
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 7,
-                "firstFrame": 127,
-                "lastFrame": 133
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
