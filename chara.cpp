@@ -747,6 +747,7 @@ void loadLockKeys(nlohmann::json* pLockJson, std::vector<LockKey>* pOutputVector
         newKey.type = lockKey["Type"];
         newKey.param01 = lockKey["Param01"];
         newKey.param02 = lockKey["Param02"];
+        newKey.param03 = lockKey["Param03"];
 
         if (newKey.type == 2) {
             auto hitIt = hitByID.find(newKey.param02);
@@ -1784,6 +1785,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
             writeI32(f, k.type);
             writeI32(f, k.param01);
             writeI32(f, k.param02);
+            writeI32(f, k.param03);
             writeI32(f, hitEntryPtrToIndex(k.pHitEntry, pData->hits));
         }
 
@@ -2262,6 +2264,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
             k.type = readI32(f);
             k.param01 = readI32(f);
             k.param02 = readI32(f);
+            k.param03 = readI32(f);
             actionLockKeyHitEntryIndices[ai][li] = readI32(f);
         }
 

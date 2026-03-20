@@ -341,6 +341,7 @@ struct LockKey : Key {
     int type;
     int param01;
     int param02;
+    int param03;
     HitEntry *pHitEntry = nullptr;
 };
 

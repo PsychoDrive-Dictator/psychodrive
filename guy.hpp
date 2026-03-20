@@ -802,6 +802,7 @@ private:
         focusRegenCooldownTicking = false;
         burnout = false;
         superAnimation = false;
+        superLock = false;
         superFreeze = false;
         pendingUnlockHitDelayed = false;
         alreadyDeadButDoesNotKnow = false;
@@ -938,6 +939,7 @@ private:
     bool focusRegenCooldownTicking : 1;
     bool burnout : 1;
     bool superAnimation : 1;
+    bool superLock : 1;
     bool superFreeze : 1;
     bool pendingUnlockHitDelayed : 1;
     bool appliedScaling : 1;
