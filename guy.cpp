@@ -2947,7 +2947,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             // and on block
             hitGrab = false;
         }
-        if ((isGrab || hitGrab)) {
+        if ((isGrab || hitGrab) && hitBox.type != domain) {
             pGuy->grabbedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
         }
