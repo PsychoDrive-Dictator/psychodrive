@@ -16,6 +16,14 @@ struct inputRegion {
     int input;
 };
 
+enum CharacterControllerOptionFlags {
+    buffLevel1 = 1,
+    buffLevel2 = 2,
+    buffLevel3 = 4,
+    buffLevel4 = 8,
+    buffLevel5 = 16
+};
+
 class CharacterUIController {
 public:
     void RenderUI(void);
@@ -26,6 +34,8 @@ public:
     void renderFrameMeterCancelWindows(int frameIndex);
     int getSimCharSlot(void) { return rightSide ? 1 : 0; }
     int getInput(int frameIndex);
+    int getOptionFlags();
+    void setOptionFlags(int flags);
 
     int character;
     int charVersion;
@@ -56,6 +66,11 @@ public:
     int activeInputDragID = 0;
 };
 
+enum SimulationControllerOptionFlags {
+    simCounter = 1,
+    simPunishCounter = 2
+};
+
 class SimulationController {
 public:
     SimulationController() { Reset(); }
@@ -72,6 +87,8 @@ public:
     Guy *getRecordedGuy(int frameIndex, int guyID);
     void renderRecordedHitMarkers(int frameIndex);
     Simulation *getSnapshotAtFrame(int frameIndex);
+    int getOptionFlags();
+    void setOptionFlags(int flags);
     void clampFrame(int &frame) {
         if (frame < 0) {
             frame = 0;

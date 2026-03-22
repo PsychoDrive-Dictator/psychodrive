@@ -1900,12 +1900,73 @@ void SimulationController::AdvanceUntilComplete(void)
     }
 }
 
+int CharacterUIController::getOptionFlags()
+{
+    int retFlags = 0;
+    if (buffLevel == 1) {
+        retFlags |= buffLevel1;
+    }
+    if (buffLevel == 2) {
+        retFlags |= buffLevel2;
+    }
+    if (buffLevel == 3) {
+        retFlags |= buffLevel3;
+    }
+    if (buffLevel == 4) {
+        retFlags |= buffLevel4;
+    }
+    if (buffLevel == 5) {
+        retFlags |= buffLevel5;
+    }
+    return retFlags;
+}
+
+void CharacterUIController::setOptionFlags(int flags) {
+    if (flags & buffLevel1) {
+        buffLevel = 1;
+    }
+    if (flags & buffLevel2) {
+        buffLevel = 2;
+    }
+    if (flags & buffLevel3) {
+        buffLevel = 3;
+    }
+    if (flags & buffLevel4) {
+        buffLevel = 4;
+    }
+    if (flags & buffLevel5) {
+        buffLevel = 5;
+    }
+}
+
+int SimulationController::getOptionFlags()
+{
+    int retFlags = 0;
+    if (forceCounter) {
+        retFlags |= SimulationControllerOptionFlags::simCounter;
+    }
+    if (forcePunishCounter) {
+        retFlags |= SimulationControllerOptionFlags::simPunishCounter;
+    }
+    return retFlags;
+}
+
+void SimulationController::setOptionFlags(int flags)
+{
+    forceCounter = (flags & SimulationControllerOptionFlags::simCounter);
+    forcePunishCounter = (flags & SimulationControllerOptionFlags::simPunishCounter);
+}
+
 #define DL1 '|'
 #define DL2 '_'
+#define DL3 'l'
 
 void CharacterUIController::Serialize(std::string &outStr)
 {
-    outStr += std::to_string(character) + DL1 + std::to_string(charVersion) + DL1 + std::to_string(startPosX.data) + DL1;
+    outStr += std::to_string(character) + DL1;
+    outStr += std::to_string(charVersion) + DL3;
+    outStr += std::to_string(getOptionFlags()) + DL1;
+    outStr += std::to_string(startPosX.data) + DL1;
     for (auto &i:timelineTriggers) {
         outStr += std::to_string(i.first) + DL1 + std::to_string(i.second.actionID()) + DL1 + std::to_string(i.second.styleID()) + DL1;
     }
@@ -1919,7 +1980,8 @@ void CharacterUIController::Serialize(std::string &outStr)
 void SimulationController::Serialize(std::string &outStr)
 {
     outStr = "";
-    outStr += std::to_string(gameMode) + DL2 + std::to_string(charCount) + DL2;
+    outStr += std::to_string(gameMode) + DL2;
+    outStr += std::to_string(charCount) + DL3 + std::to_string(getOptionFlags()) + DL2;
     for (int i = 0; i < charCount; i++) {
         charControllers[i].Serialize(outStr);
         outStr += DL2;
@@ -1931,46 +1993,56 @@ void SimulationController::Restore(std::string strSerialized)
     int cursor = 0;
     int max = strSerialized.length();
     gameMode = (EGameMode)atoi(&strSerialized.c_str()[cursor]);
-    cursor = strSerialized.find(DL2, cursor) + 1; if (cursor >= max) return;
+    cursor = strSerialized.find(DL2, cursor) + 1; if (!cursor || cursor >= max) return;
     charCount = atoi(&strSerialized.c_str()[cursor]);
-    cursor = strSerialized.find(DL2, cursor) + 1; if (cursor >= max) return;
+    int cursorNextDL2 = strSerialized.find(DL2, cursor) + 1; if (!cursorNextDL2 || cursorNextDL2 >= max) return;
+    cursor = strSerialized.find(DL3, cursor) + 1;
+    if (cursor && cursor < max && cursor < cursorNextDL2) {
+        setOptionFlags(atoi(&strSerialized.c_str()[cursor]));
+    }
+    cursor = cursorNextDL2; if (!cursor || cursor >= max) return;
     for (int i = 0; i < charCount; i++) {
         charControllers[i].character = atoi(&strSerialized.c_str()[cursor]);
-        cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+        cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
         charControllers[i].charVersion = atoi(&strSerialized.c_str()[cursor]);
-        cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+        int cursorNextDL1 = strSerialized.find(DL1, cursor) + 1; if (!cursorNextDL1 || cursorNextDL1 >= max) return;
+        cursor = strSerialized.find(DL3, cursor) + 1;
+        if (cursor && cursor < max && cursor < cursorNextDL1) {
+            charControllers[i].setOptionFlags(atoi(&strSerialized.c_str()[cursor]));
+        }
+        cursor = cursorNextDL1; if (!cursor || cursor >= max) return;
         charControllers[i].startPosX.data = atoi(&strSerialized.c_str()[cursor]);
         charControllers[i].flStartPosX = charControllers[i].startPosX.f();
-        cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+        cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
         charControllers[i].timelineTriggers.clear();
         charControllers[i].inputRegions.clear();
         int a,b,c;
         while (true) {
             if (strSerialized.c_str()[cursor] == DL1) {
-                cursor += 1; if (cursor >= max) return;
+                cursor += 1; if (!cursor || cursor >= max) return;
                 break;
             }
             a = atoi(&strSerialized.c_str()[cursor]);
-            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
             b = atoi(&strSerialized.c_str()[cursor]);
-            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
             c = atoi(&strSerialized.c_str()[cursor]);
-            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
             charControllers[i].timelineTriggers[a] = ActionRef(b, c);
         }
         while (true) {
             if (strSerialized.c_str()[cursor] == DL1) {
-                cursor += 1; if (cursor >= max) return;
+                cursor += 1; if (!cursor || cursor >= max) return;
                 break;
             }
             a = atoi(&strSerialized.c_str()[cursor]);
-            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
             b = atoi(&strSerialized.c_str()[cursor]);
-            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
             c = atoi(&strSerialized.c_str()[cursor]);
-            cursor = strSerialized.find(DL1, cursor) + 1; if (cursor >= max) return;
+            cursor = strSerialized.find(DL1, cursor) + 1; if (!cursor || cursor >= max) return;
             charControllers[i].inputRegions.push_back({a,b,c});
         }
-        cursor = strSerialized.find(DL2, cursor) + 1; if (cursor >= max) return;
+        cursor = strSerialized.find(DL2, cursor) + 1; if (!cursor || cursor >= max) return;
     }
 }
