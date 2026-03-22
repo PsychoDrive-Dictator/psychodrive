@@ -1857,7 +1857,7 @@ void SimulationController::AdvanceUntilComplete(void)
         }
 
         // failsafe
-        if (frameCount > 2000) {
+        if (frameCount > 10000) {
             bDone = true;
         }
 

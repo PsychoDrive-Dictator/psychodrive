@@ -169,7 +169,7 @@ void ComboWorker::WorkLoop(void) {
                 currentRoute.lastFrameDamage = pSim->frameCounter;
             }
 
-            if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 3000) {
+            if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 10000) {
                 fprintf(stderr, "aaa\n");
                 break;
             }
