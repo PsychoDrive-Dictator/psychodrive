@@ -3373,7 +3373,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     }
 
     bool doSwitchDirection = applyHit && !isGrab;
-    if (dmgType == 21 || dmgType == 22) {
+    if (dmgType == 21 || dmgType == 22 || dmgType == 26) {
         doSwitchDirection = false; // grab type hits that happen even as unlock
         usePositionAsDirection = true;
     }
