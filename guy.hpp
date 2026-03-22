@@ -1120,7 +1120,7 @@ private:
         std::vector<GuyRef> minions;
         std::set<int> setDeferredTriggerIDs;
         std::set<ActionRef> frameTriggers;
-        FixedBuffer<uint32_t, 200> inputBuffer; // todo how much is too much?
+        FixedBuffer<uint32_t, 150> inputBuffer; // todo how much is too much?
     } dc;
 
     // stuff that won't get copied around when dumping simulations
