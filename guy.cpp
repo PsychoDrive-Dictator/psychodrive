@@ -1864,6 +1864,12 @@ int Guy::getFrameMeterColorIndex() {
     if (getHitStop() || warudo) {
         ret = 6;
     }
+    if (pOpponent && pOpponent->wallStopped && pOpponent->stunned) {
+        ret = 6;
+    }
+    if (parryFreeze) {
+        ret = 6;
+    }
     return ret;
 }
 
