@@ -782,7 +782,7 @@ void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutput
         newKey.param04 = branchKey["Param04"];
         newKey.branchAction = branchKey["Action"];
         newKey.branchFrame = branchKey["ActionFrame"];
-        newKey.keepFrame = branchKey["_InheritFrameX"];
+        newKey.keepFrame = branchKey["_InheritFrameX"] || branchKey["_InheritFrame"];
         newKey.keepPlace = branchKey["_KeepPlace"];
         newKey.typeName = branchKey.value("_TypesName", "");
 
