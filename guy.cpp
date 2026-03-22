@@ -553,6 +553,8 @@ void Guy::RunFramePostPush(void)
         DoFocusRegen();
     }
 
+    DoStatusKey();
+
     // throw tech - do it before AdvanceFrame to prevent sequencing issue
     // todo modern
     if (locked && pOpponent && pOpponent->throwTechable && (currentInput & (LP+LK)) == LP+LK && nextAction == -1) {
@@ -5448,7 +5450,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now
-    DoStatusKey();
+    DoStatusKey(true);
     WorldPhysics(true); // only floor
 
     couldMove = canMoveNow;
@@ -5644,7 +5646,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         actionStatus = 0;
         jumpStatus = 0;
         landingAdjust = 0;
-        DoStatusKey();
+        DoStatusKey(true);
     }
 }
 
@@ -5714,7 +5716,7 @@ void Guy::DoSwitchKey(void)
     }
 }
 
-void Guy::DoStatusKey(void)
+void Guy::DoStatusKey(bool doSideOp)
 {
     if (!pCurrentAction) {
         return;
@@ -5747,7 +5749,9 @@ void Guy::DoStatusKey(void)
                 }
                 break;
             case 3:
-                switchDirection();
+                if (doSideOp) {
+                    switchDirection();
+                }
                 break;
             case 9:
                 if (direction != 1) {
@@ -6398,7 +6402,7 @@ void Guy::DoShotKey(Action *pAction, int frameID)
                 pNewGuy->appliedScaling = false;
             }
             // run initial frame on behalf of sim loop here because it wasn't included this frame
-            pNewGuy->DoStatusKey();
+            pNewGuy->DoStatusKey(true);
             pNewGuy->RunFrame(true);
             pNewGuy->RunFramePostPush();
             if (pParent) {

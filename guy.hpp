@@ -451,7 +451,7 @@ private:
 
     void DoBranchKey(bool preHit = false);
     bool CheckHitBoxCondition(int conditionFlag);
-    void DoStatusKey();
+    void DoStatusKey(bool doSideOp = false);
     void DoSteerKey();
     void DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType);
     void DoPlaceKey();
