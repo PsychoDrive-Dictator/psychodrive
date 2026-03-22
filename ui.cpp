@@ -1644,6 +1644,9 @@ void SimulationController::RenderUI(void)
             vecViewLabels.push_back("P2 Actions");
             vecViewLabels.push_back("Combo Miner");
         }
+        if (viewSelect >= (int)vecViewLabels.size()) {
+            viewSelect = 0;
+        }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
 #ifdef __EMSCRIPTEN__
         if (simFrameCount > 1) {
