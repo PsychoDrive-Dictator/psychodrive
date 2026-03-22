@@ -726,6 +726,7 @@ void loadWorldKeys(nlohmann::json* pWorldJson, std::vector<WorldKey>* pOutputVec
         newKey.startFrame = worldKey["_StartFrame"];
         newKey.endFrame = worldKey["_EndFrame"];
         newKey.type = worldKey["Type"];
+        newKey.flags = worldKey["Flags"];
 
         pOutputVector->push_back(newKey);
     }
@@ -1776,6 +1777,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
             writeI32(f, k.startFrame);
             writeI32(f, k.endFrame);
             writeI32(f, k.type);
+            writeI32(f, k.flags);
         }
 
         writeU32(f, action.lockKeys.size());
@@ -2252,6 +2254,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
             k.startFrame = readI32(f);
             k.endFrame = readI32(f);
             k.type = readI32(f);
+            k.flags = readI32(f);
         }
 
         uint32_t lockKeyCount = readU32(f);

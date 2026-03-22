@@ -5961,6 +5961,18 @@ void Guy::DoWorldKey(void)
                 focusRegenCooldown = 0;
                 focusRegenCooldownFrozen = false;
                 focusRegenCooldownTicking = false;
+                if (!(worldKey.flags & 4)) {
+                    // do a normal warudo as well if that flag isnt there?
+                    if (pOpponent) {
+                        pOpponent->tokiYoTomare = true;
+                        for ( auto minion : pOpponent->dc.minions ) {
+                            minion->tokiYoTomare = true;
+                        }
+                    }
+                    for ( auto minion : dc.minions ) {
+                        minion->tokiYoTomare = true;
+                    }
+                }
                 break;
             case 0:
                 // type 1 is sa3 vs normal? why does that matter?

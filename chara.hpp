@@ -335,6 +335,7 @@ struct EventKey : Key {
 
 struct WorldKey : Key {
     int type;
+    int flags;
 };
 
 struct LockKey : Key {
