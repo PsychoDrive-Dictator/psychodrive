@@ -3524,7 +3524,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
     if (applyHit && dmgValue) {
-        if (comboHits == 0 && !stunned) {
+        if ((comboHits == 0 || comboDamage == 0) && !stunned) {
             currentScaling = 100;
             pendingScaling = 0;
         }
