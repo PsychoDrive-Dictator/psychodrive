@@ -5701,9 +5701,9 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 377,
+                "count": 81,
                 "firstFrame": 51,
-                "lastFrame": 1131
+                "lastFrame": 901
             },
             {
                 "count": 459,
@@ -7376,8 +7376,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 650,
-                "firstFrame": 905,
+                "count": 383,
+                "firstFrame": 907,
                 "lastFrame": 1229
             },
             {

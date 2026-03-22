@@ -405,6 +405,8 @@ bool Guy::RunFrame(bool advancingTime)
 
         DoLockKey();
 
+        Fixed prevPosOffset = posOffsetX;
+
         Fixed prevPosY = getPosY();
 
         if (!noPlaceXNextFrame && !setPlaceX) {
@@ -522,8 +524,7 @@ bool Guy::RunFrame(bool advancingTime)
         teleported = false;
 
         DoSwitchKey();
-
-        DoEventKey(pCurrentAction, currentFrame);
+        DoEventKey(pCurrentAction, currentFrame, prevPosOffset);
 
         if (advancingTime && countingDownInstall && styleInstallFrames) {
             styleInstallFrames--;
@@ -5944,16 +5945,6 @@ void Guy::DoWorldKey(void)
         switch (type) {
             case 1:
                 superAnimation = true;
-                // todo make a set of mutually exclusive scratch variables
-                // for now use anything existing to not bloat the size up
-                groundBounceVelX = getPosX();
-                //groundBounceVelY = getPosY();
-                posX = Fixed(0);
-                //posY = Fixed(0);
-                velocityX = Fixed(0);
-                velocityY = Fixed(0);
-                accelX = Fixed(0);
-                accelY = Fixed(0);
                 if (pOpponent) {
                     pOpponent->superFreeze = true;
                     setFocusRegenCooldown(90 + 1 + 1); // one for the unfreeze frame
@@ -5980,14 +5971,6 @@ void Guy::DoWorldKey(void)
                 // resume
                 if (superAnimation) {
                     superAnimation = false;
-                    posX = groundBounceVelX - (posOffsetX*direction);
-                    //posY = groundBounceVelY;
-                    if (pOpponent && pOpponent->locked) {
-                        pOpponent->posX = posX;
-                        //pOpponent->posY = posY;
-                    }
-                    groundBounceVelX = Fixed(0);
-                    //groundBounceVelY = Fixed(0);
                 }
                 if (pOpponent) {
                     if (pOpponent->superFreeze) {
@@ -6038,6 +6021,17 @@ void Guy::DoLockKey(void)
                 pOpponent->juggleCounter = 0;
                 pOpponent->resetHitStunOnLand = false;
                 pOpponent->knockDown = false;
+                if (lockKey.param03 == 1) {
+                    // todo make a set of mutually exclusive scratch variables
+                    // for now use anything existing to not bloat the size up
+                    log(true, "saving super lock position " + std::to_string(getPosX().f()))
+                    groundBounceVelX = getPosX();
+                    //groundBounceVelY = getPosY();
+                    posX = Fixed(0);
+                    //posY = Fixed(0);
+
+                    superLock = true;
+                }
                 if (!pOpponent->locked) {
                     // only snap position if this isn't a followup lock
                     pOpponent->direction = direction;
@@ -6153,7 +6147,7 @@ void Guy::DoPlaceKey(void)
     }
 }
 
-void Guy::DoEventKey(Action *pAction, int frameID)
+void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
 {
     if (!pAction) {
         return;
@@ -6206,6 +6200,23 @@ void Guy::DoEventKey(Action *pAction, int frameID)
                             }
                             if (param2 || param3 || param4 || param5 ) {
                                 log(logUnknowns, "unknown offset param");
+                            }
+                            break;
+                        }
+                        case 10:
+                        {
+                            if (superLock) {
+                                log(true, "was super lock");
+                                posX = groundBounceVelX - prevPosOffset * direction;
+                                //posY = groundBounceVelY;
+                                if (pOpponent && pOpponent->locked) {
+                                    pOpponent->posX = posX;
+                                    //pOpponent->posY = posY;
+                                }
+                                groundBounceVelX = Fixed(0);
+                                //groundBounceVelY = Fixed(0);
+
+                                superLock = false;
                             }
                             break;
                         }

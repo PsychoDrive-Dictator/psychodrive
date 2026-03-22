@@ -456,7 +456,7 @@ private:
     void DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType);
     void DoPlaceKey();
     void DoSwitchKey();
-    void DoEventKey(Action *pAction, int frameID);
+    void DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset = Fixed(0));
     void DoWorldKey();
     void DoLockKey();
     void DoShotKey(Action *pAction, int frameID);
