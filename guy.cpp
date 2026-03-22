@@ -5313,6 +5313,18 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         superGainScaling = 100;
         resetComboCount = false;
         lastDamageScale = 0;
+
+        juggleCounter = 0;
+        pAttacker = nullptr;
+        wallBounce = false; // just in case we didn't reach a wall
+        wallSplat = false;
+        stunSplat = false;
+        if (stunned) {
+            burnout = false;
+            stunned = false;
+            focus = maxFocus;
+        }
+
         if (pOpponent) {
             pOpponent->driveRushCancel = false;
             pOpponent->parryDriveRush = false;
@@ -5333,7 +5345,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         log(true, message );
 
         juggleCounter = 0;
-
         pAttacker = nullptr;
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
