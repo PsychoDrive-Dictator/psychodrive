@@ -487,8 +487,8 @@ bool Guy::RunFrame(bool advancingTime)
             if (hitVelX != Fixed(0)) {
                 if (!locked && !nageKnockdown) {
                     posX = posX + hitVelX;
-                    pushBackThisFrame = hitVelX;
                 }
+                pushBackThisFrame = hitVelX;
 
                 Fixed prevHitVelX = hitVelX;
                 hitVelX = hitVelX + hitAccelX;
@@ -2327,7 +2327,12 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                 if (pushX < Fixed(0)) {
                     pAttacker->reflectThisFrame *= Fixed(-1);
                 }
-                pAttacker->posX += pAttacker->reflectThisFrame;
+                if (!nageKnockdown) {
+                    pAttacker->posX += pAttacker->reflectThisFrame;
+                } else {
+                    pAttacker->posX += hitVelX * Fixed(-1);
+                    hitVelX = hitVelX + hitAccelX;
+                }
                 pAttacker->hitReflectVelX = hitVelX * Fixed(-1);
                 pAttacker->hitReflectAccelX = hitAccelX * Fixed(-1);
                 log(logTransitions, "start reflect! initial " + std::to_string(pAttacker->reflectThisFrame.f()));
@@ -3920,6 +3925,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             }
         }
     }
+
+        if (dmgType == 11 && pAttacker->pendingUnlockHit && destTime != 0) {
+            hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+            hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
+            nageKnockdown = true;
+        }
 
     if (!isDomain && applyHit && !appliedAction && !isGrab) {
         int prevNextAction = nextAction;
