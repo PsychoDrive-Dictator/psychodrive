@@ -3846,7 +3846,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
                     hitStun--;
                 }
 
-                if (hitStun == 0) {
+                if (hitStun == 0 || piyoBound) {
                     hitStun = 1; // so AdvanceFrame knocks us down
                 }
 
