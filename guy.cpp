@@ -1890,7 +1890,7 @@ bool Guy::Push(Guy *pOtherGuy)
     // wall at the same time while stll being affected by reflect
     if (pOpponent && !pOpponent->warudo && (reflectThisFrame == Fixed(0) || deferredReflect)) {
         if (hitReflectVelX != Fixed(0)) {
-            if (!locked && !nageKnockdown) {
+            if (!locked && !nageKnockdown && !ignoreCornerPushback) {
                 posX = posX + hitReflectVelX;
             }
 
@@ -2327,11 +2327,13 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                 if (pushX < Fixed(0)) {
                     pAttacker->reflectThisFrame *= Fixed(-1);
                 }
-                if (!nageKnockdown) {
-                    pAttacker->posX += pAttacker->reflectThisFrame;
-                } else {
-                    pAttacker->posX += hitVelX * Fixed(-1);
-                    hitVelX = hitVelX + hitAccelX;
+                if (!pAttacker->ignoreCornerPushback) {
+                    if (!nageKnockdown) {
+                        pAttacker->posX += pAttacker->reflectThisFrame;
+                    } else {
+                        pAttacker->posX += hitVelX * Fixed(-1);
+                        hitVelX = hitVelX + hitAccelX;
+                    }
                 }
                 pAttacker->hitReflectVelX = hitVelX * Fixed(-1);
                 pAttacker->hitReflectAccelX = hitAccelX * Fixed(-1);
