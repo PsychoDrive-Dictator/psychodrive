@@ -5727,6 +5727,10 @@ void Guy::DoStatusKey(void)
         }
 
         landingAdjust = statusKey.landingAdjust;
+
+        if (getPosY() > landingAdjust) {
+            airborne = true;
+        }
         forcedPoseStatus = statusKey.poseStatus;
         actionStatus = statusKey.actionStatus;
         jumpStatus = statusKey.jumpStatus;
