@@ -5696,6 +5696,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jamie_corner_grab",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 92,
+                "firstFrame": 185,
+                "lastFrame": 276
+            },
+            {
+                "count": 27,
+                "firstFrame": 184,
+                "lastFrame": 209
+            },
+            {
+                "count": 1,
+                "firstFrame": 209,
+                "lastFrame": 209
+            },
+            {
+                "count": 1,
+                "firstFrame": 184,
+                "lastFrame": 184
+            },
+            {
+                "count": 1,
+                "firstFrame": 184,
+                "lastFrame": 184
+            },
+            {
+                "count": 3,
+                "firstFrame": 193,
+                "lastFrame": 224
+            },
+            {
+                "count": 16,
+                "firstFrame": 193,
+                "lastFrame": 208
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "jamie_drink_jump_cancel_divekick",
         "testVersion": "26",
         "finished": true,
