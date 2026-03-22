@@ -903,12 +903,12 @@ void loadStyles(nlohmann::json* pCharInfoJson, std::vector<StyleData>* pOutputVe
 
             if (styleJson["StyleData"].contains("Action")) {
                 nlohmann::json &actionJson = styleJson["StyleData"]["Action"];
-                if (actionJson.contains("Start")) {
+                if (actionJson.contains("Start") && actionJson["Start"]["Action"] != -1) {
                     newStyle.hasStartAction = true;
                     newStyle.startActionID = actionJson["Start"]["Action"];
                     newStyle.startActionStyle = actionJson["Start"]["Style"];
                 }
-                if (actionJson.contains("Exit")) {
+                if (actionJson.contains("Exit") && actionJson["Exit"]["Action"] != -1) {
                     newStyle.hasExitAction = true;
                     newStyle.exitActionID = actionJson["Exit"]["Action"];
                     newStyle.exitActionStyle = actionJson["Exit"]["Style"];
