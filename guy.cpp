@@ -6024,7 +6024,7 @@ void Guy::DoLockKey(void)
                 if (lockKey.param03 == 1) {
                     // todo make a set of mutually exclusive scratch variables
                     // for now use anything existing to not bloat the size up
-                    log(true, "saving super lock position " + std::to_string(getPosX().f()))
+                    //log(true, "saving super lock position " + std::to_string(getPosX().f()))
                     groundBounceVelX = getPosX();
                     //groundBounceVelY = getPosY();
                     posX = Fixed(0);
@@ -6206,7 +6206,7 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                         case 10:
                         {
                             if (superLock) {
-                                log(true, "was super lock");
+                                //log(true, "was super lock");
                                 posX = groundBounceVelX - prevPosOffset * direction;
                                 //posY = groundBounceVelY;
                                 if (pOpponent && pOpponent->locked) {
