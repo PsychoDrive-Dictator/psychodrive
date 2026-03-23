@@ -18,9 +18,6 @@
 #include "guy.hpp"
 #include "combogen.hpp"
 
-#define STRINGIZE(x) #x
-#define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
-
 SDL_Window* window = nullptr;
 SDL_GLContext gl_context;
 

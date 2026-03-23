@@ -7,118 +7,6 @@
 #include "json.hpp"
 #include "fixed.hpp"
 
-template<typename T, std::size_t N, bool AssertOnOverflow = false>
-class FixedBuffer {
-private:
-    T buffer[N];
-    std::size_t count = 0;
-
-public:
-    inline void push_front(const T& value) {
-        if constexpr (AssertOnOverflow) {
-            assert(count < N);
-        }
-        std::memmove(&buffer[1], &buffer[0], (N - 1) * sizeof(T));
-        buffer[0] = value;
-        if (count < N) {
-            count++;
-        }
-    }
-
-    inline void push_back(const T& value) {
-        if constexpr (AssertOnOverflow) {
-            assert(count < N);
-        }
-        buffer[count] = value;
-        if (count < N) {
-            count++;
-        }
-    }
-
-    inline void clear() {
-        count = 0;
-    }
-
-    inline T& operator[](std::size_t index) {
-        return buffer[index];
-    }
-
-    inline const T& operator[](std::size_t index) const {
-        return buffer[index];
-    }
-
-    inline FixedBuffer& operator=(const FixedBuffer& other) {
-        if (this != &other) {
-            count = other.count;
-            if (count > 0) {
-                std::memcpy(buffer, other.buffer, count * sizeof(T));
-            }
-        }
-        return *this;
-    }
-
-    inline std::size_t size() const {
-        return count;
-    }
-
-    inline bool operator!=(const FixedBuffer& other) const {
-        if (count != other.count) return true;
-        return std::memcmp(buffer, other.buffer, count * sizeof(T)) != 0;
-    }
-};
-
-template<typename T>
-class ObjectPool {
-private:
-    std::vector<T*> allocated;
-    std::vector<T*> available;
-    std::vector<T*> blocks;
-    std::size_t growSize;
-
-public:
-    ObjectPool(std::size_t initialSize) : growSize(initialSize) {
-        grow();
-    }
-
-    ~ObjectPool() {
-        for (auto block : blocks) {
-            delete[] block;
-        }
-    }
-
-    T* allocate() {
-        if (available.empty()) {
-            grow();
-        }
-        T* obj = available.back();
-        available.pop_back();
-        allocated.push_back(obj);
-        return obj;
-    }
-
-    void release(T* obj) {
-        auto it = std::find(allocated.begin(), allocated.end(), obj);
-        if (it != allocated.end()) {
-            allocated.erase(it);
-            available.push_back(obj);
-        }
-    }
-
-    void reset() {
-        available.insert(available.end(), allocated.begin(), allocated.end());
-        allocated.clear();
-    }
-
-private:
-    void grow() {
-        T* block = new T[growSize];
-        blocks.push_back(block);
-        for (std::size_t i = 0; i < growSize; i++) {
-            available.push_back(&block[i]);
-        }
-    }
-};
-
 enum EGameMode {
     Batch = -1,
     Training = 0,
@@ -313,3 +201,118 @@ std::string to_string_leading_zeroes(unsigned int number, unsigned int length);
 std::string readFile(const std::string &fileName);
 nlohmann::json parse_json_file(const std::string &fileName);
 void createGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color);
+
+#define STRINGIZE(x) #x
+#define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
+
+template<typename T, std::size_t N, bool AssertOnOverflow = false>
+class FixedBuffer {
+private:
+    T buffer[N];
+    std::size_t count = 0;
+
+public:
+    inline void push_front(const T& value) {
+        if constexpr (AssertOnOverflow) {
+            assert(count < N);
+        }
+        std::memmove(&buffer[1], &buffer[0], (N - 1) * sizeof(T));
+        buffer[0] = value;
+        if (count < N) {
+            count++;
+        }
+    }
+
+    inline void push_back(const T& value) {
+        if constexpr (AssertOnOverflow) {
+            assert(count < N);
+        }
+        buffer[count] = value;
+        if (count < N) {
+            count++;
+        }
+    }
+
+    inline void clear() {
+        count = 0;
+    }
+
+    inline T& operator[](std::size_t index) {
+        return buffer[index];
+    }
+
+    inline const T& operator[](std::size_t index) const {
+        return buffer[index];
+    }
+
+    inline FixedBuffer& operator=(const FixedBuffer& other) {
+        if (this != &other) {
+            count = other.count;
+            if (count > 0) {
+                std::memcpy(buffer, other.buffer, count * sizeof(T));
+            }
+        }
+        return *this;
+    }
+
+    inline std::size_t size() const {
+        return count;
+    }
+
+    inline bool operator!=(const FixedBuffer& other) const {
+        if (count != other.count) return true;
+        return std::memcmp(buffer, other.buffer, count * sizeof(T)) != 0;
+    }
+};
+
+template<typename T>
+class ObjectPool {
+private:
+    std::vector<T*> allocated;
+    std::vector<T*> available;
+    std::vector<T*> blocks;
+    std::size_t growSize;
+
+public:
+    ObjectPool(std::size_t initialSize) : growSize(initialSize) {
+        grow();
+    }
+
+    ~ObjectPool() {
+        for (auto block : blocks) {
+            delete[] block;
+        }
+    }
+
+    T* allocate() {
+        if (available.empty()) {
+            grow();
+        }
+        T* obj = available.back();
+        available.pop_back();
+        allocated.push_back(obj);
+        return obj;
+    }
+
+    void release(T* obj) {
+        auto it = std::find(allocated.begin(), allocated.end(), obj);
+        if (it != allocated.end()) {
+            allocated.erase(it);
+            available.push_back(obj);
+        }
+    }
+
+    void reset() {
+        available.insert(available.end(), allocated.begin(), allocated.end());
+        allocated.clear();
+    }
+
+private:
+    void grow() {
+        T* block = new T[growSize];
+        blocks.push_back(block);
+        for (std::size_t i = 0; i < growSize; i++) {
+            available.push_back(&block[i]);
+        }
+    }
+};

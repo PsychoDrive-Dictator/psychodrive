@@ -195,9 +195,10 @@ void requestCharDownload(const std::string& charName, int charVersion)
     }
     log("downloading " + charSpec);
     setCharsStarted.insert(charSpec);
+    std::string strVersion = std::string(STRINGIZE_VALUE_OF(PROJECT_VERSION));
     EM_ASM({
         var charSpec = UTF8ToString($0);
-        var url = charSpec + '.bin';
+        var url = charSpec + '.bin?version=' + UTF8ToString($1);
 
         fetch(url).then(function(response) {
             return response.arrayBuffer();
@@ -205,10 +206,10 @@ void requestCharDownload(const std::string& charName, int charVersion)
             var data = new Uint8Array(buffer);
             try { FS.mkdir('data'); } catch(e) {}
             try { FS.mkdir('data/cooked'); } catch(e) {}
-            FS.writeFile('data/cooked/' + url, data);
+            FS.writeFile('data/cooked/' + charSpec + '.bin', data);
             Module.ccall('jsCharLoadCallback', null, ['string'], [charSpec]);
         });
-    }, charSpec.c_str());
+    }, charSpec.c_str(), strVersion.c_str());
 #endif
 }
 
