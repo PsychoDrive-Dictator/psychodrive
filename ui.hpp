@@ -49,6 +49,11 @@ public:
     Fixed startPosX = Fixed(0);
 
     int buffLevel = 0;
+    int startHealth = 0;
+    int maxStartHealth = 0;
+    int startFocus = maxFocus;
+    int startGauge = 0;
+    int maxStartGauge = 0;
 
     // number of frames to show behind present, eg. how far right the current frame arrow is
     static constexpr int kFrameOffset = 8;

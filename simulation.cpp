@@ -116,6 +116,24 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
             pGuy->ChangeStyle(controller.buffLevel);
         }
     }
+    controller.maxStartHealth = pGuy->getCharData()->vitality;
+    controller.maxStartGauge = pGuy->getCharData()->gauge;
+
+    if (controller.startHealth == 0) {
+        controller.startHealth = controller.maxStartHealth;
+    }
+    if (controller.startHealth > controller.maxStartHealth) {
+        controller.startHealth = controller.maxStartHealth;
+    }
+    if (controller.startGauge == 0) {
+        controller.startGauge = controller.maxStartGauge;
+    }
+    if (controller.startGauge > controller.maxStartGauge) {
+        controller.startGauge = controller.maxStartGauge;
+    }
+    pGuy->setHealth(controller.startHealth);
+    pGuy->setFocus(controller.startFocus);
+    pGuy->setGauge(controller.startGauge);
 }
 
 

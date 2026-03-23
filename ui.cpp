@@ -855,6 +855,16 @@ void CharacterUIController::renderCharSetup(void)
             startPosX = Fixed(flStartPosX, true);
             simInputsChanged = true;
         }
+
+        if (ImGui::SliderInt("Health", &startHealth, 1, maxStartHealth) ) {
+            simInputsChanged = true;
+        }
+        if (ImGui::SliderInt("Drive", &startFocus, 1, maxFocus) ) {
+            simInputsChanged = true;
+        }
+        if (ImGui::SliderInt("Super", &startGauge, 1, maxStartGauge) ) {
+            simInputsChanged = true;
+        }
     }
 
     if (ImGui::SliderInt("Buff Level", &buffLevel, 0, 4) ) {
@@ -1965,7 +1975,10 @@ void CharacterUIController::Serialize(std::string &outStr)
 {
     outStr += std::to_string(character) + DL1;
     outStr += std::to_string(charVersion) + DL3;
-    outStr += std::to_string(getOptionFlags()) + DL1;
+    outStr += std::to_string(getOptionFlags()) + DL3;
+    outStr += std::to_string(startHealth) + DL3;
+    outStr += std::to_string(startFocus) + DL3;
+    outStr += std::to_string(startGauge) + DL1;
     outStr += std::to_string(startPosX.data) + DL1;
     for (auto &i:timelineTriggers) {
         outStr += std::to_string(i.first) + DL1 + std::to_string(i.second.actionID()) + DL1 + std::to_string(i.second.styleID()) + DL1;
@@ -2009,6 +2022,18 @@ void SimulationController::Restore(std::string strSerialized)
         cursor = strSerialized.find(DL3, cursor) + 1;
         if (cursor && cursor < max && cursor < cursorNextDL1) {
             charControllers[i].setOptionFlags(atoi(&strSerialized.c_str()[cursor]));
+        }
+        cursor = strSerialized.find(DL3, cursor) + 1;
+        if (cursor && cursor < max && cursor < cursorNextDL1) {
+            charControllers[i].startHealth = atoi(&strSerialized.c_str()[cursor]);
+        }
+        cursor = strSerialized.find(DL3, cursor) + 1;
+        if (cursor && cursor < max && cursor < cursorNextDL1) {
+            charControllers[i].startFocus = atoi(&strSerialized.c_str()[cursor]);
+        }
+        cursor = strSerialized.find(DL3, cursor) + 1;
+        if (cursor && cursor < max && cursor < cursorNextDL1) {
+            charControllers[i].startGauge = atoi(&strSerialized.c_str()[cursor]);
         }
         cursor = cursorNextDL1; if (!cursor || cursor >= max) return;
         charControllers[i].startPosX.data = atoi(&strSerialized.c_str()[cursor]);
