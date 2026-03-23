@@ -1834,8 +1834,11 @@ void Guy::Render(float z /* = 0.0f */, bool showDomain) {
         // drawBox(x-radius/2,y-radius/2,radius,radius,thickness,1.0,1.0,1.0,0.2);
 
         // meters
-        drawBox(x - 35.0, y - 5.0, focus / float(maxFocus) * 30.0, 3.0, 1.0, z, 0.20, 0.80, 0.0, 0.2);
-        drawBox(x + 5.0, y - 5.0, gauge / float(pCharData->gauge) * 30.0, 3.0, 1.0, z, 0.0, 0.80, 0.80, 0.2);
+        if (!isProjectile) {
+            drawBox(x - 35.0, y - 1.0, focus / float(maxFocus) * 30.0, 3.0, 1.0, z, !burnout ? 0.20 : 0.7, !burnout ? 0.80 : 0.7, !burnout ? 0.0 : 0.7, 0.2);
+            drawBox(x + 5.0, y - 1.0, gauge / float(pCharData->gauge) * 30.0, 3.0, 1.0, z, 0.0, 0.80, 0.80, 0.2);
+            drawBox(x - 35.0, y + 5.0, health / float(pCharData->vitality) * 70.0, 3.0, 1.0, z, 0.9, health > 2500 ? 0.90 : 0.0, health > 2500 ? 0.90 : 0.0, 0.2);
+        }
     }
 }
 
