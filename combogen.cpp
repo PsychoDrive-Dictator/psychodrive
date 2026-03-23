@@ -306,13 +306,12 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     }
 
     finder.threadCount = std::thread::hardware_concurrency();
+#ifdef __EMSCRIPTEN__
+    finder.threadCount = emscripten_num_logical_cores();
+#endif
     if (finder.threadCount == 0) {
         finder.threadCount = 1;
     }
-#ifdef __EMSCRIPTEN__
-    finder.threadCount = emscripten_num_logical_cores()-1;
-#endif
-
     for (int i = 0; i < finder.threadCount; i++) {
         ComboWorker *pNewWorker = new ComboWorker;
         finder.workerPool.push_back(pNewWorker);
