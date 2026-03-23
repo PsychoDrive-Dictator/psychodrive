@@ -1073,6 +1073,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_double_world",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 301,
+                "firstFrame": 128,
+                "lastFrame": 278
+            },
+            {
+                "count": 65,
+                "firstFrame": 128,
+                "lastFrame": 167
+            },
+            {
+                "count": 34,
+                "firstFrame": 134,
+                "lastFrame": 167
+            },
+            {
+                "count": 38,
+                "firstFrame": 154,
+                "lastFrame": 191
+            },
+            {
+                "count": 38,
+                "firstFrame": 154,
+                "lastFrame": 191
+            },
+            {
+                "count": 270,
+                "firstFrame": 134,
+                "lastFrame": 278
+            },
+            {
+                "count": 319,
+                "firstFrame": 107,
+                "lastFrame": 278
+            },
+            {
+                "count": 42,
+                "firstFrame": 154,
+                "lastFrame": 195
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 45,
+                "firstFrame": 154,
+                "lastFrame": 198
+            },
+            {
+                "count": 22,
+                "firstFrame": 154,
+                "lastFrame": 164
+            },
+            {
+                "count": 144,
+                "firstFrame": 127,
+                "lastFrame": 198
+            }
+        ]
+    },
+    {
+        "testName": "aa_double_world2",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 235,
+                "firstFrame": 97,
+                "lastFrame": 214
+            },
+            {
+                "count": 73,
+                "firstFrame": 97,
+                "lastFrame": 134
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 93,
+                "firstFrame": 122,
+                "lastFrame": 214
+            },
+            {
+                "count": 265,
+                "firstFrame": 76,
+                "lastFrame": 214
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 94,
+                "firstFrame": 96,
+                "lastFrame": 142
+            }
+        ]
+    },
+    {
         "testName": "aa_driverush_crossunder",
         "testVersion": "33",
         "finished": true,
