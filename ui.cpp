@@ -1367,7 +1367,7 @@ bool SimulationController::NewSim(void)
 #ifdef __EMSCRIPTEN__
     if (!triedRestoreFromURL) {
         std::string strCombo = (char*)EM_ASM_PTR({
-            let params = new URLSearchParams(document.location.search);
+            let params = new URLSearchParams(document.location.search || window.location.hash.slice(1));
             let combo = params?.get("combo");
             if (combo == null) {
                 combo = "";
@@ -1656,7 +1656,7 @@ void SimulationController::RenderUI(void)
                 //Restore(strSerialized);
                 EM_ASM({
                     var serialized = UTF8ToString($0);
-                    navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '?combo=' + serialized);
+                    navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '#combo=' + serialized);
                     //window.location.href = '?combo=' + serialized;
                 }, strSerialized.c_str());
             }

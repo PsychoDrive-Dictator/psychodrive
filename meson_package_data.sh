@@ -8,6 +8,10 @@ rsync -avx --exclude='chars' --exclude='cooked' "$MESON_SOURCE_ROOT"/data "$1"/
 
 if [[ $2 == "emscripten" ]]; then
     /usr/lib/emsdk/upstream/emscripten/tools/file_packager "$1"/psychodrive_files.data --js-output="$1"/psychodrive_files.js --exclude \*cooked\* --preload "$1"/data@./data
+
+    version=$(basename "$1")
+    version=${version#psychodrive-}
+    sed -i -e "s/version=/version=$version/g" "$1"/psychodrive.html
 fi
 
 rm -r "$1"/data
