@@ -5556,8 +5556,6 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
         nextActionOpponentAction = false;
 
-        currentArmor = nullptr; // uhhh
-
         nextAction = -1;
         nextActionFrame = -1;
 
@@ -5611,6 +5609,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             hasBeenPerfectParriedThisMove = false;
             hitArmorThisMove = false;
             hitAtemiThisMove = false;
+
+            currentArmor = nullptr; // uhhh
         }
 
         if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
