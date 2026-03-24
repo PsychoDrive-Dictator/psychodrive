@@ -2603,11 +2603,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
-            if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0)) {
+            if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0 && !pOtherGuy->wasHit)) {
                 hitEntryFlag |= counter;
             }
             // the force from the UI doesn't do the right thing for multi hit moves like hands ATM
-            if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0)) {
+            if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0 && !pOtherGuy->wasHit)) {
                 hitEntryFlag |= punish_counter;
             }
 
