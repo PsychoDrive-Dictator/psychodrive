@@ -5786,6 +5786,11 @@ void Guy::DoStatusKey(bool doSideOp)
                     switchDirection();
                 }
                 break;
+            case 5:
+                if (pOpponent && direction != pOpponent->direction) {
+                    switchDirection();
+                }
+                break;
             case 9:
                 if (direction != 1) {
                     switchDirection();
@@ -6087,8 +6092,8 @@ void Guy::DoLockKey(void)
                 }
                 if (!pOpponent->locked) {
                     // only snap position if this isn't a followup lock
-                    pOpponent->direction = direction;
                     if (pOpponent->grabAdjust) {
+                        pOpponent->direction = direction;
                         pOpponent->posX = getPosX();
                         pOpponent->posY = getPosY();
                         pOpponent->posOffsetX = Fixed(0);
