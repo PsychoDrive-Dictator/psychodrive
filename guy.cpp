@@ -4258,16 +4258,16 @@ void Guy::DoBranchKey(bool preHit)
                         if (pGuy == nullptr) {
                             log(true, "that height branch not gonna work");
                         } else {
-                            if (branchParam1 == 1 && pGuy->getPosY() < Fixed(branchParam2)) {
+                            if (branchParam1 == 1 && pGuy->getPosY().i() < branchParam2) {
                                 doBranch = true;
                             }
-                            if (branchParam1 == 2 && pGuy->getPosY() <= Fixed(branchParam2)) {
+                            if (branchParam1 == 2 && pGuy->getPosY().i() <= branchParam2) {
                                 doBranch = true;
                             }
-                            if (branchParam1 == 3 && pGuy->getPosY() > Fixed(branchParam2)) {
+                            if (branchParam1 == 3 && pGuy->getPosY().i() > branchParam2) {
                                 doBranch = true;
                             }
-                            if (branchParam1 == 4 && pGuy->getPosY() >= Fixed(branchParam2)) {
+                            if (branchParam1 == 4 && pGuy->getPosY().i() >= branchParam2) {
                                 doBranch = true;
                             }
                         }
