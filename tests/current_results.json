@@ -2614,6 +2614,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_corner_lvl2",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 927,
+                "firstFrame": 223,
+                "lastFrame": 674
+            },
+            {
+                "count": 70,
+                "firstFrame": 361,
+                "lastFrame": 401
+            },
+            {
+                "count": 26,
+                "firstFrame": 364,
+                "lastFrame": 389
+            },
+            {
+                "count": 1,
+                "firstFrame": 361,
+                "lastFrame": 361
+            },
+            {
+                "count": 1,
+                "firstFrame": 361,
+                "lastFrame": 361
+            },
+            {
+                "count": 286,
+                "firstFrame": 361,
+                "lastFrame": 547
+            },
+            {
+                "count": 553,
+                "firstFrame": 361,
+                "lastFrame": 674
+            },
+            {
+                "count": 74,
+                "firstFrame": 428,
+                "lastFrame": 501
+            },
+            {
+                "count": 709,
+                "firstFrame": 206,
+                "lastFrame": 674
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 236,
+                "firstFrame": 298,
+                "lastFrame": 533
+            }
+        ]
+    },
+    {
         "testName": "akuma_drc_6hp",
         "testVersion": "33",
         "finished": true,
@@ -3816,6 +3883,73 @@ var currentResults =
                 "count": 40,
                 "firstFrame": 1250,
                 "lastFrame": 1523
+            }
+        ]
+    },
+    {
+        "testName": "cammy_min_height_od_divekick",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 82,
+                "lastFrame": 82
+            },
+            {
+                "count": 1,
+                "firstFrame": 82,
+                "lastFrame": 82
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 81,
+                "lastFrame": 81
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 96,
+                "lastFrame": 97
             }
         ]
     },
