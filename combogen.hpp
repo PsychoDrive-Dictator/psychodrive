@@ -11,6 +11,11 @@
 #include "guy.hpp"
 #include "simulation.hpp"
 
+struct SharedSimulationSnapshot {
+    std::atomic<int> refcount = 0;
+    Simulation sim;
+};
+
 struct ComboRoute {
     std::map<int16_t, ActionRef> timelineTriggers;
     int comboHits = 0;
@@ -19,7 +24,7 @@ struct ComboRoute {
     int damage = 0;
     int lastFrameDamage = 0;
     int walkForward = 0;
-    Simulation *pSimSnapshot = nullptr;
+    SharedSimulationSnapshot *pSimSnapshot = nullptr;
 };
 
 struct DoneRoute {
@@ -50,6 +55,7 @@ public:
     std::vector<ComboWorker*> shuffledWorkerPool;
     ComboRoute currentRoute;
     Simulation *pSim = nullptr;
+    SharedSimulationSnapshot *pendingSnapshot = nullptr;
     std::thread thread;
     std::mutex mutexPendingRoutes;
     std::deque<ComboRoute> pendingRoutes;

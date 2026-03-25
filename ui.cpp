@@ -279,7 +279,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     *pGuy->getInputIDPtr() = atoi(vecInputLabels[*pGuy->getInputListIDPtr()].c_str());
 
     ImGui::SameLine();
-    std::vector<const char *> vecGuyNames;
+    std::vector<std::string> vecGuyNames;
     vecGuyNames.push_back("none");
     std::map<int, Guy *> mapDropDownIDToGuyPtr;
     mapDropDownIDToGuyPtr[0] = nullptr;
@@ -288,7 +288,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
         if (guy == pGuy) {
             continue;
         }
-        vecGuyNames.push_back( guy->getName().c_str() );
+        vecGuyNames.push_back( guy->getName() );
         mapDropDownIDToGuyPtr[guyID++] = guy;
     }
     for (auto [ i, guy ] : mapDropDownIDToGuyPtr ) {
@@ -297,8 +297,12 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
             break;
         }
     }
+    vecInputs.clear();
+    for (auto& i : vecGuyNames) {
+        vecInputs.push_back(i.c_str());
+    }
     newOpponentID = guyID;
-    modalDropDown("opponent", &newOpponentID, vecGuyNames, 100);
+    modalDropDown("opponent", &newOpponentID, vecInputs, 100);
     if (newOpponentID != guyID) {
         pGuy->setOpponent(mapDropDownIDToGuyPtr[newOpponentID]);
     }

@@ -26,8 +26,6 @@ void ComboWorker::Start(bool isFirst) {
     if (first) {
         pSim->Clone(&finder.startSnapshot);
         pSim->simGuys[0]->setRecordFrameTriggers(true, finder.doLateCancels);
-
-        currentRoute.pSimSnapshot = new Simulation;
     }
 
     thread = std::thread(&ComboWorker::WorkLoop, this);
@@ -62,17 +60,21 @@ again:
 stolen:
     idle = false;
 
-    pSim->Clone(currentRoute.pSimSnapshot);
+    pSim->Clone(&currentRoute.pSimSnapshot->sim);
+    if (--currentRoute.pSimSnapshot->refcount == 0) {
+        delete currentRoute.pSimSnapshot;
+    }
+    currentRoute.pSimSnapshot = nullptr;
     pSim->frameCounter = currentRoute.simFrameProgress-1;
     justGotNextRoute = true;
 }
 
 void ComboWorker::QueueRouteFork(ActionRef frameTrigger) {
     // call this with mutexPendingRoutes locked!
+    pendingSnapshot->refcount++;
     pendingRoutes.emplace_front();
     pendingRoutes.front() = currentRoute;
-    pendingRoutes.front().pSimSnapshot = new Simulation;
-    pendingRoutes.front().pSimSnapshot->Clone(currentRoute.pSimSnapshot);
+    pendingRoutes.front().pSimSnapshot = pendingSnapshot;
     pendingRoutes.front().timelineTriggers[pSim->frameCounter] = frameTrigger;
 }
 
@@ -88,9 +90,10 @@ void ComboWorker::WorkLoop(void) {
 
     while (true) {
         while (true) {
-            if (!justGotNextRoute) {
-                currentRoute.pSimSnapshot->Clone(pSim);
+            if (pendingSnapshot == nullptr) {
+                pendingSnapshot = new SharedSimulationSnapshot;
             }
+            pendingSnapshot->sim.Clone(pSim);
             justGotNextRoute = false;
 
             int curInput = 0;
@@ -160,6 +163,11 @@ void ComboWorker::WorkLoop(void) {
                         QueueRouteFork(ActionRef(-(UP|FORWARD), 0));
                         QueueRouteFork(ActionRef(-(UP|BACK), 0));
                     }
+                    // do this with lock held lest someone free it under us already
+                    if (pendingSnapshot->refcount) {
+                        // we jettison, they own it now
+                        pendingSnapshot = nullptr;
+                    }
                 }
                 pSim->simGuys[0]->getFrameTriggers().clear();
             }
@@ -211,8 +219,10 @@ void ComboWorker::WorkLoop(void) {
         doneRoutes.insert(doneRoute);
         mutexDoneRoutes.unlock();
 
-        delete currentRoute.pSimSnapshot;
-        currentRoute.pSimSnapshot = nullptr;
+        if (pendingSnapshot) {
+            delete pendingSnapshot;
+            pendingSnapshot = nullptr;
+        }
 
         GetNextRoute();
 

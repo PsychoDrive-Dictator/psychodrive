@@ -18,7 +18,6 @@ Simulation::~Simulation() {
 void Simulation::Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool)
 {
     gatherEveryone(simGuys, everyone);
-    gatherEveryone(pOtherSim->simGuys, pOtherSim->everyone);
 
     if (everyone.size() < pOtherSim->everyone.size()) {
         int guysToAllocate = pOtherSim->everyone.size() - everyone.size();
@@ -262,6 +261,9 @@ void Simulation::RunFrame(void) {
     }
 
     ResolveHits(this, pendingHitList);
+
+    // hits can make guys too
+    gatherEveryone(simGuys, everyone);
 
     if (replayingGameStateDump) {
         static bool firstFrame = true;
