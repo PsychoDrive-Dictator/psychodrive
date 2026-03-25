@@ -2383,7 +2383,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     getHitBoxes(&hitBoxes);
 
     for (auto const &hitbox : hitBoxes) {
-        if ((hitbox.type == hit || hitbox.type == projectile || hitbox.type == grab) && isProjectile && hitSpanFrames) {
+        if (isProjectile && hitSpanFrames && (hitbox.type == hit || hitbox.type == projectile || hitbox.type == grab)) {
             continue;
         }
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
@@ -3756,7 +3756,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
         wallStopped = false;
         wallStopFrames = false;
 
-        if (!isDomain && !isGrab) {
+        if (!isDomain && !isGrab && !isClash) {
             if (jimenBound && floorTime) {
                 int floorDestX = pHitEffect->floorDestX;
                 int floorDestY = pHitEffect->floorDestY;
