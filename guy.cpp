@@ -6427,6 +6427,11 @@ void Guy::DoShotKey(Action *pAction, int frameID)
                 log(logUnknowns, "shotkey despawn but no parent?");
             }
             die = true;
+        } else if (shotKey.operation == 1) {
+            // todo do we need to match by action id here or just blast everything?
+            for (auto & shot : getMinions()) {
+                shot->die = true;
+            }
         } else {
             Fixed posOffsetX = shotKey.posOffsetX * direction;
             Fixed posOffsetY = shotKey.posOffsetY;
