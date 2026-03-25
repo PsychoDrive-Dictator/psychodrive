@@ -75,6 +75,7 @@ if compiler_id == 'emscripten'
   add_global_link_arguments('-sFORCE_FILESYSTEM', language : 'cpp')
 #  add_global_link_arguments('-sMAIN_MODULE=2', language : 'cpp')
   add_global_link_arguments('-sALLOW_MEMORY_GROWTH', language : 'cpp')
+  add_global_link_arguments('-sMAXIMUM_MEMORY=4294967296', language : 'cpp')
   add_global_link_arguments('-sNO_DISABLE_EXCEPTION_CATCHING', language : 'cpp')
   add_global_link_arguments('-sEXPORTED_FUNCTIONS=_main,_jsLog,_jsCharLoadCallback,_jsModalDropDownSelection', language : 'cpp')
   add_global_link_arguments('-sEXPORTED_RUNTIME_METHODS=ccall,cwrap', language : 'cpp')
