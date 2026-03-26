@@ -639,6 +639,9 @@ static void mainloop(void)
 
             ResolveHits(&defaultSim, pendingHitList);
 
+            // any hit spawns
+            gatherEveryone(guys, defaultSim.everyone);
+
             static bool hasAddedData = false;
             // update plot range if we're doing that
             if (guys.size() > 0 ) {

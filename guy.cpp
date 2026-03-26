@@ -602,7 +602,7 @@ void Guy::RunFramePostPush(void)
 
 
 
-    DoShotKey(pCurrentAction, currentFrame);
+    DoShotKey(pCurrentAction, currentFrame, true);
 
     if (touchedWall && pushBackThisFrame != Fixed(0) && pOpponent && pOpponent->reflectThisFrame == Fixed(0)) {
         pOpponent->deferredReflect = true;
@@ -4726,6 +4726,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         return true;
     }
 
+    if (isProjectile && spawnedPostHit) {
+        spawnedPostHit = false;
+        return true; // skip this one
+    }
+
     bool doTriggers = true;
     if (jumpLandingDisabledFrames) {
         doTriggers = false;
@@ -6406,7 +6411,7 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
     }
 }
 
-void Guy::DoShotKey(Action *pAction, int frameID)
+void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
 {
     if (!pAction) {
         return;
@@ -6464,6 +6469,9 @@ void Guy::DoShotKey(Action *pAction, int frameID)
                 pParent->dc.minions.push_back(pNewGuy);
             } else {
                 dc.minions.push_back(pNewGuy);
+            }
+            if (!preHit) {
+                pNewGuy->spawnedPostHit = true;
             }
         }
     }

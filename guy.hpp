@@ -401,6 +401,7 @@ public:
         superLevel = parent.superLevel;
 
         isProjectile = isProj;
+
         projHitCount = -1; // unset yet, is in the first action
         if (parent.pParent) {
             pParent = parent.pParent;
@@ -459,7 +460,7 @@ private:
     void DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset = Fixed(0));
     void DoWorldKey();
     void DoLockKey();
-    void DoShotKey(Action *pAction, int frameID);
+    void DoShotKey(Action *pAction, int frameID, bool preHit = false);
     void DoFocusRegen();
 
     void DoInstantAction(int actionID);
@@ -579,6 +580,7 @@ private:
         logResources = false;
         deniedLastBranch = false;
         isProjectile = false;
+        spawnedPostHit = false;
         projHitCount = 0;
         projLifeTime = 0;
         projDataInitialized = false;
@@ -831,6 +833,7 @@ private:
     bool logResources : 1;
     bool deniedLastBranch : 1;
     bool isProjectile : 1;
+    bool spawnedPostHit : 1;
     bool projDataInitialized : 1;
     bool die : 1;
     bool noPush : 1;

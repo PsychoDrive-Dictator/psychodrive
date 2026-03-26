@@ -259,7 +259,7 @@ void renderComboMeter(bool rightSpot, int comboHits, int comboDamage, int scalin
 //     drawActionTimelineKeys(pAction, "TriggerKey", pTriggerGroups);
 // }
 
-void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
+void drawGuyStatusWindow(const char *windowName, Guy *pGuy, Simulation *pSim = nullptr)
 {
     //drawActionTimeline(pGuy->getName()->c_str(), pGuy->getVersion(), pGuy->getActionName().c_str());
 
@@ -284,13 +284,14 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     std::map<int, Guy *> mapDropDownIDToGuyPtr;
     mapDropDownIDToGuyPtr[0] = nullptr;
     int guyID = 1, newOpponentID = 0;
-    for (auto guy : guys) {
+    for (auto guy : pSim ? pSim->simGuys : guys) {
         if (guy == pGuy) {
             continue;
         }
         vecGuyNames.push_back( guy->getName() );
         mapDropDownIDToGuyPtr[guyID++] = guy;
     }
+    guyID = 0;
     for (auto [ i, guy ] : mapDropDownIDToGuyPtr ) {
         if (guy == pGuy->getOpponent()) {
             guyID = i;
@@ -420,7 +421,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy)
     int minionID = 1;
     for (auto minion : pGuy->getMinions() ) {
         std::string minionWinName = std::string(windowName) + "'s Minion " + std::to_string(minionID++);
-        drawGuyStatusWindow(minionWinName.c_str(), minion);
+        drawGuyStatusWindow(minionWinName.c_str(), minion, pSim);
     }
 
     if (guys.size() >= 2 && (pGuy == guys[0] || pGuy == guys[1]) && pGuy->getOpponent() && pGuy->getOpponent()->getComboHits()) {
@@ -1787,6 +1788,15 @@ void SimulationController::RenderUI(void)
             emscripten_vibrate(3);
         }
 #endif
+
+        int guyID = 1;
+        Simulation *pSim = simController.getSnapshotAtFrame(simController.scrubberFrame);
+        if (pSim) {
+            for (Guy *pGuy : pSim->simGuys) {
+                std::string windowName = "Guy " + std::to_string(guyID++);
+                drawGuyStatusWindow( windowName.c_str(), pGuy, pSim );
+            }
+        }
     }
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
