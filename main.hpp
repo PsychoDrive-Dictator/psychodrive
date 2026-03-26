@@ -159,6 +159,7 @@ extern bool oneframe;
 extern int runUntilFrame;
 extern bool lockCamera;
 extern bool toggleRenderUI;
+extern bool toggleDebugUI;
 
 extern bool saveState;
 extern bool restoreState;

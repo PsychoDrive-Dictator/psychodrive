@@ -274,6 +274,7 @@ bool oneframe = false;
 int runUntilFrame = 0;
 bool lockCamera = true;
 bool toggleRenderUI = true;
+bool toggleDebugUI = false;
 
 bool saveState = false;
 bool restoreState = false;

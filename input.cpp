@@ -266,6 +266,9 @@ void updateInputs(int sizeX, int sizeY)
                 case SDLK_F8:
                     limitRate = !limitRate;
                     break;
+                case SDLK_F12:
+                    toggleDebugUI = !toggleDebugUI;
+                    break;
                 case SDLK_r:
                     recordingInput = !recordingInput;
                     if (recordingInput == true) {

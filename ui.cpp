@@ -1789,12 +1789,14 @@ void SimulationController::RenderUI(void)
         }
 #endif
 
-        int guyID = 1;
-        Simulation *pSim = simController.getSnapshotAtFrame(simController.scrubberFrame);
-        if (pSim) {
-            for (Guy *pGuy : pSim->simGuys) {
-                std::string windowName = "Guy " + std::to_string(guyID++);
-                drawGuyStatusWindow( windowName.c_str(), pGuy, pSim );
+        if (toggleDebugUI) {
+            int guyID = 1;
+            Simulation *pSim = simController.getSnapshotAtFrame(simController.scrubberFrame);
+            if (pSim) {
+                for (Guy *pGuy : pSim->simGuys) {
+                    std::string windowName = "Guy " + std::to_string(guyID++);
+                    drawGuyStatusWindow( windowName.c_str(), pGuy, pSim );
+                }
             }
         }
     }
