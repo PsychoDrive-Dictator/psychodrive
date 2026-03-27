@@ -3150,6 +3150,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_shinra",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 322,
+                "firstFrame": 586,
+                "lastFrame": 746
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 45,
+                "firstFrame": 587,
+                "lastFrame": 631
+            },
+            {
+                "count": 30,
+                "firstFrame": 602,
+                "lastFrame": 631
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 662,
+                "lastFrame": 663
+            }
+        ]
+    },
+    {
         "testName": "alex_input_branches",
         "testVersion": "40",
         "finished": true,
