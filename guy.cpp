@@ -5684,7 +5684,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         actionStatus = 0;
         jumpStatus = 0;
         landingAdjust = 0;
-        DoStatusKey(true);
+        DoStatusKey();
     }
 }
 

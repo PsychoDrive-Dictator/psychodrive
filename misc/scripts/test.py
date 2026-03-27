@@ -185,25 +185,25 @@ for char in characters:
     #                 print(char + " " + moveID + " " + key)
 
     # find ShotKey operations
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "ShotKey" in move:
-            for key in move["ShotKey"]:
-                if isinstance(move["ShotKey"][key], dict) and "Operation" in move["ShotKey"][key]:
-                    shotKey = move["ShotKey"][key]
-                    if shotKey["Operation"] > 0:
-                        print(char + " " + moveID + " ShotKey Operation " + str(shotKey["Operation"]))
-
-    # find certain StatusKey Side bits
     # for moveID in moves21Json:
     #     move = moves21Json[moveID]
-    #     if "StatusKey" in move:
-    #         for key in move["StatusKey"]:
-    #             if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
-    #                 statusKey = move["StatusKey"][key]
-    #                 if statusKey["Side"] == 1:
-    #                     print(char + " " + moveID + " StatusKey Side " + str(statusKey["Side"]) + " frames " + str(statusKey["_StartFrame"]) +
-    #                           "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
+    #     if "ShotKey" in move:
+    #         for key in move["ShotKey"]:
+    #             if isinstance(move["ShotKey"][key], dict) and "Operation" in move["ShotKey"][key]:
+    #                 shotKey = move["ShotKey"][key]
+    #                 if shotKey["Operation"] > 0:
+    #                     print(char + " " + moveID + " ShotKey Operation " + str(shotKey["Operation"]))
+
+    # find certain StatusKey Side bits
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "StatusKey" in move:
+            for key in move["StatusKey"]:
+                if isinstance(move["StatusKey"][key], dict) and "Side" in move["StatusKey"][key]:
+                    statusKey = move["StatusKey"][key]
+                    if statusKey["Side"] == 8:
+                        print(char + " " + moveID + " StatusKey Side " + str(statusKey["Side"]) + " frames " + str(statusKey["_StartFrame"]) +
+                              "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
 
     # find certain SwitchKey OperationFlag bits
     # for moveID in moves21Json:
