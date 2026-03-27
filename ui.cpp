@@ -833,7 +833,7 @@ void CharacterUIController::renderCharSetup(void)
     ImGui::SameLine();
     if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 35)) {
         simInputsChanged = true;
-        timelineTriggers.clear();
+        // todo some actino ids might not match - make stitching code to find by name if needed?
     }
 
     if (gameMode == ComboMaker) {
