@@ -6296,9 +6296,11 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                             if (superLock) {
                                 //log(true, "was super lock");
                                 posX = groundBounceVelX - prevPosOffset * direction;
+                                lastPosX = getPosX(); // todo should something else make it ignore screen push?
                                 //posY = groundBounceVelY;
                                 if (pOpponent && pOpponent->locked) {
                                     pOpponent->posX = posX;
+                                    pOpponent->lastPosX = pOpponent->getPosX();
                                     //pOpponent->posY = posY;
                                 }
                                 groundBounceVelX = Fixed(0);
