@@ -2730,6 +2730,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (pOpponent) {
             HitEntry *pEntry = &pCharData->hitByID[pendingUnlockHit]->common[0];
             if (pendingUnlockHitDelayed || pEntry->floorTime == 0) {
+                pOpponent->ApplyHitEffectOnResources(pEntry, this, true);
                 pOpponent->ApplyHitEffect(pEntry, this, true, false, false, false);
                 // clamp
                 pOpponent->setFocus(pOpponent->focus);
@@ -3046,6 +3047,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 clonedEntry.moveTime = hitBox.pHitData->param[newHitFlag].moveTime;
                 pHitEntry = &clonedEntry;
             }
+            pOtherGuy->ApplyHitEffectOnResources(pHitEntry, pGuy, applyHit);
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, false, &hurtBox);
 
             if (pendingHit.parried) {
@@ -3336,7 +3338,183 @@ void Guy::ApplyUniqueBoxOps(UniqueBox &box, Guy *src)
     }
 }
 
-void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, bool isGrab, bool isDrive, bool isDomain, bool isTrade, bool isClash, HurtBox *pHurtBox)
+void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool applyHit)
+{
+    int dmgValue = pHitEffect->dmgValue;
+    int attr1 = pHitEffect->attr1;
+
+    setAttacker(attacker);
+    int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
+
+    if (applyHit && dmgValue) {
+        if ((comboHits == 0 || comboDamage == 0) && !stunned) {
+            currentScaling = 100;
+            pendingScaling = 0;
+        }
+
+        bool applyScaling = !pAttacker->appliedScaling;
+
+        if (pendingScaling && applyScaling) {
+            currentScaling -= pendingScaling;
+            log(logHits, "applied " + std::to_string(pendingScaling) + " pending scaling current" + std::to_string(currentScaling));
+            pendingScaling = 0;
+        }
+
+        if (applyScaling) {
+            if (comboHits == 0 && !stunned) {
+                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
+                pendingScaling += attackerInstantScale;
+            } else {
+                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->comboScale : 10;
+                pendingScaling += attackerInstantScale;
+                if (currentScaling == 100) {
+                    pendingScaling += 10;
+                }
+            }
+            log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
+        }
+
+        Guy *pResourceGuy = pAttacker->pParent ? pAttacker->pParent : pAttacker;
+        if (pResourceGuy->triggerSuperGainScaling < superGainScaling) {
+            superGainScaling = pResourceGuy->triggerSuperGainScaling;
+        }
+        for (Guy *pResourceMinion : pResourceGuy->getMinions()) {
+            if (pResourceMinion->triggerSuperGainScaling < superGainScaling) {
+                superGainScaling = pResourceMinion->triggerSuperGainScaling;
+            }
+        }
+
+        if (pAttacker->scalingTriggerID != lastScalingTriggerID && !applyScaling) {
+            // the combo has moved past that attack, so the instant scale is baked in
+            attackerInstantScale = 0;
+        }
+        pAttacker->appliedScaling = true;
+        if (applyScaling) {
+            lastScalingTriggerID = pAttacker->scalingTriggerID;
+        }
+        if (pAttacker->isProjectile && pAttacker->pParent) {
+            if (pAttacker->pParent->scalingTriggerID == pAttacker->scalingTriggerID) {
+                pAttacker->pParent->appliedScaling = true;
+            }
+            for (Guy *pAttackerSibling : pAttacker->pParent->getMinions()) {
+                if (pAttackerSibling->scalingTriggerID == pAttacker->scalingTriggerID) {
+                    pAttackerSibling->appliedScaling = true;
+                }
+            }
+        }
+        for (Guy *pAttackerMinion : pAttacker->getMinions()) {
+            if (pAttackerMinion->scalingTriggerID == pAttacker->scalingTriggerID) {
+                pAttackerMinion->appliedScaling = true;
+            }
+        }
+    }
+
+    int effectiveScaling = currentScaling - attackerInstantScale;
+
+    if (effectiveScaling < 10) {
+        effectiveScaling = 10;
+    }
+
+    StyleData &attackerStyleData = pAttacker->pCharData->styles[pAttacker->styleInstall];
+    effectiveScaling = effectiveScaling * attackerStyleData.attackScale / 100;
+
+    if (driveScaling) {
+        effectiveScaling = effectiveScaling * 85 / 100;
+    }
+    if (perfectScaling) {
+        effectiveScaling = effectiveScaling * 50 / 100;
+    }
+
+    if (pAttacker->superAction) {
+        if (pAttacker->superLevel == 1 && effectiveScaling < 30) {
+            effectiveScaling = 30;
+        }
+        if (pAttacker->superLevel == 2 && effectiveScaling < 40) {
+            effectiveScaling = 40;
+        }
+        if (pAttacker->superLevel == 3 && effectiveScaling < 50) {
+            effectiveScaling = 50;
+        }
+    }
+
+    int moveDamage = dmgValue * effectiveScaling / 100;
+    int prevHealth = health;
+    health -= moveDamage;
+    if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
+        health = 0;
+    }
+    recoverableHealth = 0;
+    log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
+
+    if (health < 0) {
+        if (prevHealth && attr1 & (1<<4)) {
+            health = 1;
+            alreadyDeadButDoesNotKnow = true;
+        } else {
+            health = 0;
+        }
+    }
+
+    // todo if health 0 mark finish here?
+
+    if (moveDamage > 0) {
+        // look for minions to delete on damage
+        for (auto &minion: getMinions()) {
+            if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
+                minion->die = true;
+            }
+        }
+
+        comboDamage += moveDamage;
+        lastDamageScale = effectiveScaling;
+
+        DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
+    }
+
+    int scaledFocusGain = pHitEffect->focusGainTarget;
+    if (!parrying && (!burnout || scaledFocusGain > 0)) {
+        if (perfectScaling && scaledFocusGain < 0) {
+            scaledFocusGain = scaledFocusGain * 50 / 100;
+        }
+        focus += scaledFocusGain;
+        log(logResources, "focus " + std::to_string(scaledFocusGain) + " (hit), total " + std::to_string(focus));
+        if (scaledFocusGain < 0 && !superFreeze) {
+            // todo apparently start of hitstun except if super where it's after??
+            if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
+                focusRegenCooldown++; // it freezes for one frame but doesn't apply
+            }
+            log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
+        }
+    }
+    int scaledSuperGain = pHitEffect->superGainTarget;
+    if (perfectScaling) {
+        scaledSuperGain = scaledSuperGain * 80 / 100;
+    }
+    scaledSuperGain = scaledSuperGain * pCharData->styles[styleInstall].gaugeGainRatio / 100;
+    gauge += scaledSuperGain;
+
+    Guy *pResourceGuy = pAttacker;
+    if (pAttacker->isProjectile) {
+        pResourceGuy = pAttacker->pParent;
+    }
+    // set resources directly, will be clamped by caller, for trades
+    if (!pResourceGuy->driveRushCancel && !driveScaling) {
+        scaledFocusGain = pHitEffect->focusGainOwn;
+        if (perfectScaling) {
+            scaledFocusGain = scaledFocusGain * 50 / 100;
+        }
+        pResourceGuy->focus += scaledFocusGain;
+    }
+    StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
+    scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
+    if (perfectScaling) {
+        scaledSuperGain = scaledSuperGain * 80 / 100;
+    }
+    scaledSuperGain = scaledSuperGain * superGainScaling / 100;
+    pResourceGuy->gauge += scaledSuperGain;
+}
+
+void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool isGrab, bool isDrive, bool isDomain, bool isTrade, bool isClash, HurtBox *pHurtBox)
 {
     int comboAdd = pHitEffect->comboAdd;
     int juggleFirst = pHitEffect->juggleFirst;
@@ -3345,7 +3523,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     int destX = pHitEffect->moveDestX;
     int destY = pHitEffect->moveDestY;
     int destTime = pHitEffect->moveTime;
-    int dmgValue = pHitEffect->dmgValue;
     int dmgType = pHitEffect->dmgType;
     int moveType = pHitEffect->moveType;
     int floorTime = pHitEffect->floorTime;
@@ -3385,7 +3562,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
     frontDamage = attr3 & (1<<2);
     backDamage = attr3 & (1<<3);
 
-    pAttacker = attacker;
+    setAttacker(attacker);
 
     if (useParentDirection && attacker->pParent) {
         // for the purpose of checking direction below
@@ -3539,177 +3716,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy* attacker, bool applyHit, boo
             kabeBound = false;
             kabeTataki = false;
         }
-    }
-
-    int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
-
-    if (applyHit && dmgValue) {
-        if ((comboHits == 0 || comboDamage == 0) && !stunned) {
-            currentScaling = 100;
-            pendingScaling = 0;
-        }
-
-        bool applyScaling = !pAttacker->appliedScaling;
-
-        if (pendingScaling && applyScaling) {
-            currentScaling -= pendingScaling;
-            log(logHits, "applied " + std::to_string(pendingScaling) + " pending scaling current" + std::to_string(currentScaling));
-            pendingScaling = 0;
-        }
-
-        if (applyScaling) {
-            if (comboHits == 0 && !stunned) {
-                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
-                pendingScaling += attackerInstantScale;
-            } else {
-                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->comboScale : 10;
-                pendingScaling += attackerInstantScale;
-                if (currentScaling == 100) {
-                    pendingScaling += 10;
-                }
-            }
-            log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
-        }
-
-        Guy *pResourceGuy = pAttacker->pParent ? pAttacker->pParent : pAttacker;
-        if (pResourceGuy->triggerSuperGainScaling < superGainScaling) {
-            superGainScaling = pResourceGuy->triggerSuperGainScaling;
-        }
-        for (Guy *pResourceMinion : pResourceGuy->getMinions()) {
-            if (pResourceMinion->triggerSuperGainScaling < superGainScaling) {
-                superGainScaling = pResourceMinion->triggerSuperGainScaling;
-            }
-        }
-
-        if (pAttacker->scalingTriggerID != lastScalingTriggerID && !applyScaling) {
-            // the combo has moved past that attack, so the instant scale is baked in
-            attackerInstantScale = 0;
-        }
-        pAttacker->appliedScaling = true;
-        if (applyScaling) {
-            lastScalingTriggerID = pAttacker->scalingTriggerID;
-        }
-        if (pAttacker->isProjectile && pAttacker->pParent) {
-            if (pAttacker->pParent->scalingTriggerID == pAttacker->scalingTriggerID) {
-                pAttacker->pParent->appliedScaling = true;
-            }
-            for (Guy *pAttackerSibling : pAttacker->pParent->getMinions()) {
-                if (pAttackerSibling->scalingTriggerID == pAttacker->scalingTriggerID) {
-                    pAttackerSibling->appliedScaling = true;
-                }
-            }
-        }
-        for (Guy *pAttackerMinion : pAttacker->getMinions()) {
-            if (pAttackerMinion->scalingTriggerID == pAttacker->scalingTriggerID) {
-                pAttackerMinion->appliedScaling = true;
-            }
-        }
-    }
-
-    int effectiveScaling = currentScaling - attackerInstantScale;
-
-    if (effectiveScaling < 10) {
-        effectiveScaling = 10;
-    }
-
-    StyleData &attackerStyleData = pAttacker->pCharData->styles[pAttacker->styleInstall];
-    effectiveScaling = effectiveScaling * attackerStyleData.attackScale / 100;
-
-    if (driveScaling) {
-        effectiveScaling = effectiveScaling * 85 / 100;
-    }
-    if (perfectScaling) {
-        effectiveScaling = effectiveScaling * 50 / 100;
-    }
-
-    if (pAttacker->superAction) {
-        if (pAttacker->superLevel == 1 && effectiveScaling < 30) {
-            effectiveScaling = 30;
-        }
-        if (pAttacker->superLevel == 2 && effectiveScaling < 40) {
-            effectiveScaling = 40;
-        }
-        if (pAttacker->superLevel == 3 && effectiveScaling < 50) {
-            effectiveScaling = 50;
-        }
-    }
-
-    if (!isClash) {
-        int moveDamage = dmgValue * effectiveScaling / 100;
-        int prevHealth = health;
-        health -= moveDamage;
-        if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
-            health = 0;
-        }
-        recoverableHealth = 0;
-        log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
-
-        if (health < 0) {
-            if (prevHealth && attr1 & (1<<4)) {
-                health = 1;
-                alreadyDeadButDoesNotKnow = true;
-            } else {
-                health = 0;
-            }
-        }
-
-        // todo if health 0 mark finish here?
-
-        if (moveDamage > 0) {
-            // look for minions to delete on damage
-            for (auto &minion: getMinions()) {
-                if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
-                    minion->die = true;
-                }
-            }
-
-            comboDamage += moveDamage;
-            lastDamageScale = effectiveScaling;
-
-            DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
-        }
-
-        int scaledFocusGain = pHitEffect->focusGainTarget;
-        if (!parrying && (!burnout || scaledFocusGain > 0)) {
-            if (perfectScaling && scaledFocusGain < 0) {
-                scaledFocusGain = scaledFocusGain * 50 / 100;
-            }
-            focus += scaledFocusGain;
-            log(logResources, "focus " + std::to_string(scaledFocusGain) + " (hit), total " + std::to_string(focus));
-            if (scaledFocusGain < 0 && !superFreeze) {
-                // todo apparently start of hitstun except if super where it's after??
-                if (!setFocusRegenCooldown(91) && !focusRegenCooldownFrozen) {
-                    focusRegenCooldown++; // it freezes for one frame but doesn't apply
-                }
-                log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
-            }
-        }
-        int scaledSuperGain = pHitEffect->superGainTarget;
-        if (perfectScaling) {
-            scaledSuperGain = scaledSuperGain * 80 / 100;
-        }
-        scaledSuperGain = scaledSuperGain * pCharData->styles[styleInstall].gaugeGainRatio / 100;
-        gauge += scaledSuperGain;
-
-        Guy *pResourceGuy = pAttacker;
-        if (pAttacker->isProjectile) {
-            pResourceGuy = pAttacker->pParent;
-        }
-        // set resources directly, will be clamped by caller, for trades
-        if (!pResourceGuy->driveRushCancel && !driveScaling) {
-            scaledFocusGain = pHitEffect->focusGainOwn;
-            if (perfectScaling) {
-                scaledFocusGain = scaledFocusGain * 50 / 100;
-            }
-            pResourceGuy->focus += scaledFocusGain;
-        }
-        StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
-        scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
-        if (perfectScaling) {
-            scaledSuperGain = scaledSuperGain * 80 / 100;
-        }
-        scaledSuperGain = scaledSuperGain * superGainScaling / 100;
-        pResourceGuy->gauge += scaledSuperGain;
     }
 
     if (applyHit) {
