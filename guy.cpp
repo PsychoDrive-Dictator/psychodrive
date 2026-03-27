@@ -5786,14 +5786,34 @@ void Guy::DoStatusKey(bool doSideOp)
                     switchDirection();
                 }
                 break;
+            case 2:
+                if (needsTurnaround(Fixed(0), innerDirection)) {
+                    switchInnerDirection();
+                }
+                break;
             case 3:
                 if (doSideOp) {
                     switchDirection();
                 }
                 break;
+            case 4:
+                if (doSideOp) {
+                    switchInnerDirection();
+                }
+                break;
             case 5:
                 if (pOpponent && direction != pOpponent->direction) {
                     switchDirection();
+                }
+                break;
+            case 6:
+                if (pOpponent && innerDirection != pOpponent->direction) {
+                    switchInnerDirection();
+                }
+                break;
+            case 8:
+                if (pOpponent && innerDirection == pOpponent->direction) {
+                    switchInnerDirection();
                 }
                 break;
             case 9:

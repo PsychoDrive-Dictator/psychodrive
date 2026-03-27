@@ -109,8 +109,12 @@ public:
     Fixed getLastPosY() { return lastPosY; }
     int getDirection() { return direction.i(); }
     int getCurrentInput() { return currentInput; }
+    void switchInnerDirection() {
+        innerDirection = innerDirection * Fixed(-1);
+    }
     void switchDirection() {
         direction = direction * Fixed(-1);
+        innerDirection = direction;
 
         // swap l/r in current input
         currentInput = invertDirection(currentInput);
@@ -353,6 +357,7 @@ public:
         posX = startPosX = lastPosX = x;
         posY = startPosY = lastPosY = y;
         direction = startDir;
+        innerDirection = direction;
         charColorR = color.r;
         charColorG = color.g;
         charColorB = color.b;
@@ -378,6 +383,7 @@ public:
         uniqueID = pSim->guyIDCounter++;
 
         direction = parent.direction;
+        innerDirection = direction;
         posX = parent.posX + parent.posOffsetX * direction + posOffsetX;
         posY = parent.posY + parent.posOffsetY + posOffsetY;
         lastPosX = posX;
@@ -593,6 +599,7 @@ private:
         posX = Fixed(0);
         posY = Fixed(0);
         direction = Fixed(1);
+        innerDirection = Fixed(1);
         lastDirection = Fixed(1);
         lastPosX = Fixed(0);
         lastPosY = Fixed(0);
@@ -959,6 +966,7 @@ private:
     Fixed posX;
     Fixed posY;
     Fixed direction;
+    Fixed innerDirection; // ??
     Fixed lastDirection;
 
     Fixed lastPosX;

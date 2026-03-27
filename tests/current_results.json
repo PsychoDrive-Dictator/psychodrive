@@ -4557,6 +4557,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "dictator_bugged_reverse",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 376,
+                "firstFrame": 189,
+                "lastFrame": 380
+            },
+            {
+                "count": 18,
+                "firstFrame": 189,
+                "lastFrame": 206
+            },
+            {
+                "count": 13,
+                "firstFrame": 193,
+                "lastFrame": 205
+            },
+            {
+                "count": 66,
+                "firstFrame": 188,
+                "lastFrame": 220
+            },
+            {
+                "count": 66,
+                "firstFrame": 188,
+                "lastFrame": 220
+            },
+            {
+                "count": 115,
+                "firstFrame": 188,
+                "lastFrame": 360
+            },
+            {
+                "count": 352,
+                "firstFrame": 188,
+                "lastFrame": 380
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 97,
+                "firstFrame": 188,
+                "lastFrame": 284
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 26,
+                "firstFrame": 188,
+                "lastFrame": 200
+            },
+            {
+                "count": 100,
+                "firstFrame": 188,
+                "lastFrame": 287
+            }
+        ]
+    },
+    {
         "testName": "dictator_corner_light_crusher",
         "testVersion": "26",
         "finished": true,
