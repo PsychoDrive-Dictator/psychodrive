@@ -333,7 +333,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy, Simulation *pSim = n
     Fixed posX, posY, posOffsetX, posOffsetY, velX, velY, accelX, accelY;
     pGuy->getPosDebug(posX, posY, posOffsetX, posOffsetY);
     pGuy->getVel(velX, velY, accelX, accelY);
-    ImGui::Text("pos %.2f %.2f %.2f direction %i posOffset %.2f %.2f", posX.f(), posY.f(), pGuy->getPosX().f(), pGuy->getDirection(), posOffsetX.f(), posOffsetY.f());
+    ImGui::Text("pos %.2f %.2f %.2f direction %i inner %i posOffset %.2f %.2f", posX.f(), posY.f(), pGuy->getPosX().f(), pGuy->getDirection(), pGuy->getInnerDirection(), posOffsetX.f(), posOffsetY.f());
     ImGui::Text("vel %f %f %f accel %f %f %f", velX.f(), velY.f(), pGuy->getHitVelX().f(), accelX.f(), accelY.f(), pGuy->getHitAccelX().f());
     if ( !pGuy->getOpponent() ) {
         ImGui::SameLine();

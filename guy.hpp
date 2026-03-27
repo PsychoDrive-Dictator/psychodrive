@@ -108,6 +108,7 @@ public:
     }
     Fixed getLastPosY() { return lastPosY; }
     int getDirection() { return direction.i(); }
+    int getInnerDirection() { return innerDirection.i(); }
     int getCurrentInput() { return currentInput; }
     void switchInnerDirection() {
         innerDirection = innerDirection * Fixed(-1);

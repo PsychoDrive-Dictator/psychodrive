@@ -2425,7 +2425,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 continue;
             }
             Fixed posDiff = pOtherGuy->getPosX() - getPosX();
-            posDiff *= getDirection();
+            if (pCharData->charVersion >= 40) {
+                posDiff *= getInnerDirection();
+            } else {
+                posDiff *= getDirection();
+            }
             if (posDiff > Fixed(0)) {
                 if (hitbox.flags & only_hits_behind) {
                     continue;
@@ -5347,6 +5351,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (canMoveNow) {
         perfectScaling = false;
+        innerDirection = direction;
     }
 
     if (canMoveNow && wasHit) {
