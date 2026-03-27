@@ -3038,16 +3038,31 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             if (applyHit && !pendingHit.parried) {
                 pOtherGuy->parrying = false;
             }
+            bool otherGuyWasBurnout = pOtherGuy->burnout;
+            pOtherGuy->ApplyHitEffectOnResources(pHitEntry, pGuy, applyHit);
             HitEntry clonedEntry;
+            bool justBurnedOutFromBlockedHit = false;
+            // todo can there be a trade there where the other hits regain enough focus to not burn out?
+            if (pOtherGuy->focus < 0 && !otherGuyWasBurnout && hitEntryFlag & block) {
+                int newHitFlag = hitEntryFlag & ~block;
+                newHitFlag |= special;
+                pHitEntry = &hitBox.pHitData->param[newHitFlag];
+                hitEntryFlag = newHitFlag;
+                justBurnedOutFromBlockedHit = true;
+            }
             if (hitEntryFlag & special && !(hitEntryFlag & counter)) {
                 // stupid, but apparently burnout block takes pushback value from normal block???
                 int newHitFlag = hitEntryFlag & ~special;
                 newHitFlag |= block;
                 clonedEntry = *pHitEntry;
                 clonedEntry.moveTime = hitBox.pHitData->param[newHitFlag].moveTime;
+                clonedEntry.moveDestX = hitBox.pHitData->param[newHitFlag].moveDestX;
+                if (justBurnedOutFromBlockedHit) {
+                    // no hitstun penalty yet ?
+                    clonedEntry.hitStun = hitBox.pHitData->param[newHitFlag].hitStun;
+                }
                 pHitEntry = &clonedEntry;
             }
-            pOtherGuy->ApplyHitEffectOnResources(pHitEntry, pGuy, applyHit);
             pOtherGuy->ApplyHitEffect(pHitEntry, pGuy, applyHit, pGuy->grabbedThisFrame, pGuy->wasDrive, hitBox.type == domain, trade, false, &hurtBox);
 
             if (pendingHit.parried) {
