@@ -2547,6 +2547,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_v40_parry_buffer_bug",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 490,
+                "firstFrame": 183,
+                "lastFrame": 1011
+            },
+            {
+                "count": 81,
+                "firstFrame": 932,
+                "lastFrame": 1012
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 288,
+                "firstFrame": 166,
+                "lastFrame": 908
+            },
+            {
+                "count": 288,
+                "firstFrame": 166,
+                "lastFrame": 908
+            },
+            {
+                "count": 166,
+                "firstFrame": 166,
+                "lastFrame": 1062
+            },
+            {
+                "count": 273,
+                "firstFrame": 918,
+                "lastFrame": 1176
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 67,
+                "firstFrame": 249,
+                "lastFrame": 980
+            }
+        ]
+    },
+    {
         "testName": "aa_wakeups",
         "testVersion": "39",
         "finished": true,
