@@ -2614,6 +2614,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_v40_parry_buffer_bug2",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1932,
+                "firstFrame": 77,
+                "lastFrame": 1042
+            },
+            {
+                "count": 224,
+                "firstFrame": 111,
+                "lastFrame": 1002
+            },
+            {
+                "count": 1,
+                "firstFrame": 833,
+                "lastFrame": 833
+            },
+            {
+                "count": 196,
+                "firstFrame": 67,
+                "lastFrame": 909
+            },
+            {
+                "count": 196,
+                "firstFrame": 67,
+                "lastFrame": 909
+            },
+            {
+                "count": 1036,
+                "firstFrame": 67,
+                "lastFrame": 1042
+            },
+            {
+                "count": 1139,
+                "firstFrame": 97,
+                "lastFrame": 1042
+            },
+            {
+                "count": 56,
+                "firstFrame": 834,
+                "lastFrame": 909
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 192,
+                "firstFrame": 834,
+                "lastFrame": 1042
+            },
+            {
+                "count": 345,
+                "firstFrame": 167,
+                "lastFrame": 738
+            },
+            {
+                "count": 370,
+                "firstFrame": 108,
+                "lastFrame": 1042
+            }
+        ]
+    },
+    {
         "testName": "aa_wakeups",
         "testVersion": "39",
         "finished": true,
