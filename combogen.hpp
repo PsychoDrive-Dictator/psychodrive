@@ -95,6 +95,7 @@ public:
 
     Simulation startSnapshot;
     std::map<int, ActionRef> startTimelineTriggers;
+    int startRecoveryTiming;
 
     bool playing = false;
     int playingRoute = 0;

@@ -169,6 +169,7 @@ public:
 
 
     int getComboHits() { return comboHits; }
+    int getRecoveryTiming() { return recoveryTiming; }
     int getJuggleCounter() { return juggleCounter; }
     int getHitStopForDump() { if (pendingHitStop) return pendingHitStop - 1; return std::max(0, hitStop - 1); }
     int getHitStop() { 

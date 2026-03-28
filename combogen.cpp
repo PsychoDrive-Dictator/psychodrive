@@ -188,7 +188,7 @@ void ComboWorker::WorkLoop(void) {
             // }
 
             // combo count has reset, end the search
-            if (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits) {
+            if (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits || pSim->simGuys[1]->getRecoveryTiming() != finder.startRecoveryTiming ) {
                 break;
             }
 
@@ -297,6 +297,8 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
             return item.first >= startFrame;
         });
     }
+
+    finder.startRecoveryTiming = finder.startSnapshot.simGuys[1]->getRecoveryTiming();
 
     finder.doLights = doLights;
     finder.doLateCancels = doLateCancels;
