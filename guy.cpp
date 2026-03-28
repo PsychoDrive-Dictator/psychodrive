@@ -3150,10 +3150,11 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             hitMarkerRadius = 30.0f;
         } else if (pGuy->hasBeenParriedThisFrame) {
             hitMarkerType = 2;
-            hitMarkerRadius = 60.0f;
+            hitMarkerRadius = pGuy->hasBeenPerfectParriedThisFrame ? 100.0f : 60.0f;
         } else if ((hitEntryFlag & punish_counter) == punish_counter) {
             hitMarkerRadius = 45.0f;
         }
+        int hitSeed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
         if (pGuy->pSim != &defaultSim) {
             FrameEvent event;
             event.type = FrameEvent::Hit;
@@ -3161,13 +3162,12 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             event.hitEventData.x = hitMarkerOffsetX;
             event.hitEventData.y = hitMarkerOffsetY;
             event.hitEventData.radius = hitMarkerRadius;
-            event.hitEventData.hitType = pGuy->hasBeenBlockedThisFrame ? 2 : 1;
-            event.hitEventData.seed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
+            event.hitEventData.hitType = hitMarkerType;
+            event.hitEventData.seed = hitSeed;
             event.hitEventData.dirX = pGuy->direction.f();
             event.hitEventData.dirY = 0.0f;
             pGuy->pSim->getCurrentFrameEvents().push_back(event);
         } else {
-            int hitSeed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
             addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
         }
 
