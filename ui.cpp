@@ -1545,6 +1545,10 @@ void SimulationController::RenderComboMinerSetup(void)
 {
     ImGui::Dummy(ImVec2(1000, 0));
 
+    if (ImGui::Button("Run!")) {
+        runComboFinder = true;
+    }
+    ImGui::SameLine();
     ImGui::Checkbox("Light normals", &comboFinderDoLights);
     ImGui::SameLine();
     ImGui::Checkbox("Late cancels", &comboFinderDoLateCancels);
@@ -1552,14 +1556,11 @@ void SimulationController::RenderComboMinerSetup(void)
     ImGui::Checkbox("Walk", &comboFinderDoWalk);
     ImGui::SameLine();
     ImGui::Checkbox("Karas", &comboFinderDoKaras);
-    if (ImGui::Button("Run!")) {
-        runComboFinder = true;
-    }
 
     if (finder.running || finder.totalFrames > 0) {
         ImGui::Separator();
         ImGui::Text("threads: %d", finder.threadCount);
-
+        ImGui::SameLine();
         uint64_t currentTotalFrames = finder.totalFrames;
         if (finder.running) {
             currentTotalFrames = 0;
@@ -1571,10 +1572,12 @@ void SimulationController::RenderComboMinerSetup(void)
         uint64_t fps = finder.running ? finder.currentFPS : finder.finalFPS;
 
         ImGui::Text("frames: %s", formatWithCommas(currentTotalFrames).c_str());
+        ImGui::SameLine();
         ImGui::Text("fps: %s", formatWithCommas(fps).c_str());
     }
 
     int routeCount = 0;
+    ImGui::PushFont(font);
     if (finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("Top routes:");
@@ -1619,6 +1622,7 @@ void SimulationController::RenderComboMinerSetup(void)
             ImGui::TextWrapped("%s", routeStr.c_str());
         }
     }
+    ImGui::PopFont();
 }
 
 void SimulationController::RenderUI(void)
