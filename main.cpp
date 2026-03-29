@@ -470,7 +470,6 @@ static void mainloop(void)
     if (gameMode != Training) {
         setRenderState(clearColor, sizeX, sizeY);
         int curFrame = simController.scrubberFrame; // before ui changes it
-        renderUI(io->Framerate, &logQueue, sizeX, sizeY);
         if (simInputsChanged && simController.NewSim()) {
             simController.AdvanceUntilComplete();
             // in case it got clamped
@@ -525,12 +524,13 @@ static void mainloop(void)
 
                 float vertFovRad = 2.0 * atanf( tanf( ( fov * std::numbers::pi / 180.0 ) / 2.0 ) * ((float)sizeY / (float)sizeX) );
                 // we want to see a point 25 units below the chars to clearly see their feet
-                float zoomToFitFloor = (translateY + 75.0) / tanf( vertFovRad / 2.0 );
+                float zoomToFitFloor = (translateY + 150.0) / tanf( vertFovRad / 2.0 );
 
                 zoom = fmax( zoomToFitGuys, zoomToFitFloor );
                 zoom = fmax( zoom, 250.0f );
             }
         }
+        renderUI(io->Framerate, &logQueue, sizeX, sizeY);
     } else {
         if (recordingInput) {
             recordedInput.push_back(currentInputMap[keyboardID]);

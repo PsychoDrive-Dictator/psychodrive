@@ -48,7 +48,7 @@ float grid(float dist)
 
 void main() {
     color = in_color;
-    boxalpha = color.a;
+    //boxalpha = color.a;
 
     if (isGrid == 1) {
         float edgealpha = boxalpha;
@@ -227,5 +227,5 @@ void main() {
     edgealpha = max(edgealpha, edge(abs(vertex_pos.z - offset.z)));
     edgealpha = max(edgealpha, edge( abs(vertex_pos.z - (offset.z+size.z))));
 
-    color.a = edgealpha;
+    color.a = edgealpha * color.a;
 }

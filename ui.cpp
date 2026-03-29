@@ -1541,23 +1541,36 @@ void SimulationController::doFrameMeterDrag(void)
     }
 }
 
+static bool showResults = true;
+
 void SimulationController::RenderComboMinerSetup(void)
 {
     ImGui::Dummy(ImVec2(800, 0));
 
     ImGui::PushFont(font);
-    if (ImGui::Button("Run!")) {
-        runComboFinder = true;
+    if (finder.running) {
+        if (ImGui::Button("Stop")) {
+            stopComboFinder();
+        }
+    } else {
+        if (ImGui::Button("Run!")) {
+            runComboFinder = true;
+        }
     }
-    ImGui::SameLine();
-    ImGui::Checkbox("Light normals", &comboFinderDoLights);
-    ImGui::SameLine();
-    ImGui::Checkbox("Late cancels", &comboFinderDoLateCancels);
-    ImGui::SameLine();
-    ImGui::Checkbox("Walk", &comboFinderDoWalk);
-    ImGui::SameLine();
-    ImGui::Checkbox("Karas", &comboFinderDoKaras);
-
+    if (finder.doneRoutes.size()) {
+        ImGui::SameLine();
+        if (ImGui::Button("Toggle Results")) {
+            showResults = !showResults;
+        }
+    }
+    if (!finder.running) {
+        ImGui::Checkbox("Late cancels", &comboFinderDoLateCancels);
+        ImGui::SameLine();
+        ImGui::Checkbox("Walk", &comboFinderDoWalk);
+        ImGui::Checkbox("Light normals", &comboFinderDoLights);
+        ImGui::SameLine();
+        ImGui::Checkbox("Karas", &comboFinderDoKaras);
+    }
     if (finder.running || finder.totalFrames > 0) {
         ImGui::Separator();
         ImGui::Text("threads: %d", finder.threadCount);
@@ -1604,7 +1617,7 @@ void SimulationController::RenderComboMinerSetup(void)
         }
     }
 
-    if (finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
+    if (showResults && finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("%lu routes:", finder.doneRoutes.size());
         if (finder.doneRoutes.size() >= routesToDisplay) {
@@ -1677,7 +1690,7 @@ void SimulationController::RenderComboMinerSetup(void)
         }
     }
 
-    if (finder.running && finder.recentRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
+    if (showResults && finder.running && finder.recentRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("Recent routes:");
 
@@ -1707,6 +1720,11 @@ void SimulationController::RenderUI(void)
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.05));
 
+    bool opaqueWindow = false;
+    if (viewSelect == 4 && showResults && finder.doneRoutes.size()) {
+        opaqueWindow = true;
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0,1.0,1.0,0.10));
+    }
     if (gameMode != Training) {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2(0, 0));
@@ -1735,6 +1753,9 @@ void SimulationController::RenderUI(void)
             ImGui::Text("%s", strComboInfo.c_str());
         }
         ImGui::End();
+    }
+    if (opaqueWindow) {
+        ImGui::PopStyleColor();
     }
 
     // Top right panel
@@ -1831,8 +1852,10 @@ void SimulationController::RenderUI(void)
         return;
     }
 
-    for (int i = 0; i < charCount; i++) {
-        charControllers[i].RenderUI();
+    if (!opaqueWindow) {
+        for (int i = 0; i < charCount; i++) {
+            charControllers[i].RenderUI();
+        }
     }
 
     if (simFrameCount) {

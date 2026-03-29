@@ -1810,7 +1810,7 @@ void Guy::getUniqueBoxes(std::vector<UniqueBox> *pOutHitBoxes, std::vector<Rende
 }
 
 
-void Guy::Render(float z /* = 0.0f */, bool showDomain) {
+void Guy::Render(float a /* = 1.0f */, bool showDomain) {
     Fixed fixedX = posX + (posOffsetX * direction);
     Fixed fixedY = posY + posOffsetY;
     float x = fixedX.f();
@@ -1823,21 +1823,21 @@ void Guy::Render(float z /* = 0.0f */, bool showDomain) {
     getUniqueBoxes(nullptr, &renderBoxes);
 
     for (auto box : renderBoxes) {
-        drawHitBox(box.box,thickboxes?box.thickness:1,z,box.col,box.drive,box.parry,box.di);
+        drawHitBox(box.box,thickboxes?box.thickness:1,0.0,box.col,box.drive,box.parry,box.di,a);
     }
 
-    if (renderPositionAnchors) {
+    if (renderPositionAnchors && a == 1.0f) {
         float radius = 6.0;
         float thickness = thickboxes?radius:1;
-        drawBox(x-radius/2,y-radius/2,radius,radius,thickness,z,charColorR,charColorG,charColorB,0.2);
+        drawBox(x-radius/2,y-radius/2,radius,radius,thickness,0.0,charColorR,charColorG,charColorB,1.0);
         // radius = 5.0;
         // drawBox(x-radius/2,y-radius/2,radius,radius,thickness,1.0,1.0,1.0,0.2);
 
         // meters
         if (!isProjectile) {
-            drawBox(x - 35.0, y - 1.0, focus / float(maxFocus) * 30.0, 3.0, 1.0, z, !burnout ? 0.20 : 0.7, !burnout ? 0.80 : 0.7, !burnout ? 0.0 : 0.7, 0.2);
-            drawBox(x + 5.0, y - 1.0, gauge / float(pCharData->gauge) * 30.0, 3.0, 1.0, z, 0.0, 0.80, 0.80, 0.2);
-            drawBox(x - 35.0, y + 5.0, health / float(pCharData->vitality) * 70.0, 3.0, 1.0, z, 0.9, health > 2500 ? 0.90 : 0.0, health > 2500 ? 0.90 : 0.0, 0.2);
+            drawBox(x - 35.0, y - 1.0, focus / float(maxFocus) * 30.0, 3.0, 1.0, 0.0, !burnout ? 0.20 : 0.7, !burnout ? 0.80 : 0.7, !burnout ? 0.0 : 0.7, 1.0);
+            drawBox(x + 5.0, y - 1.0, gauge / float(pCharData->gauge) * 30.0, 3.0, 1.0, 0.0, 0.0, 0.80, 0.80, 1.0);
+            drawBox(x - 35.0, y + 5.0, health / float(pCharData->vitality) * 70.0, 3.0, 1.0, 0.0, 0.9, health > 2500 ? 0.90 : 0.0, health > 2500 ? 0.90 : 0.0, 1.0);
         }
     }
 }

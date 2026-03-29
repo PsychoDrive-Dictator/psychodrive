@@ -374,6 +374,46 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.running = true;
 }
 
+void stopComboFinder(void)
+{
+    for (auto worker : finder.workerPool) {
+        worker->kill = true;
+    }
+
+    for (auto worker : finder.workerPool) {
+        worker->thread.join();
+        finder.totalFrames += worker->framesProcessed;
+        finder.doneRoutes.merge(worker->doneRoutes);
+        delete worker;
+    }
+    finder.workerPool.clear();
+
+    std::stringstream formattedTotalFrames;
+    std::stringstream formattedFPS;
+
+    struct my_numpunct : std::numpunct<char> {
+        std::string do_grouping() const {return "\03";}
+    };
+    std::locale loc (std::cout.getloc(),new my_numpunct);
+
+    formattedTotalFrames.imbue(loc);
+    formattedFPS.imbue(loc);
+
+    formattedTotalFrames << finder.totalFrames;
+
+    const auto end = std::chrono::steady_clock::now();
+    float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - finder.start).count() / 1000.0f;
+    uint64_t framesPerSeconds = finder.totalFrames / seconds;
+    formattedFPS << framesPerSeconds;
+
+    auto logEntry = "processed " + formattedTotalFrames.str() + " frames in " + std::to_string(seconds) + "s (";
+    logEntry += formattedFPS.str() + " fps)";
+    log(logEntry);
+
+    finder.finalFPS = framesPerSeconds;
+    finder.running = false;
+}
+
 void updateComboFinder(void)
 {
     if (!finder.running) {
@@ -437,42 +477,7 @@ void updateComboFinder(void)
         }
     }
     if (allIdle) {
-        for (auto worker : finder.workerPool) {
-            worker->kill = true;
-        }
-
-        for (auto worker : finder.workerPool) {
-            worker->thread.join();
-            finder.totalFrames += worker->framesProcessed;
-            finder.doneRoutes.merge(worker->doneRoutes);
-            delete worker;
-        }
-        finder.workerPool.clear();
-
-        std::stringstream formattedTotalFrames;
-        std::stringstream formattedFPS;
-
-        struct my_numpunct : std::numpunct<char> {
-            std::string do_grouping() const {return "\03";}
-        };
-        std::locale loc (std::cout.getloc(),new my_numpunct);
-
-        formattedTotalFrames.imbue(loc);
-        formattedFPS.imbue(loc);
-
-        formattedTotalFrames << finder.totalFrames;
-
-        const auto end = std::chrono::steady_clock::now();
-        float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - finder.start).count() / 1000.0f;
-        uint64_t framesPerSeconds = finder.totalFrames / seconds;
-        formattedFPS << framesPerSeconds;
-
-        auto logEntry = "processed " + formattedTotalFrames.str() + " frames in " + std::to_string(seconds) + "s (";
-        logEntry += formattedFPS.str() + " fps)";
-        log(logEntry);
-
-        finder.finalFPS = framesPerSeconds;
-        finder.running = false;
+        stopComboFinder();
 
         if (gameMode == Training) {
             paused = false;
@@ -488,10 +493,10 @@ void renderComboFinder(void)
         return;
     }
 
-    int i = finder.workerPool.size();
+    //int i = finder.workerPool.size();
     for (auto worker : finder.workerPool) {
         std::scoped_lock lockWorkerRenderSnapshot(worker->mutexRenderSnapshot);
-        worker->simRenderSnapshot.Render((i--) * -20.0f, false);
+        worker->simRenderSnapshot.Render(1.0 / (finder.workerPool.size() / 2.5) , false);
         worker->wantsRenderSnapshot = true;
     }
 }

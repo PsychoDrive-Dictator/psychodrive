@@ -66,7 +66,7 @@ public:
 
     void Input(int input);
     bool RunFrame(bool advancingTime = true);
-    void Render(float z = 0.0, bool showDomain = true);
+    void Render(float a = 1.0, bool showDomain = true);
     bool Push(Guy *pOtherGuy);
     void RunFramePostPush(void);
     bool WorldPhysics(bool onlyFloor = false, bool projBoundaries = false);

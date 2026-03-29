@@ -145,3 +145,4 @@ uint64_t calculateAverageFPS(void);
 void findCombos(bool doLights, bool doLateCancels, bool doWalk, bool doKaras);
 void updateComboFinder(void);
 void renderComboFinder(void);
+void stopComboFinder(void);

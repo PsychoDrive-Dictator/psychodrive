@@ -220,7 +220,7 @@ void drawBox( float x, float y, float w, float h, float thickness, float z, floa
     drawBoxInternal(x, y, w, h, thickness, z, r, g, b, a, noFront);
 }
 
-void drawHitBox(Box box, float thickness, float z, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/ )
+void drawHitBox(Box box, float thickness, float z, color col, bool isDrive /*= false*/, bool isParry /*= false*/, bool isDI /*= false*/, float alpha = 1.0 )
 {
     setIsGrid(0);
     if (isDrive || isParry || isDI ) {
@@ -238,9 +238,9 @@ void drawHitBox(Box box, float thickness, float z, color col, bool isDrive /*= f
             colorG = 0.0;
             colorB = 0.0;
         }
-        drawBoxInternal( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,z,colorR,colorG,colorB,0.2);
+        drawBoxInternal( box.x.f()-driveOffset, box.y.f()-driveOffset, box.w.f()+driveOffset*2, box.h.f()+driveOffset*2,thickness+driveOffset*2,z,colorR,colorG,colorB,alpha);
     }
-    drawBoxInternal( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,z,col.r,col.g,col.b,0.2);
+    drawBoxInternal( box.x.f(), box.y.f(), box.w.f(), box.h.f(),thickness,z,col.r,col.g,col.b,alpha);
 }
 
 bool thickboxes = false;
@@ -656,7 +656,7 @@ void setRenderState(color clearColor, int sizeX, int sizeY)
     // render stage
     setIsGrid(1);
     glUniform1i(loc_iswarudo, finder.running);
-    drawBoxInternal(-800.0, 0.0, 1600.0, 500.0, 5000.0, 1.0,1.0,1.0,1.0, true);
+    drawBoxInternal(-800.0, 0.0, 1600.0, 500.0, 1500.0, 1.0,1.0,1.0,1.0, true);
     glUniform1i(loc_iswarudo, 0);
 }
 
