@@ -1377,6 +1377,9 @@ void SimulationController::Reset(void)
 bool triedRestoreFromURL = false;
 bool hasRestored = false;
 
+std::string pendingLoad;
+bool hasPendingLoad = false;
+
 bool SimulationController::NewSim(void)
 {
 #ifdef __EMSCRIPTEN__
@@ -1396,6 +1399,11 @@ bool SimulationController::NewSim(void)
         triedRestoreFromURL = true;
     }
 #endif
+
+    if (hasPendingLoad) {
+        Restore(pendingLoad);
+        hasPendingLoad = false;
+    }
     charCount = 1;
 
     if (gameMode == ComboMaker) {
@@ -1675,17 +1683,57 @@ void SimulationController::RenderUI(void)
             viewSelect = 0;
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
-#ifdef __EMSCRIPTEN__
         if (simFrameCount > 1) {
             if (ImGui::Button("Share Combo", ImVec2(modeSelectorSize,0))) {
                 std::string strSerialized;
                 Serialize(strSerialized);
                 //Restore(strSerialized);
+#ifdef __EMSCRIPTEN__
                 EM_ASM({
                     var serialized = UTF8ToString($0);
                     navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '#combo=' + serialized);
                     //window.location.href = '?combo=' + serialized;
                 }, strSerialized.c_str());
+#else
+                std::string strComboURL = "https://psychodrive.gg/#combo=" + strSerialized;
+                SDL_SetClipboardText(strComboURL.c_str());
+#endif
+            }
+        }
+#ifdef __EMSCRIPTEN__
+        if (ImGui::Button("Load Combo", ImVec2(modeSelectorSize,0))) {
+            EM_ASM({
+                navigator.clipboard.readText().then(function(text) {
+                    Module.clipboardText = text;
+                });
+            });
+        }
+        std::string strClipboard = (char*)EM_ASM_PTR({
+                if (Module.clipboardText) {
+                    return stringToNewUTF8(Module.clipboardText);
+                } else {
+                    return stringToNewUTF8("");
+                }
+        });
+        auto comboAnchor = strClipboard.find("#combo=");
+        if (comboAnchor != std::string::npos) {
+            pendingLoad = strClipboard.substr(comboAnchor + 7);
+            hasPendingLoad = true;
+            simInputsChanged = true;
+            EM_ASM({
+                Module.clipboardText = null;
+            });
+        }
+#else
+        if (SDL_HasClipboardText()) {
+            std::string strClipboard = SDL_GetClipboardText();
+            auto comboAnchor = strClipboard.find("#combo=");
+            if (comboAnchor != std::string::npos) {
+                if (ImGui::Button("Load Combo", ImVec2(modeSelectorSize,0))) {
+                    pendingLoad = strClipboard.substr(comboAnchor + 7);
+                    hasPendingLoad = true;
+                    simInputsChanged = true;
+                }
             }
         }
 #endif
