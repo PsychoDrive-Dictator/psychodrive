@@ -289,7 +289,10 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
         pComboCharData = defaultSim.simGuys[0]->getCharData();
     } else {
         int startFrame = simController.scrubberFrame - 1;
-        finder.startSnapshot.Clone(simController.getSnapshotAtFrame(startFrame));
+        if (startFrame < 0) {
+            startFrame = 0;
+        }
+        simController.getFinishedSnapshotAtFrame(&finder.startSnapshot, startFrame);
         pComboCharData = simController.getRecordedGuy(0, 0)->getCharData();
 
         finder.startTimelineTriggers = simController.charControllers[0].timelineTriggers;

@@ -92,6 +92,7 @@ public:
     Guy *getRecordedGuy(int frameIndex, int guyID);
     void renderRecordedHitMarkers(int frameIndex);
     Simulation *getSnapshotAtFrame(int frameIndex);
+    void getFinishedSnapshotAtFrame(Simulation *pSimDst, int frameIndex);
     int getOptionFlags();
     void setOptionFlags(int flags);
     void clampFrame(int &frame) {

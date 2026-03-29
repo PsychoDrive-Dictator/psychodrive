@@ -1564,11 +1564,11 @@ void SimulationController::RenderComboMinerSetup(void)
         ImGui::Text("fps: %s", formatWithCommas(fps).c_str());
     }
 
+    int routeCount = 0;
     if (finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("Top routes:");
 
-        int routeCount = 0;
         const int maxRoutes = 10;
         for (auto it = finder.doneRoutes.rbegin(); it != finder.doneRoutes.rend() && routeCount < maxRoutes; ++it, ++routeCount) {
             std::string routeStr = routeToString(*it, pSim->simGuys[0]);
@@ -1584,7 +1584,7 @@ void SimulationController::RenderComboMinerSetup(void)
             }
             ImGui::PopID();
             ImGui::SameLine();
-            ImGui::TextWrapped("%s", routeStr.c_str());
+            ImGui::Text("%s", routeStr.c_str());
         }
     }
 
@@ -1592,9 +1592,21 @@ void SimulationController::RenderComboMinerSetup(void)
         ImGui::Separator();
         ImGui::Text("Recent routes:");
 
-        for (auto it = finder.recentRoutes.rbegin(); it != finder.recentRoutes.rend(); ++it) {
+        for (auto it = finder.recentRoutes.rbegin(); it != finder.recentRoutes.rend(); ++it, ++routeCount) {
             std::string routeStr = routeToString(*it, pSim->simGuys[0]);
-            ImGui::TextWrapped("%s", routeStr.c_str());
+            ImGui::PushID(routeCount);
+            if (ImGui::Button("Load")) {
+                simController.charControllers[0].timelineTriggers.clear();
+                simController.charControllers[0].timelineTriggers = finder.startTimelineTriggers;
+                for (auto & trigger : it->timelineTriggers) {
+                    simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
+                }
+                simInputsChanged = true;
+                simController.charControllers[0].changed = true;
+            }
+            ImGui::PopID();
+            ImGui::SameLine();
+            ImGui::Text("%s", routeStr.c_str());
         }
     }
 }
@@ -1803,6 +1815,22 @@ void SimulationController::RenderUI(void)
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
+}
+
+void SimulationController::getFinishedSnapshotAtFrame(Simulation *pSimDst, int frameIndex)
+{
+    if (frameIndex >= 0 && frameIndex < (int)stateRecording.size()) {
+        pSimDst->Clone(&stateRecording[frameIndex].sim);
+
+        for (int i = 0; i < charCount; i++) {
+            Guy *pGuy = pSimDst->simGuys[charControllers[i].getSimCharSlot()];
+
+            int input = charControllers[i].getInput(frameIndex);
+            int prevInput = pGuy->getCurrentInput();
+            pGuy->Input(addPressBits(input, prevInput));
+        }
+        pSimDst->AdvanceFrame();
+    }
 }
 
 void SimulationController::AdvanceUntilComplete(void)
