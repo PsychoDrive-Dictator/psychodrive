@@ -791,7 +791,7 @@ ImGuiIO& initUI(void)
         Droid_Sans_compressed_data, Droid_Sans_compressed_size, 64.0
     );
     fontBigger = io.Fonts->AddFontFromMemoryCompressedTTF(
-        Droid_Sans_compressed_data, Droid_Sans_compressed_size, 28.0
+        Droid_Sans_compressed_data, Droid_Sans_compressed_size, 24.0
     );
     font = io.Fonts->AddFontFromMemoryCompressedTTF(
         Droid_Sans_compressed_data, Droid_Sans_compressed_size, 18.0
@@ -1545,6 +1545,7 @@ void SimulationController::RenderComboMinerSetup(void)
 {
     ImGui::Dummy(ImVec2(800, 0));
 
+    ImGui::PushFont(font);
     if (ImGui::Button("Run!")) {
         runComboFinder = true;
     }
@@ -1557,7 +1558,6 @@ void SimulationController::RenderComboMinerSetup(void)
     ImGui::SameLine();
     ImGui::Checkbox("Karas", &comboFinderDoKaras);
 
-    ImGui::PushFont(font);
     if (finder.running || finder.totalFrames > 0) {
         ImGui::Separator();
         ImGui::Text("threads: %d", finder.threadCount);
@@ -1614,20 +1614,48 @@ void SimulationController::RenderComboMinerSetup(void)
         }
         ImGui::Text("Sort:");
         ImGui::SameLine();
+        bool highlighted = sortMode == 0;
+        if (highlighted) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+        }
         if (ImGui::Button("Damage")) {
             sortMode = 0;
         }
+        if (highlighted) {
+            ImGui::PopStyleColor();
+        }
         ImGui::SameLine();
+        highlighted = sortMode == 1;
+        if (highlighted) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+        }
         if (ImGui::Button("Drive Gain")) {
             sortMode = 1;
         }
+        if (highlighted) {
+            ImGui::PopStyleColor();
+        }
         ImGui::SameLine();
+        highlighted = sortMode == 2;
+        if (highlighted) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+        }
         if (ImGui::Button("Super Gain")) {
             sortMode = 2;
         }
+        if (highlighted) {
+            ImGui::PopStyleColor();
+        }
         ImGui::SameLine();
+        highlighted = sortMode == 3;
+        if (highlighted) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45,0.15,0.1,1.0));
+        }
         if (ImGui::Button("Drive Damage")) {
             sortMode = 3;
+        }
+        if (highlighted) {
+            ImGui::PopStyleColor();
         }
 
         routeCount = 0;
@@ -1737,8 +1765,9 @@ void SimulationController::RenderUI(void)
             viewSelect = 0;
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
+        int halfButtonSize = modeSelectorSize / 2 - 5;
         if (simFrameCount > 1) {
-            if (ImGui::Button("Share Combo", ImVec2(modeSelectorSize,0))) {
+            if (ImGui::Button("Share", ImVec2(halfButtonSize,0))) {
                 std::string strSerialized;
                 Serialize(strSerialized);
                 //Restore(strSerialized);
@@ -1754,8 +1783,9 @@ void SimulationController::RenderUI(void)
 #endif
             }
         }
+        ImGui::SameLine();
 #ifdef __EMSCRIPTEN__
-        if (ImGui::Button("Load Combo", ImVec2(modeSelectorSize,0))) {
+        if (ImGui::Button("Load", ImVec2(halfButtonSize,0))) {
             EM_ASM({
                 navigator.clipboard.readText().then(function(text) {
                     Module.clipboardText = text;
@@ -1783,7 +1813,7 @@ void SimulationController::RenderUI(void)
             std::string strClipboard = SDL_GetClipboardText();
             auto comboAnchor = strClipboard.find("#combo=");
             if (comboAnchor != std::string::npos) {
-                if (ImGui::Button("Load Combo", ImVec2(modeSelectorSize,0))) {
+                if (ImGui::Button("Load", ImVec2(halfButtonSize,0))) {
                     pendingLoad = strClipboard.substr(comboAnchor + 7);
                     hasPendingLoad = true;
                     simInputsChanged = true;
