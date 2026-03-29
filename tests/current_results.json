@@ -7773,6 +7773,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "marisa_5hp_max_followup",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 474,
+                "firstFrame": 129,
+                "lastFrame": 369
+            },
+            {
+                "count": 54,
+                "firstFrame": 196,
+                "lastFrame": 232
+            },
+            {
+                "count": 1,
+                "firstFrame": 195,
+                "lastFrame": 195
+            },
+            {
+                "count": 68,
+                "firstFrame": 134,
+                "lastFrame": 225
+            },
+            {
+                "count": 33,
+                "firstFrame": 134,
+                "lastFrame": 225
+            },
+            {
+                "count": 76,
+                "firstFrame": 90,
+                "lastFrame": 315
+            },
+            {
+                "count": 395,
+                "firstFrame": 128,
+                "lastFrame": 369
+            },
+            {
+                "count": 109,
+                "firstFrame": 134,
+                "lastFrame": 242
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 140,
+                "firstFrame": 134,
+                "lastFrame": 273
+            },
+            {
+                "count": 86,
+                "firstFrame": 134,
+                "lastFrame": 211
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "marisa_armors",
         "testVersion": "33",
         "finished": true,
