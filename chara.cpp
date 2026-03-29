@@ -1278,6 +1278,19 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
     }
 }
 
+void ProcessDynamicCharData(CharacterData *pCharData)
+{
+    for (auto & action : pCharData->actions) {
+        std::string strNiceName = action.name;
+        for (auto sub : {"BAS_", "ATK_", "SPA_", "_START"}) {
+            std::string::size_type pos;
+            while ((pos = strNiceName.find(sub)) != std::string::npos)
+            strNiceName.erase(pos, strlen(sub));
+        }
+        action.niceNameDyn = strNiceName;
+    }
+}
+
 CharacterData *loadCharacter(std::string charName, int charVersion)
 {
     std::string charSpec = charName + std::to_string(charVersion);
@@ -1378,6 +1391,8 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     for (auto& action : pRet->actions) {
         pRet->actionsByID[ActionRef(action.actionID, action.styleID)] = &action;
     }
+
+    ProcessDynamicCharData(pRet);
 
     return pRet;
 }
@@ -2368,6 +2383,8 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
         std::string s = readString(f);
         str = strdup(s.c_str());
     }
+
+    ProcessDynamicCharData(pRet);
 
     return pRet;
 }

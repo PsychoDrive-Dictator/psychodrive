@@ -262,7 +262,7 @@ std::string routeToString(const DoneRoute &route, Guy *pGuy)
         } else {
             actionDesc = pGuy->getActionName(trigger.second.actionID());
         }
-        result += std::to_string(trigger.first) + " " + actionDesc + " ";
+        result += actionDesc + " ";
     }
     return result;
 }

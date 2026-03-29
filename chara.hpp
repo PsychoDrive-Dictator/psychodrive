@@ -427,6 +427,7 @@ struct Action {
     int actionID;
     int styleID;
     std::string name;
+    std::string niceNameDyn;
 
     std::vector<HurtBoxKey> hurtBoxKeys;
     std::vector<PushBoxKey> pushBoxKeys;

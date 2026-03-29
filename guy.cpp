@@ -248,7 +248,7 @@ std::string Guy::getActionName(int actionID)
 {
     Action *pAction = FindMove(actionID, styleInstall);
     if (pAction) {
-        return pAction->name;
+        return pAction->niceNameDyn;
     }
     return "invalid";
 }

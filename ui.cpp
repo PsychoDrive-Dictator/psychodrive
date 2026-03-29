@@ -926,7 +926,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
     if (timelineTriggers.find(frameIndex) != timelineTriggers.end()) {
         auto &trigger = timelineTriggers[frameIndex];
         Action *pAction = pGuy->FindMove(trigger.actionID(), trigger.styleID());
-        const char *actionName = pAction ? pAction->name.c_str() : "Unknown";
+        const char *actionName = pAction ? pAction->niceNameDyn.c_str() : "Unknown";
         std::string strLabel = "Delete " + std::string(actionName);
         if (ImGui::Button(strLabel.c_str())) {
             timelineTriggers.erase(timelineTriggers.find(frameIndex));
@@ -939,7 +939,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         vecTriggerDropDownLabels.push_back("Add Action");
         for (auto &trigger : pGuy->getFrameTriggers()) {
             Action *pAction = pGuy->FindMove(trigger.actionID(), trigger.styleID());
-            const char *actionName = pAction ? pAction->name.c_str() : "Unknown";
+            const char *actionName = pAction ? pAction->niceNameDyn.c_str() : "Unknown";
             vecTriggerDropDownLabels.push_back(actionName);
             vecTriggers.push_back(trigger);
         }
@@ -1186,7 +1186,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     if (!rightSide) {
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
-        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->actionFrameDuration);
+        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->actionFrameDuration);
         renderFrameMeterCancelWindows(frameIndex);
     }
 
@@ -1293,7 +1293,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
         Action *pAction = pGuy->getCurrentActionPtr();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
-        ImGui::Text("%s %d/%d", pAction->name.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        ImGui::Text("%s %d/%d", pAction->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
     }
 
     ImGui::PopStyleColor();
@@ -1543,6 +1543,8 @@ void SimulationController::doFrameMeterDrag(void)
 
 void SimulationController::RenderComboMinerSetup(void)
 {
+    ImGui::Dummy(ImVec2(1000, 0));
+
     ImGui::Checkbox("Light normals", &comboFinderDoLights);
     ImGui::SameLine();
     ImGui::Checkbox("Late cancels", &comboFinderDoLateCancels);
@@ -1592,7 +1594,7 @@ void SimulationController::RenderComboMinerSetup(void)
             }
             ImGui::PopID();
             ImGui::SameLine();
-            ImGui::Text("%s", routeStr.c_str());
+            ImGui::TextWrapped("%s", routeStr.c_str());
         }
     }
 
@@ -1614,7 +1616,7 @@ void SimulationController::RenderComboMinerSetup(void)
             }
             ImGui::PopID();
             ImGui::SameLine();
-            ImGui::Text("%s", routeStr.c_str());
+            ImGui::TextWrapped("%s", routeStr.c_str());
         }
     }
 }
