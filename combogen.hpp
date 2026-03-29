@@ -22,6 +22,9 @@ struct ComboRoute {
     int simFrameProgress = 0;
     int guyFrameProgress = 0;
     int damage = 0;
+    int focusGain = 0;
+    int gaugeGain = 0;
+    int focusDmg = 0;
     int lastFrameDamage = 0;
     int walkForward = 0;
     SharedSimulationSnapshot *pSimSnapshot = nullptr;
@@ -30,14 +33,17 @@ struct ComboRoute {
 struct DoneRoute {
     std::map<int16_t, ActionRef> timelineTriggers;
     int damage = 0;
+    int focusGain = 0;
+    int gaugeGain = 0;
+    int focusDmg = 0;
 };
 
 struct DamageSort {
-    bool operator()(DoneRoute const& lhs, DoneRoute const& rhs) const {
-        // if (lhs.damage == rhs.damage) {
-        //     return lhs.timelineTriggers < rhs.timelineTriggers;
-        // }
-        return lhs.damage < rhs.damage;
+    // if (lhs.damage == rhs.damage) {
+    //     return lhs.timelineTriggers < rhs.timelineTriggers;
+    // }
+    bool operator()(const std::unique_ptr<DoneRoute>& lhs, const std::unique_ptr<DoneRoute>& rhs) const {
+        return lhs->damage < rhs->damage;
     }
 };
 
@@ -60,7 +66,7 @@ public:
     std::mutex mutexPendingRoutes;
     std::deque<ComboRoute> pendingRoutes;
     std::mutex mutexDoneRoutes;
-    std::set<DoneRoute, DamageSort> doneRoutes;
+    std::set<std::unique_ptr<DoneRoute>, DamageSort> doneRoutes;
     bool justGotNextRoute = false;
     std::atomic<bool> wantsRenderSnapshot;
     std::mutex mutexRenderSnapshot;
@@ -81,7 +87,7 @@ public:
 
     uint64_t totalFrames = 0;
     int maxDamage = 0;
-    std::set<DoneRoute, DamageSort> doneRoutes;
+    std::set<std::unique_ptr<DoneRoute>, DamageSort> doneRoutes;
 
     std::default_random_engine rng;
 

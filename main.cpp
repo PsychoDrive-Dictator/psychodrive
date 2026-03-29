@@ -575,7 +575,7 @@ static void mainloop(void)
         }
 
         if (finder.playing && finder.doneRoutes.size() && guys.size()) {
-            const DoneRoute &playingRoute = *finder.doneRoutes.rbegin();
+            const DoneRoute &playingRoute = **finder.doneRoutes.rbegin();
             int targetFrame = defaultSim.frameCounter + 1;
             auto frameTrigger = playingRoute.timelineTriggers.find(targetFrame);
             if (frameTrigger != playingRoute.timelineTriggers.end()) {

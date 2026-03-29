@@ -3486,12 +3486,20 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
     }
 
+    Guy *pResourceGuy = pAttacker;
+    if (pAttacker->isProjectile) {
+        pResourceGuy = pAttacker->pParent;
+    }
+
     int scaledFocusGain = pHitEffect->focusGainTarget;
     if (!parrying && (!burnout || scaledFocusGain > 0)) {
         if (perfectScaling && scaledFocusGain < 0) {
             scaledFocusGain = scaledFocusGain * 50 / 100;
         }
         focus += scaledFocusGain;
+        if (pResourceGuy->uniqueID == 0) {
+            pSim->comboProbe.focusDmg += -scaledFocusGain;
+        }
         log(logResources, "focus " + std::to_string(scaledFocusGain) + " (hit), total " + std::to_string(focus));
         if (scaledFocusGain < 0 && !superFreeze) {
             // todo apparently start of hitstun except if super where it's after??
@@ -3500,6 +3508,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             }
             log(logResources, "regen cooldown " + std::to_string(focusRegenCooldown) + " (hit)");
         }
+
     }
     int scaledSuperGain = pHitEffect->superGainTarget;
     if (perfectScaling) {
@@ -3508,10 +3517,6 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     scaledSuperGain = scaledSuperGain * pCharData->styles[styleInstall].gaugeGainRatio / 100;
     gauge += scaledSuperGain;
 
-    Guy *pResourceGuy = pAttacker;
-    if (pAttacker->isProjectile) {
-        pResourceGuy = pAttacker->pParent;
-    }
     // set resources directly, will be clamped by caller, for trades
     if (!pResourceGuy->driveRushCancel && !driveScaling) {
         scaledFocusGain = pHitEffect->focusGainOwn;
@@ -3519,6 +3524,9 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             scaledFocusGain = scaledFocusGain * 50 / 100;
         }
         pResourceGuy->focus += scaledFocusGain;
+        if (pResourceGuy->uniqueID == 0) {
+            pSim->comboProbe.focusGain += scaledFocusGain;
+        }
     }
     StyleData &style = pResourceGuy->pCharData->styles[pResourceGuy->styleInstall];
     scaledSuperGain = pHitEffect->superGainOwn * style.gaugeGainRatio / 100;
@@ -3527,6 +3535,9 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     }
     scaledSuperGain = scaledSuperGain * superGainScaling / 100;
     pResourceGuy->gauge += scaledSuperGain;
+    if (pResourceGuy->uniqueID == 0) {
+        pSim->comboProbe.gaugeGain += scaledSuperGain;
+    }
 }
 
 void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool isGrab, bool isDrive, bool isDomain, bool isTrade, bool isClash, HurtBox *pHurtBox)
@@ -5348,6 +5359,12 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         superGainScaling = 100;
         resetComboCount = false;
         lastDamageScale = 0;
+
+        if (pOpponent && pOpponent->uniqueID == 0) {
+            pSim->comboProbe.gaugeGain = 0;
+            pSim->comboProbe.focusGain = 0;
+            pSim->comboProbe.focusDmg = 0;
+        }
 
         juggleCounter = 0;
         pAttacker = nullptr;

@@ -84,6 +84,13 @@ public:
     std::vector<Guy *> vecGuysToDelete;
 
     int frameCounter = 0;
+
+    struct {
+        int focusGain = 0;
+        int gaugeGain = 0;
+        int focusDmg = 0;
+    } comboProbe;
+
     bool match = false;
     bool finished = false;
     bool timerStarted = false;

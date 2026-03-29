@@ -631,7 +631,7 @@ void drawComboFinderWindow()
         int routeCount = 0;
         const int maxRoutes = 10;
         for (auto it = finder.doneRoutes.rbegin(); it != finder.doneRoutes.rend() && routeCount < maxRoutes; ++it, ++routeCount) {
-            std::string routeStr = routeToString(*it, guys[0]);
+            std::string routeStr = routeToString(**it, guys[0]);
             ImGui::TextWrapped("%s", routeStr.c_str());
         }
     }
@@ -1543,7 +1543,7 @@ void SimulationController::doFrameMeterDrag(void)
 
 void SimulationController::RenderComboMinerSetup(void)
 {
-    ImGui::Dummy(ImVec2(1000, 0));
+    ImGui::Dummy(ImVec2(800, 0));
 
     if (ImGui::Button("Run!")) {
         runComboFinder = true;
@@ -1557,6 +1557,7 @@ void SimulationController::RenderComboMinerSetup(void)
     ImGui::SameLine();
     ImGui::Checkbox("Karas", &comboFinderDoKaras);
 
+    ImGui::PushFont(font);
     if (finder.running || finder.totalFrames > 0) {
         ImGui::Separator();
         ImGui::Text("threads: %d", finder.threadCount);
@@ -1577,31 +1578,36 @@ void SimulationController::RenderComboMinerSetup(void)
     }
 
     int routeCount = 0;
-    ImGui::PushFont(font);
     if (finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
-        ImGui::Text("Top routes:");
+        ImGui::Text("%lu routes:", finder.doneRoutes.size());
+        static int routeScrollAmount = 0;
+        const int routesToDisplay = 10;
+        if (finder.doneRoutes.size() >= routesToDisplay) {
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(400);
+            ImGui::SliderInt("##routescroll", &routeScrollAmount, 0, finder.doneRoutes.size() - routesToDisplay);
+        }
 
-        const int maxRoutes = 10;
-        for (auto it = finder.doneRoutes.rbegin(); it != finder.doneRoutes.rend() && routeCount < maxRoutes; ++it, ++routeCount) {
-            std::string routeStr = routeToString(*it, pSim->simGuys[0]);
+        for (auto it = std::next(finder.doneRoutes.rbegin(), routeScrollAmount); it != finder.doneRoutes.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
+            std::string routeStr = routeToString(**it, pSim->simGuys[0]);
             ImGui::PushID(routeCount);
             if (ImGui::Button("Load")) {
                 simController.charControllers[0].timelineTriggers.clear();
                 simController.charControllers[0].timelineTriggers = finder.startTimelineTriggers;
-                for (auto & trigger : it->timelineTriggers) {
+                for (auto & trigger : (*it)->timelineTriggers) {
                     simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
                 }
                 simInputsChanged = true;
                 simController.charControllers[0].changed = true;
             }
-            ImGui::PopID();
             ImGui::SameLine();
             ImGui::TextWrapped("%s", routeStr.c_str());
+            ImGui::PopID();
         }
     }
 
-    if (finder.recentRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
+    if (finder.running && finder.recentRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("Recent routes:");
 

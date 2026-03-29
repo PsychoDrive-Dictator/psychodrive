@@ -73,6 +73,7 @@ void Simulation::Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool)
 
     guyIDCounter = pOtherSim->guyIDCounter;
     frameCounter = pOtherSim->frameCounter;
+    comboProbe = pOtherSim->comboProbe;
 }
 
 void Simulation::CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)

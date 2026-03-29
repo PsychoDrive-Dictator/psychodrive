@@ -177,6 +177,16 @@ void ComboWorker::WorkLoop(void) {
                 currentRoute.lastFrameDamage = pSim->frameCounter;
             }
 
+            if (pSim->comboProbe.focusGain > currentRoute.focusGain) {
+                currentRoute.focusGain = pSim->comboProbe.focusGain;
+            }
+            if (pSim->comboProbe.focusDmg > currentRoute.focusDmg) {
+                currentRoute.focusDmg = pSim->comboProbe.focusDmg;
+            }
+            if (pSim->comboProbe.gaugeGain > currentRoute.gaugeGain) {
+                currentRoute.gaugeGain = pSim->comboProbe.gaugeGain;
+            }
+
             if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 10000) {
                 fprintf(stderr, "aaa\n");
                 break;
@@ -209,6 +219,9 @@ void ComboWorker::WorkLoop(void) {
         DoneRoute doneRoute;
         doneRoute.timelineTriggers = currentRoute.timelineTriggers;
         doneRoute.damage = currentRoute.damage;
+        doneRoute.focusGain = currentRoute.focusGain;
+        doneRoute.focusDmg = currentRoute.focusDmg;
+        doneRoute.gaugeGain = currentRoute.gaugeGain;
         // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
         // for ( auto &trigger : doneRoute.timelineTriggers) {
         //     logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
@@ -216,7 +229,7 @@ void ComboWorker::WorkLoop(void) {
         // log(logEntry);
         // fprintf(stderr, "%s\n", logEntry.c_str());
         mutexDoneRoutes.lock();
-        doneRoutes.insert(doneRoute);
+        doneRoutes.insert(std::make_unique<DoneRoute>(doneRoute));
         mutexDoneRoutes.unlock();
 
         if (pendingSnapshot) {
@@ -254,7 +267,10 @@ uint64_t calculateAverageFPS(void)
 
 std::string routeToString(const DoneRoute &route, Guy *pGuy)
 {
-    std::string result = std::to_string(route.damage) + ": ";
+    std::string result = std::to_string(route.damage) + " ";
+    result += std::to_string(route.focusGain) + " ";
+    result += std::to_string(route.gaugeGain) + " ";
+    result += std::to_string(route.focusDmg) + ": ";
     for ( auto &trigger : route.timelineTriggers) {
         std::string actionDesc;
         if (trigger.second.actionID() < 0) {
@@ -378,22 +394,24 @@ void updateComboFinder(void)
     bool allIdle = true;
     for (auto worker : finder.workerPool) {
         if (worker->mutexDoneRoutes.try_lock()) {
-            std::set<DoneRoute, DamageSort> newDoneRoutes;
+            std::set<std::unique_ptr<DoneRoute>, DamageSort> newDoneRoutes;
             std::swap(newDoneRoutes, worker->doneRoutes);
+            worker->mutexDoneRoutes.unlock();
 
-            // Grab last N routes for display
             if (newDoneRoutes.size() > 0) {
                 int skip = std::max(0, (int)newDoneRoutes.size() - finder.maxRecentRoutes);
+                finder.recentRoutes.clear();
                 auto it = newDoneRoutes.begin();
                 std::advance(it, skip);
-                finder.recentRoutes.assign(it, newDoneRoutes.end());
+                for (; it != newDoneRoutes.end(); ++it) {
+                    finder.recentRoutes.push_back(**it);
+                }
             }
 
-            worker->mutexDoneRoutes.unlock();
             for (auto &route : newDoneRoutes) {
-                if (route.damage > finder.maxDamage) {
-                    printRoute(route, finder.startSnapshot.simGuys[0]);
-                    finder.maxDamage = route.damage;
+                if (route->damage > finder.maxDamage) {
+                    printRoute(*route, finder.startSnapshot.simGuys[0]);
+                    finder.maxDamage = route->damage;
                     if (gameMode == Training) {
                         defaultSim.Clone(&finder.startSnapshot);
                         finder.playing = true;
