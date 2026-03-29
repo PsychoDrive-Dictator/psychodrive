@@ -47,6 +47,33 @@ struct DamageSort {
     }
 };
 
+struct FocusGainSort {
+    bool operator()(DoneRoute* lhs, DoneRoute* rhs) const {
+        if (lhs->focusGain == rhs->focusGain) {
+            return lhs->damage < rhs->damage;
+        }
+        return lhs->focusGain < rhs->focusGain;
+    }
+};
+
+struct GaugeGainSort {
+    bool operator()(DoneRoute* lhs, DoneRoute* rhs) const {
+        if (lhs->gaugeGain == rhs->gaugeGain) {
+            return lhs->damage < rhs->damage;
+        }
+        return lhs->gaugeGain < rhs->gaugeGain;
+    }
+};
+
+struct FocusDmgSort {
+    bool operator()(DoneRoute* lhs, DoneRoute* rhs) const {
+        if (lhs->focusDmg == rhs->focusDmg) {
+            return lhs->damage < rhs->damage;
+        }
+        return lhs->focusDmg < rhs->focusDmg;
+    }
+};
+
 class ComboWorker {
 public:
     void Start(bool isFirst);
@@ -88,6 +115,9 @@ public:
     uint64_t totalFrames = 0;
     int maxDamage = 0;
     std::set<std::unique_ptr<DoneRoute>, DamageSort> doneRoutes;
+    std::set<DoneRoute *, FocusGainSort> doneRoutesByFocusGain;
+    std::set<DoneRoute *, GaugeGainSort> doneRoutesByGaugeGain;
+    std::set<DoneRoute *, FocusDmgSort> doneRoutesByFocusDmg;
 
     std::default_random_engine rng;
 

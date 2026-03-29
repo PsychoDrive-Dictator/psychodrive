@@ -360,6 +360,9 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.currentFPS = 0;
     finder.totalFrames = 0;
     finder.maxDamage = 0;
+    finder.doneRoutesByFocusGain.clear();
+    finder.doneRoutesByGaugeGain.clear();
+    finder.doneRoutesByFocusDmg.clear();
     finder.doneRoutes.clear();
     finder.recentRoutes.clear();
     log("starting on " + std::to_string(finder.threadCount) + " threads");
@@ -419,7 +422,15 @@ void updateComboFinder(void)
                     }
                 }
             }
-            finder.doneRoutes.merge(newDoneRoutes);
+            for (auto it = newDoneRoutes.begin(); it != newDoneRoutes.end(); ) {
+                auto node = newDoneRoutes.extract(it++);
+                auto result = finder.doneRoutes.insert(std::move(node));
+                if (result.inserted) {
+                    finder.doneRoutesByFocusGain.insert(result.position->get());
+                    finder.doneRoutesByGaugeGain.insert(result.position->get());
+                    finder.doneRoutesByFocusDmg.insert(result.position->get());
+                }
+            }
         }
         if (!worker->idle) {
             allIdle = false;

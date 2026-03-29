@@ -1577,25 +1577,67 @@ void SimulationController::RenderComboMinerSetup(void)
         ImGui::Text("fps: %s", formatWithCommas(fps).c_str());
     }
 
+    static int routeScrollAmount = 0;
+    const int routesToDisplay = 10;
     int routeCount = 0;
+    static int sortMode = 0;
+    std::vector<DoneRoute *> vecVisibleRoutes;
+    if (sortMode == 0) {
+        routeCount = 0;
+        for (auto it = std::next(finder.doneRoutes.rbegin(), routeScrollAmount); it != finder.doneRoutes.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
+            vecVisibleRoutes.push_back(it->get());
+        }
+    } else if (sortMode == 1) {
+        routeCount = 0;
+        for (auto it = std::next(finder.doneRoutesByFocusGain.rbegin(), routeScrollAmount); it != finder.doneRoutesByFocusGain.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
+            vecVisibleRoutes.push_back(*it);
+        }
+    } else if (sortMode == 2) {
+        routeCount = 0;
+        for (auto it = std::next(finder.doneRoutesByGaugeGain.rbegin(), routeScrollAmount); it != finder.doneRoutesByGaugeGain.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
+            vecVisibleRoutes.push_back(*it);
+        }
+    } else if (sortMode == 3) {
+        routeCount = 0;
+        for (auto it = std::next(finder.doneRoutesByFocusDmg.rbegin(), routeScrollAmount); it != finder.doneRoutesByFocusDmg.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
+            vecVisibleRoutes.push_back(*it);
+        }
+    }
+
     if (finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("%lu routes:", finder.doneRoutes.size());
-        static int routeScrollAmount = 0;
-        const int routesToDisplay = 10;
         if (finder.doneRoutes.size() >= routesToDisplay) {
             ImGui::SameLine();
             ImGui::SetNextItemWidth(400);
             ImGui::SliderInt("##routescroll", &routeScrollAmount, 0, finder.doneRoutes.size() - routesToDisplay);
         }
+        ImGui::Text("Sort:");
+        ImGui::SameLine();
+        if (ImGui::Button("Damage")) {
+            sortMode = 0;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Drive Gain")) {
+            sortMode = 1;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Super Gain")) {
+            sortMode = 2;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Drive Damage")) {
+            sortMode = 3;
+        }
 
-        for (auto it = std::next(finder.doneRoutes.rbegin(), routeScrollAmount); it != finder.doneRoutes.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
-            std::string routeStr = routeToString(**it, pSim->simGuys[0]);
-            ImGui::PushID(routeCount);
+        routeCount = 0;
+        for (DoneRoute *route : vecVisibleRoutes) {
+            std::string routeStr = routeToString(*route, pSim->simGuys[0]);
+            ImGui::PushID(routeCount++);
             if (ImGui::Button("Load")) {
                 simController.charControllers[0].timelineTriggers.clear();
                 simController.charControllers[0].timelineTriggers = finder.startTimelineTriggers;
-                for (auto & trigger : (*it)->timelineTriggers) {
+                for (auto & trigger : route->timelineTriggers) {
                     simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
                 }
                 simInputsChanged = true;
