@@ -496,7 +496,7 @@ void renderComboFinder(void)
     //int i = finder.workerPool.size();
     for (auto worker : finder.workerPool) {
         std::scoped_lock lockWorkerRenderSnapshot(worker->mutexRenderSnapshot);
-        worker->simRenderSnapshot.Render(1.0 / (finder.workerPool.size() / 2.5) , false);
+        worker->simRenderSnapshot.Render(1.0 / (finder.workerPool.size() / 3.0) , false);
         worker->wantsRenderSnapshot = true;
     }
 }

@@ -537,9 +537,7 @@ private:
             ret = false;
         }
 
-        if (ret == true) {
-            outCrouching = isCrouching;
-        }
+        outCrouching = isCrouching;
 
         return ret;
     }

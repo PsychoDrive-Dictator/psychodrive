@@ -1402,6 +1402,8 @@ void Guy::DoTriggers(int fluffFrameBias)
                         triggers[entryIndex].hasAntiNormal = false;
                         triggers[entryIndex].late = false;
                     }
+
+                    triggers[entryIndex].hasNormal = true;
                 }
             }
         }
@@ -3653,6 +3655,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         hitEntryHitStun += 4;
     }
 
+    bool forceStand = false;
+
     if (applyHit) {
         resetHitStunOnLand = false;
         resetHitStunOnTransition = false;
@@ -3661,6 +3665,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
 
         if (moveType == 1) {
             crouching = false;
+            forceStand = true;
         }
     }
     if (downTime <= 1) {
@@ -4022,7 +4027,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 } else {
                     nextAction = 261;
                 }
-                if (crouching || getCrouching()) {
+                if (!forceStand && (crouching || getCrouching())) {
                     nextAction += 3;
                     crouching = true;
                 }
@@ -4053,7 +4058,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 } else {
                     nextAction = 204 + attackStrength;
                 }
-                if ( crouching ) {
+                if ( !forceStand && (crouching || getCrouching())) {
                     nextAction = 212 + attackStrength;
                 }
             }
@@ -5279,7 +5284,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         applyFreeMovement = false;
     }
     
-    if (canMoveNow) {
+    if (canMoveNow || freeMovement) {
         crouching = crouchingNow;
     }
 

@@ -1749,7 +1749,7 @@ void SimulationController::RenderUI(void)
                 break;
         }
         if (maxComboCount > 0) {
-            std::string strComboInfo = "Max damage: " + std::to_string(maxComboDamage);
+            std::string strComboInfo = "Current combo max damage: " + std::to_string(maxComboDamage);
             ImGui::Text("%s", strComboInfo.c_str());
         }
         ImGui::End();
