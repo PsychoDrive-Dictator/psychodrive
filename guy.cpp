@@ -3022,14 +3022,8 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 if (hitFlagToParent) pGuy->pParent->hasBeenPerfectParriedThisMove = true;
             }
         }
-        if (pOtherGuy->forceKnockDownState && !pOtherGuy->comboHits) {
-            if (hitStopSelf) {
-                hitStopSelf += 5;
-            }
-            if (hitStopTarget) {
-                hitStopTarget += 5;
-            }
-        }
+
+        int wasComboHits = pOtherGuy->comboHits;
 
         pOtherGuy->lastHitType = hitBox.type;
 
@@ -3105,6 +3099,15 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 clampGuys.insert(pGuy);
             }
             clampGuys.insert(pOtherGuy);
+        }
+
+        if (pOtherGuy->forceKnockDownState && !wasComboHits) {
+            if (hitStopSelf) {
+                hitStopSelf += 5;
+            }
+            if (hitStopTarget) {
+                hitStopTarget += 5;
+            }
         }
 
         bool tradeHitStop = trade;
@@ -3682,6 +3685,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             knockDownFrames = downTime;
 
             if (forceKnockDownState || dmgType == 11 || dmgType == 15 || isDrive) {
+                if (dmgType == 11) {
+                    // don't add the force knockdown hitstop later, ours is built-in and supercedes i guess
+                    // todo also 15 and drive or??
+                    forceKnockDownState = false;
+                }
                 knockDown = true;
                 // slide velocity while on the ground?
                 groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime);
