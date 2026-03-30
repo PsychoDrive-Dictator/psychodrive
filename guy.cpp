@@ -4422,6 +4422,13 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 37:
                     // hit catch - maybe will need a separate 'hitgrabbed this frame' later?
+                    if (grabbedThisFrame) {
+                        doBranch = true;
+                    }
+                    if (branchParam0 != 0) {
+                        log(logUnknowns, "unknown hit catch branch kind");
+                    }
+                    break;
                 case 36:
                     if (grabbedThisFrame) {
                         if (branchParam0 == 2 && hitPunishCounterThisMove) {

@@ -4294,18 +4294,18 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 1675,
+                "count": 962,
                 "firstFrame": 76,
                 "lastFrame": 1003
             },
             {
-                "count": 174,
+                "count": 79,
                 "firstFrame": 157,
                 "lastFrame": 928
             },
             {
-                "count": 96,
-                "firstFrame": 357,
+                "count": 1,
+                "firstFrame": 928,
                 "lastFrame": 928
             },
             {
@@ -4319,29 +4319,29 @@ var currentResults =
                 "lastFrame": 356
             },
             {
-                "count": 1220,
+                "count": 102,
                 "firstFrame": 62,
-                "lastFrame": 1003
+                "lastFrame": 825
             },
             {
-                "count": 1312,
+                "count": 44,
                 "firstFrame": 156,
-                "lastFrame": 1003
+                "lastFrame": 825
             },
             {
-                "count": 587,
-                "firstFrame": 417,
-                "lastFrame": 1003
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 499,
-                "firstFrame": 357,
-                "lastFrame": 855
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 441,
-                "firstFrame": 417,
-                "lastFrame": 857
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 42,
@@ -4349,7 +4349,7 @@ var currentResults =
                 "lastFrame": 176
             },
             {
-                "count": 511,
+                "count": 106,
                 "firstFrame": 156,
                 "lastFrame": 946
             }
