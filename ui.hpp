@@ -62,6 +62,7 @@ public:
 
     std::map<int, ActionRef> timelineTriggers;
     std::vector<inputRegion> inputRegions;
+    int forcedInput = 0;
 
     std::vector<std::string> vecTriggerDropDownLabels;
     std::vector<ActionRef> vecTriggers;

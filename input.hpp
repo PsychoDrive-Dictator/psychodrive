@@ -47,25 +47,10 @@ if (input & printedInput) { \
 static inline void renderInput(std::string &strOut, int input)
 {
 	bool printed = false;
-	if (input & UP) {
-		strOut += "UP";
-		printed = true;
-	}
-	if (input & DOWN) {
-		if (printed) strOut += "+";
-		strOut += "DOWN";
-		printed = true;
-	}
-	if (input & BACK) {
-		if (printed) strOut += "+";
-		strOut += "BACK";
-		printed = true;
-	}
-	if (input & FORWARD) {
-		if (printed) strOut += "+";
-		strOut += "FORWARD";
-		printed = true;
-	}
+	printInput(UP);
+	printInput(DOWN);
+	printInput(BACK);
+	printInput(FORWARD);
 	printInput(LP);
 	printInput(LK);
 	printInput(MP);

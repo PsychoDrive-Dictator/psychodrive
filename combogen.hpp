@@ -139,6 +139,7 @@ public:
 
 extern ComboFinder finder;
 
+std::string timelineTriggerToString(ActionRef trigger, Guy *pGuy);
 std::string routeToString(const DoneRoute &route, Guy *pGuy);
 std::string formatWithCommas(uint64_t value);
 uint64_t calculateAverageFPS(void);

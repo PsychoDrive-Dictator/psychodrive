@@ -925,9 +925,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
     }
     if (timelineTriggers.find(frameIndex) != timelineTriggers.end()) {
         auto &trigger = timelineTriggers[frameIndex];
-        Action *pAction = pGuy->FindMove(trigger.actionID(), trigger.styleID());
-        const char *actionName = pAction ? pAction->niceNameDyn.c_str() : "Unknown";
-        std::string strLabel = "Delete " + std::string(actionName);
+        std::string strLabel = "Delete " + timelineTriggerToString(trigger, pGuy);
         if (ImGui::Button(strLabel.c_str())) {
             timelineTriggers.erase(timelineTriggers.find(frameIndex));
             simInputsChanged = true;
@@ -938,9 +936,7 @@ void CharacterUIController::renderActionSetup(int frameIndex)
         vecTriggers.clear();
         vecTriggerDropDownLabels.push_back("Add Action");
         for (auto &trigger : pGuy->getFrameTriggers()) {
-            Action *pAction = pGuy->FindMove(trigger.actionID(), trigger.styleID());
-            const char *actionName = pAction ? pAction->niceNameDyn.c_str() : "Unknown";
-            vecTriggerDropDownLabels.push_back(actionName);
+            vecTriggerDropDownLabels.push_back(timelineTriggerToString(trigger, pGuy));
             vecTriggers.push_back(trigger);
         }
         if (modalDropDown("##moves", &pendingTriggerAdd, vecTriggerDropDownLabels, 220)) {
@@ -1996,9 +1992,18 @@ void SimulationController::AdvanceUntilComplete(void)
         for (int i = 0; i < charCount; i++) {
             // put forced triggers in place before RunFrame(), because it contains the hitstop end AdvanceFrame()
             Guy *pGuy = pSim->simGuys[charControllers[i].getSimCharSlot()];
+            charControllers[i].forcedInput = 0;
             auto &forcedTrigger = pGuy->getForcedTrigger();
-            if (charControllers[i].timelineTriggers.find(frameCount) != charControllers[i].timelineTriggers.end()) {
-                forcedTrigger = charControllers[i].timelineTriggers[frameCount];
+            auto frameTrigger = charControllers[i].timelineTriggers.find(frameCount);
+            if (frameTrigger != charControllers[i].timelineTriggers.end()) {
+                if (frameTrigger->second.actionID() > 0) {
+                    forcedTrigger = frameTrigger->second;
+                } else {
+                    charControllers[i].forcedInput = -frameTrigger->second.actionID();
+                    if (pGuy->getDirection() < 0) {
+                        charControllers[i].forcedInput = invertDirection(charControllers[i].forcedInput);
+                    }
+                }
             }
         }
         pSim->RunFrame();
@@ -2015,6 +2020,9 @@ void SimulationController::AdvanceUntilComplete(void)
             }
 
             int input = charControllers[i].getInput(frameCount);
+            if (charControllers[i].forcedInput) {
+                input = charControllers[i].forcedInput;
+            }
             int prevInput = pGuy->getCurrentInput();
             pGuy->Input(addPressBits(input, prevInput));
         }

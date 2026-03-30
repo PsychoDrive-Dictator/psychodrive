@@ -207,6 +207,11 @@ void ComboWorker::WorkLoop(void) {
                 break;
             }
 
+            // no hit in the game can get them at this point?
+            // if (pSim->simGuys[1]->getJuggleCounter() > 124) {
+            //     break;
+            // }
+
             //currentRoute.guyFrameProgress = pSim->simGuys[0]->getCurrentFrame();
             currentRoute.comboHits = pSim->simGuys[1]->getComboHits();
         }
@@ -265,6 +270,17 @@ uint64_t calculateAverageFPS(void)
     return seconds > 0 ? finder.totalFrames / seconds : 0;
 }
 
+std::string timelineTriggerToString(ActionRef trigger, Guy *pGuy)
+{
+    std::string actionDesc;
+    if (trigger.actionID() < 0) {
+        renderInput(actionDesc, -trigger.actionID());
+    } else {
+        actionDesc = pGuy->getActionName(trigger.actionID());
+    }
+    return actionDesc;
+}
+
 std::string routeToString(const DoneRoute &route, Guy *pGuy)
 {
     std::string result = std::to_string(route.damage) + " ";
@@ -272,13 +288,7 @@ std::string routeToString(const DoneRoute &route, Guy *pGuy)
     result += std::to_string(route.gaugeGain) + " ";
     result += std::to_string(route.focusDmg) + ": ";
     for ( auto &trigger : route.timelineTriggers) {
-        std::string actionDesc;
-        if (trigger.second.actionID() < 0) {
-            renderInput(actionDesc, -trigger.second.actionID());
-        } else {
-            actionDesc = pGuy->getActionName(trigger.second.actionID());
-        }
-        result += actionDesc + " ";
+        result += timelineTriggerToString(trigger.second, pGuy) + " ";
     }
     return result;
 }
