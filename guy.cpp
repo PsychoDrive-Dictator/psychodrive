@@ -6377,7 +6377,17 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                     }
                     break;
                 case 1:
-                    log(logUnknowns, "system event, id " + std::to_string(eventID));
+                    switch (eventID) {
+                        case 22:
+                            if (pOpponent) {
+                                // todo figure out which slot it is for real
+                                pOpponent->pendingUnlockHit = param1;
+                            }
+                            break;
+                        default:
+                            log(logUnknowns, "unknown system event, id " + std::to_string(eventID));
+                            break;
+                    }
                     break;
                 case 2:
                     switch (eventID) {

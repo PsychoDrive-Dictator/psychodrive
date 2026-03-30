@@ -7937,24 +7937,24 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 159,
+                "count": 57,
                 "firstFrame": 673,
+                "lastFrame": 729
+            },
+            {
+                "count": 120,
+                "firstFrame": 678,
                 "lastFrame": 797
             },
             {
-                "count": 217,
+                "count": 15,
                 "firstFrame": 673,
-                "lastFrame": 797
+                "lastFrame": 687
             },
             {
-                "count": 125,
-                "firstFrame": 673,
-                "lastFrame": 797
-            },
-            {
-                "count": 217,
-                "firstFrame": 673,
-                "lastFrame": 797
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,
