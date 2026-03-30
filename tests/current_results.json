@@ -4289,6 +4289,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "dhalsim_airborne_sa3_hit",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1712,
+                "firstFrame": 76,
+                "lastFrame": 1003
+            },
+            {
+                "count": 184,
+                "firstFrame": 157,
+                "lastFrame": 928
+            },
+            {
+                "count": 101,
+                "firstFrame": 357,
+                "lastFrame": 928
+            },
+            {
+                "count": 53,
+                "firstFrame": 62,
+                "lastFrame": 356
+            },
+            {
+                "count": 52,
+                "firstFrame": 62,
+                "lastFrame": 356
+            },
+            {
+                "count": 1225,
+                "firstFrame": 62,
+                "lastFrame": 1003
+            },
+            {
+                "count": 1341,
+                "firstFrame": 156,
+                "lastFrame": 1003
+            },
+            {
+                "count": 587,
+                "firstFrame": 417,
+                "lastFrame": 1003
+            },
+            {
+                "count": 499,
+                "firstFrame": 357,
+                "lastFrame": 855
+            },
+            {
+                "count": 441,
+                "firstFrame": 417,
+                "lastFrame": 857
+            },
+            {
+                "count": 94,
+                "firstFrame": 156,
+                "lastFrame": 346
+            },
+            {
+                "count": 511,
+                "firstFrame": 156,
+                "lastFrame": 946
+            }
+        ]
+    },
+    {
         "testName": "dhalsim_float",
         "testVersion": "33",
         "finished": true,
