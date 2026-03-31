@@ -1284,6 +1284,10 @@ struct TriggerCheckState {
 
 void Guy::DoTriggers(int fluffFrameBias)
 {
+    if (hitStop && ignoreHitStop) {
+        return;
+    }
+
     std::set<int> keptDeferredTriggerIDs;
     bool hasTriggerKey = pCurrentAction && !pCurrentAction->triggerKeys.empty();
     if (hasTriggerKey || fluffFrames(fluffFrameBias))
