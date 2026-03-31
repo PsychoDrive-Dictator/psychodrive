@@ -139,18 +139,28 @@ void ComboWorker::WorkLoop(void) {
                 currentRoute.simFrameProgress < pSim->frameCounter) {
                 currentRoute.simFrameProgress = pSim->frameCounter;
 
-                bool doFrameTriggers = true;
+                bool doActualFrameTriggers = true;
+                bool hasAnyFrameTriggers = pSim->simGuys[0]->getFrameTriggers().size();
 
                 // todo try to skip all karas for now, but should probably only skip on free movement
                 if (!finder.doKaras && pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct()) {
-                    doFrameTriggers = false;
+                    doActualFrameTriggers = false;
+                    hasAnyFrameTriggers = false;
+                    for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
+                        if (frameTrigger.actionID() < 0) {
+                            hasAnyFrameTriggers = true;
+                            break;
+                        }
+                    }
                 }
 
-                if ((pSim->simGuys[0]->getFrameTriggers().size() && doFrameTriggers) || pSim->simGuys[0]->canAct()) {
+                if (hasAnyFrameTriggers || pSim->simGuys[0]->canAct()) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
                         if (finder.doLights || (finder.lightsActionIDs.find(frameTrigger.actionID()) == finder.lightsActionIDs.end())) {
-                            QueueRouteFork(frameTrigger);
+                            if (frameTrigger.actionID() < 0 || doActualFrameTriggers) {
+                                QueueRouteFork(frameTrigger);
+                            }
                         }
                     }
                     if (pSim->simGuys[0]->canAct()) {
