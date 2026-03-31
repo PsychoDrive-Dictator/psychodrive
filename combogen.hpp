@@ -10,6 +10,7 @@
 
 #include "guy.hpp"
 #include "simulation.hpp"
+#include "ui.hpp"
 
 struct SharedSimulationSnapshot {
     std::atomic<int> refcount = 0;
@@ -130,7 +131,8 @@ public:
     static constexpr int maxRecentRoutes = 10;
 
     Simulation startSnapshot;
-    std::map<int, ActionRef> startTimelineTriggers;
+    std::map<int, ActionRef> startTimelineTriggers[2];
+    std::vector<inputRegion> startInputRegions[2];
     int startRecoveryTiming;
 
     bool playing = false;

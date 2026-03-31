@@ -1674,8 +1674,10 @@ void SimulationController::RenderComboMinerSetup(void)
             std::string routeStr = routeToString(*route, pSim->simGuys[0]);
             ImGui::PushID(routeCount++);
             if (ImGui::Button("Load")) {
-                simController.charControllers[0].timelineTriggers.clear();
-                simController.charControllers[0].timelineTriggers = finder.startTimelineTriggers;
+                for (int i = 0; i < 2; i++) {
+                    simController.charControllers[i].timelineTriggers = finder.startTimelineTriggers[i];
+                    simController.charControllers[i].inputRegions = finder.startInputRegions[i];
+                }
                 for (auto & trigger : route->timelineTriggers) {
                     simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
                 }
@@ -1696,8 +1698,10 @@ void SimulationController::RenderComboMinerSetup(void)
             std::string routeStr = routeToString(*it, pSim->simGuys[0]);
             ImGui::PushID(routeCount);
             if (ImGui::Button("Load")) {
-                simController.charControllers[0].timelineTriggers.clear();
-                simController.charControllers[0].timelineTriggers = finder.startTimelineTriggers;
+                for (int i = 0; i < 2; i++) {
+                    simController.charControllers[i].timelineTriggers = finder.startTimelineTriggers[i];
+                    simController.charControllers[i].inputRegions = finder.startInputRegions[i];
+                }
                 for (auto & trigger : it->timelineTriggers) {
                     simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
                 }

@@ -330,11 +330,21 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
         }
         simController.getFinishedSnapshotAtFrame(&finder.startSnapshot, startFrame);
         pComboCharData = simController.getRecordedGuy(0, 0)->getCharData();
-
-        finder.startTimelineTriggers = simController.charControllers[0].timelineTriggers;
-        std::erase_if(finder.startTimelineTriggers, [startFrame](const auto& item) {
-            return item.first >= startFrame;
-        });
+        for (int i = 0; i < 2; i++) {
+            finder.startTimelineTriggers[i] = simController.charControllers[i].timelineTriggers;
+            finder.startInputRegions[i] = simController.charControllers[i].inputRegions;
+            std::erase_if(finder.startTimelineTriggers[i], [startFrame](const auto& item) {
+                return item.first >= startFrame;
+            });
+            std::erase_if(finder.startInputRegions[i], [startFrame](const auto& item) {
+                return item.frame >= startFrame;
+            });
+            for (inputRegion &region : finder.startInputRegions[i]) {
+                if (region.frame + region.duration >= startFrame) {
+                    region.duration = startFrame - region.frame;
+                }
+            }
+        }
     }
 
     finder.startRecoveryTiming = finder.startSnapshot.simGuys[1]->getRecoveryTiming();
