@@ -772,7 +772,7 @@ ImGuiIO& initUI(void)
 {
 #ifdef __EMSCRIPTEN__
     webWidgets = true;
-    gameMode = MoveViewer;
+    gameMode = ComboMaker;
 #endif
 
     IMGUI_CHECKVERSION();
