@@ -813,6 +813,8 @@ ImGuiIO& initUI(void)
 
     ImGui::PushStyleVar(ImGuiStyleVar_DisabledAlpha, 1.0f);
 
+    simController.Reset();
+
     return io;
 }
 
