@@ -4423,6 +4423,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "dhalsim_hitstop_ignore_cancel",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 66,
+                "firstFrame": 153,
+                "lastFrame": 383
+            },
+            {
+                "count": 50,
+                "firstFrame": 163,
+                "lastFrame": 297
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 40,
+                "firstFrame": 150,
+                "lastFrame": 268
+            },
+            {
+                "count": 40,
+                "firstFrame": 150,
+                "lastFrame": 268
+            },
+            {
+                "count": 272,
+                "firstFrame": 138,
+                "lastFrame": 426
+            },
+            {
+                "count": 382,
+                "firstFrame": 139,
+                "lastFrame": 352
+            },
+            {
+                "count": 22,
+                "firstFrame": 182,
+                "lastFrame": 291
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 82,
+                "firstFrame": 140,
+                "lastFrame": 267
+            },
+            {
+                "count": 12,
+                "firstFrame": 160,
+                "lastFrame": 425
+            }
+        ]
+    },
+    {
         "testName": "dhalsim_instant_air_fb",
         "testVersion": "39",
         "finished": true,
@@ -4486,6 +4553,73 @@ var currentResults =
                 "count": 234,
                 "firstFrame": 93,
                 "lastFrame": 683
+            }
+        ]
+    },
+    {
+        "testName": "dhalsim_juggle_combo",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 268,
+                "firstFrame": 106,
+                "lastFrame": 319
+            },
+            {
+                "count": 1,
+                "firstFrame": 319,
+                "lastFrame": 319
+            },
+            {
+                "count": 190,
+                "firstFrame": 111,
+                "lastFrame": 313
+            },
+            {
+                "count": 190,
+                "firstFrame": 111,
+                "lastFrame": 313
+            },
+            {
+                "count": 14,
+                "firstFrame": 121,
+                "lastFrame": 302
+            },
+            {
+                "count": 134,
+                "firstFrame": 121,
+                "lastFrame": 318
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 4,
+                "firstFrame": 80,
+                "lastFrame": 353
             }
         ]
     },
