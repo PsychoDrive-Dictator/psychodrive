@@ -1783,22 +1783,20 @@ void SimulationController::RenderUI(void)
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
         int halfButtonSize = modeSelectorSize / 2 - 5;
-        if (simFrameCount > 1) {
-            if (ImGui::Button("Share", ImVec2(halfButtonSize,0))) {
-                std::string strSerialized;
-                Serialize(strSerialized);
-                //Restore(strSerialized);
+        if (ImGui::Button("Share", ImVec2(halfButtonSize,0))) {
+            std::string strSerialized;
+            Serialize(strSerialized);
+            //Restore(strSerialized);
 #ifdef __EMSCRIPTEN__
-                EM_ASM({
-                    var serialized = UTF8ToString($0);
-                    navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '#combo=' + serialized);
-                    //window.location.href = '?combo=' + serialized;
-                }, strSerialized.c_str());
+            EM_ASM({
+                var serialized = UTF8ToString($0);
+                navigator.clipboard.writeText(window.location.protocol + "//" + window.location.host + window.location.pathname + '#combo=' + serialized);
+                //window.location.href = '?combo=' + serialized;
+            }, strSerialized.c_str());
 #else
-                std::string strComboURL = "https://psychodrive.gg/#combo=" + strSerialized;
-                SDL_SetClipboardText(strComboURL.c_str());
+            std::string strComboURL = "https://psychodrive.gg/#combo=" + strSerialized;
+            SDL_SetClipboardText(strComboURL.c_str());
 #endif
-            }
         }
         ImGui::SameLine();
 #ifdef __EMSCRIPTEN__
