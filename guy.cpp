@@ -3371,8 +3371,8 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
     if (applyHit && dmgValue) {
-        if ((comboHits == 0 || comboDamage == 0) && !stunned) {
-            currentScaling = 100;
+        if ((comboHits == 0 || comboDamage == 0)) {
+            currentScaling = wallSplatScaling ? 80 : 100;
             pendingScaling = 0;
         }
 
@@ -3385,7 +3385,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         }
 
         if (applyScaling) {
-            if (comboHits == 0 && !stunned) {
+            if (comboHits == 0 && !wallSplatScaling) {
                 pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
                 pendingScaling += attackerInstantScale;
             } else {
@@ -3413,6 +3413,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             attackerInstantScale = 0;
         }
         pAttacker->appliedScaling = true;
+        wallSplatScaling = false;
         if (applyScaling) {
             lastScalingTriggerID = pAttacker->scalingTriggerID;
         }
@@ -3865,6 +3866,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             if (kabeTataki) {
                 // this can happen even if you block! blocked DI
                 wallSplat = true;
+                wallSplatScaling = true;
                 wallStopFrames = pHitEffect->wallStop + 2;
                 if (stunSplat) {
                     wallStopFrames = 30;
@@ -5394,6 +5396,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         pAttacker = nullptr;
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
+        wallSplatScaling = false;
         stunSplat = false;
         if (stunned) {
             burnout = false;
@@ -5425,6 +5428,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         pAttacker = nullptr;
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
+        wallSplatScaling = false;
         stunSplat = false;
         if (stunned) {
             burnout = false;

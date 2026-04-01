@@ -781,6 +781,7 @@ private:
         groundBounceAccelY = Fixed(0);
         wallBounce = false;
         wallSplat = false;
+        wallSplatScaling = false;
         stunSplat = false;
         stunned = false;
         tumble = false;
@@ -933,6 +934,7 @@ private:
     bool backDamage : 1;
     bool wallBounce : 1;
     bool wallSplat : 1;
+    bool wallSplatScaling : 1;
     bool stunSplat : 1;
     bool stunned : 1;
     bool tumble : 1;
