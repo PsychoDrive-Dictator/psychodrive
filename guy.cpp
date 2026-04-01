@@ -4626,6 +4626,9 @@ void Guy::DoBranchKey(bool preHit)
         if (doBranch) {
 
             if (keepFrame) {
+                if (branchFrame >= 1) { // only -1 is considered?
+                    branchFrame = 0;
+                }
                 int frameBias = branchFrame;
                 if (preHit) {
                     branchFrame = currentFrame + frameBias;
