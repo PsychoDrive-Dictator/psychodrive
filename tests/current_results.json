@@ -9247,6 +9247,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "terry_laneswitch_tc",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1267,
+                "firstFrame": 159,
+                "lastFrame": 803
+            },
+            {
+                "count": 146,
+                "firstFrame": 169,
+                "lastFrame": 607
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 103,
+                "firstFrame": 183,
+                "lastFrame": 630
+            },
+            {
+                "count": 56,
+                "firstFrame": 183,
+                "lastFrame": 630
+            },
+            {
+                "count": 413,
+                "firstFrame": 119,
+                "lastFrame": 750
+            },
+            {
+                "count": 796,
+                "firstFrame": 159,
+                "lastFrame": 803
+            },
+            {
+                "count": 103,
+                "firstFrame": 183,
+                "lastFrame": 630
+            },
+            {
+                "count": 181,
+                "firstFrame": 346,
+                "lastFrame": 750
+            },
+            {
+                "count": 109,
+                "firstFrame": 183,
+                "lastFrame": 633
+            },
+            {
+                "count": 104,
+                "firstFrame": 183,
+                "lastFrame": 605
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "terry_laneswitch_tc_empty",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 44,
+                "firstFrame": 108,
+                "lastFrame": 151
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 42,
+                "firstFrame": 68,
+                "lastFrame": 225
+            },
+            {
+                "count": 135,
+                "firstFrame": 108,
+                "lastFrame": 242
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "viper_jump_cancel_held_triggers",
         "testVersion": "36",
         "finished": true,
