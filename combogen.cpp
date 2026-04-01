@@ -237,6 +237,7 @@ void ComboWorker::WorkLoop(void) {
         doneRoute.focusGain = currentRoute.focusGain;
         doneRoute.focusDmg = currentRoute.focusDmg;
         doneRoute.gaugeGain = currentRoute.gaugeGain;
+        doneRoute.sideSwitch = (finder.startSnapshot.simGuys[0]->getPosX() > finder.startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
         // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
         // for ( auto &trigger : doneRoute.timelineTriggers) {
         //     logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
@@ -296,7 +297,8 @@ std::string routeToString(const DoneRoute &route, Guy *pGuy)
     std::string result = std::to_string(route.damage) + " ";
     result += std::to_string(route.focusGain) + " ";
     result += std::to_string(route.gaugeGain) + " ";
-    result += std::to_string(route.focusDmg) + ": ";
+    result += std::to_string(route.focusDmg) + " ";
+    result += std::to_string(route.sideSwitch) + ": ";
     for ( auto &trigger : route.timelineTriggers) {
         result += timelineTriggerToString(trigger.second, pGuy) + " ";
     }

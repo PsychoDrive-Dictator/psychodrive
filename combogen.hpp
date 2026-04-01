@@ -37,6 +37,7 @@ struct DoneRoute {
     int focusGain = 0;
     int gaugeGain = 0;
     int focusDmg = 0;
+    bool sideSwitch;
 };
 
 struct DamageSort {
