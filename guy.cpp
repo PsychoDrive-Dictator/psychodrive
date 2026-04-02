@@ -3806,6 +3806,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         // special wall status, splat OR bounce (NOT exclusive from special gronud satatus)
         wallSplat = false;
         wallBounce = false;
+        wallSplatScaling = false;
 
         wallStopped = false;
         wallStopFrames = false;
@@ -4945,6 +4946,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         } else {
             nextAction = 256;
         }
+        if (wallLoopProtection && wallStopped) {
+            juggleCounter += 100;
+        }
     }
 
     if (stunned && currentAction == 293 && currentFrame == 6) {
@@ -4979,6 +4983,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 wallBounceAccelY = 0.0f;
             }
             wallStopped = false;
+            wallLoopProtection = true;
         }
     }
 
@@ -5401,6 +5406,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallSplat = false;
         wallSplatScaling = false;
         stunSplat = false;
+        wallLoopProtection = false;
         if (stunned) {
             burnout = false;
             stunned = false;
@@ -5432,6 +5438,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
         wallSplatScaling = false;
+        wallLoopProtection = false;
         stunSplat = false;
         if (stunned) {
             burnout = false;

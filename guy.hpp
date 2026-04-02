@@ -782,6 +782,7 @@ private:
         wallBounce = false;
         wallSplat = false;
         wallSplatScaling = false;
+        wallLoopProtection = false;
         stunSplat = false;
         stunned = false;
         tumble = false;
@@ -935,6 +936,7 @@ private:
     bool wallBounce : 1;
     bool wallSplat : 1;
     bool wallSplatScaling : 1;
+    bool wallLoopProtection : 1;
     bool stunSplat : 1;
     bool stunned : 1;
     bool tumble : 1;
