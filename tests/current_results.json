@@ -7237,6 +7237,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jp_sa3_sideswitch",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 432,
+                "firstFrame": 226,
+                "lastFrame": 441
+            },
+            {
+                "count": 11,
+                "firstFrame": 224,
+                "lastFrame": 235
+            },
+            {
+                "count": 10,
+                "firstFrame": 227,
+                "lastFrame": 236
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 410,
+                "firstFrame": 237,
+                "lastFrame": 441
+            },
+            {
+                "count": 410,
+                "firstFrame": 237,
+                "lastFrame": 441
+            },
+            {
+                "count": 205,
+                "firstFrame": 237,
+                "lastFrame": 441
+            },
+            {
+                "count": 286,
+                "firstFrame": 224,
+                "lastFrame": 441
+            },
+            {
+                "count": 205,
+                "firstFrame": 237,
+                "lastFrame": 441
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 265,
+                "firstFrame": 237,
+                "lastFrame": 441
+            }
+        ]
+    },
+    {
         "testName": "jp_wallbounce_bnb",
         "testVersion": "26",
         "finished": true,
