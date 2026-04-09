@@ -7103,6 +7103,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "jp_lv3_sideswitch_alex",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 343,
+                "firstFrame": 155,
+                "lastFrame": 326
+            },
+            {
+                "count": 1,
+                "firstFrame": 155,
+                "lastFrame": 155
+            },
+            {
+                "count": 1,
+                "firstFrame": 167,
+                "lastFrame": 167
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 318,
+                "firstFrame": 168,
+                "lastFrame": 326
+            },
+            {
+                "count": 318,
+                "firstFrame": 168,
+                "lastFrame": 326
+            },
+            {
+                "count": 159,
+                "firstFrame": 168,
+                "lastFrame": 326
+            },
+            {
+                "count": 91,
+                "firstFrame": 236,
+                "lastFrame": 326
+            },
+            {
+                "count": 159,
+                "firstFrame": 168,
+                "lastFrame": 326
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 149,
+                "firstFrame": 168,
+                "lastFrame": 326
+            }
+        ]
+    },
+    {
+        "testName": "jp_lv3_sideswitch_alex2",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 484,
+                "firstFrame": 156,
+                "lastFrame": 397
+            },
+            {
+                "count": 10,
+                "firstFrame": 156,
+                "lastFrame": 165
+            },
+            {
+                "count": 10,
+                "firstFrame": 157,
+                "lastFrame": 166
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 462,
+                "firstFrame": 167,
+                "lastFrame": 397
+            },
+            {
+                "count": 462,
+                "firstFrame": 167,
+                "lastFrame": 397
+            },
+            {
+                "count": 231,
+                "firstFrame": 167,
+                "lastFrame": 397
+            },
+            {
+                "count": 298,
+                "firstFrame": 154,
+                "lastFrame": 397
+            },
+            {
+                "count": 231,
+                "firstFrame": 167,
+                "lastFrame": 397
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 221,
+                "firstFrame": 167,
+                "lastFrame": 397
+            }
+        ]
+    },
+    {
         "testName": "jp_manual_detonate_from_od",
         "testVersion": "34",
         "finished": true,
