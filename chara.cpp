@@ -433,7 +433,11 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         int rectListID = collisionType;
 
         if (isOther) {
-            if (collisionType == 7) {
+            rectListID = 9;
+            if (collisionType == 6) {
+                type = nullify_grab;
+                rectListID = 4;
+            } else if (collisionType == 7) {
                 type = domain;
             } else if (collisionType == 8) {
                 type = screen_freeze;
@@ -446,7 +450,6 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
             } else {
                 continue;
             }
-            rectListID = 9;
         } else {
             if (collisionType == 3) {
                 type = proximity_guard;

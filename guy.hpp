@@ -797,6 +797,7 @@ private:
         armorHitsLeft = 0;
         armorThisFrame = false;
         atemiThisFrame = false;
+        nullifiedGrabThisFrame = false;
         recoveryTiming = 0;
         recordFrameTriggers = false;
         recordLateCancels = false;
@@ -945,6 +946,7 @@ private:
     bool wallStopped : 1;
     bool armorThisFrame : 1;
     bool atemiThisFrame : 1;
+    bool nullifiedGrabThisFrame : 1;
     bool recordFrameTriggers : 1;
     bool recordLateCancels : 1;
     bool isDrive : 1;

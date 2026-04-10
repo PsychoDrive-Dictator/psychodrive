@@ -42,6 +42,7 @@ enum hitBoxType {
     direct_damage = 7,
     clash = 8,
     screen_freeze = 9,
+    nullify_grab = 10,
 };
 
 enum hitBoxFlags {

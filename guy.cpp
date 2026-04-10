@@ -361,6 +361,7 @@ bool Guy::RunFrame(bool advancingTime)
     grabAdjust = false;
     armorThisFrame = false;
     atemiThisFrame = false;
+    nullifiedGrabThisFrame = false;
     landed = false;
     pushBackThisFrame = Fixed(0);
     reflectThisFrame = Fixed(0);
@@ -2399,6 +2400,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             // todo right now we do nothing with those
             continue;
         }
+        if (hitbox.type == nullify_grab) {
+            // those don't look for anything
+            continue;
+        }
         bool isGrab = hitbox.type == grab;
         bool foundBox = false;
         HurtBox hurtBox = {};
@@ -2457,6 +2462,18 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             bool bIgnoreHitStun = hitbox.pHitData->common[0].attr2 & (1<<7);
             bool doGrab = (!pOtherGuy->getHitStun() || bIgnoreHitStun) && !pOtherGuy->throwProtectionFrames;
             if (doGrab) {
+                std::vector<HitBox> otherNullifyGrabBoxes;
+                bool grabNullified = false;
+                pOtherGuy->getHitBoxes(&otherNullifyGrabBoxes, nullptr, hitBoxType::nullify_grab);
+                for (auto const & nullifyGrabBox : otherNullifyGrabBoxes ) {
+                    if (doBoxesHit(hitbox.box, nullifyGrabBox.box)) {
+                        grabNullified = true;
+                    }
+                }
+                if (grabNullified) {
+                    pOtherGuy->nullifiedGrabThisFrame = true;
+                    continue;
+                }
                 if (!hasEvaluatedThrowBoxes) {
                     pOtherGuy->getHurtBoxes(nullptr, &otherThrowBoxes, nullptr);
                     hasEvaluatedThrowBoxes = true;
@@ -4400,7 +4417,10 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     break;
                 case 22: // atemi/counter
-                    if (atemiThisFrame) {
+                    if (branchParam1 & 1 && atemiThisFrame) {
+                        doBranch = true;
+                    }
+                    if (branchParam1 & 4 && nullifiedGrabThisFrame) {
                         doBranch = true;
                     }
                     break;
