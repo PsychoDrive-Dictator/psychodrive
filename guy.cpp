@@ -2760,8 +2760,13 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 // clamp
                 pOpponent->setFocus(pOpponent->focus);
                 pOpponent->setGauge(pOpponent->gauge);
-                setFocus(focus);
-                setGauge(gauge);
+                if (isProjectile && pParent) {
+                    pParent->setFocus(pParent->focus);
+                    pParent->setGauge(pParent->gauge);
+                } else {
+                    setFocus(focus);
+                    setGauge(gauge);
+                }
                 otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
                 pOpponent->locked = false;
                 pendingUnlockHit = 0;
@@ -3226,7 +3231,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pGuy->hitCounterThisMove = true;
                 if (hitFlagToParent) pGuy->pParent->hitCounterThisMove = true;
             }
-            if (!isGrab && !hitGrab && hitBox.type != domain && hitBox.type != direct_damage) {
+            if (hitBox.type != domain && hitBox.type != direct_damage) {
                 pGuy->hitThisFrame = true;
                 if (hitFlagToParent) pGuy->pParent->hitThisFrame = true;
                 pGuy->hitThisMove = true;
@@ -4667,7 +4672,7 @@ void Guy::DoBranchKey(bool preHit)
                 log(true, "noop branch - branch type inhibit?");
             } else {
                 if (branchAction == currentAction) {
-                    log(logBranches, "branching to frame " + std::to_string(branchFrame));
+                    log(logBranches, "branching to frame " + std::to_string(branchFrame) + " type " + std::to_string(branchType));
                     currentFrame = (branchFrame && !preHit) ? branchFrame - 1 : branchFrame;
                     currentFrameFrac = Fixed(currentFrame);
                     actionSpeed = Fixed(1); // todo right?
