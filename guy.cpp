@@ -3670,6 +3670,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         destY = 0;
     }
 
+    if (destY < 0 && !getAirborne()) {
+        destY = 0;
+    }
+
     if (blocking || isClash) {
         // todo should we remove other special status here?
         destY = 0;
