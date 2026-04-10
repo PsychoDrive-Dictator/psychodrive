@@ -7572,6 +7572,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jp_od_ghost",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 420,
+                "firstFrame": 118,
+                "lastFrame": 494
+            },
+            {
+                "count": 90,
+                "firstFrame": 143,
+                "lastFrame": 344
+            },
+            {
+                "count": 74,
+                "firstFrame": 129,
+                "lastFrame": 344
+            },
+            {
+                "count": 101,
+                "firstFrame": 104,
+                "lastFrame": 338
+            },
+            {
+                "count": 74,
+                "firstFrame": 104,
+                "lastFrame": 338
+            },
+            {
+                "count": 223,
+                "firstFrame": 104,
+                "lastFrame": 388
+            },
+            {
+                "count": 368,
+                "firstFrame": 104,
+                "lastFrame": 494
+            },
+            {
+                "count": 111,
+                "firstFrame": 104,
+                "lastFrame": 346
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 55,
+                "firstFrame": 104,
+                "lastFrame": 307
+            },
+            {
+                "count": 70,
+                "firstFrame": 104,
+                "lastFrame": 320
+            },
+            {
+                "count": 4,
+                "firstFrame": 198,
+                "lastFrame": 378
+            }
+        ]
+    },
+    {
         "testName": "jp_sa3_sideswitch",
         "testVersion": "40",
         "finished": true,
