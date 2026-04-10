@@ -384,8 +384,7 @@ bool Guy::RunFrame(bool advancingTime)
 
                 hitSpanFrames = 0;
                 airborne = pProjData->airborne;
-                int flagsX = pProjData->flags;
-                obeyHitID = flagsX & (1<<0);
+                obeyHitID = pProjData->flagsExt & (1<<0);
                 limitShotCategory = pProjData->category;
                 noPush = pProjData->noPush;
                 projLifeTime = pProjData->lifeTime;
