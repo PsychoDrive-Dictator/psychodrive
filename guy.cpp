@@ -2454,7 +2454,9 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (isGrab) {
-            if (!pOtherGuy->throwProtectionFrames) {
+            bool bIgnoreHitStun = hitbox.pHitData->common[0].attr2 & (1<<7);
+            bool doGrab = (!pOtherGuy->getHitStun() || bIgnoreHitStun) && !pOtherGuy->throwProtectionFrames;
+            if (doGrab) {
                 if (!hasEvaluatedThrowBoxes) {
                     pOtherGuy->getHurtBoxes(nullptr, &otherThrowBoxes, nullptr);
                     hasEvaluatedThrowBoxes = true;
