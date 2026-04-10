@@ -1743,6 +1743,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_hitstun_grab",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 796,
+                "firstFrame": 114,
+                "lastFrame": 528
+            },
+            {
+                "count": 118,
+                "firstFrame": 148,
+                "lastFrame": 443
+            },
+            {
+                "count": 1,
+                "firstFrame": 323,
+                "lastFrame": 323
+            },
+            {
+                "count": 314,
+                "firstFrame": 0,
+                "lastFrame": 528
+            },
+            {
+                "count": 302,
+                "firstFrame": 0,
+                "lastFrame": 528
+            },
+            {
+                "count": 731,
+                "firstFrame": 78,
+                "lastFrame": 485
+            },
+            {
+                "count": 819,
+                "firstFrame": 106,
+                "lastFrame": 528
+            },
+            {
+                "count": 171,
+                "firstFrame": 127,
+                "lastFrame": 443
+            },
+            {
+                "count": 214,
+                "firstFrame": 114,
+                "lastFrame": 436
+            },
+            {
+                "count": 249,
+                "firstFrame": 175,
+                "lastFrame": 475
+            },
+            {
+                "count": 76,
+                "firstFrame": 114,
+                "lastFrame": 335
+            },
+            {
+                "count": 226,
+                "firstFrame": 141,
+                "lastFrame": 475
+            }
+        ]
+    },
+    {
         "testName": "aa_jump_landing_triggers",
         "testVersion": "33",
         "finished": true,
@@ -6826,6 +6893,140 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "jp_atemi_vs_grab",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1304,
+                "firstFrame": 122,
+                "lastFrame": 735
+            },
+            {
+                "count": 241,
+                "firstFrame": 207,
+                "lastFrame": 323
+            },
+            {
+                "count": 99,
+                "firstFrame": 225,
+                "lastFrame": 323
+            },
+            {
+                "count": 131,
+                "firstFrame": 225,
+                "lastFrame": 369
+            },
+            {
+                "count": 131,
+                "firstFrame": 225,
+                "lastFrame": 369
+            },
+            {
+                "count": 493,
+                "firstFrame": 122,
+                "lastFrame": 697
+            },
+            {
+                "count": 684,
+                "firstFrame": 122,
+                "lastFrame": 735
+            },
+            {
+                "count": 211,
+                "firstFrame": 221,
+                "lastFrame": 632
+            },
+            {
+                "count": 198,
+                "firstFrame": 122,
+                "lastFrame": 662
+            },
+            {
+                "count": 575,
+                "firstFrame": 221,
+                "lastFrame": 662
+            },
+            {
+                "count": 64,
+                "firstFrame": 122,
+                "lastFrame": 341
+            },
+            {
+                "count": 301,
+                "firstFrame": 192,
+                "lastFrame": 519
+            }
+        ]
+    },
+    {
+        "testName": "jp_cmd_grab",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 748,
+                "firstFrame": 112,
+                "lastFrame": 388
+            },
+            {
+                "count": 107,
+                "firstFrame": 113,
+                "lastFrame": 253
+            },
+            {
+                "count": 56,
+                "firstFrame": 120,
+                "lastFrame": 253
+            },
+            {
+                "count": 40,
+                "firstFrame": 207,
+                "lastFrame": 246
+            },
+            {
+                "count": 40,
+                "firstFrame": 207,
+                "lastFrame": 246
+            },
+            {
+                "count": 497,
+                "firstFrame": 112,
+                "lastFrame": 388
+            },
+            {
+                "count": 555,
+                "firstFrame": 111,
+                "lastFrame": 388
+            },
+            {
+                "count": 49,
+                "firstFrame": 207,
+                "lastFrame": 255
+            },
+            {
+                "count": 182,
+                "firstFrame": 207,
+                "lastFrame": 388
+            },
+            {
+                "count": 81,
+                "firstFrame": 207,
+                "lastFrame": 287
+            },
+            {
+                "count": 6,
+                "firstFrame": 111,
+                "lastFrame": 116
             },
             {
                 "count": 0,
