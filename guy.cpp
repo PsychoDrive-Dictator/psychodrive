@@ -2461,7 +2461,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
         if (isGrab) {
             bool bIgnoreHitStun = hitbox.pHitData->common[0].attr2 & (1<<7);
-            bool doGrab = (!pOtherGuy->getHitStun() || bIgnoreHitStun) && !pOtherGuy->throwProtectionFrames;
+            bool doGrab = (!pOtherGuy->getHitStun() || pOtherGuy->getHitStun() > 1000 || bIgnoreHitStun) && !pOtherGuy->throwProtectionFrames;
             if (doGrab) {
                 std::vector<HitBox> otherNullifyGrabBoxes;
                 bool grabNullified = false;
