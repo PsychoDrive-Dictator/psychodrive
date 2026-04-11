@@ -714,6 +714,8 @@ private:
         hitAtemiThisFrame = false;
         punishCounterThisFrame = false;
         grabbedThisFrame = false;
+        normalGrabbedThisFrame = false;
+        hitStunGrabbedThisFrame = false;
         grabAdjust = false;
         hitThisMove = false;
         hitCounterThisMove = false;
@@ -899,6 +901,8 @@ private:
     bool hitAtemiThisFrame : 1;
     bool punishCounterThisFrame : 1;
     bool grabbedThisFrame : 1;
+    bool normalGrabbedThisFrame : 1;
+    bool hitStunGrabbedThisFrame : 1;
     bool grabAdjust : 1;
     bool hitThisMove : 1;
     bool hitCounterThisMove : 1;

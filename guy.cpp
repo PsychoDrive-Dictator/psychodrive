@@ -357,6 +357,8 @@ bool Guy::RunFrame(bool advancingTime)
     hasBeenPerfectParriedThisFrame = false;
     punishCounterThisFrame = false;
     grabbedThisFrame = false;
+    normalGrabbedThisFrame = false;
+    hitStunGrabbedThisFrame = false;
     beenHitThisFrame = false;
     grabAdjust = false;
     armorThisFrame = false;
@@ -2568,8 +2570,9 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                         if (doBoxesHit(hitbox.box, hurtbox.box)) {
                             hurtBox = hurtbox;
                             foundBox = true;
+
                             //log(logHits, "foundbox");
-                            break; // don't do further hitboxes from us
+                            break;
                         }
                     }
                 }
@@ -2696,11 +2699,6 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 hitEntryFlag |= air;
             }
 
-            if (isGrab && (pOtherGuy->blocking && pOtherGuy->hitStun)) {
-                // a grab would whiff if opponent is already in blockstun
-                continue;
-            }
-
             if (hitbox.type == domain && !pOtherGuy->locked) {
                 // domain only when locked, other things can hit during lock
                 continue;
@@ -2741,12 +2739,20 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 continue;
             }
 
+            if (hitbox.hitID != -1) {
+                canHitID |= 1ULL << hitbox.hitID;
+            }
+
             // juggle was the last thing to check, hit is valid
             pendingHitList.push_back({
                 this, pOtherGuy, hitbox, hurtBox, pHitEntry,
                 hitEntryFlag, hitbox.pHitData ? hitbox.pHitData->id : 0, blocked, parried, bombBurst
             });
         }
+    }
+
+    if (isProjectile && !obeyHitID) {
+        canHitID = 0;
     }
 
     if (pendingUnlockHit) {
@@ -2792,6 +2798,7 @@ AtemiData *Guy::findAtemi(int atemiID)
 
 void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 {
+    std::unordered_set<Guy *> attackers;
     std::unordered_set<Guy *> hitGuys;
     std::unordered_set<Guy *> clampGuys;
 
@@ -2818,10 +2825,12 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         // for now don't hit the same guy twice
         // todo figure out what happens when two simultaneous hits happen
         if (hitBox.type != direct_damage && hitGuys.find(pOtherGuy) != hitGuys.end()) {
-            continue;
+            //continue;
         } else {
             hitGuys.insert(pOtherGuy);
         }
+
+        attackers.insert(pGuy);
 
         bool isGrab = hitBox.type == grab;
 
@@ -3002,6 +3011,14 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         if ((isGrab || hitGrab) && hitBox.type != domain) {
             pGuy->grabbedThisFrame = true;
             if (hitFlagToParent) pGuy->pParent->grabbedThisFrame = true;
+            if (pHitEntry->attr2 & (1<<0)) {
+                pGuy->normalGrabbedThisFrame = true;
+                if (hitFlagToParent) pGuy->pParent->normalGrabbedThisFrame = true;
+            }
+            if (pHitEntry->attr2 & (1<<7)) {
+                pGuy->hitStunGrabbedThisFrame = true;
+                if (hitFlagToParent) pGuy->pParent->hitStunGrabbedThisFrame = true;
+            }
         }
 
         int hitStopSelf = pHitEntry->hitStopOwner;
@@ -3203,20 +3220,11 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
         }
 
-        int hitID = hitBox.hitID;
-
         if (pGuy->isProjectile) {
             pGuy->projHitCount--;
             // mmmm
             //hitStopSelf += pGuy->pCurrentAction->pProjectileData->extraHitStop;
-            if (hitBox.type == projectile && !pGuy->obeyHitID) {
-                hitID = -1;
-            }
             pGuy->hitSpanFrames = pGuy->pCurrentAction->pProjectileData->hitSpan;
-        }
-
-        if (hitID != -1) {
-            pGuy->canHitID |= 1ULL << hitID;
         }
 
         if (!pOtherGuy->blocking && !hitArmor) {
@@ -3253,21 +3261,6 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             " moveType " + std::to_string(moveType) );
         otherGuyLog(pOtherGuy, pOtherGuy->logHits, "attr0 " + std::to_string(attr0) + "hitmark " + std::to_string(hitMark));
 
-        // let's try to be doing the grab before time stops
-        if (pGuy->grabbedThisFrame && pGuy->nextAction == -1) {
-            pGuy->DoBranchKey();
-            if (pGuy->nextAction != -1) {
-                // only transition
-                pGuy->AdvanceFrame(false);
-                // only run keys, force position reset as this is a new hit
-                pOtherGuy->locked = false;
-                pGuy->RunFrame(false);
-            } else {
-                otherGuyLog(pGuy, true, "instagrab branch not found!");
-            }
-        }
-
-        // add warudo after potential instagrab branch (technical term)
         if (hitStopSelf > 0) {
             if (hitStopToParent) {
                 pGuy->pParent->addHitStop(hitStopSelf+1);
@@ -3283,6 +3276,23 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 emscripten_vibrate(hitStopTarget*2);            
             }
 #endif
+        }
+    }
+
+    for (Guy *pGuy : attackers) {
+        if (pGuy->grabbedThisFrame && pGuy->nextAction == -1) {
+            pGuy->DoBranchKey();
+            if (pGuy->nextAction != -1) {
+                // only transition
+                pGuy->AdvanceFrame(false);
+                // only run keys, force position reset as this is a new hit
+                if (pGuy->pOpponent) {
+                    pGuy->pOpponent->locked = false;
+                }
+                pGuy->RunFrame(false);
+            } else {
+                otherGuyLog(pGuy, true, "instagrab branch not found!");
+            }
         }
     }
 
@@ -4476,6 +4486,15 @@ void Guy::DoBranchKey(bool preHit)
                         }
                         if (branchParam0 != 0 && branchParam0 != 2) {
                             log(logUnknowns, "unknown catch branch kind");
+                        }
+                        if (branchParam1 == 2 && !hitStunGrabbedThisFrame) {
+                            doBranch = false;
+                        }
+                        if (branchParam1 == 1 && hitStunGrabbedThisFrame) {
+                            doBranch = false;
+                        }
+                        if (branchParam1 > 2) {
+                            log(logUnknowns, "unknown catch branch param2 kind");
                         }
                     }
                     break;
