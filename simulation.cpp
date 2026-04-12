@@ -15,7 +15,7 @@ Simulation::~Simulation() {
     }
 }
 
-void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /*= nullptr*/)
+void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /* = nullptr */, bool simulationOrder /* = true */)
 {
     if (!vecOutEveryone) {
         vecOutEveryone = &everyone;
@@ -28,7 +28,7 @@ void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /*= nullptr*/)
     }
 
     for (uint32_t i = 0; i < simGuys.size(); i++) {
-        if ((i & 1) == filterOdd) {
+        if ((i & 1) == filterOdd && simulationOrder) {
             continue;
         }
         vecOutEveryone->push_back(simGuys[i]);
@@ -36,6 +36,8 @@ void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /*= nullptr*/)
             vecOutEveryone->push_back(minion);
         }
     }
+
+    if (!simulationOrder) return;
 
     // do it again with it inverted
     filterOdd = !filterOdd;
@@ -447,7 +449,9 @@ void Simulation::AdvanceFrame(void)
 
 void Simulation::Render(float z /* = 0.0 */, bool showDomain)
 {
-    for (auto guy : everyone) {
+    std::vector<Guy *> everyoneRender;
+    gatherEveryone(&everyoneRender, false);
+    for (auto guy : everyoneRender) {
         guy->Render(z, showDomain);
     }
 }

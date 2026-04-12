@@ -602,7 +602,7 @@ void renderMarkersAndStuff(void)
 {
     int markerToDelete = -1;
     std::vector<Guy *> everyone;
-    defaultSim.gatherEveryone(&everyone);
+    defaultSim.gatherEveryone(&everyone, false);
     for (uint32_t i = 0; i < vecMarkers.size(); i++)
     {
         if (std::find(everyone.begin(), everyone.end(), vecMarkers[i].pOrigin) == everyone.end()) {

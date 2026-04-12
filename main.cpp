@@ -883,9 +883,7 @@ static void mainloop(void)
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
         renderComboFinder();
-        for (auto guy : defaultSim.everyone) {
-            guy->Render();
-        }
+        defaultSim.Render();
 
         if (resetpos) {
             uint32_t i = 0;
