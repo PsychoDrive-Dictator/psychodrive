@@ -21,9 +21,31 @@ void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /*= nullptr*/)
         vecOutEveryone = &everyone;
     }
     vecOutEveryone->clear();
-    for (auto guy : simGuys) {
-        vecOutEveryone->push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
+
+    bool filterOdd = true;
+    if (frameCounter & 1) {
+        filterOdd = !filterOdd;
+    }
+
+    for (uint32_t i = 0; i < simGuys.size(); i++) {
+        if ((i & 1) == filterOdd) {
+            continue;
+        }
+        vecOutEveryone->push_back(simGuys[i]);
+        for ( auto minion : simGuys[i]->getMinions() ) {
+            vecOutEveryone->push_back(minion);
+        }
+    }
+
+    // do it again with it inverted
+    filterOdd = !filterOdd;
+
+    for (uint32_t i = 0; i < simGuys.size(); i++) {
+        if ((i & 1) == filterOdd) {
+            continue;
+        }
+        vecOutEveryone->push_back(simGuys[i]);
+        for ( auto minion : simGuys[i]->getMinions() ) {
             vecOutEveryone->push_back(minion);
         }
     }

@@ -477,6 +477,8 @@ private:
 
     void ExitStyle();
 
+    void DoReflect();
+
     bool proxGuard() {
         if (blocking && !hitStun) {
             return true;
@@ -723,6 +725,7 @@ private:
         hasBeenBlockedThisMove = false;
         hitArmorThisMove = false;
         hitAtemiThisMove = false;
+        prevHitStop = 0;
         hitStop = 0;
         pendingHitStop = 0;
         timeInHitStop = 0;
@@ -1063,6 +1066,7 @@ private:
     // hitting side
     uint64_t canHitID;
 
+    int prevHitStop;
     int hitStop;
     int pendingHitStop;
     int timeInHitStop;

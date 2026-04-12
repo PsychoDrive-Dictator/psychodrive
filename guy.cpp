@@ -286,16 +286,7 @@ bool Guy::RunFrame(bool advancingTime)
         return false;
     }
 
-    if (advancingTime && !getWarudo()) {
-        if (debuffTimer > 0 ) {
-            debuffTimer--;
-        }
-        if (debuffTimer == 1 && getHitStop() == 1) {
-            debuffTimer = 5;
-        } else if (debuffTimer == 1 && getHitStop() > 0) {
-            debuffTimer++;
-        }
-    }
+    prevHitStop = getHitStop();
 
     if (!warudo && tokiWaUgokidasu) {
         tokiWaUgokidasu = false;
@@ -324,6 +315,8 @@ bool Guy::RunFrame(bool advancingTime)
     if (getHitStop()) {
         return false;
     }
+
+    DoStatusKey(true);
 
     if (hitSpanFrames) {
         hitSpanFrames--;
@@ -547,6 +540,17 @@ bool Guy::RunFrame(bool advancingTime)
 
 void Guy::RunFramePostPush(void)
 {
+    if (!getWarudo()) {
+        if (debuffTimer > 0 ) {
+            debuffTimer--;
+        }
+        if (debuffTimer == 1 && prevHitStop == 1) {
+            debuffTimer = 5;
+        } else if (debuffTimer == 1 && prevHitStop > 0) {
+            debuffTimer++;
+        }
+    }
+
     if (parryFreeze || warudo || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) {
         return;
     }
@@ -1894,28 +1898,9 @@ bool Guy::Push(Guy *pOtherGuy)
     }
     // seems like ignore hitstop bit lingers for one frame but just for push?
     // probably symptom of an ordering difference
-    if (warudo || (getHitStop() && !wasIgnoreHitStop)) return false;
-
-    // do reflect before push, since vel could be winning to push us flush against someone
-    // in theory should do before wall touch too but not sure if both can be touching the
-    // wall at the same time while stll being affected by reflect
-    if (pOpponent && !pOpponent->warudo && (reflectThisFrame == Fixed(0) || deferredReflect)) {
-        if (hitReflectVelX != Fixed(0)) {
-            if (!locked && !nageKnockdown && !ignoreCornerPushback) {
-                posX = posX + hitReflectVelX;
-            }
-
-            log(logTransitions, "reflect " + std::to_string(hitReflectVelX.f()));
-            reflectThisFrame = hitReflectVelX;
-            Fixed prevHitVelX = hitReflectVelX;
-            hitReflectVelX = hitReflectVelX + hitReflectAccelX;
-            if ((hitReflectVelX * prevHitVelX) < Fixed(0) || (hitReflectAccelX != Fixed(0) && hitReflectVelX == Fixed(0))) {
-                hitReflectAccelX = Fixed(0);
-                hitReflectVelX = Fixed(0);
-            }
-        }
-    }
-    deferredReflect = false;
+    bool canPush = !(warudo || (getHitStop() && !wasIgnoreHitStop));
+    bool otherGuyCanPush = !(pOtherGuy->warudo || (pOtherGuy->getHitStop() && !pOtherGuy->wasIgnoreHitStop));
+    if (!canPush && !otherGuyCanPush) return false;
 
     if (didPush) return false;
     if ( !pOtherGuy ) return false;
@@ -1923,6 +1908,11 @@ bool Guy::Push(Guy *pOtherGuy)
     if (isProjectile && !pOtherGuy->isProjectile) return false;
     if (!isProjectile && pOtherGuy->isProjectile) return false;
 
+    // do reflect before push, since vel could be winning to push us flush against someone
+    // in theory should do before wall touch too but not sure if both can be touching the
+    // wall at the same time while stll being affected by reflect
+    DoReflect();
+    pOtherGuy->DoReflect();
 
     if (isProjectile) {
         if (projHitCount < 0 || pOtherGuy->projHitCount < 0) {
@@ -2103,10 +2093,16 @@ bool Guy::Push(Guy *pOtherGuy)
 
                 // give remainder to either player depending on frame count
                 if (frameNumber & 1) {
-                    posX.data += fixedRemainder;
+                    pOtherGuy->posX.data -= fixedRemainder;
                 } else {
                     pOtherGuy->posX.data += fixedRemainder;
                 }
+
+                // if (frameNumber & 1) {
+                //     posX.data += fixedRemainder;
+                // } else {
+                //     posX.data -= fixedRemainder;
+                // }
             }
 
             // both are in contact now, slide back/forth appropriately if anyone got pushed into a wall
@@ -2375,6 +2371,29 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
     forceLanding = false;
 
     return hasPushed;
+}
+
+void Guy::DoReflect()
+{
+    if (warudo || (getHitStop() && !wasIgnoreHitStop)) return;
+
+    if (pOpponent && !pOpponent->warudo && (reflectThisFrame == Fixed(0) || deferredReflect)) {
+        if (hitReflectVelX != Fixed(0)) {
+            if (!locked && !nageKnockdown && !ignoreCornerPushback) {
+                posX = posX + hitReflectVelX;
+            }
+
+            log(logTransitions, "reflect " + std::to_string(hitReflectVelX.f()));
+            reflectThisFrame = hitReflectVelX;
+            Fixed prevHitVelX = hitReflectVelX;
+            hitReflectVelX = hitReflectVelX + hitReflectAccelX;
+            if ((hitReflectVelX * prevHitVelX) < Fixed(0) || (hitReflectAccelX != Fixed(0) && hitReflectVelX == Fixed(0))) {
+                hitReflectAccelX = Fixed(0);
+                hitReflectVelX = Fixed(0);
+            }
+        }
+    }
+    deferredReflect = false;
 }
 
 void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
@@ -4797,7 +4816,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if ((getWarudo() && !tokiWaUgokidasu) || superFreeze) {
             tickRegenCooldown = false;
         }
-        if (pOpponent && (pOpponent->getWarudo() || pOpponent->superFreeze)) {
+        if (pOpponent && ((pOpponent->getWarudo() && !pOpponent->tokiWaUgokidasu) || pOpponent->superFreeze || pOpponent->tokiYoTomare)) {
             tickRegenCooldown = false;
         }
         if (focusRegenCooldownFrozen) {
@@ -5618,7 +5637,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     // if we need landing adjust/etc during hitStop, need this updated now
-    DoStatusKey(true);
+    DoStatusKey();
     WorldPhysics(true); // only floor
 
     couldMove = canMoveNow;
@@ -5905,62 +5924,60 @@ void Guy::DoStatusKey(bool doSideOp)
         actionStatus = statusKey.actionStatus;
         jumpStatus = statusKey.jumpStatus;
 
-        switch (statusKey.side) {
-            default:
-                log (logUnknowns, "unknown side op " + std::to_string(statusKey.side));
-                break;
-            case 0:
-                break;
-            case 1:
-                if (needsTurnaround()) {
+        if (doSideOp) {
+            switch (statusKey.side) {
+                default:
+                    log (logUnknowns, "unknown side op " + std::to_string(statusKey.side));
+                    break;
+                case 0:
+                    break;
+                case 1:
+                    if (needsTurnaround()) {
+                        switchDirection();
+                    }
+                    break;
+                case 2:
+                    if (needsTurnaround(Fixed(0), innerDirection)) {
+                        switchInnerDirection();
+                    }
+                    break;
+                case 3:
                     switchDirection();
-                }
-                break;
-            case 2:
-                if (needsTurnaround(Fixed(0), innerDirection)) {
+                    break;
+                case 4:
                     switchInnerDirection();
-                }
-                break;
-            case 3:
-                if (doSideOp) {
-                    switchDirection();
-                }
-                break;
-            case 4:
-                if (doSideOp) {
-                    switchInnerDirection();
-                }
-                break;
-            case 5:
-                if (pOpponent && direction != pOpponent->direction) {
-                    switchDirection();
-                }
-                break;
-            case 6:
-                if (pOpponent && innerDirection != pOpponent->direction) {
-                    switchInnerDirection();
-                }
-                break;
-            case 8:
-                if (pOpponent && innerDirection == pOpponent->direction) {
-                    switchInnerDirection();
-                }
-                break;
-            case 9:
-                if (direction != 1) {
-                    switchDirection();
-                }
-                break;
-            case 10:
-                if (direction != -1) {
-                    switchDirection();
-                }
-                break;
-            case 11:
-                if (pParent && direction != pParent->direction) {
-                    switchDirection();
-                }
-                break;
+                    break;
+                case 5:
+                    if (pOpponent && direction != pOpponent->direction) {
+                        switchDirection();
+                    }
+                    break;
+                case 6:
+                    if (pOpponent && innerDirection != pOpponent->direction) {
+                        switchInnerDirection();
+                    }
+                    break;
+                case 8:
+                    if (pOpponent && innerDirection == pOpponent->direction) {
+                        switchInnerDirection();
+                    }
+                    break;
+                case 9:
+                    if (direction != 1) {
+                        switchDirection();
+                    }
+                    break;
+                case 10:
+                    if (direction != -1) {
+                        switchDirection();
+                    }
+                    break;
+                case 11:
+                    if (pParent && direction != pParent->direction) {
+                        switchDirection();
+                    }
+                    break;
+            }
         }
     }
 }
@@ -6624,7 +6641,7 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
                 pNewGuy->appliedScaling = false;
             }
             // run initial frame on behalf of sim loop here because it wasn't included this frame
-            pNewGuy->DoStatusKey(true);
+            //pNewGuy->DoStatusKey(true);
             pNewGuy->RunFrame(true);
             pNewGuy->RunFramePostPush();
             if (pParent) {
