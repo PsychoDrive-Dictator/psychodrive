@@ -396,7 +396,9 @@ bool Guy::RunFrame(bool advancingTime)
             noPush = false; // might be overridden below
         }
 
-        DoWorldKey();
+        if (!tokiYoTomare) {
+            DoWorldKey();
+        }
 
         DoLockKey();
 
@@ -6208,6 +6210,7 @@ void Guy::DoWorldKey(void)
                     }
                     if (pOpponent->warudo) {
                         pOpponent->tokiWaUgokidasu = true;
+                        pOpponent->DoWorldKey();
                     }
                     for ( auto minion : pOpponent->dc.minions ) {
                         if (minion->warudo) {
