@@ -1157,17 +1157,6 @@ private:
     friend void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList);
 };
 
-static inline void gatherEveryone(std::vector<Guy*> &vecGuys, std::vector<Guy*> &vecOutEveryone)
-{
-    vecOutEveryone.clear();
-    for (auto guy : vecGuys) {
-        vecOutEveryone.push_back(guy);
-        for ( auto minion : guy->getMinions() ) {
-            vecOutEveryone.push_back(minion);
-        }
-    }
-}
-
 inline GuyRef& GuyRef::operator=(Guy* rhs) {
     pGuy = rhs;
     if (pGuy) {

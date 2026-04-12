@@ -600,7 +600,7 @@ static void mainloop(void)
             vecGuysToDelete.clear();
         }
 
-        gatherEveryone(guys, defaultSim.everyone);
+        defaultSim.gatherEveryone();
 
         if (runFrame) {
             for (auto guy : defaultSim.everyone) {
@@ -610,7 +610,7 @@ static void mainloop(void)
         }
 
         // gather everyone again in case of deletions/additions in RunFrame
-        gatherEveryone(guys, defaultSim.everyone);
+        defaultSim.gatherEveryone();
 
         // if replay, we'll update the counter from the replay
         if (!runFrame && !replayingGameState) {
@@ -630,7 +630,7 @@ static void mainloop(void)
             }
 
             // gather everyone again in case of deletions/additions in RunFramePostPush
-            gatherEveryone(guys, defaultSim.everyone);
+            defaultSim.gatherEveryone();
 
             std::vector<PendingHit> pendingHitList;
 
@@ -641,7 +641,7 @@ static void mainloop(void)
             ResolveHits(&defaultSim, pendingHitList);
 
             // any hit spawns
-            gatherEveryone(guys, defaultSim.everyone);
+            defaultSim.gatherEveryone();
 
             static bool hasAddedData = false;
             // update plot range if we're doing that

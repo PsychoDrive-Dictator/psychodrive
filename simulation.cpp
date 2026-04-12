@@ -7,7 +7,7 @@ Simulation::~Simulation() {
     if (!enableCleanup) {
         return;
     }
-    gatherEveryone(simGuys, everyone);
+    gatherEveryone();
     for (auto guy: everyone) {
         // don't try to massage the guys list or opponent pointers, we're deleting everything
         guy->enableCleanup = false;
@@ -15,9 +15,23 @@ Simulation::~Simulation() {
     }
 }
 
+void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /*= nullptr*/)
+{
+    if (!vecOutEveryone) {
+        vecOutEveryone = &everyone;
+    }
+    vecOutEveryone->clear();
+    for (auto guy : simGuys) {
+        vecOutEveryone->push_back(guy);
+        for ( auto minion : guy->getMinions() ) {
+            vecOutEveryone->push_back(minion);
+        }
+    }
+}
+
 void Simulation::Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool)
 {
-    gatherEveryone(simGuys, everyone);
+    gatherEveryone();
 
     if (everyone.size() < pOtherSim->everyone.size()) {
         int guysToAllocate = pOtherSim->everyone.size() - everyone.size();
@@ -233,14 +247,14 @@ void Simulation::RunFrame(void) {
     }
     vecGuysToDelete.clear();
 
-    gatherEveryone(simGuys, everyone);
+    gatherEveryone();
 
     for (auto guy : everyone) {
         guy->RunFrame();
     }
 
     // gather everyone again in case of deletions/additions in RunFrame
-    gatherEveryone(simGuys, everyone);
+    gatherEveryone();
 
     for (auto guy : everyone) {
         guy->WorldPhysics();
@@ -253,7 +267,7 @@ void Simulation::RunFrame(void) {
     }
 
     // gather everyone again in case of deletions/additions in RunFramePostPush
-    gatherEveryone(simGuys, everyone);
+    gatherEveryone();
 
     std::vector<PendingHit> pendingHitList;
 
@@ -264,7 +278,7 @@ void Simulation::RunFrame(void) {
     ResolveHits(this, pendingHitList);
 
     // hits can make guys too
-    gatherEveryone(simGuys, everyone);
+    gatherEveryone();
 
     if (replayingGameStateDump) {
         static bool firstFrame = true;
