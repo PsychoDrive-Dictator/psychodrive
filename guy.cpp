@@ -6215,12 +6215,14 @@ void Guy::DoWorldKey(void)
                     for ( auto minion : pOpponent->dc.minions ) {
                         if (minion->warudo) {
                             minion->tokiWaUgokidasu = true;
+                            minion->DoWorldKey();
                         }
                     }
                 }
                 for ( auto minion : dc.minions ) {
                     if (minion->warudo) {
                         minion->tokiWaUgokidasu = true;
+                        minion->DoWorldKey();
                     }
                 }
                 break;
