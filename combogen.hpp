@@ -41,11 +41,20 @@ struct DoneRoute {
 };
 
 struct DamageSort {
-    // if (lhs.damage == rhs.damage) {
-    //     return lhs.timelineTriggers < rhs.timelineTriggers;
-    // }
+    // this is also our index key for dedupe
     bool operator()(const std::unique_ptr<DoneRoute>& lhs, const std::unique_ptr<DoneRoute>& rhs) const {
-        return lhs->damage < rhs->damage;
+        if (lhs->damage != rhs->damage) {
+            return lhs->damage < rhs->damage;
+        } else if (lhs->focusGain != rhs->focusGain) {
+            return lhs->focusGain < rhs->focusGain;
+        } else if (lhs->gaugeGain != rhs->gaugeGain) {
+            return lhs->gaugeGain < rhs->gaugeGain;
+        } else if (lhs->focusDmg != rhs->focusDmg) {
+            return lhs->focusDmg < rhs->focusDmg;
+        } else if (lhs->sideSwitch != rhs->sideSwitch) {
+            return lhs->sideSwitch < rhs->sideSwitch;
+        }
+        return false;
     }
 };
 

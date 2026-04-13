@@ -250,7 +250,14 @@ void ComboWorker::WorkLoop(void) {
         // log(logEntry);
         // fprintf(stderr, "%s\n", logEntry.c_str());
         mutexDoneRoutes.lock();
-        doneRoutes.insert(std::make_unique<DoneRoute>(doneRoute));
+        auto newRoute = std::make_unique<DoneRoute>(doneRoute);
+        auto it = doneRoutes.find(newRoute);
+        if (it == doneRoutes.end()) {
+            doneRoutes.insert(std::move(newRoute));
+        } else if (newRoute->timelineTriggers.size() < (*it)->timelineTriggers.size()) {
+            doneRoutes.erase(it);
+            doneRoutes.insert(std::move(newRoute));
+        }
         mutexDoneRoutes.unlock();
 
         if (pendingSnapshot) {
@@ -500,12 +507,23 @@ void updateComboFinder(void)
                 }
             }
             for (auto it = newDoneRoutes.begin(); it != newDoneRoutes.end(); ) {
-                auto node = newDoneRoutes.extract(it++);
-                auto result = finder.doneRoutes.insert(std::move(node));
-                if (result.inserted) {
-                    finder.doneRoutesByFocusGain.insert(result.position->get());
-                    finder.doneRoutesByGaugeGain.insert(result.position->get());
-                    finder.doneRoutesByFocusDmg.insert(result.position->get());
+                auto newRoute = std::move(newDoneRoutes.extract(it++).value());
+                auto existing = finder.doneRoutes.find(newRoute);
+                bool doInsert = false;
+                if (existing == finder.doneRoutes.end()) {
+                    doInsert = true;
+                } else if (newRoute->timelineTriggers.size() < (*existing)->timelineTriggers.size()) {
+                    finder.doneRoutesByFocusGain.erase(existing->get());
+                    finder.doneRoutesByGaugeGain.erase(existing->get());
+                    finder.doneRoutesByFocusDmg.erase(existing->get());
+                    finder.doneRoutes.erase(existing);
+                    doInsert = true;
+                }
+                if (doInsert) {
+                    auto [pos, inserted] = finder.doneRoutes.insert(std::move(newRoute));
+                    finder.doneRoutesByFocusGain.insert(pos->get());
+                    finder.doneRoutesByGaugeGain.insert(pos->get());
+                    finder.doneRoutesByFocusDmg.insert(pos->get());
                 }
             }
         }
