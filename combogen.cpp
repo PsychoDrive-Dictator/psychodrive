@@ -217,6 +217,11 @@ void ComboWorker::WorkLoop(void) {
                 break;
             }
 
+            if (pSim->simGuys[1]->getCurrentAction() == 353 && pSim->simGuys[1]->getCurrentFrame() > 160) {
+                // they're in the stunned script and already on the ground not able to get hit
+                break;
+            }
+
             // no hit in the game can get them at this point?
             // if (pSim->simGuys[1]->getJuggleCounter() > 124) {
             //     break;
