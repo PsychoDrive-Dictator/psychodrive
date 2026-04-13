@@ -2442,7 +2442,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         }
 
         if (applyFlags) {
-            if (pOtherGuy->airborne) {
+            if (pOtherGuy->getAirborne()) {
                 if (hitbox.flags & avoids_airborne) {
                     continue;
                 }
