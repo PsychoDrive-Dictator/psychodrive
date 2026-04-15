@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=40
+version=41
 
 copy_char_file() {
     src="PlayerData/$1/$1 $3.json"
