@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "comboutils.hpp"
 #include "combogen.hpp"
 #include "main.hpp"
 #include "ui.hpp"
@@ -310,7 +311,8 @@ std::string routeToString(const DoneRoute &route, Guy *pGuy)
     result += std::to_string(route.focusGain) + " ";
     result += std::to_string(route.gaugeGain) + " ";
     result += std::to_string(route.focusDmg) + " ";
-    result += std::to_string(route.sideSwitch) + ": ";
+    result += std::to_string(route.sideSwitch) + " ";
+    result += std::to_string(route.impossibleInput) + ": ";
     for ( auto &trigger : route.timelineTriggers) {
         result += timelineTriggerToString(trigger.second, pGuy) + " ";
     }
@@ -361,6 +363,8 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
         }
     }
 
+    initChargeChecker(finder.startSnapshot.simGuys[0]->getCharData());
+
     finder.startRecoveryTiming = finder.startSnapshot.simGuys[1]->getRecoveryTiming();
 
     finder.doLights = doLights;
@@ -370,6 +374,7 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
 
     if (!finder.doLights) {
         for (auto& [key, action] : pComboCharData->actionsByID) {
+            if (!action) continue;
             if (action->name.find("5LP") != std::string::npos ||
                 action->name.find("5LK") != std::string::npos ||
                 action->name.find("2LP") != std::string::npos ||
@@ -520,6 +525,7 @@ void updateComboFinder(void)
                     doInsert = true;
                 }
                 if (doInsert) {
+                    newRoute->impossibleInput = !checkChargeInputs(newRoute->timelineTriggers);
                     auto [pos, inserted] = finder.doneRoutes.insert(std::move(newRoute));
                     finder.doneRoutesByFocusGain.insert(pos->get());
                     finder.doneRoutesByGaugeGain.insert(pos->get());

@@ -59,6 +59,22 @@ static inline void renderInput(std::string &strOut, int input)
 	printInput(HK);
 }
 
+static inline int getInverseCardinal(int input) {
+	if (input == UP) {
+		return DOWN;
+	}
+	if (input == DOWN) {
+		return UP;
+	}
+	if (input == FORWARD) {
+		return BACK;
+	}
+	if (input == BACK) {
+		return FORWARD;
+	}
+	return 0;
+}
+
 static inline int invertDirection(int input)
 {
 	int newMask = 0;

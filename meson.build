@@ -12,6 +12,7 @@ project_source_files = [
   'guy.cpp',
   'ui.cpp',
   'combogen.cpp',
+  'comboutils.cpp',
   'input.cpp',
   'render.cpp',
   'imgui/imgui.cpp',

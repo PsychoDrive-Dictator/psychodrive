@@ -37,7 +37,8 @@ struct DoneRoute {
     int focusGain = 0;
     int gaugeGain = 0;
     int focusDmg = 0;
-    bool sideSwitch;
+    bool sideSwitch = false;
+    bool impossibleInput = false;
 };
 
 struct DamageSort {
@@ -53,6 +54,8 @@ struct DamageSort {
             return lhs->focusDmg < rhs->focusDmg;
         } else if (lhs->sideSwitch != rhs->sideSwitch) {
             return lhs->sideSwitch < rhs->sideSwitch;
+        } else if (lhs->impossibleInput != rhs->impossibleInput) {
+            return lhs->impossibleInput < rhs->impossibleInput;
         }
         return false;
     }
