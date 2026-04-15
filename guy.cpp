@@ -618,8 +618,12 @@ void Guy::RunFramePostPush(void)
     }
 }
 
-void Guy::ExecuteTrigger(Trigger *pTrigger)
+bool Guy::ExecuteTrigger(Trigger *pTrigger)
 {
+    if (FindMove(pTrigger->actionID, styleInstall) == nullptr) {
+        return false;
+    }
+
     pLastTrigger = pTrigger;
 
     nextAction = pTrigger->actionID;
@@ -719,6 +723,7 @@ void Guy::ExecuteTrigger(Trigger *pTrigger)
             log(true, "not eonugh gauge to execute?! not supposed to happen");
         }
     }
+    return true;
 }
 
 bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
@@ -1439,10 +1444,6 @@ void Guy::DoTriggers(int fluffFrameBias)
                 continue;
             }
 
-            if (FindMove(actionID, styleInstall) == nullptr) {
-                continue;
-            }
-
             bool forceTrigger = false;
 
             if (forcedTrigger == ActionRef(actionID, styleInstall)) {
@@ -1468,12 +1469,12 @@ void Guy::DoTriggers(int fluffFrameBias)
                 if (trigState.hasNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
                     log(logTriggers, "did deferred trigger " + std::to_string(actionID));
 
-                    ExecuteTrigger(pTrigger);
-
-                    // skip further triggers and cancel any delayed triggers
-                    dc.setDeferredTriggerIDs.clear();
-                    keptDeferredTriggerIDs.clear();
-                    break;
+                    if (ExecuteTrigger(pTrigger)) {
+                        // skip further triggers and cancel any delayed triggers
+                        dc.setDeferredTriggerIDs.clear();
+                        keptDeferredTriggerIDs.clear();
+                        break;
+                    }
                 }
 
                 // carry forward
@@ -1504,22 +1505,22 @@ void Guy::DoTriggers(int fluffFrameBias)
                 }
 
                 if (trigState.hasNormal && !trigState.hasAntiNormal && CheckTriggerConditions(pTrigger, fluffFrameBias)) {
-                    ExecuteTrigger(pTrigger);
+                    if (ExecuteTrigger(pTrigger)) {
+                        // consume the input by removing matching edge bits from matched initial input
+                        // otherwise chains trigger off of one input since the cancel window starts
+                        // before input buffer ends
+                        //int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
+                        //dc.inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
 
-                    // consume the input by removing matching edge bits from matched initial input
-                    // otherwise chains trigger off of one input since the cancel window starts
-                    // before input buffer ends
-                    //int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
-                    //dc.inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
+                        lastTriggerFrame = pSim->frameCounter - initialI;
+                        dc.inputBuffer[initialI] |= CONSUMED;
+                        lastTriggerInput = dc.inputBuffer[initialI];
 
-                    lastTriggerFrame = pSim->frameCounter - initialI;
-                    dc.inputBuffer[initialI] |= CONSUMED;
-                    lastTriggerInput = dc.inputBuffer[initialI];
-
-                    // skip further triggers and cancel any delayed triggers
-                    dc.setDeferredTriggerIDs.clear();
-                    keptDeferredTriggerIDs.clear();
-                    break;
+                        // skip further triggers and cancel any delayed triggers
+                        dc.setDeferredTriggerIDs.clear();
+                        keptDeferredTriggerIDs.clear();
+                        break;
+                    }
                 }
             }
         }
@@ -6674,12 +6675,12 @@ void Guy::DoInstantAction(int actionID)
 }
 
 void Guy::ChangeStyle(int newStyleID) {
-    // todo exit action from previous style?
-    styleInstall = newStyleID;
-
     if (newStyleID < 0 || (size_t)newStyleID >= pCharData->styles.size()) {
         return;
     }
+
+    // todo exit action from previous style?
+    styleInstall = newStyleID;
 
     StyleData &style = pCharData->styles[newStyleID];
     if (style.hasStartAction) {

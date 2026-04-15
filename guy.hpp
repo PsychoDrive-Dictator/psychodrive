@@ -445,7 +445,7 @@ private:
     void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade = false, bool isClash = false, HurtBox *pHurtBox = nullptr);
     void ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool applyHit);
     void ApplyUniqueBoxOps(UniqueBox &box, Guy *src);
-    void ExecuteTrigger(Trigger *pTrigger);
+    bool ExecuteTrigger(Trigger *pTrigger);
 
     bool CheckTriggerGroupConditions(int conditionFlag, int stateFlag);
     bool CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias = 0);

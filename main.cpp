@@ -420,6 +420,8 @@ color clearColor = {0.0,0.0,0.0};
 static void mainloop(void)
 {
     if (done) {
+        stopComboFinder();
+
         // save timeline buffer to disk
         timelineToInputBuffer(playBackInputBuffer);
         nlohmann::json jsonInput(playBackInputBuffer);

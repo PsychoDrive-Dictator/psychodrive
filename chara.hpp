@@ -406,7 +406,7 @@ struct ProjectileData {
 };
 
 struct StyleData {
-    int id;
+    int id = -1;
     int parentStyleID;
     int64_t terminateState;
 
