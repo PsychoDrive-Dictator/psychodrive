@@ -1593,6 +1593,9 @@ void SimulationController::RenderComboMinerSetup(void)
     int routeCount = 0;
     static int sortMode = 0;
     std::vector<DoneRoute *> vecVisibleRoutes;
+    if (routeScrollAmount >= (int)finder.doneRoutes.size()) {
+        routeScrollAmount = 0;
+    }
     if (sortMode == 0) {
         routeCount = 0;
         for (auto it = std::next(finder.doneRoutes.rbegin(), routeScrollAmount); it != finder.doneRoutes.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
@@ -1618,7 +1621,7 @@ void SimulationController::RenderComboMinerSetup(void)
     if (showResults && finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
         ImGui::Text("%lu routes:", finder.doneRoutes.size());
-        if (finder.doneRoutes.size() >= routesToDisplay) {
+        if (finder.doneRoutes.size() > routesToDisplay) {
             ImGui::SameLine();
             ImGui::SetNextItemWidth(400);
             ImGui::SliderInt("##routescroll", &routeScrollAmount, 0, finder.doneRoutes.size() - routesToDisplay);

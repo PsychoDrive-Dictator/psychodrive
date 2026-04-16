@@ -132,7 +132,7 @@ public:
 
     ObjectPool<Guy> guyPool{600};
 
-    std::vector<RecordedFrame> stateRecording;
+    std::deque<RecordedFrame> stateRecording;
 };
 
 extern SimulationController simController;
