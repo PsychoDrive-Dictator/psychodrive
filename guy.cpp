@@ -364,6 +364,12 @@ bool Guy::RunFrame(bool advancingTime)
     freeMovement = false;
     hurtBoxProxGuarded = false;
     positionProxGuarded = false;
+    crossUpProtection = false;
+
+    // set this before movement for this frame
+    if (pOpponent && fixAbs(getPosX() - pOpponent->getPosX()) <= Fixed(10.0)) {
+        crossUpProtection = true;
+    }
 
     if (pCurrentAction != nullptr)
     {
@@ -2687,8 +2693,14 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             if (pOtherGuy->currentAction == 39 || pOtherGuy->currentAction == 40 || pOtherGuy->currentAction == 41) {
                 otherGuyCanBlock = true;
             }
-            if (!(pOtherGuy->currentInput & BACK)) {
-                otherGuyCanBlock = false;
+            if (!crossUpProtection) {
+                if (!(pOtherGuy->currentInput & BACK)) {
+                    otherGuyCanBlock = false;
+                }
+            } else {
+                if (!(pOtherGuy->currentInput & BACK) && !(pOtherGuy->currentInput & FORWARD)) {
+                    otherGuyCanBlock = false;
+                }
             }
             if (otherGuyAirborne || otherGuyHit || isGrab) {
                 otherGuyCanBlock = false;
@@ -2701,10 +2713,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 blocked = true;
             }
 
-            if (hitbox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
+            if (hitbox.flags & overhead && (pOtherGuy->currentInput & (DOWN))) {
                 blocked = false;
             }
-            if (hitbox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
+            if (hitbox.flags & low && (pOtherGuy->currentInput & (DOWN)) != DOWN) {
                 blocked = false;
             }
 
