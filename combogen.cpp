@@ -199,7 +199,7 @@ void ComboWorker::WorkLoop(void) {
             }
 
             if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 10000) {
-                fprintf(stderr, "aaa\n");
+                fprintf(stderr, "aaa %i\n", pSim->simGuys[1]->getCurrentAction());
                 break;
             }
 

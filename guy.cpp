@@ -5699,6 +5699,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             // kinda crazy, but do EventKey for the bumped branch frame before the transition
             // steering moves will apply twice, on purpose. is it the same for triggers? :thonk:
             DoEventKey(pCurrentAction, currentFrame);
+            DoWorldKey(); // sometimes we need to undo world before leaving action
         }
 
         // if we transition after landing frame, reset action restriction
