@@ -641,6 +641,7 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
     bool normalAttack = flags & (1ULL<<11);
     bool uniqueAttack = flags & (1ULL<<12);
     bool specialAttack = flags & (1ULL<<13);
+    bool superAttack = flags & (1ULL<<15);
     // one-way, reset on combo end
     driveRushCancel = driveRushCancel || flags & (1ULL<<20);
     parryDriveRush =  parryDriveRush || flags & (1ULL<<21);
@@ -658,7 +659,7 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
             focusRegenCooldown--;
         }
     }
-    if (specialAttack) {
+    if (specialAttack || superAttack) {
         isDrive = false;
         wasDrive = false;
     }

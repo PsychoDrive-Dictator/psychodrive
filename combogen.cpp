@@ -199,7 +199,7 @@ void ComboWorker::WorkLoop(void) {
             }
 
             if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 10000) {
-                fprintf(stderr, "aaa %i\n", pSim->simGuys[1]->getCurrentAction());
+                fprintf(stderr, "aaa %s\n", routeToString(currentRoute, pSim->simGuys[0]).c_str());
                 break;
             }
 
@@ -303,6 +303,15 @@ std::string timelineTriggerToString(ActionRef trigger, Guy *pGuy)
         actionDesc = pGuy->getActionName(trigger.actionID());
     }
     return actionDesc;
+}
+
+std::string routeToString(const ComboRoute &route, Guy *pGuy)
+{
+    std::string result;
+    for ( auto &trigger : route.timelineTriggers) {
+        result += timelineTriggerToString(trigger.second, pGuy) + " ";
+    }
+    return result;
 }
 
 std::string routeToString(const DoneRoute &route, Guy *pGuy)
