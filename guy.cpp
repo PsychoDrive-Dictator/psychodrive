@@ -751,13 +751,16 @@ bool Guy::CheckTriggerGroupConditions(int conditionFlag, int stateFlag)
     if ( conditionFlag & (1<<3) && hitArmorThisMove) {
         conditionMet = true;
     }
-    if ( conditionFlag & (1<<10) && hasBeenPerfectParriedThisMove) {
+    if ( conditionFlag & (1<<10) && (hitCounterThisMove || hitPunishCounterThisMove)) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<11) && hitAtemiThisMove) {
         conditionMet = true;
     }
     if ( conditionFlag & (1<<12) && hasBeenParriedThisMove) {
+        conditionMet = true;
+    }
+    if ( conditionFlag & (1<<13) && hasBeenPerfectParriedThisMove) {
         conditionMet = true;
     }
 
