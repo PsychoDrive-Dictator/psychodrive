@@ -1116,15 +1116,15 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         // }
         newAction.loopCount = (*pFab)["State"]["LoopCount"];
         newAction.startScale = (*pFab)["Combo"]["_StartScaling"];
-        if (newAction.startScale == -1) {
+        if (newAction.startScale < 0) {
             newAction.startScale = 0;
         }
         newAction.comboScale = (*pFab)["Combo"]["ComboScaling"];
-        if (newAction.comboScale == -1) {
+        if (newAction.comboScale < 0) {
             newAction.comboScale = 10;
         }
         newAction.instantScale = (*pFab)["Combo"]["InstScaling"];
-        if (newAction.instantScale == -1) {
+        if (newAction.instantScale < 0) {
             newAction.instantScale = 0;
         }
 
