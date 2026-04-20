@@ -2011,6 +2011,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_parried_di",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 129,
+                "firstFrame": 118,
+                "lastFrame": 260
+            },
+            {
+                "count": 77,
+                "firstFrame": 184,
+                "lastFrame": 260
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 154,
+                "lastFrame": 155
+            }
+        ]
+    },
+    {
         "testName": "aa_parries",
         "testVersion": "39",
         "finished": true,
