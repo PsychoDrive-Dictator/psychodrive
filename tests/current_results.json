@@ -9850,6 +9850,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "terry_lvl2_scaling",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 362,
+                "firstFrame": 222,
+                "lastFrame": 404
+            },
+            {
+                "count": 473,
+                "firstFrame": 96,
+                "lastFrame": 463
+            },
+            {
+                "count": 4,
+                "firstFrame": 96,
+                "lastFrame": 449
+            },
+            {
+                "count": 293,
+                "firstFrame": 139,
+                "lastFrame": 447
+            },
+            {
+                "count": 293,
+                "firstFrame": 139,
+                "lastFrame": 447
+            },
+            {
+                "count": 71,
+                "firstFrame": 80,
+                "lastFrame": 468
+            },
+            {
+                "count": 147,
+                "firstFrame": 97,
+                "lastFrame": 448
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 39,
+                "firstFrame": 462,
+                "lastFrame": 500
+            }
+        ]
+    },
+    {
+        "testName": "terry_lvl2_scaling2",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 321,
+                "firstFrame": 403,
+                "lastFrame": 590
+            },
+            {
+                "count": 361,
+                "firstFrame": 228,
+                "lastFrame": 457
+            },
+            {
+                "count": 3,
+                "firstFrame": 422,
+                "lastFrame": 443
+            },
+            {
+                "count": 201,
+                "firstFrame": 228,
+                "lastFrame": 441
+            },
+            {
+                "count": 201,
+                "firstFrame": 228,
+                "lastFrame": 441
+            },
+            {
+                "count": 10,
+                "firstFrame": 245,
+                "lastFrame": 462
+            },
+            {
+                "count": 44,
+                "firstFrame": 245,
+                "lastFrame": 442
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 39,
+                "firstFrame": 456,
+                "lastFrame": 494
+            }
+        ]
+    },
+    {
         "testName": "viper_jump_cancel_held_triggers",
         "testVersion": "36",
         "finished": true,
