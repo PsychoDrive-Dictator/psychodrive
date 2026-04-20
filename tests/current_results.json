@@ -10051,6 +10051,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "terry_parent_hitflag",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 230,
+                "firstFrame": 159,
+                "lastFrame": 281
+            },
+            {
+                "count": 152,
+                "firstFrame": 67,
+                "lastFrame": 184
+            },
+            {
+                "count": 1,
+                "firstFrame": 184,
+                "lastFrame": 184
+            },
+            {
+                "count": 108,
+                "firstFrame": 67,
+                "lastFrame": 178
+            },
+            {
+                "count": 108,
+                "firstFrame": 67,
+                "lastFrame": 178
+            },
+            {
+                "count": 132,
+                "firstFrame": 129,
+                "lastFrame": 281
+            },
+            {
+                "count": 173,
+                "firstFrame": 128,
+                "lastFrame": 281
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 224,
+                "lastFrame": 225
+            }
+        ]
+    },
+    {
         "testName": "viper_jump_cancel_held_triggers",
         "testVersion": "36",
         "finished": true,
