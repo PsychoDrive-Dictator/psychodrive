@@ -2041,14 +2041,14 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 129,
-                "firstFrame": 118,
-                "lastFrame": 260
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 77,
-                "firstFrame": 184,
-                "lastFrame": 260
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
                 "count": 0,

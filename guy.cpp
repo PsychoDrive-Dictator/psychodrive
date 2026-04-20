@@ -2721,7 +2721,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 blocked = false;
             }
 
-            if (blocked) {
+            if (blocked || parried) {
                 hitEntryFlag = pOtherGuy->burnout ? special : block;
             }
 
@@ -3830,6 +3830,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
 
         if (attr0 & (1<<9) && comboHits) {
             kabeBound = false;
+            kabeTataki = false;
+        }
+
+        if (parrying) {
             kabeTataki = false;
         }
     }
