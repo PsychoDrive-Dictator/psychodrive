@@ -9716,6 +9716,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "terry_fb_scaling",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 190,
+                "firstFrame": 68,
+                "lastFrame": 212
+            },
+            {
+                "count": 1,
+                "firstFrame": 212,
+                "lastFrame": 212
+            },
+            {
+                "count": 135,
+                "firstFrame": 68,
+                "lastFrame": 206
+            },
+            {
+                "count": 135,
+                "firstFrame": 68,
+                "lastFrame": 206
+            },
+            {
+                "count": 15,
+                "firstFrame": 130,
+                "lastFrame": 195
+            },
+            {
+                "count": 51,
+                "firstFrame": 129,
+                "lastFrame": 211
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 81,
+                "firstFrame": 168,
+                "lastFrame": 248
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 247,
+                "lastFrame": 248
+            }
+        ]
+    },
+    {
         "testName": "terry_fierce",
         "testVersion": "33",
         "finished": true,
