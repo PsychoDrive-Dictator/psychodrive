@@ -3846,6 +3846,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         if (parrying) {
             kabeTataki = false;
         }
+
+        // you don't seem to be able to ground bounce if true grounded, unless it's an unlock?
+        if (jimenBound && !getAirborne() && !pAttacker->pendingUnlockHit) {
+            jimenBound = false;
+        }
     }
 
     if (applyHit) {
