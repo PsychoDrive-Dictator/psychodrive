@@ -10123,8 +10123,8 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 230,
-                "firstFrame": 159,
+                "count": 107,
+                "firstFrame": 175,
                 "lastFrame": 281
             },
             {
@@ -10148,14 +10148,14 @@ var currentResults =
                 "lastFrame": 178
             },
             {
-                "count": 132,
+                "count": 6,
                 "firstFrame": 129,
-                "lastFrame": 281
+                "lastFrame": 170
             },
             {
-                "count": 173,
+                "count": 47,
                 "firstFrame": 128,
-                "lastFrame": 281
+                "lastFrame": 183
             },
             {
                 "count": 0,

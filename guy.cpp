@@ -2888,6 +2888,13 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             // also used by double geyser where the player has a trigger condition
             // todo checking touch branch on player would disambiguate
             hitFlagToParent = pGuy->pCurrentAction->pProjectileData->hitFlagToParent;
+
+            // if the parent has done another move isnce then, don't send them hitflags
+            if (pGuy->pParent && pGuy->scalingTriggerID != pGuy->pParent->scalingTriggerID) {
+                hitFlagToParent = false;
+                // todo is the shotkey that advances scaling mutually exclusive with hitflagtoparent?
+                // maybe need triggerID too
+            }
             hitStopToParent = pGuy->pCurrentAction->pProjectileData->hitStopToParent;
         }
 
