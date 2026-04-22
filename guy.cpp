@@ -3117,10 +3117,10 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         pOtherGuy->lastHitType = hitBox.type;
 
         if (!hitArmor) {
-            if (applyHit && (!pendingHit.blocked && !pendingHit.parried)) {
+            if (!pendingHit.blocked && !pendingHit.parried) {
                 pOtherGuy->blocking = false;
             }
-            if (applyHit && !pendingHit.parried) {
+            if (!pendingHit.parried) {
                 pOtherGuy->parrying = false;
             }
             bool otherGuyWasBurnout = pOtherGuy->burnout;
