@@ -4532,15 +4532,14 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 36:
                     if (grabbedThisFrame) {
-                        if (branchParam0 == 2 && hitPunishCounterThisMove) {
-                            doBranch = true;
-                        }
-                        if (branchParam0 == 0 && !hitPunishCounterThisMove) {
-                            doBranch = true;
+                        doBranch = true;
+                        if (branchParam0 == 2 && !hitPunishCounterThisMove) {
+                            doBranch = false;
                         }
                         if (branchParam0 != 0 && branchParam0 != 2) {
                             log(logUnknowns, "unknown catch branch kind");
                         }
+                        // todo it might be the hitstungrabbed stomping the other, last 'last throw type'
                         if (branchParam1 == 2 && !hitStunGrabbedThisFrame) {
                             doBranch = false;
                         }
