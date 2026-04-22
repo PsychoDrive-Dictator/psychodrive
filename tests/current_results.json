@@ -6701,6 +6701,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "jamie_ex_palm_tumble",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 287,
+                "firstFrame": 161,
+                "lastFrame": 490
+            },
+            {
+                "count": 276,
+                "firstFrame": 116,
+                "lastFrame": 363
+            },
+            {
+                "count": 101,
+                "firstFrame": 181,
+                "lastFrame": 363
+            },
+            {
+                "count": 82,
+                "firstFrame": 116,
+                "lastFrame": 361
+            },
+            {
+                "count": 82,
+                "firstFrame": 116,
+                "lastFrame": 361
+            },
+            {
+                "count": 412,
+                "firstFrame": 83,
+                "lastFrame": 428
+            },
+            {
+                "count": 607,
+                "firstFrame": 103,
+                "lastFrame": 490
+            },
+            {
+                "count": 146,
+                "firstFrame": 181,
+                "lastFrame": 385
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 185,
+                "firstFrame": 181,
+                "lastFrame": 409
+            },
+            {
+                "count": 104,
+                "firstFrame": 181,
+                "lastFrame": 360
+            },
+            {
+                "count": 144,
+                "firstFrame": 238,
+                "lastFrame": 409
+            }
+        ]
+    },
+    {
         "testName": "jamie_goro_combo_forcepc",
         "testVersion": "39",
         "finished": true,
