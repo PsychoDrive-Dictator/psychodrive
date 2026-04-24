@@ -5119,8 +5119,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         } else if (tumble) {
             nextAction = 289;
             tumble = false;
-            hitStun = knockDownFrames + 1;
-            knockDownFrames = 27 - 1;
+            hitStun = knockDownFrames;
+            knockDownFrames = 27;
 
             velocityX = groundBounceVelX;
             groundBounceVelX = 0.0f;
@@ -5238,6 +5238,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     curNextAction = nextAction;
+    // save last pos before any movement down there that should really be in the next runframe
+    // otherwise our last pos will be beyond the worldphysics wall and drag the opponent around
+    lastPosX = getPosX();
+    lastPosY = getPosY();
 
     if (doHitStun && hitStun > 0)
     {
@@ -5268,16 +5272,18 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     knockDownFrames = 0;
                     nextAction = 330;
                     knockDownFrameCounter = pSim->frameCounter;
+                    bool slide = false;
                     if (groundBounceVelX != Fixed(0)) {
-                        // slide
+                        slide = true;
                         velocityX = groundBounceVelX;
                         groundBounceVelX = Fixed(0);
-                        if (nageKnockdown) {
-                            // one last slide tic from whatever previous vel
-                            posX = posX + (prevVelX * direction);
-                            // we slide one tic early, so go against the next frame worth's :/
-                            posX = posX + (velocityX * direction * -1);
-                        }
+                    }
+                    // nage slide or tumble
+                    if ((nageKnockdown && slide) || (currentAction == 289)) {
+                        // one last slide tic from whatever previous vel
+                        posX = posX + (prevVelX * direction);
+                        // we slide one tic early, so go against the next frame worth's :/
+                        posX = posX + (velocityX * direction * -1);
                     }
                     isDown = true;
                 } else {
@@ -5675,8 +5681,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     WorldPhysics(true); // only floor
 
     couldMove = canMoveNow;
-    lastPosX = getPosX();
-    lastPosY = getPosY();
     lastBGPlaceX = bgOffsetX;
     lastDirection = direction;
     wasIgnoreHitStop = ignoreHitStop;
