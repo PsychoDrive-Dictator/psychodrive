@@ -338,8 +338,11 @@ bool Guy::RunFrame(bool advancingTime)
         uniqueTimerCount++;
     }
 
-    if (advancingTime && jumpLandingDisabledFrames) {
-        jumpLandingDisabledFrames--;
+    if (advancingTime && actionDisabledFrames) {
+        actionDisabledFrames--;
+    }
+    if (advancingTime && movementDisabledFrames) {
+        movementDisabledFrames--;
     }
 
     hitThisFrame = false;
@@ -4345,6 +4348,7 @@ void Guy::DoBranchKey(bool preHit)
         }
 
         bool doBranch = false;
+        bool branchInducedLanding = false;
         int branchType = branchKey.type;
         int64_t branchParam0 = branchKey.param00;
         int64_t branchParam1 = branchKey.param01;
@@ -4433,6 +4437,9 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 13:
                     if (getPosY() == Fixed(0) && !preHit) { // it's technically landed, but like heavy buttslam checks one frame
+                        if (branchParam0 == 1 && branchAction != 39 && branchAction != 40 && branchAction != 41) {
+                            branchInducedLanding = true;
+                        }
                         doBranch = true;
                     }
                     break;
@@ -4773,6 +4780,9 @@ void Guy::DoBranchKey(bool preHit)
                 }
                 deniedLastBranch = false;
                 keepPlace = branchKey.keepPlace;
+                if (branchInducedLanding) {
+                    actionDisabledFrames = 3 + 1;
+                }
             }
 
             // FALL THROUGH - there might be another branch that works later for this frame
@@ -4911,7 +4921,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     bool doTriggers = true;
-    if (jumpLandingDisabledFrames) {
+    if (actionDisabledFrames) {
         doTriggers = false;
     }
 
@@ -4990,11 +5000,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     bool doHitStun = advancingTime || hitStun == 1;
 
     if (landed) {
-        if (currentAction != 39 && currentAction != 40 && currentAction != 41 &&
-            nextAction != 39 && nextAction != 40 && nextAction != 41 && !hitStun) {
+        if (!hitStun) {
             // non-empty jump landing
-            log(logTriggers, "disabling actions due to non-empty landing");
-            jumpLandingDisabledFrames = 3 + 1; // 3, but we decrement in RunFrame
+            log(logTriggers, "disabling movement due to non-empty landing");
+            movementDisabledFrames = 3 + 1; // 3, but we decrement in RunFrame
         }
 
         jumped = false;
@@ -5416,10 +5425,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     bool canMoveNow = false;
 
     canMoveNow = canMove(crouchingNow, movingForward, movingBackward);
-    bool applyFreeMovement = freeMovement && !didTrigger && !jumpLandingDisabledFrames && !hitStun && !blocking;
-    if (currentAction == 39 || currentAction == 40 || currentAction == 41) {
-        applyFreeMovement = false;
-    }
+    bool applyFreeMovement = freeMovement && !didTrigger && !movementDisabledFrames && !hitStun && !blocking;
     if (nextAction != -1) {
         applyFreeMovement = false;
     }
@@ -5749,8 +5755,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
 
         // if we transition after landing frame, reset action restriction
-        if (jumpLandingDisabledFrames < 4) {
-            jumpLandingDisabledFrames = 0;
+        if (actionDisabledFrames < 4) {
+            actionDisabledFrames = 0;
         }
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;

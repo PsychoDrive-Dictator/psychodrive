@@ -627,7 +627,8 @@ private:
         didPush = false;
         jumped = false;
         jumpDirection = 0;
-        jumpLandingDisabledFrames = 0;
+        actionDisabledFrames = 0;
+        movementDisabledFrames = 0;
         throwProtectionFrames = 0;
         strikeProtectionFrames = 0;
         parryHoldFreebieFrames = 0;
@@ -971,10 +972,10 @@ private:
     bool appliedScaling : 1;
     bool alreadyDeadButDoesNotKnow : 1;
 
-    int projHitCount;
-    int projLifeTime;
+    int8_t projHitCount;
+    int8_t limitShotCategory;
+    uint16_t projLifeTime;
 
-    int limitShotCategory;
     GuyRef pParent;
 
     CharacterData *pCharData;
@@ -992,19 +993,21 @@ private:
     Fixed startPosX;
     Fixed startPosY;
 
-    int jumpDirection;
-    int jumpLandingDisabledFrames;
+    int8_t jumpDirection;
+    uint8_t actionDisabledFrames;
+    uint8_t movementDisabledFrames;
 
-    int throwProtectionFrames;
-    int strikeProtectionFrames;
+    uint8_t throwProtectionFrames;
+    uint8_t strikeProtectionFrames;
 
-    int parryHoldFreebieFrames;
-    int parryFreeze;
+    uint8_t parryHoldFreebieFrames;
+    uint8_t parryFreeze;
 
-    int landingAdjust;
-    int forcedPoseStatus;
-    int actionStatus;
-    int jumpStatus;
+    uint8_t forcedPoseStatus;
+    uint8_t actionStatus;
+    uint8_t jumpStatus;
+
+    int16_t landingAdjust;
 
     Fixed posOffsetX;
     Fixed posOffsetY;
