@@ -1973,6 +1973,8 @@ bool Guy::Push(Guy *pOtherGuy)
                     }
                     addHitStop(ownHitStop);
                     pOtherGuy->addHitStop(otherHitStop);
+                    //steerDisabledFrames = pCurrentAction->pProjectileData->hitDisableMovementFrames;
+                    //pOtherGuy->steerDisabledFrames = pOtherGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
                 }
                 pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
                 pushXRight = fixMin(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
@@ -3284,6 +3286,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             // mmmm
             //hitStopSelf += pGuy->pCurrentAction->pProjectileData->extraHitStop;
             pGuy->hitSpanFrames = pGuy->pCurrentAction->pProjectileData->hitSpan;
+            pGuy->steerDisabledFrames = pGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
         }
 
         if (!pOtherGuy->blocking && !hitArmor) {
