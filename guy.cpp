@@ -3217,7 +3217,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             }
         }
         if (hitArmor && !hitAtemi) {
-            if (false) {
+            if (pGuy->isProjectile) {
                 if (hurtBox.pAtemiData->ownerStopProj != -1) {
                     hitStopTarget = hurtBox.pAtemiData->ownerStopProj;
                 }
