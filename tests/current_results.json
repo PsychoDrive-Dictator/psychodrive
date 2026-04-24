@@ -336,6 +336,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_armor_projectile_hitstop",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 91,
+                "firstFrame": 107,
+                "lastFrame": 189
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 37,
+                "firstFrame": 129,
+                "lastFrame": 189
+            },
+            {
+                "count": 4,
+                "firstFrame": 129,
+                "lastFrame": 189
+            },
+            {
+                "count": 137,
+                "firstFrame": 64,
+                "lastFrame": 251
+            },
+            {
+                "count": 477,
+                "firstFrame": 108,
+                "lastFrame": 380
+            },
+            {
+                "count": 2,
+                "firstFrame": 191,
+                "lastFrame": 192
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 62,
+                "firstFrame": 100,
+                "lastFrame": 155
+            },
+            {
+                "count": 6,
+                "firstFrame": 129,
+                "lastFrame": 193
+            }
+        ]
+    },
+    {
         "testName": "aa_blocked_specials",
         "testVersion": "39",
         "finished": true,
