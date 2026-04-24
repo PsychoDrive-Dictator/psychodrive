@@ -3552,6 +3552,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_sa1_corner_juggle",
+        "testVersion": "40",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 119,
+                "firstFrame": 142,
+                "lastFrame": 289
+            },
+            {
+                "count": 320,
+                "firstFrame": 75,
+                "lastFrame": 290
+            },
+            {
+                "count": 33,
+                "firstFrame": 258,
+                "lastFrame": 290
+            },
+            {
+                "count": 202,
+                "firstFrame": 75,
+                "lastFrame": 284
+            },
+            {
+                "count": 202,
+                "firstFrame": 75,
+                "lastFrame": 284
+            },
+            {
+                "count": 46,
+                "firstFrame": 140,
+                "lastFrame": 341
+            },
+            {
+                "count": 239,
+                "firstFrame": 142,
+                "lastFrame": 425
+            },
+            {
+                "count": 42,
+                "firstFrame": 258,
+                "lastFrame": 299
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 74,
+                "firstFrame": 258,
+                "lastFrame": 331
+            },
+            {
+                "count": 8,
+                "firstFrame": 258,
+                "lastFrame": 265
+            },
+            {
+                "count": 88,
+                "firstFrame": 258,
+                "lastFrame": 331
+            }
+        ]
+    },
+    {
         "testName": "akuma_shinra",
         "testVersion": "40",
         "finished": true,
