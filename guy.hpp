@@ -629,6 +629,7 @@ private:
         jumpDirection = 0;
         actionDisabledFrames = 0;
         movementDisabledFrames = 0;
+        steerDisabledFrames = 0;
         throwProtectionFrames = 0;
         strikeProtectionFrames = 0;
         parryHoldFreebieFrames = 0;
@@ -651,7 +652,6 @@ private:
         ignoreCornerPushback = false;
         inputIgnoresOpponentDirection = false;
         crossUpProtection = false;
-        noVelNextFrame = false;
         noAccelNextFrame = false;
         posOffsetX = Fixed(0);
         posOffsetY = Fixed(0);
@@ -887,7 +887,6 @@ private:
     bool ignoreCornerPushback : 1;
     bool inputIgnoresOpponentDirection : 1;
     bool crossUpProtection : 1;
-    bool noVelNextFrame : 1;
     bool noAccelNextFrame : 1;
     bool setPlaceX : 1;
     bool setPlaceY : 1;
@@ -996,6 +995,7 @@ private:
     int8_t jumpDirection;
     uint8_t actionDisabledFrames;
     uint8_t movementDisabledFrames;
+    uint8_t steerDisabledFrames;
 
     uint8_t throwProtectionFrames;
     uint8_t strikeProtectionFrames;

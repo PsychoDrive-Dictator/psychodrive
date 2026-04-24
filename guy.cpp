@@ -478,15 +478,15 @@ bool Guy::RunFrame(bool advancingTime)
             accelX = Fixed(0);
         }
 
-        if (!noVelNextFrame) {
+        if (!steerDisabledFrames) {
             if (ignoreSteerType != 0) {
                 posX = posX + (velocityX * direction);
             }
             if (ignoreSteerType != 1) {
                 posY = posY + velocityY;
             }
-        } else {
-            noVelNextFrame = false;
+        } else if (steerDisabledFrames) {
+            steerDisabledFrames--;
         }
 
         if (pOpponent && !pOpponent->warudo) {
@@ -5188,7 +5188,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             groundBounceVelX = Fixed(0);
             groundBounceAccelX = Fixed(0);
 
-            noVelNextFrame = true;
+            steerDisabledFrames = 1;
             velocityX -= accelX;
         } else if (currentAction == 320 || currentAction == 321) {
             disableMovement = true; // movement disabled the frame you come out of tech?
@@ -5209,7 +5209,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 nextAction = currentAction + 3;
             }
             // magic that seems specific to normal jumps
-            noVelNextFrame = true;
+            steerDisabledFrames = 1;
             // because of it, we won't actually be y>0, but we still need to be counted airborne
             airborne = true;
         } else if (currentAction == 5) {
