@@ -405,6 +405,7 @@ struct ProjectileData {
     bool noPush;
     int lifeTime;
     int hitSpan;
+    int hitDisableMovementFrames;
 };
 
 struct StyleData {
