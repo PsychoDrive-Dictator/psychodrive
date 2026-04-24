@@ -3217,14 +3217,25 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             }
         }
         if (hitArmor && !hitAtemi) {
-            if (hurtBox.pAtemiData->ownerStop != -1) {
-                hitStopTarget = hurtBox.pAtemiData->ownerStop;
+            if (false) {
+                if (hurtBox.pAtemiData->ownerStopProj != -1) {
+                    hitStopTarget = hurtBox.pAtemiData->ownerStopProj;
+                }
+                if (hurtBox.pAtemiData->targetStopProj != -1) {
+                    hitStopSelf = hurtBox.pAtemiData->targetStopProj;
+                }
+                hitStopTarget += hurtBox.pAtemiData->ownerStopAddProj;
+                hitStopSelf += hurtBox.pAtemiData->targetStopAddProj;
+            } else {
+                if (hurtBox.pAtemiData->ownerStop != -1) {
+                    hitStopTarget = hurtBox.pAtemiData->ownerStop;
+                }
+                if (hurtBox.pAtemiData->targetStop != -1) {
+                    hitStopSelf = hurtBox.pAtemiData->targetStop;
+                }
+                hitStopTarget += hurtBox.pAtemiData->ownerStopAdd;
+                hitStopSelf += hurtBox.pAtemiData->targetStopAdd;
             }
-            if (hurtBox.pAtemiData->targetStop != -1) {
-                hitStopSelf = hurtBox.pAtemiData->targetStop;
-            }
-            hitStopTarget += hurtBox.pAtemiData->ownerStopAdd;
-            hitStopSelf += hurtBox.pAtemiData->targetStopAdd;
         }
         Box hitIntersection;
         hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
