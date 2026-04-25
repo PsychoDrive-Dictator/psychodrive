@@ -2949,6 +2949,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_corner_7015_dump_forcepc",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1,
+                "firstFrame": 400,
+                "lastFrame": 400
+            },
+            {
+                "count": 433,
+                "firstFrame": 157,
+                "lastFrame": 475
+            },
+            {
+                "count": 27,
+                "firstFrame": 175,
+                "lastFrame": 475
+            },
+            {
+                "count": 262,
+                "firstFrame": 157,
+                "lastFrame": 470
+            },
+            {
+                "count": 262,
+                "firstFrame": 157,
+                "lastFrame": 470
+            },
+            {
+                "count": 46,
+                "firstFrame": 89,
+                "lastFrame": 454
+            },
+            {
+                "count": 153,
+                "firstFrame": 107,
+                "lastFrame": 474
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "akuma_corner_combo_air_fb_juggle_forcepc",
         "testVersion": "40",
         "finished": true,
