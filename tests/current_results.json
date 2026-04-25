@@ -337,7 +337,7 @@ var currentResults =
     },
     {
         "testName": "aa_armor_projectile_hitstop",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -2079,7 +2079,7 @@ var currentResults =
     },
     {
         "testName": "aa_parried_di",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -3553,7 +3553,7 @@ var currentResults =
     },
     {
         "testName": "akuma_sa1_corner_juggle",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -6903,7 +6903,7 @@ var currentResults =
     },
     {
         "testName": "jamie_ex_palm_tumble",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -9985,7 +9985,7 @@ var currentResults =
     },
     {
         "testName": "terry_fb_scaling",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -10253,7 +10253,7 @@ var currentResults =
     },
     {
         "testName": "terry_lvl2_scaling",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -10320,7 +10320,7 @@ var currentResults =
     },
     {
         "testName": "terry_lvl2_scaling2",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
@@ -10387,7 +10387,7 @@ var currentResults =
     },
     {
         "testName": "terry_parent_hitflag",
-        "testVersion": "40",
+        "testVersion": "41",
         "finished": true,
         "errorTypes": [
             {
