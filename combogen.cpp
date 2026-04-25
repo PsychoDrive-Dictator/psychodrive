@@ -144,7 +144,7 @@ void ComboWorker::WorkLoop(void) {
                 bool hasAnyFrameTriggers = pSim->simGuys[0]->getFrameTriggers().size();
 
                 // todo try to skip all karas for now, but should probably only skip on free movement
-                if (!finder.doKaras && pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct()) {
+                if (!finder.doKaras && pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct() && !pSim->simGuys[0]->getFreeMovement()) {
                     doActualFrameTriggers = false;
                     hasAnyFrameTriggers = false;
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {

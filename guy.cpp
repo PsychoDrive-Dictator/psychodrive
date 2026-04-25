@@ -1378,7 +1378,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
                     if (!defer && !antiNormal) {
                         triggers[entryIndex].hasNormal = true;
-                        triggers[entryIndex].late = currentFrame != triggerKey.startFrame && !canAct();
+                        triggers[entryIndex].late = currentFrame != triggerKey.startFrame && !canAct() && !airborne;
 
                         if (pTriggerGroup->id == 0) {
                             freeMovement = true;

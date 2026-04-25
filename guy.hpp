@@ -429,6 +429,7 @@ public:
         return canMove(a,b,c);
     }
     bool couldAct() { return couldMove; }
+    bool getFreeMovement() { return freeMovement; }
     ActionRef& getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
