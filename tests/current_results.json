@@ -3016,6 +3016,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_corner_groundbounce_forcepc",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 483,
+                "firstFrame": 287,
+                "lastFrame": 601
+            },
+            {
+                "count": 531,
+                "firstFrame": 166,
+                "lastFrame": 573
+            },
+            {
+                "count": 111,
+                "firstFrame": 184,
+                "lastFrame": 573
+            },
+            {
+                "count": 356,
+                "firstFrame": 166,
+                "lastFrame": 567
+            },
+            {
+                "count": 356,
+                "firstFrame": 166,
+                "lastFrame": 567
+            },
+            {
+                "count": 219,
+                "firstFrame": 98,
+                "lastFrame": 624
+            },
+            {
+                "count": 653,
+                "firstFrame": 116,
+                "lastFrame": 642
+            },
+            {
+                "count": 80,
+                "firstFrame": 322,
+                "lastFrame": 582
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 112,
+                "firstFrame": 322,
+                "lastFrame": 614
+            },
+            {
+                "count": 126,
+                "firstFrame": 322,
+                "lastFrame": 548
+            },
+            {
+                "count": 225,
+                "firstFrame": 288,
+                "lastFrame": 614
+            }
+        ]
+    },
+    {
         "testName": "akuma_corner_lvl2",
         "testVersion": "40",
         "finished": true,
