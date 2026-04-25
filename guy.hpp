@@ -443,7 +443,7 @@ private:
     Box rectToBox(Rect *pRect, Fixed offsetX, Fixed offsetY, int dir);
 
     void ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool applyHitStun, bool isDrive, bool isDomain, bool isTrade = false, bool isClash = false, HurtBox *pHurtBox = nullptr);
-    void ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool applyHit);
+    void ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool isGrab);
     void ApplyUniqueBoxOps(UniqueBox &box, Guy *src);
     bool ExecuteTrigger(Trigger *pTrigger);
 

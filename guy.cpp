@@ -2803,7 +2803,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (pOpponent) {
             HitEntry *pEntry = &pCharData->hitByID[pendingUnlockHit]->common[0];
             if (pendingUnlockHitDelayed || pEntry->floorTime == 0) {
-                pOpponent->ApplyHitEffectOnResources(pEntry, this, true);
+                pOpponent->ApplyHitEffectOnResources(pEntry, this, true, false);
                 pOpponent->ApplyHitEffect(pEntry, this, true, false, false, false);
                 // clamp
                 pOpponent->setFocus(pOpponent->focus);
@@ -3129,7 +3129,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 pOtherGuy->parrying = false;
             }
             bool otherGuyWasBurnout = pOtherGuy->burnout;
-            pOtherGuy->ApplyHitEffectOnResources(pHitEntry, pGuy, applyHit);
+            pOtherGuy->ApplyHitEffectOnResources(pHitEntry, pGuy, applyHit, isGrab);
             HitEntry clonedEntry;
             bool justBurnedOutFromBlockedHit = false;
             // todo can there be a trade there where the other hits regain enough focus to not burn out?
@@ -3457,11 +3457,14 @@ void Guy::ApplyUniqueBoxOps(UniqueBox &box, Guy *src)
     }
 }
 
-void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool applyHit)
+void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool applyHit, bool isGrab)
 {
     int dmgValue = pHitEffect->dmgValue;
     int attr1 = pHitEffect->attr1;
 
+    if (isGrab) {
+        dmgValue = 0;
+    }
     setAttacker(attacker);
     int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
 
@@ -3557,6 +3560,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         }
     }
 
+
     int moveDamage = dmgValue * effectiveScaling / 100;
     int prevHealth = health;
     health -= moveDamage;
@@ -3577,14 +3581,16 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
 
     // todo if health 0 mark finish here?
 
-    if (moveDamage > 0) {
+    if (moveDamage > 0 || isGrab) {
         // look for minions to delete on damage
         for (auto &minion: getMinions()) {
             if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
                 minion->die = true;
             }
         }
+    }
 
+    if (moveDamage > 0) {
         comboDamage += moveDamage;
         lastDamageScale = effectiveScaling;
 
