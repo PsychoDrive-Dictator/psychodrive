@@ -4396,7 +4396,7 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 5: // swing.. not hit?
                     // todo not always right - JP's 4HK has some extra condition to get into (2)
-                    if (!preHit && canHitID == 0) {
+                    if (!preHit && !hitThisMove && !hasBeenBlockedThisMove && !hasBeenParriedThisMove) {
                         doBranch = true;
                     }
                     break;
