@@ -4548,6 +4548,11 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 31: // todo loop count
                     break;
+                case 35: // todo random
+                    // need some sort of initial pre-known seed - then seed moves forward?
+                    // seed = (seed * 5 + 14097)
+                    // then compare param0 (probability in %) to certain seed bits (rotate 9 left?)
+                    break;
                 case 37:
                     // hit catch - maybe will need a separate 'hitgrabbed this frame' later?
                     if (grabbedThisFrame) {

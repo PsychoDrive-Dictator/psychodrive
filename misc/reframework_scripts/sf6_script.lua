@@ -1026,7 +1026,7 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.currentInput = cplayer.pl_input_new
 end
 
-local curVersion = "40"
+local curVersion = "41"
 
 sdk.hook(sdk.find_type_definition("app.BattleFlow"):get_method("UpdateFrameEnd()"),
 function(args)
@@ -1047,6 +1047,7 @@ function(args)
     local sGame = gBattle:get_field("Game"):get_data(nil)
 
     frameDump.stageTimer = sGame.stage_timer
+    -- frameDump.randomL = sGame.RndCtrl.mRandom.m_seed.L
 
     frameDump.players = {}
     local sPlayer = gBattle:get_field("Player"):get_data(nil)
