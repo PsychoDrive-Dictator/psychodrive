@@ -119,6 +119,7 @@ public:
     int replayTimerStartFrame = -1;
 
     std::vector<FrameEvent> currentFrameEvents;
+    std::vector<std::string> errorLog;
     bool enableCleanup = true;
 };
 

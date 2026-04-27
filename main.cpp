@@ -295,15 +295,10 @@ bool playingBackInput = false;
 std::deque<int> playBackInputBuffer;
 int playBackFrame = 0;
 
-bool replayingGameState = false;
-int gameStateFrame = 0;
 int replayErrors = 0;
 int fatalErrorKind = -1;
 
-bool replayingReplayFile = false;
 ReplayDecoder replayFileDecoder;
-nlohmann::json replayFileInfo;
-int replayFileTimerStartFrame = -1;
 
 std::vector<normalRangePlotEntry> vecPlotEntries;
 int curPlotEntryID = -1;
@@ -418,7 +413,6 @@ void extractCharVersion(char *cmdLine, std::string &charName, int &version)
 
 uint32_t frameStartTime;
 std::vector<Guy *> vecGuysToDelete;
-nlohmann::json gameStateDump;
 ImGuiIO *io;
 SDL_Window *sdlwindow;
 color clearColor = {0.0,0.0,0.0};
@@ -453,15 +447,13 @@ static void mainloop(void)
 
     const float desiredFrameTimeMS = 1000.0 / 60.0f;
     uint32_t currentTime = SDL_GetTicks();
-    if ((limitRate || (!playingBackInput && !replayingGameState && !replayingReplayFile)) && currentTime - frameStartTime < desiredFrameTimeMS) {
+    if ((limitRate || !playingBackInput) && currentTime - frameStartTime < desiredFrameTimeMS) {
         const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
         usleep(timeToSleepMS * 1000 - 100);
     }
     frameStartTime = SDL_GetTicks();
 
-    if (!replayingGameState && !replayingReplayFile) {
-        defaultSim.frameCounter++;
-    }
+    defaultSim.frameCounter++;
 
     int sizeX, sizeY;
     SDL_GetWindowSize(sdlwindow, &sizeX, &sizeY);
@@ -620,8 +612,7 @@ static void mainloop(void)
         // gather everyone again in case of deletions/additions in RunFrame
         defaultSim.gatherEveryone();
 
-        // if replay, we'll update the counter from the replay
-        if (!runFrame && !replayingGameState && !replayingReplayFile) {
+        if (!runFrame) {
             defaultSim.frameCounter--;
         }
 
@@ -695,180 +686,6 @@ static void mainloop(void)
                     curPlotEntryStartFrame = 0;
                     curPlotEntryNormalStartFrame = 0;
                 }
-            }
-        }
-
-        if (replayingGameState) {
-            if (runFrame) {
-                static bool firstFrame = true;
-                int targetDumpFrame = gameStateFrame;
-                if (firstFrame) {
-                    firstFrame = false;
-                } else {
-                    auto players = gameStateDump[targetDumpFrame]["players"];
-                    int i = 0;
-                    while (i < 2) {
-                        std::string desc = "player " + std::to_string(i);
-
-                        if (!defaultSim.finished && players[i]["hp"] == 0 && players[i]["hp"] == guys[i]->getHealth()) {
-                            defaultSim.finished = true;
-                        }
-
-                        if (defaultSim.finished) {
-                            break;
-                        }
-
-                        if (targetDumpFrame > 1) {
-                            compareGameStateFixed(Fixed(players[i]["posX"].get<double>()), guys[i]->getPosX(), Simulation::ePos, desc + " pos X");
-                            compareGameStateFixed(Fixed(players[i]["posY"].get<double>()), guys[i]->getPosY(), Simulation::ePos, desc + " pos Y");
-                        }
-                        Fixed velX, velY, accelX, accelY;
-                        guys[i]->getVel(velX, velY, accelX, accelY);
-                        compareGameStateFixed(Fixed(players[i]["velX"].get<double>()), velX, Simulation::eVel, desc + " vel X");
-                        compareGameStateFixed(Fixed(players[i]["velY"].get<double>()), velY, Simulation::eVel, desc + " vel Y");
-                        if (players[i].contains("accelX")) {
-                            compareGameStateFixed(Fixed(players[i]["accelX"].get<double>()), accelX, Simulation::eAccel, desc + " accel X");
-                        }
-                        compareGameStateFixed(Fixed(players[i]["accelY"].get<double>()), accelY, Simulation::eAccel, desc + " accel Y");
-
-                        if (players[i].contains("hitVelX")) {
-                            compareGameStateFixed(Fixed(players[i]["hitVelX"].get<double>()), guys[i]->getHitVelX(), Simulation::eHitVel, desc + " hitVel X");
-                            compareGameStateFixed(Fixed(players[i]["hitAccelX"].get<double>()), guys[i]->getHitAccelX(), Simulation::eHitAccel, desc + " hitAccel X");
-                        }
-
-                        compareGameStateInt(players[i]["actionID"], guys[i]->getCurrentAction(), Simulation::eActionID, desc + " action ID");
-                        compareGameStateInt(players[i]["actionFrame"], guys[i]->getCurrentFrame(), Simulation::eActionFrame, desc + " action frame");
-
-                        // swap players here, we track combo hits on the opponent
-                        compareGameStateInt(players[i]["comboCount"], guys[!i]->getComboHits(), Simulation::eComboCount, desc + " combo");
-
-                        compareGameStateInt((players[i]["bitValue"].get<int>() & (1<<7)) ? 1 : -1, guys[i]->getDirection(), Simulation::eDirection, desc + " direction");
-
-                        if (targetDumpFrame > 0) {
-                            nlohmann::json &prevPlayers = gameStateDump[targetDumpFrame-1]["players"];
-                            nlohmann::json &firstPlayers = gameStateDump[0]["players"];
-                            if (!defaultSim.match && detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "hp", guys[i]->getCharData()->vitality)) {
-                                guys[i]->setHealth(players[i]["hp"]);
-                            }
-                            if (!defaultSim.match && detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "driveGauge", maxFocus)) {
-                                guys[i]->guyLog(guys[i]->getLogResources(), "focus training refill detected, focus to " + std::to_string(players[i]["driveGauge"].get<int>()) + " was " + std::to_string(guys[i]->getFocus()));
-                                guys[i]->setFocus(players[i]["driveGauge"]);
-                                guys[i]->setFocusRegenCooldown(-1);
-                            }
-                            if (!defaultSim.match && detectTrainingAutoRegen(prevPlayers[i], players[i], firstPlayers[i], "superGauge", guys[i]->getCharData()->gauge)) {
-                                guys[i]->setGauge(players[i]["superGauge"]);
-                            }
-                        }
-
-                        compareGameStateInt(players[i]["hp"], guys[i]->getHealth(), Simulation::eHealth, desc + " health");
-                        compareGameStateInt(players[i]["hitStop"], guys[i]->getHitStopForDump(), Simulation::eHitStop, desc + " hitstop");
-
-                        if (players[i].contains("driveGauge")) {
-                            compareGameStateInt(players[i]["driveGauge"], guys[i]->getFocus(), Simulation::eGauge, desc + " drive gauge");
-                            // if (targetDumpFrame < 240 && (targetDumpFrame + 1) < (int)gameStateDump.size()) {
-                            //     nlohmann::json &nextPlayers = gameStateDump[targetDumpFrame+1]["players"];
-                            //     int driveDiff = nextPlayers[i]["driveGauge"].get<int>() - players[i]["driveGauge"].get<int>();
-                            //     if (driveDiff == 40 || driveDiff == 50 || driveDiff == 20 || driveDiff == 25 || driveDiff == 60 || driveDiff == 70) {
-                            //         if (!guys[i]->getHasFocusRegenCooldowned()) {
-                            //             guys[i]->setFocusRegenCooldown(1); // start regenning next frame
-                            //         }
-                            //     }
-                            // }
-                        }
-                        if (players[i].contains("superGauge")) {
-                            compareGameStateInt(players[i]["superGauge"], guys[i]->getGauge(), Simulation::eGauge, desc + " super gauge");
-                        }
-
-                        if (players[i].contains("driveCooldown")) {
-                            compareGameStateInt(players[i]["driveCooldown"], guys[i]->getFocusRegenCoolDown(), Simulation::eFocusRegen, desc + " drive cooldown");
-                        }
-
-                        i++;
-                    }
-
-                    if (gameStateDump[targetDumpFrame].contains("randomL")) {
-                        compareGameStateInt(gameStateDump[targetDumpFrame]["randomL"], defaultSim.randomSeed, Simulation::eRandomSeed, "random seed");
-                    }
-
-                    gameStateFrame++;
-                }
-            }
-        }
-
-        if (replayingGameState) {
-            if (runFrame) {
-                int targetDumpFrame = gameStateFrame;
-                if (targetDumpFrame >= (int)gameStateDump.size()) {
-                    replayingGameState = false;
-                    gameStateFrame = 0;
-                    log("game replay finished, errors: " + std::to_string(replayErrors));
-                } else {
-                    int inputLeft = gameStateDump[targetDumpFrame]["players"][0]["currentInput"];
-                    inputLeft = addPressBits( inputLeft, currentInputMap[replayLeft] );
-                    currentInputMap[replayLeft] = inputLeft;
-
-                    // training dumps don't have input for player 2
-                    if (gameStateDump[targetDumpFrame]["players"][1].contains("currentInput")) {
-                        int inputRight = gameStateDump[targetDumpFrame]["players"][1]["currentInput"];
-                        inputRight = addPressBits( inputRight, currentInputMap[replayRight] );
-                        currentInputMap[replayRight] = inputRight;
-                    }
-
-                    if (gameStateDump[targetDumpFrame].contains("stageTimer")) {
-                        defaultSim.frameCounter = gameStateDump[targetDumpFrame]["stageTimer"];
-                    }
-
-                    int playTimerSeconds = gameStateDump[targetDumpFrame].value("playTimer", 99);
-                    int playTimerFrames = gameStateDump[targetDumpFrame].value("playTimerMS", 60);
-
-                    if (defaultSim.match && (playTimerSeconds != 99 || (playTimerFrames != 60 && playTimerFrames != 59))) {
-                        defaultSim.timerStarted = true;
-                    }
-                }
-            } else {
-                hasInput = false;
-            }
-        }
-
-        if (replayingReplayFile) {
-            if (runFrame) {
-                uint8_t cmd;
-                do {
-                    cmd = replayFileDecoder.DecodeTick();
-                    if (cmd >= 1 && cmd <= 8) {
-                        if (cmd == 1) {
-                            replayFileTimerStartFrame = defaultSim.frameCounter + 190;
-                            replayFileDecoder.inputState[0] = 0;
-                            replayFileDecoder.inputState[1] = 0;
-                            replayFileDecoder.prevInputState[0] = 0;
-                            replayFileDecoder.prevInputState[1] = 0;
-                        }
-                        if (cmd == 3) {
-                            replayingReplayFile = false;
-                            break;
-                        }
-                    }
-                } while (cmd >= 1 && cmd <= 8 && !replayFileDecoder.finished);
-
-                if (replayFileTimerStartFrame >= 0 && defaultSim.frameCounter >= replayFileTimerStartFrame) {
-                    defaultSim.timerStarted = true;
-                    replayFileTimerStartFrame = -1;
-                }
-
-                if (replayingReplayFile && !replayFileDecoder.finished) {
-                    int inputLeft = addPressBits(replayFileDecoder.inputState[0], replayFileDecoder.prevInputState[0]);
-                    currentInputMap[replayLeft] = inputLeft;
-                    int inputRight = addPressBits(replayFileDecoder.inputState[1], replayFileDecoder.prevInputState[1]);
-                    currentInputMap[replayRight] = inputRight;
-                    replayFileDecoder.prevInputState[0] = replayFileDecoder.inputState[0];
-                    replayFileDecoder.prevInputState[1] = replayFileDecoder.inputState[1];
-                }
-                if (replayFileDecoder.finished) {
-                    replayingReplayFile = false;
-                }
-                defaultSim.frameCounter++;
-            } else {
-                hasInput = false;
             }
         }
 
@@ -1174,85 +991,33 @@ int main(int argc, char**argv)
         recordedInput = inputTimeline.get<std::vector<int>>();
     }
 
-    gameStateDump = nullptr;
     if (loadingDump) {
-        gameStateDump = parse_json_file(strDumpLoadPath);
-    }
-    if (gameStateDump != nullptr) {
+        if (dumpVersion == -1) {
+            dumpVersion = maxVersion;
+        }
         if (strDumpLoadPath.find("forcepc") != std::string::npos) {
             forcePunishCounter = true;
         }
-        if (strDumpLoadPath.find("match") != std::string::npos) {
-            defaultSim.match = true;
+        bool isMatch = strDumpLoadPath.find("match") != std::string::npos;
+
+        simController.stateRecording.clear();
+        simController.guyPool.reset();
+        if (simController.pSim) delete simController.pSim;
+        simController.pSim = new Simulation;
+        if (isMatch) simController.pSim->match = true;
+
+        if (!simController.pSim->SetupFromGameDump(strDumpLoadPath, dumpVersion)) {
+            fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());
+            exit(1);
         }
-        int i = 0;
-        while (i < (int)gameStateDump.size()) {
-            if (gameStateDump[i]["playTimer"] != 0 && gameStateDump[i]["players"][0]["actionID"] != 0 &&
-                gameStateDump[i+1]["players"][0]["actionFrame"] != 0) {
-                break;
-            }
-            i++;
-        }
-        if (dumpVersion == -1) {
-            // fall back to latest
-            dumpVersion = maxVersion;
-        }
-        int playerID = 0;
-        while (playerID < 2) {
-            nlohmann::json &playerJson = gameStateDump[i]["players"][playerID];
-            std::string charName = getCharNameFromID(playerJson["charID"]);
-            Fixed posX = Fixed(playerJson["posX"].get<double>());
-            Fixed posY = Fixed(playerJson["posY"].get<double>());
-            int bitValue = playerJson["bitValue"];
-            int charDirection = (bitValue & 1<<7) ? 1 : -1;
-            color charColor = {randFloat(), randFloat(), randFloat()};
-            createGuy(charName, dumpVersion, posX, posY, charDirection, charColor );
-            playerID++;
+        for (auto &guy : simController.pSim->simGuys) {
+            guy->setRecordFrameTriggers(true, true);
         }
 
-        while (guys.size() < 2) {
-            usleep(200 * 1000);
-            doDeferredCreateGuys();
-        }
-
-        playerID = 0;
-        while (playerID < 2) {
-            nlohmann::json &playerJson = gameStateDump[i]["players"][playerID];
-            int actionID = playerJson["actionID"];
-            int actionFrame = playerJson["actionFrame"];
-            if (actionID == 17) {
-                // guile66hit combo has p2 in mid-dash and we don't capture posoffset
-                actionID = 1;
-                actionFrame = 0;
-            }
-            guys[playerID]->setAction(actionID, actionFrame - 1);
-            guys[playerID]->setHealth(playerJson["hp"]);
-            guys[playerID]->setFocus(playerJson.value("driveGauge", maxFocus));
-            guys[playerID]->setFocusRegenCooldown(-1);
-            guys[playerID]->setGauge(playerJson.value("superGauge", guys[playerID]->getCharData()->gauge));
-
-            playerID++;
-        }
-
-        *guys[0]->getInputIDPtr() = replayLeft;
-        *guys[0]->getInputListIDPtr() = replayLeft;
-        *guys[1]->getInputIDPtr() = replayRight;
-        *guys[1]->getInputListIDPtr() = replayRight;
-
-        gameStateFrame = i;
-        replayingGameState = true;
-        currentInputMap[replayLeft] = 0;
-        currentInputMap[replayRight] = 0;
-
-        if (gameStateDump[i].contains("stageTimer")) {
-            defaultSim.frameCounter = gameStateDump[i]["stageTimer"];
-        }
-        if (gameStateDump[i].contains("randomL")) {
-            defaultSim.randomSeed = gameStateDump[i]["randomL"];
-        }
-    } else if (loadingDump) {
-        fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());
-        exit(1);
+        simController.charCount = 2;
+        gameMode = Viewer;
+        simController.AdvanceFromDump();
+        simInputsChanged = false;
     }
 
     if (loadingReplay) {
@@ -1266,7 +1031,8 @@ int main(int argc, char**argv)
             fprintf(stderr, "replay missing InputData or ReplayInfo\n");
             exit(1);
         }
-        replayFileInfo = data["ReplayInfo"];
+        nlohmann::json replayInfo = data["ReplayInfo"];
+
         replayFileDecoder = {};
         replayFileDecoder.inputData = data["InputData"].get<std::vector<uint8_t>>();
 
@@ -1274,24 +1040,11 @@ int main(int argc, char**argv)
             replayVersion = maxVersion;
         }
 
-        for (int i = 0; i < 2; i++) {
-            int fighterID = replayFileInfo["Fighters"][i]["FighterID"];
-            const char *charName = getCharNameFromID(fighterID);
-            Fixed startX = (i == 0) ? Fixed(-150.0f) : Fixed(150.0f);
-            int startDir = (i == 0) ? 1 : -1;
-            createGuy(charName, replayVersion, startX, Fixed(0), startDir, {randFloat(), randFloat(), randFloat()});
-        }
-
-        while (guys.size() < 2) {
-            usleep(200 * 1000);
-            doDeferredCreateGuys();
-        }
-
         // skip decoder past earlier rounds
         for (int r = 0; r < replayRound; r++) {
             while (!replayFileDecoder.finished) {
                 uint8_t cmd = replayFileDecoder.DecodeTick();
-                if (cmd == 3) break; // finish
+                if (cmd == 3) break;
             }
             replayFileDecoder.inputState[0] = 0;
             replayFileDecoder.inputState[1] = 0;
@@ -1299,27 +1052,19 @@ int main(int argc, char**argv)
             replayFileDecoder.prevInputState[1] = 0;
         }
 
-        if (replayRound == 0) {
-            guys[0]->setGauge(0);
-            guys[1]->setGauge(0);
-        } else {
-            nlohmann::json &prevRoundInfo = replayFileInfo["RoundInfo"][replayRound - 1];
-            for (int p = 0; p < 2; p++) {
-                guys[p]->setGauge(prevRoundInfo["SAGaugeStart"][p]);
-            }
+        simController.stateRecording.clear();
+        simController.guyPool.reset();
+        if (simController.pSim) delete simController.pSim;
+        simController.pSim = new Simulation;
+        simController.pSim->SetupReplayRound(replayInfo, replayRound, replayVersion, replayFileDecoder);
+        for (auto &guy : simController.pSim->simGuys) {
+            guy->setRecordFrameTriggers(true, true);
         }
 
-        defaultSim.randomSeed = replayFileInfo["RoundInfo"][replayRound]["RandomSeed"];
-        defaultSim.match = true;
-
-        *guys[0]->getInputIDPtr() = replayLeft;
-        *guys[0]->getInputListIDPtr() = replayLeft;
-        *guys[1]->getInputIDPtr() = replayRight;
-        *guys[1]->getInputListIDPtr() = replayRight;
-
-        replayingReplayFile = true;
-        currentInputMap[replayLeft] = 0;
-        currentInputMap[replayRight] = 0;
+        simController.charCount = 2;
+        gameMode = Viewer;
+        simController.AdvanceFromReplay(replayFileDecoder);
+        simInputsChanged = false;
     }
 
     frameStartTime = SDL_GetTicks();

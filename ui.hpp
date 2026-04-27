@@ -88,6 +88,8 @@ public:
     void RenderUI(void);
     void RenderComboMinerSetup(void);
     void AdvanceUntilComplete(void);
+    void AdvanceFromReplay(ReplayDecoder &decoder);
+    void AdvanceFromDump();
     void doFrameMeterDrag(void);
     void RecordFrame(void);
     Guy *getRecordedGuy(int frameIndex, int guyID);
@@ -111,6 +113,7 @@ public:
 
     Simulation *pSim = nullptr;
     int scrubberFrame = 0;
+    int prevScrubberFrame = -1;
     int simFrameCount = 0;
     int charCount = 1;
 

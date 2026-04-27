@@ -1502,7 +1502,7 @@ void Guy::DoTriggers(int fluffFrameBias)
             } else if (forceTrigger || CheckTriggerCommand(pTrigger, initialI)) {
                 log(logTriggers, "trigger " + std::to_string(actionID) + " " + std::to_string(triggerID) + " defer " +
                     std::to_string(trigState.hasDeferred) + " normal " + std::to_string(trigState.hasNormal) +
-                    + " antinormal " + std::to_string(trigState.hasAntiNormal));
+                    + " antinormal " + std::to_string(trigState.hasAntiNormal) + "initialI " + std::to_string(initialI));
                 if (trigState.hasDeferred || trigState.hasAntiNormal) {
                     // queue the deferred trigger
                     dc.setDeferredTriggerIDs.insert(triggerID);

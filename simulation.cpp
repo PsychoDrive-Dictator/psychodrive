@@ -292,7 +292,12 @@ void Simulation::CompareGameStateInt( int64_t dumpValue, int64_t realValue, int 
 
 void Simulation::Log(std::string logLine)
 {
-    fprintf(stderr, "%s\n", logLine.c_str());
+    if (gameMode != Viewer) {
+        fprintf(stderr, "%s\n", logLine.c_str());
+    }
+    if (logLine.size() >= 2 && logLine[0] == 'E' && logLine[1] == ';') {
+        errorLog.push_back(logLine);
+    }
 }
 
 void Simulation::RunFrame(void) {
@@ -420,7 +425,15 @@ void Simulation::RunFrame(void) {
                     CompareGameStateInt(players[i]["superGauge"], simGuys[i]->getGauge(), i, targetDumpFrame, eGauge, desc + " super gauge");
                 }
 
+                if (gameMode == Viewer && players[i].contains("driveCooldown")) {
+                    CompareGameStateInt(players[i]["driveCooldown"], simGuys[i]->getFocusRegenCoolDown(), i, targetDumpFrame, eFocusRegen, desc + " drive cooldown");
+                }
+
                 i++;
+            }
+
+            if (gameMode == Viewer && gameStateDump[targetDumpFrame].contains("randomL")) {
+                CompareGameStateInt(gameStateDump[targetDumpFrame]["randomL"], randomSeed, 0, targetDumpFrame, eRandomSeed, "random seed");
             }
 
             gameStateFrame++;

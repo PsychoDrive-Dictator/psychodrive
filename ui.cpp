@@ -1735,27 +1735,104 @@ void SimulationController::RenderUI(void)
         ImGui::SetNextWindowSize(ImVec2(0, 0));
         ImGui::Begin("PsychoDrive Left Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus );
-        switch (viewSelect) {
-            default:
-            case 0:
-                charControllers[0].renderCharSetup();
-                break;
-            case 1:
-                charControllers[0].renderActionSetup(scrubberFrame);
-                break;
-            case 2:
-                charControllers[1].renderCharSetup();
-                break;
-            case 3:
-                charControllers[1].renderActionSetup(scrubberFrame);
-                break;
-            case 4:
-                RenderComboMinerSetup();
-                break;
-        }
-        if (maxComboCount > 0) {
-            std::string strComboInfo = "Current combo max damage: " + std::to_string(maxComboDamage);
-            ImGui::Text("%s", strComboInfo.c_str());
+        if (gameMode == Viewer) {
+            ImGui::Text("Errors: %d", pSim ? (int)pSim->errorLog.size() : 0);
+            ImGui::Separator();
+            if (pSim && !pSim->errorLog.empty()) {
+                // pre-parse error frames once
+                static std::vector<int> errorFrames;
+                if (errorFrames.size() != pSim->errorLog.size()) {
+                    errorFrames.resize(pSim->errorLog.size());
+                    for (int idx = 0; idx < (int)pSim->errorLog.size(); idx++) {
+                        auto &err = pSim->errorLog[idx];
+                        int semiCount = 0;
+                        int fStart = -1, fEnd = -1;
+                        for (int c = 0; c < (int)err.size(); c++) {
+                            if (err[c] == ';') {
+                                semiCount++;
+                                if (semiCount == 2) fStart = c + 1;
+                                if (semiCount == 3) { fEnd = c; break; }
+                            }
+                        }
+                        errorFrames[idx] = (fStart >= 0 && fEnd > fStart) ? atoi(err.substr(fStart, fEnd - fStart).c_str()) : -1;
+                    }
+                }
+
+                ImGui::BeginChild("ErrorList", ImVec2(800, 500), false, ImGuiWindowFlags_None);
+                for (int idx = 0; idx < (int)pSim->errorLog.size(); idx++) {
+                    auto &err = pSim->errorLog[idx];
+                    int errFrame = errorFrames[idx];
+                    // find start of description (after 4th semicolon)
+                    int semiCount = 0;
+                    int descStart = -1;
+                    for (int c = 0; c < (int)err.size(); c++) {
+                        if (err[c] == ';') {
+                            semiCount++;
+                            if (semiCount == 4) { descStart = c + 1; break; }
+                        }
+                    }
+                    std::string display;
+                    if (errFrame >= 0 && descStart > 0) {
+                        display = "[" + std::to_string(errFrame) + "] " + err.substr(descStart);
+                    } else {
+                        display = err;
+                    }
+                    int scrubberForError = errFrame + 1;
+                    bool isCurrentFrame = (scrubberForError == scrubberFrame);
+                    if (isCurrentFrame) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
+                    }
+                    if (ImGui::Selectable(display.c_str())) {
+                        if (errFrame >= 0) {
+                            scrubberFrame = scrubberForError;
+                            clampFrame(scrubberFrame);
+                        }
+                    }
+                    if (isCurrentFrame) {
+                        ImGui::PopStyleColor();
+                    }
+                }
+                // scroll when scrubber changed (playback, drag, or click)
+                if (scrubberFrame != prevScrubberFrame) {
+                    // find first error at or after current frame
+                    int scrollTargetIdx = -1;
+                    for (int idx = 0; idx < (int)errorFrames.size(); idx++) {
+                        if (errorFrames[idx] + 1 >= scrubberFrame) {
+                            scrollTargetIdx = idx;
+                            break;
+                        }
+                    }
+                    if (scrollTargetIdx >= 0) {
+                        float itemHeight = ImGui::GetTextLineHeightWithSpacing();
+                        ImGui::SetScrollY(scrollTargetIdx * itemHeight);
+                    }
+                }
+                prevScrubberFrame = scrubberFrame;
+                ImGui::EndChild();
+            }
+        } else {
+            switch (viewSelect) {
+                default:
+                case 0:
+                    charControllers[0].renderCharSetup();
+                    break;
+                case 1:
+                    charControllers[0].renderActionSetup(scrubberFrame);
+                    break;
+                case 2:
+                    charControllers[1].renderCharSetup();
+                    break;
+                case 3:
+                    charControllers[1].renderActionSetup(scrubberFrame);
+                    break;
+                case 4:
+                    RenderComboMinerSetup();
+                    break;
+            }
+            if (maxComboCount > 0) {
+                std::string strComboInfo = "Current combo max damage: " + std::to_string(maxComboDamage);
+                ImGui::Text("%s", strComboInfo.c_str());
+            }
         }
         ImGui::End();
     }
@@ -1769,6 +1846,12 @@ void SimulationController::RenderUI(void)
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("PsychoDrive Top Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse );
+
+    int simFrameCount = pSim ? stateRecording.size() : 0;
+
+    if (gameMode == Viewer) {
+        ImGui::Text("Viewer");
+    } else {
     const char* modes[] = { "Developer", "Move Viewer", "Combo Maker" };
     if (modalDropDown("##gamemode", (int*)&gameMode, modes, IM_ARRAYSIZE(modes), modeSelectorSize)) {
         simInputsChanged = true;
@@ -1776,7 +1859,6 @@ void SimulationController::RenderUI(void)
 
         translateY = gameMode == Training ? 150.0 : 100.0;
     }
-    int simFrameCount = pSim ? stateRecording.size() : 0;
 
     if (gameMode != Training) {
         std::vector<std::string> vecViewLabels;
@@ -1846,6 +1928,7 @@ void SimulationController::RenderUI(void)
         }
 #endif
     }
+    } // else (not Viewer)
     ImGui::End();
 
     if (gameMode == Training) {
@@ -2122,6 +2205,37 @@ void SimulationController::AdvanceUntilComplete(void)
         }
         charControllers[controllerSearchForNextTrigger].triggerAdded = false;
     }
+}
+
+void SimulationController::AdvanceFromReplay(ReplayDecoder &decoder)
+{
+    while (!decoder.finished && pSim->replayingReplay) {
+        pSim->RunFrame();
+        RecordFrame();
+
+        // replay decode happens at end of RunFrame() inside Simulation,
+        // input is now set for AdvanceFrame
+        pSim->AdvanceFrame();
+    }
+
+    simFrameCount = stateRecording.size();
+    scrubberFrame = 0;
+    playing = true;
+    playSpeed = 1;
+}
+
+void SimulationController::AdvanceFromDump()
+{
+    while (pSim->replayingGameStateDump) {
+        pSim->RunFrame();
+        RecordFrame();
+        pSim->AdvanceFrame();
+    }
+
+    simFrameCount = stateRecording.size();
+    scrubberFrame = 0;
+    playing = true;
+    playSpeed = 1;
 }
 
 int CharacterUIController::getOptionFlags()

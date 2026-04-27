@@ -11,7 +11,8 @@ enum EGameMode {
     Batch = -1,
     Training = 0,
     MoveViewer,
-    ComboMaker
+    ComboMaker,
+    Viewer
 };
 
 enum hitentryflags {
