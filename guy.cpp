@@ -300,8 +300,12 @@ bool Guy::RunFrame(bool advancingTime)
         return false;
     }
 
-    if (advancingTime && getHitStop()) {
+    if (advancingTime && hitStop) {
+        // specifically go through ignoreHitstop here
         timeInHitStop++;
+    }
+
+    if (advancingTime && getHitStop()) {
         hitStop--;
         if (getHitStop() == 0) {
             // increment the frame we skipped at the beginning of hitstop
@@ -1146,14 +1150,14 @@ bool Guy::MatchCommand(CommandVariant *pVariant, int startInput, uint32_t startC
     return false;
 }
 
-bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
+bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefer)
 {
     uint32_t okKeyFlags = pTrigger->okKeyFlags;
     uint32_t okCondFlags = pTrigger->okCondFlags;
     uint32_t ngKeyFlags = pTrigger->ngKeyFlags;
     uint32_t dcExcFlags = pTrigger->dcExcFlags;
     uint32_t dcIncFlags = pTrigger->dcIncFlags;
-    int precedingTime = pTrigger->precedingTime;
+    int precedingTime = forDefer ? 0 : pTrigger->precedingTime;
     bool match = false;
     uint32_t initialCursorPos = cursorPos;
     int initialI = -1;
@@ -1174,6 +1178,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         int button = LP;
         bool bothButtonsPressed = false;
         bool atLeastOneNotConsumed = true; // todo disable this for now - is it a flag?
+        initialSearch += 1; // one frame of slop to find plink buttons
         while (button <= HK) {
             if (button & okKeyFlags) {
                 cursorPos = initialCursorPos;
@@ -1185,7 +1190,10 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
                             atLeastOneNotConsumed = true;
                         }
                         if (std::bitset<32>(dc.inputBuffer[cursorPos] & okKeyFlags).count() >= 2) {
-                            bothButtonsPressed = true;
+                            // the two buttons must be in the not-slopped search window
+                            if (initialSearch - cursorPos > 1) {
+                                bothButtonsPressed = true;
+                            }
                         }
                         initialMatch = true;
                     } else if (initialMatch == true) {
@@ -1207,6 +1215,10 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         initialMatch = atLeastOneNotConsumed && bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
         bool atLeastOneNotConsumed = false;
+        if (okCondFlags & 1024) {
+            // 1f slop for looking for the initial edge by hand
+            initialSearch += 1;
+        }
         while (cursorPos < initialSearch)
         {
             // possible to be all zeroes?
@@ -1267,11 +1279,11 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos)
         return initialMatch;
 }
 
-bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI)
+bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI, bool forDefer)
 {
     initialI = 0;
     while (true) {
-        bool initialMatch = MatchInitialInput(pTrigger, initialI);
+        bool initialMatch = MatchInitialInput(pTrigger, initialI, forDefer);
         if (!initialMatch) {
             return false;
         }
@@ -1499,7 +1511,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                 if (trigState.hasAntiNormal) {
                     break;
                 }
-            } else if (forceTrigger || CheckTriggerCommand(pTrigger, initialI)) {
+            } else if (forceTrigger || CheckTriggerCommand(pTrigger, initialI, !trigState.hasNormal)) {
                 log(logTriggers, "trigger " + std::to_string(actionID) + " " + std::to_string(triggerID) + " defer " +
                     std::to_string(trigState.hasDeferred) + " normal " + std::to_string(trigState.hasNormal) +
                     + " antinormal " + std::to_string(trigState.hasAntiNormal) + "initialI " + std::to_string(initialI));
@@ -5655,7 +5667,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         switchDirection();
     }
 
-    if (getHitStop() == 0) {
+    // specifically go through ignore hitstop here as we want it to be added to the buffer
+    if (hitStop == 0) {
         timeInHitStop = 0;
     }
 
