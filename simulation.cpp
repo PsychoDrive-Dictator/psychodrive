@@ -223,6 +223,9 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
     if (gameStateDump[i].contains("stageTimer")) {
         frameCounter = gameStateDump[i]["stageTimer"];
     }
+    if (gameStateDump[i].contains("randomL")) {
+        randomSeed = gameStateDump[i]["randomL"];
+    }
 
     replayingGameStateDump = true;
 
@@ -445,6 +448,15 @@ void Simulation::AdvanceFrame(void)
             vecGuysToDelete.push_back(guy);
         }
     }
+}
+
+int Simulation::GetRandom(void)
+{
+    // roll seed forward
+    randomSeed = (randomSeed * 5 + 14097) & 0xFFFF;
+
+    // rotated left 9 bits?
+    return (((randomSeed << 9) | (randomSeed >> 7)) & 0xFFFF) % 100;
 }
 
 void Simulation::Render(float z /* = 0.0 */, bool showDomain)

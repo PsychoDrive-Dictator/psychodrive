@@ -4548,10 +4548,12 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 31: // todo loop count
                     break;
-                case 35: // todo random
-                    // need some sort of initial pre-known seed - then seed moves forward?
-                    // seed = (seed * 5 + 14097)
-                    // then compare param0 (probability in %) to certain seed bits (rotate 9 left?)
+                case 35:
+                    // random - todo prehit currently guarantees we do it once per frame
+                    // but is it the right time in the frame?
+                    if (preHit && pSim->GetRandom() < branchParam0) {
+                        doBranch = true;
+                    }
                     break;
                 case 37:
                     // hit catch - maybe will need a separate 'hitgrabbed this frame' later?

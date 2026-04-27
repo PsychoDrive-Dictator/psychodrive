@@ -781,6 +781,10 @@ static void mainloop(void)
                         i++;
                     }
 
+                    if (gameStateDump[targetDumpFrame].contains("randomL")) {
+                        compareGameStateInt(gameStateDump[targetDumpFrame]["randomL"], defaultSim.randomSeed, Simulation::eRandomSeed, "random seed");
+                    }
+
                     gameStateFrame++;
                 }
             }
@@ -1100,6 +1104,9 @@ int main(int argc, char**argv)
 
         if (gameStateDump[i].contains("stageTimer")) {
             defaultSim.frameCounter = gameStateDump[i]["stageTimer"];
+        }
+        if (gameStateDump[i].contains("randomL")) {
+            defaultSim.randomSeed = gameStateDump[i]["randomL"];
         }
     } else if (loadingDump) {
         fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());

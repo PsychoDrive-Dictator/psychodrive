@@ -65,7 +65,8 @@ public:
         eHealth,
         eHitStop,
         eGauge,
-        eFocusRegen
+        eFocusRegen,
+        eRandomSeed
     };
 
     void CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description );
@@ -75,6 +76,7 @@ public:
 
     void RunFrame();
     void AdvanceFrame();
+    int GetRandom();
     void Render(float a = 1.0f, bool showDomain = true);
     std::vector<FrameEvent>& getCurrentFrameEvents() { return currentFrameEvents; }
 
@@ -84,6 +86,7 @@ public:
     std::vector<Guy *> vecGuysToDelete;
 
     int frameCounter = 0;
+    int randomSeed = 0;
 
     struct {
         int focusGain = 0;
