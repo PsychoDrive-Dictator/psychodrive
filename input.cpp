@@ -227,13 +227,22 @@ void updateInputs(int sizeX, int sizeY)
                     }
                     break;
                 case SDLK_p:
-                    paused = !paused;
+                    if (gameMode != Training) {
+                        simController.playing = !simController.playing;
+                    } else {
+                        paused = !paused;
+                    }
                     break;
                 case SDLK_q:
                     resetpos = true;
                     break;
                 case SDLK_0:
-                    oneframe = true;
+                    if (gameMode != Training) {
+                        simController.scrubberFrame++;
+                        simController.clampFrame(simController.scrubberFrame);
+                    } else {
+                        oneframe = true;
+                    }
                     break;
                 case SDLK_BACKQUOTE:
                     if (defaultSim.simGuys.size()) {

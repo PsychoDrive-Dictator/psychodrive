@@ -298,7 +298,7 @@ int playBackFrame = 0;
 int replayErrors = 0;
 int fatalErrorKind = -1;
 
-ReplayDecoder replayFileDecoder;
+
 
 std::vector<normalRangePlotEntry> vecPlotEntries;
 int curPlotEntryID = -1;
@@ -939,16 +939,12 @@ int main(int argc, char**argv)
 
     bool loadingReplay = false;
     std::string strReplayLoadPath;
-    int replayRound = 0;
     int replayVersion = -1;
     if ( argc > 2 && std::string(argv[1]) == "load_replay") {
         strReplayLoadPath = argv[2];
         loadingReplay = true;
         if (argc > 3) {
-            replayRound = atoi(argv[3]);
-        }
-        if (argc > 4) {
-            replayVersion = atoi(argv[4]);
+            replayVersion = atoi(argv[3]);
         }
     }
 
@@ -998,25 +994,13 @@ int main(int argc, char**argv)
         if (strDumpLoadPath.find("forcepc") != std::string::npos) {
             forcePunishCounter = true;
         }
-        bool isMatch = strDumpLoadPath.find("match") != std::string::npos;
 
-        simController.stateRecording.clear();
-        simController.guyPool.reset();
-        if (simController.pSim) delete simController.pSim;
-        simController.pSim = new Simulation;
-        if (isMatch) simController.pSim->match = true;
-
-        if (!simController.pSim->SetupFromGameDump(strDumpLoadPath, dumpVersion)) {
-            fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());
-            exit(1);
-        }
-        for (auto &guy : simController.pSim->simGuys) {
-            guy->setRecordFrameTriggers(true, true);
-        }
-
+        simController.viewerDumpPath = strDumpLoadPath;
+        simController.viewerDumpVersion = dumpVersion;
+        simController.viewerDumpIsMatch = strDumpLoadPath.find("match") != std::string::npos;
         simController.charCount = 2;
         gameMode = Viewer;
-        simController.AdvanceFromDump();
+        simController.ReloadViewer();
         simInputsChanged = false;
     }
 
@@ -1031,39 +1015,15 @@ int main(int argc, char**argv)
             fprintf(stderr, "replay missing InputData or ReplayInfo\n");
             exit(1);
         }
-        nlohmann::json replayInfo = data["ReplayInfo"];
 
-        replayFileDecoder = {};
-        replayFileDecoder.inputData = data["InputData"].get<std::vector<uint8_t>>();
-
-        if (replayVersion == -1) {
-            replayVersion = maxVersion;
-        }
-
-        // skip decoder past earlier rounds
-        for (int r = 0; r < replayRound; r++) {
-            while (!replayFileDecoder.finished) {
-                uint8_t cmd = replayFileDecoder.DecodeTick();
-                if (cmd == 3) break;
-            }
-            replayFileDecoder.inputState[0] = 0;
-            replayFileDecoder.inputState[1] = 0;
-            replayFileDecoder.prevInputState[0] = 0;
-            replayFileDecoder.prevInputState[1] = 0;
-        }
-
-        simController.stateRecording.clear();
-        simController.guyPool.reset();
-        if (simController.pSim) delete simController.pSim;
-        simController.pSim = new Simulation;
-        simController.pSim->SetupReplayRound(replayInfo, replayRound, replayVersion, replayFileDecoder);
-        for (auto &guy : simController.pSim->simGuys) {
-            guy->setRecordFrameTriggers(true, true);
-        }
+        simController.replayInfo = data["ReplayInfo"];
+        simController.replayInputData = data["InputData"].get<std::vector<uint8_t>>();
+        simController.replayVersion = (replayVersion == -1) ? maxVersion : replayVersion;
 
         simController.charCount = 2;
         gameMode = Viewer;
-        simController.AdvanceFromReplay(replayFileDecoder);
+        simController.ValidateAllRounds();
+        simController.LoadReplayRound(0);
         simInputsChanged = false;
     }
 

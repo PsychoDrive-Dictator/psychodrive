@@ -321,7 +321,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy, Simulation *pSim = n
     if (newStartPosX != startPosX) {
         pGuy->setStartPosX(Fixed(newStartPosX, true));
     }
-    ImGui::Text("action %i frame %i name %s", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->name.c_str());
+    ImGui::Text("action %i frame %i name %s input %d", pGuy->getCurrentAction(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->name.c_str(), pGuy->getCurrentInput());
     if (!pGuy->getProjectile()) {
         const char* states[] = { "stand", "jump", "crouch", "not you", "block", "not you", "crouch block" };
         modalDropDown("state", pGuy->getInputOverridePtr(), states, IM_ARRAYSIZE(states), 125);
@@ -1464,6 +1464,11 @@ void SimulationController::RecordFrame(void)
 
     frame.sim.enableCleanup = false;
     frame.sim.Clone(pSim, &guyPool);
+    if (gameMode == Viewer) {
+        for (int i = 0; i < (int)pSim->everyone.size() && i < (int)frame.sim.everyone.size(); i++) {
+            frame.sim.everyone[i]->getLogQueue() = pSim->everyone[i]->getLogQueue();
+        }
+    }
     frame.events = pSim->getCurrentFrameEvents();
     pSim->getCurrentFrameEvents().clear();
 }
@@ -1736,12 +1741,54 @@ void SimulationController::RenderUI(void)
         ImGui::Begin("PsychoDrive Left Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus );
         if (gameMode == Viewer) {
+            ImGui::Text("Log:");
+            ImGui::SameLine();
+            bool changed = false;
+            changed |= ImGui::Checkbox("unknowns", &viewerLogUnknowns);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("hits", &viewerLogHits);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("triggers", &viewerLogTriggers);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("branches", &viewerLogBranches);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("transitions", &viewerLogTransitions);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("resources", &viewerLogResources);
+            if (changed) {
+                ReloadViewer();
+            }
+            ImGui::Separator();
+            // replay round selector and results
+            if (replayRoundCount > 0) {
+                for (int r = 0; r < replayRoundCount; r++) {
+                    auto &result = replayRoundResults[r];
+                    if (result.hasErrors) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
+                    }
+                    bool selected = (r == replayCurrentRound);
+                    std::string label = result.summary;
+                    if (selected) label = "> " + label;
+                    if (ImGui::Selectable(label.c_str(), selected)) {
+                        LoadReplayRound(r);
+                        simInputsChanged = false;
+                    }
+                    if (result.hasErrors) {
+                        ImGui::PopStyleColor();
+                    }
+                }
+                ImGui::Separator();
+            }
+            if (replayRoundCount == 0) {
             ImGui::Text("Errors: %d", pSim ? (int)pSim->errorLog.size() : 0);
             ImGui::Separator();
-            if (pSim && !pSim->errorLog.empty()) {
-                // pre-parse error frames once
+            }
+            if (replayRoundCount == 0 && pSim && !pSim->errorLog.empty()) {
+                // pre-parse error frames, refresh when sim changes
                 static std::vector<int> errorFrames;
-                if (errorFrames.size() != pSim->errorLog.size()) {
+                static Simulation *errorFramesSim = nullptr;
+                if (errorFramesSim != pSim || errorFrames.size() != pSim->errorLog.size()) {
+                    errorFramesSim = pSim;
                     errorFrames.resize(pSim->errorLog.size());
                     for (int idx = 0; idx < (int)pSim->errorLog.size(); idx++) {
                         auto &err = pSim->errorLog[idx];
@@ -2224,6 +2271,46 @@ void SimulationController::AdvanceFromReplay(ReplayDecoder &decoder)
     playSpeed = 1;
 }
 
+void SimulationController::ReloadViewer()
+{
+    bool isReload = (simFrameCount > 0);
+    int savedFrame = scrubberFrame;
+    bool savedPlaying = playing;
+    int savedPlaySpeed = playSpeed;
+
+    if (replayRoundCount > 0) {
+        int round = replayCurrentRound;
+        replayCurrentRound = -1; // force reload
+        LoadReplayRound(round);
+    } else if (!viewerDumpPath.empty()) {
+        stateRecording.clear();
+        guyPool.reset();
+        if (pSim) delete pSim;
+        pSim = new Simulation;
+        if (viewerDumpIsMatch) pSim->match = true;
+
+        pSim->SetupFromGameDump(viewerDumpPath, viewerDumpVersion);
+        for (auto &guy : pSim->simGuys) {
+            guy->setRecordFrameTriggers(true, true);
+            guy->setLogTransitions(viewerLogTransitions);
+            guy->setLogTriggers(viewerLogTriggers);
+            guy->setLogUnknowns(viewerLogUnknowns);
+            guy->setLogHits(viewerLogHits);
+            guy->setLogBranches(viewerLogBranches);
+            guy->setLogResources(viewerLogResources);
+        }
+        AdvanceFromDump();
+    }
+
+    if (isReload) {
+        scrubberFrame = savedFrame;
+        clampFrame(scrubberFrame);
+        playing = savedPlaying;
+        playSpeed = savedPlaySpeed;
+    }
+    prevScrubberFrame = -1;
+}
+
 void SimulationController::AdvanceFromDump()
 {
     while (pSim->replayingGameStateDump) {
@@ -2236,6 +2323,111 @@ void SimulationController::AdvanceFromDump()
     scrubberFrame = 0;
     playing = true;
     playSpeed = 1;
+}
+
+void SimulationController::ValidateAllRounds()
+{
+    replayRoundResults.clear();
+    replayRoundCount = 0;
+
+    int roundCount = (int)replayInfo["RoundInfo"].size();
+
+    ReplayDecoder decoder;
+    decoder.inputData = replayInputData;
+
+    for (int round = 0; round < roundCount; round++) {
+        nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
+
+        if (roundInfo["RandomSeed"] == 0) {
+            break;
+        }
+        replayRoundCount++;
+
+        Simulation roundSim;
+        roundSim.SetupReplayRound(replayInfo, round, replayVersion, decoder);
+
+        int prevHealth[2] = {0, 0};
+        while (roundSim.replayingReplay) {
+            prevHealth[0] = roundSim.simGuys[0]->getHealth();
+            prevHealth[1] = roundSim.simGuys[1]->getHealth();
+            roundSim.RunFrame();
+            roundSim.AdvanceFrame();
+        }
+
+        int winPlayer = roundInfo["WinPlayerType"];
+        int losePlayer = winPlayer ^ 1;
+
+        ReplayRoundResult result;
+        std::string errors;
+
+        int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
+        if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
+            errors += "loser P" + std::to_string(losePlayer + 1) + " health " + std::to_string(loserHealth) + "; ";
+            result.hasErrors = true;
+        }
+
+        for (int p = 0; p < 2; p++) {
+            int expectedGauge = roundInfo["SAGaugeStart"][p];
+            int simGauge = roundSim.simGuys[p]->getGauge();
+            if (expectedGauge != simGauge) {
+                errors += "P" + std::to_string(p + 1) + " gauge " + std::to_string(simGauge) + " expected " + std::to_string(expectedGauge) + "; ";
+                result.hasErrors = true;
+            }
+        }
+
+        if (result.hasErrors) {
+            result.summary = "Round " + std::to_string(round + 1) + ": " + errors;
+        } else {
+            result.summary = "Round " + std::to_string(round + 1) + ": OK";
+        }
+        replayRoundResults.push_back(result);
+
+        decoder.inputState[0] = 0;
+        decoder.inputState[1] = 0;
+        decoder.prevInputState[0] = 0;
+        decoder.prevInputState[1] = 0;
+    }
+}
+
+void SimulationController::LoadReplayRound(int round)
+{
+    if (round == replayCurrentRound) return;
+    replayCurrentRound = round;
+
+    stateRecording.clear();
+    guyPool.reset();
+    if (pSim) delete pSim;
+    pSim = new Simulation;
+
+    ReplayDecoder decoder;
+    decoder.inputData = replayInputData;
+
+    // skip past earlier rounds
+    for (int r = 0; r < round; r++) {
+        while (!decoder.finished) {
+            uint8_t cmd = decoder.DecodeTick();
+            if (cmd == 3) break;
+        }
+        decoder.inputState[0] = 0;
+        decoder.inputState[1] = 0;
+        decoder.prevInputState[0] = 0;
+        decoder.prevInputState[1] = 0;
+    }
+
+    pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder);
+    for (auto &guy : pSim->simGuys) {
+        guy->setRecordFrameTriggers(true, true);
+        guy->setLogTransitions(viewerLogTransitions);
+        guy->setLogTriggers(viewerLogTriggers);
+        guy->setLogUnknowns(viewerLogUnknowns);
+        guy->setLogHits(viewerLogHits);
+        guy->setLogBranches(viewerLogBranches);
+        guy->setLogResources(viewerLogResources);
+    }
+
+    AdvanceFromReplay(decoder);
+    scrubberFrame = 0;
+    prevScrubberFrame = -1;
 }
 
 int CharacterUIController::getOptionFlags()

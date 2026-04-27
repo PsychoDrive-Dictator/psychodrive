@@ -136,6 +136,35 @@ public:
     ObjectPool<Guy> guyPool{600};
 
     std::deque<RecordedFrame> stateRecording;
+
+    // dump viewer state
+    std::string viewerDumpPath;
+    int viewerDumpVersion = -1;
+    bool viewerDumpIsMatch = false;
+
+    // replay viewer state
+    struct ReplayRoundResult {
+        std::string summary;
+        bool hasErrors = false;
+    };
+    std::vector<ReplayRoundResult> replayRoundResults;
+    nlohmann::json replayInfo;
+    std::vector<uint8_t> replayInputData;
+    int replayVersion = -1;
+    int replayCurrentRound = -1;
+    int replayRoundCount = 0;
+
+    void LoadReplayRound(int round);
+    void ValidateAllRounds();
+    void ReloadViewer();
+
+    // viewer log flags — applied to guys before simulation
+    bool viewerLogTransitions = false;
+    bool viewerLogTriggers = false;
+    bool viewerLogUnknowns = true;
+    bool viewerLogHits = false;
+    bool viewerLogBranches = false;
+    bool viewerLogResources = false;
 };
 
 extern SimulationController simController;
