@@ -468,17 +468,27 @@ void Simulation::RunFrame(void) {
     }
 
     if (replayingReplay) {
-        uint8_t cmd = pReplayDecoder->DecodeTick();
-
-        while (cmd >= 1 && cmd <= 8 && !pReplayDecoder->finished) {
-            if (cmd == 1) {
-                timerStarted = true;
-            }
-            if (cmd == 3) {
-                replayingReplay = false;
-                break;
-            }
+        uint8_t cmd;
+        do {
             cmd = pReplayDecoder->DecodeTick();
+            if (cmd >= 1 && cmd <= 8) {
+                if (cmd == 1) {
+                    replayTimerStartFrame = frameCounter + 190;
+                    pReplayDecoder->inputState[0] = 0;
+                    pReplayDecoder->inputState[1] = 0;
+                    pReplayDecoder->prevInputState[0] = 0;
+                    pReplayDecoder->prevInputState[1] = 0;
+                }
+                if (cmd == 3) {
+                    replayingReplay = false;
+                    break;
+                }
+            }
+        } while (cmd >= 1 && cmd <= 8 && !pReplayDecoder->finished);
+
+        if (replayTimerStartFrame >= 0 && frameCounter >= replayTimerStartFrame) {
+            timerStarted = true;
+            replayTimerStartFrame = -1;
         }
 
         if (replayingReplay && !pReplayDecoder->finished) {
@@ -557,7 +567,7 @@ uint8_t ReplayDecoder::DecodeTick()
         return 0;
     }
 
-    // complex command toggle
+    // raw bytes payload?
     int playerMask = cmd & 0x03;
     int sizeCode = (cmd >> 4) & 0x07;
     int bytesPerPlayer = (sizeCode >= 4) ? (sizeCode - 3) : 1;
@@ -571,7 +581,8 @@ uint8_t ReplayDecoder::DecodeTick()
                 value |= inputData[pos++] << (b * 8);
             }
         }
-        inputState[p] = value;
+        int mask = (1 << (bytesPerPlayer * 8)) - 1;
+        inputState[p] = (inputState[p] & ~mask) | value;
     }
 
     return 0;

@@ -300,6 +300,11 @@ int gameStateFrame = 0;
 int replayErrors = 0;
 int fatalErrorKind = -1;
 
+bool replayingReplayFile = false;
+ReplayDecoder replayFileDecoder;
+nlohmann::json replayFileInfo;
+int replayFileTimerStartFrame = -1;
+
 std::vector<normalRangePlotEntry> vecPlotEntries;
 int curPlotEntryID = -1;
 int curPlotEntryStartFrame = 0;
@@ -448,13 +453,13 @@ static void mainloop(void)
 
     const float desiredFrameTimeMS = 1000.0 / 60.0f;
     uint32_t currentTime = SDL_GetTicks();
-    if ((limitRate || (!playingBackInput && !replayingGameState)) && currentTime - frameStartTime < desiredFrameTimeMS) {
+    if ((limitRate || (!playingBackInput && !replayingGameState && !replayingReplayFile)) && currentTime - frameStartTime < desiredFrameTimeMS) {
         const float timeToSleepMS = (desiredFrameTimeMS - (currentTime - frameStartTime));
         usleep(timeToSleepMS * 1000 - 100);
     }
     frameStartTime = SDL_GetTicks();
 
-    if (!replayingGameState) {
+    if (!replayingGameState && !replayingReplayFile) {
         defaultSim.frameCounter++;
     }
 
@@ -616,7 +621,7 @@ static void mainloop(void)
         defaultSim.gatherEveryone();
 
         // if replay, we'll update the counter from the replay
-        if (!runFrame && !replayingGameState) {
+        if (!runFrame && !replayingGameState && !replayingReplayFile) {
             defaultSim.frameCounter--;
         }
 
@@ -825,6 +830,48 @@ static void mainloop(void)
             }
         }
 
+        if (replayingReplayFile) {
+            if (runFrame) {
+                uint8_t cmd;
+                do {
+                    cmd = replayFileDecoder.DecodeTick();
+                    if (cmd >= 1 && cmd <= 8) {
+                        if (cmd == 1) {
+                            replayFileTimerStartFrame = defaultSim.frameCounter + 190;
+                            replayFileDecoder.inputState[0] = 0;
+                            replayFileDecoder.inputState[1] = 0;
+                            replayFileDecoder.prevInputState[0] = 0;
+                            replayFileDecoder.prevInputState[1] = 0;
+                        }
+                        if (cmd == 3) {
+                            replayingReplayFile = false;
+                            break;
+                        }
+                    }
+                } while (cmd >= 1 && cmd <= 8 && !replayFileDecoder.finished);
+
+                if (replayFileTimerStartFrame >= 0 && defaultSim.frameCounter >= replayFileTimerStartFrame) {
+                    defaultSim.timerStarted = true;
+                    replayFileTimerStartFrame = -1;
+                }
+
+                if (replayingReplayFile && !replayFileDecoder.finished) {
+                    int inputLeft = addPressBits(replayFileDecoder.inputState[0], replayFileDecoder.prevInputState[0]);
+                    currentInputMap[replayLeft] = inputLeft;
+                    int inputRight = addPressBits(replayFileDecoder.inputState[1], replayFileDecoder.prevInputState[1]);
+                    currentInputMap[replayRight] = inputRight;
+                    replayFileDecoder.prevInputState[0] = replayFileDecoder.inputState[0];
+                    replayFileDecoder.prevInputState[1] = replayFileDecoder.inputState[1];
+                }
+                if (replayFileDecoder.finished) {
+                    replayingReplayFile = false;
+                }
+                defaultSim.frameCounter++;
+            } else {
+                hasInput = false;
+            }
+        }
+
         for (auto guy : guys) {
             if ( hasInput ) {
                 int input = 0;
@@ -1002,7 +1049,7 @@ int main(int argc, char**argv)
             int winPlayer = roundInfo["WinPlayerType"];
             int losePlayer = winPlayer ^ 1;
 
-            fprintf(stderr, "R;round %d finished at frame %d\n", round, roundSim.frameCounter);
+            fprintf(stderr, "R;round %d finished at frame %d\n", round + 1, roundSim.frameCounter);
 
             int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
             if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
@@ -1014,7 +1061,7 @@ int main(int argc, char**argv)
                 int expectedGauge = roundInfo["SAGaugeStart"][p];
                 int simGauge = roundSim.simGuys[p]->getGauge();
                 if (expectedGauge != simGauge) {
-                    fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round, p + 1, simGauge, expectedGauge);
+                    fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round + 1, p + 1, simGauge, expectedGauge);
                     totalErrors++;
                 }
             }
@@ -1073,6 +1120,17 @@ int main(int argc, char**argv)
         }
     }
 
+    bool loadingReplay = false;
+    std::string strReplayLoadPath;
+    int replayVersion = -1;
+    if ( argc > 2 && std::string(argv[1]) == "load_replay") {
+        strReplayLoadPath = argv[2];
+        loadingReplay = true;
+        if (argc > 3) {
+            replayVersion = atoi(argv[3]);
+        }
+    }
+
     sdlwindow = initWindowRender();
     initUI();
     io = &ImGui::GetIO(); // why doesn't the one from initUI work? who knows
@@ -1082,7 +1140,7 @@ int main(int argc, char**argv)
     if (argc > 1)
         gameMode = Training;
     
-    if (gameMode == Training && loadingDump == false) {
+    if (gameMode == Training && loadingDump == false && loadingReplay == false) {
         std::string charNameLeft = (char*)charNames[rand() % charNames.size()];
         int versionLeft = maxVersion;
         std::string charNameRight = (char*)charNames[rand() % charNames.size()];
@@ -1191,6 +1249,54 @@ int main(int argc, char**argv)
     } else if (loadingDump) {
         fprintf(stderr, "failed to load dump %s\n", strDumpLoadPath.c_str());
         exit(1);
+    }
+
+    if (loadingReplay) {
+        nlohmann::json replayJson = parse_json_file(strReplayLoadPath);
+        if (replayJson == nullptr) {
+            fprintf(stderr, "failed to load replay %s\n", strReplayLoadPath.c_str());
+            exit(1);
+        }
+        nlohmann::json &data = replayJson.contains("BattleReplayData") ? replayJson["BattleReplayData"] : replayJson;
+        if (!data.contains("InputData") || !data.contains("ReplayInfo")) {
+            fprintf(stderr, "replay missing InputData or ReplayInfo\n");
+            exit(1);
+        }
+        replayFileInfo = data["ReplayInfo"];
+        replayFileDecoder = {};
+        replayFileDecoder.inputData = data["InputData"].get<std::vector<uint8_t>>();
+
+        if (replayVersion == -1) {
+            replayVersion = maxVersion;
+        }
+
+        for (int i = 0; i < 2; i++) {
+            int fighterID = replayFileInfo["Fighters"][i]["FighterID"];
+            const char *charName = getCharNameFromID(fighterID);
+            Fixed startX = (i == 0) ? Fixed(-150.0f) : Fixed(150.0f);
+            int startDir = (i == 0) ? 1 : -1;
+            createGuy(charName, replayVersion, startX, Fixed(0), startDir, {randFloat(), randFloat(), randFloat()});
+        }
+
+        while (guys.size() < 2) {
+            usleep(200 * 1000);
+            doDeferredCreateGuys();
+        }
+
+        guys[0]->setGauge(0);
+        guys[1]->setGauge(0);
+
+        defaultSim.randomSeed = replayFileInfo["RoundInfo"][0]["RandomSeed"];
+        defaultSim.match = true;
+
+        *guys[0]->getInputIDPtr() = replayLeft;
+        *guys[0]->getInputListIDPtr() = replayLeft;
+        *guys[1]->getInputIDPtr() = replayRight;
+        *guys[1]->getInputListIDPtr() = replayRight;
+
+        replayingReplayFile = true;
+        currentInputMap[replayLeft] = 0;
+        currentInputMap[replayRight] = 0;
     }
 
     frameStartTime = SDL_GetTicks();

@@ -116,6 +116,7 @@ public:
 
     bool replayingReplay = false;
     ReplayDecoder *pReplayDecoder = nullptr;
+    int replayTimerStartFrame = -1;
 
     std::vector<FrameEvent> currentFrameEvents;
     bool enableCleanup = true;
