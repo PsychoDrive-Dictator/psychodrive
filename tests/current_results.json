@@ -11592,6 +11592,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_luke_viper_simple",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1313,
+                "firstFrame": 567,
+                "lastFrame": 1347
+            },
+            {
+                "count": 491,
+                "firstFrame": 533,
+                "lastFrame": 1096
+            },
+            {
+                "count": 30,
+                "firstFrame": 609,
+                "lastFrame": 1096
+            },
+            {
+                "count": 297,
+                "firstFrame": 533,
+                "lastFrame": 1538
+            },
+            {
+                "count": 297,
+                "firstFrame": 533,
+                "lastFrame": 1538
+            },
+            {
+                "count": 300,
+                "firstFrame": 129,
+                "lastFrame": 1407
+            },
+            {
+                "count": 606,
+                "firstFrame": 0,
+                "lastFrame": 1095
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 1417,
+                "lastFrame": 1531
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "zz_match_rashid_deejay",
         "testVersion": "39",
         "finished": true,

@@ -403,6 +403,8 @@ local launchReplayNextFrame = false
 
 local hijackingReplays = false
 
+local dumpingOnlineReplays = false
+
 local callMeNextFrame = nil
 
 local dumpingGameState = false
@@ -580,6 +582,9 @@ re.on_draw_ui(function()
   
   local hijackchanged, hijackvalue = imgui.checkbox("hijack replays with replay.json", hijackingReplays)
   hijackingReplays = hijackvalue
+
+  local dumpOnlineChanged, dumpOnlineValue = imgui.checkbox("dump online replays when viewed", dumpingOnlineReplays)
+  dumpingOnlineReplays = dumpOnlineValue
 
 	imgui.end_rect(5)
 	imgui.text()
@@ -759,7 +764,7 @@ function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOn
   end
 
   recurseCount = recurseCount + 1
-  if recurseCount > 3 then
+  if recurseCount > 6 then
     return { recurse = 1 }
   end
 
@@ -932,11 +937,16 @@ end
 
 sdk.hook(sdk.find_type_definition("app.BattleReplayDataManager"):get_method("AddReplayData"),
 function(args)
+  local BattleReplayData = sdk.to_managed_object(args[3])
   if hijackingReplays == true then
-    local BattleReplayData = sdk.to_managed_object(args[3])
     logToFile( "AddReplayData - hijacking" )
-
     loadReplay("replay.json", BattleReplayData)
+  end
+  if dumpingOnlineReplays == true then
+    logToFile( "AddReplayData - dumping" )
+    local replayID = sdk.to_managed_object(args[4]):ToString()
+    local replayFileName = "replay_viewed_" .. replayID .. ".json"
+    logToFile( managed_object_to_json(BattleReplayData), replayFileName)
   end
 end,
 function(retval)
