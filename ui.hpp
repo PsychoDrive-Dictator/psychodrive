@@ -158,7 +158,8 @@ public:
     void ValidateAllRounds();
     void ReloadViewer();
 
-    // viewer log flags — applied to guys before simulation
+    bool viewerErrorTypeFilter[14] = {true,false,false,false,false,true,true,true,true,true,true,true,true,true};
+
     bool viewerLogTransitions = false;
     bool viewerLogTriggers = false;
     bool viewerLogUnknowns = true;

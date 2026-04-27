@@ -1759,7 +1759,6 @@ void SimulationController::RenderUI(void)
                 ReloadViewer();
             }
             ImGui::Separator();
-            // replay round selector and results
             if (replayRoundCount > 0) {
                 for (int r = 0; r < replayRoundCount; r++) {
                     auto &result = replayRoundResults[r];
@@ -1779,58 +1778,119 @@ void SimulationController::RenderUI(void)
                 }
                 ImGui::Separator();
             }
-            if (replayRoundCount == 0) {
-            ImGui::Text("Errors: %d", pSim ? (int)pSim->errorLog.size() : 0);
-            ImGui::Separator();
-            }
             if (replayRoundCount == 0 && pSim && !pSim->errorLog.empty()) {
-                // pre-parse error frames, refresh when sim changes
-                static std::vector<int> errorFrames;
+                static constexpr int errorTypeCount = 14;
+                // warning types: vel, accel, hitVel, hitAccel
+                static constexpr int warningTypes[] = {1, 2, 3, 4};
+                static constexpr int warningTypeCount = IM_ARRAYSIZE(warningTypes);
+                struct ErrorColumn { int type; const char *name; };
+                static constexpr ErrorColumn errorColumns[] = {
+                    {5, "ActionID"}, {6, "ActionFrame"}, {0, "Pos"},
+                    {7, "Combo"}, {8, "Direction"}, {9, "Health"},
+                    {10, "Hitstop"}, {11, "Gauge"}, {12, "FocusRegen"}, {13, "RandomSeed"}
+                };
+                static constexpr int errorColumnCount = IM_ARRAYSIZE(errorColumns);
+
+                struct ParsedError {
+                    int frame;
+                    int type;
+                    int descStart;
+                };
+                static std::vector<ParsedError> parsedErrors;
                 static Simulation *errorFramesSim = nullptr;
-                if (errorFramesSim != pSim || errorFrames.size() != pSim->errorLog.size()) {
+                if (errorFramesSim != pSim || parsedErrors.size() != pSim->errorLog.size()) {
                     errorFramesSim = pSim;
-                    errorFrames.resize(pSim->errorLog.size());
+                    parsedErrors.resize(pSim->errorLog.size());
                     for (int idx = 0; idx < (int)pSim->errorLog.size(); idx++) {
                         auto &err = pSim->errorLog[idx];
                         int semiCount = 0;
-                        int fStart = -1, fEnd = -1;
+                        int fStart = -1, fEnd = -1, tStart = -1, tEnd = -1, dStart = -1;
                         for (int c = 0; c < (int)err.size(); c++) {
                             if (err[c] == ';') {
                                 semiCount++;
                                 if (semiCount == 2) fStart = c + 1;
-                                if (semiCount == 3) { fEnd = c; break; }
+                                if (semiCount == 3) { fEnd = c; tStart = c + 1; }
+                                if (semiCount == 4) { tEnd = c; dStart = c + 1; break; }
                             }
                         }
-                        errorFrames[idx] = (fStart >= 0 && fEnd > fStart) ? atoi(err.substr(fStart, fEnd - fStart).c_str()) : -1;
+                        parsedErrors[idx].frame = (fStart >= 0 && fEnd > fStart) ? atoi(err.substr(fStart, fEnd - fStart).c_str()) : -1;
+                        parsedErrors[idx].type = (tStart >= 0 && tEnd > tStart) ? atoi(err.substr(tStart, tEnd - tStart).c_str()) : -1;
+                        parsedErrors[idx].descStart = dStart;
                     }
                 }
 
-                ImGui::BeginChild("ErrorList", ImVec2(800, 500), false, ImGuiWindowFlags_None);
-                for (int idx = 0; idx < (int)pSim->errorLog.size(); idx++) {
-                    auto &err = pSim->errorLog[idx];
-                    int errFrame = errorFrames[idx];
-                    // find start of description (after 4th semicolon)
-                    int semiCount = 0;
-                    int descStart = -1;
-                    for (int c = 0; c < (int)err.size(); c++) {
-                        if (err[c] == ';') {
-                            semiCount++;
-                            if (semiCount == 4) { descStart = c + 1; break; }
-                        }
+                int errorTypeCounts[errorTypeCount] = {};
+                for (auto &pe : parsedErrors) {
+                    if (pe.type >= 0 && pe.type < errorTypeCount) {
+                        errorTypeCounts[pe.type]++;
                     }
+                }
+
+                auto passesFilter = [&](int type) -> bool {
+                    if (type < 0 || type >= errorTypeCount) return true;
+                    return viewerErrorTypeFilter[type];
+                };
+
+                int filteredCount = 0;
+                for (auto &pe : parsedErrors) {
+                    if (passesFilter(pe.type)) filteredCount++;
+                }
+
+                int warningCount = 0;
+                for (int w = 0; w < warningTypeCount; w++) warningCount += errorTypeCounts[warningTypes[w]];
+
+                ImGui::Text("Errors: %d (showing %d)", (int)pSim->errorLog.size(), filteredCount);
+                bool filterChanged = false;
+                int checkboxCount = 0;
+                if (warningCount > 0) {
+                    // all warning types share the first warning type's filter bit
+                    std::string wLabel = "Warnings (" + std::to_string(warningCount) + ")";
+                    if (ImGui::Checkbox(wLabel.c_str(), &viewerErrorTypeFilter[warningTypes[0]])) {
+                        for (int w = 1; w < warningTypeCount; w++) {
+                            viewerErrorTypeFilter[warningTypes[w]] = viewerErrorTypeFilter[warningTypes[0]];
+                        }
+                        filterChanged = true;
+                    }
+                    checkboxCount++;
+                    ImGui::SameLine();
+                }
+                for (int c = 0; c < errorColumnCount; c++) {
+                    int t = errorColumns[c].type;
+                    if (errorTypeCounts[t] == 0) continue;
+                    if (checkboxCount == 5) {
+                        ImGui::NewLine();
+                        checkboxCount = 0;
+                    }
+                    std::string label = std::string(errorColumns[c].name) + " (" + std::to_string(errorTypeCounts[t]) + ")";
+                    filterChanged |= ImGui::Checkbox(label.c_str(), &viewerErrorTypeFilter[t]);
+                    checkboxCount++;
+                    ImGui::SameLine();
+                }
+                ImGui::NewLine();
+                ImGui::Separator();
+
+                ImGui::BeginChild("ErrorList", ImVec2(800, 500), false, ImGuiWindowFlags_None);
+                int visibleIdx = 0;
+                int scrollTargetVisible = -1;
+                for (int idx = 0; idx < (int)pSim->errorLog.size(); idx++) {
+                    auto &pe = parsedErrors[idx];
+                    if (pe.type >= 0 && pe.type < errorTypeCount && !viewerErrorTypeFilter[pe.type]) {
+                        continue;
+                    }
+                    auto &err = pSim->errorLog[idx];
                     std::string display;
-                    if (errFrame >= 0 && descStart > 0) {
-                        display = "[" + std::to_string(errFrame) + "] " + err.substr(descStart);
+                    if (pe.frame >= 0 && pe.descStart > 0) {
+                        display = "[" + std::to_string(pe.frame) + "] " + err.substr(pe.descStart);
                     } else {
                         display = err;
                     }
-                    int scrubberForError = errFrame + 1;
+                    int scrubberForError = pe.frame + 1;
                     bool isCurrentFrame = (scrubberForError == scrubberFrame);
                     if (isCurrentFrame) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
                     }
                     if (ImGui::Selectable(display.c_str())) {
-                        if (errFrame >= 0) {
+                        if (pe.frame >= 0) {
                             scrubberFrame = scrubberForError;
                             clampFrame(scrubberFrame);
                         }
@@ -1838,21 +1898,16 @@ void SimulationController::RenderUI(void)
                     if (isCurrentFrame) {
                         ImGui::PopStyleColor();
                     }
+                    // track first visible error at or after current frame for scroll
+                    if (scrollTargetVisible == -1 && scrubberForError >= scrubberFrame) {
+                        scrollTargetVisible = visibleIdx;
+                    }
+                    visibleIdx++;
                 }
-                // scroll when scrubber changed (playback, drag, or click)
-                if (scrubberFrame != prevScrubberFrame) {
-                    // find first error at or after current frame
-                    int scrollTargetIdx = -1;
-                    for (int idx = 0; idx < (int)errorFrames.size(); idx++) {
-                        if (errorFrames[idx] + 1 >= scrubberFrame) {
-                            scrollTargetIdx = idx;
-                            break;
-                        }
-                    }
-                    if (scrollTargetIdx >= 0) {
-                        float itemHeight = ImGui::GetTextLineHeightWithSpacing();
-                        ImGui::SetScrollY(scrollTargetIdx * itemHeight);
-                    }
+                // scroll when scrubber changed (playback, drag, or click) or filter changed
+                if ((scrubberFrame != prevScrubberFrame || filterChanged) && scrollTargetVisible >= 0) {
+                    float itemHeight = ImGui::GetTextLineHeightWithSpacing();
+                    ImGui::SetScrollY(scrollTargetVisible * itemHeight);
                 }
                 prevScrubberFrame = scrubberFrame;
                 ImGui::EndChild();

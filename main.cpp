@@ -295,41 +295,12 @@ bool playingBackInput = false;
 std::deque<int> playBackInputBuffer;
 int playBackFrame = 0;
 
-int replayErrors = 0;
-int fatalErrorKind = -1;
-
-
 
 std::vector<normalRangePlotEntry> vecPlotEntries;
 int curPlotEntryID = -1;
 int curPlotEntryStartFrame = 0;
 int curPlotEntryNormalStartFrame = 0;
 int curPlotActionID = 0;
-
-void compareGameStateFixed( Fixed dumpValue, Fixed realValue, int errorKind, std::string description )
-{
-    if (dumpValue != realValue)
-    {
-        float valueDiff = realValue.f() - dumpValue.f();
-        std::string dumpValueStr = std::to_string(dumpValue.data) + " / " + std::to_string(dumpValue.f());
-        std::string simValueStr = std::to_string(realValue.data) + " / " + std::to_string(realValue.f());
-        log("replay error: " + description + " dump: " + dumpValueStr + " sim: " + simValueStr + " diff: " + std::to_string(valueDiff));
-        if (errorKind == fatalErrorKind) {
-            replayErrors++;
-        }
-    }
-}
-
-void compareGameStateInt( int64_t dumpValue, int64_t realValue, int errorKind, std::string description )
-{
-    if (dumpValue != realValue)
-    {
-        log("replay error: " + description + " dump: " + std::to_string(dumpValue) + " sim: " + std::to_string(realValue));
-        if (errorKind == fatalErrorKind) {
-            replayErrors++;
-        }
-    }
-}
 
 bool limitRate = true;
 
@@ -766,11 +737,6 @@ static void mainloop(void)
 
         resetpos = false;
         oneframe = false;
-        static int lasterrorcount = replayErrors;
-        if (lasterrorcount != replayErrors) {
-            paused = true; // cant pause in the middle above
-            lasterrorcount = replayErrors;
-        }
     }
 
     renderMarkersAndStuff();
@@ -931,9 +897,11 @@ int main(int argc, char**argv)
         loadingDump = true;
         if (argc > 3) {
             dumpVersion = atoi(argv[3]);
-            if (argc > 4) {
-                fatalErrorKind = atoi(argv[4]);
-            }
+        }
+        if (argc > 4) {
+            int filterType = atoi(argv[4]);
+            for (int i = 0; i < 14; i++) simController.viewerErrorTypeFilter[i] = false;
+            simController.viewerErrorTypeFilter[filterType] = true;
         }
     }
 

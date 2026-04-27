@@ -268,7 +268,7 @@ void Simulation::CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int pl
     if (dumpValue != realValue)
     {
         float valueDiff = realValue.f() - dumpValue.f();
-        uint64_t valueDiffData = realValue.data - dumpValue.data;
+        int64_t valueDiffData = realValue.data - dumpValue.data;
         std::string dumpValueStr = std::to_string(dumpValue.data) + " / " + std::to_string(dumpValue.f());
         std::string simValueStr = std::to_string(realValue.data) + " / " + std::to_string(realValue.f());
         std::string diffStr = std::to_string(valueDiffData) + " / " + std::to_string(valueDiff);
