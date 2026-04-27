@@ -344,11 +344,10 @@ void Simulation::RunFrame(void) {
     gatherEveryone();
 
     if (replayingGameStateDump) {
-        static bool firstFrame = true;
         int targetDumpFrame = gameStateFrame;
 
-        if (firstFrame) {
-            firstFrame = false;
+        if (dumpCompareFirstFrame) {
+            dumpCompareFirstFrame = false;
         } else {
             nlohmann::json &players = gameStateDump[targetDumpFrame]["players"];
             int i = 0;
