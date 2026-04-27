@@ -11592,6 +11592,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_luke_viper_maybesimple_r2",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 4787,
+                "firstFrame": 172,
+                "lastFrame": 3087
+            },
+            {
+                "count": 1183,
+                "firstFrame": 172,
+                "lastFrame": 2522
+            },
+            {
+                "count": 121,
+                "firstFrame": 172,
+                "lastFrame": 2510
+            },
+            {
+                "count": 952,
+                "firstFrame": 177,
+                "lastFrame": 2503
+            },
+            {
+                "count": 952,
+                "firstFrame": 177,
+                "lastFrame": 2503
+            },
+            {
+                "count": 2151,
+                "firstFrame": 152,
+                "lastFrame": 3087
+            },
+            {
+                "count": 2099,
+                "firstFrame": 173,
+                "lastFrame": 3087
+            },
+            {
+                "count": 793,
+                "firstFrame": 1222,
+                "lastFrame": 3087
+            },
+            {
+                "count": 526,
+                "firstFrame": 439,
+                "lastFrame": 2999
+            },
+            {
+                "count": 3698,
+                "firstFrame": 1222,
+                "lastFrame": 3087
+            },
+            {
+                "count": 255,
+                "firstFrame": 177,
+                "lastFrame": 2195
+            },
+            {
+                "count": 10256,
+                "firstFrame": 173,
+                "lastFrame": 3087
+            }
+        ]
+    },
+    {
+        "testName": "zz_match_luke_viper_maybesimple_r3",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 8674,
+                "firstFrame": 170,
+                "lastFrame": 4224
+            },
+            {
+                "count": 1613,
+                "firstFrame": 170,
+                "lastFrame": 3447
+            },
+            {
+                "count": 634,
+                "firstFrame": 204,
+                "lastFrame": 3447
+            },
+            {
+                "count": 1058,
+                "firstFrame": 193,
+                "lastFrame": 3484
+            },
+            {
+                "count": 1031,
+                "firstFrame": 193,
+                "lastFrame": 3484
+            },
+            {
+                "count": 5128,
+                "firstFrame": 189,
+                "lastFrame": 4224
+            },
+            {
+                "count": 5204,
+                "firstFrame": 421,
+                "lastFrame": 4224
+            },
+            {
+                "count": 1517,
+                "firstFrame": 548,
+                "lastFrame": 4107
+            },
+            {
+                "count": 3701,
+                "firstFrame": 1777,
+                "lastFrame": 4224
+            },
+            {
+                "count": 5133,
+                "firstFrame": 1498,
+                "lastFrame": 4224
+            },
+            {
+                "count": 881,
+                "firstFrame": 1166,
+                "lastFrame": 3410
+            },
+            {
+                "count": 10037,
+                "firstFrame": 548,
+                "lastFrame": 4224
+            }
+        ]
+    },
+    {
         "testName": "zz_match_luke_viper_simple",
         "testVersion": "41",
         "finished": true,
