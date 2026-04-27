@@ -3835,9 +3835,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         if (dmgType == 13) {
             knockDown = true;
             bool doKnockDown = destY == 0 && pHitEffect->throwRelease == 1; // ?
-            if (moveType == 15 && destTime != 0) {
-                doKnockDown = false; // this overrides that, looks like
-            }
+            // if (moveType == 15 && destTime != 0) {
+            //     doKnockDown = false; // this overrides that, looks like
+            // }
             if (!isDomain && applyHit && (piyoBound || doKnockDown)) { // ??
                 knockDownFrames = 0;
                 hitEntryHitStun = downTime;
@@ -3854,11 +3854,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             //resetHitStunOnTransition = true;
         }
 
-        if (jimenBound && !pHitEffect->floorDestY) {
-            jimenBound = false;
-            // it stays on the ground one more frame in lieu of a ground bounce?
-            knockDownFrames += 1;
-        }
+        // if (jimenBound && !pHitEffect->floorDestY) {
+        //     jimenBound = false;
+        //     // it stays on the ground one more frame in lieu of a ground bounce?
+        //     knockDownFrames += 1;
+        // }
 
         if (dmgType == 30 && blocking) {
             kabeTataki = false;
@@ -3938,6 +3938,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         wallStopFrames = false;
 
         if (!isDomain && !isGrab && !isClash) {
+            if (jimenBound && !floorTime && !getAirborne() && dmgType != 21) {
+                nextAction = 350;
+                appliedAction = true;
+                hitStun = 2;
+                knockDownFrames = downTime;
+            } else
             if (jimenBound && floorTime) {
                 int floorDestX = pHitEffect->floorDestX;
                 int floorDestY = pHitEffect->floorDestY;
@@ -4035,6 +4041,11 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 // the bounddest for this is always positive
                 if (!groundBounce) {
                     groundBounceVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
+                }
+
+                // maybe we need to actually let the ground bounce through here
+                if (jimenBound && !floorTime && !getAirborne()) {
+                    knockDownFrames += 1;
                 }
 
                 // commit current place offset
@@ -4294,10 +4305,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         }
     }
 
-    if (jimenBound && !airborne) {
-        AdvanceFrame(false);
-        //posX += velocityX * direction;
-    }
+    // if (jimenBound && !airborne) {
+    //     AdvanceFrame(false);
+    //     //posX += velocityX * direction;
+    // }
 
     // if (pAttacker->pendingUnlockHit && floorTime) {
     //     noAccelNextFrame = true;
