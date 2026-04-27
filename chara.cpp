@@ -525,6 +525,10 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         if (flags & 0x40000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
         }
+        if (flags & 0x80000) {
+            // same, but for projectiles? todo why
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
+        }
         if (flags & 0x100000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | multi_counter);
         }
