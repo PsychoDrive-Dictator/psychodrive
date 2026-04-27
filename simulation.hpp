@@ -19,6 +19,16 @@ inline bool detectTrainingAutoRegen(nlohmann::json &prevPlayer, nlohmann::json &
 
 class CharacterUIController;
 
+struct ReplayDecoder {
+    std::vector<uint8_t> inputData;
+    int pos = 0;
+    int inputState[2] = {0, 0};
+    int prevInputState[2] = {0, 0};
+    bool finished = false;
+
+    uint8_t DecodeTick();
+};
+
 struct FrameEvent {
     enum Type {
         Hit = 0
@@ -51,6 +61,7 @@ public:
     void CreateGuyFromCharController(CharacterUIController &controller);
 
     bool SetupFromGameDump(std::string dumpPath, int version);
+    void SetupReplayRound(nlohmann::json &replayInfo, int round, int version, ReplayDecoder &decoder);
 
     enum ErrorType {
         ePos = 0,
@@ -102,6 +113,9 @@ public:
     nlohmann::json gameStateDump;
     int gameStateFrame = 0;
     int replayErrors = 0;
+
+    bool replayingReplay = false;
+    ReplayDecoder *pReplayDecoder = nullptr;
 
     std::vector<FrameEvent> currentFrameEvents;
     bool enableCleanup = true;

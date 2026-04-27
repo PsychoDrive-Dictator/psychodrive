@@ -1,6 +1,7 @@
 #include "simulation.hpp"
 #include "guy.hpp"
 #include "ui.hpp"
+#include "input.hpp"
 #include "render.hpp"
 
 Simulation::~Simulation() {
@@ -232,6 +233,36 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
     return true;
 }
 
+void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int version, ReplayDecoder &decoder)
+{
+    for (int i = 0; i < 2; i++) {
+        int fighterID = replayInfo["Fighters"][i]["FighterID"];
+        const char *charName = getCharNameFromID(fighterID);
+        Fixed startX = (i == 0) ? Fixed(-150.0f) : Fixed(150.0f);
+        int startDir = (i == 0) ? 1 : -1;
+        CreateGuy(charName, version, startX, Fixed(0), startDir, {0.5f, 0.5f, 0.5f});
+    }
+
+    nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
+    randomSeed = roundInfo["RandomSeed"];
+
+    if (round == 0) {
+        for (int p = 0; p < 2; p++) {
+            simGuys[p]->setGauge(0);
+        }
+    } else {
+        nlohmann::json &prevRoundInfo = replayInfo["RoundInfo"][round - 1];
+        for (int p = 0; p < 2; p++) {
+            simGuys[p]->setGauge(prevRoundInfo["SAGaugeStart"][p]);
+        }
+    }
+
+    match = true;
+    timerStarted = false;
+    pReplayDecoder = &decoder;
+    replayingReplay = true;
+}
+
 void Simulation::CompareGameStateFixed( Fixed dumpValue, Fixed realValue, int player, int frame, ErrorType errorType, std::string description )
 {
     if (dumpValue != realValue)
@@ -435,6 +466,36 @@ void Simulation::RunFrame(void) {
             }
         }
     }
+
+    if (replayingReplay) {
+        uint8_t cmd = pReplayDecoder->DecodeTick();
+
+        while (cmd >= 1 && cmd <= 8 && !pReplayDecoder->finished) {
+            if (cmd == 1) {
+                timerStarted = true;
+            }
+            if (cmd == 3) {
+                replayingReplay = false;
+                break;
+            }
+            cmd = pReplayDecoder->DecodeTick();
+        }
+
+        if (replayingReplay && !pReplayDecoder->finished) {
+            int inputLeft = addPressBits(pReplayDecoder->inputState[0], pReplayDecoder->prevInputState[0]);
+            int inputRight = addPressBits(pReplayDecoder->inputState[1], pReplayDecoder->prevInputState[1]);
+
+            pReplayDecoder->prevInputState[0] = pReplayDecoder->inputState[0];
+            pReplayDecoder->prevInputState[1] = pReplayDecoder->inputState[1];
+
+            simGuys[0]->Input(inputLeft);
+            simGuys[1]->Input(inputRight);
+        }
+
+        if (pReplayDecoder->finished) {
+            replayingReplay = false;
+        }
+    }
 }
 
 void Simulation::AdvanceFrame(void)
@@ -468,3 +529,50 @@ void Simulation::Render(float z /* = 0.0 */, bool showDomain)
     }
 }
 
+uint8_t ReplayDecoder::DecodeTick()
+{
+    if (pos >= (int)inputData.size()) {
+        finished = true;
+        return 0;
+    }
+
+    // advance here
+    uint8_t cmd = inputData[pos++];
+
+    // empty tick, no changes
+    if (cmd == 0x00) {
+        return 0;
+    }
+
+    // control cmmand
+    if (cmd <= 0x08) {
+        return cmd;
+    }
+
+    // simple command toggle
+    if (cmd >= 0x80) {
+        int player = (cmd >> 5) & 1;
+        int bitIndex = cmd & 0x1F;
+        inputState[player] ^= (1 << bitIndex);
+        return 0;
+    }
+
+    // complex command toggle
+    int playerMask = cmd & 0x03;
+    int sizeCode = (cmd >> 4) & 0x07;
+    int bytesPerPlayer = (sizeCode >= 4) ? (sizeCode - 3) : 1;
+
+    for (int p = 0; p < 2; p++) {
+        if (!(playerMask & (1 << p)))
+            continue;
+        int value = 0;
+        for (int b = 0; b < bytesPerPlayer; b++) {
+            if (pos < (int)inputData.size()) {
+                value |= inputData[pos++] << (b * 8);
+            }
+        }
+        inputState[p] = value;
+    }
+
+    return 0;
+}

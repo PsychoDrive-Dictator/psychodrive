@@ -952,6 +952,86 @@ int main(int argc, char**argv)
         }
     }
 
+    if ( argc > 2 && std::string(argv[1]) == "run_replay") {
+        gameMode = Batch;
+        int version = -1;
+        if ( argc > 3 ) {
+            version = atoi(argv[3]);
+        }
+        if (version == -1) {
+            version = atoi(charVersions[charVersionCount - 1]);
+        }
+
+        nlohmann::json replayJson = parse_json_file(argv[2]);
+        if (replayJson == nullptr) {
+            fprintf(stderr, "failed to load replay %s\n", argv[2]);
+            exit(1);
+        }
+        nlohmann::json &data = replayJson.contains("BattleReplayData") ? replayJson["BattleReplayData"] : replayJson;
+        if (!data.contains("InputData") || !data.contains("ReplayInfo")) {
+            fprintf(stderr, "replay missing InputData or ReplayInfo\n");
+            exit(1);
+        }
+        nlohmann::json replayInfo = data["ReplayInfo"];
+
+        ReplayDecoder decoder;
+        decoder.inputData = data["InputData"].get<std::vector<uint8_t>>();
+
+        int totalErrors = 0;
+        int roundCount = (int)replayInfo["RoundInfo"].size();
+
+        for (int round = 0; round < roundCount; round++) {
+            nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
+
+            // online replays have all five round slots but zero out missing ones
+            if (roundInfo["RandomSeed"] == 0) {
+                break;
+            }
+
+            Simulation roundSim;
+            roundSim.SetupReplayRound(replayInfo, round, version, decoder);
+
+            int prevHealth[2] = {0, 0};
+            while (roundSim.replayingReplay) {
+                prevHealth[0] = roundSim.simGuys[0]->getHealth();
+                prevHealth[1] = roundSim.simGuys[1]->getHealth();
+                roundSim.RunFrame();
+                roundSim.AdvanceFrame();
+            }
+
+            int winPlayer = roundInfo["WinPlayerType"];
+            int losePlayer = winPlayer ^ 1;
+
+            fprintf(stderr, "R;round %d finished at frame %d\n", round, roundSim.frameCounter);
+
+            int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
+            if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
+                fprintf(stderr, "E;round %d loser (P%d) health %d expected zero prev health %d expected nonzero\n", round + 1, losePlayer + 1, loserHealth, prevHealth[losePlayer]);
+                totalErrors++;
+            }
+
+            for (int p = 0; p < 2; p++) {
+                int expectedGauge = roundInfo["SAGaugeStart"][p];
+                int simGauge = roundSim.simGuys[p]->getGauge();
+                if (expectedGauge != simGauge) {
+                    fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round, p + 1, simGauge, expectedGauge);
+                    totalErrors++;
+                }
+            }
+
+            // todo check win condition
+
+            // reset for next round
+            decoder.inputState[0] = 0;
+            decoder.inputState[1] = 0;
+            decoder.prevInputState[0] = 0;
+            decoder.prevInputState[1] = 0;
+        }
+
+        fprintf(stderr, "F;replay finished, total errors: %d\n", totalErrors);
+        exit(0);
+    }
+
     if (argc > 1 && std::string(argv[1]) == "printversions") {
         for (int i = 0; i < charVersionCount; i++) {
             printf("%d\n", atoi(charVersions[i]));
