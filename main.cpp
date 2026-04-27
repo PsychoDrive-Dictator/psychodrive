@@ -149,6 +149,15 @@ struct guyCreateInfo_t {
 std::vector<guyCreateInfo_t> vecDeferredCreateGuys;
 bool newCharLoaded = false;
 
+struct PendingViewerLoad {
+    bool active = false;
+    bool isReplay = false;
+    std::string path;
+    std::vector<std::string> neededChars;
+    int version;
+};
+PendingViewerLoad pendingViewerLoad;
+
 void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color)
 {
     Guy *pNewGuy = new Guy(&defaultSim, charName, charVersion, x, y, startDir, color);
@@ -254,6 +263,32 @@ void doDeferredCreateGuys(void)
         vecDeferredCreateGuys = vecDeferredNotDoneYet;
         newCharLoaded = false;
     }
+
+    if (pendingViewerLoad.active) {
+        bool allReady = true;
+        for (auto &charSpec : pendingViewerLoad.neededChars) {
+            if (setCharsLoaded.find(charSpec) == setCharsLoaded.end()) {
+                allReady = false;
+                break;
+            }
+        }
+        if (allReady) {
+            simController.charCount = 2;
+            gameMode = Viewer;
+            if (pendingViewerLoad.isReplay) {
+                simController.viewerDumpPath.clear();
+                simController.ValidateAllRounds();
+                simController.LoadReplayRound(0);
+            } else {
+                simController.replayRoundCount = 0;
+                simController.replayCurrentRound = -1;
+                simController.replayRoundResults.clear();
+                simController.ReloadViewer();
+            }
+            simInputsChanged = false;
+            pendingViewerLoad.active = false;
+        }
+    }
 }
 
 extern "C" {
@@ -265,6 +300,65 @@ void jsCharLoadCallback(char *charVerKey)
         setCharsLoaded.insert(charVerKey);
         newCharLoaded = true;
     }
+}
+
+void jsLoadFile(char *filePath)
+{
+    int maxVersion = atoi(charVersions[charVersionCount - 1]);
+    std::string path(filePath);
+
+    nlohmann::json parsed = parse_json_file(path);
+    if (parsed == nullptr) {
+        fprintf(stderr, "failed to parse dropped file\n");
+        return;
+    }
+
+    pendingViewerLoad = {};
+    pendingViewerLoad.active = true;
+    pendingViewerLoad.path = path;
+    pendingViewerLoad.version = maxVersion;
+
+    // check if it's a replay (has InputData/ReplayInfo)
+    nlohmann::json *data = &parsed;
+    if (parsed.contains("BattleReplayData")) {
+        data = &parsed["BattleReplayData"];
+    }
+    if (data->contains("InputData") && data->contains("ReplayInfo")) {
+        pendingViewerLoad.isReplay = true;
+        simController.replayInfo = (*data)["ReplayInfo"];
+        simController.replayInputData = (*data)["InputData"].get<std::vector<uint8_t>>();
+        simController.replayVersion = maxVersion;
+
+        for (int i = 0; i < 2; i++) {
+            int fighterID = (*data)["ReplayInfo"]["Fighters"][i]["FighterID"];
+            std::string charName = getCharNameFromID(fighterID);
+            std::string charSpec = charName + std::to_string(maxVersion);
+            pendingViewerLoad.neededChars.push_back(charSpec);
+            requestCharDownload(charName, maxVersion);
+        }
+    } else {
+        // otherwise treat as dump — extract char names from first frame's players
+        pendingViewerLoad.isReplay = false;
+        if (path.find("forcepc") != std::string::npos) {
+            forcePunishCounter = true;
+        }
+        simController.viewerDumpPath = path;
+        simController.viewerDumpVersion = maxVersion;
+        simController.viewerDumpIsMatch = path.find("match") != std::string::npos;
+
+        for (int i = 0; i < (int)parsed.size() && i < 1; i++) {
+            if (parsed[i].contains("players")) {
+                for (auto &p : parsed[i]["players"]) {
+                    std::string charName = getCharNameFromID(p["charID"]);
+                    std::string charSpec = charName + std::to_string(maxVersion);
+                    pendingViewerLoad.neededChars.push_back(charSpec);
+                    requestCharDownload(charName, maxVersion);
+                }
+                break;
+            }
+        }
+    }
+
 }
 
 }
