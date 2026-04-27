@@ -5492,10 +5492,20 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         // reset status - recovered control to neutral
         jumped = false;
         blocking = false;
+
+        Fixed turnAroundThreshold = Fixed(10);
+
+        if (dc.inputBuffer.size() > 1 &&
+            (dc.inputBuffer[1] & (FORWARD|BACK)) == 0 &&
+            (currentInput & (FORWARD|BACK)) != 0) {
+            // if we just tapped a movement key, instantly turn around
+            turnAroundThreshold = Fixed(0);
+        }
+
         if (canMoveNow) {
             isDrive = false;
             wasDrive = false;
-            moveTurnaround = needsTurnaround(Fixed(10));
+            moveTurnaround = needsTurnaround(turnAroundThreshold);
         }
 
         int moveInput = currentInput;
