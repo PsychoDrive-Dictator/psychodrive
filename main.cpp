@@ -1122,12 +1122,16 @@ int main(int argc, char**argv)
 
     bool loadingReplay = false;
     std::string strReplayLoadPath;
+    int replayRound = 0;
     int replayVersion = -1;
     if ( argc > 2 && std::string(argv[1]) == "load_replay") {
         strReplayLoadPath = argv[2];
         loadingReplay = true;
         if (argc > 3) {
-            replayVersion = atoi(argv[3]);
+            replayRound = atoi(argv[3]);
+        }
+        if (argc > 4) {
+            replayVersion = atoi(argv[4]);
         }
     }
 
@@ -1283,10 +1287,29 @@ int main(int argc, char**argv)
             doDeferredCreateGuys();
         }
 
-        guys[0]->setGauge(0);
-        guys[1]->setGauge(0);
+        // skip decoder past earlier rounds
+        for (int r = 0; r < replayRound; r++) {
+            while (!replayFileDecoder.finished) {
+                uint8_t cmd = replayFileDecoder.DecodeTick();
+                if (cmd == 3) break; // finish
+            }
+            replayFileDecoder.inputState[0] = 0;
+            replayFileDecoder.inputState[1] = 0;
+            replayFileDecoder.prevInputState[0] = 0;
+            replayFileDecoder.prevInputState[1] = 0;
+        }
 
-        defaultSim.randomSeed = replayFileInfo["RoundInfo"][0]["RandomSeed"];
+        if (replayRound == 0) {
+            guys[0]->setGauge(0);
+            guys[1]->setGauge(0);
+        } else {
+            nlohmann::json &prevRoundInfo = replayFileInfo["RoundInfo"][replayRound - 1];
+            for (int p = 0; p < 2; p++) {
+                guys[p]->setGauge(prevRoundInfo["SAGaugeStart"][p]);
+            }
+        }
+
+        defaultSim.randomSeed = replayFileInfo["RoundInfo"][replayRound]["RandomSeed"];
         defaultSim.match = true;
 
         *guys[0]->getInputIDPtr() = replayLeft;
