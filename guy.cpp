@@ -5831,13 +5831,30 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
         int inheritFlags = pCurrentAction ? pCurrentAction->inheritKindFlag : 0;
 
-        if (!(inheritFlags & (1<<0)) && !keepPlace) {
+        bool inheritX = (inheritFlags & (1<<0));
+        bool inheritY = (inheritFlags & (1<<1));
+
+        // todo what in the FUCK is going on here? viper thunder followup doesn't
+        // show inherit y place even though the placekeys really seem to want that?
+        // is there some kinda implicit inherit here?? possible omega hack
+        if (pCurrentAction && pCurrentAction->placeKeys.size()) {
+            for (auto &placeKey : pCurrentAction->placeKeys) {
+                // if (placeKey.axis == 0) {
+                //     inheritX = true;
+                // }
+                if (placeKey.axis == 1) {
+                    inheritY = true;
+                }
+            }
+        }
+
+        if (!inheritX && !keepPlace) {
             posX = posX + (posOffsetX * direction);
             posOffsetX = Fixed(0);
         } else {
             noPlaceXNextFrame = true;
         }
-        if (!(inheritFlags & (1<<1)) && !keepPlace) {
+        if (!inheritY && !keepPlace) {
             posY = posY + posOffsetY;
             posOffsetY = Fixed(0);
         } else {
