@@ -3849,6 +3849,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 isDown = true;
             } else {
                 knockDownFrames = downTime;
+                if (hitEntryHitStun == 0 && getPosY() == Fixed(0)) {
+                    hitEntryHitStun = 30 + 1;
+                }
             }
 
             //resetHitStunOnTransition = true;

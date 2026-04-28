@@ -2021,9 +2021,9 @@ var currentResults =
                 "lastFrame": 532
             },
             {
-                "count": 95,
+                "count": 1,
                 "firstFrame": 179,
-                "lastFrame": 532
+                "lastFrame": 179
             },
             {
                 "count": 0,
@@ -2041,13 +2041,13 @@ var currentResults =
                 "lastFrame": 326
             },
             {
-                "count": 129,
-                "firstFrame": 439,
+                "count": 96,
+                "firstFrame": 443,
                 "lastFrame": 532
             },
             {
-                "count": 184,
-                "firstFrame": 439,
+                "count": 151,
+                "firstFrame": 443,
                 "lastFrame": 532
             },
             {
