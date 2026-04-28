@@ -4494,6 +4494,24 @@ void Guy::DoBranchKey(bool preHit)
                         doBranch = true;
                     }
                     break;
+                case 17: // distance to opponent? maybe to other stuff too
+                    if (pOpponent) {
+                        Fixed distToOpponent = fixAbs(getPosX() - pOpponent->getPosX());
+                        if (branchParam0 == 9) {
+                            if (distToOpponent >= branchParam1) {
+                                doBranch = true;
+                            }
+                        } else if (branchParam0 == 10) {
+                            if (distToOpponent < branchParam1) {
+                                doBranch = true;
+                            }
+                        } else {
+                            log(logUnknowns, "unknown type of distance branch");
+                        }
+                    } else {
+                        log(true, "dangling distance branch");
+                    }
+                    break;
                 case 18:
                     if ((branchParam0 == -2147483647) && (branchParam1 == 2)) {
                         // sign change on vel? used for transitioning between rise and fall
