@@ -143,6 +143,13 @@ void Guy::DoSteerKeyOperation(Fixed &value, Fixed keyValue, int operationType)
             break;
         case 3: // ratio
             value = value * keyValue;
+            // we don't know for sure it's going to be negative at this point
+            // but we won't know it's a ratio anymore by the time we know
+            // odds are we're not gonna turn around with velocity probably
+            // but it's still a bit of a hack
+            if (direction < Fixed(0) && keyValue.data & 63) {
+                value.data += 1;
+            }
             break;
         default:
             log(logUnknowns, "Uknown steer keyoperation!");
