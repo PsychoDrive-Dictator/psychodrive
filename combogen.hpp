@@ -26,6 +26,8 @@ struct ComboRoute {
     int focusGain = 0;
     int gaugeGain = 0;
     int focusDmg = 0;
+    int focusSpend = 0;
+    int gaugeSpend = 0;
     int lastFrameDamage = 0;
     int walkForward = 0;
     SharedSimulationSnapshot *pSimSnapshot = nullptr;
@@ -37,6 +39,8 @@ struct DoneRoute {
     int focusGain = 0;
     int gaugeGain = 0;
     int focusDmg = 0;
+    int focusSpend = 0;
+    int gaugeSpend = 0;
     bool sideSwitch = false;
     bool impossibleInput = false;
 };
@@ -56,6 +60,10 @@ struct DamageSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
+        } else if (lhs->focusSpend != rhs->focusSpend) {
+            return lhs->focusSpend < rhs->focusSpend;
+        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
+            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -75,6 +83,10 @@ struct FocusGainSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
+        } else if (lhs->focusSpend != rhs->focusSpend) {
+            return lhs->focusSpend < rhs->focusSpend;
+        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
+            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -84,16 +96,20 @@ struct GaugeGainSort {
     bool operator()(DoneRoute* lhs, DoneRoute* rhs) const {
         if (lhs->gaugeGain != rhs->gaugeGain) {
             return lhs->gaugeGain < rhs->gaugeGain;
-        } else if (lhs->focusGain != rhs->focusGain) {
-            return lhs->focusGain < rhs->focusGain;
         } else if (lhs->damage != rhs->damage) {
             return lhs->damage < rhs->damage;
+        } else if (lhs->focusGain != rhs->focusGain) {
+            return lhs->focusGain < rhs->focusGain;
         } else if (lhs->focusDmg != rhs->focusDmg) {
             return lhs->focusDmg < rhs->focusDmg;
         } else if (lhs->sideSwitch != rhs->sideSwitch) {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
+        } else if (lhs->focusSpend != rhs->focusSpend) {
+            return lhs->focusSpend < rhs->focusSpend;
+        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
+            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -103,16 +119,20 @@ struct FocusDmgSort {
     bool operator()(DoneRoute* lhs, DoneRoute* rhs) const {
         if (lhs->focusDmg != rhs->focusDmg) {
             return lhs->focusDmg < rhs->focusDmg;
+        } else if (lhs->damage != rhs->damage) {
+            return lhs->damage < rhs->damage;
         } else if (lhs->focusGain != rhs->focusGain) {
             return lhs->focusGain < rhs->focusGain;
         } else if (lhs->gaugeGain != rhs->gaugeGain) {
             return lhs->gaugeGain < rhs->gaugeGain;
-        } else if (lhs->damage != rhs->damage) {
-            return lhs->damage < rhs->damage;
         } else if (lhs->sideSwitch != rhs->sideSwitch) {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
+        } else if (lhs->focusSpend != rhs->focusSpend) {
+            return lhs->focusSpend < rhs->focusSpend;
+        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
+            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }

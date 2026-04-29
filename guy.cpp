@@ -727,6 +727,9 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
     if (pTrigger->needsFocus) {
         deferredFocusCost = pTrigger->focusCost;
         log(logResources, "queuing deferred cost");
+        if (uniqueID == 0) {
+            pSim->comboProbe.focusSpend += deferredFocusCost;
+        }
     }
     if (focusRegenCooldownFrozen) {
         // if we cancel out of the od move
@@ -740,6 +743,9 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
 
     if (pTrigger->needsGauge) {
         gauge -= pTrigger->gaugeCost;
+        if (uniqueID == 0) {
+            pSim->comboProbe.gaugeSpend += pTrigger->gaugeCost;
+        }
         if (gauge < 0) {
             log(true, "not eonugh gauge to execute?! not supposed to happen");
         }
@@ -3382,6 +3388,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             if (guy->deferredFocusCost < 0) {
                 guy->deferredFocusCost *= -1;
             }
+
             guy->setFocus(guy->focus - guy->deferredFocusCost);
             //log(logResources, "focus " + std::to_string(deferredFocusCost) + ", total " + std::to_string(focus));
             guy->deferredFocusCost = 0;
@@ -5600,6 +5607,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             pSim->comboProbe.gaugeGain = 0;
             pSim->comboProbe.focusGain = 0;
             pSim->comboProbe.focusDmg = 0;
+            pSim->comboProbe.focusSpend = 0;
+            pSim->comboProbe.gaugeSpend = 0;
         }
 
         juggleCounter = 0;
@@ -6689,8 +6698,14 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                         case 36:
                             if (param1 == 2) {
                                 setGauge(gauge + param2);
+                                if (param2 < 0 && uniqueID == 0) {
+                                    pSim->comboProbe.gaugeSpend += -param2;
+                                }
                             } else if (param1 == 4) {
                                 setFocus(focus + param2);
+                                if (param2 < 0 && uniqueID == 0) {
+                                    pSim->comboProbe.focusSpend += -param2;
+                                }
                                 log(logResources, "focus " + std::to_string(param2) + " (eventkey), total " + std::to_string(focus));
                                 if (param2 < 0 && (!parrying || !successfulParry)) {
                                     // same as spending bar on od move

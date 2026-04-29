@@ -197,6 +197,12 @@ void ComboWorker::WorkLoop(void) {
             if (pSim->comboProbe.gaugeGain > currentRoute.gaugeGain) {
                 currentRoute.gaugeGain = pSim->comboProbe.gaugeGain;
             }
+            if (pSim->comboProbe.focusSpend > currentRoute.focusSpend) {
+                currentRoute.focusSpend = pSim->comboProbe.focusSpend;
+            }
+            if (pSim->comboProbe.gaugeSpend > currentRoute.gaugeSpend) {
+                currentRoute.gaugeSpend = pSim->comboProbe.gaugeSpend;
+            }
 
             if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 10000) {
                 fprintf(stderr, "aaa %s\n", routeToString(currentRoute, pSim->simGuys[0]).c_str());
@@ -243,6 +249,9 @@ void ComboWorker::WorkLoop(void) {
         doneRoute.focusGain = currentRoute.focusGain;
         doneRoute.focusDmg = currentRoute.focusDmg;
         doneRoute.gaugeGain = currentRoute.gaugeGain;
+        doneRoute.gaugeGain = currentRoute.gaugeGain;
+        doneRoute.focusSpend = currentRoute.focusSpend;
+        doneRoute.gaugeSpend = currentRoute.gaugeSpend;
         doneRoute.sideSwitch = (finder.startSnapshot.simGuys[0]->getPosX() > finder.startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
         // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
         // for ( auto &trigger : doneRoute.timelineTriggers) {
@@ -316,7 +325,9 @@ std::string routeToString(const ComboRoute &route, Guy *pGuy)
 
 std::string routeToString(const DoneRoute &route, Guy *pGuy)
 {
-    std::string result = std::to_string(route.damage) + " ";
+    std::string result = std::to_string(route.focusSpend / 10000) + " ";
+    result += std::to_string(route.gaugeSpend / 10000) + " ";
+    result += std::to_string(route.damage) + " ";
     result += std::to_string(route.focusGain) + " ";
     result += std::to_string(route.gaugeGain) + " ";
     result += std::to_string(route.focusDmg) + " ";

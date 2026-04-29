@@ -103,6 +103,8 @@ public:
         int focusGain = 0;
         int gaugeGain = 0;
         int focusDmg = 0;
+        int focusSpend = 0;
+        int gaugeSpend = 0;
     } comboProbe;
 
     bool match = false;
