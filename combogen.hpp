@@ -208,6 +208,9 @@ public:
 
     int filterFocusBars = 6;
     int filterGaugeBars = 3;
+    bool filterSideSwitchOnly = false;
+    bool filterImpossibleOnly = false;
+    bool sawImpossible = false;
     bool filterDirty = false;
     std::set<DoneRoute *, DoneRoutePtrDamageSort> filteredByDamage;
     std::set<DoneRoute *, FocusGainSort> filteredByFocusGain;
@@ -244,3 +247,4 @@ void findCombos(bool doLights, bool doLateCancels, bool doWalk, bool doKaras);
 void updateComboFinder(void);
 void renderComboFinder(void);
 void stopComboFinder(void);
+bool filterIsActive(const ComboFinder &f);

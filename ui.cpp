@@ -1598,7 +1598,7 @@ void SimulationController::RenderComboMinerSetup(void)
     int routeCount = 0;
     static int sortMode = 0;
 
-    bool filterActive = finder.filterFocusBars < 6 || finder.filterGaugeBars < 3;
+    bool filterActive = filterIsActive(finder);
     size_t totalVisibleCount = 0;
     std::vector<DoneRoute *> vecVisibleRoutes;
 
@@ -1737,6 +1737,16 @@ void SimulationController::RenderComboMinerSetup(void)
         ImGui::SetNextItemWidth(120);
         if (ImGui::SliderInt("Super##filter", &finder.filterGaugeBars, 0, 3, finder.filterGaugeBars >= 3 ? "any" : "<= %d bars")) {
             finder.filterDirty = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Side switch", &finder.filterSideSwitchOnly)) {
+            finder.filterDirty = true;
+        }
+        if (finder.sawImpossible) {
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Impossible?", &finder.filterImpossibleOnly)) {
+                finder.filterDirty = true;
+            }
         }
 
         routeCount = 0;

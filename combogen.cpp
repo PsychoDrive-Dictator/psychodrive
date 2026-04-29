@@ -438,6 +438,8 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.filteredByFocusGain.clear();
     finder.filteredByGaugeGain.clear();
     finder.filteredByFocusDmg.clear();
+    finder.sawImpossible = false;
+    finder.filterImpossibleOnly = false;
     finder.recentRoutes.clear();
     log("starting on " + std::to_string(finder.threadCount) + " threads");
 
@@ -488,6 +490,25 @@ void stopComboFinder(void)
     finder.running = false;
 }
 
+bool filterIsActive(const ComboFinder &f)
+{
+    return f.filterFocusBars < 6
+        || f.filterGaugeBars < 3
+        || f.filterSideSwitchOnly
+        || f.filterImpossibleOnly;
+}
+
+static bool passesFilter(const ComboFinder &f, const DoneRoute *r)
+{
+    int focusMax = f.filterFocusBars >= 6 ? INT_MAX : f.filterFocusBars * 10000;
+    int gaugeMax = f.filterGaugeBars >= 3 ? INT_MAX : f.filterGaugeBars * 10000;
+    if (r->focusSpend > focusMax) return false;
+    if (r->gaugeSpend > gaugeMax) return false;
+    if (f.filterSideSwitchOnly && !r->sideSwitch) return false;
+    if (f.filterImpossibleOnly && !r->impossibleInput) return false;
+    return true;
+}
+
 void updateComboFinder(void)
 {
     if (finder.filterDirty) {
@@ -496,13 +517,10 @@ void updateComboFinder(void)
         finder.filteredByGaugeGain.clear();
         finder.filteredByFocusDmg.clear();
 
-        bool filterIsActive = finder.filterFocusBars < 6 || finder.filterGaugeBars < 3;
-        if (filterIsActive) {
-            int filterFocusMax = finder.filterFocusBars >= 6 ? INT_MAX : finder.filterFocusBars * 10000;
-            int filterGaugeMax = finder.filterGaugeBars >= 3 ? INT_MAX : finder.filterGaugeBars * 10000;
+        if (filterIsActive(finder)) {
             for (auto &up : finder.doneRoutes) {
                 DoneRoute *r = up.get();
-                if (r->focusSpend <= filterFocusMax && r->gaugeSpend <= filterGaugeMax) {
+                if (passesFilter(finder, r)) {
                     finder.filteredByDamage.insert(r);
                     finder.filteredByFocusGain.insert(r);
                     finder.filteredByGaugeGain.insert(r);
@@ -559,12 +577,7 @@ void updateComboFinder(void)
                     }
                 }
             }
-            bool filterIsActive = finder.filterFocusBars < 6 || finder.filterGaugeBars < 3;
-            int filterFocusMax = finder.filterFocusBars >= 6 ? INT_MAX : finder.filterFocusBars * 10000;
-            int filterGaugeMax = finder.filterGaugeBars >= 3 ? INT_MAX : finder.filterGaugeBars * 10000;
-            auto passesFilter = [&](DoneRoute *r) {
-                return r->focusSpend <= filterFocusMax && r->gaugeSpend <= filterGaugeMax;
-            };
+            bool isFiltering = filterIsActive(finder);
 
             for (auto it = newDoneRoutes.begin(); it != newDoneRoutes.end(); ) {
                 auto newRoute = std::move(newDoneRoutes.extract(it++).value());
@@ -577,7 +590,7 @@ void updateComboFinder(void)
                     finder.doneRoutesByFocusGain.erase(oldPtr);
                     finder.doneRoutesByGaugeGain.erase(oldPtr);
                     finder.doneRoutesByFocusDmg.erase(oldPtr);
-                    if (filterIsActive) {
+                    if (isFiltering) {
                         finder.filteredByDamage.erase(oldPtr);
                         finder.filteredByFocusGain.erase(oldPtr);
                         finder.filteredByGaugeGain.erase(oldPtr);
@@ -588,12 +601,15 @@ void updateComboFinder(void)
                 }
                 if (doInsert) {
                     newRoute->impossibleInput = !checkChargeInputs(newRoute->timelineTriggers);
+                    if (newRoute->impossibleInput && !finder.sawImpossible) {
+                        finder.sawImpossible = true;
+                    }
                     auto [pos, inserted] = finder.doneRoutes.insert(std::move(newRoute));
                     DoneRoute *newPtr = pos->get();
                     finder.doneRoutesByFocusGain.insert(newPtr);
                     finder.doneRoutesByGaugeGain.insert(newPtr);
                     finder.doneRoutesByFocusDmg.insert(newPtr);
-                    if (filterIsActive && passesFilter(newPtr)) {
+                    if (isFiltering && passesFilter(finder, newPtr)) {
                         finder.filteredByDamage.insert(newPtr);
                         finder.filteredByFocusGain.insert(newPtr);
                         finder.filteredByGaugeGain.insert(newPtr);
