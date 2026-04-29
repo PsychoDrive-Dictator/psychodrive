@@ -1628,8 +1628,22 @@ void SimulationController::RenderComboMinerSetup(void)
         ImGui::Text("%lu routes:", finder.doneRoutes.size());
         if (finder.doneRoutes.size() > routesToDisplay) {
             ImGui::SameLine();
+            if (ImGui::Button("<")) {
+                routeScrollAmount -= routesToDisplay;
+                if (routeScrollAmount < 0) {
+                    routeScrollAmount = 0;
+                }
+            }
+            ImGui::SameLine();
             ImGui::SetNextItemWidth(400);
             ImGui::SliderInt("##routescroll", &routeScrollAmount, 0, finder.doneRoutes.size() - routesToDisplay);
+            ImGui::SameLine();
+            if (ImGui::Button(">")) {
+                routeScrollAmount += routesToDisplay;
+                if (routeScrollAmount > (int)finder.doneRoutes.size() - routesToDisplay) {
+                    routeScrollAmount = (int)finder.doneRoutes.size() - routesToDisplay;
+                }
+            }
         }
         ImGui::Text("Sort:");
         ImGui::SameLine();
