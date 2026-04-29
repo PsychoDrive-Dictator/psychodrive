@@ -330,7 +330,8 @@ void jsLoadFile(char *filePath)
     if (data->contains("InputData") && data->contains("ReplayInfo")) {
         pendingViewerLoad.isReplay = true;
         simController.replayInfo = (*data)["ReplayInfo"];
-        if (isOldReplayFormat(simController.replayInfo)) {
+        simController.replayIsOldFormat = isOldReplayFormat(simController.replayInfo);
+        if (simController.replayIsOldFormat) {
             fixupOldReplayInfo(simController.replayInfo);
         }
         simController.replayInputData = replayInputBytes((*data)["InputData"]).get<std::vector<uint8_t>>();
@@ -993,7 +994,8 @@ int main(int argc, char**argv)
             exit(1);
         }
         nlohmann::json replayInfo = data["ReplayInfo"];
-        if (isOldReplayFormat(replayInfo)) {
+        bool oldFormat = isOldReplayFormat(replayInfo);
+        if (oldFormat) {
             fixupOldReplayInfo(replayInfo);
         }
 
@@ -1002,6 +1004,7 @@ int main(int argc, char**argv)
 
         int totalErrors = 0;
         int roundCount = (int)replayInfo["RoundInfo"].size();
+        int carryGauges[2] = {0, 0};
 
         for (int round = 0; round < roundCount; round++) {
             nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
@@ -1012,7 +1015,8 @@ int main(int argc, char**argv)
             }
 
             Simulation roundSim;
-            roundSim.SetupReplayRound(replayInfo, round, version, decoder);
+            const int *startGauges = (oldFormat && round > 0) ? carryGauges : nullptr;
+            roundSim.SetupReplayRound(replayInfo, round, version, decoder, startGauges);
 
             int prevHealth[2] = {0, 0};
             while (roundSim.replayingReplay) {
@@ -1033,12 +1037,16 @@ int main(int argc, char**argv)
                 totalErrors++;
             }
 
+            bool checkGauge = !oldFormat || round == roundCount - 1;
             for (int p = 0; p < 2; p++) {
-                int expectedGauge = roundInfo["SAGaugeStart"][p];
                 int simGauge = roundSim.simGuys[p]->getGauge();
-                if (expectedGauge != simGauge) {
-                    fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round + 1, p + 1, simGauge, expectedGauge);
-                    totalErrors++;
+                carryGauges[p] = simGauge;
+                if (checkGauge) {
+                    int expectedGauge = roundInfo["SAGaugeStart"][p];
+                    if (expectedGauge != simGauge) {
+                        fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round + 1, p + 1, simGauge, expectedGauge);
+                        totalErrors++;
+                    }
                 }
             }
 
@@ -1178,7 +1186,8 @@ int main(int argc, char**argv)
         }
 
         simController.replayInfo = data["ReplayInfo"];
-        if (isOldReplayFormat(simController.replayInfo)) {
+        simController.replayIsOldFormat = isOldReplayFormat(simController.replayInfo);
+        if (simController.replayIsOldFormat) {
             fixupOldReplayInfo(simController.replayInfo);
         }
         simController.replayInputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();

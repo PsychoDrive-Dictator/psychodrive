@@ -61,7 +61,7 @@ public:
     void CreateGuyFromCharController(CharacterUIController &controller);
 
     bool SetupFromGameDump(std::string dumpPath, int version);
-    void SetupReplayRound(nlohmann::json &replayInfo, int round, int version, ReplayDecoder &decoder);
+    void SetupReplayRound(nlohmann::json &replayInfo, int round, int version, ReplayDecoder &decoder, const int *startGauges = nullptr);
 
     enum ErrorType {
         ePos = 0,

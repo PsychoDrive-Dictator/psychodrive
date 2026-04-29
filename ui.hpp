@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <deque>
 
 #include "chara.hpp"
@@ -153,6 +154,8 @@ public:
     int replayVersion = -1;
     int replayCurrentRound = -1;
     int replayRoundCount = 0;
+    bool replayIsOldFormat = false;
+    std::vector<std::array<int, 2>> replaySimulatedRoundEndGauges;
 
     void LoadReplayRound(int round);
     void ValidateAllRounds();

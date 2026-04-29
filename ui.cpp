@@ -2456,11 +2456,14 @@ void SimulationController::ValidateAllRounds()
 {
     replayRoundResults.clear();
     replayRoundCount = 0;
+    replaySimulatedRoundEndGauges.clear();
 
     int roundCount = (int)replayInfo["RoundInfo"].size();
 
     ReplayDecoder decoder;
     decoder.inputData = replayInputData;
+
+    int carryGauges[2] = {0, 0};
 
     for (int round = 0; round < roundCount; round++) {
         nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
@@ -2471,7 +2474,8 @@ void SimulationController::ValidateAllRounds()
         replayRoundCount++;
 
         Simulation roundSim;
-        roundSim.SetupReplayRound(replayInfo, round, replayVersion, decoder);
+        const int *startGauges = (replayIsOldFormat && round > 0) ? carryGauges : nullptr;
+        roundSim.SetupReplayRound(replayInfo, round, replayVersion, decoder, startGauges);
 
         int prevHealth[2] = {0, 0};
         while (roundSim.replayingReplay) {
@@ -2493,14 +2497,21 @@ void SimulationController::ValidateAllRounds()
             result.hasErrors = true;
         }
 
+        bool checkGauge = !replayIsOldFormat || round == roundCount - 1;
+        std::array<int, 2> endGauges = {0, 0};
         for (int p = 0; p < 2; p++) {
-            int expectedGauge = roundInfo["SAGaugeStart"][p];
             int simGauge = roundSim.simGuys[p]->getGauge();
-            if (expectedGauge != simGauge) {
-                errors += "P" + std::to_string(p + 1) + " gauge " + std::to_string(simGauge) + " expected " + std::to_string(expectedGauge) + "; ";
-                result.hasErrors = true;
+            carryGauges[p] = simGauge;
+            endGauges[p] = simGauge;
+            if (checkGauge) {
+                int expectedGauge = roundInfo["SAGaugeStart"][p];
+                if (expectedGauge != simGauge) {
+                    errors += "P" + std::to_string(p + 1) + " gauge " + std::to_string(simGauge) + " expected " + std::to_string(expectedGauge) + "; ";
+                    result.hasErrors = true;
+                }
             }
         }
+        replaySimulatedRoundEndGauges.push_back(endGauges);
 
         if (result.hasErrors) {
             result.summary = "Round " + std::to_string(round + 1) + ": " + errors;
@@ -2541,7 +2552,14 @@ void SimulationController::LoadReplayRound(int round)
         decoder.prevInputState[1] = 0;
     }
 
-    pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder);
+    int carryGauges[2] = {0, 0};
+    const int *startGauges = nullptr;
+    if (replayIsOldFormat && round > 0 && round - 1 < (int)replaySimulatedRoundEndGauges.size()) {
+        carryGauges[0] = replaySimulatedRoundEndGauges[round - 1][0];
+        carryGauges[1] = replaySimulatedRoundEndGauges[round - 1][1];
+        startGauges = carryGauges;
+    }
+    pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder, startGauges);
     for (auto &guy : pSim->simGuys) {
         guy->setRecordFrameTriggers(true, true);
         guy->setLogTransitions(viewerLogTransitions);

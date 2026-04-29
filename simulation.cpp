@@ -233,7 +233,7 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
     return true;
 }
 
-void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int version, ReplayDecoder &decoder)
+void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int version, ReplayDecoder &decoder, const int *startGauges)
 {
     for (int i = 0; i < 2; i++) {
         int fighterID = replayInfo["Fighters"][i]["FighterID"];
@@ -246,7 +246,11 @@ void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int ver
     nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
     randomSeed = roundInfo["RandomSeed"];
 
-    if (round == 0) {
+    if (startGauges) {
+        for (int p = 0; p < 2; p++) {
+            simGuys[p]->setGauge(startGauges[p]);
+        }
+    } else if (round == 0) {
         for (int p = 0; p < 2; p++) {
             simGuys[p]->setGauge(0);
         }
