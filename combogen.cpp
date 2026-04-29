@@ -265,9 +265,20 @@ void ComboWorker::WorkLoop(void) {
         auto it = doneRoutes.find(newRoute);
         if (it == doneRoutes.end()) {
             doneRoutes.insert(std::move(newRoute));
-        } else if (newRoute->timelineTriggers.size() < (*it)->timelineTriggers.size()) {
-            doneRoutes.erase(it);
-            doneRoutes.insert(std::move(newRoute));
+        } else {
+            const DoneRoute *ex = it->get();
+            int newTriggers = (int)newRoute->timelineTriggers.size();
+            int exTriggers = (int)ex->timelineTriggers.size();
+            bool notWorse = newTriggers <= exTriggers
+                && newRoute->focusSpend <= ex->focusSpend
+                && newRoute->gaugeSpend <= ex->gaugeSpend;
+            bool betterSomewhere = newTriggers < exTriggers
+                || newRoute->focusSpend < ex->focusSpend
+                || newRoute->gaugeSpend < ex->gaugeSpend;
+            if (notWorse && betterSomewhere) {
+                doneRoutes.erase(it);
+                doneRoutes.insert(std::move(newRoute));
+            }
         }
         mutexDoneRoutes.unlock();
 
@@ -585,19 +596,30 @@ void updateComboFinder(void)
                 bool doInsert = false;
                 if (existing == finder.doneRoutes.end()) {
                     doInsert = true;
-                } else if (newRoute->timelineTriggers.size() < (*existing)->timelineTriggers.size()) {
-                    DoneRoute *oldPtr = existing->get();
-                    finder.doneRoutesByFocusGain.erase(oldPtr);
-                    finder.doneRoutesByGaugeGain.erase(oldPtr);
-                    finder.doneRoutesByFocusDmg.erase(oldPtr);
-                    if (isFiltering) {
-                        finder.filteredByDamage.erase(oldPtr);
-                        finder.filteredByFocusGain.erase(oldPtr);
-                        finder.filteredByGaugeGain.erase(oldPtr);
-                        finder.filteredByFocusDmg.erase(oldPtr);
+                } else {
+                    const DoneRoute *ex = existing->get();
+                    int newTriggers = (int)newRoute->timelineTriggers.size();
+                    int exTriggers = (int)ex->timelineTriggers.size();
+                    bool notWorse = newTriggers <= exTriggers
+                        && newRoute->focusSpend <= ex->focusSpend
+                        && newRoute->gaugeSpend <= ex->gaugeSpend;
+                    bool betterSomewhere = newTriggers < exTriggers
+                        || newRoute->focusSpend < ex->focusSpend
+                        || newRoute->gaugeSpend < ex->gaugeSpend;
+                    if (notWorse && betterSomewhere) {
+                        DoneRoute *oldPtr = existing->get();
+                        finder.doneRoutesByFocusGain.erase(oldPtr);
+                        finder.doneRoutesByGaugeGain.erase(oldPtr);
+                        finder.doneRoutesByFocusDmg.erase(oldPtr);
+                        if (isFiltering) {
+                            finder.filteredByDamage.erase(oldPtr);
+                            finder.filteredByFocusGain.erase(oldPtr);
+                            finder.filteredByGaugeGain.erase(oldPtr);
+                            finder.filteredByFocusDmg.erase(oldPtr);
+                        }
+                        finder.doneRoutes.erase(existing);
+                        doInsert = true;
                     }
-                    finder.doneRoutes.erase(existing);
-                    doInsert = true;
                 }
                 if (doInsert) {
                     newRoute->impossibleInput = !checkChargeInputs(newRoute->timelineTriggers);

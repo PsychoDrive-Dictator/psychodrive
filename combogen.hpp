@@ -60,10 +60,6 @@ struct DamageSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
-        } else if (lhs->focusSpend != rhs->focusSpend) {
-            return lhs->focusSpend < rhs->focusSpend;
-        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
-            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -83,10 +79,6 @@ struct DoneRoutePtrDamageSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
-        } else if (lhs->focusSpend != rhs->focusSpend) {
-            return lhs->focusSpend < rhs->focusSpend;
-        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
-            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -106,10 +98,6 @@ struct FocusGainSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
-        } else if (lhs->focusSpend != rhs->focusSpend) {
-            return lhs->focusSpend < rhs->focusSpend;
-        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
-            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -129,10 +117,6 @@ struct GaugeGainSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
-        } else if (lhs->focusSpend != rhs->focusSpend) {
-            return lhs->focusSpend < rhs->focusSpend;
-        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
-            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
@@ -152,10 +136,6 @@ struct FocusDmgSort {
             return lhs->sideSwitch < rhs->sideSwitch;
         } else if (lhs->impossibleInput != rhs->impossibleInput) {
             return lhs->impossibleInput < rhs->impossibleInput;
-        } else if (lhs->focusSpend != rhs->focusSpend) {
-            return lhs->focusSpend < rhs->focusSpend;
-        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
-            return lhs->gaugeSpend < rhs->gaugeSpend;
         }
         return false;
     }
