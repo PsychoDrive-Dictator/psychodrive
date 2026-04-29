@@ -1597,36 +1597,72 @@ void SimulationController::RenderComboMinerSetup(void)
     const int routesToDisplay = 10;
     int routeCount = 0;
     static int sortMode = 0;
+
+    bool filterActive = finder.filterFocusBars < 6 || finder.filterGaugeBars < 3;
+    size_t totalVisibleCount = 0;
     std::vector<DoneRoute *> vecVisibleRoutes;
-    if (routeScrollAmount >= (int)finder.doneRoutes.size()) {
-        routeScrollAmount = 0;
-    }
-    if (sortMode == 0) {
-        routeCount = 0;
-        for (auto it = std::next(finder.doneRoutes.rbegin(), routeScrollAmount); it != finder.doneRoutes.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
-            vecVisibleRoutes.push_back(it->get());
+
+    auto clampScroll = [&]() {
+        if (routeScrollAmount > (int)totalVisibleCount - routesToDisplay) routeScrollAmount = (int)totalVisibleCount - routesToDisplay;
+        if (routeScrollAmount < 0) routeScrollAmount = 0;
+    };
+
+    if (filterActive) {
+        if (sortMode == 0) {
+            totalVisibleCount = finder.filteredByDamage.size();
+            clampScroll();
+            for (auto it = std::next(finder.filteredByDamage.rbegin(), routeScrollAmount); it != finder.filteredByDamage.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
+        } else if (sortMode == 1) {
+            totalVisibleCount = finder.filteredByFocusGain.size();
+            clampScroll();
+            for (auto it = std::next(finder.filteredByFocusGain.rbegin(), routeScrollAmount); it != finder.filteredByFocusGain.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
+        } else if (sortMode == 2) {
+            totalVisibleCount = finder.filteredByGaugeGain.size();
+            clampScroll();
+            for (auto it = std::next(finder.filteredByGaugeGain.rbegin(), routeScrollAmount); it != finder.filteredByGaugeGain.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
+        } else if (sortMode == 3) {
+            totalVisibleCount = finder.filteredByFocusDmg.size();
+            clampScroll();
+            for (auto it = std::next(finder.filteredByFocusDmg.rbegin(), routeScrollAmount); it != finder.filteredByFocusDmg.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
         }
-    } else if (sortMode == 1) {
-        routeCount = 0;
-        for (auto it = std::next(finder.doneRoutesByFocusGain.rbegin(), routeScrollAmount); it != finder.doneRoutesByFocusGain.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
-            vecVisibleRoutes.push_back(*it);
-        }
-    } else if (sortMode == 2) {
-        routeCount = 0;
-        for (auto it = std::next(finder.doneRoutesByGaugeGain.rbegin(), routeScrollAmount); it != finder.doneRoutesByGaugeGain.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
-            vecVisibleRoutes.push_back(*it);
-        }
-    } else if (sortMode == 3) {
-        routeCount = 0;
-        for (auto it = std::next(finder.doneRoutesByFocusDmg.rbegin(), routeScrollAmount); it != finder.doneRoutesByFocusDmg.rend() && routeCount < routesToDisplay; ++it, ++routeCount) {
-            vecVisibleRoutes.push_back(*it);
+    } else {
+        totalVisibleCount = finder.doneRoutes.size();
+        clampScroll();
+        if (sortMode == 0) {
+            for (auto it = std::next(finder.doneRoutes.rbegin(), routeScrollAmount); it != finder.doneRoutes.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(it->get());
+            }
+        } else if (sortMode == 1) {
+            for (auto it = std::next(finder.doneRoutesByFocusGain.rbegin(), routeScrollAmount); it != finder.doneRoutesByFocusGain.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
+        } else if (sortMode == 2) {
+            for (auto it = std::next(finder.doneRoutesByGaugeGain.rbegin(), routeScrollAmount); it != finder.doneRoutesByGaugeGain.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
+        } else if (sortMode == 3) {
+            for (auto it = std::next(finder.doneRoutesByFocusDmg.rbegin(), routeScrollAmount); it != finder.doneRoutesByFocusDmg.rend() && (int)vecVisibleRoutes.size() < routesToDisplay; ++it) {
+                vecVisibleRoutes.push_back(*it);
+            }
         }
     }
 
     if (showResults && finder.doneRoutes.size() > 0 && pSim && pSim->simGuys.size() > 0) {
         ImGui::Separator();
-        ImGui::Text("%lu routes:", finder.doneRoutes.size());
-        if (finder.doneRoutes.size() > routesToDisplay) {
+        if (filterActive) {
+            ImGui::Text("%zu / %zu routes:", totalVisibleCount, finder.doneRoutes.size());
+        } else {
+            ImGui::Text("%zu routes:", totalVisibleCount);
+        }
+        if ((int)totalVisibleCount > routesToDisplay) {
             ImGui::SameLine();
             if (ImGui::Button("<")) {
                 routeScrollAmount -= routesToDisplay;
@@ -1635,13 +1671,13 @@ void SimulationController::RenderComboMinerSetup(void)
                 }
             }
             ImGui::SameLine();
-            ImGui::SetNextItemWidth(400);
-            ImGui::SliderInt("##routescroll", &routeScrollAmount, 0, finder.doneRoutes.size() - routesToDisplay);
+            ImGui::SetNextItemWidth(300);
+            ImGui::SliderInt("##routescroll", &routeScrollAmount, 0, (int)totalVisibleCount - routesToDisplay);
             ImGui::SameLine();
             if (ImGui::Button(">")) {
                 routeScrollAmount += routesToDisplay;
-                if (routeScrollAmount > (int)finder.doneRoutes.size() - routesToDisplay) {
-                    routeScrollAmount = (int)finder.doneRoutes.size() - routesToDisplay;
+                if (routeScrollAmount > (int)totalVisibleCount - routesToDisplay) {
+                    routeScrollAmount = (int)totalVisibleCount - routesToDisplay;
                 }
             }
         }
@@ -1689,6 +1725,18 @@ void SimulationController::RenderComboMinerSetup(void)
         }
         if (highlighted) {
             ImGui::PopStyleColor();
+        }
+
+        ImGui::Text("Filter:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        if (ImGui::SliderInt("Drive##filter", &finder.filterFocusBars, 0, 6, finder.filterFocusBars >= 6 ? "any" : "<= %d bars")) {
+            finder.filterDirty = true;
+        }
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        if (ImGui::SliderInt("Super##filter", &finder.filterGaugeBars, 0, 3, finder.filterGaugeBars >= 3 ? "any" : "<= %d bars")) {
+            finder.filterDirty = true;
         }
 
         routeCount = 0;

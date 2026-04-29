@@ -69,6 +69,29 @@ struct DamageSort {
     }
 };
 
+struct DoneRoutePtrDamageSort {
+    bool operator()(const DoneRoute *lhs, const DoneRoute *rhs) const {
+        if (lhs->damage != rhs->damage) {
+            return lhs->damage < rhs->damage;
+        } else if (lhs->focusGain != rhs->focusGain) {
+            return lhs->focusGain < rhs->focusGain;
+        } else if (lhs->gaugeGain != rhs->gaugeGain) {
+            return lhs->gaugeGain < rhs->gaugeGain;
+        } else if (lhs->focusDmg != rhs->focusDmg) {
+            return lhs->focusDmg < rhs->focusDmg;
+        } else if (lhs->sideSwitch != rhs->sideSwitch) {
+            return lhs->sideSwitch < rhs->sideSwitch;
+        } else if (lhs->impossibleInput != rhs->impossibleInput) {
+            return lhs->impossibleInput < rhs->impossibleInput;
+        } else if (lhs->focusSpend != rhs->focusSpend) {
+            return lhs->focusSpend < rhs->focusSpend;
+        } else if (lhs->gaugeSpend != rhs->gaugeSpend) {
+            return lhs->gaugeSpend < rhs->gaugeSpend;
+        }
+        return false;
+    }
+};
+
 struct FocusGainSort {
     bool operator()(DoneRoute* lhs, DoneRoute* rhs) const {
         if (lhs->focusGain != rhs->focusGain) {
@@ -182,6 +205,14 @@ public:
     std::set<DoneRoute *, FocusGainSort> doneRoutesByFocusGain;
     std::set<DoneRoute *, GaugeGainSort> doneRoutesByGaugeGain;
     std::set<DoneRoute *, FocusDmgSort> doneRoutesByFocusDmg;
+
+    int filterFocusBars = 6;
+    int filterGaugeBars = 3;
+    bool filterDirty = false;
+    std::set<DoneRoute *, DoneRoutePtrDamageSort> filteredByDamage;
+    std::set<DoneRoute *, FocusGainSort> filteredByFocusGain;
+    std::set<DoneRoute *, GaugeGainSort> filteredByGaugeGain;
+    std::set<DoneRoute *, FocusDmgSort> filteredByFocusDmg;
 
     std::default_random_engine rng;
 
