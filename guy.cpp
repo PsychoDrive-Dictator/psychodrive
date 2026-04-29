@@ -1978,7 +1978,8 @@ bool Guy::Push(Guy *pOtherGuy)
             if (doBoxesHit(pushbox, otherPushBox)) {
 
                 // check hitcount in case we already clashed but still in hitstop
-                if (isProjectile && projHitCount > 0 && pOtherGuy->isProjectile && pOtherGuy->projHitCount > 0) {
+                if (isProjectile && pCurrentAction->pProjectileData && projHitCount > 0 &&
+                    pOtherGuy->isProjectile && pOtherGuy->pCurrentAction->pProjectileData && pOtherGuy->projHitCount > 0) {
                     // projectile clash
                     int ownHitStop = 10;
                     int otherHitStop = 10;
@@ -3106,7 +3107,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
             // perfect
             bool parryAsStrike = hitBox.type == hit;
-            if (pGuy->isProjectile && pGuy->pCurrentAction->pProjectileData->flags & (1<<30)) {
+            if (pGuy->isProjectile && pGuy->pCurrentAction->pProjectileData && pGuy->pCurrentAction->pProjectileData->flags & (1<<30)) {
                 parryAsStrike = true;
             }
             bool didPerfect = true;
@@ -3308,10 +3309,12 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 
         if (pGuy->isProjectile) {
             pGuy->projHitCount--;
-            // mmmm
-            //hitStopSelf += pGuy->pCurrentAction->pProjectileData->extraHitStop;
-            pGuy->hitSpanFrames = pGuy->pCurrentAction->pProjectileData->hitSpan;
-            pGuy->steerDisabledFrames = pGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
+            if (pGuy->pCurrentAction->pProjectileData) {
+                // mmmm
+                //hitStopSelf += pGuy->pCurrentAction->pProjectileData->extraHitStop;
+                pGuy->hitSpanFrames = pGuy->pCurrentAction->pProjectileData->hitSpan;
+                pGuy->steerDisabledFrames = pGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
+            }
         }
 
         if (!pOtherGuy->blocking && !hitArmor) {
@@ -3610,7 +3613,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     if (moveDamage > 0 || isGrab) {
         // look for minions to delete on damage
         for (auto &minion: getMinions()) {
-            if (minion->isProjectile && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
+            if (minion->isProjectile && minion->pCurrentAction->pProjectileData && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
                 minion->die = true;
             }
         }
