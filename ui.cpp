@@ -2486,15 +2486,25 @@ void SimulationController::ValidateAllRounds()
         }
 
         int winPlayer = roundInfo["WinPlayerType"];
-        int losePlayer = winPlayer ^ 1;
 
         ReplayRoundResult result;
         std::string errors;
 
-        int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
-        if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
-            errors += "loser P" + std::to_string(losePlayer + 1) + " health " + std::to_string(loserHealth) + "; ";
-            result.hasErrors = true;
+        if (winPlayer == 0 || winPlayer == 1) {
+            int losePlayer = winPlayer ^ 1;
+            int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
+            if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
+                errors += "loser P" + std::to_string(losePlayer + 1) + " health " + std::to_string(loserHealth) + "; ";
+                result.hasErrors = true;
+            }
+        } else {
+            for (int p = 0; p < 2; p++) {
+                int h = roundSim.simGuys[p]->getHealth();
+                if (h != 0 || prevHealth[p] == 0) {
+                    errors += "draw P" + std::to_string(p + 1) + " health " + std::to_string(h) + "; ";
+                    result.hasErrors = true;
+                }
+            }
         }
 
         bool checkGauge = !replayIsOldFormat || round == roundCount - 1;

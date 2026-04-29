@@ -1027,14 +1027,24 @@ int main(int argc, char**argv)
             }
 
             int winPlayer = roundInfo["WinPlayerType"];
-            int losePlayer = winPlayer ^ 1;
 
             fprintf(stderr, "R;round %d finished at frame %d\n", round + 1, roundSim.frameCounter);
 
-            int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
-            if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
-                fprintf(stderr, "E;round %d loser (P%d) health %d expected zero prev health %d expected nonzero\n", round + 1, losePlayer + 1, loserHealth, prevHealth[losePlayer]);
-                totalErrors++;
+            if (winPlayer == 0 || winPlayer == 1) {
+                int losePlayer = winPlayer ^ 1;
+                int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
+                if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
+                    fprintf(stderr, "E;round %d loser (P%d) health %d expected zero prev health %d expected nonzero\n", round + 1, losePlayer + 1, loserHealth, prevHealth[losePlayer]);
+                    totalErrors++;
+                }
+            } else {
+                for (int p = 0; p < 2; p++) {
+                    int h = roundSim.simGuys[p]->getHealth();
+                    if (h != 0 || prevHealth[p] == 0) {
+                        fprintf(stderr, "E;round %d draw P%d health %d expected zero prev health %d expected nonzero\n", round + 1, p + 1, h, prevHealth[p]);
+                        totalErrors++;
+                    }
+                }
             }
 
             bool checkGauge = !oldFormat || round == roundCount - 1;
