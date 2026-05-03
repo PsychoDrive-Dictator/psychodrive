@@ -7036,6 +7036,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "honda_throws",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 808,
+                "firstFrame": 201,
+                "lastFrame": 694
+            },
+            {
+                "count": 182,
+                "firstFrame": 176,
+                "lastFrame": 553
+            },
+            {
+                "count": 9,
+                "firstFrame": 200,
+                "lastFrame": 553
+            },
+            {
+                "count": 46,
+                "firstFrame": 176,
+                "lastFrame": 365
+            },
+            {
+                "count": 46,
+                "firstFrame": 176,
+                "lastFrame": 365
+            },
+            {
+                "count": 441,
+                "firstFrame": 382,
+                "lastFrame": 646
+            },
+            {
+                "count": 585,
+                "firstFrame": 180,
+                "lastFrame": 694
+            },
+            {
+                "count": 118,
+                "firstFrame": 464,
+                "lastFrame": 581
+            },
+            {
+                "count": 490,
+                "firstFrame": 343,
+                "lastFrame": 694
+            },
+            {
+                "count": 150,
+                "firstFrame": 464,
+                "lastFrame": 613
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "jamie_command_grab",
         "testVersion": "40",
         "finished": true,
