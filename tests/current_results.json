@@ -3021,17 +3021,17 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 301,
-                "firstFrame": 1396,
-                "lastFrame": 1988
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 1228,
+                "count": 718,
                 "firstFrame": 74,
                 "lastFrame": 2436
             },
             {
-                "count": 307,
+                "count": 6,
                 "firstFrame": 120,
                 "lastFrame": 2436
             },
@@ -3046,19 +3046,14 @@ var currentResults =
                 "lastFrame": 2431
             },
             {
-                "count": 666,
+                "count": 180,
                 "firstFrame": 74,
                 "lastFrame": 2418
             },
             {
-                "count": 1035,
+                "count": 201,
                 "firstFrame": 101,
                 "lastFrame": 2435
-            },
-            {
-                "count": 327,
-                "firstFrame": 1395,
-                "lastFrame": 2000
             },
             {
                 "count": 0,
@@ -3066,18 +3061,23 @@ var currentResults =
                 "lastFrame": -1
             },
             {
-                "count": 1878,
-                "firstFrame": 1028,
-                "lastFrame": 2905
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 6,
-                "firstFrame": 1395,
-                "lastFrame": 1802
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 156,
-                "firstFrame": 1395,
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 4,
+                "firstFrame": 1471,
                 "lastFrame": 1877
             }
         ]

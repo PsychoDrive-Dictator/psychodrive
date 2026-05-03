@@ -2463,6 +2463,9 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (isProjectile && hitSpanFrames && (hitbox.type == hit || hitbox.type == projectile || hitbox.type == grab)) {
             continue;
         }
+        if (isProjectile && projHitCount < -1) {
+            continue;
+        }
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
             continue;
         }
@@ -3278,46 +3281,49 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 hitStopSelf += hurtBox.pAtemiData->targetStopAdd;
             }
         }
-        Box hitIntersection;
-        hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
-        hitIntersection.y = fixMax(hitBox.box.y, hurtBox.box.y);
-        hitIntersection.w = fixMin(hitBox.box.x + hitBox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
-        hitIntersection.h = fixMin(hitBox.box.y + hitBox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
 
-        float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
-        if (pGuy->direction < Fixed(0)) {
-            hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
-        }
-        float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
-        int hitMarkerType = 1;
-        float hitMarkerRadius = 35.0f;
-        if (pGuy->hasBeenBlockedThisFrame) {
-            hitMarkerType = 2;
-            hitMarkerRadius = 30.0f;
-        } else if (pGuy->hasBeenParriedThisFrame) {
-            hitMarkerType = 2;
-            hitMarkerRadius = pGuy->hasBeenPerfectParriedThisFrame ? 100.0f : 60.0f;
-        } else if ((hitEntryFlag & punish_counter) == punish_counter) {
-            hitMarkerRadius = 45.0f;
-        }
-        int hitSeed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
-        if (pGuy->pSim != &defaultSim) {
-            FrameEvent event;
-            event.type = FrameEvent::Hit;
-            event.hitEventData.targetID = pOtherGuy->getUniqueID();
-            event.hitEventData.x = hitMarkerOffsetX;
-            event.hitEventData.y = hitMarkerOffsetY;
-            event.hitEventData.radius = hitMarkerRadius;
-            event.hitEventData.hitType = hitMarkerType;
-            event.hitEventData.seed = hitSeed;
-            event.hitEventData.dirX = pGuy->direction.f();
-            event.hitEventData.dirY = 0.0f;
-            pGuy->pSim->getCurrentFrameEvents().push_back(event);
-        } else {
-            addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
+        if (hitBox.type != direct_damage) {
+            Box hitIntersection;
+            hitIntersection.x = fixMax(hitBox.box.x, hurtBox.box.x);
+            hitIntersection.y = fixMax(hitBox.box.y, hurtBox.box.y);
+            hitIntersection.w = fixMin(hitBox.box.x + hitBox.box.w, hurtBox.box.x + hurtBox.box.w) - hitIntersection.x;
+            hitIntersection.h = fixMin(hitBox.box.y + hitBox.box.h, hurtBox.box.y + hurtBox.box.h) - hitIntersection.y;
+
+            float hitMarkerOffsetX = hitIntersection.x.f() + hitIntersection.w.f() - pOtherGuy->getPosX().f();
+            if (pGuy->direction < Fixed(0)) {
+                hitMarkerOffsetX = hitIntersection.x.f() - pOtherGuy->getPosX().f();
+            }
+            float hitMarkerOffsetY = (hitIntersection.y.f() + (hitIntersection.h.f() / 2.0f)) - pOtherGuy->getPosY().f();
+            int hitMarkerType = 1;
+            float hitMarkerRadius = 35.0f;
+            if (pGuy->hasBeenBlockedThisFrame) {
+                hitMarkerType = 2;
+                hitMarkerRadius = 30.0f;
+            } else if (pGuy->hasBeenParriedThisFrame) {
+                hitMarkerType = 2;
+                hitMarkerRadius = pGuy->hasBeenPerfectParriedThisFrame ? 100.0f : 60.0f;
+            } else if ((hitEntryFlag & punish_counter) == punish_counter) {
+                hitMarkerRadius = 45.0f;
+            }
+            int hitSeed = pGuy->pSim->frameCounter + int(hitMarkerOffsetX + hitMarkerOffsetY);
+            if (pGuy->pSim != &defaultSim) {
+                FrameEvent event;
+                event.type = FrameEvent::Hit;
+                event.hitEventData.targetID = pOtherGuy->getUniqueID();
+                event.hitEventData.x = hitMarkerOffsetX;
+                event.hitEventData.y = hitMarkerOffsetY;
+                event.hitEventData.radius = hitMarkerRadius;
+                event.hitEventData.hitType = hitMarkerType;
+                event.hitEventData.seed = hitSeed;
+                event.hitEventData.dirX = pGuy->direction.f();
+                event.hitEventData.dirY = 0.0f;
+                pGuy->pSim->getCurrentFrameEvents().push_back(event);
+            } else {
+                addHitMarker({hitMarkerOffsetX,hitMarkerOffsetY,hitMarkerRadius,pOtherGuy,hitMarkerType, 0, 10, hitSeed, pGuy->direction.f(), 0.0f});
+            }
         }
 
-        if (pGuy->isProjectile) {
+        if (pGuy->isProjectile && hitBox.type != direct_damage) {
             pGuy->projHitCount--;
             if (pGuy->pCurrentAction->pProjectileData) {
                 // mmmm
@@ -4356,7 +4362,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         debuffTimer = 300;
     } else if (dmgKind == 9) {
         poisoned = true;
-        debuffTimer = 300;
+        debuffTimer = 420;
     }
 }
 
@@ -4704,7 +4710,7 @@ void Guy::DoBranchKey(bool preHit)
                 //     }
                 //     break;
                 case 45:
-                    if (isProjectile && projHitCount == 0 ) {
+                    if (isProjectile && (projHitCount == 0 || projHitCount < -1)) {
                         // log("hitcount=0 branch");
                         doBranch = true;
                     }
@@ -5067,11 +5073,17 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if (advancingTime) {
         if (isProjectile) {
             if (!didBranch && projHitCount == 0) {
-                return false; // die
+                if (pCurrentAction->pProjectileData && pCurrentAction->pProjectileData->flags & (1<<1)) {
+                    projHitCount = -2;
+                    // stop counting?
+                    limitShotCategory = 0;
+                } else {
+                    return false; // die
+                }
             }
 
             projLifeTime--;
-            if (projLifeTime <= 0) {
+            if (!didBranch && projLifeTime <= 0) {
                 return false;
             }
 
