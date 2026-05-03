@@ -8979,6 +8979,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "lily_throws",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1279,
+                "firstFrame": 144,
+                "lastFrame": 781
+            },
+            {
+                "count": 215,
+                "firstFrame": 416,
+                "lastFrame": 693
+            },
+            {
+                "count": 73,
+                "firstFrame": 437,
+                "lastFrame": 682
+            },
+            {
+                "count": 20,
+                "firstFrame": 416,
+                "lastFrame": 435
+            },
+            {
+                "count": 20,
+                "firstFrame": 416,
+                "lastFrame": 435
+            },
+            {
+                "count": 547,
+                "firstFrame": 159,
+                "lastFrame": 753
+            },
+            {
+                "count": 485,
+                "firstFrame": 419,
+                "lastFrame": 781
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 579,
+                "firstFrame": 416,
+                "lastFrame": 781
+            },
+            {
+                "count": 94,
+                "firstFrame": 650,
+                "lastFrame": 743
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "luke_normal_throw",
         "testVersion": "39",
         "finished": true,
