@@ -3083,6 +3083,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aki_throws",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 932,
+                "firstFrame": 149,
+                "lastFrame": 844
+            },
+            {
+                "count": 36,
+                "firstFrame": 149,
+                "lastFrame": 725
+            },
+            {
+                "count": 2,
+                "firstFrame": 148,
+                "lastFrame": 725
+            },
+            {
+                "count": 13,
+                "firstFrame": 148,
+                "lastFrame": 723
+            },
+            {
+                "count": 13,
+                "firstFrame": 148,
+                "lastFrame": 723
+            },
+            {
+                "count": 67,
+                "firstFrame": 148,
+                "lastFrame": 429
+            },
+            {
+                "count": 199,
+                "firstFrame": 148,
+                "lastFrame": 501
+            },
+            {
+                "count": 3,
+                "firstFrame": 164,
+                "lastFrame": 387
+            },
+            {
+                "count": 894,
+                "firstFrame": 148,
+                "lastFrame": 844
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "akuma_corner_7015_dump_forcepc",
         "testVersion": "41",
         "finished": true,
