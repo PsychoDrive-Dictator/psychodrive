@@ -563,8 +563,14 @@ bool Guy::RunFrame(bool advancingTime)
 void Guy::RunFramePostPush(void)
 {
     if (!getWarudo()) {
+        if (poisoned) {
+            health -= 1;
+        }
         if (debuffTimer > 0 ) {
             debuffTimer--;
+            if (debuffTimer == 0) {
+                poisoned = false;
+            }
         }
         if (debuffTimer == 1 && prevHitStop == 1) {
             debuffTimer = 5;
@@ -2790,7 +2796,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             }
 
             // if bomb burst and found a bomb, use the next hit ID instead
-            if (pHitEntry->bombBurst && pOpponent->debuffTimer) {
+            bool shiftHitID = pHitEntry->bombBurst && pOpponent->debuffTimer;
+            if (pHitEntry->attr1 & (1<<16) && pOpponent->poisoned) {
+                shiftHitID = true;
+            }
+            if (shiftHitID) {
                 bombBurst = true;
                 int nextHitID = pHitData->id + 1;
                 auto bombHitIt = pCharData->hitByID.find(nextHitID);
@@ -3343,6 +3353,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 
             if (pendingHit.bombBurst) {
                 pOtherGuy->debuffTimer = 0;
+                pOtherGuy->poisoned = false;
             }
         }
         otherGuyLog(pOtherGuy, pOtherGuy->logHits, "hit type " + std::to_string(hitBox.type) + " hitID " + std::to_string(hitBox.hitID) +
@@ -3616,6 +3627,9 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             if (minion->isProjectile && minion->pCurrentAction->pProjectileData && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
                 minion->die = true;
             }
+        }
+        if (pOpponent) {
+            pOpponent->debuffTimer = 1;
         }
     }
 
@@ -4340,6 +4354,9 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
     if (dmgKind == 11) {
         // todo change hit marker color
         debuffTimer = 300;
+    } else if (dmgKind == 9) {
+        poisoned = true;
+        debuffTimer = 300;
     }
 }
 
@@ -4727,8 +4744,16 @@ void Guy::DoBranchKey(bool preHit)
                                     doBranch = true;
                                 }
                             }
-                            if (branchParam4 & 8) {
+                            if (branchParam4 & 4) {
+                                if (poisoned) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam4 & 8) {
                                 if (pGuy->debuffTimer > 0) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam4 & 1024) {
+                                if (!poisoned) {
                                     doBranch = true;
                                 }
                             } else if (branchParam4 & 2048) {

@@ -827,6 +827,7 @@ private:
         superFreeze = false;
         pendingUnlockHitDelayed = false;
         alreadyDeadButDoesNotKnow = false;
+        poisoned = false;
         moveStartPos = Fixed(0);
         uniqueTimerCount = 0;
         debuffTimer = 0;
@@ -971,6 +972,7 @@ private:
     bool pendingUnlockHitDelayed : 1;
     bool appliedScaling : 1;
     bool alreadyDeadButDoesNotKnow : 1;
+    bool poisoned : 1;
 
     int8_t projHitCount;
     int8_t limitShotCategory;
