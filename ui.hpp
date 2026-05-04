@@ -120,6 +120,8 @@ public:
 
     int viewSelect = 0;
 
+    bool recordFrames = true;
+
     int maxComboCount = 0;
     int maxComboDamage = 0;
 
@@ -148,17 +150,21 @@ public:
         std::string summary;
         bool hasErrors = false;
     };
-    std::vector<ReplayRoundResult> replayRoundResults;
+    struct ReplayRoundRecording {
+        std::deque<RecordedFrame> frames;
+        ReplayRoundResult result;
+        std::array<int, 2> endGauges = {0, 0};
+    };
+    std::vector<ReplayRoundRecording> replayRoundRecordings;
     nlohmann::json replayInfo;
     std::vector<uint8_t> replayInputData;
     int replayVersion = -1;
     int replayCurrentRound = -1;
     int replayRoundCount = 0;
     bool replayIsOldFormat = false;
-    std::vector<std::array<int, 2>> replaySimulatedRoundEndGauges;
 
+    void SimulateAllReplayRounds();
     void LoadReplayRound(int round);
-    void ValidateAllRounds();
     void ReloadViewer();
 
     bool viewerErrorTypeFilter[14] = {true,false,false,false,false,true,true,true,true,true,true,true,true,true};

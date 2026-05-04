@@ -1459,6 +1459,8 @@ bool SimulationController::NewSim(void)
 
 void SimulationController::RecordFrame(void)
 {
+    if (!recordFrames) return;
+
     stateRecording.emplace_back();
     RecordedFrame &frame = stateRecording[stateRecording.size()-1];
 
@@ -1833,7 +1835,7 @@ void SimulationController::RenderUI(void)
             ImGui::Separator();
             if (replayRoundCount > 0) {
                 for (int r = 0; r < replayRoundCount; r++) {
-                    auto &result = replayRoundResults[r];
+                    auto &result = replayRoundRecordings[r].result;
                     if (result.hasErrors) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
                     }
@@ -2405,9 +2407,9 @@ void SimulationController::ReloadViewer()
     bool savedPlaying = playing;
     int savedPlaySpeed = playSpeed;
 
-    if (replayRoundCount > 0) {
-        int round = replayCurrentRound;
-        replayCurrentRound = -1; // force reload
+    if (!replayInputData.empty()) {
+        int round = (replayCurrentRound >= 0) ? replayCurrentRound : 0;
+        SimulateAllReplayRounds();
         LoadReplayRound(round);
     } else if (!viewerDumpPath.empty()) {
         stateRecording.clear();
@@ -2452,11 +2454,14 @@ void SimulationController::AdvanceFromDump()
     playSpeed = 1;
 }
 
-void SimulationController::ValidateAllRounds()
+void SimulationController::SimulateAllReplayRounds()
 {
-    replayRoundResults.clear();
+    replayRoundRecordings.clear();
     replayRoundCount = 0;
-    replaySimulatedRoundEndGauges.clear();
+    replayCurrentRound = -1;
+    stateRecording.clear();
+    guyPool.reset();
+    if (pSim) { delete pSim; pSim = nullptr; }
 
     int roundCount = (int)replayInfo["RoundInfo"].size();
 
@@ -2465,24 +2470,39 @@ void SimulationController::ValidateAllRounds()
 
     int carryGauges[2] = {0, 0};
 
+    bool batchMode = (gameMode == Batch);
+
     for (int round = 0; round < roundCount; round++) {
         nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
 
         if (roundInfo["RandomSeed"] == 0) {
             break;
         }
-        replayRoundCount++;
 
-        Simulation roundSim;
+        pSim = new Simulation;
         const int *startGauges = (replayIsOldFormat && round > 0) ? carryGauges : nullptr;
-        roundSim.SetupReplayRound(replayInfo, round, replayVersion, decoder, startGauges);
+        pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder, startGauges);
+        for (auto &guy : pSim->simGuys) {
+            guy->setRecordFrameTriggers(true, true);
+            guy->setLogTransitions(viewerLogTransitions);
+            guy->setLogTriggers(viewerLogTriggers);
+            guy->setLogUnknowns(viewerLogUnknowns);
+            guy->setLogHits(viewerLogHits);
+            guy->setLogBranches(viewerLogBranches);
+            guy->setLogResources(viewerLogResources);
+        }
 
         int prevHealth[2] = {0, 0};
-        while (roundSim.replayingReplay) {
-            prevHealth[0] = roundSim.simGuys[0]->getHealth();
-            prevHealth[1] = roundSim.simGuys[1]->getHealth();
-            roundSim.RunFrame();
-            roundSim.AdvanceFrame();
+        while (!decoder.finished && pSim->replayingReplay) {
+            prevHealth[0] = pSim->simGuys[0]->getHealth();
+            prevHealth[1] = pSim->simGuys[1]->getHealth();
+            pSim->RunFrame();
+            RecordFrame();
+            pSim->AdvanceFrame();
+        }
+
+        if (batchMode) {
+            fprintf(stderr, "R;round %d finished at frame %d\n", round + 1, pSim->frameCounter);
         }
 
         int winPlayer = roundInfo["WinPlayerType"];
@@ -2492,15 +2512,21 @@ void SimulationController::ValidateAllRounds()
 
         if (winPlayer == 0 || winPlayer == 1) {
             int losePlayer = winPlayer ^ 1;
-            int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
+            int loserHealth = pSim->simGuys[losePlayer]->getHealth();
             if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
+                if (batchMode) {
+                    fprintf(stderr, "E;round %d loser (P%d) health %d expected zero prev health %d expected nonzero\n", round + 1, losePlayer + 1, loserHealth, prevHealth[losePlayer]);
+                }
                 errors += "loser P" + std::to_string(losePlayer + 1) + " health " + std::to_string(loserHealth) + "; ";
                 result.hasErrors = true;
             }
         } else {
             for (int p = 0; p < 2; p++) {
-                int h = roundSim.simGuys[p]->getHealth();
+                int h = pSim->simGuys[p]->getHealth();
                 if (h != 0 || prevHealth[p] == 0) {
+                    if (batchMode) {
+                        fprintf(stderr, "E;round %d draw P%d health %d expected zero prev health %d expected nonzero\n", round + 1, p + 1, h, prevHealth[p]);
+                    }
                     errors += "draw P" + std::to_string(p + 1) + " health " + std::to_string(h) + "; ";
                     result.hasErrors = true;
                 }
@@ -2510,79 +2536,70 @@ void SimulationController::ValidateAllRounds()
         bool checkGauge = !replayIsOldFormat || round == roundCount - 1;
         std::array<int, 2> endGauges = {0, 0};
         for (int p = 0; p < 2; p++) {
-            int simGauge = roundSim.simGuys[p]->getGauge();
+            int simGauge = pSim->simGuys[p]->getGauge();
             carryGauges[p] = simGauge;
             endGauges[p] = simGauge;
             if (checkGauge) {
                 int expectedGauge = roundInfo["SAGaugeStart"][p];
                 if (expectedGauge != simGauge) {
+                    if (batchMode) {
+                        fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round + 1, p + 1, simGauge, expectedGauge);
+                    }
                     errors += "P" + std::to_string(p + 1) + " gauge " + std::to_string(simGauge) + " expected " + std::to_string(expectedGauge) + "; ";
                     result.hasErrors = true;
                 }
             }
         }
-        replaySimulatedRoundEndGauges.push_back(endGauges);
 
         if (result.hasErrors) {
             result.summary = "Round " + std::to_string(round + 1) + ": " + errors;
         } else {
             result.summary = "Round " + std::to_string(round + 1) + ": OK";
         }
-        replayRoundResults.push_back(result);
+
+        ReplayRoundRecording recording;
+        recording.frames = std::move(stateRecording);
+        recording.result = std::move(result);
+        recording.endGauges = endGauges;
+        replayRoundRecordings.push_back(std::move(recording));
+        replayRoundCount++;
+
+        stateRecording.clear();
+        delete pSim;
+        pSim = nullptr;
 
         decoder.inputState[0] = 0;
         decoder.inputState[1] = 0;
         decoder.prevInputState[0] = 0;
         decoder.prevInputState[1] = 0;
+    }
+
+    if (batchMode) {
+        fprintf(stderr, "F;replay finished\n");
+    }
+
+    if (!pSim) {
+        pSim = new Simulation;
     }
 }
 
 void SimulationController::LoadReplayRound(int round)
 {
     if (round == replayCurrentRound) return;
+    if (round < 0 || round >= (int)replayRoundRecordings.size()) return;
+
+    // give back any frames currently held by stateRecording so the pool can reuse them
+    if (replayCurrentRound >= 0 && replayCurrentRound < (int)replayRoundRecordings.size()) {
+        replayRoundRecordings[replayCurrentRound].frames = std::move(stateRecording);
+    }
+    stateRecording = std::move(replayRoundRecordings[round].frames);
     replayCurrentRound = round;
 
-    stateRecording.clear();
-    guyPool.reset();
-    if (pSim) delete pSim;
-    pSim = new Simulation;
-
-    ReplayDecoder decoder;
-    decoder.inputData = replayInputData;
-
-    // skip past earlier rounds
-    for (int r = 0; r < round; r++) {
-        while (!decoder.finished) {
-            uint8_t cmd = decoder.DecodeTick();
-            if (cmd == 3) break;
-        }
-        decoder.inputState[0] = 0;
-        decoder.inputState[1] = 0;
-        decoder.prevInputState[0] = 0;
-        decoder.prevInputState[1] = 0;
-    }
-
-    int carryGauges[2] = {0, 0};
-    const int *startGauges = nullptr;
-    if (replayIsOldFormat && round > 0 && round - 1 < (int)replaySimulatedRoundEndGauges.size()) {
-        carryGauges[0] = replaySimulatedRoundEndGauges[round - 1][0];
-        carryGauges[1] = replaySimulatedRoundEndGauges[round - 1][1];
-        startGauges = carryGauges;
-    }
-    pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder, startGauges);
-    for (auto &guy : pSim->simGuys) {
-        guy->setRecordFrameTriggers(true, true);
-        guy->setLogTransitions(viewerLogTransitions);
-        guy->setLogTriggers(viewerLogTriggers);
-        guy->setLogUnknowns(viewerLogUnknowns);
-        guy->setLogHits(viewerLogHits);
-        guy->setLogBranches(viewerLogBranches);
-        guy->setLogResources(viewerLogResources);
-    }
-
-    AdvanceFromReplay(decoder);
+    simFrameCount = stateRecording.size();
     scrubberFrame = 0;
     prevScrubberFrame = -1;
+    playing = true;
+    playSpeed = 1;
 }
 
 int CharacterUIController::getOptionFlags()

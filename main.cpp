@@ -277,12 +277,13 @@ void doDeferredCreateGuys(void)
             gameMode = Viewer;
             if (pendingViewerLoad.isReplay) {
                 simController.viewerDumpPath.clear();
-                simController.ValidateAllRounds();
+                simController.SimulateAllReplayRounds();
                 simController.LoadReplayRound(0);
             } else {
                 simController.replayRoundCount = 0;
                 simController.replayCurrentRound = -1;
-                simController.replayRoundResults.clear();
+                simController.replayRoundRecordings.clear();
+                simController.replayInputData.clear();
                 simController.ReloadViewer();
             }
             simInputsChanged = false;
@@ -993,83 +994,17 @@ int main(int argc, char**argv)
             fprintf(stderr, "replay missing InputData or ReplayInfo\n");
             exit(1);
         }
-        nlohmann::json replayInfo = data["ReplayInfo"];
-        bool oldFormat = isOldReplayFormat(replayInfo);
-        if (oldFormat) {
-            fixupOldReplayInfo(replayInfo);
+
+        simController.replayInfo = data["ReplayInfo"];
+        simController.replayIsOldFormat = isOldReplayFormat(simController.replayInfo);
+        if (simController.replayIsOldFormat) {
+            fixupOldReplayInfo(simController.replayInfo);
         }
+        simController.replayInputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();
+        simController.replayVersion = version;
+        simController.recordFrames = false;
+        simController.SimulateAllReplayRounds();
 
-        ReplayDecoder decoder;
-        decoder.inputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();
-
-        int totalErrors = 0;
-        int roundCount = (int)replayInfo["RoundInfo"].size();
-        int carryGauges[2] = {0, 0};
-
-        for (int round = 0; round < roundCount; round++) {
-            nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
-
-            // online replays have all five round slots but zero out missing ones
-            if (roundInfo["RandomSeed"] == 0) {
-                break;
-            }
-
-            Simulation roundSim;
-            const int *startGauges = (oldFormat && round > 0) ? carryGauges : nullptr;
-            roundSim.SetupReplayRound(replayInfo, round, version, decoder, startGauges);
-
-            int prevHealth[2] = {0, 0};
-            while (roundSim.replayingReplay) {
-                prevHealth[0] = roundSim.simGuys[0]->getHealth();
-                prevHealth[1] = roundSim.simGuys[1]->getHealth();
-                roundSim.RunFrame();
-                roundSim.AdvanceFrame();
-            }
-
-            int winPlayer = roundInfo["WinPlayerType"];
-
-            fprintf(stderr, "R;round %d finished at frame %d\n", round + 1, roundSim.frameCounter);
-
-            if (winPlayer == 0 || winPlayer == 1) {
-                int losePlayer = winPlayer ^ 1;
-                int loserHealth = roundSim.simGuys[losePlayer]->getHealth();
-                if (loserHealth != 0 || prevHealth[losePlayer] == 0) {
-                    fprintf(stderr, "E;round %d loser (P%d) health %d expected zero prev health %d expected nonzero\n", round + 1, losePlayer + 1, loserHealth, prevHealth[losePlayer]);
-                    totalErrors++;
-                }
-            } else {
-                for (int p = 0; p < 2; p++) {
-                    int h = roundSim.simGuys[p]->getHealth();
-                    if (h != 0 || prevHealth[p] == 0) {
-                        fprintf(stderr, "E;round %d draw P%d health %d expected zero prev health %d expected nonzero\n", round + 1, p + 1, h, prevHealth[p]);
-                        totalErrors++;
-                    }
-                }
-            }
-
-            bool checkGauge = !oldFormat || round == roundCount - 1;
-            for (int p = 0; p < 2; p++) {
-                int simGauge = roundSim.simGuys[p]->getGauge();
-                carryGauges[p] = simGauge;
-                if (checkGauge) {
-                    int expectedGauge = roundInfo["SAGaugeStart"][p];
-                    if (expectedGauge != simGauge) {
-                        fprintf(stderr, "E;round %d P%d end gauge %d expected %d\n", round + 1, p + 1, simGauge, expectedGauge);
-                        totalErrors++;
-                    }
-                }
-            }
-
-            // todo check win condition
-
-            // reset for next round
-            decoder.inputState[0] = 0;
-            decoder.inputState[1] = 0;
-            decoder.prevInputState[0] = 0;
-            decoder.prevInputState[1] = 0;
-        }
-
-        fprintf(stderr, "F;replay finished, total errors: %d\n", totalErrors);
         exit(0);
     }
 
@@ -1205,7 +1140,7 @@ int main(int argc, char**argv)
 
         simController.charCount = 2;
         gameMode = Viewer;
-        simController.ValidateAllRounds();
+        simController.SimulateAllReplayRounds();
         simController.LoadReplayRound(0);
         simInputsChanged = false;
     }
