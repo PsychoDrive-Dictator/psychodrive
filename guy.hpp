@@ -726,6 +726,8 @@ private:
         hitCounterThisMove = false;
         hitPunishCounterThisMove = false;
         hasBeenBlockedThisMove = false;
+        hasBeenParriedThisMove = false;
+        hasBeenPerfectParriedThisMove = false;
         hitArmorThisMove = false;
         hitAtemiThisMove = false;
         prevHitStop = 0;
