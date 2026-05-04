@@ -2395,23 +2395,7 @@ void SimulationController::ReloadViewer()
         SimulateAllReplayRounds();
         LoadReplayRound(round);
     } else if (!viewerDumpPath.empty()) {
-        stateRecording.clear();
-        guyPool.reset();
-        if (pSim) delete pSim;
-        pSim = new Simulation;
-        if (viewerDumpIsMatch) pSim->match = true;
-
-        pSim->SetupFromGameDump(viewerDumpPath, viewerDumpVersion);
-        for (auto &guy : pSim->simGuys) {
-            guy->setRecordFrameTriggers(true, true);
-            guy->setLogTransitions(viewerLogTransitions);
-            guy->setLogTriggers(viewerLogTriggers);
-            guy->setLogUnknowns(viewerLogUnknowns);
-            guy->setLogHits(viewerLogHits);
-            guy->setLogBranches(viewerLogBranches);
-            guy->setLogResources(viewerLogResources);
-        }
-        AdvanceFromDump();
+        LoadFromGameDump(viewerDumpPath, viewerDumpVersion);
     }
 
     if (isReload) {
@@ -2423,8 +2407,37 @@ void SimulationController::ReloadViewer()
     prevScrubberFrame = -1;
 }
 
-void SimulationController::AdvanceFromDump()
+void SimulationController::LoadFromGameDump(const std::string &path, int version)
 {
+    viewerDumpPath = path;
+    viewerDumpVersion = version;
+
+    stateRecording.clear();
+    guyPool.reset();
+
+    if (pSim) {
+        delete pSim;
+    }
+    pSim = new Simulation;
+
+    if (path.find("match") != std::string::npos) {
+        pSim->match = true;
+    }
+    if (path.find("forcepc") != std::string::npos) {
+        forcePunishCounter = true;
+    }
+
+    pSim->SetupFromGameDump(path, version);
+    for (auto &guy : pSim->simGuys) {
+        guy->setRecordFrameTriggers(true, true);
+        guy->setLogTransitions(viewerLogTransitions);
+        guy->setLogTriggers(viewerLogTriggers);
+        guy->setLogUnknowns(viewerLogUnknowns);
+        guy->setLogHits(viewerLogHits);
+        guy->setLogBranches(viewerLogBranches);
+        guy->setLogResources(viewerLogResources);
+    }
+
     while (pSim->replayingGameStateDump) {
         pSim->RunFrame();
         RecordFrame();

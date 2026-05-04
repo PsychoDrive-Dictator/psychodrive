@@ -89,7 +89,6 @@ public:
     void RenderUI(void);
     void RenderComboMinerSetup(void);
     void AdvanceUntilComplete(void);
-    void AdvanceFromDump();
     void doFrameMeterDrag(void);
     void RecordFrame(void);
     Guy *getRecordedGuy(int frameIndex, int guyID);
@@ -142,7 +141,6 @@ public:
     // dump viewer state
     std::string viewerDumpPath;
     int viewerDumpVersion = -1;
-    bool viewerDumpIsMatch = false;
 
     // replay viewer state
     struct ReplayRoundResult {
@@ -165,6 +163,7 @@ public:
     bool LoadFromReplay(nlohmann::json &parsed, int version);
     void SimulateAllReplayRounds();
     void LoadReplayRound(int round);
+    void LoadFromGameDump(const std::string &path, int version);
     void ReloadViewer();
 
     bool viewerErrorTypeFilter[14] = {true,false,false,false,false,true,true,true,true,true,true,true,true,true};

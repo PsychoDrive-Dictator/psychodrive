@@ -284,7 +284,7 @@ void doDeferredCreateGuys(void)
                 simController.replayCurrentRound = -1;
                 simController.replayRoundRecordings.clear();
                 simController.replayInputData.clear();
-                simController.ReloadViewer();
+                simController.LoadFromGameDump(pendingViewerLoad.path, pendingViewerLoad.version);
             }
             simInputsChanged = false;
             pendingViewerLoad.active = false;
@@ -332,12 +332,6 @@ void jsLoadFile(char *filePath)
     } else {
         // otherwise treat as dump — extract char names from first frame's players
         pendingViewerLoad.isReplay = false;
-        if (path.find("forcepc") != std::string::npos) {
-            forcePunishCounter = true;
-        }
-        simController.viewerDumpPath = path;
-        simController.viewerDumpVersion = maxVersion;
-        simController.viewerDumpIsMatch = path.find("match") != std::string::npos;
 
         for (int i = 0; i < (int)parsed.size() && i < 1; i++) {
             if (parsed[i].contains("players")) {
@@ -846,28 +840,17 @@ int main(int argc, char**argv)
 
     if ( argc > 2 && std::string(argv[1]) == "run_dump") {
         gameMode = Batch;
-        Simulation dumpSim;
         int version = -1;
         if ( argc > 3 ) {
             version = atoi(argv[3]);
         }
         strDumpLoadPath = argv[2];
-        dumpSim.SetupFromGameDump(strDumpLoadPath, version);
 
-        if (strDumpLoadPath.find("forcepc") != std::string::npos) {
-            forcePunishCounter = true;
-        }
-        if (strDumpLoadPath.find("match") != std::string::npos) {
-            dumpSim.match = true;
-        }
 
-        while (true) {
-            dumpSim.RunFrame();
-            dumpSim.AdvanceFrame();
-            if (dumpSim.replayingGameStateDump == false) {
-                exit(0);
-            }
-        }
+        simController.recordFrames = false;
+        simController.LoadFromGameDump(strDumpLoadPath, version);
+
+        exit(0);
     }
 
     if ( argc > 2 && std::string(argv[1]) == "run_replay") {
@@ -992,16 +975,10 @@ int main(int argc, char**argv)
         if (dumpVersion == -1) {
             dumpVersion = maxVersion;
         }
-        if (strDumpLoadPath.find("forcepc") != std::string::npos) {
-            forcePunishCounter = true;
-        }
 
-        simController.viewerDumpPath = strDumpLoadPath;
-        simController.viewerDumpVersion = dumpVersion;
-        simController.viewerDumpIsMatch = strDumpLoadPath.find("match") != std::string::npos;
         simController.charCount = 2;
         gameMode = Viewer;
-        simController.ReloadViewer();
+        simController.LoadFromGameDump(strDumpLoadPath, dumpVersion);
         simInputsChanged = false;
     }
 
