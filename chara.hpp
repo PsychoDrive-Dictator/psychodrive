@@ -474,6 +474,7 @@ struct CharacterData {
 
     int vitality;
     int gauge;
+    int flags;
 
     std::vector<Charge> charges;
     std::vector<Command> commands;

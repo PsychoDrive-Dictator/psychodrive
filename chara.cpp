@@ -1335,6 +1335,7 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     if (pCharInfoJson) {
         pRet->vitality = (*pCharInfoJson)["PlData"]["Vitality"];
         pRet->gauge = (*pCharInfoJson)["PlData"]["Gauge"].get<int>();
+        pRet->flags = (*pCharInfoJson)["PlData"]["Attribute"];
     }
 
     loadStyles(pCharInfoJson, &pRet->styles);
@@ -1481,6 +1482,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
     writeI32(f, pData->charID);
     writeI32(f, pData->vitality);
     writeI32(f, pData->gauge);
+    writeI32(f, pData->flags);
 
     writeU32(f, pData->charges.size());
     for (auto& charge : pData->charges) {
@@ -1910,6 +1912,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
     pRet->charVersion = charVersion;
     pRet->vitality = readI32(f);
     pRet->gauge = readI32(f);
+    pRet->flags = readI32(f);
 
     uint32_t chargeCount = readU32(f);
     pRet->charges.resize(chargeCount);
