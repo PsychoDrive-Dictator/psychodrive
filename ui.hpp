@@ -150,7 +150,6 @@ public:
     struct ReplayRoundRecording {
         std::deque<RecordedFrame> frames;
         ReplayRoundResult result;
-        std::array<int, 2> endGauges = {0, 0};
     };
     std::vector<ReplayRoundRecording> replayRoundRecordings;
     nlohmann::json replayInfo;

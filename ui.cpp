@@ -2507,6 +2507,12 @@ static void fixupOldReplayInfo(nlohmann::json &replayInfo)
             if (sn.is_object() && sn.contains("mValue")) styleNo = sn["mValue"];
             else if (sn.is_array()) styleNo = sn;
         }
+        nlohmann::json uniqueParam = nlohmann::json::array({0, 0});
+        if (old.contains("UniqueParam")) {
+            const auto &up = old["UniqueParam"];
+            if (up.is_object() && up.contains("raw")) uniqueParam = up["raw"];
+            else if (up.is_array()) uniqueParam = up;
+        }
 
         int roundCount = 0;
         if (old.contains("RandomSeed") && old["RandomSeed"].is_array()) {
@@ -2525,13 +2531,13 @@ static void fixupOldReplayInfo(nlohmann::json &replayInfo)
             if (old.contains("FinishType") && old["FinishType"].is_array() && (int)old["FinishType"].size() > r) {
                 ri["FinishType"] = old["FinishType"][r];
             }
-            if (r == roundCount - 1) {
-                ri["SAGaugeStart"] = saGauge;
-            } else {
-                ri["SAGaugeStart"] = nlohmann::json::array({0, 0});
-            }
-            ri["StyleNo"] = styleNo;
-            if (old.contains("UniqueParam")) ri["UniqueParam"] = old["UniqueParam"];
+            // old format only stores end-of-match values for these fields; use them on the
+            // last round only and zero earlier rounds so simulation code can safely consume
+            // RoundInfo[r] without picking up wrong per-round state
+            bool isLast = (r == roundCount - 1);
+            ri["SAGaugeStart"] = isLast ? saGauge : nlohmann::json::array({0, 0});
+            ri["StyleNo"] = isLast ? styleNo : nlohmann::json::array({0, 0});
+            ri["UniqueParam"] = isLast ? uniqueParam : nlohmann::json::array({0, 0});
             if (old.contains("BgmInfo")) ri["BgmInfo"] = old["BgmInfo"];
             newRounds.push_back(ri);
         }
@@ -2570,9 +2576,9 @@ void SimulationController::SimulateAllReplayRounds()
     ReplayDecoder decoder;
     decoder.inputData = replayInputData;
 
-    int carryGauges[2] = {0, 0};
-
     bool batchMode = (gameMode == Batch);
+
+    Simulation *prevRoundSim = nullptr;
 
     for (int round = 0; round < roundCount; round++) {
         nlohmann::json &roundInfo = replayInfo["RoundInfo"][round];
@@ -2581,9 +2587,10 @@ void SimulationController::SimulateAllReplayRounds()
             break;
         }
 
+        const Simulation *prevRoundEnd = (replayIsOldFormat && round > 0) ? prevRoundSim : nullptr;
+
         pSim = new Simulation;
-        const int *startGauges = (replayIsOldFormat && round > 0) ? carryGauges : nullptr;
-        pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder, startGauges);
+        pSim->SetupReplayRound(replayInfo, round, replayVersion, decoder, prevRoundEnd);
         for (auto &guy : pSim->simGuys) {
             guy->setRecordFrameTriggers(true, true);
             guy->setLogTransitions(viewerLogTransitions);
@@ -2636,12 +2643,9 @@ void SimulationController::SimulateAllReplayRounds()
         }
 
         bool checkGauge = !replayIsOldFormat || round == roundCount - 1;
-        std::array<int, 2> endGauges = {0, 0};
-        for (int p = 0; p < 2; p++) {
-            int simGauge = pSim->simGuys[p]->getGauge();
-            carryGauges[p] = simGauge;
-            endGauges[p] = simGauge;
-            if (checkGauge) {
+        if (checkGauge) {
+            for (int p = 0; p < 2; p++) {
+                int simGauge = pSim->simGuys[p]->getGauge();
                 int expectedGauge = roundInfo["SAGaugeStart"][p];
                 if (expectedGauge != simGauge) {
                     if (batchMode) {
@@ -2662,12 +2666,12 @@ void SimulationController::SimulateAllReplayRounds()
         ReplayRoundRecording recording;
         recording.frames = std::move(stateRecording);
         recording.result = std::move(result);
-        recording.endGauges = endGauges;
         replayRoundRecordings.push_back(std::move(recording));
         replayRoundCount++;
 
         stateRecording.clear();
-        delete pSim;
+        delete prevRoundSim;
+        prevRoundSim = pSim;
         pSim = nullptr;
 
         decoder.inputState[0] = 0;
@@ -2675,6 +2679,8 @@ void SimulationController::SimulateAllReplayRounds()
         decoder.prevInputState[0] = 0;
         decoder.prevInputState[1] = 0;
     }
+
+    delete prevRoundSim;
 
     if (batchMode) {
         fprintf(stderr, "F;replay finished\n");
