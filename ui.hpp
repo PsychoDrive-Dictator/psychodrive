@@ -89,7 +89,6 @@ public:
     void RenderUI(void);
     void RenderComboMinerSetup(void);
     void AdvanceUntilComplete(void);
-    void AdvanceFromReplay(ReplayDecoder &decoder);
     void AdvanceFromDump();
     void doFrameMeterDrag(void);
     void RecordFrame(void);
@@ -163,6 +162,7 @@ public:
     int replayRoundCount = 0;
     bool replayIsOldFormat = false;
 
+    bool LoadFromReplay(nlohmann::json &parsed, int version);
     void SimulateAllReplayRounds();
     void LoadReplayRound(int round);
     void ReloadViewer();

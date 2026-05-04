@@ -292,10 +292,6 @@ void doDeferredCreateGuys(void)
     }
 }
 
-static bool isOldReplayFormat(const nlohmann::json &replayInfo);
-static void fixupOldReplayInfo(nlohmann::json &replayInfo);
-static const nlohmann::json &replayInputBytes(const nlohmann::json &inputData);
-
 extern "C" {
 
 void jsCharLoadCallback(char *charVerKey)
@@ -323,20 +319,8 @@ void jsLoadFile(char *filePath)
     pendingViewerLoad.path = path;
     pendingViewerLoad.version = maxVersion;
 
-    // check if it's a replay (has InputData/ReplayInfo)
-    nlohmann::json *data = &parsed;
-    if (parsed.contains("BattleReplayData")) {
-        data = &parsed["BattleReplayData"];
-    }
-    if (data->contains("InputData") && data->contains("ReplayInfo")) {
+    if (simController.LoadFromReplay(parsed, maxVersion)) {
         pendingViewerLoad.isReplay = true;
-        simController.replayInfo = (*data)["ReplayInfo"];
-        simController.replayIsOldFormat = isOldReplayFormat(simController.replayInfo);
-        if (simController.replayIsOldFormat) {
-            fixupOldReplayInfo(simController.replayInfo);
-        }
-        simController.replayInputData = replayInputBytes((*data)["InputData"]).get<std::vector<uint8_t>>();
-        simController.replayVersion = maxVersion;
 
         for (int i = 0; i < 2; i++) {
             int fighterID = simController.replayInfo["Fighters"][i]["FighterID"];
@@ -440,94 +424,6 @@ nlohmann::json parse_json_file(const std::string &fileName)
     return nlohmann::json::parse(fileText);
 }
 
-static const nlohmann::json &replayInputBytes(const nlohmann::json &inputData)
-{
-    if (inputData.is_object() && inputData.contains("mValue")) {
-        return inputData["mValue"];
-    }
-    return inputData;
-}
-
-static bool isOldReplayFormat(const nlohmann::json &replayInfo)
-{
-    if (replayInfo.contains("RoundInfo") && replayInfo["RoundInfo"].is_object()) {
-        return true;
-    }
-    if (replayInfo.contains("Fighters") && replayInfo["Fighters"].is_object()
-        && replayInfo["Fighters"].contains("FighterID")
-        && replayInfo["Fighters"]["FighterID"].is_array()) {
-        return true;
-    }
-    return false;
-}
-
-static void fixupOldReplayInfo(nlohmann::json &replayInfo)
-{
-    // fix up everything except input data, which still needs mValue accessed by hand
-
-    if (replayInfo["Fighters"].is_object() && replayInfo["Fighters"].contains("FighterID")
-        && replayInfo["Fighters"]["FighterID"].is_array()) {
-        nlohmann::json oldFighters = replayInfo["Fighters"];
-        nlohmann::json newFighters = nlohmann::json::array();
-        size_t n = oldFighters["FighterID"].size();
-        for (size_t i = 0; i < n; i++) {
-            nlohmann::json f = nlohmann::json::object();
-            for (auto it = oldFighters.begin(); it != oldFighters.end(); ++it) {
-                if (it.value().is_array() && it.value().size() > i) {
-                    f[it.key()] = it.value()[i];
-                }
-            }
-            newFighters.push_back(f);
-        }
-        replayInfo["Fighters"] = newFighters;
-    }
-
-    if (replayInfo["RoundInfo"].is_object()) {
-        nlohmann::json old = replayInfo["RoundInfo"];
-
-        nlohmann::json saGauge = nlohmann::json::array({0, 0});
-        if (old.contains("SAGaugeStart")) {
-            const auto &sg = old["SAGaugeStart"];
-            if (sg.is_object() && sg.contains("mValue")) saGauge = sg["mValue"];
-            else if (sg.is_array()) saGauge = sg;
-        }
-        nlohmann::json styleNo = nlohmann::json::array({0, 0});
-        if (old.contains("StyleNo")) {
-            const auto &sn = old["StyleNo"];
-            if (sn.is_object() && sn.contains("mValue")) styleNo = sn["mValue"];
-            else if (sn.is_array()) styleNo = sn;
-        }
-
-        int roundCount = 0;
-        if (old.contains("RandomSeed") && old["RandomSeed"].is_array()) {
-            roundCount = (int)old["RandomSeed"].size();
-        }
-
-        nlohmann::json newRounds = nlohmann::json::array();
-        for (int r = 0; r < roundCount; r++) {
-            nlohmann::json ri = nlohmann::json::object();
-            ri["RandomSeed"] = old["RandomSeed"][r];
-            ri["WinPlayerType"] = 0;
-            if (old.contains("WinPlayerType") && old["WinPlayerType"].is_array() && (int)old["WinPlayerType"].size() > r) {
-                ri["WinPlayerType"] = old["WinPlayerType"][r];
-            }
-            ri["FinishType"] = 0;
-            if (old.contains("FinishType") && old["FinishType"].is_array() && (int)old["FinishType"].size() > r) {
-                ri["FinishType"] = old["FinishType"][r];
-            }
-            if (r == roundCount - 1) {
-                ri["SAGaugeStart"] = saGauge;
-            } else {
-                ri["SAGaugeStart"] = nlohmann::json::array({0, 0});
-            }
-            ri["StyleNo"] = styleNo;
-            if (old.contains("UniqueParam")) ri["UniqueParam"] = old["UniqueParam"];
-            if (old.contains("BgmInfo")) ri["BgmInfo"] = old["BgmInfo"];
-            newRounds.push_back(ri);
-        }
-        replayInfo["RoundInfo"] = newRounds;
-    }
-}
 
 std::string to_string_leading_zeroes(unsigned int number, unsigned int length)
 {
@@ -989,19 +885,10 @@ int main(int argc, char**argv)
             fprintf(stderr, "failed to load replay %s\n", argv[2]);
             exit(1);
         }
-        nlohmann::json &data = replayJson.contains("BattleReplayData") ? replayJson["BattleReplayData"] : replayJson;
-        if (!data.contains("InputData") || !data.contains("ReplayInfo")) {
+        if (!simController.LoadFromReplay(replayJson, version)) {
             fprintf(stderr, "replay missing InputData or ReplayInfo\n");
             exit(1);
         }
-
-        simController.replayInfo = data["ReplayInfo"];
-        simController.replayIsOldFormat = isOldReplayFormat(simController.replayInfo);
-        if (simController.replayIsOldFormat) {
-            fixupOldReplayInfo(simController.replayInfo);
-        }
-        simController.replayInputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();
-        simController.replayVersion = version;
         simController.recordFrames = false;
         simController.SimulateAllReplayRounds();
 
@@ -1124,19 +1011,11 @@ int main(int argc, char**argv)
             fprintf(stderr, "failed to load replay %s\n", strReplayLoadPath.c_str());
             exit(1);
         }
-        nlohmann::json &data = replayJson.contains("BattleReplayData") ? replayJson["BattleReplayData"] : replayJson;
-        if (!data.contains("InputData") || !data.contains("ReplayInfo")) {
+        int useVersion = (replayVersion == -1) ? maxVersion : replayVersion;
+        if (!simController.LoadFromReplay(replayJson, useVersion)) {
             fprintf(stderr, "replay missing InputData or ReplayInfo\n");
             exit(1);
         }
-
-        simController.replayInfo = data["ReplayInfo"];
-        simController.replayIsOldFormat = isOldReplayFormat(simController.replayInfo);
-        if (simController.replayIsOldFormat) {
-            fixupOldReplayInfo(simController.replayInfo);
-        }
-        simController.replayInputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();
-        simController.replayVersion = (replayVersion == -1) ? maxVersion : replayVersion;
 
         simController.charCount = 2;
         gameMode = Viewer;

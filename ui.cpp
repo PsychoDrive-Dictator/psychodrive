@@ -2383,23 +2383,6 @@ void SimulationController::AdvanceUntilComplete(void)
     }
 }
 
-void SimulationController::AdvanceFromReplay(ReplayDecoder &decoder)
-{
-    while (!decoder.finished && pSim->replayingReplay) {
-        pSim->RunFrame();
-        RecordFrame();
-
-        // replay decode happens at end of RunFrame() inside Simulation,
-        // input is now set for AdvanceFrame
-        pSim->AdvanceFrame();
-    }
-
-    simFrameCount = stateRecording.size();
-    scrubberFrame = 0;
-    playing = true;
-    playSpeed = 1;
-}
-
 void SimulationController::ReloadViewer()
 {
     bool isReload = (simFrameCount > 0);
@@ -2452,6 +2435,112 @@ void SimulationController::AdvanceFromDump()
     scrubberFrame = 0;
     playing = true;
     playSpeed = 1;
+}
+
+static const nlohmann::json &replayInputBytes(const nlohmann::json &inputData)
+{
+    if (inputData.is_object() && inputData.contains("mValue")) {
+        return inputData["mValue"];
+    }
+    return inputData;
+}
+
+static bool isOldReplayFormat(const nlohmann::json &replayInfo)
+{
+    if (replayInfo.contains("RoundInfo") && replayInfo["RoundInfo"].is_object()) {
+        return true;
+    }
+    if (replayInfo.contains("Fighters") && replayInfo["Fighters"].is_object()
+        && replayInfo["Fighters"].contains("FighterID")
+        && replayInfo["Fighters"]["FighterID"].is_array()) {
+        return true;
+    }
+    return false;
+}
+
+static void fixupOldReplayInfo(nlohmann::json &replayInfo)
+{
+    // fix up everything except input data, which still needs mValue accessed by hand
+
+    if (replayInfo["Fighters"].is_object() && replayInfo["Fighters"].contains("FighterID")
+        && replayInfo["Fighters"]["FighterID"].is_array()) {
+        nlohmann::json oldFighters = replayInfo["Fighters"];
+        nlohmann::json newFighters = nlohmann::json::array();
+        size_t n = oldFighters["FighterID"].size();
+        for (size_t i = 0; i < n; i++) {
+            nlohmann::json f = nlohmann::json::object();
+            for (auto it = oldFighters.begin(); it != oldFighters.end(); ++it) {
+                if (it.value().is_array() && it.value().size() > i) {
+                    f[it.key()] = it.value()[i];
+                }
+            }
+            newFighters.push_back(f);
+        }
+        replayInfo["Fighters"] = newFighters;
+    }
+
+    if (replayInfo["RoundInfo"].is_object()) {
+        nlohmann::json old = replayInfo["RoundInfo"];
+
+        nlohmann::json saGauge = nlohmann::json::array({0, 0});
+        if (old.contains("SAGaugeStart")) {
+            const auto &sg = old["SAGaugeStart"];
+            if (sg.is_object() && sg.contains("mValue")) saGauge = sg["mValue"];
+            else if (sg.is_array()) saGauge = sg;
+        }
+        nlohmann::json styleNo = nlohmann::json::array({0, 0});
+        if (old.contains("StyleNo")) {
+            const auto &sn = old["StyleNo"];
+            if (sn.is_object() && sn.contains("mValue")) styleNo = sn["mValue"];
+            else if (sn.is_array()) styleNo = sn;
+        }
+
+        int roundCount = 0;
+        if (old.contains("RandomSeed") && old["RandomSeed"].is_array()) {
+            roundCount = (int)old["RandomSeed"].size();
+        }
+
+        nlohmann::json newRounds = nlohmann::json::array();
+        for (int r = 0; r < roundCount; r++) {
+            nlohmann::json ri = nlohmann::json::object();
+            ri["RandomSeed"] = old["RandomSeed"][r];
+            ri["WinPlayerType"] = 0;
+            if (old.contains("WinPlayerType") && old["WinPlayerType"].is_array() && (int)old["WinPlayerType"].size() > r) {
+                ri["WinPlayerType"] = old["WinPlayerType"][r];
+            }
+            ri["FinishType"] = 0;
+            if (old.contains("FinishType") && old["FinishType"].is_array() && (int)old["FinishType"].size() > r) {
+                ri["FinishType"] = old["FinishType"][r];
+            }
+            if (r == roundCount - 1) {
+                ri["SAGaugeStart"] = saGauge;
+            } else {
+                ri["SAGaugeStart"] = nlohmann::json::array({0, 0});
+            }
+            ri["StyleNo"] = styleNo;
+            if (old.contains("UniqueParam")) ri["UniqueParam"] = old["UniqueParam"];
+            if (old.contains("BgmInfo")) ri["BgmInfo"] = old["BgmInfo"];
+            newRounds.push_back(ri);
+        }
+        replayInfo["RoundInfo"] = newRounds;
+    }
+}
+
+bool SimulationController::LoadFromReplay(nlohmann::json &parsed, int version)
+{
+    nlohmann::json &data = parsed.contains("BattleReplayData") ? parsed["BattleReplayData"] : parsed;
+    if (!data.contains("InputData") || !data.contains("ReplayInfo")) {
+        return false;
+    }
+
+    replayInfo = data["ReplayInfo"];
+    replayIsOldFormat = isOldReplayFormat(replayInfo);
+    if (replayIsOldFormat) {
+        fixupOldReplayInfo(replayInfo);
+    }
+    replayInputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();
+    replayVersion = version;
+    return true;
 }
 
 void SimulationController::SimulateAllReplayRounds()
@@ -2588,7 +2677,7 @@ void SimulationController::LoadReplayRound(int round)
     if (round == replayCurrentRound) return;
     if (round < 0 || round >= (int)replayRoundRecordings.size()) return;
 
-    // give back any frames currently held by stateRecording so the pool can reuse them
+    // stash the previously-viewed round's frames back in their slot before swapping in the new round
     if (replayCurrentRound >= 0 && replayCurrentRound < (int)replayRoundRecordings.size()) {
         replayRoundRecordings[replayCurrentRound].frames = std::move(stateRecording);
     }
