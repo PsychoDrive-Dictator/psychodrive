@@ -438,6 +438,7 @@ public:
     Action* FindMove(int actionID, int styleID);
     AtemiData *findAtemi(int atemiID);
     void ChangeStyle(int newStyleID);
+    void DoInstantAction(int actionID);
 private:
     void NextAction(bool didTrigger, bool didBranch, bool bElide = false);
     void UpdateActionData(void);
@@ -472,8 +473,6 @@ private:
     void DoLockKey();
     void DoShotKey(Action *pAction, int frameID, bool preHit = false);
     void DoFocusRegen();
-
-    void DoInstantAction(int actionID);
     void AdvanceScalingTriggerID();
 
     void ExitStyle();

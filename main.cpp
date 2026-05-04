@@ -172,6 +172,9 @@ void createGuyNow(std::string charName, int charVersion, Fixed x, Fixed y, int s
         *pNewGuy->getInputListIDPtr() = 1; // its spot in the UI, or it'll override it :/
     }
     defaultSim.simGuys.push_back(pNewGuy);
+
+    pNewGuy->DoInstantAction(580); // IMM_STAGE_INIT
+    pNewGuy->DoInstantAction(581); // IMM_ROUND_INIT
 }
 
 bool isCharLoaded(const std::string& charName, int charVersion)

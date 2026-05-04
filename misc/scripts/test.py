@@ -115,7 +115,7 @@ for char in characters:
     # charWithVersion = char + "39"
     # hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     # movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "40"
+    charWithVersion = char + "41"
     hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
     tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))
@@ -165,24 +165,24 @@ for char in characters:
     #         print(char + " " + moveID)
 
     # find certain branches
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "BranchKey" in move:
-            for key in move["BranchKey"]:
-                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-                    branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 35:
-                        print(char + " " + moveID + " RANDOM branch params " + str(branchKey["Param00"]) +
-                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "BranchKey" in move:
+    #         for key in move["BranchKey"]:
+    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+    #                 branchKey = move["BranchKey"][key]
+    #                 if branchKey["Type"] == 35:
+    #                     print(char + " " + moveID + " RANDOM branch params " + str(branchKey["Param00"]) +
+    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
-    # for moveID in moves21Json:
-    #     if "IMM_" in moveID:
-    #         move = moves21Json[moveID]
-    #         for key in move:
-    #             if "Key" in key:
-    #                 print(char + " " + moveID + " " + key)
+    for moveID in moves21Json:
+        if "IMM_" in moveID:
+            move = moves21Json[moveID]
+            for key in move:
+                if "Key" in key:
+                    print(char + " " + moveID + " " + key)
 
     # find ShotKey operations
     # for moveID in moves21Json:

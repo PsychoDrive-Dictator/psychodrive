@@ -173,6 +173,9 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
     pGuy->setHealth(controller.startHealth);
     pGuy->setFocus(controller.startFocus);
     pGuy->setGauge(controller.startGauge);
+
+    pGuy->DoInstantAction(580); // IMM_STAGE_INIT
+    pGuy->DoInstantAction(581); // IMM_ROUND_INIT
 }
 
 
@@ -249,6 +252,10 @@ void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int ver
     if (prevRoundEnd) {
         for (int p = 0; p < 2; p++) {
             simGuys[p]->setGauge(prevRoundEnd->simGuys[p]->getGauge());
+            if (simGuys[p]->getCharData()->flags & (1<<6)) {
+                simGuys[p]->getUniqueParam(0) = prevRoundEnd->simGuys[p]->getUniqueParam(0);
+            }
+            //simGuys[p]->ChangeStyle(prevRoundEnd->simGuys[p]->getStyle());
         }
     } else if (round == 0) {
         for (int p = 0; p < 2; p++) {
@@ -258,7 +265,18 @@ void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int ver
         nlohmann::json &prevRoundInfo = replayInfo["RoundInfo"][round - 1];
         for (int p = 0; p < 2; p++) {
             simGuys[p]->setGauge(prevRoundInfo["SAGaugeStart"][p]);
+            if (simGuys[p]->getCharData()->flags & (1<<6)) {
+                simGuys[p]->getUniqueParam(0) = prevRoundInfo["UniqueParam"][p];
+            }
+            //simGuys[p]->ChangeStyle(prevRoundInfo["StyleNo"][p]);
         }
+    }
+
+    for (int p = 0; p < 2; p++) {
+        if (round == 0) {
+            simGuys[p]->DoInstantAction(580); // IMM_STAGE_INIT
+        }
+        simGuys[p]->DoInstantAction(581); // IMM_ROUND_INIT
     }
 
     match = true;
