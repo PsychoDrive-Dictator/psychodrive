@@ -476,6 +476,7 @@ private:
     void AdvanceScalingTriggerID();
 
     void ExitStyle();
+    void RevokeStyle();
 
     void DoReflect();
 

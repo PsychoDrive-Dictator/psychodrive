@@ -255,7 +255,7 @@ void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int ver
             if (simGuys[p]->getCharData()->flags & (1<<6)) {
                 simGuys[p]->getUniqueParam(0) = prevRoundEnd->simGuys[p]->getUniqueParam(0);
             }
-            //simGuys[p]->ChangeStyle(prevRoundEnd->simGuys[p]->getStyle());
+            simGuys[p]->ChangeStyle(prevRoundEnd->simGuys[p]->getStyle());
         }
     } else if (round == 0) {
         for (int p = 0; p < 2; p++) {
@@ -268,7 +268,7 @@ void Simulation::SetupReplayRound(nlohmann::json &replayInfo, int round, int ver
             if (simGuys[p]->getCharData()->flags & (1<<6)) {
                 simGuys[p]->getUniqueParam(0) = prevRoundInfo["UniqueParam"][p];
             }
-            //simGuys[p]->ChangeStyle(prevRoundInfo["StyleNo"][p]);
+            simGuys[p]->ChangeStyle(prevRoundInfo["StyleNo"][p]);
         }
     }
 

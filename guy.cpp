@@ -756,6 +756,19 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
             log(true, "not eonugh gauge to execute?! not supposed to happen");
         }
     }
+
+    if (styleInstall >= 0 && (size_t)styleInstall < pCharData->styles.size()) {
+        StyleData &style = pCharData->styles[styleInstall];
+        if ((normalAttack || uniqueAttack) && style.terminateState & (1<<29)) {
+            RevokeStyle();
+        }
+        if (specialAttack && style.terminateState & (1<<30)) {
+            RevokeStyle();
+        }
+        if (superAttack && style.terminateState & (1<<31)) {
+            RevokeStyle();
+        }
+    }
     return true;
 }
 
@@ -3644,6 +3657,13 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         lastDamageScale = effectiveScaling;
 
         DoInstantAction(582); // IMM_DAMAGE_INIT (_init? is there another?)
+
+        if (styleInstall >= 0 && (size_t)styleInstall < pCharData->styles.size()) {
+            StyleData &style = pCharData->styles[styleInstall];
+            if (style.terminateState & (1ULL<<32)) {
+                RevokeStyle();
+            }
+        }
     }
 
     Guy *pResourceGuy = pAttacker;
@@ -5135,8 +5155,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (styleInstall >= 0 && (size_t)styleInstall < pCharData->styles.size()) {
             StyleData &style = pCharData->styles[styleInstall];
             if (style.terminateState == 0x3ff1fffffff) {
-                // that apparently means landing... figure out deeper meaning later
-                ExitStyle();
+                // todo fix check here, refers to some action status tracking?
+                RevokeStyle();
             }
         }
     }
@@ -5567,6 +5587,14 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         // reset status - recovered control to neutral
         jumped = false;
         blocking = false;
+
+        if (styleInstall >= 0 && (size_t)styleInstall < pCharData->styles.size()) {
+            StyleData &style = pCharData->styles[styleInstall];
+            if (style.terminateState & 0xffffffff) {
+                // todo fix check here, but close enough - the first like 26 bits are different movement
+                RevokeStyle();
+            }
+        }
 
         Fixed turnAroundThreshold = Fixed(10);
 
@@ -6909,6 +6937,21 @@ void Guy::ExitStyle() {
             styleInstall = style.parentStyleID;
         }
     } else {
+        styleInstall = style.parentStyleID;
+    }
+}
+
+void Guy::RevokeStyle() {
+    if (styleInstall < 0 || (size_t)styleInstall >= pCharData->styles.size()) {
+        return;
+    }
+
+    StyleData &style = pCharData->styles[styleInstall];
+
+    int oldStyleInstall = styleInstall;
+    DoInstantAction(595); // todo standard revoke action? not sure
+    if (oldStyleInstall == styleInstall) {
+        // if it didn't do anything?
         styleInstall = style.parentStyleID;
     }
 }
