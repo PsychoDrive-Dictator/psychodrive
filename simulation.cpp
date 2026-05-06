@@ -149,12 +149,7 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
     CreateGuy(charName, version, controller.startPosX, Fixed(0), controller.rightSide ? -1 : 1, controller.charColor);
 
     Guy *pGuy = simGuys[controller.getSimCharSlot()];
-    if (controller.buffLevel) {
-        pGuy->getUniqueParam(0) = controller.buffLevel;
-        if (controller.buffLevel < (int)(pGuy->getCharData()->styles.size())) {
-            pGuy->ChangeStyle(controller.buffLevel);
-        }
-    }
+
     controller.maxStartHealth = pGuy->getCharData()->vitality;
     controller.maxStartGauge = pGuy->getCharData()->gauge;
 
@@ -176,6 +171,13 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
 
     pGuy->DoInstantAction(580); // IMM_STAGE_INIT
     pGuy->DoInstantAction(581); // IMM_ROUND_INIT
+
+    if (controller.buffLevel) {
+        pGuy->getUniqueParam(0) = controller.buffLevel;
+        if (controller.buffLevel < (int)(pGuy->getCharData()->styles.size())) {
+            pGuy->ChangeStyle(controller.buffLevel);
+        }
+    }
 }
 
 
