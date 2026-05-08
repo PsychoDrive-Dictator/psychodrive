@@ -1136,7 +1136,7 @@ bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorP
 bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, uint32_t initialI, bool needPositiveEdge) {
     bool pass = false;
     if (pCommandInput->type == InputType::Rotation) {
-        while (cursorPos < maxSearch) {
+        while (cursorPos < maxSearch - 1) {
             if (MatchRotateCommandInput(pCommandInput, cursorPos, cursorPos + pCommandInput->numFrames)) {
                 pass = true;
                 break;
