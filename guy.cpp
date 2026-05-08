@@ -1099,46 +1099,50 @@ bool Guy::MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t
 bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t searchArea) {
     // rotate
     int pointsNeeded = pCommandInput->rotatePointsNeeded;
-    int curAngle = 0;
-    int pointsForward = 0;
-    int pointsBackwards = 0;
-    bool pass = false;
-    while (cursorPos < dc.inputBuffer.size() && cursorPos < searchArea)
+    int pointsGotten = 0;
+    int rotateNeededMask = 0;
+    uint32_t cursorPosCopy = cursorPos;
+    while (cursorPosCopy < dc.inputBuffer.size() && cursorPosCopy < searchArea)
     {
-        int bufferInput = dc.inputBuffer[cursorPos];
-        int targetAngle = inputAngle(bufferInput);
-        if (targetAngle) {
-            if (curAngle == 0) {
-                curAngle = targetAngle;
-            }
-            int diff = angleDiff(curAngle, targetAngle);
-            //log(std::to_string(diff) + " " + std::to_string(pointsForward) + " " + std::to_string(pointsBackwards));
-            if (diff >= 90 && diff < 180) {
-                pointsForward++;
-                curAngle = targetAngle;
-            }
-            if (diff <= -90 && diff > -180) {
-                pointsBackwards++;
-                curAngle = targetAngle;
-            }
+        int bufferInput = dc.inputBuffer[cursorPosCopy];
+        if (bufferInput == Input::BACK && (rotateNeededMask & BACK) == 0) {
+            rotateNeededMask |= Input::BACK;
+            pointsGotten++;
         }
-        cursorPos++;
+        if (bufferInput == Input::DOWN && (rotateNeededMask & DOWN) == 0) {
+            rotateNeededMask |= Input::DOWN;
+            pointsGotten++;
+        }
+        if (bufferInput == Input::FORWARD && (rotateNeededMask & FORWARD) == 0) {
+            rotateNeededMask |= Input::FORWARD;
+            pointsGotten++;
+        }
+        if (bufferInput & Input::UP && (rotateNeededMask & UP) == 0) {
+            rotateNeededMask |= Input::UP;
+            pointsGotten++;
+        }
+        if (pointsGotten == pointsNeeded) {
+            return true;
+        }
+        if (rotateNeededMask == (UP|DOWN|BACK|FORWARD)) {
+            rotateNeededMask = 0;
+        }
+
+        cursorPosCopy++;
     }
-    if (pointsNeeded <= pointsForward || pointsNeeded <= pointsBackwards) {
-        pass = true;
-    }
-    return pass;
+    return false;
 }
 
 bool Guy::MatchCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t startSearch, uint32_t maxSearch, uint32_t initialI, bool needPositiveEdge) {
     bool pass = false;
-    uint32_t inputSearchArea = 0;
     if (pCommandInput->type == InputType::Rotation) {
-        inputSearchArea = startSearch + pCommandInput->numFrames * 2; // todo, i think that's best case
-        // if (inputSearchArea > maxSearch) {
-        //     inputSearchArea = maxSearch;
-        // }
-        pass = MatchRotateCommandInput(pCommandInput, cursorPos, inputSearchArea);
+        while (cursorPos < maxSearch) {
+            if (MatchRotateCommandInput(pCommandInput, cursorPos, cursorPos + pCommandInput->numFrames)) {
+                pass = true;
+                break;
+            }
+            cursorPos++;
+        }
     } else if (pCommandInput->type == InputType::ChargeRelease) {
         if (pCommandInput->pCharge) {
             pass = MatchChargeCommandInput(pCommandInput->pCharge, cursorPos, maxSearch, initialI);
