@@ -28,6 +28,15 @@ void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /* = nullptr *
         filterOdd = !filterOdd;
     }
 
+    if (simGuys.size() > 1) {
+        if (simGuys[0]->getLocked()) {
+            filterOdd = false;
+        }
+        if (simGuys[1]->getLocked()) {
+            filterOdd = true;
+        }
+    }
+
     for (uint32_t i = 0; i < simGuys.size(); i++) {
         if ((i & 1) == filterOdd && simulationOrder) {
             continue;

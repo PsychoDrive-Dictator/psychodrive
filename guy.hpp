@@ -430,6 +430,7 @@ public:
     }
     bool couldAct() { return couldMove; }
     bool getFreeMovement() { return freeMovement; }
+    bool getLocked() { return locked; }
     ActionRef& getForcedTrigger() { return forcedTrigger; }
     int *getNeutralMovePtr() { return &neutralMove; }
     int *getInputOverridePtr() { return &inputOverride; }
@@ -779,6 +780,7 @@ private:
         knockDownFrameCounter = 0;
         knockDownFrames = 0;
         nageKnockdown = false;
+        ignorePlace = false;
         recoverForward = false;
         recoverReverse = false;
         noBackRecovery = false;
@@ -836,6 +838,7 @@ private:
         pCurrentAction = nullptr;
         pSim = nullptr;
         lastHitType = none;
+        throwRelease = 0;
     }
 
     int uniqueID;
@@ -942,6 +945,7 @@ private:
     bool knockDown : 1;
     bool isDown : 1;
     bool nageKnockdown : 1;
+    bool ignorePlace : 1;
     bool recoverForward : 1;
     bool recoverReverse : 1;
     bool noBackRecovery : 1;
@@ -1091,6 +1095,7 @@ private:
     GuyRef pAttacker;
     int hitStun;
     hitBoxType lastHitType;
+    int8_t throwRelease;
 
     Fixed hitVelX;
     Fixed hitAccelX;

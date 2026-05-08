@@ -555,6 +555,16 @@ bool Guy::RunFrame(bool advancingTime)
                 ExitStyle();
             }
         }
+
+        if (pOpponent && pOpponent->pendingUnlockHit) {
+            HitEntry *pEntry = &pOpponent->pCharData->hitByID[pOpponent->pendingUnlockHit]->common[0];
+            if (pEntry->throwRelease == 1) {
+                // pOpponent->posX = pOpponent->posX + (pOpponent->posOffsetX * pOpponent->direction);
+                // pOpponent->posOffsetX = Fixed(0);
+                // pOpponent->bgOffsetX = Fixed(0);
+                ignorePlace = true;
+            }
+        }
     }
 
     return true;
@@ -5262,6 +5272,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
             if (recoverForward && needsTurnaround()) {
                 // todo do we need to consume something here? or leave recoverForward until final landing
+                log(logTransitions, "bounce switchDirection!");
                 switchDirection();
             }
 
@@ -5433,7 +5444,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         groundBounceVelX = Fixed(0);
                     }
                     // nage slide or tumble
-                    if ((nageKnockdown && slide) || (currentAction == 289)) {
+                    if ((throwRelease == 3 && !landed) || (nageKnockdown && slide) || (currentAction == 289)) {
                         // one last slide tic from whatever previous vel
                         posX = posX + (prevVelX * direction);
                         // we slide one tic early, so go against the next frame worth's :/
@@ -5470,6 +5481,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         posX = posX + (prevVelX * direction);
                     }
                     if (backroll && needsTurnaround()) {
+                        log(logTransitions, "backroll switchDirection!");
                         switchDirection();
                     }
                     isDown = false;
@@ -5481,6 +5493,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 nageKnockdown = false;
 
                 if (recoverForward && needsTurnaround()) {
+                    log(logTransitions, "wakeup switchDirection!");
                     switchDirection();
                     velocityX *= Fixed(-1);
                 }
@@ -5712,6 +5725,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         std::string message = "recovered! adv " + std::to_string(advantage);
         log(true, message );
 
+        throwRelease = 0;
         juggleCounter = 0;
         pAttacker = nullptr;
         wallBounce = false; // just in case we didn't reach a wall
@@ -5790,6 +5804,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     if (moveTurnaround || (needsTurnaround() && (didTrigger && (canMoveNow || freeMovement)))) {
+        log(logTransitions, "move switchDirection!");
         switchDirection();
     }
 
@@ -5966,6 +5981,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             noPlaceYNextFrame = true;
         }
 
+        ignorePlace = false;
         setPlaceX = false;
         setPlaceY = false;
         keepPlace = false;
@@ -6524,6 +6540,30 @@ void Guy::DoLockKey(void)
                 log(true, "weird!");
             }
             pendingUnlockHit = lockKey.param02;
+            HitEntry *pEntry = &pCharData->hitByID[lockKey.param02]->common[0];
+            pOpponent->throwRelease = pEntry->throwRelease;
+            if (pEntry->throwRelease == 3) {
+                // pOpponent->ApplyHitEffectOnResources(pEntry, this, true, false);
+                // pOpponent->ApplyHitEffect(pEntry, this, true, false, false, false);
+                // // clamp
+                // pOpponent->setFocus(pOpponent->focus);
+                // pOpponent->setGauge(pOpponent->gauge);
+                // if (isProjectile && pParent) {
+                //     pParent->setFocus(pParent->focus);
+                //     pParent->setGauge(pParent->gauge);
+                // } else {
+                //     setFocus(focus);
+                //     setGauge(gauge);
+                // }
+                // otherGuyLog(pOpponent, pOpponent->logHits, "lock hit dt " + std::to_string(pendingUnlockHit) + " dmgType " + std::to_string(pEntry->dmgType) + " moveType " + std::to_string(pEntry->moveType));
+                // pOpponent->locked = false;
+                // pendingUnlockHit = 0;
+
+                pOpponent->posX = pOpponent->posX + (pOpponent->posOffsetX * pOpponent->direction);
+                pOpponent->posOffsetX = Fixed(0);
+                pOpponent->bgOffsetX = Fixed(0);
+                //pOpponent->ignorePlace = true;
+            }
         }
     }
 }
@@ -6547,6 +6587,9 @@ void Guy::DoPlaceKey(void)
 
         // seems like we stop obeying palcekey after a nage hit?
         if (nageKnockdown) {
+            break;
+        }
+        if (ignorePlace) {
             break;
         }
 
@@ -6712,6 +6755,10 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                             if (pOpponent) {
                                 // todo figure out which slot it is for real
                                 pOpponent->pendingUnlockHit = param1;
+                                HitEntry *pEntry = &pOpponent->pCharData->hitByID[param1]->common[0];
+                                if (pEntry) {
+                                    throwRelease = pEntry->throwRelease;
+                                }
                             }
                             break;
                         default:
