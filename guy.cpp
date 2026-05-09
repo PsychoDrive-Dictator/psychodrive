@@ -5393,13 +5393,14 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             airborne = true;
         } else if (currentAction == 5) {
             nextAction = 4; // finish transition to crouch
-        } else if (!getAirborne() && !isProjectile && ((pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) || hitStun)) {
+        } else if (!opponentAction && !getAirborne() && !isProjectile && ((pCurrentAction->loopPoint != -1 && (loopCount == -1 || loopCount > 0)) || hitStun)) {
             currentFrame = pCurrentAction->loopPoint;
             if (currentFrame == -1) {
                 currentFrame = 0;
             }
             currentFrameFrac = Fixed(currentFrame);
             hasLooped = true;
+            log(logTransitions, "looped!!!");
             if (loopCount > 0) {
                 loopCount--;
             }
@@ -5410,7 +5411,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         } else if (blocking) {
             // ???
             nextAction = currentAction + 1;
-        } else if (wallStopped || locked || airborne || (isProjectile && loopCount == -1)) {
+        } else if (wallStopped || locked || airborne || opponentAction || (isProjectile && loopCount == -1)) {
             // freeze time at the end there, hopefully a branch will get us when we land :/
             // should this apply in general, not just airborne?
             currentFrame--;
