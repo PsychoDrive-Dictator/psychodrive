@@ -1097,14 +1097,19 @@ bool Guy::MatchChargeCommandInput(Charge *pCharge, uint32_t &cursorPos, uint32_t
 }
 
 bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorPos, uint32_t searchArea) {
-    // rotate
-    int pointsNeeded = pCommandInput->rotatePointsNeeded;
+    // two schemes in parallel?
     int pointsGotten = 0;
     int rotateNeededMask = 0;
+
+    int pointsGottenDiag = 0;
+    int diagNeededMask = 0;
+
     uint32_t cursorPosCopy = cursorPos;
     while (cursorPosCopy < dc.inputBuffer.size() && cursorPosCopy < searchArea)
     {
         int bufferInput = dc.inputBuffer[cursorPosCopy];
+
+        // first scheme, 426 + any up
         if (bufferInput == Input::BACK && (rotateNeededMask & BACK) == 0) {
             rotateNeededMask |= Input::BACK;
             pointsGotten++;
@@ -1121,11 +1126,36 @@ bool Guy::MatchRotateCommandInput(CommandInput *pCommandInput, uint32_t &cursorP
             rotateNeededMask |= Input::UP;
             pointsGotten++;
         }
-        if (pointsGotten == pointsNeeded) {
+
+        // second scheme, diagonals
+        if (bufferInput == (BACK|UP) && (diagNeededMask & UP) == 0) {
+            diagNeededMask |= Input::UP;
+            pointsGottenDiag++;
+        }
+        if (bufferInput == (UP|FORWARD) && (diagNeededMask & FORWARD) == 0) {
+            diagNeededMask |= Input::FORWARD;
+            pointsGottenDiag++;
+        }
+        if (bufferInput == (FORWARD|DOWN) && (diagNeededMask & DOWN) == 0) {
+            diagNeededMask |= Input::DOWN;
+            pointsGottenDiag++;
+        }
+        if (bufferInput == (DOWN|BACK) && (diagNeededMask & BACK) == 0) {
+            diagNeededMask |= Input::BACK;
+            pointsGottenDiag++;
+        }
+
+        if (pointsGotten == pCommandInput->rotatePointsNeeded || pointsGottenDiag == pCommandInput->rotatePointsNeeded) {
             return true;
         }
-        if (rotateNeededMask == (UP|DOWN|BACK|FORWARD)) {
+
+        if (rotateNeededMask == (UP|DOWN|BACK|FORWARD) || diagNeededMask == (UP|DOWN|BACK|FORWARD)) {
+            // allow both schemes to mix and match for 720s
             rotateNeededMask = 0;
+            diagNeededMask = 0;
+            int maxPointsGotten = std::max(pointsGotten, pointsGottenDiag);
+            pointsGotten = maxPointsGotten;
+            pointsGottenDiag = maxPointsGotten;
         }
 
         cursorPosCopy++;
