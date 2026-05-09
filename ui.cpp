@@ -2558,6 +2558,19 @@ bool SimulationController::LoadFromReplay(nlohmann::json &parsed, int version)
         fixupOldReplayInfo(replayInfo);
     }
     replayInputData = replayInputBytes(data["InputData"]).get<std::vector<uint8_t>>();
+    if (version == -1) {
+        if (replayInfo.contains("Version") && replayInfo["Version"].is_number_integer()) {
+            int64_t startTime = 0;
+            if (parsed.contains("ReplayResultInfo") && parsed["ReplayResultInfo"].is_object()
+                && parsed["ReplayResultInfo"].contains("StartTime")
+                && parsed["ReplayResultInfo"]["StartTime"].is_number_integer()) {
+                startTime = parsed["ReplayResultInfo"]["StartTime"].get<int64_t>();
+            }
+            version = simVersionFromGameVersion(replayInfo["Version"].get<int>(), startTime);
+        } else {
+            version = atoi(charVersions[charVersionCount - 1]);
+        }
+    }
     replayVersion = version;
     return true;
 }
@@ -2683,7 +2696,7 @@ void SimulationController::SimulateAllReplayRounds()
     delete prevRoundSim;
 
     if (batchMode) {
-        fprintf(stderr, "F;replay finished\n");
+        fprintf(stderr, "F;replay finished;%d\n", replayVersion);
     }
 
     if (!pSim) {

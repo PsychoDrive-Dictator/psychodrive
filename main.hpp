@@ -142,6 +142,7 @@ int getCharIDFromName(const char *charName);
 
 extern const char* charVersions[];
 extern const int charVersionCount;
+int simVersionFromGameVersion(int gameVersion, int64_t time);
 
 bool isCharLoaded(const std::string& charName, int charVersion);
 void requestCharDownload(const std::string& charName, int charVersion);

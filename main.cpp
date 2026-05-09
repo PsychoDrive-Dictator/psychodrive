@@ -128,6 +128,29 @@ const char* charVersions[] = {
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
+int simVersionFromGameVersion(int gameVersion, int64_t time)
+{
+    static const struct { int game; int64_t time; int sim; } table[] = {
+        { 0,                 0, 19 },
+        { 10005000,          0, 21 }, // no 20 replays as that was hotfixed same day
+        { 10005000, 1717286400, 22 }, // hotfix 2 dropped like a week after
+        { 10006000,          0, 23 },
+        { 10007000,          0, 24 },
+        { 10008000,          0, 25 },
+        { 10009000,          0, 26 },
+        { 20002010,          0, 41 },
+    };
+    int ret = table[0].sim;
+    for (const auto &row : table) {
+        if (gameVersion > row.game || (gameVersion == row.game && time >= row.time)) {
+            ret = row.sim;
+        } else {
+            break;
+        }
+    }
+    return ret;
+}
+
 bool resetpos = false;
 
 Simulation defaultSim;
@@ -849,7 +872,6 @@ int main(int argc, char**argv)
         }
         strDumpLoadPath = argv[2];
 
-
         simController.recordFrames = false;
         simController.LoadFromGameDump(strDumpLoadPath, version);
 
@@ -861,9 +883,6 @@ int main(int argc, char**argv)
         int version = -1;
         if ( argc > 3 ) {
             version = atoi(argv[3]);
-        }
-        if (version == -1) {
-            version = atoi(charVersions[charVersionCount - 1]);
         }
 
         nlohmann::json replayJson = parse_json_file(argv[2]);
