@@ -883,6 +883,9 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     if (pTrigger->limitShotCount > 0) {
         int count = 0;
         for ( auto minion : dc.minions ) {
+            if (minion->limitShotCategory < 0) {
+                continue;
+            }
             if (pTrigger->limitShotCategory & (1 << minion->limitShotCategory)) {
                 count++;
             }
@@ -2522,7 +2525,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
         if (isProjectile && hitSpanFrames && (hitbox.type == hit || hitbox.type == projectile || hitbox.type == grab)) {
             continue;
         }
-        if (isProjectile && projHitCount < -1) {
+        if (isProjectile && projHitCount <= 0) {
             continue;
         }
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
@@ -4857,6 +4860,9 @@ void Guy::DoBranchKey(bool preHit)
                             pGuyMinions = pParent;
                         }
                         for ( auto minion : pGuyMinions->dc.minions ) {
+                            if (minion->limitShotCategory < 0) {
+                                continue;
+                            }
                             if (branchParam0 == minion->limitShotCategory) {
                                 count++;
                             }
@@ -5142,7 +5148,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 if (pCurrentAction->pProjectileData && pCurrentAction->pProjectileData->flags & (1<<1)) {
                     projHitCount = -2;
                     // stop counting?
-                    limitShotCategory = 0;
+                    limitShotCategory = -1;
                 } else {
                     return false; // die
                 }
@@ -6351,6 +6357,9 @@ void Guy::DoSteerKey(void)
                     } else if (targetType == 4) {
                         // todo supposed to be nearest matching projectile?
                         for ( auto minion : dc.minions ) {
+                            if (minion->limitShotCategory < 0) {
+                                continue;
+                            }
                             if (shotCategory & (1 << minion->limitShotCategory)) {
                                 pGuy = minion;
                                 break;
