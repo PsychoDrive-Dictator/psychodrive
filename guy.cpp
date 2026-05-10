@@ -1341,22 +1341,24 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         initialI = cursorPos;
     }
     cursorPos = initialI;
-    // there's some weirdness here - parry can be buffered sometimes?
-    if (match || !(pTrigger->flags & (1ULL<<40))) {
-        if (okKeyFlags == 0) {
-            if (dcExcFlags != 0 ) {
-                if ((dcExcFlags & currentInput) != dcExcFlags) {
-                    return false;
-                }
-            }
-            if (dcIncFlags != 0 ) {
-                if (!(dcIncFlags & currentInput)) {
-                    return false;
-                }
+    // for held inputs if we didn't find a valid positive edge, make sure we're still held
+    if (okKeyFlags == 0 && (match || (dc.inputBuffer[initialI] & CONSUMED))) {
+        if (dcExcFlags != 0 ) {
+            if ((dcExcFlags & currentInput) != dcExcFlags) {
+                return false;
             }
         }
+        if (dcIncFlags != 0 ) {
+            if (!(dcIncFlags & currentInput)) {
+                return false;
+            }
+        }
+        // only positive edge for held inputs during defer
+        // if (forDefer) {
+        //     return false;
+        // }
     }
-        return initialMatch;
+    return initialMatch;
 }
 
 bool Guy::CheckTriggerCommand(Trigger *pTrigger, uint32_t &initialI, bool forDefer)
