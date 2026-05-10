@@ -534,6 +534,7 @@ bool Guy::RunFrame(bool advancingTime)
         throwTechable = false;
         canBlock = false;
         ignoreBodyPush = false;
+        bodyPushIntangible = false;
         ignoreHitStop = false;
         ignoreScreenPush = false;
         ignoreCornerPushback = false;
@@ -2011,6 +2012,7 @@ bool Guy::Push(Guy *pOtherGuy)
     // for now, maybe there's other rules
     if (isProjectile && !pOtherGuy->isProjectile) return false;
     if (!isProjectile && pOtherGuy->isProjectile) return false;
+    if (bodyPushIntangible || pOtherGuy->bodyPushIntangible) return false;
 
     // do reflect before push, since vel could be winning to push us flush against someone
     // in theory should do before wall touch too but not sure if both can be touching the
@@ -6162,6 +6164,9 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x40) {
             ignoreScreenPush = true;
+        }
+        if (flag & 0x20) {
+            bodyPushIntangible = true;
         }
         if (flag & 0x8) {
             ignoreHitStop = true;

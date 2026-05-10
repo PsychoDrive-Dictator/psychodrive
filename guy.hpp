@@ -650,6 +650,7 @@ private:
         offsetDoesNotPush = false;
         teleported = false;
         ignoreBodyPush = false;
+        bodyPushIntangible = false;
         ignoreScreenPush = false;
         ignoreCornerPushback = false;
         inputIgnoresOpponentDirection = false;
@@ -890,6 +891,7 @@ private:
     bool offsetDoesNotPush : 1;
     bool teleported : 1;
     bool ignoreBodyPush : 1;
+    bool bodyPushIntangible : 1;
     bool ignoreScreenPush : 1;
     bool ignoreCornerPushback : 1;
     bool inputIgnoresOpponentDirection : 1;
