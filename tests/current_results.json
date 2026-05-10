@@ -3083,6 +3083,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aki_throw_kill",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 4,
+                "firstFrame": 187,
+                "lastFrame": 189
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 188,
+                "lastFrame": 188
+            },
+            {
+                "count": 1,
+                "firstFrame": 188,
+                "lastFrame": 188
+            },
+            {
+                "count": 1,
+                "firstFrame": 188,
+                "lastFrame": 188
+            },
+            {
+                "count": 1,
+                "firstFrame": 188,
+                "lastFrame": 188
+            },
+            {
+                "count": 2,
+                "firstFrame": 188,
+                "lastFrame": 189
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 188,
+                "lastFrame": 188
+            },
+            {
+                "count": 1,
+                "firstFrame": 188,
+                "lastFrame": 188
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aki_throws",
         "testVersion": "41",
         "finished": true,
@@ -3954,6 +4021,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_sa2",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 254,
+                "firstFrame": 324,
+                "lastFrame": 574
+            },
+            {
+                "count": 38,
+                "firstFrame": 299,
+                "lastFrame": 344
+            },
+            {
+                "count": 4,
+                "firstFrame": 324,
+                "lastFrame": 327
+            },
+            {
+                "count": 24,
+                "firstFrame": 299,
+                "lastFrame": 322
+            },
+            {
+                "count": 24,
+                "firstFrame": 299,
+                "lastFrame": 322
+            },
+            {
+                "count": 102,
+                "firstFrame": 299,
+                "lastFrame": 413
+            },
+            {
+                "count": 276,
+                "firstFrame": 299,
+                "lastFrame": 574
+            },
+            {
+                "count": 4,
+                "firstFrame": 368,
+                "lastFrame": 371
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 168,
+                "firstFrame": 236,
+                "lastFrame": 403
+            }
+        ]
+    },
+    {
+        "testName": "akuma_sa2_splat",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 268,
+                "firstFrame": 325,
+                "lastFrame": 593
+            },
+            {
+                "count": 35,
+                "firstFrame": 300,
+                "lastFrame": 338
+            },
+            {
+                "count": 4,
+                "firstFrame": 325,
+                "lastFrame": 328
+            },
+            {
+                "count": 24,
+                "firstFrame": 300,
+                "lastFrame": 323
+            },
+            {
+                "count": 24,
+                "firstFrame": 300,
+                "lastFrame": 323
+            },
+            {
+                "count": 175,
+                "firstFrame": 300,
+                "lastFrame": 482
+            },
+            {
+                "count": 293,
+                "firstFrame": 300,
+                "lastFrame": 593
+            },
+            {
+                "count": 32,
+                "firstFrame": 409,
+                "lastFrame": 440
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 236,
+                "firstFrame": 237,
+                "lastFrame": 472
+            }
+        ]
+    },
+    {
         "testName": "akuma_shinra",
         "testVersion": "40",
         "finished": true,
@@ -4280,6 +4481,73 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "bison_sa1_kill",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 94,
+                "firstFrame": 171,
+                "lastFrame": 271
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 271,
+                "lastFrame": 271
             },
             {
                 "count": 0,
