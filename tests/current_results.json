@@ -8778,6 +8778,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "juri_throws",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 757,
+                "firstFrame": 120,
+                "lastFrame": 723
+            },
+            {
+                "count": 3,
+                "firstFrame": 123,
+                "lastFrame": 577
+            },
+            {
+                "count": 6,
+                "firstFrame": 122,
+                "lastFrame": 577
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 179,
+                "firstFrame": 161,
+                "lastFrame": 649
+            },
+            {
+                "count": 332,
+                "firstFrame": 161,
+                "lastFrame": 723
+            },
+            {
+                "count": 1,
+                "firstFrame": 331,
+                "lastFrame": 331
+            },
+            {
+                "count": 149,
+                "firstFrame": 123,
+                "lastFrame": 614
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ken_run_tatsu_hit_behind",
         "testVersion": "39",
         "finished": true,
