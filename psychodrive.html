@@ -143,6 +143,19 @@
         };
         reader.readAsArrayBuffer(file);
       });
+      Module.onRuntimeInitialized = () => {
+        let params = new URLSearchParams(document.location.search || window.location.hash.slice(1));
+        let load = params?.get("load");
+        if (load != null) {
+          var url = window.location.protocol + "//" + window.location.host + "/" + load;
+          fetch(url).then(response => response.arrayBuffer()).then(buffer => {
+              var path = '/tmp/' + self.crypto.randomUUID();
+              try { Module.FS.mkdir('/tmp'); } catch(e) {}
+              Module.FS.writeFile(path, new Uint8Array(buffer));
+              Module.ccall('jsLoadFile', null, ['string'], [path]);
+          });
+        }
+      }
     </script>
     <script type="text/javascript" src="./psychodrive_files.js?version="></script>
     <script type="text/javascript" src="./psychodrive.js?version="></script>

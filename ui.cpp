@@ -1270,12 +1270,24 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         if (webWidgets) {
             ImGui::BeginDisabled();
         }
+        float cursorPosX = ImGui::GetCursorPosX();
+        bool draw = true;
+        if (cursorPosX + kFrameButtonWidth < 0) {
+            draw = false;
+        }
+        if (cursorPosX > renderSizeX) {
+            draw = false;
+        }
         ImVec2 framePos = ImGui::GetCursorScreenPos();
-        if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
-            simController.scrubberFrame = i;
+        if (draw) {
+            if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
+                simController.scrubberFrame = i;
+            }
+        } else {
+            ImGui::Dummy(ImVec2(kFrameButtonWidth,kFrameButtonHeight));
         }
         Guy *guyToUse = gameMode == Viewer ? pGuyPrevFrame : pGuy;
-        if (guyToUse && guyToUse->getCurrentInput() & (UP|DOWN|BACK|FORWARD)) {
+        if (draw && guyToUse && guyToUse->getCurrentInput() & (UP|DOWN|BACK|FORWARD)) {
             int inputToUse = guyToUse->getCurrentInput();
             if (guyToUse->getDirection() < 0) {
                 inputToUse = invertDirection(inputToUse);
@@ -1320,7 +1332,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
                 }
             }
         }
-        if (guyToUse && guyToUse->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
+        if (draw && guyToUse && guyToUse->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
             ImVec2 frameTopMiddle = framePos + ImVec2(kFrameButtonWidth / 2.0 + 3.5, 4.0);
             int button = LP;
             int buttonCount = 0;
