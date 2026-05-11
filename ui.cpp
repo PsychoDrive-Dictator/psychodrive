@@ -1182,7 +1182,10 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
 
     if (!rightSide) {
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
+        float startCursorX = ImGui::GetCursorPosX();
+        ImGui::Text("%s", getCharNiceNameFromID(pGuy->getCharData()->charID));
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
         ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->actionFrameDuration);
         renderFrameMeterCancelWindows(frameIndex);
     }
@@ -1354,7 +1357,10 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         renderFrameMeterCancelWindows(frameIndex);
         Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
         Action *pAction = pGuy->getCurrentActionPtr();
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
+        float startCursorX = ImGui::GetCursorPosX();
+        ImGui::Text("%s", getCharNiceNameFromID(pGuy->getCharData()->charID));
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
         ImGui::Text("%s %d/%d", pAction->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
     }
 

@@ -93,6 +93,17 @@ const char *getCharNameFromID(int charID)
     return nullptr;
 }
 
+const char *getCharNiceNameFromID(int charID)
+{
+    for (charEntry &entry : charEntries ) {
+        if (entry.charID == charID) {
+            return entry.niceName;
+        }
+    }
+
+    return nullptr;
+}
+
 int getCharIDFromName(const char *charName)
 {
     for (charEntry &entry : charEntries) {

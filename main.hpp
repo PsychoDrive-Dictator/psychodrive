@@ -138,6 +138,7 @@ extern std::vector<const char *> charNames;
 extern std::vector<const char *> charNiceNames;
 
 const char *getCharNameFromID(int charID);
+const char *getCharNiceNameFromID(int charID);
 int getCharIDFromName(const char *charName);
 
 extern const char* charVersions[];
