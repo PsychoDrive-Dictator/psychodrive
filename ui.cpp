@@ -1154,7 +1154,7 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
 
         if (timelineTriggers.find(i) != timelineTriggers.end()) {
             float startOffset = (kFrameButtonWidth + kHorizSpacing) * i;
-            ImGui::SetCursorPosX(cursorX + startOffset + 5.0);
+            ImGui::SetCursorPosX(cursorX + startOffset + 10.5);
             ImGui::SetCursorPosY(cursorY - 2.5);
 
             ImGui::PushID(i);
@@ -1271,7 +1271,53 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
             simController.scrubberFrame = i;
         }
-        if (pGuyPrevFrame && pGuyPrevFrame->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
+        Guy *guyToUse = gameMode == Viewer ? pGuyPrevFrame : pGuy;
+        if (guyToUse && guyToUse->getCurrentInput() & (UP|DOWN|BACK|FORWARD)) {
+            int inputToUse = guyToUse->getCurrentInput();
+            if (guyToUse->getDirection() < 0) {
+                inputToUse = invertDirection(inputToUse);
+            }
+            ImVec2 frameTopLeftQuadrant = framePos + ImVec2(6.0, 6.0);
+            const float thickness = 2.0;
+            const float length = 4.5;
+            const ImColor activeOrange = ImColor(ImVec4(0.9,0.3,0.2,1.0));
+            const ImColor lessBrightWhite = ImColor(ImVec4(1.0,1.0,1.0,0.8));
+            ImColor backColor;
+            ImVec2 direction;
+            for (int pass = 0; pass < 2; pass++) {
+                int button = UP;
+                while (button <= FORWARD) {
+                    bool draw = false;
+                    if (!(inputToUse & button) && pass == 0) {
+                        draw = true;
+                    }
+                    if (inputToUse & button && pass == 1) {
+                        draw = true;
+                    }
+                    if (button & FORWARD) {
+                        direction = ImVec2(length,0.0);
+                    }
+                    if (button & BACK) {
+                        direction = ImVec2(-length,0.0);
+                    }
+                    if (button & UP) {
+                        direction = ImVec2(0.0,-length);
+                    }
+                    if (button & DOWN) {
+                        direction = ImVec2(0.0,length);
+                    }
+                    backColor = darkText ? ImColor(kFrameButtonBorderColor) : lessBrightWhite;
+                    if (pass == 1) {
+                        backColor = activeOrange;
+                    }
+                    if (draw) {
+                        ImGui::GetCurrentWindow()->DrawList->AddLine(frameTopLeftQuadrant, frameTopLeftQuadrant + direction, backColor, thickness);
+                    }
+                    button = button << 1;
+                }
+            }
+        }
+        if (guyToUse && guyToUse->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
             ImVec2 frameTopMiddle = framePos + ImVec2(kFrameButtonWidth / 2.0 + 3.5, 4.0);
             int button = LP;
             int buttonCount = 0;
@@ -1279,8 +1325,8 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
                 float x = (buttonCount % 3) * 5.0;
                 float y = (buttonCount / 3) * 5.0;
                 ImColor buttonColor = darkText ? ImColor(kFrameButtonBorderColor) : ImColor(ImVec4(1.0,1.0,1.0,0.8));
-                if (pGuyPrevFrame->getCurrentInput() & button) {
-                    buttonColor = ImColor(ImVec4(1.0,0.0,0.0,1.0));
+                if (guyToUse->getCurrentInput() & button) {
+                    buttonColor = ImColor(ImVec4(0.9,0.3,0.2,1.0));;
                 }
                 ImGui::GetCurrentWindow()->DrawList->AddCircleFilled(frameTopMiddle + ImVec2(x, y), 2.0, buttonColor);
 
