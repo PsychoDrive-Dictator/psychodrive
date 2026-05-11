@@ -1426,8 +1426,56 @@ SimulationController::~SimulationController()
     stateRecording.clear();
 }
 
+bool triedRestoreFromURL = false;
+std::string strRestoreCombo = "";
+int restoreFrame = -1;
+int restoreRound = -1;
+bool hasRestored = false;
+
 void SimulationController::Reset(void)
 {
+#ifdef __EMSCRIPTEN__
+    if (!triedRestoreFromURL) {
+        strRestoreCombo = (char*)EM_ASM_PTR({
+            let params = new URLSearchParams(document.location.search || window.location.hash.slice(1));
+            let combo = params?.get("combo");
+            if (combo == null) {
+                combo = "";
+            }
+            return stringToNewUTF8(combo);
+        });
+        std::string strFrame = (char*)EM_ASM_PTR({
+            let params = new URLSearchParams(document.location.search || window.location.hash.slice(1));
+            let frame = params?.get("frame");
+            if (frame == null) {
+                frame = "";
+            }
+            return stringToNewUTF8(frame);
+        });
+        if (strFrame != "") {
+            int frame = atoi(strFrame.c_str());
+            if (frame > 0) {
+                restoreFrame = frame;
+            }
+        }
+        std::string strRound = (char*)EM_ASM_PTR({
+            let params = new URLSearchParams(document.location.search || window.location.hash.slice(1));
+            let round = params?.get("round");
+            if (round == null) {
+                round = "";
+            }
+            return stringToNewUTF8(round);
+        });
+        if (strRound != "") {
+            int round = atoi(strRound.c_str());
+            if (round > 0) {
+                restoreRound = round;
+            }
+        }
+        triedRestoreFromURL = true;
+    }
+#endif
+
     charControllers.clear();
     charControllers.emplace_back();
     charControllers.emplace_back();
@@ -1454,32 +1502,16 @@ void SimulationController::Reset(void)
     }
 }
 
-bool triedRestoreFromURL = false;
-bool hasRestored = false;
-
 std::string pendingLoad;
 bool hasPendingLoad = false;
 
 bool SimulationController::NewSim(void)
 {
-#ifdef __EMSCRIPTEN__
-    if (!triedRestoreFromURL) {
-        std::string strCombo = (char*)EM_ASM_PTR({
-            let params = new URLSearchParams(document.location.search || window.location.hash.slice(1));
-            let combo = params?.get("combo");
-            if (combo == null) {
-                combo = "";
-            }
-            return stringToNewUTF8(combo);
-        });
-        if (strCombo != "") {
-            Restore(strCombo);
-            hasRestored = true;
-        }
-        triedRestoreFromURL = true;
+    if (strRestoreCombo != "") {
+        Restore(strRestoreCombo);
+        hasRestored = true;
+        strRestoreCombo = "";
     }
-#endif
-
     if (hasPendingLoad) {
         Restore(pendingLoad);
         hasPendingLoad = false;
@@ -1534,6 +1566,12 @@ bool SimulationController::NewSim(void)
     if (hasRestored) {
         playing = true;
         hasRestored = false;
+
+        if (restoreFrame > -1) {
+            scrubberFrame = restoreFrame;
+            playing = false;
+            restoreFrame = -1;
+        }
     }
 
     return true;
@@ -2218,12 +2256,13 @@ void SimulationController::RenderUI(void)
 
         // ImGui::SetNextItemWidth(renderSizeX - 40);
         // ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
-
+        ImGui::Text("Frame %d/%d", scrubberFrame, simFrameCount);
+        ImGui::SameLine();
         if (ImGui::Button("Rewind")) {
             scrubberFrame = 0;
         }
         ImGui::SameLine();
-        if (ImGui::Button("Play")) {
+        if (ImGui::Button(playing ? "Pause" : "Play")) {
             if (simController.scrubberFrame >= simController.simFrameCount - 1) {
                 simController.scrubberFrame = 0;
             }
@@ -2530,6 +2569,15 @@ void SimulationController::LoadFromGameDump(const std::string &path, int version
     scrubberFrame = 0;
     playing = true;
     playSpeed = 1;
+
+    if (restoreFrame > -1) {
+        scrubberFrame = restoreFrame;
+        playing = false;
+        restoreFrame = -1;
+        if (scrubberFrame >= (int)stateRecording.size()) {
+            scrubberFrame = stateRecording.size() - 1;
+        }
+    }
 }
 
 static const nlohmann::json &replayInputBytes(const nlohmann::json &inputData)
@@ -2788,6 +2836,10 @@ void SimulationController::SimulateAllReplayRounds()
 
 void SimulationController::LoadReplayRound(int round)
 {
+    if (restoreRound > -1) {
+        round = restoreRound;
+        restoreRound = -1;
+    }
     if (round == replayCurrentRound) return;
     if (round < 0 || round >= (int)replayRoundRecordings.size()) return;
 
@@ -2803,6 +2855,15 @@ void SimulationController::LoadReplayRound(int round)
     prevScrubberFrame = -1;
     playing = true;
     playSpeed = 1;
+
+    if (restoreFrame > -1) {
+        scrubberFrame = restoreFrame;
+        playing = false;
+        restoreFrame = -1;
+        if (scrubberFrame >= (int)stateRecording.size()) {
+            scrubberFrame = stateRecording.size() - 1;
+        }
+    }
 }
 
 int CharacterUIController::getOptionFlags()
