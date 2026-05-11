@@ -1172,7 +1172,6 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
 {
     ImGui::PushID(getSimCharSlot());
 
-    const float kFrameButtonHeight = 35.0;
     const ImVec4 kFrameButtonBorderColor = ImVec4(0.0,0.0,0.0,1.0);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(kHorizSpacing,ImGui::GetStyle().ItemSpacing.y));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
@@ -1228,6 +1227,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     for (int i = 0; i < frameCount; i++) {
         Guy *pGuy = simController.getRecordedGuy(i, getSimCharSlot());
         Guy *pGuyNextFrame = simController.getRecordedGuy(i+1, getSimCharSlot());
+        Guy *pGuyPrevFrame = i > 0 ? simController.getRecordedGuy(i-1, getSimCharSlot()) : nullptr;
         if (i != 0) ImGui::SameLine();
 
         ImGui::PushID(i);
@@ -1267,8 +1267,26 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
         if (webWidgets) {
             ImGui::BeginDisabled();
         }
+        ImVec2 framePos = ImGui::GetCursorScreenPos();
         if (ImGui::Button(strButtonCaption.c_str(), ImVec2(kFrameButtonWidth,kFrameButtonHeight))) {
             simController.scrubberFrame = i;
+        }
+        if (pGuyPrevFrame && pGuyPrevFrame->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
+            ImVec2 frameTopMiddle = framePos + ImVec2(kFrameButtonWidth / 2.0 + 3.5, 4.0);
+            int button = LP;
+            int buttonCount = 0;
+            while (button <= HK) {
+                float x = (buttonCount % 3) * 5.0;
+                float y = (buttonCount / 3) * 5.0;
+                ImColor buttonColor = darkText ? ImColor(kFrameButtonBorderColor) : ImColor(ImVec4(1.0,1.0,1.0,0.8));
+                if (pGuyPrevFrame->getCurrentInput() & button) {
+                    buttonColor = ImColor(ImVec4(1.0,0.0,0.0,1.0));
+                }
+                ImGui::GetCurrentWindow()->DrawList->AddCircleFilled(frameTopMiddle + ImVec2(x, y), 2.0, buttonColor);
+
+                button = button << 1;
+                buttonCount++;
+            }
         }
         if (webWidgets) {
             ImGui::EndDisabled();
@@ -1313,7 +1331,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     ImVec2 *curTrongle = rightSide ? upsideDownTrongle : trongle;
     for (int i = 0; i < IM_ARRAYSIZE(trongle); i++) {
         curTrongle[i] += ImGui::GetWindowPos();
-        curTrongle[i].x += kFrameOffset * (kHorizSpacing + kFrameButtonWidth);
+        curTrongle[i].x += kFrameOffset * (kHorizSpacing + kFrameButtonWidth) + 5.5;
         curTrongle[i].y += tronglePosY;
         if (rightSide) {
             curTrongle[i].y += kFrameButtonHeight - 1.0;
@@ -2121,7 +2139,7 @@ void SimulationController::RenderUI(void)
     }
 
     if (simFrameCount) {
-        ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 200));
+        ImGui::SetNextWindowPos(ImVec2(0, renderSizeY - 220));
         ImGui::SetNextWindowSize(ImVec2(renderSizeX, 0));
 
         ImGui::Begin("PsychoDrive Bottom Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |

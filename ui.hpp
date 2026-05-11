@@ -58,8 +58,9 @@ public:
 
     // number of frames to show behind present, eg. how far right the current frame arrow is
     static constexpr int kFrameOffset = 8;
-    static constexpr float kHorizSpacing = 1.0;
-    static constexpr float kFrameButtonWidth = 25.0;
+    static constexpr float kHorizSpacing = 2.0;
+    static constexpr float kFrameButtonWidth = 36.0;
+    static constexpr float kFrameButtonHeight = 48.0;
 
     std::map<int, ActionRef> timelineTriggers;
     std::vector<inputRegion> inputRegions;
