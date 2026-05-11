@@ -2000,12 +2000,13 @@ int Guy::getFrameMeterColorIndex() {
 
 bool Guy::Push(Guy *pOtherGuy)
 {
+    if ( !pOtherGuy ) return false;
+
     // might need to put this at the end if we find ordering difference, but convenient for now
-    if (pOtherGuy) {
-        for (GuyRef minion : pOtherGuy->getMinions()) {
-            Push(minion);
-        }
+    for (GuyRef minion : pOtherGuy->getMinions()) {
+        Push(minion);
     }
+
     // seems like ignore hitstop bit lingers for one frame but just for push?
     // probably symptom of an ordering difference
     bool canPush = !(warudo || (getHitStop() && !wasIgnoreHitStop));
@@ -2013,7 +2014,6 @@ bool Guy::Push(Guy *pOtherGuy)
     if (!canPush && !otherGuyCanPush) return false;
 
     if (didPush) return false;
-    if ( !pOtherGuy ) return false;
     // for now, maybe there's other rules
     if (isProjectile && !pOtherGuy->isProjectile) return false;
     if (!isProjectile && pOtherGuy->isProjectile) return false;
