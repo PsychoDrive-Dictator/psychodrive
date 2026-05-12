@@ -33,6 +33,8 @@ public:
     void renderActionSetup(int frameIndex);
     void renderFrameMeter(int frameIndex);
     void renderFrameMeterCancelWindows(int frameIndex);
+    void drawInput(int input, ImVec2 pos, float scale, float brightBG, float alwaysDrawBG);
+    void renderCharSummaryRow();
     int getSimCharSlot(void) { return rightSide ? 1 : 0; }
     int getInput(int frameIndex);
     int getOptionFlags();
@@ -61,6 +63,7 @@ public:
     static constexpr float kHorizSpacing = 1.0;
     static constexpr float kFrameButtonWidth = 29.0;
     static constexpr float kFrameButtonHeight = 40.0;
+    static constexpr ImVec4 kFrameButtonBorderColor = ImVec4(0.0,0.0,0.0,1.0);
 
     std::map<int, ActionRef> timelineTriggers;
     std::vector<inputRegion> inputRegions;

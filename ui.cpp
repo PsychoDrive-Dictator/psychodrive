@@ -1168,11 +1168,94 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
     ImGui::PopStyleColor();
 }
 
+void CharacterUIController::drawInput(int input, ImVec2 pos, float scale, float brightBG, float alwaysDrawBG)
+{
+    if (input & (UP|DOWN|BACK|FORWARD) || alwaysDrawBG) {
+        ImVec2 frameTopLeftQuadrant = pos + ImVec2(6.0 * scale, 6.0 * scale);
+        const float thickness = 2.0 * scale;
+        const float length = 4.5 * scale;
+        const ImColor activeOrange = ImColor(ImVec4(0.9,0.3,0.2,1.0));
+        const ImColor lessBrightWhite = ImColor(ImVec4(1.0,1.0,1.0,0.8));
+        ImColor backColor;
+        ImVec2 direction;
+        for (int pass = 0; pass < 2; pass++) {
+            int button = UP;
+            while (button <= FORWARD) {
+                bool draw = false;
+                if (!(input & button) && pass == 0) {
+                    draw = true;
+                }
+                if (input & button && pass == 1) {
+                    draw = true;
+                }
+                if (button & FORWARD) {
+                    direction = ImVec2(length,0.0);
+                }
+                if (button & BACK) {
+                    direction = ImVec2(-length,0.0);
+                }
+                if (button & UP) {
+                    direction = ImVec2(0.0,-length);
+                }
+                if (button & DOWN) {
+                    direction = ImVec2(0.0,length);
+                }
+                backColor = !brightBG ? ImColor(kFrameButtonBorderColor) : lessBrightWhite;
+                if (pass == 1) {
+                    backColor = activeOrange;
+                }
+                if (draw) {
+                    ImGui::GetCurrentWindow()->DrawList->AddLine(frameTopLeftQuadrant, frameTopLeftQuadrant + direction, backColor, thickness);
+                }
+                button = button << 1;
+            }
+        }
+    }
+    if (input & (LP|MP|HP|LK|MK|HK) || alwaysDrawBG) {
+        ImVec2 frameTopMiddle = pos + ImVec2(15.0 * scale, 4.0 * scale);
+        int button = LP;
+        int buttonCount = 0;
+        while (button <= HK) {
+            float x = (buttonCount % 3) * 5.0 * scale;
+            float y = (buttonCount / 3) * 5.0 * scale;
+            ImColor buttonColor = !brightBG ? ImColor(kFrameButtonBorderColor) : ImColor(ImVec4(1.0,1.0,1.0,0.8));
+            if (input & button) {
+                buttonColor = ImColor(ImVec4(0.9,0.3,0.2,1.0));;
+            }
+            ImGui::GetCurrentWindow()->DrawList->AddCircleFilled(frameTopMiddle + ImVec2(x, y), 2.0 * scale, buttonColor);
+
+            button = button << 1;
+            buttonCount++;
+        }
+    }
+}
+
+void CharacterUIController::renderCharSummaryRow()
+{
+    Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
+    Guy *pGuyPrevFrame = simController.scrubberFrame > 0 ? simController.getRecordedGuy(simController.scrubberFrame-1, getSimCharSlot()) : nullptr;
+    float startCursorX = ImGui::GetCursorPosX();
+    //ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth) - 150.0);
+    ImGui::Text("%s", getCharNiceNameFromID(pGuy->getCharData()->charID));
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth) - 60.0);
+    Guy *guyToUse = gameMode == Viewer ? pGuyPrevFrame : pGuy;
+    if (guyToUse) {
+        int inputToUse = guyToUse->getCurrentInput();
+        if (guyToUse->getDirection() < 0) {
+            inputToUse = invertDirection(inputToUse);
+        }
+        drawInput(inputToUse, ImGui::GetCursorScreenPos() - ImVec2(0.0, 5.0), 2.0, true, true);
+    }
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
+    ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->actionFrameDuration);
+}
+
 void CharacterUIController::renderFrameMeter(int frameIndex)
 {
     ImGui::PushID(getSimCharSlot());
 
-    const ImVec4 kFrameButtonBorderColor = ImVec4(0.0,0.0,0.0,1.0);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(kHorizSpacing,ImGui::GetStyle().ItemSpacing.y));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
@@ -1181,12 +1264,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     int frameCount = simController.stateRecording.size();
 
     if (!rightSide) {
-        Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
-        float startCursorX = ImGui::GetCursorPosX();
-        ImGui::Text("%s", getCharNiceNameFromID(pGuy->getCharData()->charID));
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
-        ImGui::Text("%s %d/%d", pGuy->getCurrentActionPtr()->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pGuy->getCurrentActionPtr()->actionFrameDuration);
+        renderCharSummaryRow();
         renderFrameMeterCancelWindows(frameIndex);
     }
 
@@ -1287,73 +1365,15 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
             ImGui::Dummy(ImVec2(kFrameButtonWidth,kFrameButtonHeight));
         }
         Guy *guyToUse = gameMode == Viewer ? pGuyPrevFrame : pGuy;
-        if (draw && guyToUse && guyToUse->getCurrentInput() & (UP|DOWN|BACK|FORWARD)) {
+        if (draw && guyToUse) {
             int inputToUse = guyToUse->getCurrentInput();
             if (guyToUse->getDirection() < 0) {
                 inputToUse = invertDirection(inputToUse);
             }
-            ImVec2 frameTopLeftQuadrant = framePos + ImVec2(6.0, 6.0);
             if (rightSide) {
-                frameTopLeftQuadrant.y = framePos.y + kFrameButtonHeight - 7.0;
+                framePos.y = framePos.y + kFrameButtonHeight - 13.0;
             }
-            const float thickness = 2.0;
-            const float length = 4.5;
-            const ImColor activeOrange = ImColor(ImVec4(0.9,0.3,0.2,1.0));
-            const ImColor lessBrightWhite = ImColor(ImVec4(1.0,1.0,1.0,0.8));
-            ImColor backColor;
-            ImVec2 direction;
-            for (int pass = 0; pass < 2; pass++) {
-                int button = UP;
-                while (button <= FORWARD) {
-                    bool draw = false;
-                    if (!(inputToUse & button) && pass == 0) {
-                        draw = true;
-                    }
-                    if (inputToUse & button && pass == 1) {
-                        draw = true;
-                    }
-                    if (button & FORWARD) {
-                        direction = ImVec2(length,0.0);
-                    }
-                    if (button & BACK) {
-                        direction = ImVec2(-length,0.0);
-                    }
-                    if (button & UP) {
-                        direction = ImVec2(0.0,-length);
-                    }
-                    if (button & DOWN) {
-                        direction = ImVec2(0.0,length);
-                    }
-                    backColor = darkText ? ImColor(kFrameButtonBorderColor) : lessBrightWhite;
-                    if (pass == 1) {
-                        backColor = activeOrange;
-                    }
-                    if (draw) {
-                        ImGui::GetCurrentWindow()->DrawList->AddLine(frameTopLeftQuadrant, frameTopLeftQuadrant + direction, backColor, thickness);
-                    }
-                    button = button << 1;
-                }
-            }
-        }
-        if (draw && guyToUse && guyToUse->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
-            ImVec2 frameTopMiddle = framePos + ImVec2(15.0, 4.0);
-            if (rightSide) {
-                frameTopMiddle.y = framePos.y + kFrameButtonHeight - 9.0;
-            }
-            int button = LP;
-            int buttonCount = 0;
-            while (button <= HK) {
-                float x = (buttonCount % 3) * 5.0;
-                float y = (buttonCount / 3) * 5.0;
-                ImColor buttonColor = darkText ? ImColor(kFrameButtonBorderColor) : ImColor(ImVec4(1.0,1.0,1.0,0.8));
-                if (guyToUse->getCurrentInput() & button) {
-                    buttonColor = ImColor(ImVec4(0.9,0.3,0.2,1.0));;
-                }
-                ImGui::GetCurrentWindow()->DrawList->AddCircleFilled(frameTopMiddle + ImVec2(x, y), 2.0, buttonColor);
-
-                button = button << 1;
-                buttonCount++;
-            }
+            drawInput(inputToUse, framePos, 1.0, !darkText, false);
         }
         if (webWidgets) {
             ImGui::EndDisabled();
@@ -1373,13 +1393,7 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
 
     if (rightSide) {
         renderFrameMeterCancelWindows(frameIndex);
-        Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
-        Action *pAction = pGuy->getCurrentActionPtr();
-        float startCursorX = ImGui::GetCursorPosX();
-        ImGui::Text("%s", getCharNiceNameFromID(pGuy->getCharData()->charID));
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(startCursorX + kFrameOffset * (kHorizSpacing + kFrameButtonWidth));
-        ImGui::Text("%s %d/%d", pAction->niceNameDyn.c_str(), pGuy->getCurrentFrame(), pAction->actionFrameDuration);
+        renderCharSummaryRow();
     }
 
     ImGui::PopStyleColor();
