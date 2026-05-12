@@ -1955,24 +1955,26 @@ void SimulationController::RenderUI(void)
         ImGui::Begin("PsychoDrive Left Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus );
         if (gameMode == Viewer) {
-            ImGui::Text("Log:");
-            ImGui::SameLine();
-            bool changed = false;
-            changed |= ImGui::Checkbox("unknowns", &viewerLogUnknowns);
-            ImGui::SameLine();
-            changed |= ImGui::Checkbox("hits", &viewerLogHits);
-            ImGui::SameLine();
-            changed |= ImGui::Checkbox("triggers", &viewerLogTriggers);
-            ImGui::SameLine();
-            changed |= ImGui::Checkbox("branches", &viewerLogBranches);
-            ImGui::SameLine();
-            changed |= ImGui::Checkbox("transitions", &viewerLogTransitions);
-            ImGui::SameLine();
-            changed |= ImGui::Checkbox("resources", &viewerLogResources);
-            if (changed) {
-                ReloadViewer();
+            if (toggleDebugUI) {
+                ImGui::Text("Log:");
+                ImGui::SameLine();
+                bool changed = false;
+                changed |= ImGui::Checkbox("unknowns", &viewerLogUnknowns);
+                ImGui::SameLine();
+                changed |= ImGui::Checkbox("hits", &viewerLogHits);
+                ImGui::SameLine();
+                changed |= ImGui::Checkbox("triggers", &viewerLogTriggers);
+                ImGui::SameLine();
+                changed |= ImGui::Checkbox("branches", &viewerLogBranches);
+                ImGui::SameLine();
+                changed |= ImGui::Checkbox("transitions", &viewerLogTransitions);
+                ImGui::SameLine();
+                changed |= ImGui::Checkbox("resources", &viewerLogResources);
+                if (changed) {
+                    ReloadViewer();
+                }
+                ImGui::Separator();
             }
-            ImGui::Separator();
             if (replayRoundCount > 0) {
                 for (int r = 0; r < replayRoundCount; r++) {
                     auto &result = replayRoundRecordings[r].result;
