@@ -1293,6 +1293,9 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
                 inputToUse = invertDirection(inputToUse);
             }
             ImVec2 frameTopLeftQuadrant = framePos + ImVec2(6.0, 6.0);
+            if (rightSide) {
+                frameTopLeftQuadrant.y = framePos.y + kFrameButtonHeight - 7.0;
+            }
             const float thickness = 2.0;
             const float length = 4.5;
             const ImColor activeOrange = ImColor(ImVec4(0.9,0.3,0.2,1.0));
@@ -1333,7 +1336,10 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
             }
         }
         if (draw && guyToUse && guyToUse->getCurrentInput() & (LP|MP|HP|LK|MK|HK)) {
-            ImVec2 frameTopMiddle = framePos + ImVec2(kFrameButtonWidth / 2.0 + 3.5, 4.0);
+            ImVec2 frameTopMiddle = framePos + ImVec2(15.0, 4.0);
+            if (rightSide) {
+                frameTopMiddle.y = framePos.y + kFrameButtonHeight - 9.0;
+            }
             int button = LP;
             int buttonCount = 0;
             while (button <= HK) {
@@ -1382,22 +1388,22 @@ void CharacterUIController::renderFrameMeter(int frameIndex)
     ImGui::PopStyleVar();
 
     ImVec2 trongle[] = {
-        {15.0,0.0},
-        {25.0,0.0},
-        {20.0,8.0}
+        {11.0,0.0},
+        {23.0,0.0},
+        {17.0,9.0}
     };
     // can't just invert it as both need to be clockwise for imgui AA
     ImVec2 upsideDownTrongle[] = {
-        {15.0,0.0},
-        {20.0,-8.0},
-        {25.0,0.0}
+        {11.0,0.0},
+        {17.0,-9.0},
+        {23.0,0.0}
     };
-    ImVec2 *curTrongle = rightSide ? upsideDownTrongle : trongle;
+    ImVec2 *curTrongle = rightSide ? trongle : upsideDownTrongle;
     for (int i = 0; i < IM_ARRAYSIZE(trongle); i++) {
         curTrongle[i] += ImGui::GetWindowPos();
         curTrongle[i].x += kFrameOffset * (kHorizSpacing + kFrameButtonWidth) + 5.5;
         curTrongle[i].y += tronglePosY;
-        if (rightSide) {
+        if (!rightSide) {
             curTrongle[i].y += kFrameButtonHeight - 1.0;
         } else {
             curTrongle[i].y += 1.0;
