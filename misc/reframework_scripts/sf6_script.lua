@@ -824,6 +824,25 @@ function loadReplay(filename, outBattleReplayData)
   local jsonreplay = replayfile:read "*a"
   replayfile:close()
   local table = myjson.decode(jsonreplay)
+  if table.BattleReplayData ~= nil then
+    table = table.BattleReplayData
+  end
+  -- pad up to 5 empty rounds so we don't downsize the game's fixed round info array
+  local roundInfo = table.ReplayInfo and table.ReplayInfo.RoundInfo
+  if roundInfo ~= nil then
+    while #roundInfo < 5 do
+      roundInfo[#roundInfo + 1] = {
+        BgmInfo = {DataPlayerId = -1, IsUseW = false, PlayerId = -1, SoundId = -1},
+        FinishType = 0,
+        NegativeEdgeFlags = {_items = {}, _size = 0, _version = 0},
+        RandomSeed = 0,
+        SAGaugeStart = {0, 0},
+        StyleNo = {0, 0},
+        UniqueParam = {0, 0},
+        WinPlayerType = 0,
+      }
+    end
+  end
   table_to_managed_object(outBattleReplayData, table)
   -- validate import
   --logToFile( managed_object_to_json(outBattleReplayData), "replay_out.json")

@@ -2100,7 +2100,7 @@ void SimulationController::RenderUI(void)
                     } else {
                         display = err;
                     }
-                    int scrubberForError = pe.frame + 1;
+                    int scrubberForError = pe.frame - pSim->gameStateStartFrame + 1;
                     bool isCurrentFrame = (scrubberForError == scrubberFrame);
                     if (isCurrentFrame) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));

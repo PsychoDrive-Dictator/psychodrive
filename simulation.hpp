@@ -115,6 +115,7 @@ public:
     bool dumpCompareFirstFrame = true;
     nlohmann::json gameStateDump;
     int gameStateFrame = 0;
+    int gameStateStartFrame = 0;
     int replayErrors = 0;
 
     bool replayingReplay = false;

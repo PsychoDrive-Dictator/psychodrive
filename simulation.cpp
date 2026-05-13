@@ -234,6 +234,7 @@ bool Simulation::SetupFromGameDump(std::string dumpPath, int version)
     }
 
     gameStateFrame = i;
+    gameStateStartFrame = i;
 
     if (gameStateDump[i].contains("stageTimer")) {
         frameCounter = gameStateDump[i]["stageTimer"];
