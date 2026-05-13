@@ -608,139 +608,6 @@ function logToFile(message, forcedFileOut)
  
 end
 
---hookinstalled=0
-
---function onGamePadConnectedEvent(gamePadDevice)
---	logToFile( "event " )
---end
-
-function dumpPlayers()
-  gamePlayer = sdk.get_native_singleton("via.hid.GamePlayer")
-  gamePlayerTypeDef = sdk.find_type_definition("via.hid.GamePlayer")
-  playerInfoTypeDef = sdk.find_type_definition("via.hid.GamePlayerInfo")
-  playerCount = sdk.call_native_func(gamePlayer, gamePlayerTypeDef, "getAllPlayerInfoCount" )
-
-  logToFile( "dumpPlayers:" )
-  local i = 0
-  while i < playerCount do
-    playerInfo = sdk.call_native_func(gamePlayer, gamePlayerTypeDef, "getAllPlayerInfo(System.UInt32)", i )
-    assigned = sdk.call_native_func(playerInfo, playerInfoTypeDef, "get_Assigned" )
-    gamePadDevice = sdk.call_native_func(playerInfo, playerInfoTypeDef, "get_GamePadDevice" )
-    gamePadHidName = gamePadDevice and gamePadDevice:call("get_Name")
-    gamePadID = gamePadDevice and gamePadDevice:call("get_UniqueId")
-    if assigned == true then
-      logToFile( i .. " " .. gamePadID .. " " .. gamePadHidName )
-    end
-
-    i = i + 1
-  end
-  logToFile( "dumpPlayers end." )
-end
-
-sdk.hook(sdk.find_type_definition("via.hid.GamePlayer"):get_method("findAssignedPlayerIndex"),
-function(args)
-  -- dumpPlayers()
-  dumpPlayersNextFrame = true
-end,
-function(retval)
-    return retval
-end
-)
-
-sdk.hook(sdk.find_type_definition("via.hid.NativeDeviceBase"):get_method("clearEvents"),
-function(args)
-  -- dumpPlayers()
-  dumpPlayersNextFrame = true
-end,
-function(retval)
-    return retval
-end
-)
-
-local lastBattleFlow
-
-sdk.hook(sdk.find_type_definition("app.battle.bBattleFlow"):get_method("startBattle"),
-function(args)
-  local maybeBattleFlowObj = sdk.to_managed_object(args[2])
-  lastBattleFlow = maybeBattleFlowObj
-  local battleDesc = maybeBattleFlowObj:get_field("m_desc")
-  local m_round = maybeBattleFlowObj:get_field("m_round")
-
-  logToFile( "VS start. Round: " .. m_round .. " Stage: " .. tostring(battleDesc:get_field("Stage"):get_field("StageId")) .. " Rule: " .. tostring(battleDesc:get_field("Rule"):get_field("GameMode")) )
-
-  local battleCore = maybeBattleFlowObj:get_field("m_battle_core")
-  local fighterDescs = battleCore:get_field("_FighterDescs")
-  local fighters = battleCore:call("get_Fighters")
-
-  local inputManager = sdk.get_managed_singleton("app.InputManager")
-  
-  -- doesn't work?
-  -- if hookinstalled == 0 then
-	--  sdk.call_native_func(sdk.get_native_singleton("via.hid.GamePad"), sdk.find_type_definition("via.hid.GamePad"), "setGamePadConnectedEvent", onGamePadConnectedEvent)
-	--  logToFile( "hook installed" )
-	--  
-  --  hookinstalled = 1
-  --end
-
-  
-  local i = 0
-  while fighterDescs[i] do
-  	local fd = fighterDescs[i]
-  	local padID = fd:get_field("PadId")
-
-  	local inputDevice = inputManager:call("GetDevice(System.Int32)", padID)
-  	local gamePad = inputDevice and inputDevice:get_field("GamePad")
-    local gamePadUniqueID = gamePad and gamePad:call("get_UniqueId")
-  	local gamePadHidName = gamePad and gamePad:call("get_Name")
-    local charName = fighters[i] and fighters[i]:call("get_Name")
-    logToFile( "Fighter " .. tostring(i) .. " " .. charName .. " PadID " .. tostring(padID) .. " " .. tostring(gamePadHidName)  .. " " .. tostring(gamePadUniqueID) )
-	  
-    i = i + 1
-  end
-
-  -- BattleFlow.saveReplay(MatchData resultData)
-  -- byte = BattleFlow.getReplayData
-
-  -- app.battle.BattleReplayController.Start(app.battle.BattleReplayController.EReplayType)
-  -- and End
-  -- on replays ave?
-  -- app.BattleReplayDataManager.AddReplayData(app.BattleReplayData, System.String, app.network.api.HatoClientAPI.Component.CommonReplayInfo)
-
-  -- app.battle.bBattleFlow.MatchLog.setRoundWinnder(System.Int32, app.battle.BattleDesc)
-  -- app.battle.bBattleFlow.MatchLog.setMatchWinner(System.Int32, app.battle.BattleDesc)
-
-  -- this happens on gamepad disconnect!
-  -- via.hid.NativeDeviceBase.clearEvents()
-  -- vid.hidGamePlayer…getAllPlayerInfoCount
-  -- getAllPlayerInfo(System.UInt32) with return from above
-  -- via.hid.GamePlauyerInfo
-  -- via.hid.GamePadDevice = getGamePadDevice(via.hid.GamePlayerIndex)
-
-  -- 0 seems to be Left - esf001v00 is ryu, PadID swaps if the players swap controllers before the game starts
-end,
-function(retval)
-    return retval
-end
-)
-
-sdk.hook(sdk.find_type_definition("app.battle.bBattleFlow.MatchLog"):get_method("setRoundWinner"),
-function(args)
-  logToFile( "setRoundWinner " .. sdk.to_int64(args[3]) )
-end,
-function(retval)
-    return retval
-end
-)
-
-sdk.hook(sdk.find_type_definition("app.battle.bBattleFlow.MatchLog"):get_method("setMatchWinner"),
-function(args)
-  logToFile( "setMatchWinner " .. sdk.to_int64(args[3]) )
-end,
-function(retval)
-    return retval
-end
-)
-
 function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOnly, isType )
   local fields
   if isType == nil then
@@ -813,8 +680,14 @@ function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOn
             newElem = obj_to_table(element, staticIgnoreList, recurseCount, allowStatic, staticOnly)
             for elemFieldName, elemFieldValue in pairs(newElem) do
               -- should only be one non-static element remaining in there for valuetype..
-              table.insert( out[name], elemFieldValue )
-              break
+              local useElem = true
+              if element:get_type_definition():get_name() == "B4" and elemFieldName ~= "raw" then
+                useElem = false
+              end
+              if useElem then
+                table.insert( out[name], elemFieldValue )
+                break
+              end
             end
           else
             table.insert( out[name], obj_to_table(element, staticIgnoreList, recurseCount, allowStatic, staticOnly) )
@@ -884,7 +757,7 @@ function table_to_managed_object(managed, table)
         local targetArraySize = value:get_size()
         local sourceArraySize = #table[name]
         local arrayElementType = string.gsub(value:get_type_definition():get_full_name(), "%[%]", "")
-        -- logToFile( "array " .. name .. " json size " .. sourceArraySize .. " target size " .. targetArraySize .. " elem " .. arrayElementType )
+        --logToFile( "array " .. name .. " json size " .. sourceArraySize .. " target size " .. targetArraySize .. " elem " .. arrayElementType )
   
         if targetArraySize ~= sourceArraySize then
           -- allocate new array in dest
@@ -897,10 +770,39 @@ function table_to_managed_object(managed, table)
 
         for j, element in ipairs(value:get_elements()) do
           if element:get_type_definition():is_value_type() and element:get_type_definition():get_name() ~= "Guid" then
-            --logToFile("elem j " .. j .. " value " .. table[name][j])
-            value[j-1] = table[name][j]
+            --logToFile(name .. " " .. element:get_type_definition():get_name() .. " elem j " .. j .. " value " .. table[name][j])
+
+            if element:get_type_definition():get_name() == "B4" then
+              --value[j-1].b0 = table[name][j]
+              --logToFile("b4 path.. " .. table[name][j] .. " old value " .. value[j-1].raw)
+
+
+              --value[j-1]:write_dword(element:get_type_definition():get_field("raw"):get_offset_from_base(), table[name][j])
+
+              local newB4 = sdk.create_instance(arrayElementType);
+              newB4:add_ref()
+              newB4.raw = table[name][j]
+              value[j-1] = newB4
+              --value[j-1]:set_field("raw", newRaw)
+              -- value[j-1]:write_byte(element:get_type_definition():get_field("b0"):get_offset_from_base(), value[j-1].raw & 0xFF)
+              -- value[j-1]:write_byte(element:get_type_definition():get_field("b1"):get_offset_from_base(), value[j-1].raw & 0xFF)
+              -- value[j-1]:write_byte(element:get_type_definition():get_field("b2"):get_offset_from_base(), value[j-1].raw & 0xFF)
+              -- value[j-1]:write_byte(element:get_type_definition():get_field("b3"):get_offset_from_base(), value[j-1].raw & 0xFF)
+
+
+              --logToFile("b4 path again.. " .. table[name][j] .. " old value " .. value[j-1].raw)
+              --write_valuetype(managed, name, table[name][j])
+            else
+              value[j-1] = table[name][j]
+            end
+
+            --elemValue = table[name][j]
+
+            --local elemValue = sdk.create_int32(table[name][j])
+            --elemValue:add_ref()
+            --value:call("SetValue(System.Object, System.Int32)", elemValue , j-1)
           else
-            table_to_managed_object(element, table[name][j])
+            table_to_managed_object(value[j-1], table[name][j])
           end
         end
       elseif typeName == "Guid" then
@@ -910,7 +812,7 @@ function table_to_managed_object(managed, table)
       elseif sdk.is_managed_object(value) then
         table_to_managed_object(value, table[name])
       else
-        --logToFile("set field " .. name .. "typename" .. typeName .. "value" .. tostring(table[name]))
+        -- logToFile("set field " .. name .. "typename" .. typeName .. "value" .. tostring(table[name]))
         managed:set_field(name, table[name])
       end
     end
@@ -922,17 +824,17 @@ function loadReplay(filename, outBattleReplayData)
   local jsonreplay = replayfile:read "*a"
   replayfile:close()
   local table = myjson.decode(jsonreplay)
-  table_to_managed_object(outBattleReplayData, table["BattleReplayData"])
+  table_to_managed_object(outBattleReplayData, table)
+  -- validate import
+  --logToFile( managed_object_to_json(outBattleReplayData), "replay_out.json")
   
-  local inputDataCount = #table["BattleReplayData"]["InputData"]["mValue"]
-  local inputData = sdk.create_managed_array("System.Byte", inputDataCount)
-  inputData:add_ref()
-
-  for i, element in ipairs(inputData:get_elements()) do
-    inputData:call("SetValue(System.Object, System.Int32)", sdk.create_byte(table["BattleReplayData"]["InputData"]["mValue"][i]) , i-1)
-  end
-
-  outBattleReplayData:set_field("InputData", inputData)
+  --local inputDataCount = #table["InputData"]
+  --local inputData = sdk.create_managed_array("System.Byte", inputDataCount)
+  --inputData:add_ref()
+  --for i, element in ipairs(inputData:get_elements()) do
+  --  inputData:call("SetValue(System.Object, System.Int32)", sdk.create_byte(table["InputData"][i]) , i-1)
+  --end
+  --outBattleReplayData:set_field("InputData", inputData)
 end
 
 sdk.hook(sdk.find_type_definition("app.BattleReplayDataManager"):get_method("AddReplayData"),
@@ -944,7 +846,10 @@ function(args)
   end
   if dumpingOnlineReplays == true then
     logToFile( "AddReplayData - dumping" )
-    local replayID = sdk.to_managed_object(args[4]):ToString()
+    local replayID = "local"
+    if sdk.to_managed_object(args[4]) ~= nil then
+      replayID = sdk.to_managed_object(args[4]):ToString()
+    end
     local replayFileName = "replay_viewed_" .. replayID .. ".json"
     logToFile( managed_object_to_json(BattleReplayData), replayFileName)
   end
