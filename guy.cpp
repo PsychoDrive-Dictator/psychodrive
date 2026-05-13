@@ -3873,6 +3873,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
     if (blocking || isClash) {
         // todo should we remove other special status here?
         destY = 0;
+        // don't get poisoned or otherwise debuffed when blocking
+        if (applyHit) { // lame way to let direct damage through even if blocking
+            dmgKind = 0;
+        }
     }
 
     // if going airborne, start counting juggle
