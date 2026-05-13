@@ -1295,10 +1295,6 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         initialMatch = atLeastOneNotConsumed && bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
         bool atLeastOneNotConsumed = false;
-        if (okCondFlags & 1024) {
-            // 1f slop for looking for the initial edge by hand
-            initialSearch += 1;
-        }
         while (cursorPos < initialSearch)
         {
             // possible to be all zeroes?
@@ -1329,6 +1325,9 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
             }
             cursorPos++;
         }
+        if (match && !((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[cursorPos], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))) {
+            match = false;
+        }
         if (atLeastOneNotConsumed == false) {
             initialMatch = false;
         }
@@ -1353,10 +1352,10 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
                 return false;
             }
         }
-        // only positive edge for held inputs during defer
-        // if (forDefer) {
-        //     return false;
-        // }
+        // only positive edge for held inputs during defer in.. hitstun... yep
+        if (forDefer && hitStun) {
+            return false;
+        }
     }
     return initialMatch;
 }
@@ -1633,7 +1632,7 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
 
         for (auto &initialI : initialIsToConsume) {
-            lastTriggerFrame = pSim->frameCounter - initialI;
+            //lastTriggerFrame = pSim->frameCounter - initialI;
             dc.inputBuffer[initialI] |= CONSUMED;
             // if someone uses both trigger input branch and multiple ambiguous deferred triggers,
             // we have to start remembering trigger input per kept deferred trigger
@@ -7037,6 +7036,9 @@ void Guy::ExitStyle() {
     } else {
         styleInstall = style.parentStyleID;
     }
+    if (styleInstall == -1) {
+        styleInstall = 0;
+    }
 }
 
 void Guy::RevokeStyle() {
@@ -7051,6 +7053,9 @@ void Guy::RevokeStyle() {
     if (oldStyleInstall == styleInstall) {
         // if it didn't do anything?
         styleInstall = style.parentStyleID;
+    }
+    if (styleInstall == -1) {
+        styleInstall = 0;
     }
 }
 
