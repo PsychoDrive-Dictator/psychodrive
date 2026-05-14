@@ -6221,9 +6221,11 @@ void Guy::DoSwitchKey(void)
 
         int operation = switchKey.operationFlag;
 
-        if (operation & 1) {
-            log (logTransitions, "force landing op");
-            forceLanding = true;
+        if (currentFrame == switchKey.endFrame - 1) {
+            if (operation & 1) {
+                log (logTransitions, "force landing op");
+                forceLanding = true;
+            }
         }
     }
 }
