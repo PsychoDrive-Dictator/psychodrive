@@ -1089,6 +1089,7 @@ void loadProjectileDatas(nlohmann::json* pMovesJson, std::map<int, ProjectileDat
                     newProj.lifeTime = (*pProjData)["LifeTime"];
                     newProj.hitSpan = (*pProjData)["HitSpan"];
                     newProj.hitDisableMovementFrames = (*pProjData)["HitAfterFrame"];
+                    newProj.hitStopOverride = (*pProjData)["HitStopOverride"];
 
                     (*pUniqueProjectiles)[dataIndex] = newProj;
                 }
@@ -1589,6 +1590,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
         writeI32(f, proj.lifeTime);
         writeI32(f, proj.hitSpan);
         writeI32(f, proj.hitDisableMovementFrames);
+        writeI32(f, proj.hitStopOverride);
     }
 
     writeU32(f, pData->atemis.size());
@@ -2041,6 +2043,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
         proj.lifeTime = readI32(f);
         proj.hitSpan = readI32(f);
         proj.hitDisableMovementFrames = readI32(f);
+        proj.hitStopOverride = readI32(f);
     }
 
     uint32_t atemiCount = readU32(f);

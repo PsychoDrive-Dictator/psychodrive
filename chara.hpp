@@ -406,6 +406,7 @@ struct ProjectileData {
     int lifeTime;
     int hitSpan;
     int hitDisableMovementFrames;
+    int hitStopOverride;
 };
 
 struct StyleData {

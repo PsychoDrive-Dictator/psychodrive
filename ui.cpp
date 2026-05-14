@@ -263,7 +263,7 @@ void drawGuyStatusWindow(const char *windowName, Guy *pGuy, Simulation *pSim = n
 {
     //drawActionTimeline(pGuy->getName()->c_str(), pGuy->getVersion(), pGuy->getActionName().c_str());
 
-    ImGui::Begin(windowName);
+    ImGui::Begin(windowName, nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
     color col = pGuy->getColor();
     ImGui::TextColored(ImVec4(col.r, col.g, col.b, 1), "%s %d", pGuy->getName().c_str(), pGuy->getVersion());
     ImGui::SameLine();

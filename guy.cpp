@@ -15,6 +15,7 @@
 #include "guy.hpp"
 #include "main.hpp"
 #include "render.hpp"
+#include "ui.hpp"
 #include <string>
 
 #include <cmath>
@@ -2045,31 +2046,55 @@ bool Guy::Push(Guy *pOtherGuy)
     for (auto pushbox : pushBoxes ) {
         for (auto otherPushBox : otherPushBoxes ) {
             if (doBoxesHit(pushbox, otherPushBox)) {
-
                 // check hitcount in case we already clashed but still in hitstop
                 if (isProjectile && pCurrentAction->pProjectileData && projHitCount > 0 &&
                     pOtherGuy->isProjectile && pOtherGuy->pCurrentAction->pProjectileData && pOtherGuy->projHitCount > 0) {
                     // projectile clash
+                    std::vector<HitBox> ownHitBoxes;
+                    std::vector<HitBox> otherHitBoxes;
+                    getHitBoxes(&ownHitBoxes, nullptr, none, proximity_guard);
+                    pOtherGuy->getHitBoxes(&otherHitBoxes, nullptr, none, proximity_guard);
+
+                    // default?
                     int ownHitStop = 10;
                     int otherHitStop = 10;
+
+                    if (ownHitBoxes.size()) {
+                        ownHitStop = ownHitBoxes.front().pHitData->common[0].hitStopOwner;
+                    }
+                    if (otherHitBoxes.size()) {
+                        otherHitStop = otherHitBoxes.front().pHitData->common[0].hitStopOwner;
+                    }
+                    int clashHitStop = std::max(ownHitStop, otherHitStop);
+                    // todo what if both? even frame?
+                    if (pCurrentAction->pProjectileData->hitStopOverride > -1) {
+                        clashHitStop = pCurrentAction->pProjectileData->hitStopOverride;
+                    }
+                    if (pOtherGuy->pCurrentAction->pProjectileData->hitStopOverride > -1) {
+                        clashHitStop = pOtherGuy->pCurrentAction->pProjectileData->hitStopOverride;
+                    }
                     if (pCurrentAction->pProjectileData->clashPriority < pOtherGuy->pCurrentAction->pProjectileData->clashPriority) {
                         projHitCount--;
-                        // if (projHitCount != 0) {
-                        //     otherHitStop += pOtherGuy->pCurrentAction->pProjectileData->extraHitStop;
-                        // }
                     } else if (pCurrentAction->pProjectileData->clashPriority > pOtherGuy->pCurrentAction->pProjectileData->clashPriority) {
                         pOtherGuy->projHitCount--;
-                        // if (pOtherGuy->projHitCount != 0) {
-                        //     ownHitStop += pCurrentAction->pProjectileData->extraHitStop;
-                        // }
                     } else {
                         projHitCount--;
                         pOtherGuy->projHitCount--;
                     }
-                    addHitStop(ownHitStop);
-                    pOtherGuy->addHitStop(otherHitStop);
-                    //steerDisabledFrames = pCurrentAction->pProjectileData->hitDisableMovementFrames;
-                    //pOtherGuy->steerDisabledFrames = pOtherGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
+                    if (pCurrentAction->pProjectileData->hitStopToParent && pParent) {
+                        pParent->addHitStop(clashHitStop+1);
+                    }
+                    addHitStop(clashHitStop+1);
+                    if (pOtherGuy->pCurrentAction->pProjectileData->hitStopToParent && pOtherGuy->pParent) {
+                        pOtherGuy->pParent->addHitStop(clashHitStop+1);
+                    }
+                    pOtherGuy->addHitStop(clashHitStop+1);
+
+                    hitSpanFrames = pCurrentAction->pProjectileData->hitSpan;
+                    steerDisabledFrames = pCurrentAction->pProjectileData->hitDisableMovementFrames;
+
+                    pOtherGuy->hitSpanFrames = pOtherGuy->pCurrentAction->pProjectileData->hitSpan;
+                    pOtherGuy->steerDisabledFrames = pOtherGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
                 }
                 pushXLeft = fixMax(pushXLeft, pushbox.x + pushbox.w - otherPushBox.x);
                 pushXRight = fixMin(pushXRight, pushbox.x - (otherPushBox.x + otherPushBox.w));
@@ -2244,10 +2269,10 @@ bool Guy::Push(Guy *pOtherGuy)
                 posX += wallDiff;
                 pOtherGuy->posX += wallDiff;
             }
-
-            didPush = true;
-            pOtherGuy->didPush = true;
         }
+
+        didPush = true;
+        pOtherGuy->didPush = true;
 
         touchedOpponent = true; // could be touching anyone really but can fix later
         pOtherGuy->touchedOpponent = true;
@@ -3439,6 +3464,11 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             pGuy->addHitStop(hitStopSelf+1);
         }
         if (hitStopTarget > 0) {
+            if (pOtherGuy->isProjectile && pOtherGuy->pCurrentAction && pOtherGuy->pCurrentAction->pProjectileData && pOtherGuy->pParent) {
+                if (pOtherGuy->pCurrentAction->pProjectileData->hitStopToParent) {
+                    pOtherGuy->pParent->addHitStop(hitStopTarget+1);
+                }
+            }
             pOtherGuy->addHitStop(hitStopTarget+1);
 #ifdef __EMSCRIPTEN__
             // only vibrate here in realtime mode
@@ -6981,6 +7011,9 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
             // run initial frame on behalf of sim loop here because it wasn't included this frame
             //pNewGuy->DoStatusKey(true);
             pNewGuy->RunFrame(true);
+            if (pOpponent) {
+                pNewGuy->Push(pOpponent); // push/clash with other projectiles/etc
+            }
             pNewGuy->RunFramePostPush();
             if (pParent) {
                 pParent->dc.minions.push_back(pNewGuy);
@@ -6989,6 +7022,14 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
             }
             if (!preHit) {
                 pNewGuy->spawnedPostHit = true;
+            }
+            if (gameMode == Viewer) {
+                pNewGuy->setLogTransitions(simController.viewerLogTransitions);
+                pNewGuy->setLogTriggers(simController.viewerLogTriggers);
+                pNewGuy->setLogUnknowns(simController.viewerLogUnknowns);
+                pNewGuy->setLogHits(simController.viewerLogHits);
+                pNewGuy->setLogBranches(simController.viewerLogBranches);
+                pNewGuy->setLogResources(simController.viewerLogResources);
             }
         }
     }
