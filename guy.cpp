@@ -3975,7 +3975,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
     if (applyHit && !isGrab) {
         if (dmgType == 13) {
             knockDown = true;
-            bool doKnockDown = destY == 0 && pHitEffect->throwRelease == 1; // ?
+            bool doKnockDown = destY == 0 && pHitEffect->throwRelease == 1 && !jimenBound; // ?
             // if (moveType == 15 && destTime != 0) {
             //     doKnockDown = false; // this overrides that, looks like
             // }
@@ -4173,7 +4173,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                     // there's a race condition with getting them right, because the hit is applied
                     // from RunFrame -> lockkey, and the velocity will be off by one frame depending
                     // on who's RunFrame runs first
-                    hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+                    int factor = destTime == 1 ? -1 : -2;
+                    hitVelX = Fixed(hitVelDirection.i() * destX * factor) / Fixed(destTime);
                     hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
 
                     velocityX = Fixed(destX) / Fixed(destTime);
@@ -4227,7 +4228,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                     // if (parrying && !pAttacker->isProjectile) {
                     //     destX -= 1; // ??????? in the higuchi replay it's for sure like that
                     // }
-                    hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
+                    int factor = destTime == 1 ? -1 : -2;
+                    hitVelX = Fixed(hitVelDirection.i() * destX * factor) / Fixed(destTime);
                     if (destX < 0 && hitVelX.data & 63) {
                         hitVelX.data -= 1;
                     }
@@ -4268,11 +4270,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         }
     }
 
-        if (dmgType == 11 && pAttacker->pendingUnlockHit && destTime != 0) {
-            hitVelX = Fixed(hitVelDirection.i() * destX * -2) / Fixed(destTime);
-            hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
-            nageKnockdown = true;
-        }
+    if (dmgType == 11 && pAttacker->pendingUnlockHit && destTime != 0) {
+        int factor = destTime == 1 ? -1 : -2;
+        hitVelX = Fixed(hitVelDirection.i() * destX * factor) / Fixed(destTime);
+        hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
+        nageKnockdown = true;
+    }
 
     if (!isDomain && applyHit && !appliedAction && !isGrab) {
         int prevNextAction = nextAction;
