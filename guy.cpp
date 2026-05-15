@@ -2013,7 +2013,7 @@ bool Guy::Push(Guy *pOtherGuy)
     bool otherGuyCanPush = !(pOtherGuy->warudo || (pOtherGuy->getHitStop() && !pOtherGuy->wasIgnoreHitStop));
     if (!canPush && !otherGuyCanPush) return false;
 
-    if (didPush) return false;
+    if (didPush || pOtherGuy->didPush) return false;
     // for now, maybe there's other rules
     if (isProjectile && !pOtherGuy->isProjectile) return false;
     if (!isProjectile && pOtherGuy->isProjectile) return false;
@@ -2026,12 +2026,12 @@ bool Guy::Push(Guy *pOtherGuy)
     pOtherGuy->DoReflect();
 
     if (isProjectile) {
-        if (projHitCount < 0 || pOtherGuy->projHitCount < 0) {
+        if (projHitCount <= 0 || pOtherGuy->projHitCount <= 0) {
             return false;
         }
-        if (getHitStop() || pOtherGuy->getHitStop()) {
-            return false;
-        }
+        // if (getHitStop() && pOtherGuy->getHitStop()) {
+        //     return false;
+        // }
     }
 
     std::vector<Box> pushBoxes;
@@ -7003,6 +7003,12 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
 
             // spawn new guy
             Guy *pNewGuy = new Guy(*this, posOffsetX, posOffsetY, shotKey.actionId, shotKey.styleIdx, true);
+            pNewGuy->setLogTransitions(simController.viewerLogTransitions);
+            pNewGuy->setLogTriggers(simController.viewerLogTriggers);
+            pNewGuy->setLogUnknowns(simController.viewerLogUnknowns);
+            pNewGuy->setLogHits(simController.viewerLogHits);
+            pNewGuy->setLogBranches(simController.viewerLogBranches);
+            pNewGuy->setLogResources(simController.viewerLogResources);
             if (shotKey.flags & 4) {
                 pNewGuy->ignoreWarudo = true;
             }
@@ -7027,14 +7033,6 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
             }
             if (!preHit) {
                 pNewGuy->spawnedPostHit = true;
-            }
-            if (gameMode == Viewer) {
-                pNewGuy->setLogTransitions(simController.viewerLogTransitions);
-                pNewGuy->setLogTriggers(simController.viewerLogTriggers);
-                pNewGuy->setLogUnknowns(simController.viewerLogUnknowns);
-                pNewGuy->setLogHits(simController.viewerLogHits);
-                pNewGuy->setLogBranches(simController.viewerLogBranches);
-                pNewGuy->setLogResources(simController.viewerLogResources);
             }
         }
     }

@@ -1577,6 +1577,12 @@ bool SimulationController::NewSim(void)
 
     for (auto &guy : pSim->simGuys) {
         guy->setRecordFrameTriggers(true, true);
+        guy->setLogTransitions(viewerLogTransitions);
+        guy->setLogTriggers(viewerLogTriggers);
+        guy->setLogUnknowns(viewerLogUnknowns);
+        guy->setLogHits(viewerLogHits);
+        guy->setLogBranches(viewerLogBranches);
+        guy->setLogResources(viewerLogResources);
     }
 
 
@@ -1954,27 +1960,31 @@ void SimulationController::RenderUI(void)
         ImGui::SetNextWindowSize(ImVec2(0, 0));
         ImGui::Begin("PsychoDrive Left Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus );
-        if (gameMode == Viewer) {
-            if (toggleDebugUI) {
-                ImGui::Text("Log:");
-                ImGui::SameLine();
-                bool changed = false;
-                changed |= ImGui::Checkbox("unknowns", &viewerLogUnknowns);
-                ImGui::SameLine();
-                changed |= ImGui::Checkbox("hits", &viewerLogHits);
-                ImGui::SameLine();
-                changed |= ImGui::Checkbox("triggers", &viewerLogTriggers);
-                ImGui::SameLine();
-                changed |= ImGui::Checkbox("branches", &viewerLogBranches);
-                ImGui::SameLine();
-                changed |= ImGui::Checkbox("transitions", &viewerLogTransitions);
-                ImGui::SameLine();
-                changed |= ImGui::Checkbox("resources", &viewerLogResources);
-                if (changed) {
+        if (toggleDebugUI) {
+            ImGui::Text("Log:");
+            ImGui::SameLine();
+            bool changed = false;
+            changed |= ImGui::Checkbox("unknowns", &viewerLogUnknowns);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("hits", &viewerLogHits);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("triggers", &viewerLogTriggers);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("branches", &viewerLogBranches);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("transitions", &viewerLogTransitions);
+            ImGui::SameLine();
+            changed |= ImGui::Checkbox("resources", &viewerLogResources);
+            if (changed) {
+                if (gameMode == Viewer) {
                     ReloadViewer();
+                } else {
+                    simInputsChanged = true;
                 }
-                ImGui::Separator();
             }
+            ImGui::Separator();
+        }
+        if (gameMode == Viewer) {
             if (replayRoundCount > 0) {
                 for (int r = 0; r < replayRoundCount; r++) {
                     auto &result = replayRoundRecordings[r].result;
