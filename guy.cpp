@@ -524,7 +524,7 @@ bool Guy::RunFrame(bool advancingTime)
             }
         }
         // let projectiles land though - akuma air fb and mai charged fan bounce
-        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0)) {
+        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0) && airborne) {
             airborne = false;
             landed = true;
         }
@@ -5248,6 +5248,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                 // todo fix check here, refers to some action status tracking?
                 RevokeStyle();
             }
+        }
+
+        if (isProjectile && nextAction == -1) {
+            // no landing branch, hit the ground and fade off
+            return false;
         }
     }
 
