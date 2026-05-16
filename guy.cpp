@@ -3887,11 +3887,6 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         switchDirection();
     }
 
-    // if (attacker->pendingUnlockHit && innerDirection != direction) {
-    //     log(logHits, "unlock inner switchDirection!");
-    //     switchDirection();
-    //     hitVelDirection *= Fixed(-1);
-    // }
     // if (doSwitchDirection && attacker->pendingUnlockHit && recoverReverse && !needsTurnaround()) {
     //     log(logHits, "unlock switchDirection!");
     //     switchDirection();
@@ -5593,6 +5588,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     log(logTransitions, "wakeup switchDirection!");
                     switchDirection();
                     velocityX *= Fixed(-1);
+                }
+                if (innerDirection != direction) {
+                    log(logTransitions, "wakeup inner switchDirection!");
+                    switchDirection();
                 }
             } else {
                 blocking = false;
