@@ -2396,6 +2396,11 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
         hasPushed = true;
     }
 
+    // some projectiles don 't get pushed directly by the wall but we still want a branch to trigger
+    if (isProjectile && onWall(true)) {
+        touchedWall = true;
+    }
+
     // you can still be in floor contact on your way up
     // especially with the 1 threshold
     bool landedByFloorPush = airborne && floorpush && velocityY < 0;

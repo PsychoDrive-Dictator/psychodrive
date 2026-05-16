@@ -546,13 +546,13 @@ private:
         return ret;
     }
 
-    bool onLeftWall() { return getPosX(true) == -wallDistance; }
-    bool onRightWall() { return getPosX(true) == wallDistance; }
-    bool onWall() { return onLeftWall() || onRightWall(); }
+    bool onLeftWall(bool proj = false) { return getPosX(true) <= (proj ? -projWallDistance : -wallDistance); }
+    bool onRightWall(bool proj = false) { return getPosX(true) >= (proj ? projWallDistance : wallDistance); }
+    bool onWall(bool proj = false) { return onLeftWall(proj) || onRightWall(proj); }
 
-    bool wasOnLeftWall() { return getLastPosX(true) == -wallDistance; }
-    bool wasOnRightWall() { return getLastPosX(true) == wallDistance; }
-    bool wasOnWall() { return wasOnLeftWall() || wasOnRightWall(); }
+    bool wasOnLeftWall(bool proj = false) { return getLastPosX(true) <= (proj ? -projWallDistance : -wallDistance); }
+    bool wasOnRightWall(bool proj = false) { return getLastPosX(true) >= (proj ? projWallDistance : wallDistance); }
+    bool wasOnWall(bool proj = false) { return wasOnLeftWall(proj) || wasOnRightWall(proj); }
 
     bool conditionOperator(int op, int operand, int threshold, std::string desc);
 
