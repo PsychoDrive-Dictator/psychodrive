@@ -2056,8 +2056,8 @@ bool Guy::Push(Guy *pOtherGuy)
                     pOtherGuy->getHitBoxes(&otherHitBoxes, nullptr, none, proximity_guard);
 
                     // default?
-                    int ownHitStop = 10;
-                    int otherHitStop = 10;
+                    int ownHitStop = 8;
+                    int otherHitStop = 8;
 
                     if (ownHitBoxes.size()) {
                         ownHitStop = ownHitBoxes.front().pHitData->common[0].hitStopOwner;
