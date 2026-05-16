@@ -3886,6 +3886,17 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         log(logHits, "reverse facing hit switchDirection!");
         switchDirection();
     }
+
+    // if (attacker->pendingUnlockHit && innerDirection != direction) {
+    //     log(logHits, "unlock inner switchDirection!");
+    //     switchDirection();
+    //     hitVelDirection *= Fixed(-1);
+    // }
+    // if (doSwitchDirection && attacker->pendingUnlockHit && recoverReverse && !needsTurnaround()) {
+    //     log(logHits, "unlock switchDirection!");
+    //     switchDirection();
+    //     hitVelDirection *= Fixed(-1);
+    // }
     // if (doSwitchDirection && recoverReverse && !isDomain && direction != attackerDirection) {
     //     // like in a sideswitch combo
     //     switchDirection();
@@ -5803,7 +5814,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (canMoveNow) {
         perfectScaling = false;
-        innerDirection = direction;
     }
 
     if (canMoveNow && wasHit) {
@@ -6078,6 +6088,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         // assuming it's supposed to be for branches only
         if (!didBranch) {
             inheritHitID = false;
+            innerDirection = direction;
         }
 
         if (!inheritHitID) {
@@ -6280,7 +6291,7 @@ void Guy::DoStatusKey(bool doSideOp)
                     switchDirection();
                     break;
                 case 4:
-                    switchInnerDirection();
+                    innerDirection = direction * Fixed(-1);
                     break;
                 case 5:
                     if (pOpponent && direction != pOpponent->direction) {
@@ -6607,6 +6618,7 @@ void Guy::DoLockKey(void)
                     // only snap position if this isn't a followup lock
                     if (pOpponent->grabAdjust) {
                         pOpponent->direction = direction;
+                        pOpponent->innerDirection = direction;
                         pOpponent->posX = getPosX();
                         pOpponent->posY = getPosY();
                         pOpponent->posOffsetX = Fixed(0);
