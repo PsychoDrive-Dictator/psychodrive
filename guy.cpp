@@ -6037,6 +6037,8 @@ void Guy::AdvanceScalingTriggerID()
         }
     }
     scalingTriggerID = maxTeamScalingTriggerID + 1;
+
+    perfectScaling = false;
 }
 
 void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
