@@ -428,7 +428,7 @@ public:
         bool a,b,c;
         return canMove(a,b,c);
     }
-    bool couldAct() { return couldMove; }
+    //bool couldAct() { return couldMove; }
     bool getFreeMovement() { return freeMovement; }
     bool getLocked() { return locked; }
     ActionRef& getForcedTrigger() { return forcedTrigger; }

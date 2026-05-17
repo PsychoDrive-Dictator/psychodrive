@@ -3282,6 +3282,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 hitStopSelf = 9 + 1;
                 hitStopTarget = 9 + 1;
                 pOtherGuy->parryHoldFreebieFrames = 13; // ?
+                pOtherGuy->pOpponent->perfectScaling = true;
             }
             if (didPerfect) {
                 pGuy->hasBeenPerfectParriedThisFrame = true;
@@ -5696,7 +5697,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    bool canProxGuard = !hitStun && (canAct() || currentAction == 39 || currentAction == 40 || currentAction == 41);
+    bool couldAct = canAct();
+    bool canProxGuard = !hitStun && (couldAct || currentAction == 39 || currentAction == 40 || currentAction == 41);
     // positionProxGuarded lets uncrouchable protection work immediately on wakeup
     // it's possible this isn't strictly correct but in practice if there are hurtboxes the position is in there
     bool proxGuarded = hurtBoxProxGuarded || positionProxGuarded;
@@ -5820,7 +5822,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (((canMoveNow || canProxGuard) && comboHits) || resetComboCount) {
+    if ((couldAct && comboHits) || resetComboCount) {
         if ( comboHits) {
             log(true, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
         }
@@ -5863,11 +5865,11 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (canMoveNow) {
+    if (couldAct) {
         perfectScaling = false;
     }
 
-    if (canMoveNow && wasHit) {
+    if (couldAct && wasHit) {
         int advantage = pSim->frameCounter - pOpponent->recoveryTiming;
         std::string message = "recovered! adv " + std::to_string(advantage);
         log(true, message );
@@ -5907,7 +5909,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool didTransition = false;
 
-    if (!didTrigger && canMoveNow && nextAction == -1) {
+    if (!didTrigger && couldAct && nextAction == -1) {
         // can run deferred trigger if going into fluff frames now
         DoTriggers();
         if (nextAction != -1) {
