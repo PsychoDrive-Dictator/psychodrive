@@ -476,7 +476,8 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         if (hitID < 0) {
             hitID = 15;
         }
-        if (hasHitID == false) {
+        // todo maybe need to use erase id?
+        if (hasHitID == false && !(collisionType == 10)) {
             hitID = -1;
         }
         if (hitID == 15 || type == domain) {

@@ -2544,6 +2544,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
     if (parryFreeze || warudo || getHitStop() || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) return;
     if ( !pOtherGuy ) return;
 
+    // might need to put this at the end if we find ordering difference, but convenient for now
+    for (GuyRef minion : pOtherGuy->getMinions()) {
+        CheckHit(minion, pendingHitList);
+    }
+
     std::vector<HitBox> hitBoxes;
     std::vector<HurtBox> otherThrowBoxes;
     std::vector<HurtBox> otherHurtBoxes;
@@ -2560,10 +2565,6 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             continue;
         }
         if (hitbox.hitID != -1 && ((1ULL<<hitbox.hitID) & canHitID)) {
-            continue;
-        }
-        if (hitbox.type == destroy_projectile) {
-            // todo right now we do nothing with those
             continue;
         }
         if (hitbox.type == nullify_grab) {
@@ -2784,6 +2785,36 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                         }
                     }
                 }
+            } else if (hitbox.type == destroy_projectile) {
+                if (pOtherGuy->isProjectile && pOtherGuy->pCurrentAction && pOtherGuy->pCurrentAction->pProjectileData) {
+                    std::vector<Box> otherPushBoxes;
+                    pOtherGuy->getPushBoxes(&otherPushBoxes);
+                    for (auto const & pushBox : otherPushBoxes) {
+                        if (doBoxesHit(hitbox.box, pushBox)) {
+                            // some logic duped with proj clashes from ::Push here
+
+                            int clashHitStop = 8;
+
+                            // todo maybe that's the id - they probably all use 3 for now
+                            if (pOtherGuy->pCurrentAction->pProjectileData->clashPriority < 3) {
+                                pOtherGuy->projHitCount--;
+                            }
+
+                            if (pOtherGuy->pCurrentAction->pProjectileData->hitStopToParent && pOtherGuy->pParent) {
+                                pOtherGuy->pParent->addHitStop(clashHitStop+1);
+                            }
+                            pOtherGuy->addHitStop(clashHitStop+1);
+                            addHitStop(clashHitStop+1);
+
+                            pOtherGuy->hitSpanFrames = pOtherGuy->pCurrentAction->pProjectileData->hitSpan;
+                            pOtherGuy->steerDisabledFrames = pOtherGuy->pCurrentAction->pProjectileData->hitDisableMovementFrames;
+
+                            if (hitbox.hitID != -1) {
+                                canHitID |= 1ULL << hitbox.hitID;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -2792,6 +2823,12 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 // not supposed to get through!
                 exit(0);
                 log(true, "wtf! " + std::to_string(hitbox.type));
+                continue;
+            }
+
+            if (pOtherGuy->isProjectile) {
+                // we can't actually hit projectiles, but we'll mark them hit for the appropriate branch
+                pOtherGuy->comboHits++;
                 continue;
             }
 
@@ -2985,10 +3022,15 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         Guy *pGuy = pendingHit.pGuyHitting;
         int hitEntryFlag = pendingHit.hitEntryFlag;
 
+        // we might have queued a projectile hit before projectile got projectile-destroyed-box
+        if (pGuy->getHitStop()) {
+            continue;
+        }
+
         bool trade = false;
         PendingHit tradeHit = {};
         for (auto &otherPendingHit : pendingHitList) {
-            if (otherPendingHit.pGuyGettingHit == pGuy) {
+            if (otherPendingHit.pGuyGettingHit == pGuy && !otherPendingHit.pGuyHitting->getHitStop()) {
                 otherGuyLog(pOtherGuy, pOtherGuy->logHits, "trade!");
                 trade = true;
                 // todo see simultaneous hit question thing below
