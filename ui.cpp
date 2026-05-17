@@ -1154,7 +1154,7 @@ void CharacterUIController::renderFrameMeterCancelWindows(int frameIndex)
 
         if (timelineTriggers.find(i) != timelineTriggers.end()) {
             float startOffset = (kFrameButtonWidth + kHorizSpacing) * i;
-            ImGui::SetCursorPosX(cursorX + startOffset + 10.5);
+            ImGui::SetCursorPosX(cursorX + startOffset + 7.0);
             ImGui::SetCursorPosY(cursorY - 2.5);
 
             ImGui::PushID(i);
