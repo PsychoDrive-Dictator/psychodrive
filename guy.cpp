@@ -4943,6 +4943,11 @@ void Guy::DoBranchKey(bool preHit)
                         }
                     }
                     break;
+                case 50:
+                    if (isProjectile && comboHits) {
+                        doBranch = true;
+                    }
+                    break;
                 case 52: // shot count
                     {
                         int count = 0;
@@ -7017,10 +7022,19 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                             break;
                     }
                     break;
-                default:
-                    log(logUnknowns, "unhandled event, type " + std::to_string(eventType) + " id " + std::to_string(eventID));
+                case 8:
+                    switch (eventID) {
+                        case 76: // something rendering related?
+                            break;
+                        default:
+                            log(logUnknowns, "unhandled shot event id " + std::to_string(eventID));
+                            break;
+                    }
                 case 11: // commentary
                 case 5: // camera
+                    break;
+                default:
+                    log(logUnknowns, "unhandled event, type " + std::to_string(eventType) + " id " + std::to_string(eventID));
                     break;
         }
     }
