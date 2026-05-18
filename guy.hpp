@@ -748,6 +748,7 @@ private:
         lastTriggerFrame = 0;
         lastTriggerInput = 0;
         pLastTrigger = nullptr;
+        chainComboMask = 0;
         pAttacker = nullptr;
         hitStun = 0;
         resetHitStunOnLand = false;
@@ -1092,6 +1093,7 @@ private:
     int lastTriggerFrame;
     uint32_t lastTriggerInput;
     Trigger *pLastTrigger;
+    uint8_t chainComboMask;
 
     // getting hit side
     GuyRef pAttacker;

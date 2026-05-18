@@ -741,6 +741,19 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
     if (flags & (1ULL<<9)) superLevel = 3;
     if (flags & (1ULL<<10)) superLevel = 3; // ca?
 
+    if (flags & (1ULL<<43)) {
+        int button = -1;
+        if (flags & (1ULL<<4)) button = 0; // l
+        if (flags & (1ULL<<5)) button = 1;
+        if (flags & (1ULL<<6)) button = 2;
+        if (button > -1 && flags & (1ULL<<1)) button += 3; // kicks
+        if (button > -1) {
+            chainComboMask |= 1<<button;
+        }
+    } else {
+        chainComboMask = 0;
+    }
+
     // meters
     if (pTrigger->needsFocus) {
         deferredFocusCost = pTrigger->focusCost;
@@ -873,6 +886,17 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
     if (!pTrigger->okKeyFlags && !pTrigger->dcExcFlags && !pTrigger->dcIncFlags) {
         // some triggers don't seem hooked to anything?
         return false;
+    }
+
+    if (pTrigger->flags & (1ULL<<43)) {
+        int button = -1;
+        if (pTrigger->flags & (1ULL<<4)) button = 0; // l
+        if (pTrigger->flags & (1ULL<<5)) button = 1;
+        if (pTrigger->flags & (1ULL<<6)) button = 2;
+        if (button > -1 && pTrigger->flags & (1ULL<<1)) button += 3; // kicks
+        if (button > -1 && chainComboMask & (1<<button)) {
+            return false;
+        }
     }
 
     if (pTrigger->useUniqueParam && pTrigger->condParamID >= 0 && pTrigger->condParamID < uniqueParamCount) {
@@ -1474,7 +1498,7 @@ void Guy::DoTriggers(int fluffFrameBias)
                         triggers[entryIndex].hasNormal = true;
                         triggers[entryIndex].late = currentFrame != triggerKey.startFrame && !canAct() && !airborne;
 
-                        if (pTriggerGroup->id == 0) {
+                        if (pTriggerGroup->id == 0 && (!pSim->match || pSim->timerStarted)) {
                             freeMovement = true;
                         }
                     }
@@ -1495,8 +1519,10 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
 
         if (addTriggerGroupZero) {
-
-            freeMovement = true;
+            chainComboMask = 0;
+            if (!pSim->match || pSim->timerStarted) {
+                freeMovement = true;
+            }
 
             auto it = pCharData->triggerGroupByID.find(0);
             if (it != pCharData->triggerGroupByID.end()) {
@@ -5726,9 +5752,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if (nextAction != -1) {
         applyFreeMovement = false;
     }
-    if (pSim->match && !pSim->timerStarted) {
-        applyFreeMovement = false;
-    }
 
     if (disableMovement) {
         canMoveNow = false;
@@ -5833,6 +5856,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         superGainScaling = 100;
         resetComboCount = false;
         lastDamageScale = 0;
+        chainComboMask = 0;
 
         if (pOpponent && pOpponent->uniqueID == 0) {
             pSim->comboProbe.gaugeGain = 0;
@@ -5867,6 +5891,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (couldAct) {
         perfectScaling = false;
+
+        chainComboMask = 0;
 
         DoInstantAction(584); // TO_NORMAL ? todo only on edge?
     }
@@ -6942,6 +6968,9 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                             if (param3 == 1) {
                                 styleInstallFrames = param4;
                             }
+                            break;
+                        case 37:
+                            chainComboMask = 0;
                             break;
                         case 41: // air action counter
                             if (param1 == 0) {
