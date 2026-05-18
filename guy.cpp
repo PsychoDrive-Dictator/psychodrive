@@ -5867,6 +5867,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (couldAct) {
         perfectScaling = false;
+
+        DoInstantAction(584); // TO_NORMAL ? todo only on edge?
     }
 
     if (couldAct && wasHit) {
