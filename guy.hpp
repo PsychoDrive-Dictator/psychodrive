@@ -647,6 +647,7 @@ private:
         forceKnockDownState = false;
         throwTechable = false;
         canBlock = false;
+        noWallJump = false;
         offsetDoesNotPush = false;
         teleported = false;
         ignoreBodyPush = false;
@@ -889,6 +890,7 @@ private:
     bool forceKnockDownState : 1;
     bool throwTechable : 1;
     bool canBlock : 1;
+    bool noWallJump : 1;
     bool offsetDoesNotPush : 1;
     bool teleported : 1;
     bool ignoreBodyPush : 1;

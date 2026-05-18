@@ -1281,6 +1281,7 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
 
 void ProcessDynamicCharData(CharacterData *pCharData)
 {
+    bool foundWallJump = false;
     for (auto & action : pCharData->actions) {
         std::string strNiceName = action.name;
         for (auto sub : {"BAS_", "ATK_", "SPA_", "_START"}) {
@@ -1289,6 +1290,14 @@ void ProcessDynamicCharData(CharacterData *pCharData)
             strNiceName.erase(pos, strlen(sub));
         }
         action.niceNameDyn = strNiceName;
+        if (action.actionID == 47 && !action.common) {
+            foundWallJump = true;
+        }
+    }
+
+    pCharData->canWallJumpDyn = pCharData->flags & (1<<7);
+    if (!foundWallJump) {
+        pCharData->canWallJumpDyn = false;
     }
 }
 
@@ -1689,6 +1698,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
         writeI32(f, action.actionID);
         writeI32(f, action.styleID);
         writeString(f, action.name);
+        writeBool(f, action.common);
 
         writeU32(f, action.hurtBoxKeys.size());
         for (auto& k : action.hurtBoxKeys) {
@@ -2160,6 +2170,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
         action.actionID = readI32(f);
         action.styleID = readI32(f);
         action.name = readString(f);
+        action.common = readBool(f);
 
         uint32_t hurtBoxKeyCount = readU32(f);
         action.hurtBoxKeys.resize(hurtBoxKeyCount);

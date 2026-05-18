@@ -534,6 +534,7 @@ bool Guy::RunFrame(bool advancingTime)
         forceKnockDownState = false;
         throwTechable = false;
         canBlock = false;
+        noWallJump = false;
         ignoreBodyPush = false;
         bodyPushIntangible = false;
         ignoreHitStop = false;
@@ -2445,7 +2446,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
             landed = true;
         }
         if (!forceLanding) {
-            bool doEmptyLanding = currentAction == 36 || currentAction == 37 || currentAction == 38;
+            bool doEmptyLanding = currentAction == 36 || currentAction == 37 || currentAction == 38 || currentAction == 48;
             if (hitStun && !locked && !knockDown) {
                 // air recovery
                 doEmptyLanding = true;
@@ -2461,6 +2462,9 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                     resetComboCount = true;
                 } else {
                     nextAction = currentAction + 3;
+                    if (currentAction == 48) {
+                        nextAction = 40;
+                    }
                 }
                 AdvanceFrame(false);
             }
@@ -5479,12 +5483,36 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         groundBounceAccelX = Fixed(0);
     }
 
-    if (currentAction == 33 && jumpDirection == 0 && currentInput & 1 ) {
+    if (currentAction == 33 && jumpDirection == 0 && currentInput & 1) {
         // one opportunity to adjust neutral jump direction during prejump
         if (currentInput & 4) {
             jumpDirection = -1;
         } else if (currentInput & 8) {
             jumpDirection = 1;
+        }
+    }
+
+    if (pCharData->canWallJumpDyn && !didTrigger && !noWallJump && (currentAction == 36 || currentAction == 37 || currentAction == 38)) {
+        int input = currentInput;
+        if (direction < Fixed(0)) {
+            input = invertDirection(currentInput); // to stage space
+        }
+        bool doWallJump = false;
+        // todo stage boundary, etc
+        if (onLeftWall() && (input & 0xF) == (UP|FORWARD)) {
+            doWallJump = true;
+            if (direction < Fixed(0)) {
+                switchDirection();
+            }
+        }
+        if (onRightWall() && (input & 0xF) == (UP|BACK)) {
+            doWallJump = true;
+            if (direction > Fixed(0)) {
+                switchDirection();
+            }
+        }
+        if (doWallJump) {
+            nextAction = 47;
         }
     }
 
@@ -5510,6 +5538,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             nextAction = 1;
         } else if (currentAction >= 251 && currentAction <= 253) {
             nextAction = currentAction - 21;
+        } else if (currentAction == 47) {
+            nextAction = 48;
         } else if ( currentAction == 33 || currentAction == 34 || currentAction == 35 ) {
             // If done with pre-jump, transition to jump
             if ( currentAction == 33) {
@@ -6289,6 +6319,9 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x10000000) {
             ignoreCornerPushback = true;
+        }
+        if (flag & 0x20000000) {
+            noWallJump = true;
         }
         if (flag & 0x8000000) {
             isDrive = true;

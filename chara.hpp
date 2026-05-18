@@ -478,6 +478,8 @@ struct CharacterData {
     int gauge;
     int flags;
 
+    bool canWallJumpDyn;
+
     std::vector<Charge> charges;
     std::vector<Command> commands;
     std::vector<Trigger> triggers;
