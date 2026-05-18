@@ -615,6 +615,8 @@ private:
         landed = false;
         forceLanding = false;
         touchedWall = false;
+        onLeftScreenWall = false;
+        onRightScreenWall = false;
         touchedOpponent = false;
         startsFalling = false;
         crouching = false;
@@ -870,6 +872,8 @@ private:
     bool landed : 1;
     bool forceLanding : 1;
     bool touchedWall : 1;
+    bool onLeftScreenWall : 1;
+    bool onRightScreenWall : 1;
     bool touchedOpponent : 1;
     bool startsFalling : 1;
     bool crouching : 1;

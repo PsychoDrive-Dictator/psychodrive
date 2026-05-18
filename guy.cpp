@@ -2315,6 +2315,8 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
     Fixed pushX = Fixed(0);
     bool floorpush = false;
     touchedWall = false;
+    onLeftScreenWall = false;
+    onRightScreenWall = false;
     didPush = false;
 
     if (!noPush) {
@@ -2355,11 +2357,13 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
             if (!isProjectile) {
                 // screen
                 if (pOpponent && !ignoreScreenPush) {
-                    if (x < screenCenterX - maxPlayerDistance) {
+                    if (x <= screenCenterX - maxPlayerDistance) {
                         pushX = -(x - (screenCenterX - maxPlayerDistance));
+                        onLeftScreenWall = true;
                     }
-                    if (x > screenCenterX + maxPlayerDistance) {
+                    if (x >= screenCenterX + maxPlayerDistance) {
                         pushX = -(x - (screenCenterX + maxPlayerDistance));
+                        onRightScreenWall = true;
                     }
                     if (pushX != Fixed(0)) {
                         log (logTransitions, "screen push " + std::to_string(pushX.f()));
@@ -5499,13 +5503,13 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
         bool doWallJump = false;
         // todo stage boundary, etc
-        if (onLeftWall() && (input & 0xF) == (UP|FORWARD)) {
+        if ((onLeftWall() || onLeftScreenWall) && (input & 0xF) == (UP|FORWARD)) {
             doWallJump = true;
             if (direction < Fixed(0)) {
                 switchDirection();
             }
         }
-        if (onRightWall() && (input & 0xF) == (UP|BACK)) {
+        if ((onRightWall() || onRightScreenWall) && (input & 0xF) == (UP|BACK)) {
             doWallJump = true;
             if (direction > Fixed(0)) {
                 switchDirection();
