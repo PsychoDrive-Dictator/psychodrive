@@ -432,6 +432,7 @@ struct Action {
     int styleID;
     std::string name;
     std::string niceNameDyn;
+    bool common = false;
 
     std::vector<HurtBoxKey> hurtBoxKeys;
     std::vector<PushBoxKey> pushBoxKeys;

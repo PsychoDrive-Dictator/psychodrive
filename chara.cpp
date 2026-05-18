@@ -1161,17 +1161,6 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
             }
         }
 
-        bool exists = false;
-        for (const auto& existingAction : pRet->actions) {
-            if (existingAction.actionID == newAction.actionID && existingAction.styleID == newAction.styleID) {
-                exists = true;
-                break;
-            }
-        }
-        if (exists) {
-            continue;
-        }
-
         if (key.contains("DamageCollisionKey")) {
             newAction.hurtBoxKeys.reserve(key["DamageCollisionKey"].size() - 1);
             loadHurtBoxKeys(&key["DamageCollisionKey"], &newAction.hurtBoxKeys, rectsByIDs, atemiByID);
@@ -1381,8 +1370,8 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
     }
 
     pRet->atemis.reserve(countAtemis(pAtemiJson) + countAtemis(pCommonAtemiJson));
-    loadAtemis(pAtemiJson, &pRet->atemis);
     loadAtemis(pCommonAtemiJson, &pRet->atemis);
+    loadAtemis(pAtemiJson, &pRet->atemis);
 
     for (auto& atemi : pRet->atemis) {
         pRet->atemiByID[atemi.id] = &atemi;
@@ -1397,9 +1386,11 @@ CharacterData *loadCharacter(std::string charName, int charVersion)
         pRet->hitByID[hit.id] = &hit;
     }
 
-
-    loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
     loadActionsFromMoves(pCommonMovesJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
+    for (auto& action : pRet->actions) {
+        action.common = true;
+    }
+    loadActionsFromMoves(pMovesDictJson, pRet, pRet->rectsByIDs, pRet->atemiByID, pRet->hitByID, pRet->triggerGroupByID);
 
     for (auto& action : pRet->actions) {
         pRet->actionsByID[ActionRef(action.actionID, action.styleID)] = &action;
