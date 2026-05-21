@@ -624,6 +624,7 @@ void Guy::RunFramePostPush(void)
         health += 2;
         if (recoverableHealth < 0) {
             health += recoverableHealth;
+            recoverableHealth = 0;
         }
         if (health > pCharData->vitality) {
             health = pCharData->vitality;
@@ -3788,25 +3789,27 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     if (alreadyDeadButDoesNotKnow && !(attr1 & (1<<4))) {
         health = 0;
     }
-    recoverableHealth = 0;
+    if (moveDamage && (!blocking || !parrying)) {
+        recoverableHealth = 0;
+    }
     log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
 
-    // if (pHitEffect->recoverableDamage) {
-    //     health -= pHitEffect->recoverableDamage;
-    //     recoverableHealth = pHitEffect->recoverableDamage;
-    //     recoverableHealthCooldown = 120;
+    if (pHitEffect->recoverableDamage) {
+        health -= pHitEffect->recoverableDamage;
+        recoverableHealth += pHitEffect->recoverableDamage;
+        recoverableHealthCooldown = 120;
 
-    //     if (health <= 0) {
-    //         recoverableHealth -= -health + 1;
-    //         if (recoverableHealth >= 0) {
-    //             health = 1;
-    //         } else {
-    //             recoverableHealth = 0;
-    //             recoverableHealthCooldown = 0;
-    //             health = 0;
-    //         }
-    //     }
-    // }
+        if (health <= 0) {
+            recoverableHealth -= -health + 1;
+            if (recoverableHealth >= 0) {
+                health = 1;
+            } else {
+                recoverableHealth = 0;
+                recoverableHealthCooldown = 0;
+                health = 0;
+            }
+        }
+    }
 
     if (health < 0) {
         if (prevHealth && attr1 & (1<<4)) {
