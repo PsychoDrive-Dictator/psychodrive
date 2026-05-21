@@ -663,7 +663,11 @@ function obj_to_table(obj, staticIgnoreList, recurseCount, allowStatic, staticOn
               -- end
             end
           else
-            out[name] = field:get_data(nil)
+            if typeName == "sfix" then
+              out[name] = field:get_data(nil).v / 65536.0
+            else
+              out[name] = field:get_data(nil)
+            end
           end
         end
         -- maybe need to hash on name and value both?

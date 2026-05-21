@@ -4691,6 +4691,274 @@ var currentResults =
         ]
     },
     {
+        "testName": "blanka_backthrow_against_corner",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 327,
+                "firstFrame": 131,
+                "lastFrame": 441
+            },
+            {
+                "count": 1,
+                "firstFrame": 145,
+                "lastFrame": 145
+            },
+            {
+                "count": 2,
+                "firstFrame": 144,
+                "lastFrame": 145
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 137,
+                "firstFrame": 145,
+                "lastFrame": 254
+            },
+            {
+                "count": 282,
+                "firstFrame": 160,
+                "lastFrame": 441
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 31,
+                "firstFrame": 160,
+                "lastFrame": 190
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "blanka_backthrow_against_corner2",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 247,
+                "firstFrame": 141,
+                "lastFrame": 387
+            },
+            {
+                "count": 1,
+                "firstFrame": 141,
+                "lastFrame": 141
+            },
+            {
+                "count": 2,
+                "firstFrame": 140,
+                "lastFrame": 141
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 137,
+                "firstFrame": 141,
+                "lastFrame": 250
+            },
+            {
+                "count": 232,
+                "firstFrame": 156,
+                "lastFrame": 387
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 31,
+                "firstFrame": 156,
+                "lastFrame": 186
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "blanka_backthrow_against_corner3",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 147,
+                "firstFrame": 129,
+                "lastFrame": 260
+            },
+            {
+                "count": 1,
+                "firstFrame": 142,
+                "lastFrame": 142
+            },
+            {
+                "count": 2,
+                "firstFrame": 141,
+                "lastFrame": 142
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 137,
+                "firstFrame": 142,
+                "lastFrame": 251
+            },
+            {
+                "count": 104,
+                "firstFrame": 157,
+                "lastFrame": 260
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 31,
+                "firstFrame": 157,
+                "lastFrame": 187
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "blanka_backthrow_against_corner5a",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 153,
+                "firstFrame": 131,
+                "lastFrame": 270
+            },
+            {
+                "count": 1,
+                "firstFrame": 142,
+                "lastFrame": 142
+            },
+            {
+                "count": 2,
+                "firstFrame": 141,
+                "lastFrame": 142
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 85,
+                "firstFrame": 142,
+                "lastFrame": 199
+            },
+            {
+                "count": 43,
+                "firstFrame": 157,
+                "lastFrame": 199
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 31,
+                "firstFrame": 157,
+                "lastFrame": 187
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "blanka_throws",
         "testVersion": "41",
         "finished": true,
