@@ -3351,6 +3351,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "akuma_backthrow_against_wall",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 9,
+                "firstFrame": 141,
+                "lastFrame": 147
+            },
+            {
+                "count": 15,
+                "firstFrame": 143,
+                "lastFrame": 157
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 126,
+                "firstFrame": 143,
+                "lastFrame": 242
+            },
+            {
+                "count": 136,
+                "firstFrame": 182,
+                "lastFrame": 317
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 61,
+                "firstFrame": 182,
+                "lastFrame": 242
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "akuma_corner_7015_dump_forcepc",
         "testVersion": "41",
         "finished": true,
@@ -6228,6 +6295,73 @@ var currentResults =
                 "count": 2,
                 "firstFrame": 1850,
                 "lastFrame": 1851
+            }
+        ]
+    },
+    {
+        "testName": "dictator_backthrow_against_wall",
+        "testVersion": "41",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 81,
+                "firstFrame": 206,
+                "lastFrame": 286
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 81,
+                "firstFrame": 206,
+                "lastFrame": 286
+            },
+            {
+                "count": 81,
+                "firstFrame": 206,
+                "lastFrame": 286
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 44,
+                "firstFrame": 206,
+                "lastFrame": 249
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },
