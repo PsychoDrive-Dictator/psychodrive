@@ -946,6 +946,7 @@ void loadHitEntry(nlohmann::json* pHitEntryJson, HitEntry* pEntry)
     pEntry->curveTargetID = (*pHitEntryJson)["CurveTgtID"];
     pEntry->curveOwnID = (*pHitEntryJson)["CurveOwnID"];
     pEntry->dmgValue = (*pHitEntryJson)["DmgValue"];
+    pEntry->recoverableDamage = (*pHitEntryJson)["DmgRecover"];
     pEntry->focusGainOwn = (*pHitEntryJson)["FocusOwn"];
     pEntry->focusGainTarget = (*pHitEntryJson)["FocusTgt"];
     pEntry->superGainOwn = (*pHitEntryJson)["SuperOwn"];
@@ -1623,6 +1624,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
         writeI32(f, e.curveOwnID);
         writeI32(f, e.curveTargetID);
         writeI32(f, e.dmgValue);
+        writeI32(f, e.recoverableDamage);
         writeI32(f, e.focusGainOwn);
         writeI32(f, e.focusGainTarget);
         writeI32(f, e.superGainOwn);
@@ -2082,6 +2084,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
         e.curveOwnID = readI32(f);
         e.curveTargetID = readI32(f);
         e.dmgValue = readI32(f);
+        e.recoverableDamage = readI32(f);
         e.focusGainOwn = readI32(f);
         e.focusGainTarget = readI32(f);
         e.superGainOwn = readI32(f);

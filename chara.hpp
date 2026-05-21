@@ -174,6 +174,7 @@ struct HitEntry {
     int curveOwnID;
     int curveTargetID;
     int dmgValue;
+    int recoverableDamage;
     int focusGainOwn;
     int focusGainTarget;
     int superGainOwn;
