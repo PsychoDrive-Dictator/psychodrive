@@ -41,6 +41,7 @@ struct DoneRoute {
     int focusDmg = 0;
     int focusSpend = 0;
     int gaugeSpend = 0;
+    int advantage = 0;
     bool sideSwitch = false;
     bool impossibleInput = false;
 };

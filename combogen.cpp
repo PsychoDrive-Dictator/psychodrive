@@ -247,6 +247,19 @@ void ComboWorker::WorkLoop(void) {
         }
 
         if (addRoute) {
+            int framesToFinishRecovery = 0;
+            pSim->simGuys[0]->setRecordFrameTriggers(false, false);
+            while (pSim->simGuys[1]->getRecoveryTiming() == finder.startRecoveryTiming) {
+                pSim->RunFrame();
+                pSim->AdvanceFrame();
+                framesProcessed++;
+                framesToFinishRecovery++;
+                if (framesToFinishRecovery > 1000) {
+                    fprintf(stderr, "bbb %s\n", routeToString(currentRoute, pSim->simGuys[0]).c_str());
+                    break;
+                }
+            }
+
             DoneRoute doneRoute;
             doneRoute.timelineTriggers = currentRoute.timelineTriggers;
             doneRoute.damage = currentRoute.damage;
@@ -257,6 +270,7 @@ void ComboWorker::WorkLoop(void) {
             doneRoute.focusSpend = currentRoute.focusSpend;
             doneRoute.gaugeSpend = currentRoute.gaugeSpend;
             doneRoute.sideSwitch = (finder.startSnapshot.simGuys[0]->getPosX() > finder.startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
+            doneRoute.advantage = pSim->simGuys[1]->getRecoveryTiming() - pSim->simGuys[0]->getRecoveryTiming();
             // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
             // for ( auto &trigger : doneRoute.timelineTriggers) {
             //     logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
@@ -274,10 +288,12 @@ void ComboWorker::WorkLoop(void) {
                 int exTriggers = (int)ex->timelineTriggers.size();
                 bool notWorse = newTriggers <= exTriggers
                     && newRoute->focusSpend <= ex->focusSpend
-                    && newRoute->gaugeSpend <= ex->gaugeSpend;
+                    && newRoute->gaugeSpend <= ex->gaugeSpend
+                    && newRoute->advantage >= ex->advantage;
                 bool betterSomewhere = newTriggers < exTriggers
                     || newRoute->focusSpend < ex->focusSpend
-                    || newRoute->gaugeSpend < ex->gaugeSpend;
+                    || newRoute->gaugeSpend < ex->gaugeSpend
+                    || newRoute->advantage > ex->advantage;
                 if (notWorse && betterSomewhere) {
                     doneRoutes.erase(it);
                     doneRoutes.insert(std::move(newRoute));
@@ -344,6 +360,10 @@ std::string routeToString(const DoneRoute &route, Guy *pGuy)
     std::string result = std::to_string(route.focusSpend / 10000) + " ";
     result += std::to_string(route.gaugeSpend / 10000) + " ";
     result += std::to_string(route.damage) + " ";
+    if (route.advantage >= 0) {
+        result += "+";
+    }
+    result += std::to_string(route.advantage) + " ";
     result += std::to_string(route.focusGain) + " ";
     result += std::to_string(route.gaugeGain) + " ";
     result += std::to_string(route.focusDmg) + " ";
@@ -606,10 +626,12 @@ void updateComboFinder(void)
                     int exTriggers = (int)ex->timelineTriggers.size();
                     bool notWorse = newTriggers <= exTriggers
                         && newRoute->focusSpend <= ex->focusSpend
-                        && newRoute->gaugeSpend <= ex->gaugeSpend;
+                        && newRoute->gaugeSpend <= ex->gaugeSpend
+                        && newRoute->advantage >= ex->advantage;
                     bool betterSomewhere = newTriggers < exTriggers
                         || newRoute->focusSpend < ex->focusSpend
-                        || newRoute->gaugeSpend < ex->gaugeSpend;
+                        || newRoute->gaugeSpend < ex->gaugeSpend
+                        || newRoute->advantage > ex->advantage;
                     if (notWorse && betterSomewhere) {
                         DoneRoute *oldPtr = existing->get();
                         finder.doneRoutesByFocusGain.erase(oldPtr);
