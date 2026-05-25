@@ -249,7 +249,7 @@ void ComboWorker::WorkLoop(void) {
         if (addRoute) {
             int framesToFinishRecovery = 0;
             pSim->simGuys[0]->setRecordFrameTriggers(false, false);
-            while (pSim->simGuys[1]->getRecoveryTiming() == finder.startRecoveryTiming) {
+            while (pSim->simGuys[1]->getRecoveryTiming() == finder.startRecoveryTiming || !pSim->simGuys[0]->canAct()) {
                 pSim->RunFrame();
                 pSim->AdvanceFrame();
                 framesProcessed++;
@@ -474,6 +474,8 @@ void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk =
     finder.filteredByGaugeGain.clear();
     finder.filteredByFocusDmg.clear();
     finder.sawImpossible = false;
+    finder.minAdvantage = 0;
+    finder.maxAdvantage = 0;
     finder.filterImpossibleOnly = false;
     finder.recentRoutes.clear();
     log("starting on " + std::to_string(finder.threadCount) + " threads");
@@ -530,7 +532,8 @@ bool filterIsActive(const ComboFinder &f)
     return f.filterFocusBars < 6
         || f.filterGaugeBars < 3
         || f.filterSideSwitchOnly
-        || f.filterImpossibleOnly;
+        || f.filterImpossibleOnly
+        || f.doFilterAdvantage;
 }
 
 static bool passesFilter(const ComboFinder &f, const DoneRoute *r)
@@ -541,6 +544,8 @@ static bool passesFilter(const ComboFinder &f, const DoneRoute *r)
     if (r->gaugeSpend > gaugeMax) return false;
     if (f.filterSideSwitchOnly && !r->sideSwitch) return false;
     if (f.filterImpossibleOnly && !r->impossibleInput) return false;
+    if (f.doFilterAdvantage && f.filterAdvantageExact && r->advantage != f.filterAdvantage) return false;
+    if (f.doFilterAdvantage && !f.filterAdvantageExact && r->advantage < f.filterAdvantage) return false;
     return true;
 }
 
@@ -651,6 +656,12 @@ void updateComboFinder(void)
                     newRoute->impossibleInput = !checkChargeInputs(newRoute->timelineTriggers);
                     if (newRoute->impossibleInput && !finder.sawImpossible) {
                         finder.sawImpossible = true;
+                    }
+                    if (newRoute->advantage > finder.maxAdvantage) {
+                        finder.maxAdvantage = newRoute->advantage;
+                    }
+                    if (newRoute->advantage < finder.minAdvantage) {
+                        finder.minAdvantage = newRoute->advantage;
                     }
                     auto [pos, inserted] = finder.doneRoutes.insert(std::move(newRoute));
                     DoneRoute *newPtr = pos->get();

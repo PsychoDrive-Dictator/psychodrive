@@ -191,6 +191,12 @@ public:
     int filterGaugeBars = 3;
     bool filterSideSwitchOnly = false;
     bool filterImpossibleOnly = false;
+    int filterAdvantage = 0;
+    bool doFilterAdvantage = false;
+    bool filterAdvantageExact = false;
+
+    int minAdvantage = 0;
+    int maxAdvantage = 0;
     bool sawImpossible = false;
     bool filterDirty = false;
     std::set<DoneRoute *, DoneRoutePtrDamageSort> filteredByDamage;

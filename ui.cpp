@@ -1897,6 +1897,39 @@ void SimulationController::RenderComboMinerSetup(void)
             }
         }
 
+        if (finder.maxAdvantage || finder.minAdvantage) {
+            if (ImGui::Checkbox("Advantage", &finder.doFilterAdvantage)) {
+                finder.filterDirty = true;
+            }
+            if (finder.doFilterAdvantage) {
+                ImGui::SameLine();
+                if (ImGui::Button("<##advantage")) {
+                    finder.filterAdvantage--;
+                    finder.filterDirty = true;
+                    if (finder.filterAdvantage < finder.minAdvantage) {
+                        finder.filterAdvantage = finder.minAdvantage;
+                    }
+                }
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(180);
+                if (ImGui::SliderInt("##advantagefilter", &finder.filterAdvantage, finder.minAdvantage, finder.maxAdvantage)) {
+                    finder.filterDirty = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(">##advantage")) {
+                    finder.filterAdvantage++;
+                    finder.filterDirty = true;
+                    if (finder.filterAdvantage > finder.maxAdvantage) {
+                        finder.filterAdvantage = finder.maxAdvantage;
+                    }
+                }
+                ImGui::SameLine();
+                if (ImGui::Checkbox("Exact", &finder.filterAdvantageExact)) {
+                    finder.filterDirty = true;
+                }
+            }
+        }
+
         routeCount = 0;
         for (DoneRoute *route : vecVisibleRoutes) {
             std::string routeStr = routeToString(*route, pSim->simGuys[0]);
