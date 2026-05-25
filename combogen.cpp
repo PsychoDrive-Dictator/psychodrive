@@ -239,48 +239,52 @@ void ComboWorker::WorkLoop(void) {
             currentRoute.comboHits = pSim->simGuys[1]->getComboHits();
         }
 
-        int lastFrameDamage = currentRoute.lastFrameDamage;
-        std::erase_if(currentRoute.timelineTriggers, [lastFrameDamage](const auto& item) {
-            return item.first > lastFrameDamage;
-        });
+        bool addRoute = true;
 
-        DoneRoute doneRoute;
-        doneRoute.timelineTriggers = currentRoute.timelineTriggers;
-        doneRoute.damage = currentRoute.damage;
-        doneRoute.focusGain = currentRoute.focusGain;
-        doneRoute.focusDmg = currentRoute.focusDmg;
-        doneRoute.gaugeGain = currentRoute.gaugeGain;
-        doneRoute.gaugeGain = currentRoute.gaugeGain;
-        doneRoute.focusSpend = currentRoute.focusSpend;
-        doneRoute.gaugeSpend = currentRoute.gaugeSpend;
-        doneRoute.sideSwitch = (finder.startSnapshot.simGuys[0]->getPosX() > finder.startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
-        // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
-        // for ( auto &trigger : doneRoute.timelineTriggers) {
-        //     logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
-        // }
-        // log(logEntry);
-        // fprintf(stderr, "%s\n", logEntry.c_str());
-        mutexDoneRoutes.lock();
-        auto newRoute = std::make_unique<DoneRoute>(doneRoute);
-        auto it = doneRoutes.find(newRoute);
-        if (it == doneRoutes.end()) {
-            doneRoutes.insert(std::move(newRoute));
-        } else {
-            const DoneRoute *ex = it->get();
-            int newTriggers = (int)newRoute->timelineTriggers.size();
-            int exTriggers = (int)ex->timelineTriggers.size();
-            bool notWorse = newTriggers <= exTriggers
-                && newRoute->focusSpend <= ex->focusSpend
-                && newRoute->gaugeSpend <= ex->gaugeSpend;
-            bool betterSomewhere = newTriggers < exTriggers
-                || newRoute->focusSpend < ex->focusSpend
-                || newRoute->gaugeSpend < ex->gaugeSpend;
-            if (notWorse && betterSomewhere) {
-                doneRoutes.erase(it);
-                doneRoutes.insert(std::move(newRoute));
-            }
+        int lastFrameDamage = currentRoute.lastFrameDamage;
+        if (std::any_of(currentRoute.timelineTriggers.begin(), currentRoute.timelineTriggers.end(), [lastFrameDamage](const auto& item) { return item.first > lastFrameDamage; })) {
+            addRoute = false;
         }
-        mutexDoneRoutes.unlock();
+
+        if (addRoute) {
+            DoneRoute doneRoute;
+            doneRoute.timelineTriggers = currentRoute.timelineTriggers;
+            doneRoute.damage = currentRoute.damage;
+            doneRoute.focusGain = currentRoute.focusGain;
+            doneRoute.focusDmg = currentRoute.focusDmg;
+            doneRoute.gaugeGain = currentRoute.gaugeGain;
+            doneRoute.gaugeGain = currentRoute.gaugeGain;
+            doneRoute.focusSpend = currentRoute.focusSpend;
+            doneRoute.gaugeSpend = currentRoute.gaugeSpend;
+            doneRoute.sideSwitch = (finder.startSnapshot.simGuys[0]->getPosX() > finder.startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
+            // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
+            // for ( auto &trigger : doneRoute.timelineTriggers) {
+            //     logEntry += std::to_string(trigger.first) + " " + guys[0]->getActionName(trigger.second.first) + " ";
+            // }
+            // log(logEntry);
+            // fprintf(stderr, "%s\n", logEntry.c_str());
+            mutexDoneRoutes.lock();
+            auto newRoute = std::make_unique<DoneRoute>(doneRoute);
+            auto it = doneRoutes.find(newRoute);
+            if (it == doneRoutes.end()) {
+                doneRoutes.insert(std::move(newRoute));
+            } else {
+                const DoneRoute *ex = it->get();
+                int newTriggers = (int)newRoute->timelineTriggers.size();
+                int exTriggers = (int)ex->timelineTriggers.size();
+                bool notWorse = newTriggers <= exTriggers
+                    && newRoute->focusSpend <= ex->focusSpend
+                    && newRoute->gaugeSpend <= ex->gaugeSpend;
+                bool betterSomewhere = newTriggers < exTriggers
+                    || newRoute->focusSpend < ex->focusSpend
+                    || newRoute->gaugeSpend < ex->gaugeSpend;
+                if (notWorse && betterSomewhere) {
+                    doneRoutes.erase(it);
+                    doneRoutes.insert(std::move(newRoute));
+                }
+            }
+            mutexDoneRoutes.unlock();
+        }
 
         if (pendingSnapshot) {
             delete pendingSnapshot;
