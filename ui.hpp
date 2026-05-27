@@ -6,6 +6,7 @@
 #include "chara.hpp"
 #include "simulation.hpp"
 #include "guy.hpp"
+#include "combogen.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -91,6 +92,7 @@ public:
     void Serialize(std::string &outStr);
     bool NewSim(void);
     void RenderUI(void);
+    void RenderMoveViewerWindow(void);
     void RenderComboMinerSetup(void);
     void AdvanceUntilComplete(void);
     void doFrameMeterDrag(void);
@@ -111,6 +113,9 @@ public:
     }
 
     std::vector<CharacterUIController> charControllers;
+
+    bool moveViewerInputsChanged = true;
+    ComboFinder moveViewerFinder;
 
     static constexpr float kFrameMeterDragRatio = 2.5;
 

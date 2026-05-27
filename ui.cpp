@@ -854,11 +854,13 @@ void CharacterUIController::renderCharSetup(void)
     if (modalDropDown("##char", &character, charNiceNames, 207)) {
         simInputsChanged = true;
         timelineTriggers.clear();
+        simController.moveViewerInputsChanged = true;
     }
     ImGui::SameLine();
     if (modalDropDown("##charversion", &charVersion, charVersions, charVersionCount, 35)) {
         simInputsChanged = true;
         // todo some actino ids might not match - make stitching code to find by name if needed?
+        simController.moveViewerInputsChanged = true;
     }
 
     if (gameMode == ComboMaker) {
@@ -897,8 +899,10 @@ void CharacterUIController::renderCharSetup(void)
         }
     }
 
-    if (ImGui::SliderInt("Buff Level", &buffLevel, 0, 4) ) {
-        simInputsChanged = true;
+    if (gameMode == ComboMaker) {
+        if (ImGui::SliderInt("Buff Level", &buffLevel, 0, 4) ) {
+            simInputsChanged = true;
+        }
     }
 }
 
@@ -1535,8 +1539,9 @@ void SimulationController::Reset(void)
         charControllers[0].startPosX = Fixed(-150);
         charControllers[1].startPosX = Fixed(150);
     } else {
-        charControllers[0].startPosX = Fixed(0);
-        charControllers[1].startPosX = Fixed(0);
+        charControllers[0].character = 0;
+        charControllers[0].startPosX = Fixed(-50);
+        charControllers[1].startPosX = Fixed(50);
     }
 
     for (auto &charController : charControllers) {
@@ -1716,6 +1721,45 @@ void SimulationController::doFrameMeterDrag(void)
 }
 
 static bool showResults = true;
+
+void SimulationController::RenderMoveViewerWindow(void)
+{
+    if (moveViewerInputsChanged) {
+        Simulation startSim;
+        startSim.CreateGuyFromCharController(charControllers[0]);
+        startSim.CreateGuyFromCharController(charControllers[1]);
+
+        moveViewerFinder.doLights = true;
+        moveViewerFinder.stopOnRecovery = true;
+        moveViewerFinder.Start(&startSim);
+
+        moveViewerInputsChanged = false;
+    }
+
+    if (moveViewerFinder.running) {
+        moveViewerFinder.Update();
+    }
+
+    int routeCount = 0;
+    for (auto & route : moveViewerFinder.doneRoutes) {
+        std::string routeStr = routeToString(*route, pSim->simGuys[0]);
+        ImGui::PushID(routeCount++);
+        // if (ImGui::Button("Load")) {
+        //     for (int i = 0; i < 2; i++) {
+        //         simController.charControllers[i].timelineTriggers = finderStartTimelineTriggers[i];
+        //         simController.charControllers[i].inputRegions = finderStartInputRegions[i];
+        //     }
+        //     for (auto & trigger : route->timelineTriggers) {
+        //         simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
+        //     }
+        //     simInputsChanged = true;
+        //     simController.charControllers[0].changed = true;
+        // }
+        //ImGui::SameLine();
+        ImGui::TextWrapped("%s", routeStr.c_str());
+        ImGui::PopID();
+    }
+}
 
 void SimulationController::RenderComboMinerSetup(void)
 {
@@ -2194,6 +2238,9 @@ void SimulationController::RenderUI(void)
                 prevScrubberFrame = scrubberFrame;
                 ImGui::EndChild();
             }
+        } else if (gameMode == MoveViewer) {
+            charControllers[0].renderCharSetup();
+            RenderMoveViewerWindow();
         } else {
             switch (viewSelect) {
                 default:
@@ -2244,19 +2291,19 @@ void SimulationController::RenderUI(void)
         translateY = gameMode == Training ? 150.0 : 100.0;
     }
 
-    if (gameMode != Training) {
+    if (gameMode == ComboMaker) {
         std::vector<std::string> vecViewLabels;
         vecViewLabels.push_back("P1 Setup");
         vecViewLabels.push_back("P1 Actions");
-        if (gameMode == ComboMaker) {
-            vecViewLabels.push_back("P2 Setup");
-            vecViewLabels.push_back("P2 Actions");
-            vecViewLabels.push_back("Combo Miner");
-        }
+        vecViewLabels.push_back("P2 Setup");
+        vecViewLabels.push_back("P2 Actions");
+        vecViewLabels.push_back("Combo Miner");
         if (viewSelect >= (int)vecViewLabels.size()) {
             viewSelect = 0;
         }
         modalDropDown("##viewselect", (int*)&viewSelect, vecViewLabels, modeSelectorSize);
+    }
+    if (gameMode != Training) {
         int halfButtonSize = modeSelectorSize / 2 - 5;
         if (ImGui::Button("Share", ImVec2(halfButtonSize,0))) {
             std::string strSerialized;

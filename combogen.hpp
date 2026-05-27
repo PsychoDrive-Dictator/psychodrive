@@ -10,7 +10,6 @@
 
 #include "guy.hpp"
 #include "simulation.hpp"
-#include "ui.hpp"
 
 struct SharedSimulationSnapshot {
     std::atomic<int> refcount = 0;
@@ -187,7 +186,9 @@ public:
     bool doLateCancels = false;
     bool doWalk = false;
     bool doKaras = false;
+    bool stopOnRecovery = false;
     std::set<int> lightsActionIDs;
+    std::set<int> triggerGroupZeroActionIDs;
 
     uint64_t totalFrames = 0;
     int maxDamage = 0;

@@ -135,6 +135,10 @@ void ComboWorker::WorkLoop(void) {
             pSim->AdvanceFrame();
             framesProcessed++;
 
+            if (pFinder->stopOnRecovery && pFinder->startSnapshot.simGuys[0]->getRecoveryTiming() != pSim->simGuys[0]->getRecoveryTiming()) {
+                break;
+            }
+
             if (!pSim->simGuys[0]->getHitStop() &&
                 currentRoute.simFrameProgress < pSim->frameCounter) {
                 currentRoute.simFrameProgress = pSim->frameCounter;
@@ -157,13 +161,27 @@ void ComboWorker::WorkLoop(void) {
                 if (hasAnyFrameTriggers || pSim->simGuys[0]->canAct()) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
-                        if (pFinder->doLights || (pFinder->lightsActionIDs.find(frameTrigger.actionID()) == pFinder->lightsActionIDs.end())) {
-                            if (frameTrigger.actionID() < 0 || doActualFrameTriggers) {
-                                QueueRouteFork(frameTrigger);
+                        bool doThisTrigger = true;
+                        if (!pFinder->doLights && (pFinder->lightsActionIDs.find(frameTrigger.actionID()) != pFinder->lightsActionIDs.end())) {
+                            doThisTrigger = false;
+                        }
+                        if (pFinder->stopOnRecovery) {
+                            // skip any neutral moves past the first one
+                            if (currentRoute.timelineTriggers.size() && (pFinder->triggerGroupZeroActionIDs.find(frameTrigger.actionID()) != pFinder->triggerGroupZeroActionIDs.end())) {
+                                doThisTrigger = false;
+                            }
+                            // don't repeat any moves
+                            for (auto & trigger : currentRoute.timelineTriggers) {
+                                if (trigger.second.actionID() == frameTrigger.actionID()) {
+                                    doThisTrigger = false;
+                                }
                             }
                         }
+                        if (doThisTrigger && (frameTrigger.actionID() < 0 || doActualFrameTriggers)) {
+                            QueueRouteFork(frameTrigger);
+                        }
                     }
-                    if (pSim->simGuys[0]->canAct()) {
+                    if (pSim->simGuys[0]->canAct() && !pFinder->stopOnRecovery) {
                         if (pFinder->doWalk && (currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
                             if (pSim->simGuys[0]->getFocus() < 60000 && pSim->simGuys[0]->getFocus()) {
                                 QueueRouteFork(ActionRef(-FORWARD, 0));
@@ -172,6 +190,10 @@ void ComboWorker::WorkLoop(void) {
                         // QueueRouteFork(ActionRef(-BACK, 0));
                         QueueRouteFork(ActionRef(-(UP|FORWARD), 0));
                         QueueRouteFork(ActionRef(-(UP|BACK), 0));
+                    }
+                    if (pSim->simGuys[0]->canAct() && pFinder->stopOnRecovery) {
+                        // neutral jump so air normals can hit, for now
+                        QueueRouteFork(ActionRef(-(UP), 0));
                     }
                     // do this with lock held lest someone free it under us already
                     if (pendingSnapshot->refcount) {
@@ -225,6 +247,11 @@ void ComboWorker::WorkLoop(void) {
 
             if (pSim->simGuys[1]->getCurrentAction() == 353 && pSim->simGuys[1]->getCurrentFrame() > 160) {
                 // they're in the stunned script and already on the ground not able to get hit
+                break;
+            }
+
+            if (pFinder->stopOnRecovery && !currentRoute.timelineTriggers.size()) {
+                // we're done firing all the initial triggers and we may die now - no use trying delays
                 break;
             }
 
@@ -381,6 +408,7 @@ void ComboFinder::Start(Simulation *pStartSim)
         return;
     }
 
+    pStartSim->gatherEveryone();
     startSnapshot.Clone(pStartSim);
 
     initChargeChecker(startSnapshot.simGuys[0]->getCharData());
@@ -398,6 +426,12 @@ void ComboFinder::Start(Simulation *pStartSim)
             {
                 lightsActionIDs.insert(key.actionID());
             }
+        }
+    }
+    triggerGroupZeroActionIDs.clear();
+    if (stopOnRecovery) {
+        for (auto & entry : startSnapshot.simGuys[0]->getCharData()->triggerGroupByID[0]->entries) {
+            triggerGroupZeroActionIDs.insert(entry.actionID);
         }
     }
 
