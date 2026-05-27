@@ -26,6 +26,29 @@
 int renderSizeX;
 int renderSizeY;
 
+ComboFinder finder;
+std::map<int, ActionRef> finderStartTimelineTriggers[2];
+std::vector<inputRegion> finderStartInputRegions[2];
+
+void snapshotFinderStartState(int startFrame)
+{
+    for (int i = 0; i < 2; i++) {
+        finderStartTimelineTriggers[i] = simController.charControllers[i].timelineTriggers;
+        finderStartInputRegions[i] = simController.charControllers[i].inputRegions;
+        std::erase_if(finderStartTimelineTriggers[i], [startFrame](const auto& item) {
+            return item.first >= startFrame;
+        });
+        std::erase_if(finderStartInputRegions[i], [startFrame](const auto& item) {
+            return item.frame >= startFrame;
+        });
+        for (inputRegion &region : finderStartInputRegions[i]) {
+            if (region.frame + region.duration >= startFrame) {
+                region.duration = startFrame - region.frame;
+            }
+        }
+    }
+}
+
 bool webWidgets = false;
 
 ImFont *comboFont = nullptr;
@@ -1701,7 +1724,7 @@ void SimulationController::RenderComboMinerSetup(void)
     ImGui::PushFont(font);
     if (finder.running) {
         if (ImGui::Button("Stop")) {
-            stopComboFinder();
+            finder.Stop();
         }
     } else {
         if (ImGui::Button("Run!")) {
@@ -1746,7 +1769,7 @@ void SimulationController::RenderComboMinerSetup(void)
     int routeCount = 0;
     static int sortMode = 0;
 
-    bool filterActive = filterIsActive(finder);
+    bool filterActive = finder.filterIsActive();
     size_t totalVisibleCount = 0;
     std::vector<DoneRoute *> vecVisibleRoutes;
 
@@ -1936,8 +1959,8 @@ void SimulationController::RenderComboMinerSetup(void)
             ImGui::PushID(routeCount++);
             if (ImGui::Button("Load")) {
                 for (int i = 0; i < 2; i++) {
-                    simController.charControllers[i].timelineTriggers = finder.startTimelineTriggers[i];
-                    simController.charControllers[i].inputRegions = finder.startInputRegions[i];
+                    simController.charControllers[i].timelineTriggers = finderStartTimelineTriggers[i];
+                    simController.charControllers[i].inputRegions = finderStartInputRegions[i];
                 }
                 for (auto & trigger : route->timelineTriggers) {
                     simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;
@@ -1960,8 +1983,8 @@ void SimulationController::RenderComboMinerSetup(void)
             ImGui::PushID(routeCount);
             if (ImGui::Button("Load")) {
                 for (int i = 0; i < 2; i++) {
-                    simController.charControllers[i].timelineTriggers = finder.startTimelineTriggers[i];
-                    simController.charControllers[i].inputRegions = finder.startInputRegions[i];
+                    simController.charControllers[i].timelineTriggers = finderStartTimelineTriggers[i];
+                    simController.charControllers[i].inputRegions = finderStartInputRegions[i];
                 }
                 for (auto & trigger : it->timelineTriggers) {
                     simController.charControllers[0].timelineTriggers[(int)trigger.first-1] = trigger.second;

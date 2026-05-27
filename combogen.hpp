@@ -142,6 +142,8 @@ struct FocusDmgSort {
     }
 };
 
+class ComboFinder;
+
 class ComboWorker {
 public:
     void Start(bool isFirst);
@@ -149,6 +151,7 @@ public:
     void QueueRouteFork(ActionRef frameTrigger);
     void WorkLoop(void);
 
+    ComboFinder *pFinder = nullptr;
     std::atomic<bool> idle;
     std::atomic<bool> kill;
     std::atomic<uint64_t> framesProcessed = 0;
@@ -170,6 +173,12 @@ public:
 
 class ComboFinder {
 public:
+    void Start(Simulation *pStartSim);
+    void Update(void);
+    void Render(void);
+    void Stop(void);
+    bool filterIsActive(void) const;
+
     std::vector<ComboWorker*> workerPool;
     int threadCount = 0;
     bool running = false;
@@ -215,23 +224,16 @@ public:
     static constexpr int maxRecentRoutes = 10;
 
     Simulation startSnapshot;
-    std::map<int, ActionRef> startTimelineTriggers[2];
-    std::vector<inputRegion> startInputRegions[2];
     int startRecoveryTiming;
 
     bool playing = false;
     int playingRoute = 0;
-};
 
-extern ComboFinder finder;
+    bool newBestPending = false;
+    bool stoppedPending = false;
+};
 
 std::string timelineTriggerToString(ActionRef trigger, Guy *pGuy);
 std::string routeToString(const ComboRoute &route, Guy *pGuy);
 std::string routeToString(const DoneRoute &route, Guy *pGuy);
 std::string formatWithCommas(uint64_t value);
-uint64_t calculateAverageFPS(void);
-void findCombos(bool doLights, bool doLateCancels, bool doWalk, bool doKaras);
-void updateComboFinder(void);
-void renderComboFinder(void);
-void stopComboFinder(void);
-bool filterIsActive(const ComboFinder &f);

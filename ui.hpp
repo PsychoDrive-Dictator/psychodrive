@@ -182,6 +182,11 @@ public:
 extern SimulationController simController;
 extern bool simInputsChanged;
 
+extern class ComboFinder finder;
+extern std::map<int, ActionRef> finderStartTimelineTriggers[2];
+extern std::vector<inputRegion> finderStartInputRegions[2];
+void snapshotFinderStartState(int startFrame);
+
 void timelineToInputBuffer(std::deque<int> &inputBuffer);
 void renderUI(float frameRate, std::deque<std::string> *pLogQueue, int sizeX, int sizeY);
 ImGuiIO& initUI(void);

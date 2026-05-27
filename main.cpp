@@ -510,7 +510,7 @@ color clearColor = {0.0,0.0,0.0};
 static void mainloop(void)
 {
     if (done) {
-        stopComboFinder();
+        finder.Stop();
 
         // save timeline buffer to disk
         timelineToInputBuffer(playBackInputBuffer);
@@ -550,10 +550,54 @@ static void mainloop(void)
 
     updateInputs(sizeX, sizeY);
 
-    updateComboFinder();
+    finder.Update();
+
+    if (finder.newBestPending) {
+        finder.newBestPending = false;
+        if (gameMode == Training) {
+            defaultSim.Clone(&finder.startSnapshot);
+            finder.playing = true;
+            paused = false;
+        }
+    }
+    if (finder.stoppedPending) {
+        finder.stoppedPending = false;
+        if (gameMode == Training) {
+            paused = false;
+            finder.playing = true;
+            defaultSim.Clone(&finder.startSnapshot);
+        }
+    }
 
     if (runComboFinder) {
-        findCombos(comboFinderDoLights, comboFinderDoLateCancels, comboFinderDoWalk, comboFinderDoKaras);
+        finder.doLights = comboFinderDoLights;
+        finder.doLateCancels = comboFinderDoLateCancels;
+        finder.doWalk = comboFinderDoWalk;
+        finder.doKaras = comboFinderDoKaras;
+
+        Simulation startSim;
+        Simulation *pStartSim = nullptr;
+        if (gameMode == Training) {
+            pStartSim = &defaultSim;
+            for (int i = 0; i < 2; i++) {
+                finderStartTimelineTriggers[i].clear();
+                finderStartInputRegions[i].clear();
+            }
+        } else {
+            int startFrame = simController.scrubberFrame - 1;
+            if (startFrame < 0) {
+                startFrame = 0;
+            }
+            simController.getFinishedSnapshotAtFrame(&startSim, startFrame);
+            pStartSim = &startSim;
+            snapshotFinderStartState(startFrame);
+        }
+
+        if (gameMode == Training && !paused) {
+            paused = true;
+        }
+
+        finder.Start(pStartSim);
         runComboFinder = false;
     }
 
@@ -570,7 +614,7 @@ static void mainloop(void)
 
         if (!simInputsChanged) {
             Simulation *pFrameSim = simController.getSnapshotAtFrame(curFrame);
-            renderComboFinder();
+            finder.Render();
             if (pFrameSim) {
                 pFrameSim->Render();
             }
@@ -843,7 +887,7 @@ static void mainloop(void)
         setRenderState(clearColor, sizeX, sizeY);
         renderUI(io->Framerate, &logQueue, sizeX, sizeY);
 
-        renderComboFinder();
+        finder.Render();
         defaultSim.Render();
 
         if (resetpos) {

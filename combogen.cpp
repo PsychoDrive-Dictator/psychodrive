@@ -14,20 +14,18 @@
 #include "main.hpp"
 #include "ui.hpp"
 
-ComboFinder finder;
-
 void ComboWorker::Start(bool isFirst) {
     idle = false;
     first = isFirst;
     wantsRenderSnapshot = false;
 
-    shuffledWorkerPool = finder.workerPool;
-    std::shuffle(shuffledWorkerPool.begin(),shuffledWorkerPool.end(), finder.rng);
+    shuffledWorkerPool = pFinder->workerPool;
+    std::shuffle(shuffledWorkerPool.begin(),shuffledWorkerPool.end(), pFinder->rng);
 
     pSim = new Simulation;
     if (first) {
-        pSim->Clone(&finder.startSnapshot);
-        pSim->simGuys[0]->setRecordFrameTriggers(true, finder.doLateCancels);
+        pSim->Clone(&pFinder->startSnapshot);
+        pSim->simGuys[0]->setRecordFrameTriggers(true, pFinder->doLateCancels);
     }
 
     thread = std::thread(&ComboWorker::WorkLoop, this);
@@ -145,7 +143,7 @@ void ComboWorker::WorkLoop(void) {
                 bool hasAnyFrameTriggers = pSim->simGuys[0]->getFrameTriggers().size();
 
                 // todo try to skip all karas for now, but should probably only skip on free movement
-                if (!finder.doKaras && pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct() && !pSim->simGuys[0]->getFreeMovement()) {
+                if (!pFinder->doKaras && pSim->simGuys[0]->getCurrentFrame() <= 1 && !pSim->simGuys[0]->canAct() && !pSim->simGuys[0]->getFreeMovement()) {
                     doActualFrameTriggers = false;
                     hasAnyFrameTriggers = false;
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
@@ -159,14 +157,14 @@ void ComboWorker::WorkLoop(void) {
                 if (hasAnyFrameTriggers || pSim->simGuys[0]->canAct()) {
                     std::scoped_lock lockPendingRoutes(mutexPendingRoutes);
                     for (auto &frameTrigger : pSim->simGuys[0]->getFrameTriggers()) {
-                        if (finder.doLights || (finder.lightsActionIDs.find(frameTrigger.actionID()) == finder.lightsActionIDs.end())) {
+                        if (pFinder->doLights || (pFinder->lightsActionIDs.find(frameTrigger.actionID()) == pFinder->lightsActionIDs.end())) {
                             if (frameTrigger.actionID() < 0 || doActualFrameTriggers) {
                                 QueueRouteFork(frameTrigger);
                             }
                         }
                     }
                     if (pSim->simGuys[0]->canAct()) {
-                        if (finder.doWalk && (currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
+                        if (pFinder->doWalk && (currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
                             if (pSim->simGuys[0]->getFocus() < 60000 && pSim->simGuys[0]->getFocus()) {
                                 QueueRouteFork(ActionRef(-FORWARD, 0));
                             }
@@ -205,7 +203,7 @@ void ComboWorker::WorkLoop(void) {
                 currentRoute.gaugeSpend = pSim->comboProbe.gaugeSpend;
             }
 
-            if (pSim->frameCounter - finder.startSnapshot.frameCounter >= 10000) {
+            if (pSim->frameCounter - pFinder->startSnapshot.frameCounter >= 10000) {
                 fprintf(stderr, "aaa %s\n", routeToString(currentRoute, pSim->simGuys[0]).c_str());
                 break;
             }
@@ -216,7 +214,7 @@ void ComboWorker::WorkLoop(void) {
             // }
 
             // combo count has reset, end the search
-            if (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits || pSim->simGuys[1]->getRecoveryTiming() != finder.startRecoveryTiming ) {
+            if (pSim->simGuys[1]->getComboHits() < currentRoute.comboHits || pSim->simGuys[1]->getRecoveryTiming() != pFinder->startRecoveryTiming ) {
                 break;
             }
 
@@ -249,7 +247,7 @@ void ComboWorker::WorkLoop(void) {
         if (addRoute) {
             int framesToFinishRecovery = 0;
             pSim->simGuys[0]->setRecordFrameTriggers(false, false);
-            while (pSim->simGuys[1]->getRecoveryTiming() == finder.startRecoveryTiming || !pSim->simGuys[0]->canAct()) {
+            while (pSim->simGuys[1]->getRecoveryTiming() == pFinder->startRecoveryTiming || !pSim->simGuys[0]->canAct()) {
                 pSim->RunFrame();
                 pSim->AdvanceFrame();
                 framesProcessed++;
@@ -269,7 +267,7 @@ void ComboWorker::WorkLoop(void) {
             doneRoute.gaugeGain = currentRoute.gaugeGain;
             doneRoute.focusSpend = currentRoute.focusSpend;
             doneRoute.gaugeSpend = currentRoute.gaugeSpend;
-            doneRoute.sideSwitch = (finder.startSnapshot.simGuys[0]->getPosX() > finder.startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
+            doneRoute.sideSwitch = (pFinder->startSnapshot.simGuys[0]->getPosX() > pFinder->startSnapshot.simGuys[1]->getPosX()) != (pSim->simGuys[0]->getPosX() > pSim->simGuys[1]->getPosX());
             doneRoute.advantage = pSim->simGuys[1]->getRecoveryTiming() - pSim->simGuys[0]->getRecoveryTiming();
             // std::string logEntry = std::to_string(doneRoute.damage) + " damage: ";
             // for ( auto &trigger : doneRoute.timelineTriggers) {
@@ -328,13 +326,6 @@ std::string formatWithCommas(uint64_t value)
     return formatted.str();
 }
 
-uint64_t calculateAverageFPS(void)
-{
-    const auto end = std::chrono::steady_clock::now();
-    float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - finder.start).count() / 1000.0f;
-    return seconds > 0 ? finder.totalFrames / seconds : 0;
-}
-
 std::string timelineTriggerToString(ActionRef trigger, Guy *pGuy)
 {
     std::string actionDesc;
@@ -384,122 +375,90 @@ void printRoute(const DoneRoute &route, Guy *pGuy)
 #endif
 }
 
-void findCombos(bool doLights = false, bool doLateCancels = false, bool doWalk = false, bool doKaras = false)
+void ComboFinder::Start(Simulation *pStartSim)
 {
-    if (finder.running) {
-        // ?
+    if (running) {
         return;
     }
 
-    CharacterData *pComboCharData = nullptr;
-    if (gameMode == Training) {
-        finder.startSnapshot.Clone(&defaultSim);
-        pComboCharData = defaultSim.simGuys[0]->getCharData();
-    } else {
-        int startFrame = simController.scrubberFrame - 1;
-        if (startFrame < 0) {
-            startFrame = 0;
-        }
-        simController.getFinishedSnapshotAtFrame(&finder.startSnapshot, startFrame);
-        pComboCharData = simController.getRecordedGuy(0, 0)->getCharData();
-        for (int i = 0; i < 2; i++) {
-            finder.startTimelineTriggers[i] = simController.charControllers[i].timelineTriggers;
-            finder.startInputRegions[i] = simController.charControllers[i].inputRegions;
-            std::erase_if(finder.startTimelineTriggers[i], [startFrame](const auto& item) {
-                return item.first >= startFrame;
-            });
-            std::erase_if(finder.startInputRegions[i], [startFrame](const auto& item) {
-                return item.frame >= startFrame;
-            });
-            for (inputRegion &region : finder.startInputRegions[i]) {
-                if (region.frame + region.duration >= startFrame) {
-                    region.duration = startFrame - region.frame;
-                }
-            }
-        }
-    }
+    startSnapshot.Clone(pStartSim);
 
-    initChargeChecker(finder.startSnapshot.simGuys[0]->getCharData());
+    initChargeChecker(startSnapshot.simGuys[0]->getCharData());
 
-    finder.startRecoveryTiming = finder.startSnapshot.simGuys[1]->getRecoveryTiming();
+    startRecoveryTiming = startSnapshot.simGuys[1]->getRecoveryTiming();
 
-    finder.doLights = doLights;
-    finder.doLateCancels = doLateCancels;
-    finder.doWalk = doWalk;
-    finder.doKaras = doKaras;
-
-    if (!finder.doLights) {
-        for (auto& [key, action] : pComboCharData->actionsByID) {
+    lightsActionIDs.clear();
+    if (!doLights) {
+        for (auto& [key, action] : startSnapshot.simGuys[0]->getCharData()->actionsByID) {
             if (!action) continue;
             if (action->name.find("5LP") != std::string::npos ||
                 action->name.find("5LK") != std::string::npos ||
                 action->name.find("2LP") != std::string::npos ||
                 action->name.find("2LK") != std::string::npos)
             {
-                finder.lightsActionIDs.insert(key.actionID());
+                lightsActionIDs.insert(key.actionID());
             }
         }
     }
 
-    finder.threadCount = std::thread::hardware_concurrency();
+    threadCount = std::thread::hardware_concurrency();
 #ifdef __EMSCRIPTEN__
-    finder.threadCount = emscripten_num_logical_cores();
+    threadCount = emscripten_num_logical_cores();
 #endif
-    if (finder.threadCount == 0) {
-        finder.threadCount = 1;
+    if (threadCount == 0) {
+        threadCount = 1;
     }
-    for (int i = 0; i < finder.threadCount; i++) {
+    for (int i = 0; i < threadCount; i++) {
         ComboWorker *pNewWorker = new ComboWorker;
-        finder.workerPool.push_back(pNewWorker);
+        pNewWorker->pFinder = this;
+        workerPool.push_back(pNewWorker);
     }
 
     bool first = true;
-    for (auto worker : finder.workerPool) {
+    for (auto worker : workerPool) {
         worker->Start(first);
         first = false;
     }
 
-    finder.start = std::chrono::steady_clock::now();
-    finder.lastFPSUpdate = finder.start;
-    finder.lastFrameCount = 0;
-    finder.currentFPS = 0;
-    finder.totalFrames = 0;
-    finder.maxDamage = 0;
-    finder.doneRoutesByFocusGain.clear();
-    finder.doneRoutesByGaugeGain.clear();
-    finder.doneRoutesByFocusDmg.clear();
-    finder.doneRoutes.clear();
-    finder.filteredByDamage.clear();
-    finder.filteredByFocusGain.clear();
-    finder.filteredByGaugeGain.clear();
-    finder.filteredByFocusDmg.clear();
-    finder.sawImpossible = false;
-    finder.minAdvantage = 0;
-    finder.maxAdvantage = 0;
-    finder.filterImpossibleOnly = false;
-    finder.recentRoutes.clear();
-    log("starting on " + std::to_string(finder.threadCount) + " threads");
+    start = std::chrono::steady_clock::now();
+    lastFPSUpdate = start;
+    lastFrameCount = 0;
+    currentFPS = 0;
+    totalFrames = 0;
+    maxDamage = 0;
+    doneRoutesByFocusGain.clear();
+    doneRoutesByGaugeGain.clear();
+    doneRoutesByFocusDmg.clear();
+    doneRoutes.clear();
+    filteredByDamage.clear();
+    filteredByFocusGain.clear();
+    filteredByGaugeGain.clear();
+    filteredByFocusDmg.clear();
+    sawImpossible = false;
+    minAdvantage = 0;
+    maxAdvantage = 0;
+    filterImpossibleOnly = false;
+    recentRoutes.clear();
+    newBestPending = false;
+    stoppedPending = false;
+    log("starting on " + std::to_string(threadCount) + " threads");
 
-    if (gameMode == Training && !paused) {
-        paused = true;
-    }
-
-    finder.running = true;
+    running = true;
 }
 
-void stopComboFinder(void)
+void ComboFinder::Stop(void)
 {
-    for (auto worker : finder.workerPool) {
+    for (auto worker : workerPool) {
         worker->kill = true;
     }
 
-    for (auto worker : finder.workerPool) {
+    for (auto worker : workerPool) {
         worker->thread.join();
-        finder.totalFrames += worker->framesProcessed;
-        finder.doneRoutes.merge(worker->doneRoutes);
+        totalFrames += worker->framesProcessed;
+        doneRoutes.merge(worker->doneRoutes);
         delete worker;
     }
-    finder.workerPool.clear();
+    workerPool.clear();
 
     std::stringstream formattedTotalFrames;
     std::stringstream formattedFPS;
@@ -512,28 +471,28 @@ void stopComboFinder(void)
     formattedTotalFrames.imbue(loc);
     formattedFPS.imbue(loc);
 
-    formattedTotalFrames << finder.totalFrames;
+    formattedTotalFrames << totalFrames;
 
     const auto end = std::chrono::steady_clock::now();
-    float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - finder.start).count() / 1000.0f;
-    uint64_t framesPerSeconds = finder.totalFrames / seconds;
+    float seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.0f;
+    uint64_t framesPerSeconds = totalFrames / seconds;
     formattedFPS << framesPerSeconds;
 
     auto logEntry = "processed " + formattedTotalFrames.str() + " frames in " + std::to_string(seconds) + "s (";
     logEntry += formattedFPS.str() + " fps)";
     log(logEntry);
 
-    finder.finalFPS = framesPerSeconds;
-    finder.running = false;
+    finalFPS = framesPerSeconds;
+    running = false;
 }
 
-bool filterIsActive(const ComboFinder &f)
+bool ComboFinder::filterIsActive(void) const
 {
-    return f.filterFocusBars < 6
-        || f.filterGaugeBars < 3
-        || f.filterSideSwitchOnly
-        || f.filterImpossibleOnly
-        || f.doFilterAdvantage;
+    return filterFocusBars < 6
+        || filterGaugeBars < 3
+        || filterSideSwitchOnly
+        || filterImpossibleOnly
+        || doFilterAdvantage;
 }
 
 static bool passesFilter(const ComboFinder &f, const DoneRoute *r)
@@ -549,81 +508,77 @@ static bool passesFilter(const ComboFinder &f, const DoneRoute *r)
     return true;
 }
 
-void updateComboFinder(void)
+void ComboFinder::Update(void)
 {
-    if (finder.filterDirty) {
-        finder.filteredByDamage.clear();
-        finder.filteredByFocusGain.clear();
-        finder.filteredByGaugeGain.clear();
-        finder.filteredByFocusDmg.clear();
+    if (filterDirty) {
+        filteredByDamage.clear();
+        filteredByFocusGain.clear();
+        filteredByGaugeGain.clear();
+        filteredByFocusDmg.clear();
 
-        if (filterIsActive(finder)) {
-            for (auto &up : finder.doneRoutes) {
+        if (filterIsActive()) {
+            for (auto &up : doneRoutes) {
                 DoneRoute *r = up.get();
-                if (passesFilter(finder, r)) {
-                    finder.filteredByDamage.insert(r);
-                    finder.filteredByFocusGain.insert(r);
-                    finder.filteredByGaugeGain.insert(r);
-                    finder.filteredByFocusDmg.insert(r);
+                if (passesFilter(*this, r)) {
+                    filteredByDamage.insert(r);
+                    filteredByFocusGain.insert(r);
+                    filteredByGaugeGain.insert(r);
+                    filteredByFocusDmg.insert(r);
                 }
             }
         }
-        finder.filterDirty = false;
+        filterDirty = false;
     }
 
-    if (!finder.running) {
+    if (!running) {
         return;
     }
 
     const auto now = std::chrono::steady_clock::now();
-    float timeSinceLastFPSUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(now - finder.lastFPSUpdate).count() / 1000.0f;
+    float timeSinceLastFPSUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastFPSUpdate).count() / 1000.0f;
 
     if (timeSinceLastFPSUpdate >= 1.0f) {
         uint64_t currentTotalFrames = 0;
-        for (auto worker : finder.workerPool) {
+        for (auto worker : workerPool) {
             currentTotalFrames += worker->framesProcessed;
         }
-        uint64_t framesDelta = currentTotalFrames - finder.lastFrameCount;
-        finder.currentFPS = framesDelta / timeSinceLastFPSUpdate;
-        finder.lastFrameCount = currentTotalFrames;
-        finder.lastFPSUpdate = now;
+        uint64_t framesDelta = currentTotalFrames - lastFrameCount;
+        currentFPS = framesDelta / timeSinceLastFPSUpdate;
+        lastFrameCount = currentTotalFrames;
+        lastFPSUpdate = now;
     }
 
     bool allIdle = true;
-    for (auto worker : finder.workerPool) {
+    for (auto worker : workerPool) {
         if (worker->mutexDoneRoutes.try_lock()) {
             std::set<std::unique_ptr<DoneRoute>, DamageSort> newDoneRoutes;
             std::swap(newDoneRoutes, worker->doneRoutes);
             worker->mutexDoneRoutes.unlock();
 
             if (newDoneRoutes.size() > 0) {
-                int skip = std::max(0, (int)newDoneRoutes.size() - finder.maxRecentRoutes);
-                finder.recentRoutes.clear();
+                int skip = std::max(0, (int)newDoneRoutes.size() - maxRecentRoutes);
+                recentRoutes.clear();
                 auto it = newDoneRoutes.begin();
                 std::advance(it, skip);
                 for (; it != newDoneRoutes.end(); ++it) {
-                    finder.recentRoutes.push_back(**it);
+                    recentRoutes.push_back(**it);
                 }
             }
 
             for (auto &route : newDoneRoutes) {
-                if (route->damage > finder.maxDamage) {
-                    printRoute(*route, finder.startSnapshot.simGuys[0]);
-                    finder.maxDamage = route->damage;
-                    if (gameMode == Training) {
-                        defaultSim.Clone(&finder.startSnapshot);
-                        finder.playing = true;
-                        paused = false;
-                    }
+                if (route->damage > maxDamage) {
+                    printRoute(*route, startSnapshot.simGuys[0]);
+                    maxDamage = route->damage;
+                    newBestPending = true;
                 }
             }
-            bool isFiltering = filterIsActive(finder);
+            bool isFiltering = filterIsActive();
 
             for (auto it = newDoneRoutes.begin(); it != newDoneRoutes.end(); ) {
                 auto newRoute = std::move(newDoneRoutes.extract(it++).value());
-                auto existing = finder.doneRoutes.find(newRoute);
+                auto existing = doneRoutes.find(newRoute);
                 bool doInsert = false;
-                if (existing == finder.doneRoutes.end()) {
+                if (existing == doneRoutes.end()) {
                     doInsert = true;
                 } else {
                     const DoneRoute *ex = existing->get();
@@ -639,40 +594,40 @@ void updateComboFinder(void)
                         || newRoute->advantage > ex->advantage;
                     if (notWorse && betterSomewhere) {
                         DoneRoute *oldPtr = existing->get();
-                        finder.doneRoutesByFocusGain.erase(oldPtr);
-                        finder.doneRoutesByGaugeGain.erase(oldPtr);
-                        finder.doneRoutesByFocusDmg.erase(oldPtr);
+                        doneRoutesByFocusGain.erase(oldPtr);
+                        doneRoutesByGaugeGain.erase(oldPtr);
+                        doneRoutesByFocusDmg.erase(oldPtr);
                         if (isFiltering) {
-                            finder.filteredByDamage.erase(oldPtr);
-                            finder.filteredByFocusGain.erase(oldPtr);
-                            finder.filteredByGaugeGain.erase(oldPtr);
-                            finder.filteredByFocusDmg.erase(oldPtr);
+                            filteredByDamage.erase(oldPtr);
+                            filteredByFocusGain.erase(oldPtr);
+                            filteredByGaugeGain.erase(oldPtr);
+                            filteredByFocusDmg.erase(oldPtr);
                         }
-                        finder.doneRoutes.erase(existing);
+                        doneRoutes.erase(existing);
                         doInsert = true;
                     }
                 }
                 if (doInsert) {
                     newRoute->impossibleInput = !checkChargeInputs(newRoute->timelineTriggers);
-                    if (newRoute->impossibleInput && !finder.sawImpossible) {
-                        finder.sawImpossible = true;
+                    if (newRoute->impossibleInput && !sawImpossible) {
+                        sawImpossible = true;
                     }
-                    if (newRoute->advantage > finder.maxAdvantage) {
-                        finder.maxAdvantage = newRoute->advantage;
+                    if (newRoute->advantage > maxAdvantage) {
+                        maxAdvantage = newRoute->advantage;
                     }
-                    if (newRoute->advantage < finder.minAdvantage) {
-                        finder.minAdvantage = newRoute->advantage;
+                    if (newRoute->advantage < minAdvantage) {
+                        minAdvantage = newRoute->advantage;
                     }
-                    auto [pos, inserted] = finder.doneRoutes.insert(std::move(newRoute));
+                    auto [pos, inserted] = doneRoutes.insert(std::move(newRoute));
                     DoneRoute *newPtr = pos->get();
-                    finder.doneRoutesByFocusGain.insert(newPtr);
-                    finder.doneRoutesByGaugeGain.insert(newPtr);
-                    finder.doneRoutesByFocusDmg.insert(newPtr);
-                    if (isFiltering && passesFilter(finder, newPtr)) {
-                        finder.filteredByDamage.insert(newPtr);
-                        finder.filteredByFocusGain.insert(newPtr);
-                        finder.filteredByGaugeGain.insert(newPtr);
-                        finder.filteredByFocusDmg.insert(newPtr);
+                    doneRoutesByFocusGain.insert(newPtr);
+                    doneRoutesByGaugeGain.insert(newPtr);
+                    doneRoutesByFocusDmg.insert(newPtr);
+                    if (isFiltering && passesFilter(*this, newPtr)) {
+                        filteredByDamage.insert(newPtr);
+                        filteredByFocusGain.insert(newPtr);
+                        filteredByGaugeGain.insert(newPtr);
+                        filteredByFocusDmg.insert(newPtr);
                     }
                 }
             }
@@ -682,26 +637,20 @@ void updateComboFinder(void)
         }
     }
     if (allIdle) {
-        stopComboFinder();
-
-        if (gameMode == Training) {
-            paused = false;
-            finder.playing = true;
-            defaultSim.Clone(&finder.startSnapshot);
-        }
+        Stop();
+        stoppedPending = true;
     }
 }
 
-void renderComboFinder(void)
+void ComboFinder::Render(void)
 {
-    if (!finder.running) {
+    if (!running) {
         return;
     }
 
-    //int i = finder.workerPool.size();
-    for (auto worker : finder.workerPool) {
+    for (auto worker : workerPool) {
         std::scoped_lock lockWorkerRenderSnapshot(worker->mutexRenderSnapshot);
-        worker->simRenderSnapshot.Render(1.0 / (finder.workerPool.size() / 3.0) , false);
+        worker->simRenderSnapshot.Render(1.0 / (workerPool.size() / 3.0) , false);
         worker->wantsRenderSnapshot = true;
     }
 }
