@@ -7974,6 +7974,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ingrid_sa2_timing",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 163,
+                "firstFrame": 560,
+                "lastFrame": 722
+            },
+            {
+                "count": 125,
+                "firstFrame": 427,
+                "lastFrame": 629
+            },
+            {
+                "count": 2,
+                "firstFrame": 491,
+                "lastFrame": 629
+            },
+            {
+                "count": 127,
+                "firstFrame": 427,
+                "lastFrame": 624
+            },
+            {
+                "count": 115,
+                "firstFrame": 427,
+                "lastFrame": 624
+            },
+            {
+                "count": 390,
+                "firstFrame": 79,
+                "lastFrame": 596
+            },
+            {
+                "count": 179,
+                "firstFrame": 101,
+                "lastFrame": 590
+            },
+            {
+                "count": 73,
+                "firstFrame": 559,
+                "lastFrame": 631
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 133,
+                "firstFrame": 531,
+                "lastFrame": 663
+            },
+            {
+                "count": 10,
+                "firstFrame": 559,
+                "lastFrame": 569
+            },
+            {
+                "count": 238,
+                "firstFrame": 531,
+                "lastFrame": 663
+            }
+        ]
+    },
+    {
         "testName": "jamie_command_grab",
         "testVersion": "40",
         "finished": true,
