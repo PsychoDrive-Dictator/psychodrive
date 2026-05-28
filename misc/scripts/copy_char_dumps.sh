@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=41
+version=42
 
 copy_char_file() {
     src="PlayerData/$1/$1 $3.json"
@@ -38,6 +38,7 @@ copy_char_dumps Ed ed
 copy_char_dumps Elena elena
 copy_char_dumps 'E Honda' honda
 copy_char_dumps Guile guile
+copy_char_dumps Ingrid ingrid
 copy_char_dumps Jamie jamie
 copy_char_dumps JP jp
 copy_char_dumps Juri juri

@@ -1527,7 +1527,7 @@ void SimulationController::Reset(void)
     charControllers.emplace_back();
     charControllers.emplace_back();
 
-    charControllers[0].character = 28;
+    charControllers[0].character = 29;
     charControllers[0].charVersion = charVersionCount - 1;
     charControllers[0].charColor = { 1.0, 1.0, 1.0 };
     charControllers[1].character = 0;
@@ -1539,7 +1539,6 @@ void SimulationController::Reset(void)
         charControllers[0].startPosX = Fixed(-150);
         charControllers[1].startPosX = Fixed(150);
     } else {
-        charControllers[0].character = 0;
         charControllers[0].startPosX = Fixed(-50);
         charControllers[1].startPosX = Fixed(50);
     }
