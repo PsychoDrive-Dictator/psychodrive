@@ -271,6 +271,11 @@ void ComboWorker::WorkLoop(void) {
             addRoute = false;
         }
 
+        // is this just a superset of above check?
+        if (pSim->simGuys[0]->getScalingTriggerID() != pSim->simGuys[1]->getLastScalingTriggerID()) {
+            addRoute = false;
+        }
+
         if (addRoute) {
             int framesToFinishRecovery = 0;
             pSim->simGuys[0]->setRecordFrameTriggers(false, false);

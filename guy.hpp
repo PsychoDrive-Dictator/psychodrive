@@ -183,6 +183,8 @@ public:
     int getHitStun() { return hitStun; }
     int getComboDamage() { return comboDamage; }
     int getLastDamageScale() { return lastDamageScale; }
+    int getLastScalingTriggerID() { return lastScalingTriggerID; }
+    int getScalingTriggerID() { return scalingTriggerID; }
     bool getAppliedScaling() { return appliedScaling; }
     std::string getUniqueParamsString() {
         std::string ret;
