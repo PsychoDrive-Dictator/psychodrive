@@ -899,9 +899,11 @@ void CharacterUIController::renderCharSetup(void)
         }
     }
 
-    if (gameMode == ComboMaker) {
+    if (gameMode == ComboMaker || gameMode == MoveViewer) {
+        ImGui::SetNextItemWidth( webWidgets ? 250.0 : 170.0 );
         if (ImGui::SliderInt("Buff Level", &buffLevel, 0, 4) ) {
             simInputsChanged = true;
+            simController.moveViewerInputsChanged = true;
         }
     }
 }
@@ -1723,7 +1725,9 @@ static bool showResults = true;
 
 void SimulationController::RenderMoveViewerWindow(void)
 {
-    if (moveViewerInputsChanged) {
+    ImGui::Dummy(ImVec2(800, 0));
+
+    if (moveViewerInputsChanged && !moveViewerFinder.running) {
         Simulation startSim;
         startSim.CreateGuyFromCharController(charControllers[0]);
         startSim.CreateGuyFromCharController(charControllers[1]);
@@ -1739,6 +1743,7 @@ void SimulationController::RenderMoveViewerWindow(void)
         moveViewerFinder.Update();
     }
 
+    ImGui::BeginChild("MoveList", ImVec2(0, 750), false, ImGuiWindowFlags_None);
     int routeCount = 0;
     for (auto & route : moveViewerFinder.doneRoutes) {
         std::string routeStr = routeToString(*route, pSim->simGuys[0]);
@@ -1758,6 +1763,7 @@ void SimulationController::RenderMoveViewerWindow(void)
         ImGui::TextWrapped("%s", routeStr.c_str());
         ImGui::PopID();
     }
+    ImGui::EndChild();
 }
 
 void SimulationController::RenderComboMinerSetup(void)
