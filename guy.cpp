@@ -2381,7 +2381,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                 Fixed &forward = pCurrentAction->pProjectileData->wallBoxForward;
                 Fixed &back = pCurrentAction->pProjectileData->wallBoxBack;
                 if (direction > Fixed(0)) {
-                    if (forward != Fixed(0)) {
+                    if (forward != Fixed(0) || projBoundaries) {
                         Fixed nose = x + forward;
                         if (nose > projWallDistance) {
                             pushX = -(nose - projWallDistance);
@@ -2390,7 +2390,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                             pushX = -(nose - (screenCenterX + maxProjectileDistance));
                         }
                     }
-                    if (back != Fixed(0)) {
+                    if (back != Fixed(0) || projBoundaries) {
                         Fixed tail = x - back;
                         if (tail < -projWallDistance) {
                             pushX = -(tail - -projWallDistance);
@@ -2400,7 +2400,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                         }
                     }
                 } else {
-                    if (forward != Fixed(0)) {
+                    if (forward != Fixed(0) || projBoundaries) {
                         Fixed nose = x - forward;
                         if (nose < -projWallDistance) {
                             pushX = -(nose - -projWallDistance);
@@ -2409,7 +2409,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                             pushX = -(nose - (screenCenterX - maxProjectileDistance));
                         }
                     }
-                    if (back != Fixed(0)) {
+                    if (back != Fixed(0) || projBoundaries) {
                         Fixed tail = x + back;
                         if (tail > projWallDistance) {
                             pushX = -(tail - projWallDistance);
