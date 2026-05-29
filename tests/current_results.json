@@ -8041,6 +8041,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ingrid_sa2_teleport_juggle",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 634,
+                "firstFrame": 699,
+                "lastFrame": 963
+            },
+            {
+                "count": 726,
+                "firstFrame": 488,
+                "lastFrame": 909
+            },
+            {
+                "count": 86,
+                "firstFrame": 690,
+                "lastFrame": 909
+            },
+            {
+                "count": 330,
+                "firstFrame": 488,
+                "lastFrame": 821
+            },
+            {
+                "count": 330,
+                "firstFrame": 488,
+                "lastFrame": 821
+            },
+            {
+                "count": 576,
+                "firstFrame": 47,
+                "lastFrame": 961
+            },
+            {
+                "count": 717,
+                "firstFrame": 69,
+                "lastFrame": 963
+            },
+            {
+                "count": 108,
+                "firstFrame": 686,
+                "lastFrame": 919
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 52,
+                "firstFrame": 686,
+                "lastFrame": 863
+            },
+            {
+                "count": 201,
+                "firstFrame": 552,
+                "lastFrame": 865
+            },
+            {
+                "count": 77,
+                "firstFrame": 787,
+                "lastFrame": 870
+            }
+        ]
+    },
+    {
         "testName": "ingrid_sa2_timing",
         "testVersion": "42",
         "finished": true,
