@@ -963,7 +963,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
                 // rnage check on the way up? waive if not going up
                 rangeCheckMatch = true;
             }
-            if (pTrigger->rangeCondition == 5 && !(velocityY < Fixed(0))) {
+            if (pTrigger->rangeCondition == 5 && !(velocityY < Fixed(0) || landed)) {
                 // rnage check on the way down? waive if not going down
                 rangeCheckMatch = true;
             }
