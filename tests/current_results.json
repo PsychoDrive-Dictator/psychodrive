@@ -8041,6 +8041,207 @@ var currentResults =
         ]
     },
     {
+        "testName": "ingrid_normal_atemi",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 139,
+                "firstFrame": 225,
+                "lastFrame": 363
+            },
+            {
+                "count": 12,
+                "firstFrame": 138,
+                "lastFrame": 233
+            },
+            {
+                "count": 1,
+                "firstFrame": 138,
+                "lastFrame": 138
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 142,
+                "lastFrame": 142
+            },
+            {
+                "count": 2,
+                "firstFrame": 142,
+                "lastFrame": 143
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 264,
+                "lastFrame": 265
+            }
+        ]
+    },
+    {
+        "testName": "ingrid_normal_atemi_behind",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 344,
+                "firstFrame": 177,
+                "lastFrame": 360
+            },
+            {
+                "count": 2,
+                "firstFrame": 182,
+                "lastFrame": 200
+            },
+            {
+                "count": 1,
+                "firstFrame": 182,
+                "lastFrame": 182
+            },
+            {
+                "count": 28,
+                "firstFrame": 191,
+                "lastFrame": 218
+            },
+            {
+                "count": 28,
+                "firstFrame": 191,
+                "lastFrame": 218
+            },
+            {
+                "count": 95,
+                "firstFrame": 186,
+                "lastFrame": 271
+            },
+            {
+                "count": 196,
+                "firstFrame": 187,
+                "lastFrame": 360
+            },
+            {
+                "count": 28,
+                "firstFrame": 191,
+                "lastFrame": 218
+            },
+            {
+                "count": 21,
+                "firstFrame": 191,
+                "lastFrame": 211
+            },
+            {
+                "count": 31,
+                "firstFrame": 191,
+                "lastFrame": 221
+            },
+            {
+                "count": 18,
+                "firstFrame": 191,
+                "lastFrame": 199
+            },
+            {
+                "count": 48,
+                "firstFrame": 191,
+                "lastFrame": 238
+            }
+        ]
+    },
+    {
+        "testName": "ingrid_normal_atemi_front_whiff_land",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 15,
+                "firstFrame": 130,
+                "lastFrame": 144
+            },
+            {
+                "count": 1,
+                "firstFrame": 113,
+                "lastFrame": 113
+            },
+            {
+                "count": 1,
+                "firstFrame": 113,
+                "lastFrame": 113
+            },
+            {
+                "count": 16,
+                "firstFrame": 120,
+                "lastFrame": 144
+            },
+            {
+                "count": 2,
+                "firstFrame": 120,
+                "lastFrame": 144
+            },
+            {
+                "count": 7,
+                "firstFrame": 117,
+                "lastFrame": 198
+            },
+            {
+                "count": 156,
+                "firstFrame": 118,
+                "lastFrame": 205
+            },
+            {
+                "count": 2,
+                "firstFrame": 120,
+                "lastFrame": 144
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1,
+                "firstFrame": 120,
+                "lastFrame": 120
+            },
+            {
+                "count": 20,
+                "firstFrame": 120,
+                "lastFrame": 129
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ingrid_sa2_teleport_juggle",
         "testVersion": "42",
         "finished": true,
@@ -9310,6 +9511,73 @@ var currentResults =
                 "count": 2,
                 "firstFrame": 170,
                 "lastFrame": 171
+            }
+        ]
+    },
+    {
+        "testName": "jp_normal_atemi",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 68,
+                "firstFrame": 184,
+                "lastFrame": 292
+            },
+            {
+                "count": 2,
+                "firstFrame": 184,
+                "lastFrame": 292
+            },
+            {
+                "count": 48,
+                "firstFrame": 240,
+                "lastFrame": 287
+            },
+            {
+                "count": 48,
+                "firstFrame": 240,
+                "lastFrame": 287
+            },
+            {
+                "count": 20,
+                "firstFrame": 188,
+                "lastFrame": 272
+            },
+            {
+                "count": 48,
+                "firstFrame": 188,
+                "lastFrame": 291
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             }
         ]
     },
