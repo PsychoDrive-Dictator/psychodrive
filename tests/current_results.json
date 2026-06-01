@@ -135,6 +135,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_air_recovery_trigger",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 48,
+                "firstFrame": 84,
+                "lastFrame": 121
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 31,
+                "firstFrame": 84,
+                "lastFrame": 114
+            },
+            {
+                "count": 31,
+                "firstFrame": 84,
+                "lastFrame": 114
+            },
+            {
+                "count": 38,
+                "firstFrame": 84,
+                "lastFrame": 121
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "aa_air_trade",
         "testVersion": "33",
         "finished": true,
