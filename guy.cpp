@@ -6175,6 +6175,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         nextAction = -1;
         nextActionFrame = -1;
 
+        deniedLastBranch = true;
+
         UpdateActionData();
 
         if (pCurrentAction && currentFrame >= pCurrentAction->actionFrameDuration) {
