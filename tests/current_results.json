@@ -10922,6 +10922,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "rashid_throws",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 216,
+                "firstFrame": 146,
+                "lastFrame": 486
+            },
+            {
+                "count": 34,
+                "firstFrame": 147,
+                "lastFrame": 377
+            },
+            {
+                "count": 6,
+                "firstFrame": 146,
+                "lastFrame": 377
+            },
+            {
+                "count": 15,
+                "firstFrame": 147,
+                "lastFrame": 161
+            },
+            {
+                "count": 15,
+                "firstFrame": 147,
+                "lastFrame": 161
+            },
+            {
+                "count": 197,
+                "firstFrame": 57,
+                "lastFrame": 486
+            },
+            {
+                "count": 140,
+                "firstFrame": 147,
+                "lastFrame": 486
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 134,
+                "firstFrame": 377,
+                "lastFrame": 486
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ryu_back_hp",
         "testVersion": "26",
         "finished": true,
