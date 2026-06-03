@@ -7157,10 +7157,14 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
         }
 
         if (shotKey.operation == 2) {
-            if (pParent == nullptr) {
-                log(logUnknowns, "shotkey despawn but no parent?");
+            if (shotKey.actionId == currentAction && isProjectile) {
+                die = true;
             }
-            die = true;
+            for (auto & minion : getMinions()) {
+                if (shotKey.actionId == minion->currentAction) {
+                    minion->die = true;
+                }
+            }
         } else if (shotKey.operation == 1) {
             // todo do we need to match by action id here or just blast everything?
             for (auto & shot : getMinions()) {
