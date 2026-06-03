@@ -1637,7 +1637,6 @@ void SimulationController::RecordFrame(void)
     stateRecording.emplace_back();
     RecordedFrame &frame = stateRecording[stateRecording.size()-1];
 
-    frame.sim.enableCleanup = false;
     frame.sim.Clone(pSim);
     if (gameMode == Viewer) {
         for (int i = 0; i < (int)pSim->everyone.size() && i < (int)frame.sim.everyone.size(); i++) {
