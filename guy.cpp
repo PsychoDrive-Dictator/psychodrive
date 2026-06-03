@@ -1286,6 +1286,9 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         bool bothButtonsPressed = false;
         bool atLeastOneNotConsumed = true; // todo disable this for now - is it a flag?
         initialSearch += 1; // one frame of slop to find plink buttons
+        if (dc.inputBuffer.size() < (size_t)initialSearch) {
+            initialSearch = dc.inputBuffer.size();
+        }
         while (button <= HK) {
             if (button & okKeyFlags) {
                 cursorPos = initialCursorPos;
@@ -1346,7 +1349,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
                 match = false;
                 break; // break once initialMatch no longer true, set i on last true
             }
-            if (dc.inputBuffer[cursorPos] & FROZEN) {
+            if (dc.inputBuffer[cursorPos] & FROZEN && initialSearch < dc.inputBuffer.size()) {
                 initialSearch++;
                 //log(true, "extending backroll window frozen " + std::to_string(searchWindow));
             }
@@ -5682,10 +5685,13 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         searchWindow += pSim->frameCounter - knockDownFrameCounter;
                         knockDownFrameCounter = 0;
                     }
+                    if (dc.inputBuffer.size() < (size_t)searchWindow) {
+                        searchWindow = dc.inputBuffer.size();
+                    }
                     bool backroll = false;
                     for (int i = 0; i < searchWindow && !noBackRecovery; i++) {
                         int input = dc.inputBuffer[i] & (LP+MP+HP+LK+MK+HK);
-                        if (dc.inputBuffer[i] & FROZEN) {
+                        if (dc.inputBuffer[i] & FROZEN && (size_t)searchWindow < dc.inputBuffer.size()) {
                             searchWindow++;
                             //log(true, "extending backroll window frozen " + std::to_string(searchWindow));
                         }

@@ -158,7 +158,7 @@ public:
         std::deque<RecordedFrame> frames;
         ReplayRoundResult result;
     };
-    std::vector<ReplayRoundRecording> replayRoundRecordings;
+    std::deque<ReplayRoundRecording> replayRoundRecordings;
     nlohmann::json replayInfo;
     std::vector<uint8_t> replayInputData;
     int replayVersion = -1;

@@ -243,10 +243,12 @@ public:
     }
 
     inline T& operator[](std::size_t index) {
+        assert(index < N);
         return buffer[index];
     }
 
     inline const T& operator[](std::size_t index) const {
+        assert(index < N);
         return buffer[index];
     }
 
