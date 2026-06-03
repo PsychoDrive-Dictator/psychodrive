@@ -1279,6 +1279,9 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
     if (framesSinceLastInput > initialSearch) {
         return false;
     }
+    if (!dc.inputBuffer.size()) {
+        return false;
+    }
 
     if ((okCondFlags & 0x60) == 0x60) {
         int parallelMatchesFound = 0;
@@ -1355,7 +1358,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
             }
             cursorPos++;
         }
-        if (match && !((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[cursorPos], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))) {
+        if (match && cursorPos < dc.inputBuffer.size() && !((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[cursorPos], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))) {
             match = false;
         }
         if (atLeastOneNotConsumed == false) {
@@ -1368,6 +1371,9 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
     }
     if (initialI == -1) {
         initialI = cursorPos;
+    }
+    if (dc.inputBuffer.size() && (size_t)initialI >= dc.inputBuffer.size()) {
+        initialI = dc.inputBuffer.size() - 1;
     }
     cursorPos = initialI;
     // for held inputs if we didn't find a valid positive edge, make sure we're still held
