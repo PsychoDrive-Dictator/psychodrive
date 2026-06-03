@@ -1471,7 +1471,6 @@ int CharacterUIController::getInput(int frameID)
 
 SimulationController::~SimulationController()
 {
-    // clear stateRecording before guyPool destructs to avoid dangling pointers
     stateRecording.clear();
 }
 
@@ -1598,7 +1597,6 @@ bool SimulationController::NewSim(void)
     }
 
     stateRecording.clear();
-    guyPool.reset();
 
     for (int i = 0; i < charCount; i++) {
         pSim->CreateGuyFromCharController(charControllers[i]);
@@ -1640,7 +1638,7 @@ void SimulationController::RecordFrame(void)
     RecordedFrame &frame = stateRecording[stateRecording.size()-1];
 
     frame.sim.enableCleanup = false;
-    frame.sim.Clone(pSim, &guyPool);
+    frame.sim.Clone(pSim);
     if (gameMode == Viewer) {
         for (int i = 0; i < (int)pSim->everyone.size() && i < (int)frame.sim.everyone.size(); i++) {
             frame.sim.everyone[i]->getLogQueue() = pSim->everyone[i]->getLogQueue();
@@ -2674,7 +2672,6 @@ void SimulationController::LoadFromGameDump(const std::string &path, int version
     viewerDumpVersion = version;
 
     stateRecording.clear();
-    guyPool.reset();
 
     if (pSim) {
         delete pSim;
@@ -2851,7 +2848,6 @@ void SimulationController::SimulateAllReplayRounds()
     replayRoundCount = 0;
     replayCurrentRound = -1;
     stateRecording.clear();
-    guyPool.reset();
     if (pSim) { delete pSim; pSim = nullptr; }
 
     int roundCount = (int)replayInfo["RoundInfo"].size();

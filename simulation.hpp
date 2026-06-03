@@ -55,7 +55,7 @@ class Simulation {
 public:
     ~Simulation();
     void gatherEveryone(std::vector<Guy*> *vecOutEveryone = nullptr, bool simulationOrder = true);
-    void Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool = nullptr);
+    void Clone(Simulation *pOtherSim);
     void CreateGuy(std::string charName, int charVersion, Fixed x, Fixed y, int startDir, color color);
     void CreateGuyFromDumpedPlayer(nlohmann::json &playerJson, int version);
     void CreateGuyFromCharController(CharacterUIController &controller);

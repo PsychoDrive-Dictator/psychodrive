@@ -143,8 +143,6 @@ public:
     float curMomentum;
     ImGuiID activeDragID = 0;
 
-    ObjectPool<Guy> guyPool{600};
-
     std::deque<RecordedFrame> stateRecording;
 
     // dump viewer state

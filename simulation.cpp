@@ -63,29 +63,22 @@ void Simulation::gatherEveryone(std::vector<Guy*> *vecOutEveryone /* = nullptr *
     }
 }
 
-void Simulation::Clone(Simulation *pOtherSim, ObjectPool<Guy> *pGuyPool)
+void Simulation::Clone(Simulation *pOtherSim)
 {
     gatherEveryone();
 
     if (everyone.size() < pOtherSim->everyone.size()) {
         int guysToAllocate = pOtherSim->everyone.size() - everyone.size();
         for (int i = 0; i < guysToAllocate; i++) {
-            Guy *newGuy = pGuyPool ? pGuyPool->allocate() : new Guy;
-            if (pGuyPool) {
-                newGuy->enableCleanup = false;
-            }
+            Guy *newGuy = new Guy;
             everyone.push_back(newGuy);
         }
     }
     if (everyone.size() > pOtherSim->everyone.size()) {
         int guysToFree = everyone.size() - pOtherSim->everyone.size();
         for (int i = 0; i < guysToFree; i++) {
-            if (pGuyPool) {
-                pGuyPool->release(everyone.back());
-            } else {
-                everyone.back()->enableCleanup = false;
-                delete everyone.back();
-            }
+            everyone.back()->enableCleanup = false;
+            delete everyone.back();
             everyone.pop_back();
         }
     }
