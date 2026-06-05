@@ -744,6 +744,7 @@ private:
         pendingHitStop = 0;
         timeInHitStop = 0;
         hitSpanFrames = 0;
+        resetActionDisabledFramesOnTransition = false;
         ignoreHitStop = false;
         wasIgnoreHitStop = false;
         ignoreWarudo = false;
@@ -939,6 +940,7 @@ private:
     bool hitArmorThisMove : 1;
     bool hitAtemiThisMove : 1;
     bool countingDownInstall : 1;
+    bool resetActionDisabledFramesOnTransition : 1;
     bool ignoreHitStop : 1;
     bool wasIgnoreHitStop : 1;
     bool ignoreWarudo : 1;

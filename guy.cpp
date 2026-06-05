@@ -5121,8 +5121,13 @@ void Guy::DoBranchKey(bool preHit)
                 deniedLastBranch = false;
                 keepPlace = branchKey.keepPlace;
                 if (branchInducedLanding) {
-                    log(logTriggers, "disabling actions");
                     actionDisabledFrames = 3;
+                    resetActionDisabledFramesOnTransition = true;
+                    if (hitAtemiThisMove) {
+                        actionDisabledFrames++;
+                        resetActionDisabledFramesOnTransition = false;
+                    }
+                    log(logTriggers, "disabling actions for " + std::to_string(actionDisabledFrames) + " frames due to landing branch");
                 }
             }
 
@@ -6172,8 +6177,10 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
 
         // if we transition after landing frame, reset action restriction
-        if (actionDisabledFrames < 3) {
+        if (actionDisabledFrames && actionDisabledFrames < 3 && resetActionDisabledFramesOnTransition) {
+            log(logTriggers, "resetting action disabled frames");
             actionDisabledFrames = 0;
+            resetActionDisabledFramesOnTransition = false;
         }
 
         currentFrame = nextActionFrame != -1 ? nextActionFrame : 0;
