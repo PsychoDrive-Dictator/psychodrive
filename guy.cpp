@@ -270,7 +270,7 @@ void Guy::UpdateActionData(void)
     }
 
     if (pCurrentAction == nullptr) {
-        log(true, "couldn't find next action, reverting to 1 - style lapsed?");
+        log(logErrors, "couldn't find next action, reverting to 1 - style lapsed?");
         currentAction = 1;
         pCurrentAction = FindMove(currentAction, styleInstall);
     }
@@ -780,7 +780,7 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
             pSim->comboProbe.gaugeSpend += pTrigger->gaugeCost;
         }
         if (gauge < 0) {
-            log(true, "not eonugh gauge to execute?! not supposed to happen");
+            log(logErrors, "not eonugh gauge to execute?! not supposed to happen");
         }
     }
 
@@ -1068,7 +1068,7 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
             break;
         }
         // if (pCommand->id == 36) {
-        //     guyLog(true, std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
+        //     guyLog(logErrors, std::to_string(inputID) + " " + std::to_string(inputOkKeyFlags) +
         //     " inputbuffercursor " + std::to_string(inputBufferCursor) + " matchThisInput " + std::to_string(matchThisFrame) + " buffer " + std::to_string(bufferInput));
         // }
         inputBufferCursor++;
@@ -1076,7 +1076,7 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
 
     // if (fail) {
     //     if (pCommand->id == 36) {
-    //         guyLog(true, "fail " + std::to_string(dc.inputBuffer[inputBufferCursor]));
+    //         guyLog(logErrors, "fail " + std::to_string(dc.inputBuffer[inputBufferCursor]));
     //     }
     //     break;
     // }
@@ -1354,7 +1354,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
             }
             if (dc.inputBuffer[cursorPos] & FROZEN && initialSearch < dc.inputBuffer.size()) {
                 initialSearch++;
-                //log(true, "extending backroll window frozen " + std::to_string(searchWindow));
+                //log(logErrors, "extending backroll window frozen " + std::to_string(searchWindow));
             }
             cursorPos++;
         }
@@ -1492,7 +1492,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
                     if (entryIndex == -1) {
                         if (triggerCount >= triggerCheckArraySize) {
-                            log(true, "trigger check array overflow!!");
+                            log(logErrors, "trigger check array overflow!!");
                             continue;
                         }
                         entryIndex = triggerCount++;
@@ -1551,7 +1551,7 @@ void Guy::DoTriggers(int fluffFrameBias)
 
                     if (entryIndex == -1) {
                         if (triggerCount >= triggerCheckArraySize) {
-                            log(true, "trigger check array overflow!!");
+                            log(logErrors, "trigger check array overflow!!");
                             continue;
                         }
                         entryIndex = triggerCount++;
@@ -2352,7 +2352,7 @@ bool Guy::WorldPhysics(bool onlyFloor, bool projBoundaries)
                 screenCenterX = bothPlayerPos / Fixed(2);
                 int fixedRemainder = bothPlayerPos.data - screenCenterX.data * 2;
                 screenCenterX.data += fixedRemainder;
-                //log(true, "screencenter " + std::to_string(screenCenterX.f()));
+                //log(logErrors, "screencenter " + std::to_string(screenCenterX.f()));
                 screenCenterX = fixMax(-maxScreenCenterDisplacement, screenCenterX);
                 screenCenterX = fixMin(maxScreenCenterDisplacement, screenCenterX);
                 if (pScreenGuyOne->onLeftWall() || pScreenGuyTwo->onLeftWall()) {
@@ -2866,7 +2866,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             if (hitbox.type != hit && hitbox.type != projectile && hitbox.type != grab && hitbox.type != domain && hitbox.type != direct_damage) {
                 // not supposed to get through!
                 exit(0);
-                log(true, "wtf! " + std::to_string(hitbox.type));
+                log(logErrors, "wtf! " + std::to_string(hitbox.type));
                 continue;
             }
 
@@ -4216,7 +4216,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 groundBounce = true;
                 groundBounceVelX = Fixed(-floorDestX) / Fixed(floorTime);
                 groundBounceAccelX = Fixed(floorDestX) / Fixed(floorTime * 32);
-                log(true, "floorDestX" + std::to_string(floorDestX) + " floorTime" + std::to_string(floorTime));
+                //log(logHits, "floorDestX" + std::to_string(floorDestX) + " floorTime" + std::to_string(floorTime));
                 if (direction == Fixed(-1) && groundBounceAccelX.data & 63) {
                     // ??
                     groundBounceAccelX.data += 1;
@@ -4283,7 +4283,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             if ((dmgType == 21 || dmgType == 22) && pAttacker->pendingUnlockHit) {
                 // thrown? constant velocity one frame from now, ignore place/hitvel, hard knockdown after hitstun is done
                 if (!locked) {
-                    log(true, "nage but not locked?");
+                    log(logErrors, "nage but not locked?");
                 }
                 if (dmgType == 21 && destTime != 0) {
                     // those aren't actually used but they're set in game so it quiets some warnings
@@ -4703,7 +4703,7 @@ void Guy::DoBranchKey(bool preHit)
                            //log("action branch1");
                         }
                     } else {
-                        log(true, "that branch not gonna work");
+                        log(logErrors, "that branch not gonna work");
                     }
                     break;
                 case 12: // height
@@ -4717,7 +4717,7 @@ void Guy::DoBranchKey(bool preHit)
                             pGuy = pOpponent;
                         }
                         if (pGuy == nullptr) {
-                            log(true, "that height branch not gonna work");
+                            log(logErrors, "that height branch not gonna work");
                         } else {
                             if (branchParam1 == 1 && pGuy->getPosY().i() < branchParam2) {
                                 doBranch = true;
@@ -4776,7 +4776,7 @@ void Guy::DoBranchKey(bool preHit)
                             log(logUnknowns, "unknown type of distance branch");
                         }
                     } else {
-                        log(true, "dangling distance branch");
+                        log(logErrors, "dangling distance branch");
                     }
                     break;
                 case 18:
@@ -4959,7 +4959,7 @@ void Guy::DoBranchKey(bool preHit)
                             pGuy = pParent;
                         }
                         if (pGuy == nullptr) {
-                            log(true, "that status branch not gonna work");
+                            log(logErrors, "that status branch not gonna work");
                         } else {
                             if (branchParam3 == 1) {
                                 // just matching branch in jp SAA_LV3_START(1) for now
@@ -5102,7 +5102,7 @@ void Guy::DoBranchKey(bool preHit)
             }
 
             if (branchAction == currentAction && keepFrame) {
-                log(true, "noop branch - branch type inhibit?");
+                log(logBranches, "noop branch - branch type inhibit?");
             } else {
                 if (branchAction == currentAction) {
                     log(logBranches, "branching to frame " + std::to_string(branchFrame) + " type " + std::to_string(branchType));
@@ -5292,7 +5292,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         currentSpeed = Fixed(1);
     }
     currentFrameFrac += currentSpeed;
-    //log(true, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
+    //log(logErrors, "currentFrameFrac " + std::to_string(currentFrameFrac.f()) + " " + std::to_string(currentFrameFrac.data));
     currentFrame = currentFrameFrac.i();
 
     // evaluate branches after the frame bump, branch frames are meant to be elided afaict
@@ -5701,7 +5701,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                         int input = dc.inputBuffer[i] & (LP+MP+HP+LK+MK+HK);
                         if (dc.inputBuffer[i] & FROZEN && (size_t)searchWindow < dc.inputBuffer.size()) {
                             searchWindow++;
-                            //log(true, "extending backroll window frozen " + std::to_string(searchWindow));
+                            //log(logErrors, "extending backroll window frozen " + std::to_string(searchWindow));
                         }
                         if (std::bitset<32>(input).count() >= 2) {
                             backroll = true;
@@ -5915,7 +5915,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if ((couldAct && comboHits) || resetComboCount) {
         if ( comboHits) {
-            log(true, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
+            log(logErrors, " combo hits " + std::to_string(comboHits) + " damage " + std::to_string(comboDamage));
         }
         comboDamage = 0;
         comboHits = 0;
@@ -5968,7 +5968,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     if (couldAct && wasHit) {
         int advantage = pSim->frameCounter - pOpponent->recoveryTiming;
         std::string message = "recovered! adv " + std::to_string(advantage);
-        log(true, message );
+        log(logErrors, message );
 
         throwRelease = 0;
         juggleCounter = 0;
@@ -6762,7 +6762,7 @@ void Guy::DoLockKey(void)
                 if (lockKey.param03 == 1) {
                     // todo make a set of mutually exclusive scratch variables
                     // for now use anything existing to not bloat the size up
-                    //log(true, "saving super lock position " + std::to_string(getPosX().f()))
+                    //log(logErrors, "saving super lock position " + std::to_string(getPosX().f()))
                     groundBounceVelX = getPosX();
                     //groundBounceVelY = getPosY();
                     posX = Fixed(0);
@@ -6799,7 +6799,7 @@ void Guy::DoLockKey(void)
             // apply hit DT param 02 after RunFrame, since we dont know if other guy RunFrame
             // has run or not yet and it introduces ordering issues
             if (pendingUnlockHit) {
-                log(true, "weird!");
+                log(logErrors, "weird!");
             }
             pendingUnlockHit = lockKey.param02;
             HitEntry *pEntry = &pCharData->hitByID[lockKey.param02]->common[0];
@@ -6962,7 +6962,7 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                                 posX = pOffsetGuy->getPosX() + posOffset * direction;
                                 teleported = true;
                             } else {
-                                log(true, "offset broken");
+                                log(logErrors, "offset broken");
                             }
                             if (param2 || param3 || param4 || param5 ) {
                                 log(logUnknowns, "unknown offset param");
@@ -6972,7 +6972,7 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                         case 10:
                         {
                             if (superLock) {
-                                //log(true, "was super lock");
+                                //log(logErrors, "was super lock");
                                 posX = groundBounceVelX - prevPosOffset * direction;
                                 lastPosX = getPosX(); // todo should something else make it ignore screen push?
                                 //posY = groundBounceVelY;
@@ -7235,7 +7235,7 @@ void Guy::DoInstantAction(int actionID)
         DoEventKey(pInstantAction, 0);
         DoShotKey(pInstantAction, 0);
     } else {
-        log(true, "couldn't find instant action " + std::to_string(actionID));
+        log(logErrors, "couldn't find instant action " + std::to_string(actionID));
     }
 }
 

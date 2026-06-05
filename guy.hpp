@@ -152,7 +152,7 @@ public:
     }
 
     void guyLog(bool doLog, std::string logLine);
-    void guyLog(std::string logLine) { guyLog(true, logLine ); }
+    //void guyLog(std::string logLine) { guyLog(logErrors, logLine ); }
 
     bool getLogTransitions() { return logTransitions; }
     void setLogTransitions(bool set) { logTransitions = set; }
@@ -166,7 +166,8 @@ public:
     void setLogBranches(bool set) { logBranches = set; }
     bool getLogResources() { return logResources; }
     void setLogResources(bool set) { logResources = set; }
-
+    bool getLogErrors() { return logErrors; }
+    void setLogErrors(bool set) { logErrors = set; }
 
     int getComboHits() { return comboHits; }
     int getRecoveryTiming() { return recoveryTiming; }
@@ -591,6 +592,7 @@ private:
         logHits = false;
         logBranches = false;
         logResources = false;
+        logErrors = true;
         deniedLastBranch = false;
         isProjectile = false;
         spawnedPostHit = false;
@@ -863,6 +865,7 @@ private:
     bool logHits : 1;
     bool logBranches : 1;
     bool logResources : 1;
+    bool logErrors : 1;
     bool deniedLastBranch : 1;
     bool isProjectile : 1;
     bool spawnedPostHit : 1;

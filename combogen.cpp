@@ -26,6 +26,15 @@ void ComboWorker::Start(bool isFirst) {
     if (first) {
         pSim->Clone(&pFinder->startSnapshot);
         pSim->simGuys[0]->setRecordFrameTriggers(true, pFinder->doLateCancels);
+        for (auto &guy : pSim->simGuys) {
+            guy->setLogErrors(false);
+            guy->setLogTransitions(false);
+            guy->setLogTriggers(false);
+            guy->setLogUnknowns(false);
+            guy->setLogHits(false);
+            guy->setLogBranches(false);
+            guy->setLogResources(false);
+        }
     }
 
     thread = std::thread(&ComboWorker::WorkLoop, this);
