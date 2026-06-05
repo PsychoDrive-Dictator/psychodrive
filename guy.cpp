@@ -5121,7 +5121,8 @@ void Guy::DoBranchKey(bool preHit)
                 deniedLastBranch = false;
                 keepPlace = branchKey.keepPlace;
                 if (branchInducedLanding) {
-                    actionDisabledFrames = 3 + 1;
+                    log(logTriggers, "disabling actions");
+                    actionDisabledFrames = 3;
                 }
             }
 
@@ -5262,6 +5263,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool doTriggers = true;
     if (actionDisabledFrames) {
+        log(logTriggers, "actions disabled " + std::to_string(actionDisabledFrames));
         doTriggers = false;
     }
 
@@ -5790,7 +5792,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     }
 
     bool couldAct = canAct();
-    bool canProxGuard = !hitStun && (couldAct || currentAction == 39 || currentAction == 40 || currentAction == 41);
+    bool canProxGuard = !didTrigger && !hitStun && (couldAct || currentAction == 39 || currentAction == 40 || currentAction == 41);
     // positionProxGuarded lets uncrouchable protection work immediately on wakeup
     // it's possible this isn't strictly correct but in practice if there are hurtboxes the position is in there
     bool proxGuarded = hurtBoxProxGuarded || positionProxGuarded;
@@ -6003,7 +6005,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     bool didTransition = false;
 
-    if (!didTrigger && couldAct && nextAction == -1) {
+    if (doTriggers && !didTrigger && couldAct && nextAction == -1) {
         // can run deferred trigger if going into fluff frames now
         DoTriggers();
         if (nextAction != -1) {
@@ -6065,7 +6067,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
     bool didRecoveryTrigger = false;
 
     curNextAction = nextAction;
-    if (!didTrigger && didTransition && (canMoveNow || proxGuard())) {
+    if (doTriggers && !didTrigger && didTransition && (canMoveNow || proxGuard())) {
         DoTriggers();
         if (nextAction != curNextAction) {
             didTrigger = true;
@@ -6170,7 +6172,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         }
 
         // if we transition after landing frame, reset action restriction
-        if (actionDisabledFrames < 4) {
+        if (actionDisabledFrames < 3) {
             actionDisabledFrames = 0;
         }
 
