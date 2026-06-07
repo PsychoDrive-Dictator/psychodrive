@@ -12999,6 +12999,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_1780113235_r1_proj_combo_only",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1834,
+                "firstFrame": 60,
+                "lastFrame": 1777
+            },
+            {
+                "count": 546,
+                "firstFrame": 168,
+                "lastFrame": 1777
+            },
+            {
+                "count": 13,
+                "firstFrame": 218,
+                "lastFrame": 1693
+            },
+            {
+                "count": 576,
+                "firstFrame": 50,
+                "lastFrame": 1769
+            },
+            {
+                "count": 576,
+                "firstFrame": 50,
+                "lastFrame": 1769
+            },
+            {
+                "count": 364,
+                "firstFrame": 50,
+                "lastFrame": 1777
+            },
+            {
+                "count": 285,
+                "firstFrame": 198,
+                "lastFrame": 1777
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 135,
+                "firstFrame": 1691,
+                "lastFrame": 1777
+            }
+        ]
+    },
+    {
         "testName": "zz_match_akuma_bullshit_di_steal",
         "testVersion": "39",
         "finished": true,
