@@ -1944,6 +1944,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_input_screenfreeze",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1997,
+                "firstFrame": 227,
+                "lastFrame": 1258
+            },
+            {
+                "count": 127,
+                "firstFrame": 327,
+                "lastFrame": 1139
+            },
+            {
+                "count": 66,
+                "firstFrame": 325,
+                "lastFrame": 1139
+            },
+            {
+                "count": 826,
+                "firstFrame": 0,
+                "lastFrame": 1132
+            },
+            {
+                "count": 826,
+                "firstFrame": 0,
+                "lastFrame": 1132
+            },
+            {
+                "count": 1069,
+                "firstFrame": 213,
+                "lastFrame": 1200
+            },
+            {
+                "count": 1306,
+                "firstFrame": 214,
+                "lastFrame": 1258
+            },
+            {
+                "count": 210,
+                "firstFrame": 284,
+                "lastFrame": 1158
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 856,
+                "firstFrame": 284,
+                "lastFrame": 1258
+            },
+            {
+                "count": 108,
+                "firstFrame": 217,
+                "lastFrame": 1107
+            },
+            {
+                "count": 1364,
+                "firstFrame": 1,
+                "lastFrame": 1258
+            }
+        ]
+    },
+    {
         "testName": "aa_jump_landing_triggers",
         "testVersion": "33",
         "finished": true,
