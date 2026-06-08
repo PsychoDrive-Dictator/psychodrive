@@ -2928,6 +2928,9 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             if (otherGuyAirborne || otherGuyHit || isGrab) {
                 otherGuyCanBlock = false;
             }
+            if (hitbox.type == direct_damage) {
+                otherGuyCanBlock = false;
+            }
             bool blocked = false;
             bool parried = false;
             if (pOtherGuy->parrying && !isGrab) {
