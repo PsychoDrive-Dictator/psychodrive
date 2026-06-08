@@ -908,6 +908,86 @@ void CharacterUIController::renderCharSetup(void)
     }
 }
 
+const char *renderHitBoxType(hitBoxType type)
+{
+    switch (type) {
+        default: case none: return "none";
+        case hit: return "hit";
+        case grab: return "grab";
+        case projectile: return "projectile";
+        case domain: return "domain";
+        case destroy_projectile: return "destroy_projectile";
+        case proximity_guard: return "proximity_guard";
+        case direct_damage: return "direct_damage";
+        case clash: return "clash";
+        case screen_freeze: return "screen_freeze";
+        case nullify_grab: return "nullify_grab";
+    }
+}
+
+std::string renderHitBoxFlags(int input)
+{
+    std::string strOut;
+	bool printed = false;
+
+    printInput(overhead);
+	printInput(low);
+	printInput(avoids_standing);
+	printInput(avoids_crouching);
+	printInput(avoids_airborne);
+	printInput(only_hits_behind);
+	printInput(only_hits_front);
+	printInput(only_hits_in_combo);
+	printInput(multi_counter);
+	printInput(fixed_position);
+	printInput(ignore_armor);
+	printInput(ignore_atemi);
+	printInput(avoids_facing_opponent);
+	printInput(avoids_backturned_opponent);
+	printInput(only_hits_in_combo_no_sibling);
+
+    return strOut;
+}
+
+void CharacterUIController::renderHitBoxDetails(void)
+{
+    if (!simController.pSim) {
+        return;
+    }
+
+    Guy *pGuy = simController.getRecordedGuy(simController.scrubberFrame, getSimCharSlot());
+
+    if (!pGuy) {
+        return;
+    }
+
+    std::vector<HitBox> hitBoxes;
+    std::vector<RenderBox> renderBoxes;
+    pGuy->getHitBoxes(&hitBoxes, &renderBoxes);
+    for (auto &minion : pGuy->getMinions()) {
+        minion->getHitBoxes(&hitBoxes, &renderBoxes);
+    }
+
+    if (!hitBoxes.size()) {
+        return;
+    }
+
+    if (highlightedBox >= (int)hitBoxes.size()) {
+        highlightedBox = 0;
+    }
+
+    ImGui::SliderInt("Select Box", &highlightedBox, 0, hitBoxes.size()-1);
+
+    for (uint i = 0; i < hitBoxes.size(); i++) {
+        bool highlight = highlightedBox == (int)i;
+        HitBox &hitBox = hitBoxes[i];
+        ImGui::Text("%stype %s x %f y %f w %d h %d flags %s", highlight ? "> " : "", renderHitBoxType(hitBox.type), hitBox.box.x.f(), hitBox.box.y.f(), hitBox.box.w.i(), hitBox.box.h.i(), renderHitBoxFlags(hitBox.flags).c_str());
+        if (highlight) {
+            drawHitBox(renderBoxes[i].box, thickboxes?renderBoxes[i].thickness:1,0.0,{1.0, 1.0, 1.0}, false, false, false, 1.0);
+        }
+    }
+}
+
 void CharacterUIController::renderActionSetup(int frameIndex)
 {
     if (!simController.pSim) {
@@ -2262,6 +2342,7 @@ void SimulationController::RenderUI(void)
                     RenderComboMinerSetup();
                     break;
             }
+            charControllers[0].renderHitBoxDetails();
             if (maxComboCount > 0) {
                 std::string strComboInfo = "Current combo max damage: " + std::to_string(maxComboDamage);
                 ImGui::Text("%s", strComboInfo.c_str());

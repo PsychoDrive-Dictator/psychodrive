@@ -2646,6 +2646,11 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             if (hitbox.flags & only_hits_in_combo && (pOtherGuy->hitStun == 0 || pOtherGuy->blocking)) {
                 continue;
             }
+            if (hitbox.flags & only_hits_in_combo_no_sibling &&
+                (pOtherGuy->hitStun == 0 || pOtherGuy->blocking ||
+                 (isProjectile && pOtherGuy->pAttacker != this && pOtherGuy->pAttacker != pParent))) {
+                continue;
+            }
             Fixed posDiff = pOtherGuy->getPosX() - getPosX();
             if (pCharData->charVersion >= 40) {
                 posDiff *= getInnerDirection();
@@ -3339,6 +3344,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         int wasComboHits = pOtherGuy->comboHits;
 
         pOtherGuy->lastHitType = hitBox.type;
+        pOtherGuy->comboHitTypeMask |= 1<<hitBox.type;
 
         if (!hitArmor) {
             if (!pendingHit.blocked && !pendingHit.parried) {
@@ -3696,8 +3702,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     if (isGrab) {
         dmgValue = 0;
     }
-    setAttacker(attacker);
-    int attackerInstantScale = pAttacker->triggerInstantScale + pAttacker->actionInstantScale;
+    int attackerInstantScale = attacker->triggerInstantScale + attacker->actionInstantScale;
 
     if (applyHit && dmgValue) {
         if ((comboHits == 0 || comboDamage == 0)) {
@@ -3705,7 +3710,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             pendingScaling = 0;
         }
 
-        bool applyScaling = !pAttacker->appliedScaling;
+        bool applyScaling = !attacker->appliedScaling;
 
         if (pendingScaling && applyScaling) {
             currentScaling -= pendingScaling;
@@ -3715,10 +3720,10 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
 
         if (applyScaling) {
             if (comboHits == 0 && !wallSplatScaling) {
-                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->startScale : 0;
+                pendingScaling = attacker->pCurrentAction ? attacker->pCurrentAction->startScale : 0;
                 pendingScaling += attackerInstantScale;
             } else {
-                pendingScaling = pAttacker->pCurrentAction ? pAttacker->pCurrentAction->comboScale : 10;
+                pendingScaling = attacker->pCurrentAction ? attacker->pCurrentAction->comboScale : 10;
                 pendingScaling += attackerInstantScale;
                 if (currentScaling == 100) {
                     pendingScaling += 10;
@@ -3727,7 +3732,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
         }
 
-        Guy *pResourceGuy = pAttacker->pParent ? pAttacker->pParent : pAttacker;
+        Guy *pResourceGuy = attacker->pParent ? attacker->pParent.pGuy : attacker;
         if (pResourceGuy->triggerSuperGainScaling < superGainScaling) {
             superGainScaling = pResourceGuy->triggerSuperGainScaling;
         }
@@ -3737,27 +3742,27 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
             }
         }
 
-        if (pAttacker->scalingTriggerID != lastScalingTriggerID && !applyScaling) {
+        if (attacker->scalingTriggerID != lastScalingTriggerID && !applyScaling) {
             // the combo has moved past that attack, so the instant scale is baked in
             attackerInstantScale = 0;
         }
-        pAttacker->appliedScaling = true;
+        attacker->appliedScaling = true;
         wallSplatScaling = false;
         if (applyScaling) {
-            lastScalingTriggerID = pAttacker->scalingTriggerID;
+            lastScalingTriggerID = attacker->scalingTriggerID;
         }
-        if (pAttacker->isProjectile && pAttacker->pParent) {
-            if (pAttacker->pParent->scalingTriggerID == pAttacker->scalingTriggerID) {
-                pAttacker->pParent->appliedScaling = true;
+        if (attacker->isProjectile && attacker->pParent) {
+            if (attacker->pParent->scalingTriggerID == attacker->scalingTriggerID) {
+                attacker->pParent->appliedScaling = true;
             }
-            for (Guy *pAttackerSibling : pAttacker->pParent->getMinions()) {
-                if (pAttackerSibling->scalingTriggerID == pAttacker->scalingTriggerID) {
+            for (Guy *pAttackerSibling : attacker->pParent->getMinions()) {
+                if (pAttackerSibling->scalingTriggerID == attacker->scalingTriggerID) {
                     pAttackerSibling->appliedScaling = true;
                 }
             }
         }
-        for (Guy *pAttackerMinion : pAttacker->getMinions()) {
-            if (pAttackerMinion->scalingTriggerID == pAttacker->scalingTriggerID) {
+        for (Guy *pAttackerMinion : attacker->getMinions()) {
+            if (pAttackerMinion->scalingTriggerID == attacker->scalingTriggerID) {
                 pAttackerMinion->appliedScaling = true;
             }
         }
@@ -3769,7 +3774,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         effectiveScaling = 10;
     }
 
-    StyleData &attackerStyleData = pAttacker->pCharData->styles[pAttacker->styleInstall];
+    StyleData &attackerStyleData = attacker->pCharData->styles[attacker->styleInstall];
     effectiveScaling = effectiveScaling * attackerStyleData.attackScale / 100;
 
     if (driveScaling) {
@@ -3779,14 +3784,14 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         effectiveScaling = effectiveScaling * 50 / 100;
     }
 
-    if (pAttacker->superAction) {
-        if (pAttacker->superLevel == 1 && effectiveScaling < 30) {
+    if (attacker->superAction) {
+        if (attacker->superLevel == 1 && effectiveScaling < 30) {
             effectiveScaling = 30;
         }
-        if (pAttacker->superLevel == 2 && effectiveScaling < 40) {
+        if (attacker->superLevel == 2 && effectiveScaling < 40) {
             effectiveScaling = 40;
         }
-        if (pAttacker->superLevel == 3 && effectiveScaling < 50) {
+        if (attacker->superLevel == 3 && effectiveScaling < 50) {
             effectiveScaling = 50;
         }
     }
@@ -3801,7 +3806,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     if (moveDamage && (!blocking || !parrying)) {
         recoverableHealth = 0;
     }
-    log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(pAttacker->scalingTriggerID));
+    log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(attacker->scalingTriggerID));
 
     if (pHitEffect->recoverableDamage) {
         health -= pHitEffect->recoverableDamage;
@@ -3857,9 +3862,9 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         }
     }
 
-    Guy *pResourceGuy = pAttacker;
-    if (pAttacker->isProjectile) {
-        pResourceGuy = pAttacker->pParent;
+    Guy *pResourceGuy = attacker;
+    if (attacker->isProjectile) {
+        pResourceGuy = attacker->pParent;
     }
 
     int scaledFocusGain = pHitEffect->focusGainTarget;
@@ -3959,11 +3964,13 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
     frontDamage = attr3 & (1<<2);
     backDamage = attr3 & (1<<3);
 
-    setAttacker(attacker);
+    if (comboAdd && (applyHit || isGrab)) {
+        setAttacker(attacker);
+    }
 
+    Guy *attackerForDirection = attacker;
     if (useParentDirection && attacker->pParent) {
-        // for the purpose of checking direction below
-        attacker = attacker->pParent;
+        attackerForDirection = attacker->pParent;
     }
 
     bool doSwitchDirection = applyHit && !isGrab;
@@ -3972,16 +3979,16 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         usePositionAsDirection = true;
     }
 
-    Fixed attackerDirection = attacker->direction;
+    Fixed attackerDirection = attackerForDirection->direction;
     if (usePositionAsDirection) {
-        attackerDirection = attacker->direction;
-        if (attacker->needsTurnaround(Fixed(0))) {
+        attackerDirection = attackerForDirection->direction;
+        if (attackerForDirection->needsTurnaround(Fixed(0))) {
             attackerDirection *= Fixed(-1);
         }
     }
     Fixed hitVelDirection = attackerDirection * Fixed(-1);
     // in a real crossup, hitvel will go opposite the direction of the hit player
-    if ((attacker->pendingUnlockHit || backDamage || frontDamage) && attacker->needsTurnaround(Fixed(10))) {
+    if ((attackerForDirection->pendingUnlockHit || backDamage || frontDamage) && attackerForDirection->needsTurnaround(Fixed(10))) {
         attackerDirection *= Fixed(-1);
     }
 
@@ -3993,12 +4000,12 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         switchDirection();
         log(logHits, "hit switchDirection!");
     }
-    if (doSwitchDirection && recoverReverse && direction != attacker->direction) {
+    if (doSwitchDirection && recoverReverse && direction != attackerForDirection->direction) {
         log(logHits, "reverse facing hit switchDirection!");
         switchDirection();
     }
 
-    // if (doSwitchDirection && attacker->pendingUnlockHit && recoverReverse && !needsTurnaround()) {
+    // if (doSwitchDirection && attackerForDirection->pendingUnlockHit && recoverReverse && !needsTurnaround()) {
     //     log(logHits, "unlock switchDirection!");
     //     switchDirection();
     //     hitVelDirection *= Fixed(-1);
@@ -4144,7 +4151,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         }
 
         // you don't seem to be able to ground bounce if true grounded, unless it's an unlock?
-        if (jimenBound && !getAirborne() && !pAttacker->pendingUnlockHit) {
+        if (jimenBound && !getAirborne() && !attacker->pendingUnlockHit) {
             jimenBound = false;
         }
     }
@@ -4280,7 +4287,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
 
         //if (destTime != 0)
         {
-            if ((dmgType == 21 || dmgType == 22) && pAttacker->pendingUnlockHit) {
+            if ((dmgType == 21 || dmgType == 22) && attacker->pendingUnlockHit) {
                 // thrown? constant velocity one frame from now, ignore place/hitvel, hard knockdown after hitstun is done
                 if (!locked) {
                     log(logErrors, "nage but not locked?");
@@ -4342,7 +4349,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             } else if (!isDomain && destTime != 0 && moveType != 9) {
                 // generic pushback/airborne knock
                 if (!airborne) {
-                    // if (parrying && !pAttacker->isProjectile) {
+                    // if (parrying && !attacker->isProjectile) {
                     //     destX -= 1; // ??????? in the higuchi replay it's for sure like that
                     // }
                     int factor = destTime == 1 ? -1 : -2;
@@ -4387,7 +4394,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         }
     }
 
-    if (dmgType == 11 && pAttacker->pendingUnlockHit && destTime != 0) {
+    if (dmgType == 11 && attacker->pendingUnlockHit && destTime != 0) {
         int factor = destTime == 1 ? -1 : -2;
         hitVelX = Fixed(hitVelDirection.i() * destX * factor) / Fixed(destTime);
         hitAccelX = fixDivWithBias(Fixed(hitVelDirection.i() * destX * 2) , Fixed(destTime * destTime));
@@ -4399,7 +4406,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         if (blocking) {
             if (parrying) {
                 nextAction = 483; // todo script depends on attack height?
-                if (pAttacker->hasBeenPerfectParriedThisFrame) {
+                if (attacker->hasBeenPerfectParriedThisFrame) {
                     nextAction = 486;
                     hitStun = 1;
                     hitVelX = Fixed(0);
@@ -4574,7 +4581,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
     //     //posX += velocityX * direction;
     // }
 
-    // if (pAttacker->pendingUnlockHit && floorTime) {
+    // if (attacker->pendingUnlockHit && floorTime) {
     //     noAccelNextFrame = true;
     //     noVelNextFrame = true;
     // }
@@ -5930,6 +5937,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         resetComboCount = false;
         lastDamageScale = 0;
         chainComboMask = 0;
+
+        lastHitType = none;
+        comboHitTypeMask = 0;
 
         if (pOpponent && pOpponent->uniqueID == 0) {
             pSim->comboProbe.gaugeGain = 0;

@@ -31,6 +31,7 @@ public:
     void RenderUI(void);
     void Serialize(std::string &outStr);
     void renderCharSetup(void);
+    void renderHitBoxDetails(void);
     void renderActionSetup(int frameIndex);
     void renderFrameMeter(int frameIndex);
     void renderFrameMeterCancelWindows(int frameIndex);
@@ -76,6 +77,8 @@ public:
     int pendingTriggerAdd;
 
     int activeInputDragID = 0;
+
+    int highlightedBox = 0;
 };
 
 enum SimulationControllerOptionFlags {

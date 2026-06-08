@@ -523,18 +523,20 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         if (flags & 0x8000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | ignore_armor);
         }
-        if (flags & 0x40000) {
-            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
+        if (flags & 0x40000 && type == hit) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo_no_sibling);
         }
-        if (flags & 0x80000) {
-            // same, but for projectiles? todo why
-            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
+        if (flags & 0x80000 && type == projectile) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo_no_sibling);
         }
         if (flags & 0x100000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | multi_counter);
         }
         if (flags & 0x800000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | fixed_position);
+        }
+        if (flags & 0x2000000) {
+            newKey.flags = (hitBoxFlags)(newKey.flags | only_hits_in_combo);
         }
         if (flags & 0x4000000) {
             newKey.flags = (hitBoxFlags)(newKey.flags | avoids_facing_opponent);

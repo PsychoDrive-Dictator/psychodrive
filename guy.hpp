@@ -38,6 +38,7 @@ struct GuyRef {
     GuyRef& operator=(const GuyRef&) = default;
 
     bool operator==(Guy* rhs) { return this->pGuy == rhs; }
+    bool operator!=(Guy* rhs) { return this->pGuy != rhs; }
     void FixRef(std::map<int,Guy*> &guysByID) {
         if (guyID != -1) {
             assert(guysByID.find(guyID) != guysByID.end());
@@ -848,6 +849,7 @@ private:
         pCurrentAction = nullptr;
         pSim = nullptr;
         lastHitType = none;
+        comboHitTypeMask = 0;
         throwRelease = 0;
     }
 
@@ -1112,6 +1114,7 @@ private:
     GuyRef pAttacker;
     int hitStun;
     hitBoxType lastHitType;
+    uint16_t comboHitTypeMask;
     int8_t throwRelease;
 
     Fixed hitVelX;
