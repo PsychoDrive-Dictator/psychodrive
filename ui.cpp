@@ -1718,10 +1718,9 @@ void SimulationController::RecordFrame(void)
     RecordedFrame &frame = stateRecording[stateRecording.size()-1];
 
     frame.sim.Clone(pSim);
-    if (gameMode == Viewer) {
-        for (int i = 0; i < (int)pSim->everyone.size() && i < (int)frame.sim.everyone.size(); i++) {
-            frame.sim.everyone[i]->getLogQueue() = pSim->everyone[i]->getLogQueue();
-        }
+    for (int i = 0; i < (int)pSim->everyone.size() && i < (int)frame.sim.everyone.size(); i++) {
+        frame.sim.everyone[i]->getLogQueue() = pSim->everyone[i]->getLogQueue();
+        frame.sim.everyone[i]->getLastLogFrame() = pSim->everyone[i]->getLastLogFrame();
     }
     frame.events = pSim->getCurrentFrameEvents();
     pSim->getCurrentFrameEvents().clear();

@@ -143,7 +143,7 @@ for char in characters:
     #         for key in move["AttackCollisionKey"]:
     #             if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
     #                 attackKey = move["AttackCollisionKey"][key]
-    #                 if attackKey["KindFlag"] & 33554432:
+    #                 if attackKey["KindFlag"] & 524288 and attackKey["CollisionType"] != 1:
     #                     print(char + " " + moveID + " type " + str(attackKey["CollisionType"]) +
     #                           " hit " + str(attackKey["HitID"]) + " frames " + str(attackKey["_StartFrame"]) + "-" + str(attackKey["_EndFrame"]) +
     #                           " condition " + hex(attackKey["Condition"]) + " kind " + hex(attackKey["KindFlag"]))

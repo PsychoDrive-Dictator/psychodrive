@@ -88,6 +88,7 @@ public:
     int getUniqueID() { return uniqueID; }
     color getColor() { color ret; ret.r = charColorR; ret.g = charColorG; ret.b = charColorB; return ret; }
     std::deque<std::string> &getLogQueue() { return nc.logQueue; }
+    int &getLastLogFrame() { return nc.lastLogFrame; }
     // for opponent direction
     std::vector<GuyRef> &getMinions() { return dc.minions; }
     Fixed getPosX(bool forWall = false) {

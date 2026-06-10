@@ -59,7 +59,7 @@ bool doBoxesHit(Box box1, Box box2)
     return true;
 }
 
-bool matchFrameButton( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0 )
+bool matchFrameButton(int input, uint32_t okKeyFlags, uint32_t okCondFlags, uint32_t dcExcFlags = 0, uint32_t dcIncFlags = 0, uint32_t ngKeyFlags = 0, uint32_t ngCondFlags = 0, bool handleEdge = true)
 {
     // do that before stripping held keys since apparently holding parry to drive rush depends on it
     if (dcExcFlags != 0 ) {
@@ -86,9 +86,11 @@ bool matchFrameButton( int input, uint32_t okKeyFlags, uint32_t okCondFlags, uin
         return true;
     }
 
-    input &= ~(LP+MP+HP+LK+MK+HK);
-    input |= (input & (LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed)) >> 6;
-    input &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
+    if (handleEdge) {
+        input &= ~(LP+MP+HP+LK+MK+HK);
+        input |= (input & (LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed)) >> 6;
+        input &= ~(LP_pressed+MP_pressed+HP_pressed+LK_pressed+MK_pressed+HK_pressed);
+    }
 
     if (okCondFlags & 2) {
         if ((input & 0xF) == (okKeyFlags & 0xF)) {
@@ -239,14 +241,16 @@ void Guy::Input(int input)
     if (input == 0 && inputOverride != 0) {
         input = inputOverride;
     }
-    framesSinceLastInput++;
-    if (input != 0) {
-        framesSinceLastInput = 0;
-    }
-    currentInput = input;
 
     if (warudo) {
         input |= FROZEN;
+    }
+
+    currentInput = input;
+
+    framesSinceLastInput++;
+    if (input != 0) {
+        framesSinceLastInput = 0;
     }
 
     dc.inputBuffer.push_front(input);
@@ -1328,6 +1332,7 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         initialMatch = atLeastOneNotConsumed && bothButtonsPressed && (parallelMatchesFound >= 2);
     } else {
         bool atLeastOneNotConsumed = false;
+        int freezeFrames = 0;
         while (cursorPos < initialSearch)
         {
             // possible to be all zeroes?
@@ -1352,9 +1357,11 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
                 match = false;
                 break; // break once initialMatch no longer true, set i on last true
             }
-            if (dc.inputBuffer[cursorPos] & FROZEN && initialSearch < dc.inputBuffer.size()) {
+            if ((dc.inputBuffer[cursorPos] & FROZEN) && (cursorPos == (initialSearch - 1)) && initialSearch < dc.inputBuffer.size()) {
                 initialSearch++;
-                //log(logErrors, "extending backroll window frozen " + std::to_string(searchWindow));
+            }
+            if (dc.inputBuffer[cursorPos] & FROZEN) {
+                freezeFrames++;
             }
             cursorPos++;
         }
@@ -1367,6 +1374,12 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         if (okCondFlags & 1024 && match) {
             // if we never got to not-matching, we never saw the initial edge
             initialMatch = false;
+        }
+        // if we started holding in screen freeze, verify we still holding
+        if (initialMatch && dc.inputBuffer[initialI] & FROZEN && freezeFrames > 16) {
+            if (!((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(currentInput, okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags, false))) {
+                initialMatch = false;
+            }
         }
     }
     if (initialI == -1) {
