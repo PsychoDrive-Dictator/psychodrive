@@ -1363,12 +1363,18 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
             if (dc.inputBuffer[cursorPos] & FROZEN) {
                 freezeFrames++;
             }
+            // if (pTrigger->id == 6) {
+            //     log(logTriggers, "natch " + std::to_string(match) + " " + std::to_string(cursorPos));
+            // }
             cursorPos++;
         }
         if (match && cursorPos < dc.inputBuffer.size() && !((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(dc.inputBuffer[cursorPos], okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags))) {
             match = false;
         }
         if (atLeastOneNotConsumed == false) {
+            // if (pTrigger->id == 6) {
+            //     log(logTriggers, "kill 1");
+            // }
             initialMatch = false;
         }
         if (okCondFlags & 1024 && match) {
@@ -1377,7 +1383,18 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         }
         // if we started holding in screen freeze, verify we still holding
         if (initialMatch && dc.inputBuffer[initialI] & FROZEN && freezeFrames > 16) {
-            if (!((okKeyFlags || dcExcFlags || dcIncFlags) && matchFrameButton(currentInput, okKeyFlags, okCondFlags, dcExcFlags, dcIncFlags, ngKeyFlags, false))) {
+            int okHold = okKeyFlags;
+            int dcHoldExc = dcExcFlags;
+            int dcHoldInc = dcIncFlags;
+            if (okHold) {
+                // if it's direction + button, we don't need to be holding direction anymore
+                dcHoldExc = 0;
+                dcHoldInc = 0;
+            }
+            if (!((okHold || dcHoldExc || dcHoldInc) && matchFrameButton(currentInput, okHold, okCondFlags, dcHoldExc, dcHoldInc, ngKeyFlags, 0, false))) {
+                // if (pTrigger->id == 6) {
+                //     log(logTriggers, "kill 2 " + std::to_string(currentInput));
+                // }
                 initialMatch = false;
             }
         }
