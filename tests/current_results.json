@@ -7371,6 +7371,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ed_target_combo",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 135,
+                "firstFrame": 108,
+                "lastFrame": 221
+            },
+            {
+                "count": 45,
+                "firstFrame": 108,
+                "lastFrame": 130
+            },
+            {
+                "count": 43,
+                "firstFrame": 109,
+                "lastFrame": 130
+            },
+            {
+                "count": 20,
+                "firstFrame": 109,
+                "lastFrame": 128
+            },
+            {
+                "count": 20,
+                "firstFrame": 109,
+                "lastFrame": 128
+            },
+            {
+                "count": 163,
+                "firstFrame": 59,
+                "lastFrame": 221
+            },
+            {
+                "count": 109,
+                "firstFrame": 109,
+                "lastFrame": 221
+            },
+            {
+                "count": 82,
+                "firstFrame": 140,
+                "lastFrame": 221
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "guile_fierce_drc_combo",
         "testVersion": "26",
         "finished": true,
