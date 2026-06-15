@@ -13200,6 +13200,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_1778905274_nexus_into_armor",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 2614,
+                "firstFrame": 255,
+                "lastFrame": 2464
+            },
+            {
+                "count": 1098,
+                "firstFrame": 484,
+                "lastFrame": 2464
+            },
+            {
+                "count": 105,
+                "firstFrame": 482,
+                "lastFrame": 2294
+            },
+            {
+                "count": 571,
+                "firstFrame": 366,
+                "lastFrame": 2339
+            },
+            {
+                "count": 547,
+                "firstFrame": 366,
+                "lastFrame": 2339
+            },
+            {
+                "count": 981,
+                "firstFrame": 184,
+                "lastFrame": 2325
+            },
+            {
+                "count": 1571,
+                "firstFrame": 255,
+                "lastFrame": 2463
+            },
+            {
+                "count": 382,
+                "firstFrame": 366,
+                "lastFrame": 2464
+            },
+            {
+                "count": 236,
+                "firstFrame": 546,
+                "lastFrame": 1725
+            },
+            {
+                "count": 1674,
+                "firstFrame": 366,
+                "lastFrame": 2464
+            },
+            {
+                "count": 248,
+                "firstFrame": 368,
+                "lastFrame": 2351
+            },
+            {
+                "count": 6354,
+                "firstFrame": 316,
+                "lastFrame": 2464
+            }
+        ]
+    },
+    {
+        "testName": "zz_match_1780107533_jamie_dp_into_armor",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 566,
+                "firstFrame": 416,
+                "lastFrame": 2086
+            },
+            {
+                "count": 527,
+                "firstFrame": 129,
+                "lastFrame": 1997
+            },
+            {
+                "count": 10,
+                "firstFrame": 171,
+                "lastFrame": 1914
+            },
+            {
+                "count": 426,
+                "firstFrame": 129,
+                "lastFrame": 1997
+            },
+            {
+                "count": 425,
+                "firstFrame": 129,
+                "lastFrame": 1997
+            },
+            {
+                "count": 358,
+                "firstFrame": 153,
+                "lastFrame": 1992
+            },
+            {
+                "count": 134,
+                "firstFrame": 153,
+                "lastFrame": 1997
+            },
+            {
+                "count": 317,
+                "firstFrame": 315,
+                "lastFrame": 631
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 1874,
+                "firstFrame": 213,
+                "lastFrame": 2086
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 88,
+                "firstFrame": 1999,
+                "lastFrame": 2086
+            }
+        ]
+    },
+    {
         "testName": "zz_match_1780113235_r1_proj_combo_only",
         "testVersion": "42",
         "finished": true,
