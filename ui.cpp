@@ -2473,9 +2473,26 @@ void SimulationController::RenderUI(void)
         }
         ImGui::PopFont();
 
-        // ImGui::SetNextItemWidth(renderSizeX - 40);
-        // ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
+        if (simFrameCount > renderSizeX / (CharacterUIController::kHorizSpacing + CharacterUIController::kFrameButtonWidth)) {
+            ImGui::SetNextItemWidth(100);
+            ImGui::SliderInt("##framedump", &scrubberFrame, 0, simFrameCount - 1);
+            ImGui::SameLine();
+        }
+        if (ImGui::Button("<")) {
+            scrubberFrame--;
+            if (scrubberFrame < 0) {
+                scrubberFrame = 0;
+            }
+        }
+        ImGui::SameLine();
         ImGui::Text("Frame %d/%d", scrubberFrame, simFrameCount);
+        ImGui::SameLine();
+        if (ImGui::Button(">")) {
+            scrubberFrame++;
+            if (scrubberFrame >= simFrameCount) {
+                scrubberFrame = simFrameCount - 1;
+            }
+        }
         ImGui::SameLine();
         if (ImGui::Button("Rewind")) {
             scrubberFrame = 0;
