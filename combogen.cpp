@@ -110,6 +110,9 @@ void ComboWorker::WorkLoop(void) {
             if (currentRoute.walkForward) {
                 currentRoute.walkForward++;
             }
+            if (currentRoute.walkBack) {
+                currentRoute.walkBack++;
+            }
 
             auto &forcedTrigger = pSim->simGuys[0]->getForcedTrigger();
             auto frameTrigger = currentRoute.timelineTriggers.find(pSim->frameCounter+1);
@@ -118,10 +121,14 @@ void ComboWorker::WorkLoop(void) {
                     forcedTrigger = frameTrigger->second;
                     // rearm forward walk if we did a move
                     currentRoute.walkForward = 0;
+                    currentRoute.walkBack = 0;
                 } else {
                     curInput = -frameTrigger->second.actionID();
                     if (curInput == FORWARD) {
                         currentRoute.walkForward = 1;
+                    }
+                    if (curInput == BACK) {
+                        currentRoute.walkBack = 1;
                     }
                     // it's not actually input, it's direction agnostic stuff
                     // input gets inverted, so pre-invert :/
@@ -187,7 +194,16 @@ void ComboWorker::WorkLoop(void) {
                             }
                         }
                         if (doThisTrigger && (frameTrigger.actionID() < 0 || doActualFrameTriggers)) {
-                            QueueRouteFork(frameTrigger);
+                            bool queue = true;
+                            if (frameTrigger.actionID() == -FORWARD && !(currentRoute.walkForward == 0 || currentRoute.walkForward == 2)) {
+                                queue = false;
+                            }
+                            if (frameTrigger.actionID() == -BACK && !(currentRoute.walkBack == 0 || currentRoute.walkBack == 2)) {
+                                queue = false;
+                            }
+                            if (queue) {
+                                QueueRouteFork(frameTrigger);
+                            }
                         }
                     }
                     if (pSim->simGuys[0]->canAct() && !pFinder->stopOnRecovery) {

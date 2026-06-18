@@ -29,6 +29,7 @@ struct ComboRoute {
     int gaugeSpend = 0;
     int lastFrameDamage = 0;
     int walkForward = 0;
+    int walkBack = 0;
     SharedSimulationSnapshot *pSimSnapshot = nullptr;
 };
 
