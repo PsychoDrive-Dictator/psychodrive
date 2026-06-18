@@ -1790,7 +1790,9 @@ void SimulationController::doFrameMeterDrag(void)
 
         activeDragID = ImGui::GetItemID();
         ImGui::ResetMouseDragDelta();
-    } else if (activeDragID == ImGui::GetItemID()) {
+
+        playing = false;
+    } else if (activeDragID != 0 && activeDragID == ImGui::GetItemID()) {
         activeDragID = 0;
         momentumActive = true;
         curMomentum = lastDragDelta;
@@ -2477,6 +2479,7 @@ void SimulationController::RenderUI(void)
         ImGui::SameLine();
         if (ImGui::Button("Rewind")) {
             scrubberFrame = 0;
+            playing = false;
         }
         ImGui::SameLine();
         if (ImGui::Button(playing ? "Pause" : "Play")) {
