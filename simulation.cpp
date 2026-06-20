@@ -174,9 +174,9 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
     pGuy->DoInstantAction(580); // IMM_STAGE_INIT
     pGuy->DoInstantAction(581); // IMM_ROUND_INIT
 
-    if (controller.buffLevel) {
+    if (controller.buffLevel != pGuy->getUniqueParam(0)) {
         pGuy->getUniqueParam(0) = controller.buffLevel;
-        if (controller.buffLevel < (int)(pGuy->getCharData()->styles.size())) {
+        if (controller.buffLevel && controller.buffLevel < (int)(pGuy->getCharData()->styles.size())) {
             pGuy->ChangeStyle(controller.buffLevel);
         }
     }
