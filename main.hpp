@@ -83,6 +83,7 @@ struct HitBox {
     int hitID;
     int flags;
     struct HitData *pHitData = nullptr;
+    struct AtemiData *pAtemiData = nullptr;
 };
 
 struct UniqueBox {

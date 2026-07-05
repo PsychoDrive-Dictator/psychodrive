@@ -1942,7 +1942,7 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
                 pOutRenderBoxes->push_back({rect, thickness, collisionColor, drive});
             }
             if (pOutHitBoxes) {
-                pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
+                pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData, hitBoxKey.pAtemiData});
             }
         } else {
             for (auto pRect : hitBoxKey.rects) {
@@ -1956,7 +1956,7 @@ void Guy::getHitBoxes(std::vector<HitBox> *pOutHitBoxes, std::vector<RenderBox> 
                 }
 
                 if (pOutHitBoxes) {
-                    pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData});
+                    pOutHitBoxes->push_back({rect, type, hitBoxKey.hitID, hitBoxKey.flags, hitBoxKey.pHitData, hitBoxKey.pAtemiData});
                 }
             }
         }
@@ -2710,14 +2710,25 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             if (doGrab) {
                 std::vector<HitBox> otherNullifyGrabBoxes;
                 bool grabNullified = false;
+                struct AtemiData *pAtemiHitstop = nullptr;
                 pOtherGuy->getHitBoxes(&otherNullifyGrabBoxes, nullptr, hitBoxType::nullify_grab);
                 for (auto const & nullifyGrabBox : otherNullifyGrabBoxes ) {
                     if (doBoxesHit(hitbox.box, nullifyGrabBox.box)) {
                         grabNullified = true;
+                        pAtemiHitstop = nullifyGrabBox.pAtemiData;
                     }
                 }
                 if (grabNullified) {
                     pOtherGuy->nullifiedGrabThisFrame = true;
+                    if (pAtemiHitstop) {
+                        if (isProjectile) {
+                            addHitStop(pAtemiHitstop->targetStopProj + 1);
+                            pOtherGuy->addHitStop(pAtemiHitstop->ownerStopProj + 1);
+                        } else {
+                            addHitStop(pAtemiHitstop->targetStop + 1);
+                            pOtherGuy->addHitStop(pAtemiHitstop->ownerStop + 1);
+                        }
+                    }
                     continue;
                 }
                 if (!hasEvaluatedThrowBoxes) {

@@ -271,6 +271,7 @@ struct HitBoxKey : BoxKey {
     hitBoxType type;
     hitBoxFlags flags;
     HitData *pHitData = nullptr;
+    AtemiData *pAtemiData = nullptr;
 
     bool hasValidStyle = false;
     int validStyle;

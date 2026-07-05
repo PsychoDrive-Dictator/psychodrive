@@ -401,7 +401,7 @@ void loadPushBoxKeys(nlohmann::json* pPushBoxJson, std::vector<PushBoxKey>* pOut
     }
 }
 
-void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, bool isOther, std::map<int, HitData*>& hitByID)
+void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutputVector, std::map<std::pair<int, int>, Rect*>& rectsByIDs, bool isOther, std::map<int, HitData*>& hitByID, std::map<int, AtemiData*>& atemiByID)
 {
     if (!pHitBoxJson) {
         return;
@@ -463,12 +463,22 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
                 continue;
             }
         }
+        int flags = hitBox["KindFlag"];
 
         newKey.type = type;
         int hitEntryID = hitBox["AttackDataListIndex"];
-        auto hitIt = hitByID.find(hitEntryID);
-        if (hitIt != hitByID.end()) {
-            newKey.pHitData = hitIt->second;
+        if (hitEntryID != -1) {
+            if (type == nullify_grab && flags & (1<<28)) {
+                auto atemiIt = atemiByID.find(hitEntryID);
+                if (atemiIt != atemiByID.end()) {
+                    newKey.pAtemiData = atemiIt->second;
+                }
+            } else {
+                auto hitIt = hitByID.find(hitEntryID);
+                if (hitIt != hitByID.end()) {
+                    newKey.pHitData = hitIt->second;
+                }
+            }
         }
 
         int hitID = hitBox["HitID"];
@@ -500,7 +510,6 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
             }
         }
 
-        int flags = hitBox["KindFlag"];
         // ty gelly the homie
         if (flags & 0x10) {
             newKey.flags = (hitBoxFlags)(newKey.flags | avoids_standing);
@@ -1184,10 +1193,10 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         newAction.hitBoxKeys.reserve(hitBoxKeyCount);
 
         if (key.contains("OtherCollisionKey")) {
-            loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true, hitByID);
+            loadHitBoxKeys(&key["OtherCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, true, hitByID, atemiByID);
         }
         if (key.contains("AttackCollisionKey")) {
-            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, hitByID);
+            loadHitBoxKeys(&key["AttackCollisionKey"], &newAction.hitBoxKeys, rectsByIDs, false, hitByID, atemiByID);
         }
 
         if (key.contains("UniqueCollisionKey")) {
@@ -1730,6 +1739,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
             writeI32(f, (int32_t)k.type);
             writeI32(f, (int32_t)k.flags);
             writeI32(f, ptrToIndex(k.pHitData, pData->hits));
+            writeI32(f, ptrToIndex(k.pAtemiData, pData->atemis));
             writeBool(f, k.hasValidStyle);
             writeI32(f, k.validStyle);
             writeBool(f, k.hasHitID);
@@ -2206,6 +2216,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
             k.type = (hitBoxType)readI32(f);
             k.flags = (hitBoxFlags)readI32(f);
             k.pHitData = indexToPtr(readI32(f), pRet->hits);
+            k.pAtemiData = indexToPtr(readI32(f), pRet->atemis);
             k.hasValidStyle = readBool(f);
             k.validStyle = readI32(f);
             k.hasHitID = readBool(f);
