@@ -3016,6 +3016,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "aa_throw_into_drive_reversal",
+        "testVersion": "42",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 500,
+                "firstFrame": 191,
+                "lastFrame": 467
+            },
+            {
+                "count": 102,
+                "firstFrame": 271,
+                "lastFrame": 327
+            },
+            {
+                "count": 25,
+                "firstFrame": 271,
+                "lastFrame": 327
+            },
+            {
+                "count": 72,
+                "firstFrame": 177,
+                "lastFrame": 321
+            },
+            {
+                "count": 72,
+                "firstFrame": 177,
+                "lastFrame": 321
+            },
+            {
+                "count": 140,
+                "firstFrame": 208,
+                "lastFrame": 371
+            },
+            {
+                "count": 388,
+                "firstFrame": 264,
+                "lastFrame": 467
+            },
+            {
+                "count": 24,
+                "firstFrame": 271,
+                "lastFrame": 329
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 12,
+                "firstFrame": 271,
+                "lastFrame": 282
+            },
+            {
+                "count": 80,
+                "firstFrame": 263,
+                "lastFrame": 302
+            },
+            {
+                "count": 14,
+                "firstFrame": 271,
+                "lastFrame": 361
+            }
+        ]
+    },
+    {
         "testName": "aa_throw_tech",
         "testVersion": "26",
         "finished": true,
