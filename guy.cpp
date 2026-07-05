@@ -4314,7 +4314,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 wallSplatScaling = true;
                 wallStopFrames = pHitEffect->wallStop + 2;
                 if (stunSplat) {
-                    wallStopFrames = 30;
+                    wallStopFrames = 0;
                 }
             } else if (kabeBound && wallTime) {
                 int wallDestX = pHitEffect->wallDestX;
@@ -5304,6 +5304,13 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         deferredFocusCost = -deferredFocusCost;
     }
 
+    if (advancingTime && warudoFrames > 0) {
+        warudoFrames--;
+        if (warudoFrames == 0) {
+            tokiWaUgokidasu = true;
+        }
+    }
+
     if (getHitStop() || getWarudo()) {
         if (tokiWaUgokidasu) {
             // time has begun to move again
@@ -5486,7 +5493,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         }
     }
 
-    if (stunned && currentAction == 293 && currentFrame == 6) {
+    if (stunned && currentAction == 293 && currentFrame == 8) {
         wallStopped = true;
     }
 
@@ -6765,6 +6772,27 @@ void Guy::DoWorldKey(void)
                 }
                 for ( auto minion : dc.minions ) {
                     minion->tokiYoTomare = true;
+                }
+                break;
+            case 3:
+                // freeze for n frames according to timer?
+                if (worldKey.timer > 0) {
+                    if (pOpponent) {
+                        pOpponent->tokiYoTomare = true;
+                        pOpponent->warudoFrames = worldKey.timer;
+                        for ( auto minion : pOpponent->dc.minions ) {
+                            minion->tokiYoTomare = true;
+                            minion->warudoFrames = worldKey.timer;
+                        }
+                    }
+                    tokiYoTomare = true;
+                    warudoFrames = worldKey.timer;
+                    for ( auto minion : dc.minions ) {
+                        minion->tokiYoTomare = true;
+                        minion->warudoFrames = worldKey.timer;
+                    }
+                } else {
+                    log(logUnknowns, "worldkey 3 but not positive timer?");
                 }
                 break;
             case 5:

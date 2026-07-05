@@ -340,6 +340,7 @@ struct EventKey : Key {
 struct WorldKey : Key {
     int type;
     int flags;
+    int timer;
 };
 
 struct LockKey : Key {
