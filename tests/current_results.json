@@ -13401,6 +13401,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_1777694142_parent_hitflag",
+        "testVersion": "43",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 5583,
+                "firstFrame": 829,
+                "lastFrame": 4127
+            },
+            {
+                "count": 813,
+                "firstFrame": 359,
+                "lastFrame": 3646
+            },
+            {
+                "count": 46,
+                "firstFrame": 415,
+                "lastFrame": 3350
+            },
+            {
+                "count": 882,
+                "firstFrame": 359,
+                "lastFrame": 3646
+            },
+            {
+                "count": 786,
+                "firstFrame": 359,
+                "lastFrame": 3646
+            },
+            {
+                "count": 1119,
+                "firstFrame": 271,
+                "lastFrame": 3638
+            },
+            {
+                "count": 2208,
+                "firstFrame": 281,
+                "lastFrame": 3515
+            },
+            {
+                "count": 82,
+                "firstFrame": 1054,
+                "lastFrame": 2830
+            },
+            {
+                "count": 9,
+                "firstFrame": 1321,
+                "lastFrame": 2354
+            },
+            {
+                "count": 6284,
+                "firstFrame": 882,
+                "lastFrame": 4129
+            },
+            {
+                "count": 341,
+                "firstFrame": 1018,
+                "lastFrame": 2804
+            },
+            {
+                "count": 4672,
+                "firstFrame": 465,
+                "lastFrame": 4129
+            }
+        ]
+    },
+    {
         "testName": "zz_match_1778905274_nexus_into_armor",
         "testVersion": "42",
         "finished": true,
