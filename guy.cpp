@@ -4740,7 +4740,7 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 4:
                     // todo parry too right?
-                    if (hasBeenBlockedThisMove) {
+                    if (!preHit && (hasBeenBlockedThisMove || hasBeenParriedThisMove || hitArmorThisMove)) {
                         doBranch = true;
                     }
 
