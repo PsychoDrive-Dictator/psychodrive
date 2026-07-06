@@ -2150,14 +2150,16 @@ bool Guy::Push(Guy *pOtherGuy)
                         projHitCount--;
                         pOtherGuy->projHitCount--;
                     }
-                    if (pCurrentAction->pProjectileData->hitStopToParent && pParent) {
-                        pParent->addHitStop(clashHitStop+1);
+                    if (clashHitStop) {
+                        if (pCurrentAction->pProjectileData->hitStopToParent && pParent) {
+                            pParent->addHitStop(clashHitStop+1);
+                        }
+                        addHitStop(clashHitStop+1);
+                        if (pOtherGuy->pCurrentAction->pProjectileData->hitStopToParent && pOtherGuy->pParent) {
+                            pOtherGuy->pParent->addHitStop(clashHitStop+1);
+                        }
+                        pOtherGuy->addHitStop(clashHitStop+1);
                     }
-                    addHitStop(clashHitStop+1);
-                    if (pOtherGuy->pCurrentAction->pProjectileData->hitStopToParent && pOtherGuy->pParent) {
-                        pOtherGuy->pParent->addHitStop(clashHitStop+1);
-                    }
-                    pOtherGuy->addHitStop(clashHitStop+1);
 
                     hitSpanFrames = pCurrentAction->pProjectileData->hitSpan;
                     steerDisabledFrames = pCurrentAction->pProjectileData->hitDisableMovementFrames;
