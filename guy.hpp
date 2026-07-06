@@ -409,6 +409,7 @@ public:
         triggerInstantScale = parent.triggerInstantScale;
         triggerSuperGainScaling = parent.triggerSuperGainScaling;
         scalingTriggerID = parent.scalingTriggerID;
+        parentActionIDAtSpawn = parent.currentAction;
         appliedScaling = parent.appliedScaling;
         superAction = parent.superAction;
         superLevel = parent.superLevel;
@@ -606,6 +607,7 @@ private:
         noPush = false;
         obeyHitID = false;
         pParent = nullptr;
+        parentActionIDAtSpawn = -1;
         pCharData = nullptr;
         posX = Fixed(0);
         posY = Fixed(0);
@@ -1005,6 +1007,7 @@ private:
     uint16_t projLifeTime;
 
     GuyRef pParent;
+    int16_t parentActionIDAtSpawn;
 
     CharacterData *pCharData;
 
