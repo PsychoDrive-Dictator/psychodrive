@@ -11458,6 +11458,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ryu_buffed_heavy_hasho_into_parry_advantage",
+        "testVersion": "43",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 195,
+                "firstFrame": 232,
+                "lastFrame": 426
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 36,
+                "firstFrame": 231,
+                "lastFrame": 266
+            },
+            {
+                "count": 36,
+                "firstFrame": 231,
+                "lastFrame": 266
+            },
+            {
+                "count": 71,
+                "firstFrame": 211,
+                "lastFrame": 333
+            },
+            {
+                "count": 197,
+                "firstFrame": 229,
+                "lastFrame": 426
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 15,
+                "firstFrame": 231,
+                "lastFrame": 245
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ryu_corner_bhp_light_dp_juggle",
         "testVersion": "26",
         "finished": true,
