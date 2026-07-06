@@ -3355,10 +3355,10 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             bool didPerfect = true;
             if (parryAsStrike) {
                 bool semiPerfect = false;
-                if (hitBox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
+                if (pOtherGuy->pCharData->charVersion >= 30 && hitBox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
                     semiPerfect = true;
                 }
-                if (hitBox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
+                if (pOtherGuy->pCharData->charVersion >= 30 && hitBox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
                     semiPerfect = true;
                 }
                 if (semiPerfect) { // demoted to regular parry
