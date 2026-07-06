@@ -121,7 +121,7 @@ struct Trigger {
     int comboInst;
     int comboSuperScaling;
 
-    int64_t flags = 0;
+    uint64_t flags = 0;
 };
 
 struct TriggerGroupEntry {

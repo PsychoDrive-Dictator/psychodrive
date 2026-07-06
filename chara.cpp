@@ -1561,7 +1561,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
         writeI32(f, trigger.gaugeCost);
         writeI32(f, trigger.comboInst);
         writeI32(f, trigger.comboSuperScaling);
-        writeI64(f, trigger.flags);
+        writeU64(f, trigger.flags);
     }
 
     writeU32(f, pData->triggerGroups.size());
@@ -2003,7 +2003,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
         trigger.gaugeCost = readI32(f);
         trigger.comboInst = readI32(f);
         trigger.comboSuperScaling = readI32(f);
-        trigger.flags = readI64(f);
+        trigger.flags = readU64(f);
     }
     for (size_t i = 0; i < triggerCount; i++) {
         pRet->triggers[i].pCommandClassic = indexToPtr(triggerCommandIndices[i], pRet->commands);

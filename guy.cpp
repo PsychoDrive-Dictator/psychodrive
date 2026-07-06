@@ -1422,6 +1422,11 @@ bool Guy::MatchInitialInput(Trigger *pTrigger, uint32_t &cursorPos, bool forDefe
         if (forDefer && hitStun) {
             return false;
         }
+    } else {
+        if (initialMatch && pTrigger->flags & (1ULL<<40)) {
+            lastParryFrame = pSim->frameCounter - initialI;
+            //log(logTriggers, "lastParryFrame " + std::to_string(lastParryFrame));
+        }
     }
     return initialMatch;
 }
@@ -1686,7 +1691,6 @@ void Guy::DoTriggers(int fluffFrameBias)
                         //int okKeyFlags = (*pTrigger)["norm"]["ok_key_flags"];
                         //dc.inputBuffer[initialI] &= ~((okKeyFlags & (LP+MP+HP+LK+MK+HK)) << 6);
 
-                        lastTriggerFrame = pSim->frameCounter - initialI;
                         dc.inputBuffer[initialI] |= CONSUMED;
                         lastTriggerInput = dc.inputBuffer[initialI];
 
@@ -1700,7 +1704,6 @@ void Guy::DoTriggers(int fluffFrameBias)
         }
 
         for (auto &initialI : initialIsToConsume) {
-            //lastTriggerFrame = pSim->frameCounter - initialI;
             dc.inputBuffer[initialI] |= CONSUMED;
             // if someone uses both trigger input branch and multiple ambiguous deferred triggers,
             // we have to start remembering trigger input per kept deferred trigger
@@ -3346,7 +3349,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             hitStopTarget = hitStopSelf;
         }
 
-        if (pOtherGuy->parrying && pGuy->pSim->frameCounter - pOtherGuy->lastTriggerFrame < 2) {
+        if (pendingHit.parried && pGuy->pSim->frameCounter - pOtherGuy->lastParryFrame < 2 && pOtherGuy->pLastTrigger && pOtherGuy->pLastTrigger->flags & (1ULL<<40)) {
             // perfect
             bool parryAsStrike = hitBox.type == hit;
             if (pGuy->isProjectile && pGuy->pCurrentAction->pProjectileData && pGuy->pCurrentAction->pProjectileData->flags & (1<<30)) {
@@ -3355,7 +3358,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             bool didPerfect = true;
             if (parryAsStrike) {
                 bool semiPerfect = false;
-                if (pOtherGuy->pCharData->charVersion >= 30 && hitBox.flags & overhead && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
+                if (pOtherGuy->pCharData->charVersion >= 30 && !(hitBox.flags & low) && (pOtherGuy->currentInput & (DOWN+BACK)) != BACK) {
                     semiPerfect = true;
                 }
                 if (pOtherGuy->pCharData->charVersion >= 30 && hitBox.flags & low && (pOtherGuy->currentInput & (DOWN+BACK)) != DOWN+BACK) {
@@ -3363,7 +3366,8 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 }
                 if (semiPerfect) { // demoted to regular parry
                     didPerfect = false;
-                    // todo some gauge shit here?
+                    //pOtherGuy->focus += 3000;
+                    otherGuyLog(pOtherGuy, pOtherGuy->logHits, "semi-perfect!");
                 } else {
                     hitStopSelf = 0;
                     hitStopTarget = 1;
@@ -3371,12 +3375,14 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                         guy->parryFreeze = 61;
                     }
                     pOtherGuy->pOpponent->perfectScaling = true;
+                    otherGuyLog(pOtherGuy, pOtherGuy->logHits, "perfect strike!");
                 }
             } else { // projectile pp
                 hitStopSelf = 9 + 1;
                 hitStopTarget = 9 + 1;
                 pOtherGuy->parryHoldFreebieFrames = 13; // ?
                 pOtherGuy->pOpponent->perfectScaling = true;
+                otherGuyLog(pOtherGuy, pOtherGuy->logHits, "perfect proj!");
             }
             if (didPerfect) {
                 pGuy->hasBeenPerfectParriedThisFrame = true;

@@ -758,7 +758,7 @@ private:
         tokiWaUgokidasu = false;
         scalingTriggerID = 0;
         appliedScaling = false;
-        lastTriggerFrame = 0;
+        lastParryFrame = 0;
         lastTriggerInput = 0;
         pLastTrigger = nullptr;
         chainComboMask = 0;
@@ -1111,7 +1111,7 @@ private:
     int warudoFrames;
 
     int scalingTriggerID;
-    int lastTriggerFrame;
+    int lastParryFrame;
     uint32_t lastTriggerInput;
     Trigger *pLastTrigger;
     uint8_t chainComboMask;
