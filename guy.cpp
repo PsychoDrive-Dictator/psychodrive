@@ -580,7 +580,7 @@ bool Guy::RunFrame(bool advancingTime)
 void Guy::RunFramePostPush(void)
 {
     if (!getWarudo()) {
-        if (poisoned) {
+        if (poisoned && (!pOpponent || !pOpponent->getWarudo())) {
             health -= 1;
         }
         if (debuffTimer > 0 ) {
@@ -3887,7 +3887,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
 
     // todo if health 0 mark finish here?
 
-    if (moveDamage > 0 || isGrab) {
+    if (moveDamage > 0 || pHitEffect->recoverableDamage > 0 || isGrab) {
         // look for minions to delete on damage
         for (auto &minion: getMinions()) {
             if (minion->isProjectile && minion->pCurrentAction->pProjectileData && minion->pCurrentAction->pProjectileData->flags & (1<<6)) {
