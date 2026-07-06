@@ -3366,7 +3366,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                 }
                 if (semiPerfect) { // demoted to regular parry
                     didPerfect = false;
-                    //pOtherGuy->focus += 3000;
+                    pOtherGuy->focus += 3000;
                     otherGuyLog(pOtherGuy, pOtherGuy->logHits, "semi-perfect!");
                 } else {
                     hitStopSelf = 0;
