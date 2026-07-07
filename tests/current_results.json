@@ -13669,6 +13669,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "zz_match_1782525667_aki_poison_fixes",
+        "testVersion": "43",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1730,
+                "firstFrame": 194,
+                "lastFrame": 1818
+            },
+            {
+                "count": 249,
+                "firstFrame": 251,
+                "lastFrame": 1906
+            },
+            {
+                "count": 35,
+                "firstFrame": 287,
+                "lastFrame": 1906
+            },
+            {
+                "count": 217,
+                "firstFrame": 251,
+                "lastFrame": 1848
+            },
+            {
+                "count": 203,
+                "firstFrame": 251,
+                "lastFrame": 1848
+            },
+            {
+                "count": 331,
+                "firstFrame": 242,
+                "lastFrame": 1832
+            },
+            {
+                "count": 166,
+                "firstFrame": 272,
+                "lastFrame": 1852
+            },
+            {
+                "count": 6,
+                "firstFrame": 513,
+                "lastFrame": 518
+            },
+            {
+                "count": 9,
+                "firstFrame": 385,
+                "lastFrame": 393
+            },
+            {
+                "count": 1630,
+                "firstFrame": 513,
+                "lastFrame": 2150
+            },
+            {
+                "count": 38,
+                "firstFrame": 446,
+                "lastFrame": 524
+            },
+            {
+                "count": 1699,
+                "firstFrame": 446,
+                "lastFrame": 2150
+            }
+        ]
+    },
+    {
         "testName": "zz_match_akuma_bullshit_di_steal",
         "testVersion": "39",
         "finished": true,
