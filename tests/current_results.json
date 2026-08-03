@@ -4758,6 +4758,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "alex_heavy_dp_adv",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 290,
+                "firstFrame": 87,
+                "lastFrame": 342
+            },
+            {
+                "count": 59,
+                "firstFrame": 87,
+                "lastFrame": 170
+            },
+            {
+                "count": 2,
+                "firstFrame": 120,
+                "lastFrame": 121
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 53,
+                "firstFrame": 162,
+                "lastFrame": 247
+            },
+            {
+                "count": 189,
+                "firstFrame": 86,
+                "lastFrame": 342
+            },
+            {
+                "count": 9,
+                "firstFrame": 197,
+                "lastFrame": 205
+            },
+            {
+                "count": 9,
+                "firstFrame": 162,
+                "lastFrame": 170
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "alex_input_branches",
         "testVersion": "40",
         "finished": true,
@@ -8376,6 +8443,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ingrid_ca",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1475,
+                "firstFrame": 160,
+                "lastFrame": 882
+            },
+            {
+                "count": 30,
+                "firstFrame": 684,
+                "lastFrame": 713
+            },
+            {
+                "count": 4,
+                "firstFrame": 684,
+                "lastFrame": 713
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 167,
+                "firstFrame": 160,
+                "lastFrame": 882
+            },
+            {
+                "count": 1433,
+                "firstFrame": 160,
+                "lastFrame": 882
+            },
+            {
+                "count": 12,
+                "firstFrame": 204,
+                "lastFrame": 732
+            },
+            {
+                "count": 351,
+                "firstFrame": 160,
+                "lastFrame": 882
+            },
+            {
+                "count": 10,
+                "firstFrame": 204,
+                "lastFrame": 619
+            },
+            {
+                "count": 3,
+                "firstFrame": 160,
+                "lastFrame": 162
+            },
+            {
+                "count": 12,
+                "firstFrame": 204,
+                "lastFrame": 764
+            }
+        ]
+    },
+    {
         "testName": "ingrid_normal_atemi",
         "testVersion": "42",
         "finished": true,
@@ -8707,6 +8841,73 @@ var currentResults =
                 "count": 135,
                 "firstFrame": 531,
                 "lastFrame": 663
+            }
+        ]
+    },
+    {
+        "testName": "ingrid_sa3",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1395,
+                "firstFrame": 156,
+                "lastFrame": 841
+            },
+            {
+                "count": 25,
+                "firstFrame": 650,
+                "lastFrame": 674
+            },
+            {
+                "count": 4,
+                "firstFrame": 650,
+                "lastFrame": 674
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 15,
+                "firstFrame": 156,
+                "lastFrame": 735
+            },
+            {
+                "count": 1368,
+                "firstFrame": 156,
+                "lastFrame": 841
+            },
+            {
+                "count": 20,
+                "firstFrame": 208,
+                "lastFrame": 693
+            },
+            {
+                "count": 2,
+                "firstFrame": 156,
+                "lastFrame": 650
+            },
+            {
+                "count": 18,
+                "firstFrame": 208,
+                "lastFrame": 593
+            },
+            {
+                "count": 3,
+                "firstFrame": 156,
+                "lastFrame": 158
+            },
+            {
+                "count": 20,
+                "firstFrame": 208,
+                "lastFrame": 725
             }
         ]
     },
@@ -10759,6 +10960,140 @@ var currentResults =
                 "count": 0,
                 "firstFrame": -1,
                 "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "lily_sa2",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 15,
+                "firstFrame": 198,
+                "lastFrame": 265
+            },
+            {
+                "count": 186,
+                "firstFrame": 155,
+                "lastFrame": 283
+            },
+            {
+                "count": 1,
+                "firstFrame": 283,
+                "lastFrame": 283
+            },
+            {
+                "count": 110,
+                "firstFrame": 155,
+                "lastFrame": 264
+            },
+            {
+                "count": 110,
+                "firstFrame": 155,
+                "lastFrame": 264
+            },
+            {
+                "count": 179,
+                "firstFrame": 155,
+                "lastFrame": 516
+            },
+            {
+                "count": 161,
+                "firstFrame": 156,
+                "lastFrame": 516
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
+        "testName": "lily_sa2_whiff",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 15,
+                "firstFrame": 197,
+                "lastFrame": 244
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 31,
+                "firstFrame": 336,
+                "lastFrame": 366
+            },
+            {
+                "count": 31,
+                "firstFrame": 336,
+                "lastFrame": 366
             },
             {
                 "count": 0,
@@ -13263,6 +13598,73 @@ var currentResults =
                 "count": 2,
                 "firstFrame": 111,
                 "lastFrame": 112
+            }
+        ]
+    },
+    {
+        "testName": "yasmine_sa3",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 851,
+                "firstFrame": 295,
+                "lastFrame": 923
+            },
+            {
+                "count": 19,
+                "firstFrame": 648,
+                "lastFrame": 695
+            },
+            {
+                "count": 47,
+                "firstFrame": 649,
+                "lastFrame": 695
+            },
+            {
+                "count": 1,
+                "firstFrame": 648,
+                "lastFrame": 648
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 276,
+                "firstFrame": 648,
+                "lastFrame": 923
+            },
+            {
+                "count": 272,
+                "firstFrame": 650,
+                "lastFrame": 923
+            },
+            {
+                "count": 214,
+                "firstFrame": 710,
+                "lastFrame": 923
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 740,
+                "lastFrame": 741
             }
         ]
     },
