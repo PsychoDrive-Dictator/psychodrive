@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=43
+version=50
 
 copy_char_file() {
     src="PlayerData/$1/$1 $3.json"
@@ -54,4 +54,5 @@ copy_char_dumps Rashid rashid
 copy_char_dumps Ryu ryu
 copy_char_dumps Sagat sagat
 copy_char_dumps Terry terry
+copy_char_dumps Yasmine yasmine
 copy_char_dumps Zangief zangief
