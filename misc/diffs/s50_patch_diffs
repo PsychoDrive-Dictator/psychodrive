@@ -1,0 +1,2945 @@
+ryu ATK_5LP hit 0 on block MoveDest.x was 34, now 30
+ryu ATK_5LP hit 0 on burnout block MoveDest.x was 34, now 30
+ryu ATK_5LP_B hit 0 on block MoveDest.x was 34, now 30
+ryu ATK_5LP_B hit 0 on burnout block MoveDest.x was 34, now 30
+ryu ATK_5LP_C hit 0 on block MoveDest.x was 34, now 30
+ryu ATK_5LP_C hit 0 on burnout block MoveDest.x was 34, now 30
+ryu ATK_6HP hit 1 on block MoveDest.x was 45, now 30
+ryu ATK_6HP hit 1 on burnout block MoveDest.x was 45, now 30
+ryu SPA_HADO(5) PROJ hit 0 on hit Juggle1st was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on hit JuggleAdd was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on hit JuggleLimit was 2, now 3
+ryu SPA_HADO(5) PROJ hit 0 on block Juggle1st was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on block JuggleAdd was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on block JuggleLimit was 2, now 3
+ryu SPA_HADO(5) PROJ hit 0 on air hit Juggle1st was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on air hit JuggleAdd was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on burnout block Juggle1st was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on burnout block JuggleLimit was 2, now 3
+ryu SPA_HADO(5) PROJ hit 0 on counter Juggle1st was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on counter JuggleAdd was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on counter JuggleLimit was 2, now 3
+ryu SPA_HADO(5) PROJ hit 0 on punish counter Juggle1st was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+ryu SPA_HADO(5) PROJ hit 0 on punish counter JuggleLimit was 2, now 3
+ryu SPA_SYORYU_START(3) hit 0 on hit JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 0 on hit JuggleLimit was 6, now 10
+ryu SPA_SYORYU_START(3) hit 1 on hit JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 1 on hit JuggleLimit was 7, now 10
+ryu SPA_SYORYU_START(3) hit 0 on block JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 0 on block JuggleLimit was 6, now 10
+ryu SPA_SYORYU_START(3) hit 1 on block JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 1 on block JuggleLimit was 7, now 10
+ryu SPA_SYORYU_START(3) hit 0 on air hit JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 0 on air hit JuggleLimit was 6, now 10
+ryu SPA_SYORYU_START(3) hit 1 on air hit JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 1 on air hit JuggleLimit was 7, now 10
+ryu SPA_SYORYU_START(3) hit 0 on burnout block JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 0 on burnout block JuggleLimit was 6, now 10
+ryu SPA_SYORYU_START(3) hit 1 on burnout block JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 1 on burnout block JuggleLimit was 7, now 10
+ryu SPA_SYORYU_START(3) hit 0 on counter JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 0 on counter JuggleLimit was 6, now 10
+ryu SPA_SYORYU_START(3) hit 1 on counter JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 1 on counter JuggleLimit was 7, now 10
+ryu SPA_SYORYU_START(3) hit 0 on punish counter JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 0 on punish counter JuggleLimit was 6, now 10
+ryu SPA_SYORYU_START(3) hit 1 on punish counter JuggleAdd was 1, now 0
+ryu SPA_SYORYU_START(3) hit 1 on punish counter JuggleLimit was 7, now 10
+ryu SPA_TATSUMAKI_AIR_END(3) hit 0 on hit MoveDest.x was 150, now 130
+ryu SPA_TATSUMAKI_AIR_END(3) hit 0 on counter MoveDest.x was 150, now 130
+ryu SPA_TATSUMAKI_AIR_END(3) hit 0 on punish counter MoveDest.x was 150, now 130
+ryu _1058 PROJ hit 0 on hit JuggleAdd was 1, now 3
+ryu _1058 PROJ hit 0 on block JuggleAdd was 1, now 3
+ryu _1058 PROJ hit 0 on air hit JuggleAdd was 1, now 3
+ryu _1058 PROJ hit 0 on burnout block JuggleAdd was 1, now 3
+ryu _1058 PROJ hit 0 on counter JuggleAdd was 1, now 3
+ryu _1058 PROJ hit 0 on punish counter JuggleAdd was 1, now 3
+luke ATK_2MP was active from 5-7 now active from 5-8
+luke ATK_2MP(1) was active from 5-7 now active from 5-8
+luke ATK_5HP hit 0 on block HitStun was 20, now 21
+luke ATK_5HP hit 0 on block MoveTime was 20, now 21
+luke ATK_5HP hit 0 on burnout block HitStun was 24, now 25
+luke ATK_5HP hit 0 on burnout block MoveTime was 24, now 25
+luke ATK_5HP(1) hit 0 on block HitStun was 20, now 21
+luke ATK_5HP(1) hit 0 on block MoveTime was 20, now 21
+luke ATK_5HP(1) hit 0 on burnout block HitStun was 24, now 25
+luke ATK_5HP(1) hit 0 on burnout block MoveTime was 24, now 25
+luke ATK_5MP(1) was active from 7-11 now active from 8-12
+luke ATK_5MP(1) was 31 frames now 28
+luke ATK_5MP(1) hit 0 on hit DmgValue was 400, now 600
+luke ATK_5MP(1) hit 0 on hit DmgVari was 2, now -1
+luke ATK_5MP(1) hit 0 on hit FocusOwn was 500, now 1500
+luke ATK_5MP(1) hit 0 on hit HitStopOwner was 10, now 11
+luke ATK_5MP(1) hit 0 on hit HitStopTarget was 10, now 11
+luke ATK_5MP(1) hit 0 on hit MoveDest.x was 40, now 50
+luke ATK_5MP(1) hit 0 on hit SndPower was 0, now 2
+luke ATK_5MP(1) hit 0 on hit SndType was 0, now 2
+luke ATK_5MP(1) hit 0 on hit SuperOwn was 400, now 500
+luke ATK_5MP(1) hit 0 on hit SuperTgt was 280, now 350
+luke ATK_5MP(1) hit 0 on block DmgPart was 0, now 1
+luke ATK_5MP(1) hit 0 on block FocusOwn was 500, now 1500
+luke ATK_5MP(1) hit 0 on block FocusTgt was -1000, now -3000
+luke ATK_5MP(1) hit 0 on block HitStopOwner was 10, now 11
+luke ATK_5MP(1) hit 0 on block HitStopTarget was 10, now 11
+luke ATK_5MP(1) hit 0 on block HitStun was 15, now 17
+luke ATK_5MP(1) hit 0 on block MoveDest.x was 20, now 50
+luke ATK_5MP(1) hit 0 on block MoveTime was 15, now 17
+luke ATK_5MP(1) hit 0 on block SndPower was 0, now 2
+luke ATK_5MP(1) hit 0 on block SndType was 0, now 2
+luke ATK_5MP(1) hit 0 on block SuperOwn was 200, now 250
+luke ATK_5MP(1) hit 0 on block SuperTgt was 100, now 125
+luke ATK_5MP(1) hit 0 on air hit DmgValue was 400, now 600
+luke ATK_5MP(1) hit 0 on air hit FocusOwn was 500, now 1500
+luke ATK_5MP(1) hit 0 on air hit HitStopOwner was 10, now 11
+luke ATK_5MP(1) hit 0 on air hit HitStopTarget was 10, now 11
+luke ATK_5MP(1) hit 0 on air hit SndPower was 0, now 2
+luke ATK_5MP(1) hit 0 on air hit SndType was 0, now 2
+luke ATK_5MP(1) hit 0 on air hit SuperOwn was 400, now 500
+luke ATK_5MP(1) hit 0 on air hit SuperTgt was 280, now 350
+luke ATK_5MP(1) hit 0 on burnout block DmgPart was 0, now 1
+luke ATK_5MP(1) hit 0 on burnout block FocusOwn was 500, now 1500
+luke ATK_5MP(1) hit 0 on burnout block FocusTgt was 500, now 1500
+luke ATK_5MP(1) hit 0 on burnout block HitStopOwner was 10, now 11
+luke ATK_5MP(1) hit 0 on burnout block HitStopTarget was 10, now 11
+luke ATK_5MP(1) hit 0 on burnout block HitStun was 19, now 21
+luke ATK_5MP(1) hit 0 on burnout block MoveDest.x was 20, now 50
+luke ATK_5MP(1) hit 0 on burnout block MoveTime was 19, now 21
+luke ATK_5MP(1) hit 0 on burnout block SndPower was 0, now 2
+luke ATK_5MP(1) hit 0 on burnout block SndType was 0, now 2
+luke ATK_5MP(1) hit 0 on burnout block SuperOwn was 200, now 250
+luke ATK_5MP(1) hit 0 on burnout block SuperTgt was 100, now 125
+luke ATK_5MP(1) hit 0 on counter DmgValue was 480, now 720
+luke ATK_5MP(1) hit 0 on counter DmgVari was 2, now -1
+luke ATK_5MP(1) hit 0 on counter FocusOwn was 500, now 1500
+luke ATK_5MP(1) hit 0 on counter HitStopOwner was 10, now 11
+luke ATK_5MP(1) hit 0 on counter HitStopTarget was 10, now 11
+luke ATK_5MP(1) hit 0 on counter MoveDest.x was 40, now 50
+luke ATK_5MP(1) hit 0 on counter SndPower was 0, now 2
+luke ATK_5MP(1) hit 0 on counter SndType was 0, now 2
+luke ATK_5MP(1) hit 0 on counter SuperOwn was 400, now 500
+luke ATK_5MP(1) hit 0 on counter SuperTgt was 280, now 350
+luke ATK_5MP(1) hit 0 on punish counter DmgValue was 480, now 720
+luke ATK_5MP(1) hit 0 on punish counter DmgVari was 2, now -1
+luke ATK_5MP(1) hit 0 on punish counter FocusOwn was 500, now 1500
+luke ATK_5MP(1) hit 0 on punish counter HitStopOwner was 10, now 11
+luke ATK_5MP(1) hit 0 on punish counter HitStopTarget was 10, now 11
+luke ATK_5MP(1) hit 0 on punish counter MoveDest.x was 40, now 50
+luke ATK_5MP(1) hit 0 on punish counter SndPower was 0, now 2
+luke ATK_5MP(1) hit 0 on punish counter SndType was 0, now 2
+luke ATK_5MP(1) hit 0 on punish counter SuperOwn was 400, now 500
+luke ATK_5MP(1) hit 0 on punish counter SuperTgt was 280, now 350
+luke ATK_5MP_TC3 was 39 frames now 36
+luke ATK_8MP was active from 8-12 now active from 7-12
+luke SAA_Ereser hit -1 on hit DmgValue was 700, now 900
+luke SAA_Ereser hit -1 on hit DownTime was 70, now 72
+luke SAA_Ereser hit -1 on block DownTime was 70, now 72
+luke SAA_Ereser hit -1 on air hit DmgValue was 700, now 900
+luke SAA_Ereser hit -1 on air hit DownTime was 70, now 72
+luke SAA_Ereser hit -1 on burnout block DownTime was 70, now 72
+luke SAA_Ereser hit -1 on counter DmgValue was 840, now 1080
+luke SAA_Ereser hit -1 on counter DownTime was 70, now 72
+luke SAA_Ereser hit -1 on punish counter DmgValue was 840, now 1080
+luke SAA_Ereser hit -1 on punish counter DownTime was 70, now 72
+luke SPA_HADO PROJ was active from 0-5 now active from 0-6
+luke SPA_HADO PROJ hit 0 on counter DmgType was 3, now 11
+luke SPA_HADO PROJ hit 0 on counter HitStun was 25, now 20
+luke SPA_HADO PROJ hit 0 on counter MoveDest.x was 50, now 120
+luke SPA_HADO PROJ hit 0 on counter MoveDest.y was 0, now 60
+luke SPA_HADO PROJ hit 0 on counter MoveTime was 25, now 20
+luke SPA_HADO PROJ hit 0 on counter MoveType was 0, now 13
+luke SPA_HADO PROJ hit 0 on punish counter DmgType was 3, now 11
+luke SPA_HADO PROJ hit 0 on punish counter HitStun was 27, now 20
+luke SPA_HADO PROJ hit 0 on punish counter MoveDest.x was 50, now 120
+luke SPA_HADO PROJ hit 0 on punish counter MoveDest.y was 0, now 60
+luke SPA_HADO PROJ hit 0 on punish counter MoveTime was 27, now 20
+luke SPA_HADO PROJ hit 0 on punish counter MoveType was 0, now 13
+luke SPA_HADO(1) PROJ hit 0 on counter DmgType was 3, now 11
+luke SPA_HADO(1) PROJ hit 0 on counter HitStun was 25, now 20
+luke SPA_HADO(1) PROJ hit 0 on counter MoveDest.x was 50, now 120
+luke SPA_HADO(1) PROJ hit 0 on counter MoveDest.y was 0, now 60
+luke SPA_HADO(1) PROJ hit 0 on counter MoveTime was 25, now 20
+luke SPA_HADO(1) PROJ hit 0 on counter MoveType was 0, now 13
+luke SPA_HADO(1) PROJ hit 0 on punish counter DmgType was 3, now 11
+luke SPA_HADO(1) PROJ hit 0 on punish counter HitStun was 27, now 20
+luke SPA_HADO(1) PROJ hit 0 on punish counter MoveDest.x was 50, now 120
+luke SPA_HADO(1) PROJ hit 0 on punish counter MoveDest.y was 0, now 60
+luke SPA_HADO(1) PROJ hit 0 on punish counter MoveTime was 27, now 20
+luke SPA_HADO(1) PROJ hit 0 on punish counter MoveType was 0, now 13
+luke SPA_HADO(2) PROJ hit 0 on counter DmgType was 3, now 11
+luke SPA_HADO(2) PROJ hit 0 on counter HitStun was 25, now 20
+luke SPA_HADO(2) PROJ hit 0 on counter MoveDest.x was 50, now 120
+luke SPA_HADO(2) PROJ hit 0 on counter MoveDest.y was 0, now 60
+luke SPA_HADO(2) PROJ hit 0 on counter MoveTime was 25, now 20
+luke SPA_HADO(2) PROJ hit 0 on counter MoveType was 0, now 13
+luke SPA_HADO(2) PROJ hit 0 on punish counter DmgType was 3, now 11
+luke SPA_HADO(2) PROJ hit 0 on punish counter HitStun was 27, now 20
+luke SPA_HADO(2) PROJ hit 0 on punish counter MoveDest.x was 50, now 120
+luke SPA_HADO(2) PROJ hit 0 on punish counter MoveDest.y was 0, now 60
+luke SPA_HADO(2) PROJ hit 0 on punish counter MoveTime was 27, now 20
+luke SPA_HADO(2) PROJ hit 0 on punish counter MoveType was 0, now 13
+kimberly ATK_2HP(1) hit 1 on hit JuggleAdd was 1, now 0
+kimberly ATK_2HP(1) hit 1 on block JuggleAdd was 1, now 0
+kimberly ATK_2HP(1) hit 1 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2HP(1) hit 1 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2HP(1) hit 1 on counter JuggleAdd was 1, now 0
+kimberly ATK_2HP(1) hit 1 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2HP(3) hit 1 on hit JuggleAdd was 1, now 0
+kimberly ATK_2HP(3) hit 1 on block JuggleAdd was 1, now 0
+kimberly ATK_2HP(3) hit 1 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2HP(3) hit 1 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2HP(3) hit 1 on counter JuggleAdd was 1, now 0
+kimberly ATK_2HP(3) hit 1 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2LK(3) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2LK(3) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2LK(3) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2LK(3) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2LK(3) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2LK(3) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2LK(7) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2LK(7) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2LK(7) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2LK(7) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2LK(7) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2LK(7) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2LP(2) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2LP(2) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2LP(2) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2LP(2) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2LP(2) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2LP(2) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2LP(5) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2LP(5) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2LP(5) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2LP(5) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2LP(5) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2LP(5) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2MK(1) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2MK(1) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2MK(1) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2MK(1) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2MK(1) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2MK(1) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2MK(3) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2MK(3) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2MK(3) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2MK(3) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2MK(3) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2MK(3) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2MP(2) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2MP(2) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2MP(2) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2MP(2) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2MP(2) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2MP(2) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_2MP(4) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_2MP(4) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_2MP(4) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_2MP(4) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_2MP(4) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_2MP(4) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5HK(1) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5HK(1) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5HK(1) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5HK(1) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5HK(1) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5HK(1) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5HK(3) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5HK(3) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5HK(3) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5HK(3) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5HK(3) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5HK(3) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5HP(1) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5HP(1) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5HP(1) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5HP(1) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5HP(1) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5HP(1) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5HP(3) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5HP(3) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5HP(3) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5HP(3) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5HP(3) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5HP(3) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5LK(1) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5LK(1) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5LK(1) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5LK(1) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5LK(1) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5LK(1) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5LK(3) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5LK(3) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5LK(3) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5LK(3) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5LK(3) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5LK(3) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5LP(2) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5LP(2) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5LP(2) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5LP(2) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5LP(2) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5LP(2) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5LP(5) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5LP(5) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5LP(5) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5LP(5) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5LP(5) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5LP(5) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5MK(1) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5MK(1) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5MK(1) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5MK(1) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5MK(1) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5MK(1) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5MK(3) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5MK(3) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5MK(3) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5MK(3) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5MK(3) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5MK(3) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5MP(2) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5MP(2) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5MP(2) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5MP(2) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5MP(2) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5MP(2) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly ATK_5MP(5) hit 0 on hit JuggleAdd was 1, now 0
+kimberly ATK_5MP(5) hit 0 on block JuggleAdd was 1, now 0
+kimberly ATK_5MP(5) hit 0 on air hit JuggleAdd was 1, now 0
+kimberly ATK_5MP(5) hit 0 on burnout block JuggleAdd was 1, now 0
+kimberly ATK_5MP(5) hit 0 on counter JuggleAdd was 1, now 0
+kimberly ATK_5MP(5) hit 0 on punish counter JuggleAdd was 1, now 0
+kimberly SPA_ChargeChop_L_START hit 0 on hit MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START hit 0 on counter MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START hit 0 on punish counter MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START(3) hit 0 on hit MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START(3) hit 0 on counter MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START(3) hit 0 on punish counter MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START(6) hit 0 on hit MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START(6) hit 0 on counter MoveDest.x was 42, now 37
+kimberly SPA_ChargeChop_L_START(6) hit 0 on punish counter MoveDest.x was 42, now 37
+kimberly SPA_Hayagake_Jump(2) hit 0 on hit DmgValue was 270, now 180
+kimberly SPA_Hayagake_Jump(2) hit 0 on hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on hit HitStun was 17, now 23
+kimberly SPA_Hayagake_Jump(2) hit 0 on hit MoveTime was 17, now 23
+kimberly SPA_Hayagake_Jump(2) hit 1 on hit DmgValue was 180, now 90
+kimberly SPA_Hayagake_Jump(2) hit 1 on hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 1 on block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on air hit DmgValue was 270, now 180
+kimberly SPA_Hayagake_Jump(2) hit 0 on air hit DownTime was 11, now 10
+kimberly SPA_Hayagake_Jump(2) hit 0 on air hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 1 on air hit DmgValue was 180, now 90
+kimberly SPA_Hayagake_Jump(2) hit 1 on air hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on burnout block DmgValue was 67, now 45
+kimberly SPA_Hayagake_Jump(2) hit 0 on burnout block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 1 on burnout block DmgValue was 45, now 22
+kimberly SPA_Hayagake_Jump(2) hit 1 on burnout block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on counter DmgValue was 324, now 216
+kimberly SPA_Hayagake_Jump(2) hit 0 on counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on counter HitStun was 19, now 25
+kimberly SPA_Hayagake_Jump(2) hit 0 on counter MoveTime was 19, now 25
+kimberly SPA_Hayagake_Jump(2) hit 1 on counter DmgValue was 216, now 108
+kimberly SPA_Hayagake_Jump(2) hit 1 on counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on punish counter DmgValue was 324, now 216
+kimberly SPA_Hayagake_Jump(2) hit 0 on punish counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(2) hit 0 on punish counter HitStun was 21, now 27
+kimberly SPA_Hayagake_Jump(2) hit 0 on punish counter MoveTime was 21, now 27
+kimberly SPA_Hayagake_Jump(2) hit 1 on punish counter DmgValue was 216, now 108
+kimberly SPA_Hayagake_Jump(2) hit 1 on punish counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(3) hit 0 on hit DmgValue was 180, now 270
+kimberly SPA_Hayagake_Jump(3) hit 0 on hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on hit HitStun was 23, now 17
+kimberly SPA_Hayagake_Jump(3) hit 0 on hit MoveTime was 23, now 17
+kimberly SPA_Hayagake_Jump(3) hit 1 on hit DmgValue was 90, now 180
+kimberly SPA_Hayagake_Jump(3) hit 1 on hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 1 on block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on air hit DmgValue was 180, now 270
+kimberly SPA_Hayagake_Jump(3) hit 0 on air hit DownTime was 10, now 11
+kimberly SPA_Hayagake_Jump(3) hit 0 on air hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 1 on air hit DmgValue was 90, now 180
+kimberly SPA_Hayagake_Jump(3) hit 1 on air hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on burnout block DmgValue was 45, now 67
+kimberly SPA_Hayagake_Jump(3) hit 0 on burnout block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 1 on burnout block DmgValue was 22, now 45
+kimberly SPA_Hayagake_Jump(3) hit 1 on burnout block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on counter DmgValue was 216, now 324
+kimberly SPA_Hayagake_Jump(3) hit 0 on counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on counter HitStun was 25, now 19
+kimberly SPA_Hayagake_Jump(3) hit 0 on counter MoveTime was 25, now 19
+kimberly SPA_Hayagake_Jump(3) hit 1 on counter DmgValue was 108, now 216
+kimberly SPA_Hayagake_Jump(3) hit 1 on counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on punish counter DmgValue was 216, now 324
+kimberly SPA_Hayagake_Jump(3) hit 0 on punish counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(3) hit 0 on punish counter HitStun was 27, now 21
+kimberly SPA_Hayagake_Jump(3) hit 0 on punish counter MoveTime was 27, now 21
+kimberly SPA_Hayagake_Jump(3) hit 1 on punish counter DmgValue was 108, now 216
+kimberly SPA_Hayagake_Jump(3) hit 1 on punish counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(4) hit 0 on hit DmgValue was 270, now 180
+kimberly SPA_Hayagake_Jump(4) hit 0 on hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on hit HitStun was 17, now 23
+kimberly SPA_Hayagake_Jump(4) hit 0 on hit MoveTime was 17, now 23
+kimberly SPA_Hayagake_Jump(4) hit 1 on hit DmgValue was 180, now 90
+kimberly SPA_Hayagake_Jump(4) hit 1 on hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 1 on block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on air hit DmgValue was 270, now 180
+kimberly SPA_Hayagake_Jump(4) hit 0 on air hit DownTime was 11, now 10
+kimberly SPA_Hayagake_Jump(4) hit 0 on air hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 1 on air hit DmgValue was 180, now 90
+kimberly SPA_Hayagake_Jump(4) hit 1 on air hit FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on burnout block DmgValue was 67, now 45
+kimberly SPA_Hayagake_Jump(4) hit 0 on burnout block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 1 on burnout block DmgValue was 45, now 22
+kimberly SPA_Hayagake_Jump(4) hit 1 on burnout block FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on counter DmgValue was 324, now 216
+kimberly SPA_Hayagake_Jump(4) hit 0 on counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on counter HitStun was 19, now 25
+kimberly SPA_Hayagake_Jump(4) hit 0 on counter MoveTime was 19, now 25
+kimberly SPA_Hayagake_Jump(4) hit 1 on counter DmgValue was 216, now 108
+kimberly SPA_Hayagake_Jump(4) hit 1 on counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on punish counter DmgValue was 324, now 216
+kimberly SPA_Hayagake_Jump(4) hit 0 on punish counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(4) hit 0 on punish counter HitStun was 21, now 27
+kimberly SPA_Hayagake_Jump(4) hit 0 on punish counter MoveTime was 21, now 27
+kimberly SPA_Hayagake_Jump(4) hit 1 on punish counter DmgValue was 216, now 108
+kimberly SPA_Hayagake_Jump(4) hit 1 on punish counter FocusOwn was 500, now 0
+kimberly SPA_Hayagake_Jump(5) hit 0 on hit DmgValue was 180, now 270
+kimberly SPA_Hayagake_Jump(5) hit 0 on hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on hit HitStun was 23, now 17
+kimberly SPA_Hayagake_Jump(5) hit 0 on hit MoveTime was 23, now 17
+kimberly SPA_Hayagake_Jump(5) hit 1 on hit DmgValue was 90, now 180
+kimberly SPA_Hayagake_Jump(5) hit 1 on hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 1 on block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on air hit DmgValue was 180, now 270
+kimberly SPA_Hayagake_Jump(5) hit 0 on air hit DownTime was 10, now 11
+kimberly SPA_Hayagake_Jump(5) hit 0 on air hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 1 on air hit DmgValue was 90, now 180
+kimberly SPA_Hayagake_Jump(5) hit 1 on air hit FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on burnout block DmgValue was 45, now 67
+kimberly SPA_Hayagake_Jump(5) hit 0 on burnout block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 1 on burnout block DmgValue was 22, now 45
+kimberly SPA_Hayagake_Jump(5) hit 1 on burnout block FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on counter DmgValue was 216, now 324
+kimberly SPA_Hayagake_Jump(5) hit 0 on counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on counter HitStun was 25, now 19
+kimberly SPA_Hayagake_Jump(5) hit 0 on counter MoveTime was 25, now 19
+kimberly SPA_Hayagake_Jump(5) hit 1 on counter DmgValue was 108, now 216
+kimberly SPA_Hayagake_Jump(5) hit 1 on counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on punish counter DmgValue was 216, now 324
+kimberly SPA_Hayagake_Jump(5) hit 0 on punish counter FocusOwn was 0, now 500
+kimberly SPA_Hayagake_Jump(5) hit 0 on punish counter HitStun was 27, now 21
+kimberly SPA_Hayagake_Jump(5) hit 0 on punish counter MoveTime was 27, now 21
+kimberly SPA_Hayagake_Jump(5) hit 1 on punish counter DmgValue was 108, now 216
+kimberly SPA_Hayagake_Jump(5) hit 1 on punish counter FocusOwn was 0, now 500
+kimberly _1005 PROJ was active from 0-10 now active from -1--1
+kimberly _1005 PROJ different hit count
+kimberly _1005 PROJ _StartScaling was 10 , now -1
+kimberly _1006 PROJ was active from 0-10 now active from -1--1
+kimberly _1006 PROJ different hit count
+kimberly _1006 PROJ _StartScaling was 10 , now -1
+kimberly _1007 PROJ was active from 0-10 now active from -1--1
+kimberly _1007 PROJ different hit count
+kimberly _1007 PROJ _StartScaling was 10 , now -1
+kimberly _1008 PROJ _StartScaling was 10 , now 20
+chunli ATK_S_HP hit 1 on block HitStun was 18, now 22
+chunli ATK_S_HP hit 1 on block MoveTime was 18, now 22
+chunli ATK_S_HP hit 1 on burnout block HitStun was 22, now 26
+chunli ATK_S_HP hit 1 on burnout block MoveTime was 22, now 26
+chunli ATK_S_HP(1) hit 1 on block HitStun was 18, now 22
+chunli ATK_S_HP(1) hit 1 on block MoveTime was 18, now 22
+chunli ATK_S_HP(1) hit 1 on burnout block HitStun was 22, now 26
+chunli ATK_S_HP(1) hit 1 on burnout block MoveTime was 22, now 26
+chunli SPA_HAZANNSHU hit 0 on block HitStun was 18, now 19
+chunli SPA_HAZANNSHU hit 0 on block MoveTime was 18, now 19
+chunli SPA_HAZANNSHU hit 0 on air hit HitStun was 10, now 11
+chunli SPA_HAZANNSHU hit 0 on air hit MoveTime was 10, now 11
+chunli SPA_HAZANNSHU hit 0 on burnout block HitStun was 22, now 23
+chunli SPA_HAZANNSHU hit 0 on burnout block MoveTime was 22, now 23
+chunli SPA_TENNSHOU(1) hit 0 on hit FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on hit JuggleLimit was 1, now 2
+chunli SPA_TENNSHOU(1) hit 1 on hit FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on block FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on block JuggleLimit was 1, now 2
+chunli SPA_TENNSHOU(1) hit 1 on block FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on air hit FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on air hit JuggleLimit was 1, now 2
+chunli SPA_TENNSHOU(1) hit 1 on air hit FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on burnout block FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on burnout block JuggleLimit was 1, now 2
+chunli SPA_TENNSHOU(1) hit 1 on burnout block FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on counter FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on counter JuggleLimit was 1, now 2
+chunli SPA_TENNSHOU(1) hit 1 on counter FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on punish counter FocusOwn was 1000, now 2000
+chunli SPA_TENNSHOU(1) hit 0 on punish counter JuggleLimit was 1, now 2
+chunli SPA_TENNSHOU(1) hit 1 on punish counter FocusOwn was 1000, now 2000
+manon ATK_2MK hit 0 on hit HitStun was 23, now 24
+manon ATK_2MK hit 0 on hit MoveTime was 23, now 24
+manon ATK_2MK hit 0 on counter HitStun was 25, now 26
+manon ATK_2MK hit 0 on counter MoveTime was 25, now 26
+manon ATK_2MK hit 0 on punish counter HitStun was 27, now 28
+manon ATK_2MK hit 0 on punish counter MoveTime was 27, now 28
+manon ATK_3HK hit 0 on hit Juggle1st was 1, now 3
+manon ATK_3HK hit 0 on block Juggle1st was 1, now 3
+manon ATK_3HK hit 0 on air hit Juggle1st was 1, now 3
+manon ATK_3HK hit 0 on burnout block Juggle1st was 1, now 3
+manon ATK_3HK hit 0 on counter Juggle1st was 1, now 3
+manon ATK_3HK hit 0 on punish counter Juggle1st was 1, now 3
+manon ATK_3HK(1) hit 0 on hit Juggle1st was 1, now 3
+manon ATK_3HK(1) hit 0 on block Juggle1st was 1, now 3
+manon ATK_3HK(1) hit 0 on air hit Juggle1st was 1, now 3
+manon ATK_3HK(1) hit 0 on burnout block Juggle1st was 1, now 3
+manon ATK_3HK(1) hit 0 on counter Juggle1st was 1, now 3
+manon ATK_3HK(1) hit 0 on punish counter Juggle1st was 1, now 3
+manon ATK_5MK hit 0 on hit HitStun was 19, now 21
+manon ATK_5MK hit 0 on hit MoveTime was 19, now 21
+manon ATK_5MK hit 0 on counter HitStun was 21, now 23
+manon ATK_5MK hit 0 on counter MoveTime was 21, now 23
+manon ATK_5MK hit 0 on punish counter HitStun was 23, now 25
+manon ATK_5MK hit 0 on punish counter MoveTime was 23, now 25
+manon SAA_01 hit 0 on hit JuggleLimit was 5, now 6
+manon SAA_01 hit 0 on block JuggleLimit was 5, now 6
+manon SAA_01 hit 0 on air hit JuggleLimit was 5, now 6
+manon SAA_01 hit 0 on burnout block JuggleLimit was 5, now 6
+manon SAA_01 hit 0 on counter JuggleLimit was 5, now 6
+manon SAA_01 hit 0 on punish counter JuggleLimit was 5, now 6
+manon SAA_2 hit 0 on hit JuggleLimit was 6, now 7
+manon SAA_2 hit 1 on hit JuggleLimit was 6, now 7
+manon SAA_2 hit 0 on block JuggleLimit was 6, now 7
+manon SAA_2 hit 1 on block JuggleLimit was 6, now 7
+manon SAA_2 hit 0 on air hit JuggleLimit was 6, now 7
+manon SAA_2 hit 1 on air hit JuggleLimit was 6, now 7
+manon SAA_2 hit 0 on burnout block JuggleLimit was 6, now 7
+manon SAA_2 hit 1 on burnout block JuggleLimit was 6, now 7
+manon SAA_2 hit 0 on counter JuggleLimit was 6, now 7
+manon SAA_2 hit 1 on counter JuggleLimit was 6, now 7
+manon SAA_2 hit 0 on punish counter JuggleLimit was 6, now 7
+manon SAA_2 hit 1 on punish counter JuggleLimit was 6, now 7
+manon SPA_02_HIGH hit 0 on hit HitStun was 29, now 30
+manon SPA_02_HIGH hit 0 on hit JuggleLimit was 5, now 6
+manon SPA_02_HIGH hit 0 on hit MoveTime was 29, now 30
+manon SPA_02_HIGH hit 0 on block JuggleLimit was 5, now 6
+manon SPA_02_HIGH hit 0 on air hit JuggleLimit was 5, now 6
+manon SPA_02_HIGH hit 0 on burnout block JuggleLimit was 5, now 6
+manon SPA_02_HIGH hit 0 on counter HitStun was 31, now 32
+manon SPA_02_HIGH hit 0 on counter JuggleLimit was 5, now 6
+manon SPA_02_HIGH hit 0 on counter MoveTime was 31, now 32
+manon SPA_02_HIGH hit 0 on punish counter HitStun was 33, now 34
+manon SPA_02_HIGH hit 0 on punish counter JuggleLimit was 5, now 6
+manon SPA_02_HIGH hit 0 on punish counter MoveTime was 33, now 34
+manon SPA_02_HIGH(1) hit 0 on hit Juggle1st was 1, now 4
+manon SPA_02_HIGH(1) hit 0 on hit JuggleAdd was 1, now 3
+manon SPA_02_HIGH(1) hit 0 on hit JuggleLimit was 5, now 3
+manon SPA_02_HIGH(1) hit 0 on hit MoveDest.y was 0, now -150
+manon SPA_02_HIGH(1) hit 0 on block Juggle1st was 1, now 4
+manon SPA_02_HIGH(1) hit 0 on block JuggleAdd was 1, now 3
+manon SPA_02_HIGH(1) hit 0 on block JuggleLimit was 5, now 3
+manon SPA_02_HIGH(1) hit 0 on air hit Attr0 was 1, now 9
+manon SPA_02_HIGH(1) hit 0 on air hit DmgType was 11, now 13
+manon SPA_02_HIGH(1) hit 0 on air hit FloorDest.x was 0, now 30
+manon SPA_02_HIGH(1) hit 0 on air hit FloorDest.y was 0, now 100
+manon SPA_02_HIGH(1) hit 0 on air hit FloorTime was 0, now 45
+manon SPA_02_HIGH(1) hit 0 on air hit Juggle1st was 1, now 4
+manon SPA_02_HIGH(1) hit 0 on air hit JuggleAdd was 1, now 3
+manon SPA_02_HIGH(1) hit 0 on air hit JuggleLimit was 5, now 3
+manon SPA_02_HIGH(1) hit 0 on air hit MoveDest.y was 10, now -100
+manon SPA_02_HIGH(1) hit 0 on air hit MoveType was 13, now 15
+manon SPA_02_HIGH(1) hit 0 on air hit _jimen_bound was False, now True
+manon SPA_02_HIGH(1) hit 0 on burnout block Juggle1st was 1, now 4
+manon SPA_02_HIGH(1) hit 0 on burnout block JuggleAdd was 1, now 3
+manon SPA_02_HIGH(1) hit 0 on burnout block JuggleLimit was 5, now 3
+manon SPA_02_HIGH(1) hit 0 on counter Juggle1st was 1, now 4
+manon SPA_02_HIGH(1) hit 0 on counter JuggleAdd was 1, now 3
+manon SPA_02_HIGH(1) hit 0 on counter JuggleLimit was 5, now 3
+manon SPA_02_HIGH(1) hit 0 on counter MoveDest.y was 0, now -150
+manon SPA_02_HIGH(1) hit 0 on punish counter Juggle1st was 1, now 4
+manon SPA_02_HIGH(1) hit 0 on punish counter JuggleAdd was 1, now 3
+manon SPA_02_HIGH(1) hit 0 on punish counter JuggleLimit was 5, now 3
+manon SPA_02_HIGH(1) hit 0 on punish counter MoveDest.y was 0, now -150
+manon SPA_02_LOW hit 0 on hit JuggleLimit was 5, now 6
+manon SPA_02_LOW hit 1 on hit JuggleLimit was 6, now 7
+manon SPA_02_LOW hit 0 on block JuggleLimit was 5, now 6
+manon SPA_02_LOW hit 1 on block JuggleLimit was 6, now 7
+manon SPA_02_LOW hit 0 on air hit JuggleLimit was 5, now 6
+manon SPA_02_LOW hit 1 on air hit JuggleLimit was 6, now 7
+manon SPA_02_LOW hit 0 on burnout block JuggleLimit was 5, now 6
+manon SPA_02_LOW hit 1 on burnout block JuggleLimit was 6, now 7
+manon SPA_02_LOW hit 0 on counter JuggleLimit was 5, now 6
+manon SPA_02_LOW hit 1 on counter JuggleLimit was 6, now 7
+manon SPA_02_LOW hit 0 on punish counter JuggleLimit was 5, now 6
+manon SPA_02_LOW hit 1 on punish counter JuggleLimit was 6, now 7
+manon SPA_02_MIDDLE hit 0 on hit JuggleLimit was 5, now 6
+manon SPA_02_MIDDLE hit 1 on hit JuggleLimit was 6, now 7
+manon SPA_02_MIDDLE hit 0 on block JuggleLimit was 5, now 6
+manon SPA_02_MIDDLE hit 1 on block JuggleLimit was 6, now 7
+manon SPA_02_MIDDLE hit 0 on air hit JuggleLimit was 5, now 6
+manon SPA_02_MIDDLE hit 1 on air hit JuggleLimit was 6, now 7
+manon SPA_02_MIDDLE hit 0 on burnout block JuggleLimit was 5, now 6
+manon SPA_02_MIDDLE hit 1 on burnout block JuggleLimit was 6, now 7
+manon SPA_02_MIDDLE hit 0 on counter JuggleLimit was 5, now 6
+manon SPA_02_MIDDLE hit 1 on counter JuggleLimit was 6, now 7
+manon SPA_02_MIDDLE hit 0 on punish counter JuggleLimit was 5, now 6
+manon SPA_02_MIDDLE hit 1 on punish counter JuggleLimit was 6, now 7
+manon SPA_04_GF was 38 frames now 36
+manon SPA_04_GF _StartScaling was -1 , now 20
+manon SPA_04_START_M hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(1) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(10) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(11) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(12) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(13) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(14) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(15) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(16) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(17) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(18) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(19) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(2) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(3) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(4) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(5) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(6) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(7) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(8) hit 1 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 0 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 1 on hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 0 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 1 on block JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 0 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 1 on air hit JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 0 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 1 on burnout block JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 0 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 1 on counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 0 on punish counter JuggleLimit was 3, now 6
+manon SPA_04_START_M(9) hit 1 on punish counter JuggleLimit was 3, now 6
+zangief ATK_22MK _StartScaling was -1 , now 20
+zangief SPA_DLARIAT_END(1) hit 3 on block HitStun was 17, now 22
+zangief SPA_DLARIAT_END(1) hit 3 on block MoveTime was 17, now 22
+zangief SPA_DLARIAT_END(1) hit 3 on burnout block HitStun was 21, now 26
+zangief SPA_DLARIAT_END(1) hit 3 on burnout block MoveTime was 21, now 26
+zangief SPA_SUPLEX(2) was 252 frames now 253
+zangief SPA_SUPLEX(2) InstScaling was 0 , now 10
+zangief SPA_SUPLEX(3) was 252 frames now 253
+zangief SPA_SUPLEX(3) InstScaling was 0 , now 10
+jp SPA_SP1(5) PROJ hit 0 on hit HitStun was 16, now 19
+jp SPA_SP1(5) PROJ hit 0 on hit MoveDest.y was 30, now 90
+jp SPA_SP1(5) PROJ hit 0 on hit MoveTime was 16, now 19
+cammy ATK_4MP hit 0 on hit MoveDest.x was 40, now 30
+cammy ATK_4MP hit 0 on block HitStun was 16, now 18
+cammy ATK_4MP hit 0 on block MoveDest.x was 50, now 30
+cammy ATK_4MP hit 0 on block MoveTime was 16, now 18
+cammy ATK_4MP hit 0 on burnout block HitStun was 20, now 22
+cammy ATK_4MP hit 0 on burnout block MoveDest.x was 50, now 30
+cammy ATK_4MP hit 0 on burnout block MoveTime was 20, now 22
+cammy ATK_4MP hit 0 on counter MoveDest.x was 40, now 30
+cammy ATK_4MP hit 0 on punish counter MoveDest.x was 40, now 30
+cammy ATK_5HK hit 0 on punish counter HitStun was 22, now 25
+cammy ATK_5HK hit 0 on punish counter MoveTime was 22, now 25
+cammy ATK_5HK(1) hit 0 on punish counter HitStun was 22, now 25
+cammy ATK_5HK(1) hit 0 on punish counter MoveTime was 22, now 25
+cammy SPA_ACSELSPINKNUCKLE_H(3) hit -1 on block HitStun was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(3) hit -1 on block MoveTime was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(3) hit -1 on block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(3) hit -1 on burnout block HitStun was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(3) hit -1 on burnout block MoveTime was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(3) hit -1 on burnout block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(4) hit -1 on block HitStun was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(4) hit -1 on block MoveTime was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(4) hit -1 on block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(4) hit -1 on burnout block HitStun was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(4) hit -1 on burnout block MoveTime was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(4) hit -1 on burnout block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(5) hit -1 on block HitStun was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(5) hit -1 on block MoveTime was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(5) hit -1 on block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(5) hit -1 on burnout block HitStun was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(5) hit -1 on burnout block MoveTime was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(5) hit -1 on burnout block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(6) hit -1 on block HitStun was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(6) hit -1 on block MoveTime was 19, now 24
+cammy SPA_ACSELSPINKNUCKLE_H(6) hit -1 on block ScreenVib was -1, now 27
+cammy SPA_ACSELSPINKNUCKLE_H(6) hit -1 on burnout block HitStun was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(6) hit -1 on burnout block MoveTime was 23, now 28
+cammy SPA_ACSELSPINKNUCKLE_H(6) hit -1 on burnout block ScreenVib was -1, now 27
+cammy SPA_CANNONSPIKE_AIR(4) was active from 23-35 now active from 21-33
+ken ATK_2MP hit 0 on hit DmgValue was 700, now 600
+ken ATK_2MP hit 0 on hit HitStun was 20, now 22
+ken ATK_2MP hit 0 on hit MoveDest.x was 50, now 49
+ken ATK_2MP hit 0 on hit MoveTime was 20, now 22
+ken ATK_2MP hit 0 on air hit DmgValue was 700, now 600
+ken ATK_2MP hit 0 on counter DmgValue was 840, now 720
+ken ATK_2MP hit 0 on counter HitStun was 22, now 24
+ken ATK_2MP hit 0 on counter MoveDest.x was 50, now 49
+ken ATK_2MP hit 0 on counter MoveTime was 22, now 24
+ken ATK_2MP hit 0 on punish counter DmgValue was 840, now 720
+ken ATK_2MP hit 0 on punish counter HitStun was 24, now 26
+ken ATK_2MP hit 0 on punish counter MoveDest.x was 50, now 49
+ken ATK_2MP hit 0 on punish counter MoveTime was 24, now 26
+ken ATK_2MP(1) hit 0 on hit DmgValue was 700, now 600
+ken ATK_2MP(1) hit 0 on hit HitStun was 20, now 22
+ken ATK_2MP(1) hit 0 on hit MoveDest.x was 50, now 49
+ken ATK_2MP(1) hit 0 on hit MoveTime was 20, now 22
+ken ATK_2MP(1) hit 0 on air hit DmgValue was 700, now 600
+ken ATK_2MP(1) hit 0 on counter DmgValue was 840, now 720
+ken ATK_2MP(1) hit 0 on counter HitStun was 22, now 24
+ken ATK_2MP(1) hit 0 on counter MoveDest.x was 50, now 49
+ken ATK_2MP(1) hit 0 on counter MoveTime was 22, now 24
+ken ATK_2MP(1) hit 0 on punish counter DmgValue was 840, now 720
+ken ATK_2MP(1) hit 0 on punish counter HitStun was 24, now 26
+ken ATK_2MP(1) hit 0 on punish counter MoveDest.x was 50, now 49
+ken ATK_2MP(1) hit 0 on punish counter MoveTime was 24, now 26
+ken ATK_MK_FUMIKOMI was active from 9-13 now active from 7-11
+ken ATK_MK_FUMIKOMI was 33 frames now 31
+ken ATK_MK_FUMIKOMI hit 0 on hit HitStun was 27, now 25
+ken ATK_MK_FUMIKOMI hit 0 on hit MoveTime was 27, now 25
+ken ATK_MK_FUMIKOMI hit 0 on block MoveDest.x was 62, now 50
+ken ATK_MK_FUMIKOMI hit 0 on burnout block MoveDest.x was 62, now 50
+ken ATK_MK_FUMIKOMI hit 0 on counter HitStun was 29, now 27
+ken ATK_MK_FUMIKOMI hit 0 on counter MoveTime was 29, now 27
+ken ATK_MK_FUMIKOMI hit 0 on punish counter HitStun was 31, now 29
+ken ATK_MK_FUMIKOMI hit 0 on punish counter MoveTime was 31, now 29
+deejay ATK_2LK hit 0 on hit MoveDest.x was 45, now 35
+deejay ATK_2LK hit 0 on block MoveDest.x was 45, now 35
+deejay ATK_2LK hit 0 on burnout block MoveDest.x was 45, now 35
+deejay ATK_2LK hit 0 on counter MoveDest.x was 45, now 35
+deejay ATK_2LK hit 0 on punish counter MoveDest.x was 45, now 35
+deejay ATK_2LK_B hit 0 on hit MoveDest.x was 45, now 35
+deejay ATK_2LK_B hit 0 on block MoveDest.x was 45, now 35
+deejay ATK_2LK_B hit 0 on burnout block MoveDest.x was 45, now 35
+deejay ATK_2LK_B hit 0 on counter MoveDest.x was 45, now 35
+deejay ATK_2LK_B hit 0 on punish counter MoveDest.x was 45, now 35
+deejay ATK_2LK_C hit 0 on hit MoveDest.x was 45, now 35
+deejay ATK_2LK_C hit 0 on block MoveDest.x was 45, now 35
+deejay ATK_2LK_C hit 0 on burnout block MoveDest.x was 45, now 35
+deejay ATK_2LK_C hit 0 on counter MoveDest.x was 45, now 35
+deejay ATK_2LK_C hit 0 on punish counter MoveDest.x was 45, now 35
+deejay ATK_2LP hit 0 on hit MoveDest.x was 40, now 35
+deejay ATK_2LP hit 0 on block MoveDest.x was 40, now 35
+deejay ATK_2LP hit 0 on burnout block MoveDest.x was 40, now 35
+deejay ATK_2LP hit 0 on counter MoveDest.x was 40, now 35
+deejay ATK_2LP hit 0 on punish counter MoveDest.x was 40, now 35
+deejay ATK_2LP_B hit 0 on hit MoveDest.x was 40, now 35
+deejay ATK_2LP_B hit 0 on block MoveDest.x was 40, now 35
+deejay ATK_2LP_B hit 0 on burnout block MoveDest.x was 40, now 35
+deejay ATK_2LP_B hit 0 on counter MoveDest.x was 40, now 35
+deejay ATK_2LP_B hit 0 on punish counter MoveDest.x was 40, now 35
+deejay ATK_2LP_C hit 0 on hit MoveDest.x was 40, now 35
+deejay ATK_2LP_C hit 0 on block MoveDest.x was 40, now 35
+deejay ATK_2LP_C hit 0 on burnout block MoveDest.x was 40, now 35
+deejay ATK_2LP_C hit 0 on counter MoveDest.x was 40, now 35
+deejay ATK_2LP_C hit 0 on punish counter MoveDest.x was 40, now 35
+deejay ATK_3MK hit 1 on air hit Attr0 was 1, now 9
+deejay ATK_3MK hit 1 on air hit FloorDest.x was 0, now 10
+deejay ATK_3MK hit 1 on air hit FloorDest.y was 0, now 10
+deejay ATK_3MK hit 1 on air hit FloorTime was 0, now 18
+deejay ATK_3MK hit 1 on air hit _jimen_bound was False, now True
+deejay ATK_5LK hit 0 on hit MoveDest.x was 50, now 45
+deejay ATK_5LK hit 0 on block MoveDest.x was 50, now 45
+deejay ATK_5LK hit 0 on burnout block MoveDest.x was 50, now 45
+deejay ATK_5LK hit 0 on counter MoveDest.x was 50, now 45
+deejay ATK_5LK hit 0 on punish counter MoveDest.x was 50, now 45
+deejay ATK_5LP hit 0 on hit MoveDest.x was 38, now 33
+deejay ATK_5LP hit 0 on block MoveDest.x was 38, now 33
+deejay ATK_5LP hit 0 on burnout block MoveDest.x was 38, now 33
+deejay ATK_5LP hit 0 on counter MoveDest.x was 38, now 33
+deejay ATK_5LP hit 0 on punish counter MoveDest.x was 38, now 33
+deejay ATK_5LP_B hit 0 on hit MoveDest.x was 38, now 33
+deejay ATK_5LP_B hit 0 on block MoveDest.x was 38, now 33
+deejay ATK_5LP_B hit 0 on burnout block MoveDest.x was 38, now 33
+deejay ATK_5LP_B hit 0 on counter MoveDest.x was 38, now 33
+deejay ATK_5LP_B hit 0 on punish counter MoveDest.x was 38, now 33
+deejay ATK_5LP_C hit 0 on hit MoveDest.x was 38, now 33
+deejay ATK_5LP_C hit 0 on block MoveDest.x was 38, now 33
+deejay ATK_5LP_C hit 0 on burnout block MoveDest.x was 38, now 33
+deejay ATK_5LP_C hit 0 on counter MoveDest.x was 38, now 33
+deejay ATK_5LP_C hit 0 on punish counter MoveDest.x was 38, now 33
+deejay SPA_3_EX_DowbleRollingSobat was active from 18-32 now active from 16-30
+deejay SPA_3_EX_DowbleRollingSobat was 51 frames now 49
+lily ATK_5HK hit 0 on counter Attr0 was 0, now 1
+lily ATK_5HK hit 0 on counter DmgType was 3, now 11
+lily ATK_5HK hit 0 on counter DownTime was 3, now 10
+lily ATK_5HK hit 0 on counter HitStun was 28, now 20
+lily ATK_5HK hit 0 on counter MoveDest.x was 70, now 120
+lily ATK_5HK hit 0 on counter MoveDest.y was 0, now 55
+lily ATK_5HK hit 0 on counter MoveTime was 28, now 20
+lily ATK_5HK hit 0 on counter MoveType was 0, now 13
+lily ATK_5HK hit 0 on counter _no_zu was False, now True
+lily SPA_CondorWind_MH hit 0 on hit DmgPart was 0, now 2
+lily SPA_CondorWind_MH hit 0 on hit DmgPower was 3, now 2
+lily SPA_CondorWind_MH hit 0 on hit DmgType was 23, now 4
+lily SPA_CondorWind_MH hit 0 on hit DmgVari was -1, now 1
+lily SPA_CondorWind_MH hit 0 on hit DownTime was 1, now 8
+lily SPA_CondorWind_MH hit 0 on hit HitStun was 31, now 22
+lily SPA_CondorWind_MH hit 0 on hit MoveDest.x was 60, now 45
+lily SPA_CondorWind_MH hit 0 on hit MoveTime was 31, now 22
+lily SPA_CondorWind_MH hit 0 on hit MoveType was 3, now 74
+lily SPA_CondorWind_MH hit 0 on hit _IsStrength_H was False, now True
+lily SPA_CondorWind_MH hit 0 on hit _IsStrength_S was True, now False
+lily SPA_CondorWind_MH hit 0 on block DownTime was 1, now 8
+lily SPA_CondorWind_MH hit 0 on air hit Attr0 was 1, now 9
+lily SPA_CondorWind_MH hit 0 on air hit DownTime was 1, now 8
+lily SPA_CondorWind_MH hit 0 on air hit FloorDest.x was 0, now 30
+lily SPA_CondorWind_MH hit 0 on air hit FloorDest.y was 0, now 25
+lily SPA_CondorWind_MH hit 0 on air hit FloorTime was 0, now 17
+lily SPA_CondorWind_MH hit 0 on air hit HitStun was 18, now 3
+lily SPA_CondorWind_MH hit 0 on air hit MoveDest.x was 140, now 20
+lily SPA_CondorWind_MH hit 0 on air hit MoveDest.y was 30, now -65
+lily SPA_CondorWind_MH hit 0 on air hit MoveTime was 18, now 3
+lily SPA_CondorWind_MH hit 0 on air hit _jimen_bound was False, now True
+lily SPA_CondorWind_MH hit 0 on burnout block DownTime was 1, now 8
+lily SPA_CondorWind_MH hit 0 on counter DmgPart was 0, now 2
+lily SPA_CondorWind_MH hit 0 on counter DmgPower was 3, now 2
+lily SPA_CondorWind_MH hit 0 on counter DmgType was 23, now 4
+lily SPA_CondorWind_MH hit 0 on counter DmgVari was -1, now 1
+lily SPA_CondorWind_MH hit 0 on counter DownTime was 1, now 8
+lily SPA_CondorWind_MH hit 0 on counter HitStun was 33, now 24
+lily SPA_CondorWind_MH hit 0 on counter MoveDest.x was 60, now 45
+lily SPA_CondorWind_MH hit 0 on counter MoveTime was 33, now 24
+lily SPA_CondorWind_MH hit 0 on counter MoveType was 3, now 74
+lily SPA_CondorWind_MH hit 0 on counter _IsStrength_H was False, now True
+lily SPA_CondorWind_MH hit 0 on counter _IsStrength_S was True, now False
+lily SPA_CondorWind_MH hit 0 on punish counter DmgPart was 0, now 2
+lily SPA_CondorWind_MH hit 0 on punish counter DmgPower was 3, now 2
+lily SPA_CondorWind_MH hit 0 on punish counter DmgType was 23, now 4
+lily SPA_CondorWind_MH hit 0 on punish counter DmgVari was -1, now 1
+lily SPA_CondorWind_MH hit 0 on punish counter DownTime was 1, now 8
+lily SPA_CondorWind_MH hit 0 on punish counter HitStun was 35, now 26
+lily SPA_CondorWind_MH hit 0 on punish counter MoveDest.x was 60, now 45
+lily SPA_CondorWind_MH hit 0 on punish counter MoveTime was 35, now 26
+lily SPA_CondorWind_MH hit 0 on punish counter MoveType was 3, now 74
+lily SPA_CondorWind_MH hit 0 on punish counter _IsStrength_H was False, now True
+lily SPA_CondorWind_MH hit 0 on punish counter _IsStrength_S was True, now False
+lily SPA_CondorWind_MH(2) hit 0 on hit Attr0 was 1, now 0
+lily SPA_CondorWind_MH(2) hit 0 on hit DmgType was 11, now 23
+lily SPA_CondorWind_MH(2) hit 0 on hit DmgValue was 1100, now 900
+lily SPA_CondorWind_MH(2) hit 0 on hit HitStun was 20, now 31
+lily SPA_CondorWind_MH(2) hit 0 on hit MoveDest.x was 160, now 60
+lily SPA_CondorWind_MH(2) hit 0 on hit MoveDest.y was 40, now 0
+lily SPA_CondorWind_MH(2) hit 0 on hit MoveTime was 20, now 31
+lily SPA_CondorWind_MH(2) hit 0 on hit MoveType was 13, now 3
+lily SPA_CondorWind_MH(2) hit 0 on hit _no_zu was True, now False
+lily SPA_CondorWind_MH(2) hit 0 on air hit DmgValue was 1100, now 900
+lily SPA_CondorWind_MH(2) hit 0 on air hit HitStun was 19, now 18
+lily SPA_CondorWind_MH(2) hit 0 on air hit MoveDest.x was 160, now 140
+lily SPA_CondorWind_MH(2) hit 0 on air hit MoveTime was 19, now 18
+lily SPA_CondorWind_MH(2) hit 0 on burnout block DmgValue was 275, now 225
+lily SPA_CondorWind_MH(2) hit 0 on counter Attr0 was 1, now 0
+lily SPA_CondorWind_MH(2) hit 0 on counter DmgType was 11, now 23
+lily SPA_CondorWind_MH(2) hit 0 on counter DmgValue was 1320, now 1080
+lily SPA_CondorWind_MH(2) hit 0 on counter HitStun was 20, now 33
+lily SPA_CondorWind_MH(2) hit 0 on counter MoveDest.x was 160, now 60
+lily SPA_CondorWind_MH(2) hit 0 on counter MoveDest.y was 40, now 0
+lily SPA_CondorWind_MH(2) hit 0 on counter MoveTime was 20, now 33
+lily SPA_CondorWind_MH(2) hit 0 on counter MoveType was 13, now 3
+lily SPA_CondorWind_MH(2) hit 0 on counter _no_zu was True, now False
+lily SPA_CondorWind_MH(2) hit 0 on punish counter Attr0 was 1, now 0
+lily SPA_CondorWind_MH(2) hit 0 on punish counter DmgType was 11, now 23
+lily SPA_CondorWind_MH(2) hit 0 on punish counter DmgValue was 1320, now 1080
+lily SPA_CondorWind_MH(2) hit 0 on punish counter HitStun was 20, now 35
+lily SPA_CondorWind_MH(2) hit 0 on punish counter MoveDest.x was 160, now 60
+lily SPA_CondorWind_MH(2) hit 0 on punish counter MoveDest.y was 40, now 0
+lily SPA_CondorWind_MH(2) hit 0 on punish counter MoveTime was 20, now 35
+lily SPA_CondorWind_MH(2) hit 0 on punish counter MoveType was 13, now 3
+lily SPA_CondorWind_MH(2) hit 0 on punish counter _no_zu was True, now False
+lily SPA_CondorWind_MH(4) was 30 frames now 32
+lily SPA_CondorWind_MH(4) hit 0 on hit Attr3 was 9, now 0
+lily SPA_CondorWind_MH(4) hit 0 on hit DmgType was 15, now 11
+lily SPA_CondorWind_MH(4) hit 0 on hit DmgValue was 1200, now 1100
+lily SPA_CondorWind_MH(4) hit 0 on hit FocusOwn was 0, now 2000
+lily SPA_CondorWind_MH(4) hit 0 on hit HitStun was 29, now 20
+lily SPA_CondorWind_MH(4) hit 0 on hit JuggleLimit was 3, now 2
+lily SPA_CondorWind_MH(4) hit 0 on hit MoveDest.y was 65, now 40
+lily SPA_CondorWind_MH(4) hit 0 on hit MoveTime was 29, now 20
+lily SPA_CondorWind_MH(4) hit 0 on hit MoveType was 16, now 13
+lily SPA_CondorWind_MH(4) hit 0 on hit _back_damage was True, now False
+lily SPA_CondorWind_MH(4) hit 0 on hit _chara_forward was True, now False
+lily SPA_CondorWind_MH(4) hit 0 on block FocusOwn was 0, now 2000
+lily SPA_CondorWind_MH(4) hit 0 on block HitStun was 22, now 21
+lily SPA_CondorWind_MH(4) hit 0 on block JuggleLimit was 3, now 2
+lily SPA_CondorWind_MH(4) hit 0 on block MoveTime was 22, now 21
+lily SPA_CondorWind_MH(4) hit 0 on air hit DmgType was 15, now 11
+lily SPA_CondorWind_MH(4) hit 0 on air hit DmgValue was 1200, now 1100
+lily SPA_CondorWind_MH(4) hit 0 on air hit DmgVari was 2, now -1
+lily SPA_CondorWind_MH(4) hit 0 on air hit FocusOwn was 0, now 2000
+lily SPA_CondorWind_MH(4) hit 0 on air hit HitStun was 27, now 19
+lily SPA_CondorWind_MH(4) hit 0 on air hit JuggleLimit was 3, now 2
+lily SPA_CondorWind_MH(4) hit 0 on air hit MoveDest.y was 60, now 30
+lily SPA_CondorWind_MH(4) hit 0 on air hit MoveTime was 27, now 19
+lily SPA_CondorWind_MH(4) hit 0 on air hit MoveType was 16, now 13
+lily SPA_CondorWind_MH(4) hit 0 on burnout block DmgValue was 300, now 275
+lily SPA_CondorWind_MH(4) hit 0 on burnout block FocusOwn was 0, now 2000
+lily SPA_CondorWind_MH(4) hit 0 on burnout block HitStun was 26, now 25
+lily SPA_CondorWind_MH(4) hit 0 on burnout block JuggleLimit was 3, now 2
+lily SPA_CondorWind_MH(4) hit 0 on burnout block MoveTime was 26, now 25
+lily SPA_CondorWind_MH(4) hit 0 on counter Attr3 was 9, now 0
+lily SPA_CondorWind_MH(4) hit 0 on counter DmgType was 15, now 11
+lily SPA_CondorWind_MH(4) hit 0 on counter DmgValue was 1440, now 1320
+lily SPA_CondorWind_MH(4) hit 0 on counter FocusOwn was 0, now 2000
+lily SPA_CondorWind_MH(4) hit 0 on counter HitStun was 29, now 20
+lily SPA_CondorWind_MH(4) hit 0 on counter JuggleLimit was 3, now 2
+lily SPA_CondorWind_MH(4) hit 0 on counter MoveDest.y was 65, now 40
+lily SPA_CondorWind_MH(4) hit 0 on counter MoveTime was 29, now 20
+lily SPA_CondorWind_MH(4) hit 0 on counter MoveType was 16, now 13
+lily SPA_CondorWind_MH(4) hit 0 on counter _back_damage was True, now False
+lily SPA_CondorWind_MH(4) hit 0 on counter _chara_forward was True, now False
+lily SPA_CondorWind_MH(4) hit 0 on punish counter Attr3 was 9, now 0
+lily SPA_CondorWind_MH(4) hit 0 on punish counter DmgType was 15, now 11
+lily SPA_CondorWind_MH(4) hit 0 on punish counter DmgValue was 1440, now 1320
+lily SPA_CondorWind_MH(4) hit 0 on punish counter FocusOwn was 0, now 2000
+lily SPA_CondorWind_MH(4) hit 0 on punish counter HitStun was 29, now 20
+lily SPA_CondorWind_MH(4) hit 0 on punish counter JuggleLimit was 3, now 2
+lily SPA_CondorWind_MH(4) hit 0 on punish counter MoveDest.y was 65, now 40
+lily SPA_CondorWind_MH(4) hit 0 on punish counter MoveTime was 29, now 20
+lily SPA_CondorWind_MH(4) hit 0 on punish counter MoveType was 16, now 13
+lily SPA_CondorWind_MH(4) hit 0 on punish counter _back_damage was True, now False
+lily SPA_CondorWind_MH(4) hit 0 on punish counter _chara_forward was True, now False
+lily SPA_CondorWind_MH(4) ComboScaling was 20 , now -1
+lily SPA_CondorWind_MH(4) _StartScaling was 20 , now -1
+aki ATK_2HP hit 1 on punish counter DmgKind was 0, now 9
+aki ATK_2HP hit 1 on punish counter SndAttr was 0, now 5
+aki ATK_5HP_TC hit 0 on hit DmgType was 11, now 15
+aki ATK_5HP_TC hit 0 on hit HitStun was 23, now 35
+aki ATK_5HP_TC hit 0 on hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC hit 0 on hit MoveDest.y was 60, now 100
+aki ATK_5HP_TC hit 0 on hit MoveTime was 23, now 35
+aki ATK_5HP_TC hit 0 on hit MoveType was 13, now 16
+aki ATK_5HP_TC hit 0 on air hit DmgType was 11, now 15
+aki ATK_5HP_TC hit 0 on air hit HitStun was 23, now 32
+aki ATK_5HP_TC hit 0 on air hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC hit 0 on air hit MoveDest.y was 50, now 100
+aki ATK_5HP_TC hit 0 on air hit MoveTime was 23, now 32
+aki ATK_5HP_TC hit 0 on air hit MoveType was 13, now 16
+aki ATK_5HP_TC hit 0 on counter DmgType was 11, now 15
+aki ATK_5HP_TC hit 0 on counter HitStun was 23, now 35
+aki ATK_5HP_TC hit 0 on counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC hit 0 on counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC hit 0 on counter MoveTime was 23, now 35
+aki ATK_5HP_TC hit 0 on counter MoveType was 13, now 16
+aki ATK_5HP_TC hit 0 on punish counter DmgType was 11, now 15
+aki ATK_5HP_TC hit 0 on punish counter HitStun was 23, now 35
+aki ATK_5HP_TC hit 0 on punish counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC hit 0 on punish counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC hit 0 on punish counter MoveTime was 23, now 35
+aki ATK_5HP_TC hit 0 on punish counter MoveType was 13, now 16
+aki ATK_5HP_TC(1) hit 0 on hit DmgType was 11, now 15
+aki ATK_5HP_TC(1) hit 0 on hit HitStun was 23, now 35
+aki ATK_5HP_TC(1) hit 0 on hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC(1) hit 0 on hit MoveDest.y was 60, now 100
+aki ATK_5HP_TC(1) hit 0 on hit MoveTime was 23, now 35
+aki ATK_5HP_TC(1) hit 0 on hit MoveType was 13, now 16
+aki ATK_5HP_TC(1) hit 0 on air hit DmgType was 11, now 15
+aki ATK_5HP_TC(1) hit 0 on air hit HitStun was 23, now 32
+aki ATK_5HP_TC(1) hit 0 on air hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC(1) hit 0 on air hit MoveDest.y was 50, now 100
+aki ATK_5HP_TC(1) hit 0 on air hit MoveTime was 23, now 32
+aki ATK_5HP_TC(1) hit 0 on air hit MoveType was 13, now 16
+aki ATK_5HP_TC(1) hit 0 on counter DmgType was 11, now 15
+aki ATK_5HP_TC(1) hit 0 on counter HitStun was 23, now 35
+aki ATK_5HP_TC(1) hit 0 on counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC(1) hit 0 on counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC(1) hit 0 on counter MoveTime was 23, now 35
+aki ATK_5HP_TC(1) hit 0 on counter MoveType was 13, now 16
+aki ATK_5HP_TC(1) hit 0 on punish counter DmgType was 11, now 15
+aki ATK_5HP_TC(1) hit 0 on punish counter HitStun was 23, now 35
+aki ATK_5HP_TC(1) hit 0 on punish counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC(1) hit 0 on punish counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC(1) hit 0 on punish counter MoveTime was 23, now 35
+aki ATK_5HP_TC(1) hit 0 on punish counter MoveType was 13, now 16
+aki ATK_5HP_TC(2) hit 0 on hit DmgType was 11, now 15
+aki ATK_5HP_TC(2) hit 0 on hit HitStun was 23, now 35
+aki ATK_5HP_TC(2) hit 0 on hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC(2) hit 0 on hit MoveDest.y was 60, now 100
+aki ATK_5HP_TC(2) hit 0 on hit MoveTime was 23, now 35
+aki ATK_5HP_TC(2) hit 0 on hit MoveType was 13, now 16
+aki ATK_5HP_TC(2) hit 0 on air hit DmgType was 11, now 15
+aki ATK_5HP_TC(2) hit 0 on air hit HitStun was 23, now 32
+aki ATK_5HP_TC(2) hit 0 on air hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC(2) hit 0 on air hit MoveDest.y was 50, now 100
+aki ATK_5HP_TC(2) hit 0 on air hit MoveTime was 23, now 32
+aki ATK_5HP_TC(2) hit 0 on air hit MoveType was 13, now 16
+aki ATK_5HP_TC(2) hit 0 on counter DmgType was 11, now 15
+aki ATK_5HP_TC(2) hit 0 on counter HitStun was 23, now 35
+aki ATK_5HP_TC(2) hit 0 on counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC(2) hit 0 on counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC(2) hit 0 on counter MoveTime was 23, now 35
+aki ATK_5HP_TC(2) hit 0 on counter MoveType was 13, now 16
+aki ATK_5HP_TC(2) hit 0 on punish counter DmgType was 11, now 15
+aki ATK_5HP_TC(2) hit 0 on punish counter HitStun was 23, now 35
+aki ATK_5HP_TC(2) hit 0 on punish counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC(2) hit 0 on punish counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC(2) hit 0 on punish counter MoveTime was 23, now 35
+aki ATK_5HP_TC(2) hit 0 on punish counter MoveType was 13, now 16
+aki ATK_5HP_TC(3) hit 0 on hit DmgType was 11, now 15
+aki ATK_5HP_TC(3) hit 0 on hit HitStun was 23, now 35
+aki ATK_5HP_TC(3) hit 0 on hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC(3) hit 0 on hit MoveDest.y was 60, now 100
+aki ATK_5HP_TC(3) hit 0 on hit MoveTime was 23, now 35
+aki ATK_5HP_TC(3) hit 0 on hit MoveType was 13, now 16
+aki ATK_5HP_TC(3) hit 0 on air hit DmgType was 11, now 15
+aki ATK_5HP_TC(3) hit 0 on air hit HitStun was 23, now 32
+aki ATK_5HP_TC(3) hit 0 on air hit MoveDest.x was 150, now 130
+aki ATK_5HP_TC(3) hit 0 on air hit MoveDest.y was 50, now 100
+aki ATK_5HP_TC(3) hit 0 on air hit MoveTime was 23, now 32
+aki ATK_5HP_TC(3) hit 0 on air hit MoveType was 13, now 16
+aki ATK_5HP_TC(3) hit 0 on counter DmgType was 11, now 15
+aki ATK_5HP_TC(3) hit 0 on counter HitStun was 23, now 35
+aki ATK_5HP_TC(3) hit 0 on counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC(3) hit 0 on counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC(3) hit 0 on counter MoveTime was 23, now 35
+aki ATK_5HP_TC(3) hit 0 on counter MoveType was 13, now 16
+aki ATK_5HP_TC(3) hit 0 on punish counter DmgType was 11, now 15
+aki ATK_5HP_TC(3) hit 0 on punish counter HitStun was 23, now 35
+aki ATK_5HP_TC(3) hit 0 on punish counter MoveDest.x was 150, now 130
+aki ATK_5HP_TC(3) hit 0 on punish counter MoveDest.y was 60, now 100
+aki ATK_5HP_TC(3) hit 0 on punish counter MoveTime was 23, now 35
+aki ATK_5HP_TC(3) hit 0 on punish counter MoveType was 13, now 16
+aki ATK_6MP was active from 15-18 now active from 15-19
+aki ATK_6MP hit 1 on block HitStun was 19, now 20
+aki ATK_6MP hit 1 on block MoveTime was 19, now 20
+aki ATK_6MP hit 1 on burnout block HitStun was 23, now 24
+aki ATK_6MP hit 1 on burnout block MoveTime was 23, now 24
+aki SPA_Kyosyutotu hit 3 on hit HitStun was 21, now 22
+aki SPA_Kyosyutotu hit 3 on hit MoveTime was 21, now 22
+aki SPA_Kyosyutotu hit 3 on counter HitStun was 23, now 24
+aki SPA_Kyosyutotu hit 3 on counter MoveTime was 23, now 24
+aki SPA_Kyosyutotu hit 3 on punish counter HitStun was 25, now 26
+aki SPA_Kyosyutotu hit 3 on punish counter MoveTime was 25, now 26
+rashid ATK_2HP hit 1 on block HitStun was 18, now 20
+rashid ATK_2HP hit 1 on block MoveTime was 18, now 20
+rashid ATK_2HP hit 1 on burnout block HitStun was 22, now 24
+rashid ATK_2HP hit 1 on burnout block MoveTime was 22, now 24
+rashid ATK_2HP(1) hit 1 on block HitStun was 18, now 20
+rashid ATK_2HP(1) hit 1 on block MoveTime was 18, now 20
+rashid ATK_2HP(1) hit 1 on burnout block HitStun was 22, now 24
+rashid ATK_2HP(1) hit 1 on burnout block MoveTime was 22, now 24
+rashid ATK_3HK hit 1 on hit HitStun was 26, now 27
+rashid ATK_3HK hit 1 on hit MoveTime was 26, now 27
+rashid ATK_3HK hit 1 on counter HitStun was 28, now 29
+rashid ATK_3HK hit 1 on counter MoveTime was 28, now 29
+rashid ATK_3HK hit 1 on punish counter HitStun was 30, now 31
+rashid ATK_3HK hit 1 on punish counter MoveTime was 30, now 31
+rashid ATK_3HK(1) hit 1 on hit HitStun was 26, now 27
+rashid ATK_3HK(1) hit 1 on hit MoveTime was 26, now 27
+rashid ATK_3HK(1) hit 1 on counter HitStun was 28, now 29
+rashid ATK_3HK(1) hit 1 on counter MoveTime was 28, now 29
+rashid ATK_3HK(1) hit 1 on punish counter HitStun was 30, now 31
+rashid ATK_3HK(1) hit 1 on punish counter MoveTime was 30, now 31
+rashid SPA_ARABIAN_CYCLONE(4) PROJ hit 0 on block MoveDest.x was 55, now 20
+rashid SPA_ARABIAN_CYCLONE(4) PROJ hit 0 on burnout block MoveDest.x was 55, now 20
+blanka ATK_4MK(1) was 26 frames now 30
+blanka ATK_5MP was active from 9-12 now active from 8-11
+blanka ATK_5MP was 27 frames now 26
+blanka SPA_THUNDER_END hit 1 on hit FocusOwn was 0, now 2000
+blanka SPA_THUNDER_END hit 1 on block FocusOwn was 0, now 2000
+blanka SPA_THUNDER_END hit 1 on air hit FocusOwn was 0, now 2000
+blanka SPA_THUNDER_END hit 1 on burnout block FocusOwn was 0, now 2000
+blanka SPA_THUNDER_END hit 1 on counter FocusOwn was 0, now 2000
+blanka SPA_THUNDER_END hit 1 on punish counter FocusOwn was 0, now 2000
+blanka SPA_THUNDER_END(1) hit 1 on hit DmgKind was 10, now 3
+blanka SPA_THUNDER_END(1) hit 1 on hit HitStun was 23, now 22
+blanka SPA_THUNDER_END(1) hit 1 on hit HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_END(1) hit 1 on hit MoveTime was 23, now 22
+blanka SPA_THUNDER_END(1) hit 1 on block HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_END(1) hit 1 on air hit DmgKind was 10, now 3
+blanka SPA_THUNDER_END(1) hit 1 on air hit HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_END(1) hit 1 on burnout block HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_END(1) hit 1 on counter DmgKind was 10, now 3
+blanka SPA_THUNDER_END(1) hit 1 on counter HitStun was 23, now 22
+blanka SPA_THUNDER_END(1) hit 1 on counter HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_END(1) hit 1 on counter MoveTime was 23, now 22
+blanka SPA_THUNDER_END(1) hit 1 on punish counter DmgKind was 10, now 3
+blanka SPA_THUNDER_END(1) hit 1 on punish counter HitStun was 23, now 22
+blanka SPA_THUNDER_END(1) hit 1 on punish counter HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_END(1) hit 1 on punish counter MoveTime was 23, now 22
+blanka SPA_THUNDER_Loop(1) hit 0 on hit DmgValue was 800, now 400
+blanka SPA_THUNDER_Loop(1) hit 0 on hit DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(1) hit 0 on hit FocusOwn was 2000, now 1500
+blanka SPA_THUNDER_Loop(1) hit 0 on hit HitStopOwner was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on hit HitStopTarget was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on hit MoveDest.x was 150, now 40
+blanka SPA_THUNDER_Loop(1) hit 0 on hit SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(1) hit 0 on hit SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(1) hit 0 on block DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(1) hit 0 on block FocusOwn was 2000, now 1500
+blanka SPA_THUNDER_Loop(1) hit 0 on block FocusTgt was -2000, now -1500
+blanka SPA_THUNDER_Loop(1) hit 0 on block HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on block HitStopTarget was 14, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on block MoveDest.x was 60, now 8
+blanka SPA_THUNDER_Loop(1) hit 0 on block SuperOwn was 500, now 250
+blanka SPA_THUNDER_Loop(1) hit 0 on block SuperTgt was 250, now 125
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit DmgValue was 800, now 400
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit FocusOwn was 2000, now 1500
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit HitStopOwner was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit HitStopTarget was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit MoveDest.x was 180, now 40
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(1) hit 0 on air hit SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block DmgValue was 200, now 60
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block FocusOwn was 2000, now 1500
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block FocusTgt was 1000, now 750
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block HitStopTarget was 14, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block MoveDest.x was 60, now 8
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block SuperOwn was 500, now 250
+blanka SPA_THUNDER_Loop(1) hit 0 on burnout block SuperTgt was 250, now 125
+blanka SPA_THUNDER_Loop(1) hit 0 on counter DmgValue was 960, now 480
+blanka SPA_THUNDER_Loop(1) hit 0 on counter DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(1) hit 0 on counter FocusOwn was 2000, now 1500
+blanka SPA_THUNDER_Loop(1) hit 0 on counter HitStopOwner was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on counter HitStopTarget was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on counter MoveDest.x was 150, now 40
+blanka SPA_THUNDER_Loop(1) hit 0 on counter SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(1) hit 0 on counter SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter DmgValue was 960, now 480
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter FocusOwn was 2000, now 1500
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter HitStopOwner was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter HitStopTarget was 18, now 5
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter MoveDest.x was 150, now 40
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(1) hit 0 on punish counter SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(2) was active from 0-73 now active from 0-10
+blanka SPA_THUNDER_Loop(2) different hit count
+blanka SPA_THUNDER_Loop(2) hit 0 on hit DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(2) hit 0 on hit FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(2) hit 0 on hit HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on hit HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on hit HitStun was 25, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on hit JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on hit MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(2) hit 0 on hit MoveTime was 25, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on hit ScreenVib was -1, now 3
+blanka SPA_THUNDER_Loop(2) hit 0 on hit SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(2) hit 0 on block DmgPower was 3, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on block DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(2) hit 0 on block FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(2) hit 0 on block FocusTgt was -4000, now -1500
+blanka SPA_THUNDER_Loop(2) hit 0 on block HitStopOwner was 20, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on block HitStopTarget was 20, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on block HitStun was 20, now 14
+blanka SPA_THUNDER_Loop(2) hit 0 on block JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on block MoveDest.x was 50, now 8
+blanka SPA_THUNDER_Loop(2) hit 0 on block MoveTime was 20, now 14
+blanka SPA_THUNDER_Loop(2) hit 0 on block ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(2) hit 0 on block SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(2) hit 0 on block _IsStrength_H was False, now True
+blanka SPA_THUNDER_Loop(2) hit 0 on block _IsStrength_S was True, now False
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit HitStun was 25, now 17
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit JuggleAdd was 3, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit MoveTime was 25, now 17
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit ScreenVib was -1, now 3
+blanka SPA_THUNDER_Loop(2) hit 0 on air hit SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block DmgPower was 3, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block DmgValue was 100, now 60
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block FocusTgt was 2000, now 750
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block HitStopOwner was 20, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block HitStopTarget was 20, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block HitStun was 24, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block MoveDest.x was 50, now 8
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block MoveTime was 24, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block _IsStrength_H was False, now True
+blanka SPA_THUNDER_Loop(2) hit 0 on burnout block _IsStrength_S was True, now False
+blanka SPA_THUNDER_Loop(2) hit 0 on counter DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(2) hit 0 on counter FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(2) hit 0 on counter HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on counter HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on counter HitStun was 25, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on counter JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on counter MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(2) hit 0 on counter MoveTime was 25, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on counter ScreenVib was -1, now 3
+blanka SPA_THUNDER_Loop(2) hit 0 on counter SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter FocusTgt was -2500, now -5000
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter HitStun was 25, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter MoveTime was 25, now 18
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter ScreenVib was -1, now 3
+blanka SPA_THUNDER_Loop(2) hit 0 on punish counter SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(2) ComboScaling was -1 , now 20
+blanka SPA_THUNDER_Loop(3) was active from 1-58 now active from 0-73
+blanka SPA_THUNDER_Loop(4) was active from 0-73 now active from 1-58
+blanka SPA_THUNDER_Loop(4) hit 0 on hit DmgKind was 10, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on hit DmgValue was 900, now 400
+blanka SPA_THUNDER_Loop(4) hit 0 on hit FocusOwn was 2000, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on hit HitStopOwner was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on hit HitStopTarget was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on hit HitStun was 18, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on hit HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on hit JuggleAdd was 2, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on hit MoveDest.x was 150, now 40
+blanka SPA_THUNDER_Loop(4) hit 0 on hit MoveDest.y was 70, now 50
+blanka SPA_THUNDER_Loop(4) hit 0 on hit MoveTime was 18, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on hit ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(4) hit 0 on hit SndVoice was 602, now 601
+blanka SPA_THUNDER_Loop(4) hit 0 on hit SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(4) hit 0 on hit SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(4) hit 0 on block DmgPart was 0, now 2
+blanka SPA_THUNDER_Loop(4) hit 0 on block DmgPower was 2, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on block FocusOwn was 2000, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on block FocusTgt was -2000, now -4000
+blanka SPA_THUNDER_Loop(4) hit 0 on block HitStopOwner was 15, now 20
+blanka SPA_THUNDER_Loop(4) hit 0 on block HitStopTarget was 14, now 20
+blanka SPA_THUNDER_Loop(4) hit 0 on block HitStun was 14, now 20
+blanka SPA_THUNDER_Loop(4) hit 0 on block HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on block JuggleAdd was 2, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on block MoveDest.x was 60, now 50
+blanka SPA_THUNDER_Loop(4) hit 0 on block MoveTime was 14, now 20
+blanka SPA_THUNDER_Loop(4) hit 0 on block ScreenVib was -1, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on block SndVoice was 602, now 601
+blanka SPA_THUNDER_Loop(4) hit 0 on block SuperOwn was 500, now 250
+blanka SPA_THUNDER_Loop(4) hit 0 on block SuperTgt was 250, now 125
+blanka SPA_THUNDER_Loop(4) hit 0 on block _IsStrength_H was True, now False
+blanka SPA_THUNDER_Loop(4) hit 0 on block _IsStrength_S was False, now True
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit DmgKind was 10, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit DmgValue was 900, now 400
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit FocusOwn was 2000, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit HitStopOwner was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit HitStopTarget was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit HitStun was 17, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit JuggleAdd was 2, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit MoveDest.x was 180, now 40
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit MoveDest.y was 70, now 50
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit MoveTime was 17, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit SndVoice was 602, now 601
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(4) hit 0 on air hit SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block DmgPart was 0, now 2
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block DmgPower was 2, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block DmgValue was 225, now 100
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block FocusOwn was 2000, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block FocusTgt was 1000, now 2000
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block HitStopOwner was 15, now 20
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block HitStopTarget was 14, now 20
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block HitStun was 18, now 24
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block JuggleAdd was 2, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block MoveDest.x was 60, now 50
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block MoveTime was 18, now 24
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block ScreenVib was -1, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block SndVoice was 602, now 601
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block SuperOwn was 500, now 250
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block SuperTgt was 250, now 125
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block _IsStrength_H was True, now False
+blanka SPA_THUNDER_Loop(4) hit 0 on burnout block _IsStrength_S was False, now True
+blanka SPA_THUNDER_Loop(4) hit 0 on counter DmgKind was 10, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on counter DmgValue was 1080, now 480
+blanka SPA_THUNDER_Loop(4) hit 0 on counter FocusOwn was 2000, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on counter HitStopOwner was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on counter HitStopTarget was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on counter HitStun was 18, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on counter HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on counter JuggleAdd was 2, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on counter MoveDest.x was 150, now 40
+blanka SPA_THUNDER_Loop(4) hit 0 on counter MoveDest.y was 70, now 50
+blanka SPA_THUNDER_Loop(4) hit 0 on counter MoveTime was 18, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on counter ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(4) hit 0 on counter SndVoice was 602, now 601
+blanka SPA_THUNDER_Loop(4) hit 0 on counter SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(4) hit 0 on counter SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter DmgKind was 10, now 3
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter DmgValue was 1080, now 480
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter FocusOwn was 2000, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter FocusTgt was -5000, now -2500
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter HitStopOwner was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter HitStopTarget was 18, now 15
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter HitStun was 18, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter JuggleAdd was 2, now 0
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter MoveDest.x was 150, now 40
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter MoveDest.y was 70, now 50
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter MoveTime was 18, now 25
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter SndVoice was 602, now 601
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter SuperOwn was 1000, now 500
+blanka SPA_THUNDER_Loop(4) hit 0 on punish counter SuperTgt was 700, now 350
+blanka SPA_THUNDER_Loop(5) was active from 1-58 now active from 0-73
+blanka SPA_THUNDER_Loop(6) was active from 0-73 now active from 1-58
+blanka SPA_THUNDER_Loop(7) was active from 1-58 now active from 0-10
+blanka SPA_THUNDER_Loop(7) different hit count
+blanka SPA_THUNDER_Loop(7) hit 0 on hit DmgValue was 500, now 400
+blanka SPA_THUNDER_Loop(7) hit 0 on hit DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(7) hit 0 on hit FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(7) hit 0 on hit HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on hit HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on hit HitStun was 25, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on hit HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(7) hit 0 on hit JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on hit MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(7) hit 0 on hit MoveTime was 25, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on hit ScreenVib was 7, now 3
+blanka SPA_THUNDER_Loop(7) hit 0 on hit SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(7) hit 0 on block DmgPower was 3, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on block DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(7) hit 0 on block FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(7) hit 0 on block FocusTgt was -4000, now -1500
+blanka SPA_THUNDER_Loop(7) hit 0 on block HitStopOwner was 20, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on block HitStopTarget was 20, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on block HitStun was 20, now 14
+blanka SPA_THUNDER_Loop(7) hit 0 on block HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(7) hit 0 on block JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on block MoveDest.x was 50, now 8
+blanka SPA_THUNDER_Loop(7) hit 0 on block MoveTime was 20, now 14
+blanka SPA_THUNDER_Loop(7) hit 0 on block ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(7) hit 0 on block SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(7) hit 0 on block _IsStrength_H was False, now True
+blanka SPA_THUNDER_Loop(7) hit 0 on block _IsStrength_S was True, now False
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit DmgValue was 500, now 400
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit HitStun was 25, now 17
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit JuggleAdd was 3, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit MoveTime was 25, now 17
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit ScreenVib was 7, now 3
+blanka SPA_THUNDER_Loop(7) hit 0 on air hit SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block DmgPower was 3, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block DmgValue was 125, now 60
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block FocusTgt was 2000, now 750
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block HitStopOwner was 20, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block HitStopTarget was 20, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block HitStun was 24, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block MoveDest.x was 50, now 8
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block MoveTime was 24, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block ScreenVib was 3, now -1
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block _IsStrength_H was False, now True
+blanka SPA_THUNDER_Loop(7) hit 0 on burnout block _IsStrength_S was True, now False
+blanka SPA_THUNDER_Loop(7) hit 0 on counter DmgValue was 600, now 480
+blanka SPA_THUNDER_Loop(7) hit 0 on counter DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(7) hit 0 on counter FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(7) hit 0 on counter HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on counter HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on counter HitStun was 25, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on counter HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(7) hit 0 on counter JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on counter MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(7) hit 0 on counter MoveTime was 25, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on counter ScreenVib was 7, now 3
+blanka SPA_THUNDER_Loop(7) hit 0 on counter SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter DmgValue was 600, now 480
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter DriveNorm was 65535, now 2000
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter FocusOwn was 0, now 1500
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter FocusTgt was -2500, now -5000
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter HitStopOwner was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter HitStopTarget was 15, now 5
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter HitStun was 25, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter HitmarkStrength was 3, now 0
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter JuggleAdd was 0, now 2
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter MoveDest.y was 50, now 70
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter MoveTime was 25, now 18
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter ScreenVib was 7, now 3
+blanka SPA_THUNDER_Loop(7) hit 0 on punish counter SndVoice was 601, now 602
+blanka SPA_THUNDER_Loop(7) ComboScaling was -1 , now 20
+juri ATK_2LK hit 0 on hit MoveDest.x was 30, now 27
+juri ATK_2LK hit 0 on block MoveDest.x was 30, now 27
+juri ATK_2LK hit 0 on burnout block MoveDest.x was 30, now 27
+juri ATK_2LK hit 0 on counter MoveDest.x was 30, now 27
+juri ATK_2LK hit 0 on punish counter MoveDest.x was 30, now 27
+juri ATK_2LK(1) hit 0 on hit MoveDest.x was 30, now 27
+juri ATK_2LK(1) hit 0 on block MoveDest.x was 30, now 27
+juri ATK_2LK(1) hit 0 on burnout block MoveDest.x was 30, now 27
+juri ATK_2LK(1) hit 0 on counter MoveDest.x was 30, now 27
+juri ATK_2LK(1) hit 0 on punish counter MoveDest.x was 30, now 27
+juri ATK_2LK(2) hit 0 on hit MoveDest.x was 30, now 27
+juri ATK_2LK(2) hit 0 on block MoveDest.x was 30, now 27
+juri ATK_2LK(2) hit 0 on burnout block MoveDest.x was 30, now 27
+juri ATK_2LK(2) hit 0 on counter MoveDest.x was 30, now 27
+juri ATK_2LK(2) hit 0 on punish counter MoveDest.x was 30, now 27
+juri ATK_2LK(3) hit 0 on hit MoveDest.x was 30, now 27
+juri ATK_2LK(3) hit 0 on block MoveDest.x was 30, now 27
+juri ATK_2LK(3) hit 0 on burnout block MoveDest.x was 30, now 27
+juri ATK_2LK(3) hit 0 on counter MoveDest.x was 30, now 27
+juri ATK_2LK(3) hit 0 on punish counter MoveDest.x was 30, now 27
+juri ATK_2LK(4) hit 0 on hit MoveDest.x was 30, now 27
+juri ATK_2LK(4) hit 0 on block MoveDest.x was 30, now 27
+juri ATK_2LK(4) hit 0 on burnout block MoveDest.x was 30, now 27
+juri ATK_2LK(4) hit 0 on counter MoveDest.x was 30, now 27
+juri ATK_2LK(4) hit 0 on punish counter MoveDest.x was 30, now 27
+juri ATK_2LK(5) hit 0 on hit MoveDest.x was 30, now 27
+juri ATK_2LK(5) hit 0 on block MoveDest.x was 30, now 27
+juri ATK_2LK(5) hit 0 on burnout block MoveDest.x was 30, now 27
+juri ATK_2LK(5) hit 0 on counter MoveDest.x was 30, now 27
+juri ATK_2LK(5) hit 0 on punish counter MoveDest.x was 30, now 27
+juri ATK_2LP hit 0 on hit MoveDest.x was 30, now 25
+juri ATK_2LP hit 0 on block MoveDest.x was 30, now 25
+juri ATK_2LP hit 0 on burnout block MoveDest.x was 30, now 25
+juri ATK_2LP hit 0 on counter MoveDest.x was 30, now 25
+juri ATK_2LP hit 0 on punish counter MoveDest.x was 30, now 25
+juri ATK_2LP(1) hit 0 on hit MoveDest.x was 30, now 25
+juri ATK_2LP(1) hit 0 on block MoveDest.x was 30, now 25
+juri ATK_2LP(1) hit 0 on burnout block MoveDest.x was 30, now 25
+juri ATK_2LP(1) hit 0 on counter MoveDest.x was 30, now 25
+juri ATK_2LP(1) hit 0 on punish counter MoveDest.x was 30, now 25
+juri ATK_2LP(2) hit 0 on hit MoveDest.x was 30, now 25
+juri ATK_2LP(2) hit 0 on block MoveDest.x was 30, now 25
+juri ATK_2LP(2) hit 0 on burnout block MoveDest.x was 30, now 25
+juri ATK_2LP(2) hit 0 on counter MoveDest.x was 30, now 25
+juri ATK_2LP(2) hit 0 on punish counter MoveDest.x was 30, now 25
+juri ATK_2LP(3) hit 0 on hit MoveDest.x was 30, now 25
+juri ATK_2LP(3) hit 0 on block MoveDest.x was 30, now 25
+juri ATK_2LP(3) hit 0 on burnout block MoveDest.x was 30, now 25
+juri ATK_2LP(3) hit 0 on counter MoveDest.x was 30, now 25
+juri ATK_2LP(3) hit 0 on punish counter MoveDest.x was 30, now 25
+juri ATK_2LP(4) hit 0 on hit MoveDest.x was 30, now 25
+juri ATK_2LP(4) hit 0 on block MoveDest.x was 30, now 25
+juri ATK_2LP(4) hit 0 on burnout block MoveDest.x was 30, now 25
+juri ATK_2LP(4) hit 0 on counter MoveDest.x was 30, now 25
+juri ATK_2LP(4) hit 0 on punish counter MoveDest.x was 30, now 25
+juri ATK_2LP(5) hit 0 on hit MoveDest.x was 30, now 25
+juri ATK_2LP(5) hit 0 on block MoveDest.x was 30, now 25
+juri ATK_2LP(5) hit 0 on burnout block MoveDest.x was 30, now 25
+juri ATK_2LP(5) hit 0 on counter MoveDest.x was 30, now 25
+juri ATK_2LP(5) hit 0 on punish counter MoveDest.x was 30, now 25
+juri ATK_4HK hit 1 on hit HitStun was 24, now 25
+juri ATK_4HK hit 1 on hit MoveTime was 24, now 25
+juri ATK_4HK hit 1 on counter HitStun was 26, now 27
+juri ATK_4HK hit 1 on counter MoveTime was 26, now 27
+juri ATK_4HK hit 1 on punish counter HitStun was 28, now 29
+juri ATK_4HK hit 1 on punish counter MoveTime was 28, now 29
+juri ATK_4HK(2) hit 1 on hit HitStun was 24, now 25
+juri ATK_4HK(2) hit 1 on hit MoveTime was 24, now 25
+juri ATK_4HK(2) hit 1 on counter HitStun was 26, now 27
+juri ATK_4HK(2) hit 1 on counter MoveTime was 26, now 27
+juri ATK_4HK(2) hit 1 on punish counter HitStun was 28, now 29
+juri ATK_4HK(2) hit 1 on punish counter MoveTime was 28, now 29
+juri ATK_5HK hit 0 on punish counter DmgType was 11, now 15
+juri ATK_5HK hit 0 on punish counter HitStun was 28, now 35
+juri ATK_5HK hit 0 on punish counter MoveTime was 28, now 35
+juri ATK_5HK hit 0 on punish counter MoveType was 13, now 16
+juri ATK_5HK(2) hit 0 on punish counter DmgType was 11, now 15
+juri ATK_5HK(2) hit 0 on punish counter HitStun was 28, now 35
+juri ATK_5HK(2) hit 0 on punish counter MoveTime was 28, now 35
+juri ATK_5HK(2) hit 0 on punish counter MoveType was 13, now 16
+juri ATK_5MK hit 1 on hit DmgValue was 300, now 700
+juri ATK_5MK hit 1 on hit DriveNorm was 5000, now 65535
+juri ATK_5MK hit 1 on hit FocusOwn was 1000, now 2000
+juri ATK_5MK hit 1 on hit SuperOwn was 700, now 1050
+juri ATK_5MK hit 1 on hit SuperTgt was 490, now 735
+juri ATK_5MK hit 1 on block FocusOwn was 1000, now 2000
+juri ATK_5MK hit 1 on block FocusTgt was -2000, now -4000
+juri ATK_5MK hit 1 on block SuperOwn was 350, now 525
+juri ATK_5MK hit 1 on block SuperTgt was 175, now 262
+juri ATK_5MK hit 1 on air hit DmgValue was 300, now 700
+juri ATK_5MK hit 1 on air hit DriveNorm was 5000, now 65535
+juri ATK_5MK hit 1 on air hit FocusOwn was 1000, now 2000
+juri ATK_5MK hit 1 on air hit SuperOwn was 700, now 1050
+juri ATK_5MK hit 1 on air hit SuperTgt was 490, now 735
+juri ATK_5MK hit 1 on burnout block FocusOwn was 1000, now 2000
+juri ATK_5MK hit 1 on burnout block FocusTgt was 1000, now 2000
+juri ATK_5MK hit 1 on burnout block SuperOwn was 350, now 525
+juri ATK_5MK hit 1 on burnout block SuperTgt was 175, now 262
+juri ATK_5MK hit 1 on counter DmgValue was 360, now 840
+juri ATK_5MK hit 1 on counter DriveNorm was 5000, now 65535
+juri ATK_5MK hit 1 on counter FocusOwn was 1000, now 2000
+juri ATK_5MK hit 1 on counter SuperOwn was 700, now 1050
+juri ATK_5MK hit 1 on counter SuperTgt was 490, now 735
+juri ATK_5MK hit 1 on punish counter DmgValue was 360, now 840
+juri ATK_5MK hit 1 on punish counter DriveNorm was 5000, now 65535
+juri ATK_5MK hit 1 on punish counter FocusOwn was 1000, now 2000
+juri ATK_5MK hit 1 on punish counter FocusTgt was -3000, now -6000
+juri ATK_5MK hit 1 on punish counter SuperOwn was 700, now 1050
+juri ATK_5MK hit 1 on punish counter SuperTgt was 490, now 735
+juri ATK_5MK(1) hit 1 on hit DmgValue was 200, now 500
+juri ATK_5MK(1) hit 1 on hit DriveNorm was 5000, now 65535
+juri ATK_5MK(1) hit 1 on hit FocusOwn was 250, now 500
+juri ATK_5MK(1) hit 1 on block FocusOwn was 250, now 500
+juri ATK_5MK(1) hit 1 on block FocusTgt was -500, now -1000
+juri ATK_5MK(1) hit 1 on air hit DmgValue was 200, now 500
+juri ATK_5MK(1) hit 1 on air hit DriveNorm was 5000, now 65535
+juri ATK_5MK(1) hit 1 on air hit FocusOwn was 250, now 500
+juri ATK_5MK(1) hit 1 on burnout block FocusOwn was 250, now 500
+juri ATK_5MK(1) hit 1 on burnout block FocusTgt was 250, now 500
+juri ATK_5MK(1) hit 1 on counter DmgValue was 240, now 600
+juri ATK_5MK(1) hit 1 on counter DriveNorm was 5000, now 65535
+juri ATK_5MK(1) hit 1 on counter FocusOwn was 250, now 500
+juri ATK_5MK(1) hit 1 on punish counter DmgValue was 240, now 600
+juri ATK_5MK(1) hit 1 on punish counter DriveNorm was 5000, now 65535
+juri ATK_5MK(1) hit 1 on punish counter FocusOwn was 250, now 500
+juri ATK_5MK(1) hit 1 on punish counter FocusTgt was -750, now -1500
+juri ATK_5MK(2) hit 1 on hit DmgValue was 300, now 700
+juri ATK_5MK(2) hit 1 on hit DriveNorm was 5000, now 65535
+juri ATK_5MK(2) hit 1 on hit FocusOwn was 1000, now 2000
+juri ATK_5MK(2) hit 1 on hit SuperOwn was 700, now 1050
+juri ATK_5MK(2) hit 1 on hit SuperTgt was 490, now 735
+juri ATK_5MK(2) hit 1 on block FocusOwn was 1000, now 2000
+juri ATK_5MK(2) hit 1 on block FocusTgt was -2000, now -4000
+juri ATK_5MK(2) hit 1 on block SuperOwn was 350, now 525
+juri ATK_5MK(2) hit 1 on block SuperTgt was 175, now 262
+juri ATK_5MK(2) hit 1 on air hit DmgValue was 300, now 700
+juri ATK_5MK(2) hit 1 on air hit DriveNorm was 5000, now 65535
+juri ATK_5MK(2) hit 1 on air hit FocusOwn was 1000, now 2000
+juri ATK_5MK(2) hit 1 on air hit SuperOwn was 700, now 1050
+juri ATK_5MK(2) hit 1 on air hit SuperTgt was 490, now 735
+juri ATK_5MK(2) hit 1 on burnout block FocusOwn was 1000, now 2000
+juri ATK_5MK(2) hit 1 on burnout block FocusTgt was 1000, now 2000
+juri ATK_5MK(2) hit 1 on burnout block SuperOwn was 350, now 525
+juri ATK_5MK(2) hit 1 on burnout block SuperTgt was 175, now 262
+juri ATK_5MK(2) hit 1 on counter DmgValue was 360, now 840
+juri ATK_5MK(2) hit 1 on counter DriveNorm was 5000, now 65535
+juri ATK_5MK(2) hit 1 on counter FocusOwn was 1000, now 2000
+juri ATK_5MK(2) hit 1 on counter SuperOwn was 700, now 1050
+juri ATK_5MK(2) hit 1 on counter SuperTgt was 490, now 735
+juri ATK_5MK(2) hit 1 on punish counter DmgValue was 360, now 840
+juri ATK_5MK(2) hit 1 on punish counter DriveNorm was 5000, now 65535
+juri ATK_5MK(2) hit 1 on punish counter FocusOwn was 1000, now 2000
+juri ATK_5MK(2) hit 1 on punish counter FocusTgt was -3000, now -6000
+juri ATK_5MK(2) hit 1 on punish counter SuperOwn was 700, now 1050
+juri ATK_5MK(2) hit 1 on punish counter SuperTgt was 490, now 735
+marisa ATK_5HP(1) hit 0 on block HitStun was 27, now 28
+marisa ATK_5HP(1) hit 0 on block MoveTime was 27, now 28
+marisa ATK_5HP(1) hit 0 on burnout block HitStun was 31, now 32
+marisa ATK_5HP(1) hit 0 on burnout block MoveTime was 31, now 32
+marisa ATK_5HP(2) hit 0 on block HitStun was 27, now 28
+marisa ATK_5HP(2) hit 0 on block MoveTime was 27, now 28
+marisa ATK_5HP(2) hit 0 on burnout block HitStun was 31, now 32
+marisa ATK_5HP(2) hit 0 on burnout block MoveTime was 31, now 32
+marisa ATK_5MP hit 1 on air hit DmgType was 10, now 11
+marisa ATK_5MP hit 1 on air hit HitStun was 22, now 16
+marisa ATK_5MP hit 1 on air hit MoveDest.y was 50, now 40
+marisa ATK_5MP hit 1 on air hit MoveTime was 22, now 16
+marisa ATK_5MP hit 1 on air hit MoveType was 12, now 13
+marisa ATK_5MP(1) hit 1 on air hit DmgType was 10, now 11
+marisa ATK_5MP(1) hit 1 on air hit HitStun was 22, now 16
+marisa ATK_5MP(1) hit 1 on air hit MoveDest.y was 50, now 40
+marisa ATK_5MP(1) hit 1 on air hit MoveTime was 22, now 16
+marisa ATK_5MP(1) hit 1 on air hit MoveType was 12, now 13
+marisa ATK_6HK was 38 frames now 37
+marisa ATK_6HK hit 0 on hit HitStun was 25, now 28
+marisa ATK_6HK hit 0 on hit MoveDest.x was 70, now 40
+marisa ATK_6HK hit 0 on hit MoveTime was 25, now 28
+marisa ATK_6HK hit 0 on counter HitStun was 27, now 30
+marisa ATK_6HK hit 0 on counter MoveDest.x was 70, now 40
+marisa ATK_6HK hit 0 on counter MoveTime was 27, now 30
+marisa ATK_6HK hit 0 on punish counter HitStun was 29, now 32
+marisa ATK_6HK hit 0 on punish counter MoveDest.x was 70, now 40
+marisa ATK_6HK hit 0 on punish counter MoveTime was 29, now 32
+marisa ATK_6MP hit 1 on punish counter DmgPart was 2, now 0
+marisa ATK_6MP hit 1 on punish counter DmgVari was 2, now 0
+marisa ATK_6MP hit 1 on punish counter MoveType was 0, now 7
+marisa SPA_Phalanx hit 0 on air hit MoveDest.x was 155, now 130
+marisa SPA_Phalanx(1) hit 0 on air hit MoveDest.x was 155, now 130
+marisa SPA_Phalanx(2) hit 0 on air hit MoveDest.x was 155, now 130
+marisa SPA_Quadriga(1) hit 0 on block HitStun was 22, now 23
+marisa SPA_Quadriga(1) hit 0 on block MoveTime was 22, now 23
+marisa SPA_Quadriga(1) hit 0 on burnout block HitStun was 26, now 27
+marisa SPA_Quadriga(1) hit 0 on burnout block MoveDest.x was 98, now 100
+marisa SPA_Quadriga(1) hit 0 on burnout block MoveTime was 26, now 27
+marisa SPA_Quadriga(2) hit 0 on hit ScreenVib was 28, now 27
+marisa SPA_Quadriga(2) hit 0 on block HitStun was 22, now 26
+marisa SPA_Quadriga(2) hit 0 on block MoveTime was 22, now 26
+marisa SPA_Quadriga(2) hit 0 on block ScreenVib was 2, now 27
+marisa SPA_Quadriga(2) hit 0 on air hit ScreenVib was 28, now 27
+marisa SPA_Quadriga(2) hit 0 on burnout block HitStun was 26, now 30
+marisa SPA_Quadriga(2) hit 0 on burnout block MoveTime was 26, now 30
+marisa SPA_Quadriga(2) hit 0 on burnout block ScreenVib was 2, now 27
+marisa SPA_Quadriga(2) hit 0 on counter ScreenVib was 28, now 27
+marisa SPA_Quadriga(2) hit 0 on punish counter ScreenVib was 28, now 27
+marisa SPA_Scutum_P_B was active from 14-17 now active from 13-17
+marisa SPA_Scutum_P_B was 53 frames now 52
+guile ATK_5HK was active from 12-15 now active from 11-14
+guile ATK_5HK was 36 frames now 35
+guile ATK_6MP hit 1 on counter FloorTime was 29, now 28
+guile ATK_6MP hit 1 on punish counter FloorTime was 29, now 28
+guile SAA_SonicHurricane_P PROJ hit 0 on hit Juggle1st was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on hit JuggleAdd was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on hit JuggleLimit was 99, now 100
+guile SAA_SonicHurricane_P PROJ hit 0 on block Juggle1st was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on block JuggleAdd was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on block JuggleLimit was 99, now 100
+guile SAA_SonicHurricane_P PROJ hit 0 on air hit Juggle1st was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on air hit JuggleAdd was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on air hit JuggleLimit was 99, now 100
+guile SAA_SonicHurricane_P PROJ hit 0 on burnout block Juggle1st was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on burnout block JuggleAdd was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on burnout block JuggleLimit was 99, now 100
+guile SAA_SonicHurricane_P PROJ hit 0 on counter Juggle1st was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on counter JuggleAdd was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on counter JuggleLimit was 99, now 100
+guile SAA_SonicHurricane_P PROJ hit 0 on punish counter Juggle1st was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on punish counter JuggleAdd was 1, now 0
+guile SAA_SonicHurricane_P PROJ hit 0 on punish counter JuggleLimit was 99, now 100
+guile SPA_SOMERSAULT_Start hit 0 on hit DmgValue was 800, now 1000
+guile SPA_SOMERSAULT_Start hit 0 on air hit DmgValue was 800, now 1000
+guile SPA_SOMERSAULT_Start hit 0 on burnout block DmgValue was 200, now 250
+guile SPA_SOMERSAULT_Start hit 0 on counter DmgValue was 960, now 1200
+guile SPA_SOMERSAULT_Start hit 0 on punish counter DmgValue was 960, now 1200
+guile SPA_SOMERSAULT_Start(1) hit 0 on hit DmgValue was 1000, now 1200
+guile SPA_SOMERSAULT_Start(1) hit 0 on air hit DmgValue was 1000, now 1200
+guile SPA_SOMERSAULT_Start(1) hit 0 on burnout block DmgValue was 250, now 300
+guile SPA_SOMERSAULT_Start(1) hit 0 on counter DmgValue was 1200, now 1440
+guile SPA_SOMERSAULT_Start(1) hit 0 on punish counter DmgValue was 1200, now 1440
+guile SPA_Sonicblade(3) PROJ hit 0 on block HitStun was 13, now 18
+guile SPA_Sonicblade(3) PROJ hit 0 on block MoveTime was 13, now 18
+guile SPA_Sonicblade(3) PROJ hit 0 on burnout block HitStun was 17, now 22
+guile SPA_Sonicblade(3) PROJ hit 0 on burnout block MoveTime was 17, now 22
+guile SPA_Sonicblade(4) PROJ hit 0 on block HitStun was 13, now 18
+guile SPA_Sonicblade(4) PROJ hit 0 on block MoveTime was 13, now 18
+guile SPA_Sonicblade(4) PROJ hit 0 on burnout block HitStun was 17, now 22
+guile SPA_Sonicblade(4) PROJ hit 0 on burnout block MoveTime was 17, now 22
+guile SPA_Sonicblade(5) PROJ hit 0 on block HitStun was 13, now 18
+guile SPA_Sonicblade(5) PROJ hit 0 on block MoveTime was 13, now 18
+guile SPA_Sonicblade(5) PROJ hit 0 on burnout block HitStun was 17, now 22
+guile SPA_Sonicblade(5) PROJ hit 0 on burnout block MoveTime was 17, now 22
+guile _1204 PROJ hit 0 on hit JuggleAdd was 99, now 101
+guile _1204 PROJ hit 0 on hit JuggleLimit was 99, now 100
+guile _1204 PROJ hit 0 on block JuggleAdd was 99, now 101
+guile _1204 PROJ hit 0 on block JuggleLimit was 99, now 100
+guile _1204 PROJ hit 0 on air hit JuggleAdd was 99, now 101
+guile _1204 PROJ hit 0 on air hit JuggleLimit was 99, now 100
+guile _1204 PROJ hit 0 on burnout block JuggleAdd was 99, now 101
+guile _1204 PROJ hit 0 on burnout block JuggleLimit was 99, now 100
+guile _1204 PROJ hit 0 on counter JuggleAdd was 99, now 101
+guile _1204 PROJ hit 0 on counter JuggleLimit was 99, now 100
+guile _1204 PROJ hit 0 on punish counter JuggleAdd was 99, now 101
+guile _1204 PROJ hit 0 on punish counter JuggleLimit was 99, now 100
+guile _933 PROJ hit 0 on block HitStun was 13, now 18
+guile _933 PROJ hit 0 on block MoveTime was 13, now 18
+guile _933 PROJ hit 0 on burnout block HitStun was 17, now 22
+guile _933 PROJ hit 0 on burnout block MoveTime was 17, now 22
+guile _934 PROJ hit 0 on block HitStun was 13, now 18
+guile _934 PROJ hit 0 on block MoveTime was 13, now 18
+guile _934 PROJ hit 0 on burnout block HitStun was 17, now 22
+guile _934 PROJ hit 0 on burnout block MoveTime was 17, now 22
+guile _935 PROJ hit 0 on block HitStun was 13, now 18
+guile _935 PROJ hit 0 on block MoveTime was 13, now 18
+guile _935 PROJ hit 0 on burnout block HitStun was 17, now 22
+guile _935 PROJ hit 0 on burnout block MoveTime was 17, now 22
+ed ATK_5LK_TC_2 hit 0 on hit MoveDest.x was 20, now 15
+ed ATK_5LK_TC_2 hit 0 on counter MoveDest.x was 20, now 15
+ed ATK_5LK_TC_2 hit 0 on punish counter MoveDest.x was 20, now 15
+ed NGA_4 was 119 frames now 126
+ed NGA_4(1) was 119 frames now 126
+ed SPA_PsychoCombination_EX _StartScaling was -1 , now 30
+ed SPA_PsychoCombination_EX_Guard _StartScaling was -1 , now 30
+ed SPA_PsychoCombination_L _StartScaling was -1 , now 30
+ed SP_01_PsychoAnchor hit 0 on block MoveDest.x was -200, now -100
+ed SP_01_PsychoAnchor hit 0 on burnout block MoveDest.x was -200, now -100
+ed SP_01_PsychoAnchor_Air hit 0 on block MoveDest.x was -200, now -100
+ed SP_01_PsychoAnchor_Air hit 0 on burnout block MoveDest.x was -200, now -100
+ed SP_01_PsychoAnchor_Guard hit 0 on block MoveDest.x was -200, now -100
+ed SP_01_PsychoAnchor_Guard hit 0 on burnout block MoveDest.x was -200, now -100
+honda ATK_5HK hit 0 on block HitStun was 18, now 20
+honda ATK_5HK hit 0 on block MoveTime was 18, now 20
+honda ATK_5HK hit 0 on burnout block HitStun was 22, now 24
+honda ATK_5HK hit 0 on burnout block MoveTime was 22, now 24
+honda ATK_5MP_Y2(1) was 28 frames now 30
+honda ATK_6HK hit 1 on punish counter BoundDest was 0, now 80
+honda ATK_6HK hit 1 on punish counter DmgType was 11, now 9
+honda ATK_6HK hit 1 on punish counter DownTime was 15, now 9
+honda ATK_6HK hit 1 on punish counter MoveType was 13, now 19
+honda SPA_SUMOSTEP was 51 frames now 44
+honda SPA_SUMOSTEP_5TC was 49 frames now 44
+honda SPA_SUMOSTEP_5TC hit 0 on hit FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on hit DmgType was 11, now 3
+honda SPA_SUMOSTEP_5TC hit 1 on hit FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on hit HitStun was 21, now 23
+honda SPA_SUMOSTEP_5TC hit 1 on hit MoveDest.x was 120, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on hit MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on hit MoveTime was 21, now 23
+honda SPA_SUMOSTEP_5TC hit 1 on hit MoveType was 13, now 0
+honda SPA_SUMOSTEP_5TC hit 0 on block FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 0 on block MoveDest.x was 70, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on block FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on block HitStun was 22, now 23
+honda SPA_SUMOSTEP_5TC hit 1 on block MoveDest.x was 70, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on block MoveTime was 22, now 23
+honda SPA_SUMOSTEP_5TC hit 0 on air hit FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on air hit FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on air hit MoveDest.x was 120, now 130
+honda SPA_SUMOSTEP_5TC hit 1 on air hit MoveDest.y was 40, now 50
+honda SPA_SUMOSTEP_5TC hit 0 on burnout block FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 0 on burnout block MoveDest.x was 70, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on burnout block FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on burnout block HitStun was 26, now 27
+honda SPA_SUMOSTEP_5TC hit 1 on burnout block MoveDest.x was 70, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on burnout block MoveTime was 26, now 27
+honda SPA_SUMOSTEP_5TC hit 0 on counter FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on counter DmgType was 11, now 3
+honda SPA_SUMOSTEP_5TC hit 1 on counter FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on counter HitStun was 21, now 25
+honda SPA_SUMOSTEP_5TC hit 1 on counter MoveDest.x was 120, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on counter MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on counter MoveTime was 21, now 25
+honda SPA_SUMOSTEP_5TC hit 1 on counter MoveType was 13, now 0
+honda SPA_SUMOSTEP_5TC hit 0 on punish counter FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter DmgType was 11, now 3
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter FocusOwn was 2000, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter HitStun was 21, now 27
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter MoveDest.x was 120, now 40
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter MoveDest.y was 50, now 0
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter MoveTime was 21, now 27
+honda SPA_SUMOSTEP_5TC hit 1 on punish counter MoveType was 13, now 0
+jamie ATK_4HP_HP_HK hit 0 on hit Attr0 was 1, now 257
+jamie ATK_4HP_HP_HK hit 0 on hit MoveDest.x was 185, now 250
+jamie ATK_4HP_HP_HK hit 0 on hit WallStop was 0, now 35
+jamie ATK_4HP_HP_HK hit 0 on hit _kabe_tataki was False, now True
+jamie ATK_4HP_HP_HK hit 0 on block Attr0 was 1, now 257
+jamie ATK_4HP_HP_HK hit 0 on block WallStop was 0, now 35
+jamie ATK_4HP_HP_HK hit 0 on block _kabe_tataki was False, now True
+jamie ATK_4HP_HP_HK hit 0 on air hit Attr0 was 1, now 257
+jamie ATK_4HP_HP_HK hit 0 on air hit MoveDest.x was 180, now 250
+jamie ATK_4HP_HP_HK hit 0 on air hit WallStop was 0, now 35
+jamie ATK_4HP_HP_HK hit 0 on air hit _kabe_tataki was False, now True
+jamie ATK_4HP_HP_HK hit 0 on burnout block Attr0 was 1, now 257
+jamie ATK_4HP_HP_HK hit 0 on burnout block WallStop was 0, now 35
+jamie ATK_4HP_HP_HK hit 0 on burnout block _kabe_tataki was False, now True
+jamie ATK_4HP_HP_HK hit 0 on counter Attr0 was 1, now 257
+jamie ATK_4HP_HP_HK hit 0 on counter MoveDest.x was 185, now 250
+jamie ATK_4HP_HP_HK hit 0 on counter WallStop was 0, now 35
+jamie ATK_4HP_HP_HK hit 0 on counter _kabe_tataki was False, now True
+jamie ATK_4HP_HP_HK hit 0 on punish counter Attr0 was 1, now 257
+jamie ATK_4HP_HP_HK hit 0 on punish counter MoveDest.x was 185, now 250
+jamie ATK_4HP_HP_HK hit 0 on punish counter WallStop was 0, now 35
+jamie ATK_4HP_HP_HK hit 0 on punish counter _kabe_tataki was False, now True
+jamie ATK_5HK hit 0 on hit MoveDest.x was 65, now 55
+jamie ATK_5HK hit 0 on block MoveDest.x was 65, now 50
+jamie ATK_5HK hit 0 on burnout block MoveDest.x was 65, now 50
+jamie ATK_5HK hit 0 on counter MoveDest.x was 65, now 55
+jamie ATK_6MK_MK_Y3 hit 0 on hit DmgValue was 200, now 300
+jamie ATK_6MK_MK_Y3 hit 1 on hit DmgValue was 200, now 300
+jamie ATK_6MK_MK_Y3 hit 1 on hit HitStun was 23, now 26
+jamie ATK_6MK_MK_Y3 hit 1 on hit MoveTime was 23, now 26
+jamie ATK_6MK_MK_Y3 hit 0 on air hit DmgValue was 200, now 300
+jamie ATK_6MK_MK_Y3 hit 1 on air hit DmgValue was 200, now 300
+jamie ATK_6MK_MK_Y3 hit 0 on counter DmgValue was 240, now 360
+jamie ATK_6MK_MK_Y3 hit 1 on counter DmgValue was 240, now 360
+jamie ATK_6MK_MK_Y3 hit 1 on counter HitStun was 23, now 26
+jamie ATK_6MK_MK_Y3 hit 1 on counter MoveTime was 23, now 26
+jamie ATK_6MK_MK_Y3 hit 0 on punish counter DmgValue was 240, now 360
+jamie ATK_6MK_MK_Y3 hit 1 on punish counter DmgValue was 240, now 360
+jamie ATK_6MK_MK_Y3 hit 1 on punish counter HitStun was 23, now 26
+jamie ATK_6MK_MK_Y3 hit 1 on punish counter MoveTime was 23, now 26
+jamie SPA1 hit 0 on block DmgVari was -1, now 2
+jamie SPA1 hit 0 on block MoveDest.x was 80, now 25
+jamie SPA1 hit 0 on block ScreenVib was -1, now 4
+jamie SPA1 hit 0 on burnout block DmgVari was -1, now 2
+jamie SPA1 hit 0 on burnout block MoveDest.x was 80, now 25
+jamie SPA1 hit 0 on burnout block ScreenVib was -1, now 4
+jamie SPA1(1) hit 0 on block DmgVari was -1, now 2
+jamie SPA1(1) hit 0 on block MoveDest.x was 80, now 25
+jamie SPA1(1) hit 0 on block ScreenVib was -1, now 4
+jamie SPA1(1) hit 0 on burnout block DmgVari was -1, now 2
+jamie SPA1(1) hit 0 on burnout block MoveDest.x was 80, now 25
+jamie SPA1(1) hit 0 on burnout block ScreenVib was -1, now 4
+jamie SPA1(2) hit 0 on block DmgVari was -1, now 2
+jamie SPA1(2) hit 0 on block MoveDest.x was 85, now 25
+jamie SPA1(2) hit 0 on block ScreenVib was -1, now 4
+jamie SPA1(2) hit 0 on burnout block DmgVari was -1, now 2
+jamie SPA1(2) hit 0 on burnout block MoveDest.x was 85, now 25
+jamie SPA1(2) hit 0 on burnout block ScreenVib was -1, now 4
+jamie SPA1(3) hit 0 on block DmgVari was -1, now 2
+jamie SPA1(3) hit 0 on block MoveDest.x was 80, now 25
+jamie SPA1(3) hit 0 on block ScreenVib was -1, now 19
+jamie SPA1(3) hit 0 on burnout block DmgVari was -1, now 2
+jamie SPA1(3) hit 0 on burnout block MoveDest.x was 80, now 25
+jamie SPA1(3) hit 0 on burnout block ScreenVib was -1, now 19
+jamie SPA2_EX_P(3) hit 0 on block FocusTgt was -1500, now -1000
+jamie SPA2_EX_P(3) hit 1 on block HitStun was 19, now 21
+jamie SPA2_EX_P(3) hit 1 on block MoveTime was 19, now 21
+jamie SPA2_EX_P(3) hit 0 on burnout block FocusTgt was 750, now 500
+jamie SPA2_EX_P(3) hit 1 on burnout block HitStun was 23, now 25
+jamie SPA2_EX_P(3) hit 1 on burnout block MoveTime was 23, now 25
+jamie SPA2_EX_P_P(1) was 50 frames now 45
+jamie SPA2_EX_P_P(1) hit 1 on hit Attr0 was 1, now 0
+jamie SPA2_EX_P_P(1) hit 1 on hit HitStun was 27, now 23
+jamie SPA2_EX_P_P(1) hit 1 on hit MoveTime was 27, now 23
+jamie SPA2_EX_P_P(1) hit 1 on hit _no_zu was True, now False
+jamie SPA2_EX_P_P(1) hit 0 on block FocusTgt was -1500, now -1000
+jamie SPA2_EX_P_P(1) hit 1 on block Attr0 was 1, now 0
+jamie SPA2_EX_P_P(1) hit 1 on block FocusTgt was -1500, now -1000
+jamie SPA2_EX_P_P(1) hit 1 on block HitStun was 19, now 21
+jamie SPA2_EX_P_P(1) hit 1 on block MoveTime was 19, now 21
+jamie SPA2_EX_P_P(1) hit 1 on block _no_zu was True, now False
+jamie SPA2_EX_P_P(1) hit 0 on burnout block FocusTgt was 750, now 500
+jamie SPA2_EX_P_P(1) hit 1 on burnout block Attr0 was 1, now 0
+jamie SPA2_EX_P_P(1) hit 1 on burnout block FocusTgt was 750, now 500
+jamie SPA2_EX_P_P(1) hit 1 on burnout block HitStun was 23, now 25
+jamie SPA2_EX_P_P(1) hit 1 on burnout block MoveTime was 23, now 25
+jamie SPA2_EX_P_P(1) hit 1 on burnout block _no_zu was True, now False
+jamie SPA2_EX_P_P(1) hit 1 on counter Attr0 was 1, now 0
+jamie SPA2_EX_P_P(1) hit 1 on counter HitStun was 29, now 25
+jamie SPA2_EX_P_P(1) hit 1 on counter MoveTime was 29, now 25
+jamie SPA2_EX_P_P(1) hit 1 on counter _no_zu was True, now False
+jamie SPA2_EX_P_P(1) hit 1 on punish counter Attr0 was 1, now 0
+jamie SPA2_EX_P_P(1) hit 1 on punish counter HitStun was 31, now 27
+jamie SPA2_EX_P_P(1) hit 1 on punish counter MoveTime was 31, now 27
+jamie SPA2_EX_P_P(1) hit 1 on punish counter _no_zu was True, now False
+jamie SPA2_EX_P_P_P hit -1 on hit JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P hit 1 on hit HitStun was 18, now 21
+jamie SPA2_EX_P_P_P hit 1 on hit MoveTime was 18, now 21
+jamie SPA2_EX_P_P_P hit -1 on block JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P hit -1 on air hit JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P hit 1 on air hit HitStun was 18, now 21
+jamie SPA2_EX_P_P_P hit 1 on air hit MoveTime was 18, now 21
+jamie SPA2_EX_P_P_P hit -1 on burnout block JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P hit -1 on counter JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P hit 1 on counter HitStun was 18, now 21
+jamie SPA2_EX_P_P_P hit 1 on counter MoveTime was 18, now 21
+jamie SPA2_EX_P_P_P hit -1 on punish counter JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P hit 1 on punish counter HitStun was 18, now 21
+jamie SPA2_EX_P_P_P hit 1 on punish counter MoveTime was 18, now 21
+jamie SPA2_EX_P_P_P(1) hit -1 on hit JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P(1) hit 1 on hit HitStun was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit 1 on hit MoveTime was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit -1 on block JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P(1) hit -1 on air hit JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P(1) hit 1 on air hit HitStun was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit 1 on air hit MoveTime was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit -1 on burnout block JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P(1) hit -1 on counter JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P(1) hit 1 on counter HitStun was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit 1 on counter MoveTime was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit -1 on punish counter JuggleLimit was 7, now 8
+jamie SPA2_EX_P_P_P(1) hit 1 on punish counter HitStun was 18, now 23
+jamie SPA2_EX_P_P_P(1) hit 1 on punish counter MoveTime was 18, now 23
+jamie SPA2_P hit 0 on air hit MoveDest.x was 110, now 70
+jamie SPA2_P(1) hit 0 on air hit MoveDest.x was 110, now 80
+jamie SPA2_P(2) hit 0 on air hit MoveDest.x was 110, now 90
+jamie SPA2_P(3) hit 0 on block FocusTgt was -2500, now -2000
+jamie SPA2_P(3) hit 0 on air hit MoveDest.x was 110, now 100
+jamie SPA2_P(3) hit 0 on burnout block FocusTgt was 1250, now 1000
+jamie SPA2_P_K hit 0 on air hit MoveDest.x was 110, now 60
+jamie SPA2_P_K(1) hit 0 on air hit MoveDest.x was 110, now 60
+jamie SPA2_P_K(2) hit 0 on air hit MoveDest.x was 110, now 60
+jamie SPA2_P_K(3) hit 0 on air hit MoveDest.x was 110, now 60
+jamie SPA2_P_P hit 0 on air hit MoveDest.x was 110, now 70
+jamie SPA2_P_P(1) hit 0 on air hit MoveDest.x was 110, now 80
+jamie SPA2_P_P(2) hit 0 on air hit MoveDest.x was 110, now 90
+jamie SPA2_P_P(3) was 42 frames now 36
+jamie SPA2_P_P(3) hit 0 on hit HitStun was 27, now 23
+jamie SPA2_P_P(3) hit 0 on hit MoveTime was 27, now 23
+jamie SPA2_P_P(3) hit 0 on block FocusTgt was -2500, now -2000
+jamie SPA2_P_P(3) hit 0 on air hit MoveDest.x was 110, now 100
+jamie SPA2_P_P(3) hit 0 on burnout block FocusTgt was 1250, now 1000
+jamie SPA2_P_P(3) hit 0 on counter HitStun was 29, now 25
+jamie SPA2_P_P(3) hit 0 on counter MoveTime was 29, now 25
+jamie SPA2_P_P(3) hit 0 on punish counter HitStun was 31, now 27
+jamie SPA2_P_P(3) hit 0 on punish counter MoveTime was 31, now 27
+jamie SPA2_P_P_P hit 0 on hit HitStun was 19, now 22
+jamie SPA2_P_P_P hit 0 on hit MoveTime was 19, now 22
+jamie SPA2_P_P_P hit 0 on air hit HitStun was 19, now 22
+jamie SPA2_P_P_P hit 0 on air hit MoveTime was 19, now 22
+jamie SPA2_P_P_P hit 0 on counter HitStun was 19, now 22
+jamie SPA2_P_P_P hit 0 on counter MoveTime was 19, now 22
+jamie SPA2_P_P_P hit 0 on punish counter HitStun was 19, now 22
+jamie SPA2_P_P_P hit 0 on punish counter MoveTime was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on hit HitStun was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on hit MoveTime was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on air hit HitStun was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on air hit MoveTime was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on counter HitStun was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on counter MoveTime was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on punish counter HitStun was 19, now 22
+jamie SPA2_P_P_P(1) hit 0 on punish counter MoveTime was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on hit HitStun was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on hit MoveTime was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on air hit HitStun was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on air hit MoveTime was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on counter HitStun was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on counter MoveTime was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on punish counter HitStun was 19, now 22
+jamie SPA2_P_P_P(2) hit 0 on punish counter MoveTime was 19, now 22
+jamie SPA2_P_P_P(3) hit 0 on hit HitStun was 20, now 25
+jamie SPA2_P_P_P(3) hit 0 on hit MoveTime was 20, now 25
+jamie SPA2_P_P_P(3) hit 0 on air hit HitStun was 19, now 25
+jamie SPA2_P_P_P(3) hit 0 on air hit MoveTime was 19, now 25
+jamie SPA2_P_P_P(3) hit 0 on counter HitStun was 20, now 25
+jamie SPA2_P_P_P(3) hit 0 on counter MoveTime was 20, now 25
+jamie SPA2_P_P_P(3) hit 0 on punish counter HitStun was 20, now 25
+jamie SPA2_P_P_P(3) hit 0 on punish counter MoveTime was 20, now 25
+jamie SPA6_EX hit 1 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 1 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 2 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 2 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 4 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 4 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 5 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 5 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 6 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 6 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 7 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 7 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 13 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 13 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 8 on hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 8 on hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 1 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 1 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 2 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 2 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 4 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 4 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 5 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 5 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 6 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 6 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 7 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 7 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 13 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 13 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 8 on block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 8 on block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 1 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 1 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 2 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 2 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 4 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 4 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 5 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 5 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 6 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 6 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 7 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 7 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 13 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 13 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 8 on air hit JuggleAdd was 1, now 0
+jamie SPA6_EX hit 8 on air hit JuggleLimit was 15, now 16
+jamie SPA6_EX hit 1 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 1 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 2 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 2 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 4 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 4 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 5 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 5 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 6 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 6 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 7 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 7 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 13 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 13 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 8 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_EX hit 8 on burnout block JuggleLimit was 15, now 16
+jamie SPA6_EX hit 1 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 1 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 2 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 2 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 4 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 4 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 5 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 5 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 6 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 6 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 7 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 7 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 13 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 13 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 8 on counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 8 on counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 1 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 1 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 2 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 2 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 4 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 4 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 5 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 5 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 6 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 6 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 7 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 7 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 13 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 13 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_EX hit 8 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_EX hit 8 on punish counter JuggleLimit was 15, now 16
+jamie SPA6_H hit 0 on hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 1 on hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 2 on hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 4 on hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 5 on hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 6 on hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 0 on block JuggleAdd was 1, now 0
+jamie SPA6_H hit 1 on block JuggleAdd was 1, now 0
+jamie SPA6_H hit 2 on block JuggleAdd was 1, now 0
+jamie SPA6_H hit 4 on block JuggleAdd was 1, now 0
+jamie SPA6_H hit 5 on block JuggleAdd was 1, now 0
+jamie SPA6_H hit 6 on block JuggleAdd was 1, now 0
+jamie SPA6_H hit 0 on air hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 1 on air hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 2 on air hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 4 on air hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 5 on air hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 6 on air hit JuggleAdd was 1, now 0
+jamie SPA6_H hit 0 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_H hit 1 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_H hit 2 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_H hit 4 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_H hit 5 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_H hit 6 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_H hit 0 on counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 1 on counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 2 on counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 4 on counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 5 on counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 6 on counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 0 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 1 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 2 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 4 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 5 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_H hit 6 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_L hit 0 on hit JuggleAdd was 1, now 0
+jamie SPA6_L hit 1 on hit JuggleAdd was 1, now 0
+jamie SPA6_L hit 2 on hit JuggleAdd was 1, now 0
+jamie SPA6_L hit 0 on block JuggleAdd was 1, now 0
+jamie SPA6_L hit 1 on block JuggleAdd was 1, now 0
+jamie SPA6_L hit 2 on block JuggleAdd was 1, now 0
+jamie SPA6_L hit 0 on air hit JuggleAdd was 1, now 0
+jamie SPA6_L hit 1 on air hit JuggleAdd was 1, now 0
+jamie SPA6_L hit 2 on air hit JuggleAdd was 1, now 0
+jamie SPA6_L hit 0 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_L hit 1 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_L hit 2 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_L hit 0 on counter JuggleAdd was 1, now 0
+jamie SPA6_L hit 1 on counter JuggleAdd was 1, now 0
+jamie SPA6_L hit 2 on counter JuggleAdd was 1, now 0
+jamie SPA6_L hit 0 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_L hit 1 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_L hit 2 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 0 on hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 1 on hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 2 on hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 4 on hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 5 on hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 0 on block JuggleAdd was 1, now 0
+jamie SPA6_M hit 1 on block JuggleAdd was 1, now 0
+jamie SPA6_M hit 2 on block JuggleAdd was 1, now 0
+jamie SPA6_M hit 4 on block JuggleAdd was 1, now 0
+jamie SPA6_M hit 5 on block JuggleAdd was 1, now 0
+jamie SPA6_M hit 0 on air hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 1 on air hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 2 on air hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 4 on air hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 5 on air hit JuggleAdd was 1, now 0
+jamie SPA6_M hit 0 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_M hit 1 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_M hit 2 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_M hit 4 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_M hit 5 on burnout block JuggleAdd was 1, now 0
+jamie SPA6_M hit 0 on counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 1 on counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 2 on counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 4 on counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 5 on counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 0 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 1 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 2 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 4 on punish counter JuggleAdd was 1, now 0
+jamie SPA6_M hit 5 on punish counter JuggleAdd was 1, now 0
+akuma ATK_6HP hit 0 on punish counter MoveDest.x was 60, now 30
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on hit HitStun was 20, now 22
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on hit MoveDest.x was -200, now -350
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on hit MoveDest.y was 85, now 130
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on hit MoveTime was 20, now 22
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on counter HitStun was 20, now 22
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on counter MoveDest.x was -200, now -350
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on counter MoveDest.y was 85, now 130
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on counter MoveTime was 20, now 22
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on punish counter HitStun was 20, now 22
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on punish counter MoveDest.x was -200, now -350
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on punish counter MoveDest.y was 85, now 130
+akuma SPA_TATSUMAKI_M_END(1) hit 0 on punish counter MoveTime was 20, now 22
+akuma _935 PROJ hit 0 on block HitStun was 17, now 18
+akuma _935 PROJ hit 0 on block MoveTime was 17, now 18
+akuma _935 PROJ hit 0 on burnout block HitStun was 21, now 22
+akuma _935 PROJ hit 0 on burnout block MoveTime was 21, now 22
+akuma _941 PROJ hit 0 on block HitStun was 17, now 18
+akuma _941 PROJ hit 0 on block MoveTime was 17, now 18
+akuma _941 PROJ hit 0 on burnout block HitStun was 21, now 22
+akuma _941 PROJ hit 0 on burnout block MoveTime was 21, now 22
+dictator ATK_5HP hit 0 on hit HitStun was 24, now 25
+dictator ATK_5HP hit 0 on hit MoveTime was 24, now 25
+dictator ATK_5HP hit 0 on counter HitStun was 26, now 27
+dictator ATK_5HP hit 0 on counter MoveTime was 26, now 27
+dictator ATK_5HP(1) hit 0 on hit HitStun was 24, now 25
+dictator ATK_5HP(1) hit 0 on hit MoveTime was 24, now 25
+dictator ATK_5HP(1) hit 0 on counter HitStun was 26, now 27
+dictator ATK_5HP(1) hit 0 on counter MoveTime was 26, now 27
+dictator SPA_HEADPRESS_P_OD_TUIKA hit -1 on block FocusTgt was -3000, now -5000
+dictator SPA_HEADPRESS_P_OD_TUIKA hit -1 on burnout block FocusTgt was 1500, now 2500
+dictator SPA_HEADPRESS_P_TUIKA hit -1 on block FocusTgt was -3000, now -5000
+dictator SPA_HEADPRESS_P_TUIKA(2) hit -1 on block FocusTgt was -3000, now -5000
+terry SPA_SP4_EX_1_2 hit 0 on hit DmgValue was 500, now 300
+terry SPA_SP4_EX_1_2 hit 1 on hit DmgValue was 400, now 600
+terry SPA_SP4_EX_1_2 hit 1 on hit HitStun was 27, now 28
+terry SPA_SP4_EX_1_2 hit 1 on hit MoveTime was 27, now 28
+terry SPA_SP4_EX_1_2 hit 0 on air hit DmgValue was 500, now 300
+terry SPA_SP4_EX_1_2 hit 1 on air hit DmgValue was 400, now 600
+terry SPA_SP4_EX_1_2 hit 0 on burnout block DmgValue was 125, now 75
+terry SPA_SP4_EX_1_2 hit 1 on burnout block DmgValue was 100, now 150
+terry SPA_SP4_EX_1_2 hit 0 on counter DmgValue was 600, now 360
+terry SPA_SP4_EX_1_2 hit 1 on counter DmgValue was 480, now 720
+terry SPA_SP4_EX_1_2 hit 1 on counter HitStun was 29, now 30
+terry SPA_SP4_EX_1_2 hit 1 on counter MoveTime was 29, now 30
+terry SPA_SP4_EX_1_2 hit 0 on punish counter DmgValue was 600, now 360
+terry SPA_SP4_EX_1_2 hit 1 on punish counter DmgValue was 480, now 720
+terry SPA_SP4_EX_1_2 hit 1 on punish counter HitStun was 31, now 32
+terry SPA_SP4_EX_1_2 hit 1 on punish counter MoveTime was 31, now 32
+terry SPA_SP4_EX_1_2(1) hit 0 on hit DmgValue was 500, now 300
+terry SPA_SP4_EX_1_2(1) hit 1 on hit DmgValue was 400, now 600
+terry SPA_SP4_EX_1_2(1) hit 1 on hit HitStun was 27, now 28
+terry SPA_SP4_EX_1_2(1) hit 1 on hit MoveTime was 27, now 28
+terry SPA_SP4_EX_1_2(1) hit 0 on air hit DmgValue was 500, now 300
+terry SPA_SP4_EX_1_2(1) hit 1 on air hit DmgValue was 400, now 600
+terry SPA_SP4_EX_1_2(1) hit 0 on burnout block DmgValue was 125, now 75
+terry SPA_SP4_EX_1_2(1) hit 1 on burnout block DmgValue was 100, now 150
+terry SPA_SP4_EX_1_2(1) hit 0 on counter DmgValue was 600, now 360
+terry SPA_SP4_EX_1_2(1) hit 1 on counter DmgValue was 480, now 720
+terry SPA_SP4_EX_1_2(1) hit 1 on counter HitStun was 29, now 30
+terry SPA_SP4_EX_1_2(1) hit 1 on counter MoveTime was 29, now 30
+terry SPA_SP4_EX_1_2(1) hit 0 on punish counter DmgValue was 600, now 360
+terry SPA_SP4_EX_1_2(1) hit 1 on punish counter DmgValue was 480, now 720
+terry SPA_SP4_EX_1_2(1) hit 1 on punish counter HitStun was 31, now 32
+terry SPA_SP4_EX_1_2(1) hit 1 on punish counter MoveTime was 31, now 32
+terry SPA_SP4_EX_3 hit -1 on hit DmgValue was 600, now 800
+terry SPA_SP4_EX_3 hit -1 on hit MoveDest.x was 220, now 160
+terry SPA_SP4_EX_3 hit -1 on air hit DmgValue was 600, now 800
+terry SPA_SP4_EX_3 hit -1 on air hit MoveDest.x was 220, now 160
+terry SPA_SP4_EX_3 hit -1 on burnout block DmgValue was 150, now 200
+terry SPA_SP4_EX_3 hit -1 on counter DmgValue was 720, now 960
+terry SPA_SP4_EX_3 hit -1 on counter MoveDest.x was 220, now 160
+terry SPA_SP4_EX_3 hit -1 on punish counter DmgValue was 720, now 960
+terry SPA_SP4_EX_3 hit -1 on punish counter MoveDest.x was 220, now 160
+mai ATK_2HP hit 1 on hit MoveDest.x was 45, now 20
+mai ATK_2HP hit 1 on block MoveDest.x was 20, now 30
+mai ATK_2HP hit 1 on burnout block MoveDest.x was 20, now 30
+mai ATK_2HP hit 1 on counter MoveDest.x was 45, now 20
+mai ATK_2HP hit 1 on punish counter MoveDest.x was 45, now 20
+mai ATK_8MP hit 0 on air hit MoveDest.x was 128, now 100
+mai ATK_8MP(2) hit 0 on air hit MoveDest.x was 128, now 100
+mai SAA_2_Normal_Air hit 0 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 1 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 2 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 3 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 4 on hit DmgValue was 800, now 1800
+mai SAA_2_Normal_Air hit 0 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 1 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 2 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 3 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air hit 4 on air hit DmgValue was 800, now 1800
+mai SAA_2_Normal_Air hit 0 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 1 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 2 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 3 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 4 on counter DmgValue was 800, now 2160
+mai SAA_2_Normal_Air hit 0 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 1 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 2 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 3 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air hit 4 on punish counter DmgValue was 800, now 2160
+mai SAA_2_Normal_Air(1) hit 0 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 1 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 2 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 3 on hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 4 on hit DmgValue was 800, now 1800
+mai SAA_2_Normal_Air(1) hit 0 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 1 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 2 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 3 on air hit DmgValue was 500, now 250
+mai SAA_2_Normal_Air(1) hit 4 on air hit DmgValue was 800, now 1800
+mai SAA_2_Normal_Air(1) hit 0 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 1 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 2 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 3 on counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 4 on counter DmgValue was 800, now 2160
+mai SAA_2_Normal_Air(1) hit 0 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 1 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 2 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 3 on punish counter DmgValue was 500, now 300
+mai SAA_2_Normal_Air(1) hit 4 on punish counter DmgValue was 800, now 2160
+mai SAA_2_PowerUp_Air hit 0 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 1 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 2 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 3 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 4 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 5 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 6 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 7 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 8 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 9 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 10 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 11 on hit DmgValue was 800, now 1900
+mai SAA_2_PowerUp_Air hit 0 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 1 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 2 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 3 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 4 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 5 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 6 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 7 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 8 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 9 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 10 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air hit 11 on air hit DmgValue was 800, now 1900
+mai SAA_2_PowerUp_Air hit 0 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 1 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 2 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 3 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 4 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 5 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 6 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 7 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 8 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 9 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 10 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 11 on counter DmgValue was 800, now 2280
+mai SAA_2_PowerUp_Air hit 0 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 1 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 2 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 3 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 4 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 5 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 6 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 7 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 8 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 9 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 10 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air hit 11 on punish counter DmgValue was 800, now 2280
+mai SAA_2_PowerUp_Air(1) hit 0 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 1 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 2 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 3 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 4 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 5 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 6 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 7 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 8 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 9 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 10 on hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 11 on hit DmgValue was 800, now 1900
+mai SAA_2_PowerUp_Air(1) hit 0 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 1 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 2 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 3 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 4 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 5 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 6 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 7 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 8 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 9 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 10 on air hit DmgValue was 200, now 100
+mai SAA_2_PowerUp_Air(1) hit 11 on air hit DmgValue was 800, now 1900
+mai SAA_2_PowerUp_Air(1) hit 0 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 1 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 2 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 3 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 4 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 5 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 6 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 7 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 8 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 9 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 10 on counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 11 on counter DmgValue was 800, now 2280
+mai SAA_2_PowerUp_Air(1) hit 0 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 1 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 2 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 3 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 4 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 5 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 6 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 7 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 8 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 9 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 10 on punish counter DmgValue was 200, now 120
+mai SAA_2_PowerUp_Air(1) hit 11 on punish counter DmgValue was 800, now 2280
+mai SPA_214P_OD ComboScaling was -1 , now 20
+mai SPA_214P_OD _StartScaling was -1 , now 40
+mai SPA_214P_OD PROJ hit 1 on hit MoveDest.x was 60, now 65
+mai SPA_214P_OD PROJ hit 1 on hit MoveDest.y was 60, now 30
+mai SPA_214P_OD PROJ hit 1 on block MoveDest.x was 50, now 10
+mai SPA_214P_OD PROJ hit 1 on air hit MoveDest.x was 60, now 65
+mai SPA_214P_OD PROJ hit 1 on air hit MoveDest.y was 60, now 30
+mai SPA_214P_OD PROJ hit 1 on burnout block MoveDest.x was 50, now 10
+mai SPA_214P_OD PROJ hit 1 on counter MoveDest.x was 60, now 65
+mai SPA_214P_OD PROJ hit 1 on counter MoveDest.y was 60, now 30
+mai SPA_214P_OD PROJ hit 1 on punish counter MoveDest.x was 60, now 65
+mai SPA_214P_OD PROJ hit 1 on punish counter MoveDest.y was 60, now 30
+mai SPA_214P_OD PROJ _StartScaling was -1 , now 40
+mai SPA_214P_OD PROJ(1) hit 2 on hit DmgValue was 400, now 700
+mai SPA_214P_OD PROJ(1) hit 2 on hit HitStun was 32, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on hit MoveDest.x was 110, now 160
+mai SPA_214P_OD PROJ(1) hit 2 on hit MoveDest.y was 100, now 90
+mai SPA_214P_OD PROJ(1) hit 2 on hit MoveTime was 32, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on block HitStun was 17, now 18
+mai SPA_214P_OD PROJ(1) hit 2 on block MoveDest.x was 50, now 110
+mai SPA_214P_OD PROJ(1) hit 2 on block MoveTime was 17, now 18
+mai SPA_214P_OD PROJ(1) hit 2 on air hit DmgValue was 400, now 700
+mai SPA_214P_OD PROJ(1) hit 2 on air hit HitStun was 28, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on air hit MoveDest.x was 110, now 180
+mai SPA_214P_OD PROJ(1) hit 2 on air hit MoveDest.y was 100, now 80
+mai SPA_214P_OD PROJ(1) hit 2 on air hit MoveTime was 28, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on burnout block DmgValue was 100, now 175
+mai SPA_214P_OD PROJ(1) hit 2 on burnout block HitStun was 21, now 22
+mai SPA_214P_OD PROJ(1) hit 2 on burnout block MoveDest.x was 50, now 110
+mai SPA_214P_OD PROJ(1) hit 2 on burnout block MoveTime was 21, now 22
+mai SPA_214P_OD PROJ(1) hit 2 on counter DmgValue was 480, now 840
+mai SPA_214P_OD PROJ(1) hit 2 on counter HitStun was 32, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on counter MoveDest.x was 110, now 160
+mai SPA_214P_OD PROJ(1) hit 2 on counter MoveDest.y was 100, now 90
+mai SPA_214P_OD PROJ(1) hit 2 on counter MoveTime was 32, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on punish counter DmgValue was 480, now 840
+mai SPA_214P_OD PROJ(1) hit 2 on punish counter HitStun was 32, now 21
+mai SPA_214P_OD PROJ(1) hit 2 on punish counter MoveDest.x was 110, now 160
+mai SPA_214P_OD PROJ(1) hit 2 on punish counter MoveDest.y was 100, now 90
+mai SPA_214P_OD PROJ(1) hit 2 on punish counter MoveTime was 32, now 21
+mai SPA_214P_OD PROJ(1) _StartScaling was -1 , now 40
+mai SPA_214P_OD(1) ComboScaling was -1 , now 20
+mai SPA_214P_OD(1) _StartScaling was -1 , now 40
+mai SPA_214P_OD(2) ComboScaling was -1 , now 20
+mai SPA_214P_OD(2) _StartScaling was -1 , now 40
+mai SPA_214P_OD(2) PROJ hit 1 on hit MoveDest.x was 60, now 65
+mai SPA_214P_OD(2) PROJ hit 1 on hit MoveDest.y was 60, now 30
+mai SPA_214P_OD(2) PROJ hit 1 on block MoveDest.x was 50, now 10
+mai SPA_214P_OD(2) PROJ hit 1 on air hit MoveDest.x was 60, now 65
+mai SPA_214P_OD(2) PROJ hit 1 on air hit MoveDest.y was 60, now 30
+mai SPA_214P_OD(2) PROJ hit 1 on burnout block MoveDest.x was 50, now 10
+mai SPA_214P_OD(2) PROJ hit 1 on counter MoveDest.x was 60, now 65
+mai SPA_214P_OD(2) PROJ hit 1 on counter MoveDest.y was 60, now 30
+mai SPA_214P_OD(2) PROJ hit 1 on punish counter MoveDest.x was 60, now 65
+mai SPA_214P_OD(2) PROJ hit 1 on punish counter MoveDest.y was 60, now 30
+mai SPA_214P_OD(2) PROJ _StartScaling was -1 , now 40
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit Attr0 was 1, now 257
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit DmgValue was 450, now 750
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit HitStun was 32, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit JuggleAdd was 1, now 0
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit MoveDest.x was 110, now 160
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit MoveDest.y was 100, now 90
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit MoveTime was 32, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit WallStop was 0, now 30
+mai SPA_214P_OD(2) PROJ(1) hit 2 on hit _kabe_tataki was False, now True
+mai SPA_214P_OD(2) PROJ(1) hit 2 on block HitStun was 17, now 18
+mai SPA_214P_OD(2) PROJ(1) hit 2 on block JuggleAdd was 1, now 0
+mai SPA_214P_OD(2) PROJ(1) hit 2 on block MoveDest.x was 50, now 110
+mai SPA_214P_OD(2) PROJ(1) hit 2 on block MoveTime was 17, now 18
+mai SPA_214P_OD(2) PROJ(1) hit 2 on block WallStop was 0, now 30
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit Attr0 was 1, now 257
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit DmgValue was 450, now 750
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit HitStun was 28, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit JuggleAdd was 1, now 0
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit MoveDest.x was 110, now 180
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit MoveDest.y was 100, now 80
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit MoveTime was 28, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit WallStop was 0, now 30
+mai SPA_214P_OD(2) PROJ(1) hit 2 on air hit _kabe_tataki was False, now True
+mai SPA_214P_OD(2) PROJ(1) hit 2 on burnout block DmgValue was 112, now 187
+mai SPA_214P_OD(2) PROJ(1) hit 2 on burnout block HitStun was 21, now 22
+mai SPA_214P_OD(2) PROJ(1) hit 2 on burnout block JuggleAdd was 1, now 0
+mai SPA_214P_OD(2) PROJ(1) hit 2 on burnout block MoveDest.x was 50, now 110
+mai SPA_214P_OD(2) PROJ(1) hit 2 on burnout block MoveTime was 21, now 22
+mai SPA_214P_OD(2) PROJ(1) hit 2 on burnout block WallStop was 0, now 30
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter Attr0 was 1, now 257
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter DmgValue was 540, now 900
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter HitStun was 32, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter JuggleAdd was 1, now 0
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter MoveDest.x was 110, now 160
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter MoveDest.y was 100, now 90
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter MoveTime was 32, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter WallStop was 0, now 30
+mai SPA_214P_OD(2) PROJ(1) hit 2 on counter _kabe_tataki was False, now True
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter Attr0 was 1, now 257
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter DmgValue was 540, now 900
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter HitStun was 32, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter JuggleAdd was 1, now 0
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter MoveDest.x was 110, now 160
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter MoveDest.y was 100, now 90
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter MoveTime was 32, now 21
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter WallStop was 0, now 30
+mai SPA_214P_OD(2) PROJ(1) hit 2 on punish counter _kabe_tataki was False, now True
+mai SPA_214P_OD(2) PROJ(1) _StartScaling was -1 , now 40
+mai SPA_8PP_START(10) hit 0 on hit HitStun was 21, now 25
+mai SPA_8PP_START(10) hit 0 on hit MoveDest.x was 180, now 190
+mai SPA_8PP_START(10) hit 0 on hit MoveTime was 21, now 25
+mai SPA_8PP_START(10) hit 0 on counter HitStun was 21, now 25
+mai SPA_8PP_START(10) hit 0 on counter MoveDest.x was 180, now 190
+mai SPA_8PP_START(10) hit 0 on counter MoveTime was 21, now 25
+mai SPA_8PP_START(10) hit 0 on punish counter HitStun was 21, now 25
+mai SPA_8PP_START(10) hit 0 on punish counter MoveDest.x was 180, now 190
+mai SPA_8PP_START(10) hit 0 on punish counter MoveTime was 21, now 25
+mai SPA_8PP_START(10) _StartScaling was -1 , now 30
+mai SPA_8PP_START(4) hit 0 on hit HitStun was 21, now 25
+mai SPA_8PP_START(4) hit 0 on hit MoveDest.x was 180, now 190
+mai SPA_8PP_START(4) hit 0 on hit MoveTime was 21, now 25
+mai SPA_8PP_START(4) hit 0 on counter HitStun was 21, now 25
+mai SPA_8PP_START(4) hit 0 on counter MoveDest.x was 180, now 190
+mai SPA_8PP_START(4) hit 0 on counter MoveTime was 21, now 25
+mai SPA_8PP_START(4) hit 0 on punish counter HitStun was 21, now 25
+mai SPA_8PP_START(4) hit 0 on punish counter MoveDest.x was 180, now 190
+mai SPA_8PP_START(4) hit 0 on punish counter MoveTime was 21, now 25
+mai SPA_8PP_START(4) _StartScaling was -1 , now 30
+mai SPA_8PP_START(5) hit 0 on hit HitStun was 21, now 25
+mai SPA_8PP_START(5) hit 0 on hit MoveDest.x was 180, now 190
+mai SPA_8PP_START(5) hit 0 on hit MoveTime was 21, now 25
+mai SPA_8PP_START(5) hit 0 on counter HitStun was 21, now 25
+mai SPA_8PP_START(5) hit 0 on counter MoveDest.x was 180, now 190
+mai SPA_8PP_START(5) hit 0 on counter MoveTime was 21, now 25
+mai SPA_8PP_START(5) hit 0 on punish counter HitStun was 21, now 25
+mai SPA_8PP_START(5) hit 0 on punish counter MoveDest.x was 180, now 190
+mai SPA_8PP_START(5) hit 0 on punish counter MoveTime was 21, now 25
+mai SPA_8PP_START(5) _StartScaling was -1 , now 30
+elena ATK_2HP hit 2 on air hit DmgType was 10, now 11
+elena ATK_2HP hit 2 on air hit MoveType was 12, now 13
+elena ATK_2MK hit 0 on block HitStun was 17, now 18
+elena ATK_2MK hit 0 on block MoveTime was 17, now 18
+elena ATK_2MK hit 0 on burnout block HitStun was 21, now 22
+elena ATK_2MK hit 0 on burnout block MoveTime was 21, now 22
+elena SPA_03_MOVE_1(3) was 34 frames now 29
+sagat ATK_2MK hit 0 on block MoveDest.x was 40, now 50
+sagat ATK_2MK hit 0 on burnout block MoveDest.x was 40, now 50
+sagat ATK_2MP _StartScaling was -1 , now 15
+sagat ATK_2MP(1) _StartScaling was -1 , now 15
+sagat ATK_2MP(2) _StartScaling was -1 , now 15
+sagat ATK_2MP_HK hit 0 on hit DmgValue was 1000, now 1100
+sagat ATK_2MP_HK hit 0 on air hit DmgValue was 1000, now 1100
+sagat ATK_2MP_HK hit 0 on counter DmgValue was 1200, now 1320
+sagat ATK_2MP_HK hit 0 on punish counter DmgValue was 1200, now 1320
+sagat ATK_2MP_HP hit 0 on hit DmgValue was 600, now 700
+sagat ATK_2MP_HP hit 0 on air hit DmgValue was 600, now 700
+sagat ATK_2MP_HP hit 0 on counter DmgValue was 720, now 840
+sagat ATK_2MP_HP hit 0 on punish counter DmgValue was 720, now 840
+sagat ATK_5LK hit 0 on hit HitStun was 16, now 17
+sagat ATK_5LK hit 0 on hit MoveTime was 16, now 17
+sagat ATK_5LK hit 0 on counter HitStun was 18, now 19
+sagat ATK_5LK hit 0 on counter MoveTime was 18, now 19
+sagat ATK_5LK hit 0 on punish counter HitStun was 20, now 21
+sagat ATK_5LK hit 0 on punish counter MoveTime was 20, now 21
+sagat ATK_5LK(1) hit 0 on hit HitStun was 16, now 17
+sagat ATK_5LK(1) hit 0 on hit MoveTime was 16, now 17
+sagat ATK_5LK(1) hit 0 on counter HitStun was 18, now 19
+sagat ATK_5LK(1) hit 0 on counter MoveTime was 18, now 19
+sagat ATK_5LK(1) hit 0 on punish counter HitStun was 20, now 21
+sagat ATK_5LK(1) hit 0 on punish counter MoveTime was 20, now 21
+sagat ATK_5MK_MK was active from 18-21 now active from 15-18
+sagat ATK_5MK_MK was 44 frames now 41
+sagat SPA_3_L_HIT(1) hit 0 on block HitStun was 20, now 22
+sagat SPA_3_L_HIT(1) hit 0 on block MoveTime was 20, now 22
+sagat SPA_3_L_HIT(1) hit 0 on burnout block HitStun was 24, now 26
+sagat SPA_3_L_HIT(1) hit 0 on burnout block MoveTime was 24, now 26
+sagat SPA_3_L_HIT(1) hit 0 on counter Attr0 was 0, now 8
+sagat SPA_3_L_HIT(1) hit 0 on counter BoundDest was 0, now 10
+sagat SPA_3_L_HIT(1) hit 0 on counter DmgType was 4, now 11
+sagat SPA_3_L_HIT(1) hit 0 on counter DownTime was 15, now 5
+sagat SPA_3_L_HIT(1) hit 0 on counter FloorDest.x was 0, now 20
+sagat SPA_3_L_HIT(1) hit 0 on counter FloorDest.y was 0, now 50
+sagat SPA_3_L_HIT(1) hit 0 on counter FloorTime was 0, now 33
+sagat SPA_3_L_HIT(1) hit 0 on counter HitStopTarget was 8, now 11
+sagat SPA_3_L_HIT(1) hit 0 on counter HitStun was 30, now 2
+sagat SPA_3_L_HIT(1) hit 0 on counter MoveDest.x was 30, now 10
+sagat SPA_3_L_HIT(1) hit 0 on counter MoveDest.y was 0, now -40
+sagat SPA_3_L_HIT(1) hit 0 on counter MoveTime was 30, now 2
+sagat SPA_3_L_HIT(1) hit 0 on counter MoveType was 74, now 13
+sagat SPA_3_L_HIT(1) hit 0 on counter _jimen_bound was False, now True
+sagat SPA_3_L_HIT(1) hit 0 on punish counter Attr0 was 0, now 8
+sagat SPA_3_L_HIT(1) hit 0 on punish counter BoundDest was 0, now 10
+sagat SPA_3_L_HIT(1) hit 0 on punish counter DmgType was 4, now 11
+sagat SPA_3_L_HIT(1) hit 0 on punish counter DownTime was 15, now 5
+sagat SPA_3_L_HIT(1) hit 0 on punish counter FloorDest.x was 0, now 20
+sagat SPA_3_L_HIT(1) hit 0 on punish counter FloorDest.y was 0, now 50
+sagat SPA_3_L_HIT(1) hit 0 on punish counter FloorTime was 0, now 33
+sagat SPA_3_L_HIT(1) hit 0 on punish counter HitStopTarget was 8, now 11
+sagat SPA_3_L_HIT(1) hit 0 on punish counter HitStun was 32, now 2
+sagat SPA_3_L_HIT(1) hit 0 on punish counter MoveDest.x was 30, now 10
+sagat SPA_3_L_HIT(1) hit 0 on punish counter MoveDest.y was 0, now -40
+sagat SPA_3_L_HIT(1) hit 0 on punish counter MoveTime was 32, now 2
+sagat SPA_3_L_HIT(1) hit 0 on punish counter MoveType was 74, now 13
+sagat SPA_3_L_HIT(1) hit 0 on punish counter _jimen_bound was False, now True
+sagat SPA_3_M_HIT(2) hit -1 on hit HitStun was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on hit Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(2) hit -1 on hit JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(2) hit -1 on hit MoveTime was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on block Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(2) hit -1 on block JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(2) hit -1 on air hit HitStun was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on air hit Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(2) hit -1 on air hit JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(2) hit -1 on air hit MoveTime was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on burnout block Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(2) hit -1 on burnout block JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(2) hit -1 on counter HitStun was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on counter Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(2) hit -1 on counter JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(2) hit -1 on counter MoveTime was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on punish counter HitStun was 26, now 28
+sagat SPA_3_M_HIT(2) hit -1 on punish counter Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(2) hit -1 on punish counter JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(2) hit -1 on punish counter MoveTime was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on hit HitStun was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on hit Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(3) hit -1 on hit JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(3) hit -1 on hit MoveTime was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on block Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(3) hit -1 on block JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(3) hit -1 on air hit HitStun was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on air hit Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(3) hit -1 on air hit JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(3) hit -1 on air hit MoveTime was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on burnout block Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(3) hit -1 on burnout block JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(3) hit -1 on counter HitStun was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on counter Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(3) hit -1 on counter JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(3) hit -1 on counter MoveTime was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on punish counter HitStun was 26, now 28
+sagat SPA_3_M_HIT(3) hit -1 on punish counter Juggle1st was 3, now 2
+sagat SPA_3_M_HIT(3) hit -1 on punish counter JuggleAdd was 2, now 1
+sagat SPA_3_M_HIT(3) hit -1 on punish counter MoveTime was 26, now 28
+viper ATK_2HK hit 0 on hit JuggleLimit was 0, now 1
+viper ATK_2HK hit 0 on block JuggleLimit was 0, now 1
+viper ATK_2HK hit 0 on air hit JuggleLimit was 0, now 1
+viper ATK_2HK hit 0 on burnout block JuggleLimit was 0, now 1
+viper ATK_2HK hit 0 on counter JuggleLimit was 0, now 1
+viper ATK_2HK hit 0 on punish counter JuggleLimit was 0, now 1
+viper ATK_5MK hit 0 on hit HitStun was 25, now 26
+viper ATK_5MK hit 0 on hit MoveTime was 25, now 26
+viper ATK_5MK hit 0 on counter HitStun was 27, now 28
+viper ATK_5MK hit 0 on counter MoveTime was 27, now 28
+viper ATK_5MK hit 0 on punish counter HitStun was 29, now 30
+viper ATK_5MK hit 0 on punish counter MoveTime was 29, now 30
+viper ATK_5MK(1) hit 0 on hit HitStun was 25, now 26
+viper ATK_5MK(1) hit 0 on hit MoveTime was 25, now 26
+viper ATK_5MK(1) hit 0 on counter HitStun was 27, now 28
+viper ATK_5MK(1) hit 0 on counter MoveTime was 27, now 28
+viper ATK_5MK(1) hit 0 on punish counter HitStun was 29, now 30
+viper ATK_5MK(1) hit 0 on punish counter MoveTime was 29, now 30
+viper SPA_Seismo_OD PROJ hit 0 on hit Juggle1st was 2, now 1
+viper SPA_Seismo_OD PROJ hit 0 on block HitStun was 16, now 18
+viper SPA_Seismo_OD PROJ hit 0 on block Juggle1st was 2, now 1
+viper SPA_Seismo_OD PROJ hit 0 on block MoveTime was 16, now 18
+viper SPA_Seismo_OD PROJ hit 0 on air hit Juggle1st was 2, now 1
+viper SPA_Seismo_OD PROJ hit 0 on burnout block HitStun was 20, now 22
+viper SPA_Seismo_OD PROJ hit 0 on burnout block Juggle1st was 2, now 1
+viper SPA_Seismo_OD PROJ hit 0 on burnout block MoveTime was 20, now 22
+viper SPA_Seismo_OD PROJ hit 0 on counter Juggle1st was 2, now 1
+viper SPA_Seismo_OD PROJ hit 0 on punish counter Juggle1st was 2, now 1
+viper SPA_THN_L hit 0 on hit HitStun was 28, now 29
+viper SPA_THN_L hit 0 on hit MoveTime was 28, now 29
+viper SPA_THN_L hit 0 on counter HitStun was 30, now 31
+viper SPA_THN_L hit 0 on counter MoveTime was 30, now 31
+viper SPA_THN_L hit 0 on punish counter HitStun was 32, now 33
+viper SPA_THN_L hit 0 on punish counter MoveTime was 32, now 33
+alex ATK_2MK hit 0 on hit HitStun was 25, now 26
+alex ATK_2MK hit 0 on hit MoveTime was 25, now 26
+alex ATK_2MK hit 0 on counter HitStun was 27, now 28
+alex ATK_2MK hit 0 on counter MoveTime was 27, now 28
+alex ATK_2MK hit 0 on punish counter HitStun was 29, now 30
+alex ATK_2MK hit 0 on punish counter MoveTime was 29, now 30
+alex ATK_4MK hit 0 on block HitStun was 19, now 20
+alex ATK_4MK hit 0 on block MoveTime was 19, now 20
+alex ATK_4MK hit 0 on burnout block HitStun was 23, now 24
+alex ATK_4MK hit 0 on burnout block MoveTime was 23, now 24
+alex ATK_92HP_Start hit 0 on hit JuggleLimit was 1, now 20
+alex ATK_92HP_Start hit 0 on block JuggleLimit was 1, now 20
+alex ATK_92HP_Start hit 0 on air hit HitStun was 20, now 5
+alex ATK_92HP_Start hit 0 on air hit JuggleLimit was 1, now 20
+alex ATK_92HP_Start hit 0 on air hit MoveDest.x was 200, now 80
+alex ATK_92HP_Start hit 0 on air hit MoveDest.y was 70, now -100
+alex ATK_92HP_Start hit 0 on air hit MoveTime was 20, now 5
+alex ATK_92HP_Start hit 0 on burnout block JuggleLimit was 1, now 20
+alex ATK_92HP_Start hit 0 on counter JuggleLimit was 1, now 20
+alex ATK_92HP_Start hit 0 on punish counter JuggleLimit was 1, now 20
+alex ATK_S_MP hit 0 on punish counter FocusTgt was -5000, now -10000
+alex ATK_S_MP hit 1 on punish counter FocusTgt was -5000, now -10000
+alex BAS_DASH_B was 25 frames now 23
+alex SPA_AirKneeSmash_L hit -1 on block HitStopOwner was 0, now 5
+alex SPA_AirKneeSmash_L hit -1 on block HitStopTarget was 0, now 5
+alex SPA_AirKneeSmash_L hit -1 on burnout block HitStopOwner was 0, now 5
+alex SPA_AirKneeSmash_L hit -1 on burnout block HitStopTarget was 0, now 5
+alex SPA_AirKneeSmash_L(1) hit 0 on block HitStopOwner was 0, now 5
+alex SPA_AirKneeSmash_L(1) hit 0 on block HitStopTarget was 0, now 5
+alex SPA_AirKneeSmash_L(1) hit 0 on burnout block HitStopOwner was 0, now 5
+alex SPA_AirKneeSmash_L(1) hit 0 on burnout block HitStopTarget was 0, now 5
+ingrid ATK_5LK hit 0 on hit HitStun was 16, now 17
+ingrid ATK_5LK hit 0 on hit MoveTime was 16, now 17
+ingrid ATK_5LK hit 0 on counter HitStun was 18, now 19
+ingrid ATK_5LK hit 0 on counter MoveTime was 18, now 19
+ingrid ATK_5LK hit 0 on punish counter HitStun was 20, now 21
+ingrid ATK_5LK hit 0 on punish counter MoveTime was 20, now 21
+ingrid ATK_5MK hit 0 on hit HitStun was 23, now 24
+ingrid ATK_5MK hit 0 on hit MoveTime was 23, now 24
+ingrid ATK_5MK hit 0 on counter HitStun was 25, now 26
+ingrid ATK_5MK hit 0 on counter MoveTime was 25, now 26
+ingrid ATK_5MK hit 0 on punish counter HitStun was 27, now 28
+ingrid ATK_5MK hit 0 on punish counter MoveTime was 27, now 28
+ingrid SPA_236P_L(4) PROJ hit 0 on hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(4) PROJ hit 0 on block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(4) PROJ hit 0 on air hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(4) PROJ hit 0 on burnout block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(4) PROJ hit 0 on counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(4) PROJ hit 0 on punish counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(5) PROJ hit 0 on hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(5) PROJ hit 0 on block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(5) PROJ hit 0 on air hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(5) PROJ hit 0 on burnout block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(5) PROJ hit 0 on counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(5) PROJ hit 0 on punish counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(6) PROJ hit 0 on hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(6) PROJ hit 0 on block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(6) PROJ hit 0 on air hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(6) PROJ hit 0 on burnout block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(6) PROJ hit 0 on counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(6) PROJ hit 0 on punish counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(7) PROJ hit 0 on hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(7) PROJ hit 0 on block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(7) PROJ hit 0 on air hit JuggleAdd was 0, now 1
+ingrid SPA_236P_L(7) PROJ hit 0 on burnout block JuggleAdd was 0, now 1
+ingrid SPA_236P_L(7) PROJ hit 0 on counter JuggleAdd was 0, now 1
+ingrid SPA_236P_L(7) PROJ hit 0 on punish counter JuggleAdd was 0, now 1
+ingrid SPA_236P_M PROJ hit 0 on hit DownTime was 10, now 9
+ingrid SPA_236P_M PROJ hit 0 on block DownTime was 10, now 9
+ingrid SPA_236P_M PROJ hit 0 on air hit DownTime was 10, now 9
+ingrid SPA_236P_M PROJ hit 0 on air hit HitStun was 20, now 21
+ingrid SPA_236P_M PROJ hit 0 on air hit MoveDest.x was 100, now 80
+ingrid SPA_236P_M PROJ hit 0 on air hit MoveDest.y was 40, now 45
+ingrid SPA_236P_M PROJ hit 0 on air hit MoveTime was 20, now 21
+ingrid SPA_236P_M PROJ hit 0 on burnout block DownTime was 10, now 9
+ingrid SPA_236P_M PROJ hit 0 on counter DownTime was 10, now 9
+ingrid SPA_236P_M PROJ hit 0 on punish counter DownTime was 10, now 9
+ingrid SPA_236P_M(1) PROJ hit 0 on hit DownTime was 10, now 9
+ingrid SPA_236P_M(1) PROJ hit 0 on block DownTime was 10, now 9
+ingrid SPA_236P_M(1) PROJ hit 0 on air hit DownTime was 10, now 9
+ingrid SPA_236P_M(1) PROJ hit 0 on air hit HitStun was 20, now 21
+ingrid SPA_236P_M(1) PROJ hit 0 on air hit MoveDest.x was 100, now 80
+ingrid SPA_236P_M(1) PROJ hit 0 on air hit MoveDest.y was 40, now 45
+ingrid SPA_236P_M(1) PROJ hit 0 on air hit MoveTime was 20, now 21
+ingrid SPA_236P_M(1) PROJ hit 0 on burnout block DownTime was 10, now 9
+ingrid SPA_236P_M(1) PROJ hit 0 on counter DownTime was 10, now 9
+ingrid SPA_236P_M(1) PROJ hit 0 on punish counter DownTime was 10, now 9
+ingrid SPA_236P_M(2) PROJ hit 0 on hit JuggleAdd was 0, now 1
+ingrid SPA_236P_M(2) PROJ hit 0 on block JuggleAdd was 0, now 1
+ingrid SPA_236P_M(2) PROJ hit 0 on air hit JuggleAdd was 0, now 1
+ingrid SPA_236P_M(2) PROJ hit 0 on burnout block JuggleAdd was 0, now 1
+ingrid SPA_236P_M(2) PROJ hit 0 on counter JuggleAdd was 0, now 1
+ingrid SPA_236P_M(2) PROJ hit 0 on punish counter JuggleAdd was 0, now 1
+ingrid SPA_236P_M(3) PROJ hit 0 on hit JuggleAdd was 0, now 1
+ingrid SPA_236P_M(3) PROJ hit 0 on block JuggleAdd was 0, now 1
+ingrid SPA_236P_M(3) PROJ hit 0 on air hit JuggleAdd was 0, now 1
+ingrid SPA_236P_M(3) PROJ hit 0 on burnout block JuggleAdd was 0, now 1
+ingrid SPA_236P_M(3) PROJ hit 0 on counter JuggleAdd was 0, now 1
+ingrid SPA_236P_M(3) PROJ hit 0 on punish counter JuggleAdd was 0, now 1
+ingrid _1320 PROJ was active from 0-15 now active from 0-50
+ingrid _1320 PROJ hit 0 on hit DmgType was 15, now 11
+ingrid _1320 PROJ hit 0 on hit DmgValue was 500, now 300
+ingrid _1320 PROJ hit 0 on hit HitStopOwner was 0, now 1
+ingrid _1320 PROJ hit 0 on hit HitStopTarget was 8, now 1
+ingrid _1320 PROJ hit 0 on hit HitStun was 38, now 21
+ingrid _1320 PROJ hit 0 on hit Hitmark was 7, now 16
+ingrid _1320 PROJ hit 0 on hit MoveDest.x was 220, now 120
+ingrid _1320 PROJ hit 0 on hit MoveDest.y was 140, now 63
+ingrid _1320 PROJ hit 0 on hit MoveTime was 38, now 21
+ingrid _1320 PROJ hit 0 on hit MoveType was 16, now 13
+ingrid _1320 PROJ hit 0 on block HitStopOwner was 0, now 1
+ingrid _1320 PROJ hit 0 on block HitStopTarget was 8, now 1
+ingrid _1320 PROJ hit 0 on block HitStun was 23, now 16
+ingrid _1320 PROJ hit 0 on block Hitmark was 7, now 16
+ingrid _1320 PROJ hit 0 on block MoveTime was 23, now 16
+ingrid _1320 PROJ hit 0 on air hit DmgType was 15, now 11
+ingrid _1320 PROJ hit 0 on air hit DmgValue was 500, now 300
+ingrid _1320 PROJ hit 0 on air hit HitStopOwner was 0, now 1
+ingrid _1320 PROJ hit 0 on air hit HitStopTarget was 8, now 1
+ingrid _1320 PROJ hit 0 on air hit HitStun was 38, now 10
+ingrid _1320 PROJ hit 0 on air hit Hitmark was 7, now 16
+ingrid _1320 PROJ hit 0 on air hit MoveDest.x was 220, now 70
+ingrid _1320 PROJ hit 0 on air hit MoveDest.y was 140, now 10
+ingrid _1320 PROJ hit 0 on air hit MoveTime was 38, now 10
+ingrid _1320 PROJ hit 0 on air hit MoveType was 16, now 13
+ingrid _1320 PROJ hit 0 on burnout block DmgValue was 250, now 150
+ingrid _1320 PROJ hit 0 on burnout block HitStopOwner was 0, now 1
+ingrid _1320 PROJ hit 0 on burnout block HitStopTarget was 8, now 1
+ingrid _1320 PROJ hit 0 on burnout block HitStun was 27, now 20
+ingrid _1320 PROJ hit 0 on burnout block Hitmark was 7, now 16
+ingrid _1320 PROJ hit 0 on burnout block MoveTime was 27, now 20
+ingrid _1320 PROJ hit 0 on counter DmgType was 15, now 11
+ingrid _1320 PROJ hit 0 on counter HitStopOwner was 0, now 1
+ingrid _1320 PROJ hit 0 on counter HitStopTarget was 8, now 1
+ingrid _1320 PROJ hit 0 on counter HitStun was 38, now 21
+ingrid _1320 PROJ hit 0 on counter Hitmark was 7, now 16
+ingrid _1320 PROJ hit 0 on counter MoveDest.x was 220, now 120
+ingrid _1320 PROJ hit 0 on counter MoveDest.y was 140, now 63
+ingrid _1320 PROJ hit 0 on counter MoveTime was 38, now 21
+ingrid _1320 PROJ hit 0 on counter MoveType was 16, now 13
+ingrid _1320 PROJ hit 0 on punish counter DmgType was 15, now 11
+ingrid _1320 PROJ hit 0 on punish counter HitStopOwner was 0, now 1
+ingrid _1320 PROJ hit 0 on punish counter HitStopTarget was 8, now 1
+ingrid _1320 PROJ hit 0 on punish counter HitStun was 38, now 21
+ingrid _1320 PROJ hit 0 on punish counter Hitmark was 7, now 16
+ingrid _1320 PROJ hit 0 on punish counter MoveDest.x was 220, now 120
+ingrid _1320 PROJ hit 0 on punish counter MoveDest.y was 140, now 63
+ingrid _1320 PROJ hit 0 on punish counter MoveTime was 38, now 21
+ingrid _1320 PROJ hit 0 on punish counter MoveType was 16, now 13
+ingrid _928 PROJ hit 0 on hit JuggleAdd was 2, now 1
+ingrid _928 PROJ hit 0 on block JuggleAdd was 2, now 1
+ingrid _928 PROJ hit 0 on air hit JuggleAdd was 2, now 1
+ingrid _928 PROJ hit 0 on burnout block JuggleAdd was 2, now 1
+ingrid _928 PROJ hit 0 on counter JuggleAdd was 2, now 1
+ingrid _928 PROJ hit 0 on punish counter JuggleAdd was 2, now 1
+ingrid _930 PROJ hit 0 on hit JuggleAdd was 2, now 1
+ingrid _930 PROJ hit 0 on block JuggleAdd was 2, now 1
+ingrid _930 PROJ hit 0 on air hit JuggleAdd was 2, now 1
+ingrid _930 PROJ hit 0 on burnout block JuggleAdd was 2, now 1
+ingrid _930 PROJ hit 0 on counter JuggleAdd was 2, now 1
+ingrid _930 PROJ hit 0 on punish counter JuggleAdd was 2, now 1
+ingrid _932 PROJ hit 0 on hit JuggleAdd was 2, now 1
+ingrid _932 PROJ hit 0 on block JuggleAdd was 2, now 1
+ingrid _932 PROJ hit 0 on air hit JuggleAdd was 2, now 1
+ingrid _932 PROJ hit 0 on air hit MoveDest.x was 140, now 90
+ingrid _932 PROJ hit 0 on burnout block JuggleAdd was 2, now 1
+ingrid _932 PROJ hit 0 on counter JuggleAdd was 2, now 1
+ingrid _932 PROJ hit 0 on punish counter JuggleAdd was 2, now 1
+ingrid _934 PROJ hit 0 on hit JuggleAdd was 2, now 1
+ingrid _934 PROJ hit 0 on block JuggleAdd was 2, now 1
+ingrid _934 PROJ hit 0 on air hit JuggleAdd was 2, now 1
+ingrid _934 PROJ hit 0 on burnout block JuggleAdd was 2, now 1
+ingrid _934 PROJ hit 0 on counter JuggleAdd was 2, now 1
+ingrid _934 PROJ hit 0 on punish counter JuggleAdd was 2, now 1
+ingrid _936 PROJ hit 0 on hit JuggleAdd was 2, now 1
+ingrid _936 PROJ hit 0 on block JuggleAdd was 2, now 1
+ingrid _936 PROJ hit 0 on air hit JuggleAdd was 2, now 1
+ingrid _936 PROJ hit 0 on burnout block JuggleAdd was 2, now 1
+ingrid _936 PROJ hit 0 on counter JuggleAdd was 2, now 1
+ingrid _936 PROJ hit 0 on punish counter JuggleAdd was 2, now 1
+ingrid _938 PROJ hit 0 on hit JuggleAdd was 2, now 1
+ingrid _938 PROJ hit 0 on block JuggleAdd was 2, now 1
+ingrid _938 PROJ hit 0 on air hit JuggleAdd was 2, now 1
+ingrid _938 PROJ hit 0 on air hit MoveDest.x was 140, now 90
+ingrid _938 PROJ hit 0 on burnout block JuggleAdd was 2, now 1
+ingrid _938 PROJ hit 0 on counter JuggleAdd was 2, now 1
+ingrid _938 PROJ hit 0 on punish counter JuggleAdd was 2, now 1
