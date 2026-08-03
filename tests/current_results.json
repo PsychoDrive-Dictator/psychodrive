@@ -13602,6 +13602,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "yasmine_boomerang",
+        "testVersion": "50",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1573,
+                "firstFrame": 152,
+                "lastFrame": 895
+            },
+            {
+                "count": 212,
+                "firstFrame": 152,
+                "lastFrame": 780
+            },
+            {
+                "count": 148,
+                "firstFrame": 142,
+                "lastFrame": 780
+            },
+            {
+                "count": 187,
+                "firstFrame": 133,
+                "lastFrame": 774
+            },
+            {
+                "count": 187,
+                "firstFrame": 133,
+                "lastFrame": 774
+            },
+            {
+                "count": 760,
+                "firstFrame": 133,
+                "lastFrame": 847
+            },
+            {
+                "count": 980,
+                "firstFrame": 133,
+                "lastFrame": 895
+            },
+            {
+                "count": 219,
+                "firstFrame": 133,
+                "lastFrame": 782
+            },
+            {
+                "count": 276,
+                "firstFrame": 142,
+                "lastFrame": 812
+            },
+            {
+                "count": 763,
+                "firstFrame": 133,
+                "lastFrame": 895
+            },
+            {
+                "count": 81,
+                "firstFrame": 133,
+                "lastFrame": 752
+            },
+            {
+                "count": 2,
+                "firstFrame": 686,
+                "lastFrame": 687
+            }
+        ]
+    },
+    {
         "testName": "yasmine_sa3",
         "testVersion": "50",
         "finished": true,
