@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=52
+version=53
 
 copy_char_file() {
     src="PlayerData/$1/$1 $3.json"
@@ -26,6 +26,7 @@ copy_char_dumps() {
 }
 
 copy_char_dumps Alex alex
+copy_char_dumps Arjun arjun
 copy_char_dumps AKI aki
 copy_char_dumps Akuma akuma
 copy_char_dumps Blanka blanka

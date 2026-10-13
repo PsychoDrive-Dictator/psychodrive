@@ -77,6 +77,7 @@ void makeCharEntries(void)
     charEntries.push_back({31, "alex", "Alex"});
     charEntries.push_back({32, "ingrid", "Ingrid"});
     charEntries.push_back({33, "yasmine", "Yasmine"});
+    charEntries.push_back({34, "arjun", "Arjun"});
 
     for (charEntry &entry : charEntries ) {
         charNames.push_back(entry.name);
@@ -143,6 +144,7 @@ const char* charVersions[] = {
     "50 - S4 Yasmine Update",
     "51 - S4 Yasmine Hotfix 1",
     "52 - S4 Yasmine Hotfix 2",
+    "53 - S4 Arjun Update",
 };
 const int charVersionCount = IM_ARRAYSIZE(charVersions);
 
