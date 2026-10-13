@@ -5093,6 +5093,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "arjun_grey_life_branch",
+        "testVersion": "53",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 444,
+                "firstFrame": 336,
+                "lastFrame": 863
+            },
+            {
+                "count": 124,
+                "firstFrame": 335,
+                "lastFrame": 726
+            },
+            {
+                "count": 50,
+                "firstFrame": 360,
+                "lastFrame": 726
+            },
+            {
+                "count": 2,
+                "firstFrame": 335,
+                "lastFrame": 699
+            },
+            {
+                "count": 2,
+                "firstFrame": 335,
+                "lastFrame": 699
+            },
+            {
+                "count": 683,
+                "firstFrame": 476,
+                "lastFrame": 863
+            },
+            {
+                "count": 113,
+                "firstFrame": 340,
+                "lastFrame": 770
+            },
+            {
+                "count": 23,
+                "firstFrame": 706,
+                "lastFrame": 728
+            },
+            {
+                "count": 37,
+                "firstFrame": 699,
+                "lastFrame": 735
+            },
+            {
+                "count": 245,
+                "firstFrame": 619,
+                "lastFrame": 863
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "bison_sa1_kill",
         "testVersion": "41",
         "finished": true,
