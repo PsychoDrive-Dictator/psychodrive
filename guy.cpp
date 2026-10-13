@@ -4894,6 +4894,68 @@ void Guy::DoBranchKey(bool preHit)
                         doBranch = true;
                     }
                     break;
+                case 24: // gauge
+                    {
+                        Guy* pGuy = nullptr;
+
+                        switch (branchParam0) {
+                            case 0:
+                                pGuy = this;
+                                break;
+                            case 1:
+                            case 2: // todo hit target
+                                pGuy = pOpponent;
+                                break;
+                            case 3:
+                                pGuy = pParent;
+                                break;
+                        }
+
+                        if (!pGuy) {
+                            log(logErrors, "that gauge branch not gonna work");
+                        }
+
+                        int gaugeChecked = 0;
+                        bool unhandledGauge = false;
+
+                        switch (branchParam3) {
+                            case 1:
+                                gaugeChecked = pGuy->getHealth();
+                                break;
+                            case 2:
+                                gaugeChecked = pGuy->getGauge();
+                                break;
+                            // where is 3 ?
+                            case 4:
+                                gaugeChecked = pGuy->getFocus();
+                                break;
+                            //case 5: // what is this? to see if it's gonna kill?
+                            case 6:
+                                gaugeChecked = pGuy->recoverableHealth;
+                                break;
+                            default:
+                                unhandledGauge = true;
+                                break;
+                        }
+
+                        if (unhandledGauge) {
+                            log(logUnknowns, "unhandled gauge type " + std::to_string(branchParam3));
+                        } else {
+                            if (branchParam1 == 1 && gaugeChecked < branchParam2) {
+                                doBranch = true;
+                            }
+                            if (branchParam1 == 2 && gaugeChecked <= branchParam2) {
+                                doBranch = true;
+                            }
+                            if (branchParam1 == 3 && gaugeChecked > branchParam2) {
+                                doBranch = true;
+                            }
+                            if (branchParam1 == 4 && gaugeChecked >= branchParam2) {
+                                doBranch = true;
+                            }
+                        }
+                    }
+                    break;
                 case 29: // unique param
                     {
                         if (branchParam1 >= 0 && branchParam1 < uniqueParamCount) {
