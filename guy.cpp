@@ -3862,6 +3862,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
 
     if (pHitEffect->recoverableDamage) {
         health -= pHitEffect->recoverableDamage;
+        comboDamage += pHitEffect->recoverableDamage;
         recoverableHealth += pHitEffect->recoverableDamage;
         recoverableHealthCooldown = 120;
 
