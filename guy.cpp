@@ -619,7 +619,7 @@ void Guy::RunFramePostPush(void)
         }
     }
 
-    if (recoverableHealthCooldown) {
+    if (recoverableHealthCooldown && !superFreeze) {
         recoverableHealthCooldown--;
     }
 
