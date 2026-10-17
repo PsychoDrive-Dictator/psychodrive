@@ -174,8 +174,8 @@ for char in characters:
             for key in move["BranchKey"]:
                 if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
                     branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 24:
-                        print(char + " " + moveID + " GAUGE branch params " + str(branchKey["Param00"]) +
+                    if branchKey["Type"] == 2:
+                        print(char + " " + moveID + " HIT branch params " + str(branchKey["Param00"]) +
                               " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
                               str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 

@@ -731,8 +731,6 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
         log(logTransitions, "forced jump status from trigger, direction " + std::to_string(jumpDirection));
     }
 
-    uniqueOpsAppliedMask = 0;
-
     triggerInstantScale = pTrigger->comboInst;
     if (pOpponent && !pOpponent->comboHits) {
         // todo is this right if projectiles hit out of order?
@@ -3702,15 +3700,19 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
                     if (!(pitcherBox.checkMask & catcherBox.checkMask)) {
                         continue;
                     }
+                    if (pitcher == catcher) {
+                        continue;
+                    }
                     if (doBoxesHit(pitcherBox.box, catcherBox.box)) {
-                        if (((catcher->uniqueOpsAppliedMask & pitcherBox.checkMask) != pitcherBox.checkMask) ||
-                            ((pitcher->uniqueOpsAppliedMask & catcherBox.checkMask) != catcherBox.checkMask)) {
+                        if (!(pitcher->uniqueOpsAppliedMask & 1) || !(catcher->uniqueOpsAppliedMask & 2)) {
                             catcher->ApplyUniqueBoxOps(pitcherBox, pitcher);
                             pitcher->ApplyUniqueBoxOps(catcherBox, catcher);
-                        }
 
-                        pitcher->uniqueOpsAppliedMask |= catcherBox.checkMask;
-                        catcher->uniqueOpsAppliedMask |= pitcherBox.checkMask;
+                            // allow one pitch and one catch in either direction
+                            // this seems to work until we find that you can catch from two different pitchers
+                            pitcher->uniqueOpsAppliedMask |= 1;
+                            catcher->uniqueOpsAppliedMask |= 2;
+                        }
                     }
                 }
             }
@@ -4855,14 +4857,37 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 20:
                     if (branchParam3 == 1 || branchParam3 == 0) { // classic controls? is 0 catchall?
-                        if (branchParam0 == 1 && (currentInputOwnerSpace & branchParam1)) {
-                            doBranch = true;
+                        int inputToUse = currentInputOwnerSpace;
+                        if (!(currentInputOwnerSpace & 0xF)) {
+                            inputToUse |= 1<<30;
                         }
-                        if (branchParam0 == 0 && !(currentInputOwnerSpace & branchParam1)) {
-                            doBranch = true;
+                        if (branchParam0 == 1) {
+                            if (branchParam1 & 0xF && branchParam1 & 1<<30) {
+                                // sagat sa2 branch has 'up or neutral' which seems busted? unless it's not or
+                                branchParam1 &= ~1<<30;
+                            }
+                            if ((inputToUse & branchParam1) != 0 &&
+                             (inputToUse & branchParam1 & 1<<30) == (branchParam1 & 1<<30)) {
+                                doBranch = true;
+                            }
+                        } else if (branchParam0 == 0) {
+                            if (!(inputToUse & branchParam1)) {
+                                doBranch = true;
+                            }
+                        } else {
+                            log(logUnknowns, "unknown input branch operation");
                         }
                         if (recordFrameTriggers) {
-                            dc.frameTriggers.insert(ActionRef(-branchParam1, 0));
+                            if (branchParam1 & 1<<30) {
+                                if (branchParam0 == 1) {
+                                    // we'll pick an arbitrary forward direction here to be anti-neutral
+                                    dc.frameTriggers.insert(ActionRef(-FORWARD, 0));
+                                } else if (branchParam0 == 0) {
+                                    dc.frameTriggers.insert(ActionRef(-(~branchParam1 & 0x7FF), 0));
+                                }
+                            } else {
+                                dc.frameTriggers.insert(ActionRef(-branchParam1, 0));
+                            }
                         }
                     }
                     if (hitStun) {
@@ -5199,6 +5224,9 @@ void Guy::DoBranchKey(bool preHit)
                     // this is used for backthrow, the other thing for held buttons
                     if (branchParam2 == 1 && lastTriggerInput & branchParam1) {
                         doBranch = true;
+                    }
+                    if (branchParam4 == 1) {
+                        log(logUnknowns, "unsupported triggerinput op");
                     }
                     // todo fix this maybe at some point..
                     // if (recordFrameTriggers) {
@@ -6009,8 +6037,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if ( moveInput & 1 ) {
 
             jumped = true;
-            // jump is trigger-ish - anything else we should do here?
-            uniqueOpsAppliedMask = 0;
+            // jump is trigger-ish - anything we should do here?
 
             if ( moveInput & 4 ) {
                 jumpDirection = -1;
@@ -6406,6 +6433,8 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
 
             currentArmor = nullptr; // uhhh
         }
+
+        uniqueOpsAppliedMask = 0;
 
         if (cancelInheritVelX != Fixed(0) || cancelInheritVelY != Fixed(0) ||
             cancelInheritAccelX != Fixed(0) || cancelInheritAccelY != Fixed(0)) {
