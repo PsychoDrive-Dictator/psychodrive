@@ -802,8 +802,10 @@ void loadBranchKeys(nlohmann::json* pBranchJson, std::vector<BranchKey>* pOutput
         newKey.param04 = branchKey["Param04"];
         newKey.branchAction = branchKey["Action"];
         newKey.branchFrame = branchKey["ActionFrame"];
-        newKey.keepFrame = branchKey["_InheritFrameX"] || branchKey["_InheritFrame"];
-        newKey.keepPlace = branchKey["_KeepPlace"];
+        int attr = branchKey["Attr"];
+        newKey.keepFrame = (attr & (256 | 2)) != 0;
+        newKey.keepPlace = (attr & 32) != 0;
+        newKey.advanceCombo = (attr & 64) != 0;
         newKey.typeName = branchKey.value("_TypesName", "");
 
         pOutputVector->push_back(newKey);
@@ -1855,6 +1857,7 @@ bool cookCharacter(CharacterData* pData, const std::string& path)
             writeI32(f, k.branchFrame);
             writeBool(f, k.keepFrame);
             writeBool(f, k.keepPlace);
+            writeBool(f, k.advanceCombo);
             writeString(f, k.typeName);
         }
 
@@ -2345,6 +2348,7 @@ CharacterData* loadCookedCharacter(const std::string& path, int charVersion)
             k.branchFrame = readI32(f);
             k.keepFrame = readBool(f);
             k.keepPlace = readBool(f);
+            k.advanceCombo = readBool(f);
             k.typeName = readString(f);
         }
 

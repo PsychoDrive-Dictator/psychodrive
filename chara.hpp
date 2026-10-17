@@ -362,6 +362,7 @@ struct BranchKey : Key {
     int branchFrame;
     bool keepFrame;
     bool keepPlace;
+    bool advanceCombo;
     std::string typeName;
 };
 

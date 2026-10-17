@@ -5283,6 +5283,10 @@ void Guy::DoBranchKey(bool preHit)
                     }
                     log(logTriggers, "disabling actions for " + std::to_string(actionDisabledFrames) + " frames due to landing branch");
                 }
+                if (branchKey.advanceCombo) {
+                    AdvanceScalingTriggerID();
+                    appliedScaling = false;
+                }
             }
 
             // FALL THROUGH - there might be another branch that works later for this frame
