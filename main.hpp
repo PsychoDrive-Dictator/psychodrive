@@ -15,7 +15,8 @@ enum EGameMode {
     Viewer
 };
 
-enum hitentryflags {
+enum hitEntryFlags {
+    stand = 0,
     crouch = 1,
     air = 2,
     special = 4,
@@ -111,7 +112,7 @@ struct PendingHit {
     HitBox hitBox;
     HurtBox hurtBox;
     HitEntry *pHitEntry;
-    int hitEntryFlag;
+    hitEntryFlags hitEntryFlag;
     int hitDataID;
     bool blocked;
     bool parried;

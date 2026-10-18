@@ -738,6 +738,8 @@ private:
         hitThisMove = false;
         hitCounterThisMove = false;
         hitPunishCounterThisMove = false;
+        lastHitCounter = false;
+        lastHitPunishCounter = false;
         hasBeenBlockedThisMove = false;
         hasBeenParriedThisMove = false;
         hasBeenPerfectParriedThisMove = false;
@@ -940,6 +942,8 @@ private:
     bool hitThisMove : 1;
     bool hitCounterThisMove : 1;
     bool hitPunishCounterThisMove : 1;
+    bool lastHitCounter : 1;
+    bool lastHitPunishCounter : 1;
     bool hasBeenBlockedThisMove : 1;
     bool hasBeenParriedThisMove : 1;
     bool hasBeenPerfectParriedThisMove : 1;

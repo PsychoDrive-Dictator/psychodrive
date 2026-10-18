@@ -2924,24 +2924,24 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
                 continue;
             }
 
-            int hitEntryFlag = 0;
+            hitEntryFlags hitEntryFlag = stand;
 
             bool otherGuyAirborne = pOtherGuy->getAirborne();
 
             if (pOtherGuy->counterState || (forceCounter && pOtherGuy->comboHits == 0 && !pOtherGuy->wasHit)) {
-                hitEntryFlag |= counter;
+                hitEntryFlag = (hitEntryFlags)(hitEntryFlag | counter);
             }
             // the force from the UI doesn't do the right thing for multi hit moves like hands ATM
             if (pOtherGuy->punishCounterState || (forcePunishCounter && pOtherGuy->comboHits == 0 && !pOtherGuy->wasHit)) {
-                hitEntryFlag |= punish_counter;
+                hitEntryFlag = (hitEntryFlags)(hitEntryFlag | punish_counter);
             }
 
             if (hitbox.flags & multi_counter) {
-                if (hitCounterThisMove) {
-                    hitEntryFlag |= counter;
+                if (lastHitCounter) {
+                    hitEntryFlag = (hitEntryFlags)(hitEntryFlag | counter);
                 }
-                if (hitPunishCounterThisMove) {
-                    hitEntryFlag |= punish_counter;
+                if (lastHitPunishCounter) {
+                    hitEntryFlag = (hitEntryFlags)(hitEntryFlag | punish_counter);
                 }
             }
 
@@ -2996,10 +2996,10 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
             // apply those modifiers on top of the block base if needed
             // todo find test for block+crouch
             if (pOtherGuy->getCrouching()) {
-                hitEntryFlag |= crouch;
+                hitEntryFlag = (hitEntryFlags)(hitEntryFlag | crouch);
             }
             if (otherGuyAirborne) {
-                hitEntryFlag |= air;
+                hitEntryFlag = (hitEntryFlags)(hitEntryFlag | air);
             }
 
             if (hitbox.type == domain && !pOtherGuy->locked) {
@@ -3115,7 +3115,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         HitEntry *pHitEntry = pendingHit.pHitEntry;
         Guy *pOtherGuy = pendingHit.pGuyGettingHit;
         Guy *pGuy = pendingHit.pGuyHitting;
-        int hitEntryFlag = pendingHit.hitEntryFlag;
+        hitEntryFlags hitEntryFlag = pendingHit.hitEntryFlag;
 
         // we might have queued a projectile hit before projectile got projectile-destroyed-box
         if (pGuy->getHitStop()) {
@@ -3249,7 +3249,7 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 
         if (hitArmor || hitAtemi) {
             // undo conter/PC if hit armor
-            hitEntryFlag = hitEntryFlag & ~(punish_counter|counter);
+            hitEntryFlag = (hitEntryFlags)(hitEntryFlag & ~(punish_counter|counter));
             pHitEntry = &hitBox.pHitData->param[hitEntryFlag];
         }
 
@@ -3394,6 +3394,14 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
         int wasComboHits = pOtherGuy->comboHits;
 
         pOtherGuy->lastHitType = hitBox.type;
+        if (hitEntryFlag & counter) {
+            pGuy->lastHitCounter = true;
+            if (hitFlagToParent) pGuy->pParent->lastHitCounter = true;
+        }
+        if ((hitEntryFlag & punish_counter) == punish_counter) {
+            pGuy->lastHitPunishCounter = true;
+            if (hitFlagToParent) pGuy->pParent->lastHitPunishCounter = true;
+        }
         pOtherGuy->comboHitTypeMask |= 1<<hitBox.type;
 
         if (!hitArmor) {
@@ -3409,16 +3417,16 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
             bool justBurnedOutFromBlockedHit = false;
             // todo can there be a trade there where the other hits regain enough focus to not burn out?
             if (pOtherGuy->focus < 0 && !otherGuyWasBurnout && hitEntryFlag & block) {
-                int newHitFlag = hitEntryFlag & ~block;
-                newHitFlag |= special;
+                hitEntryFlags newHitFlag = (hitEntryFlags)(hitEntryFlag & ~block);
+                newHitFlag = (hitEntryFlags)(newHitFlag | special);
                 pHitEntry = &hitBox.pHitData->param[newHitFlag];
                 hitEntryFlag = newHitFlag;
                 justBurnedOutFromBlockedHit = true;
             }
             if (hitEntryFlag & special && !(hitEntryFlag & counter)) {
                 // stupid, but apparently burnout block takes pushback value from normal block???
-                int newHitFlag = hitEntryFlag & ~special;
-                newHitFlag |= block;
+                hitEntryFlags newHitFlag = (hitEntryFlags)(hitEntryFlag & ~special);
+                newHitFlag = (hitEntryFlags)(newHitFlag | block);
                 clonedEntry = *pHitEntry;
                 clonedEntry.moveTime = hitBox.pHitData->param[newHitFlag].moveTime;
                 clonedEntry.moveDestX = hitBox.pHitData->param[newHitFlag].moveDestX;
@@ -6434,6 +6442,11 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             hasBeenPerfectParriedThisMove = false;
             hitArmorThisMove = false;
             hitAtemiThisMove = false;
+
+            if (!didTrigger || (pLastTrigger->flags & (1ULL << 36 | 1ULL << 37)) != (1ULL << 36 | 1ULL << 37)) {
+                lastHitCounter = false;
+                lastHitPunishCounter = false;
+            }
 
             currentArmor = nullptr; // uhhh
         }
