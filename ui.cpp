@@ -897,6 +897,10 @@ void CharacterUIController::renderCharSetup(void)
         if (ImGui::SliderInt("Super", &startGauge, 1, maxStartGauge) ) {
             simInputsChanged = true;
         }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("##inifnitesuper", &infiniteGauge)) {
+            simInputsChanged = true;
+        }
     }
 
     if (gameMode == ComboMaker || gameMode == MoveViewer) {
@@ -3119,6 +3123,9 @@ int CharacterUIController::getOptionFlags()
     if (buffLevel == 5) {
         retFlags |= buffLevel5;
     }
+    if (infiniteGauge) {
+        retFlags |= infiniteGaugeFlag;
+    }
     return retFlags;
 }
 
@@ -3138,6 +3145,7 @@ void CharacterUIController::setOptionFlags(int flags) {
     if (flags & buffLevel5) {
         buffLevel = 5;
     }
+    infiniteGauge = (flags & infiniteGaugeFlag);
 }
 
 int SimulationController::getOptionFlags()

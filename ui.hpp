@@ -23,7 +23,8 @@ enum CharacterControllerOptionFlags {
     buffLevel2 = 2,
     buffLevel3 = 4,
     buffLevel4 = 8,
-    buffLevel5 = 16
+    buffLevel5 = 16,
+    infiniteGaugeFlag = 32
 };
 
 class CharacterUIController {
@@ -59,6 +60,7 @@ public:
     int startFocus = maxFocus;
     int startGauge = 0;
     int maxStartGauge = 0;
+    bool infiniteGauge = false;
 
     // number of frames to show behind present, eg. how far right the current frame arrow is
     static constexpr int kFrameOffset = 8;

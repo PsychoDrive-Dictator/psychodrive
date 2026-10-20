@@ -777,7 +777,9 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
     }
 
     if (pTrigger->needsGauge) {
-        gauge -= pTrigger->gaugeCost;
+        if (!infiniteGauge) {
+            gauge -= pTrigger->gaugeCost;
+        }
         if (uniqueID == 0) {
             pSim->comboProbe.gaugeSpend += pTrigger->gaugeCost;
         }
@@ -993,7 +995,7 @@ bool Guy::CheckTriggerConditions(Trigger *pTrigger, int fluffFramesBias)
         }
     }
 
-    if (pTrigger->needsGauge) {
+    if (pTrigger->needsGauge && !infiniteGauge) {
         if (gauge < pTrigger->gaugeCost) {
             return false;
         }
@@ -7289,7 +7291,9 @@ void Guy::DoEventKey(Action *pAction, int frameID, Fixed prevPosOffset)
                             break;
                         case 36:
                             if (param1 == 2) {
-                                setGauge(gauge + param2);
+                                if (!infiniteGauge) {
+                                    setGauge(gauge + param2);
+                                }
                                 if (param2 < 0 && uniqueID == 0) {
                                     pSim->comboProbe.gaugeSpend += -param2;
                                 }

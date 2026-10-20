@@ -261,6 +261,9 @@ public:
             gauge = pCharData->gauge;
         }
     }
+    void setInfiniteGauge(bool infiniteGauge) {
+        this->infiniteGauge = infiniteGauge;
+    }
 
     bool getProjectile() { return isProjectile; }
     int getProjHitCount() { return projHitCount; }
@@ -849,6 +852,7 @@ private:
         pendingUnlockHitDelayed = false;
         alreadyDeadButDoesNotKnow = false;
         poisoned = false;
+        infiniteGauge = false;
         moveStartPos = Fixed(0);
         uniqueTimerCount = 0;
         debuffTimer = 0;
@@ -1005,6 +1009,7 @@ private:
     bool appliedScaling : 1;
     bool alreadyDeadButDoesNotKnow : 1;
     bool poisoned : 1;
+    bool infiniteGauge : 1;
 
     int8_t projHitCount;
     int8_t limitShotCategory;

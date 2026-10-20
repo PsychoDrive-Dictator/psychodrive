@@ -170,6 +170,7 @@ void Simulation::CreateGuyFromCharController(CharacterUIController &controller)
     pGuy->setHealth(controller.startHealth);
     pGuy->setFocus(controller.startFocus);
     pGuy->setGauge(controller.startGauge);
+    pGuy->setInfiniteGauge(controller.infiniteGauge);
 
     pGuy->DoInstantAction(580); // IMM_STAGE_INIT
     pGuy->DoInstantAction(581); // IMM_ROUND_INIT
