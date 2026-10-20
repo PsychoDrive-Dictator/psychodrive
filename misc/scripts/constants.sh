@@ -37,6 +37,7 @@ characters=(
     "alex"
     "ingrid"
     "yasmine"
+    "arjun"
 )
 
 find_charfile() {

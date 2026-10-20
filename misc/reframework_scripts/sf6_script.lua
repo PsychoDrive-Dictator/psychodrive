@@ -964,7 +964,7 @@ function dumpPlayer(playerDump, cplayer)
   playerDump.currentInput = cplayer.pl_input_new
 end
 
-local curVersion = "53"
+local curVersion = "54"
 
 sdk.hook(sdk.find_type_definition("app.BattleFlow"):get_method("UpdateFrameEnd()"),
 function(args)

@@ -46,7 +46,7 @@ def findMoveByHitID(movesJson, hitID):
             for key in move["AttackCollisionKey"]:
                 if isinstance(move["AttackCollisionKey"][key], dict) and "CollisionType" in move["AttackCollisionKey"][key]:
                     attackKey = move["AttackCollisionKey"][key]
-                    if attackKey["CollisionType"] == 0 and attackKey["AttackDataListIndex"] == int(hitID):
+                    if attackKey["CollisionType"] < 3 and attackKey["AttackDataListIndex"] == int(hitID):
                         return moveID, str(attackKey["HitID"])
     return None
 
@@ -64,6 +64,12 @@ def checkHitParamHitStun(hitParam, left, right, expectedDiff, description):
         # todo filter out crumples and grounded knockdowns too
         print(char + " " + findMoveByHitID(moves21Json, hitID)[0] + " hit " + findMoveByHitID(moves21Json, hitID)[1] + " (dt " + hitID + "):")
         print(description + " should be " + str(expectedDiff) + ", but is " + str(difference))
+
+def checkHitParamSuperGain(hitParam, left, right, description):
+    if findMoveByHitID(moves21Json, hitID) != None:
+        if hitParam[left]["SuperOwn"] != 0 and hitParam[left]["SuperOwn"] == hitParam[right]["SuperOwn"]:
+            print(char + " " + findMoveByHitID(moves21Json, hitID)[0] + " hit " + findMoveByHitID(moves21Json, hitID)[1] + " (dt " + hitID + "):")
+            print(description + " same super gain should be diff")
 
 def countActiveFrames(move):
     minActive = -1
@@ -126,18 +132,19 @@ for char in characters:
     for hitID in hits21Json:
         hitParam = hits21Json[hitID]["param"]
         # check movetime vs hitstun
-        # for param in hitParam:
-        #     if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
-        #         print("movetime != hitstun")
-        # check burnout block is -4 compared to normal block
-        # checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
-        # checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
-        # checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
-        # checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
-        # checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
-        # checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
-        # checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
-        # checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
+        for param in hitParam:
+            if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
+                print("movetime != hitstun")
+        #check burnout block is -4 compared to normal block
+        checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
+        checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
+        checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
+        checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
+        checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
+        checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
+        checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
+        checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
+        checkHitParamSuperGain(hitParam, "00", "16", "stand hit vs stand block")
 
     # find hitboxes with certain flags
     # for moveID in moves21Json:
@@ -168,16 +175,16 @@ for char in characters:
     #         print(char + " " + moveID)
 
     # find certain branches
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "BranchKey" in move:
-            for key in move["BranchKey"]:
-                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-                    branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 2:
-                        print(char + " " + moveID + " HIT branch params " + str(branchKey["Param00"]) +
-                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "BranchKey" in move:
+    #         for key in move["BranchKey"]:
+    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+    #                 branchKey = move["BranchKey"][key]
+    #                 if branchKey["Type"] == 2:
+    #                     print(char + " " + moveID + " HIT branch params " + str(branchKey["Param00"]) +
+    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
     # for moveID in moves21Json:

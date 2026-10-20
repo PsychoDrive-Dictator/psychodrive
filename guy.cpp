@@ -3395,6 +3395,8 @@ void ResolveHits(Simulation *pSim, std::vector<PendingHit> &pendingHitList)
 
         pOtherGuy->lastHitType = hitBox.type;
         if (hitEntryFlag & counter) {
+            // not really last hit since we only or it in
+            // todo figure out which way is correct - resetting it seems to change some terry rounds
             pGuy->lastHitCounter = true;
             if (hitFlagToParent) pGuy->pParent->lastHitCounter = true;
         }

@@ -4018,7 +4018,18 @@
         "_Condition": 5131
     },
     "082": {
-        "ActualTriggerID": "",
+        "ActualTriggerID": {
+            "flag0": 8388608,
+            "flag1": 0,
+            "flag2": 0,
+            "flag3": 0,
+            "flags": {
+                "p0": 8388608,
+                "p1": 0,
+                "p2": 0,
+                "p3": 0
+            }
+        },
         "AssistComboCondition": {
             "DriveGaugeCondition": 0,
             "UniqueParam0": 0,
