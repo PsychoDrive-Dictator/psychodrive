@@ -2620,7 +2620,7 @@ void Guy::DoReflect()
 
 void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 {
-    if (parryFreeze || warudo || getHitStop() || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) return;
+    if (parryFreeze || ((tokiYoTomare || warudo) && !tokiWaUgokidasu) || getHitStop() || (pOpponent && pOpponent->wallStopped && pOpponent->stunned)) return;
     if ( !pOtherGuy ) return;
 
     // might need to put this at the end if we find ordering difference, but convenient for now
