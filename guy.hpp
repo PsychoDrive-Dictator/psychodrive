@@ -651,6 +651,7 @@ private:
         parryFreeze = 0;
         couldMove = true;
         didTrigger = false;
+        forceCancelAccel = false;
         landingAdjust = 0;
         forcedPoseStatus = 0;
         actionStatus = 0;
@@ -799,6 +800,7 @@ private:
         isDown = false;
         knockDownFrameCounter = 0;
         knockDownFrames = 0;
+        splatKnockDownFrames = 0;
         nageKnockdown = false;
         ignorePlace = false;
         recoverForward = false;
@@ -907,6 +909,7 @@ private:
     bool jumped : 1;
     bool couldMove : 1;
     bool didTrigger : 1;
+    bool forceCancelAccel : 1;
     bool counterState : 1;
     bool punishCounterState : 1;
     bool forceKnockDownState : 1;
@@ -1138,24 +1141,25 @@ private:
     Fixed hitReflectVelX;
     Fixed hitReflectAccelX;
     Fixed reflectThisFrame;
-    int uniqueOpsAppliedMask;
+    int16_t uniqueOpsAppliedMask;
 
     Fixed moveStartPos;
 
     // 2.0 was here
-    int currentScaling;
-    int pendingScaling;
-    int superGainScaling;
+    int16_t currentScaling;
+    int16_t pendingScaling;
+    int16_t superGainScaling;
 
-    int comboHits;
-    int juggleCounter;
+    int16_t comboHits;
+    int16_t juggleCounter;
     int comboDamage;
-    int lastDamageScale;
-    int lastScalingTriggerID;
+    int16_t lastDamageScale;
+    int16_t lastScalingTriggerID;
 
-    int pendingUnlockHit;
+    int16_t pendingUnlockHit;
 
-    int knockDownFrames;
+    int16_t knockDownFrames;
+    int16_t splatKnockDownFrames;
     int knockDownFrameCounter;
 
     Fixed groundBounceVelX;
@@ -1168,10 +1172,10 @@ private:
     Fixed wallBounceAccelX;
     Fixed wallBounceAccelY;
 
-    int wallStopFrames;
+    int16_t wallStopFrames;
 
     AtemiData *currentArmor;
-    int armorHitsLeft;
+    int16_t armorHitsLeft;
 
     int recoveryTiming;
 

@@ -4335,6 +4335,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             if (kabeTataki) {
                 // this can happen even if you block! blocked DI
                 wallSplat = true;
+                splatKnockDownFrames = downTime;
+                if (tumble) {
+                    splatKnockDownFrames -= pHitEffect->wallStop + 2;
+                }
                 wallSplatScaling = true;
                 wallStopFrames = pHitEffect->wallStop + 2;
                 if (stunSplat) {
@@ -5586,7 +5590,26 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         if (wallSplat) {
             if (airborne) {
                 // todo what's the burnout stun sequence there?
-                nextAction = 285;
+                if (currentAction == 289) {
+                    // tumble splat crumple
+                    nextAction = 291;
+                    resetHitStunOnTransition = true;
+                    knockDown = true;
+                    wallSplat = false;
+                    wallStopped = false;
+                    wallStopFrames = 0;
+                    velocityX = Fixed(0);
+                    accelX = Fixed(0);
+                } else {
+                    nextAction = 285;
+                    resetHitStunOnLand = true;
+                }
+                hitStun = 50000;
+                knockDown = true;
+                if (splatKnockDownFrames > 0) {
+                    knockDownFrames = splatKnockDownFrames;
+                }
+                splatKnockDownFrames = 0;
             } else {
                 if (stunned) {
                     nextAction = 293;
@@ -5623,8 +5646,9 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     nextAction = 287;
                 }
                 wallSplat = false;
-                if (airborne) {
-                    accelY.data = -39497; // todo -0.6ish ? magic gravity constant?
+                if (getAirborne() || getPosY() > Fixed(0)) {
+                    forceCancelAccel = true;
+                    cancelAccelY.data = -39497; // todo -0.6ish ? magic gravity constant?
                 }
             } else {
                 nextAction = 235; // combo/bounce state
@@ -6126,6 +6150,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallSplatScaling = false;
         stunSplat = false;
         wallLoopProtection = false;
+        splatKnockDownFrames = 0;
         if (stunned) {
             burnout = false;
             stunned = false;
@@ -6163,6 +6188,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallSplatScaling = false;
         wallLoopProtection = false;
         stunSplat = false;
+        splatKnockDownFrames = 0;
         if (stunned) {
             burnout = false;
             stunned = false;
@@ -6487,7 +6513,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
             }
         }
 
-        if (didTrigger) {
+        if (didTrigger || forceCancelAccel) {
             if (cancelAccelX != Fixed(0)) {
                 accelX = cancelAccelX;
             }
@@ -6505,6 +6531,7 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         cancelAccelY = Fixed(0);
         cancelVelocityX = Fixed(0);
         cancelVelocityY = Fixed(0);
+        forceCancelAccel = false;
 
         if (isDrive && wasDrive) {
             isDrive = false;
