@@ -4088,7 +4088,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         destY = 0;
     }
 
-    if (destY < 0 && !getAirborne()) {
+    // some scripts will go into high hitbox + landingadjust to be immediately airborne no matter what
+    bool willBeAirborne = moveType == 13;
+
+    if (destY < 0 && !getAirborne() && !willBeAirborne) {
         destY = 0;
     }
 
@@ -4219,7 +4222,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
         }
 
         // you don't seem to be able to ground bounce if true grounded, unless it's an unlock?
-        if (jimenBound && !getAirborne() && !attacker->pendingUnlockHit) {
+        if (jimenBound && !getAirborne() && !attacker->pendingUnlockHit && !willBeAirborne) {
             jimenBound = false;
         }
     }
