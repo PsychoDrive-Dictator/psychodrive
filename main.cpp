@@ -166,6 +166,7 @@ int simVersionFromGameVersion(int gameVersion, int64_t time)
         { 20004000, 1786518000, 51 },
         { 20004000, 1788850800, 52 },
         { 20005000,          0, 53 },
+        { 20005000, 1792130400, 54 },
     };
     int ret = table[0].sim;
     for (const auto &row : table) {
