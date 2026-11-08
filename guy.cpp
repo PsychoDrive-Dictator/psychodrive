@@ -5167,7 +5167,7 @@ void Guy::DoBranchKey(bool preHit)
                                 if (pGuy->debuffTimer == 1) {
                                     doBranch = true;
                                 }
-                            } else if (branchParam4 & 8192) {
+                            } else if (branchParam4 & 8192 && !preHit) {
                                 // debuffed this frame? (bomb is replaced)
                                 if (pGuy->debuffTimer == 300) {
                                     doBranch = true;
@@ -7457,6 +7457,10 @@ void Guy::DoShotKey(Action *pAction, int frameID, bool preHit)
             }
             // run initial frame on behalf of sim loop here because it wasn't included this frame
             //pNewGuy->DoStatusKey(true);
+            pNewGuy->DoBranchKey(true);
+            if (pNewGuy->nextAction != -1) {
+                pNewGuy->NextAction(false, true, true);
+            }
             pNewGuy->RunFrame(true);
             if (pOpponent) {
                 pNewGuy->Push(pOpponent); // push/clash with other projectiles/etc
