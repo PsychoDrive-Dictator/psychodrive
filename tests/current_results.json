@@ -8644,6 +8644,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ingrid_groundbounce_adv",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 195,
+                "firstFrame": 293,
+                "lastFrame": 467
+            },
+            {
+                "count": 98,
+                "firstFrame": 237,
+                "lastFrame": 333
+            },
+            {
+                "count": 4,
+                "firstFrame": 312,
+                "lastFrame": 324
+            },
+            {
+                "count": 84,
+                "firstFrame": 237,
+                "lastFrame": 322
+            },
+            {
+                "count": 84,
+                "firstFrame": 237,
+                "lastFrame": 322
+            },
+            {
+                "count": 138,
+                "firstFrame": 51,
+                "lastFrame": 375
+            },
+            {
+                "count": 225,
+                "firstFrame": 73,
+                "lastFrame": 467
+            },
+            {
+                "count": 1,
+                "firstFrame": 333,
+                "lastFrame": 333
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ingrid_normal_atemi",
         "testVersion": "42",
         "finished": true,
