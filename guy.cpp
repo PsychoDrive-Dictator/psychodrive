@@ -7016,7 +7016,8 @@ void Guy::DoLockKey(void)
                     groundBounceVelX = getPosX();
                     //groundBounceVelY = getPosY();
                     posX = Fixed(0);
-                    //posY = Fixed(0);
+                    posY = Fixed(0);
+                    airborne = false;
 
                     superLock = true;
                 }
