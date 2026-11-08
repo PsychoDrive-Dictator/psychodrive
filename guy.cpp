@@ -6552,6 +6552,10 @@ void Guy::NextAction(bool didTrigger, bool didBranch, bool bElide)
         actionStatus = 0;
         jumpStatus = 0;
         landingAdjust = 0;
+        if (getPosY() < Fixed(0)) {
+            posY = Fixed(0);
+            posOffsetX = Fixed(0);
+        }
         DoStatusKey();
     }
 }
