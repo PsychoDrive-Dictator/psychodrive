@@ -3771,7 +3771,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     }
     int attackerInstantScale = attacker->triggerInstantScale + attacker->actionInstantScale;
 
-    if (applyHit && dmgValue) {
+    if (applyHit && (dmgValue || pHitEffect->recoverableDamage)) {
         if ((comboHits == 0 || comboDamage == 0)) {
             currentScaling = wallSplatScaling ? 80 : 100;
             pendingScaling = 0;
@@ -3876,9 +3876,10 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     log(logHits, "effective scaling " + std::to_string(effectiveScaling) + " " + std::to_string(moveDamage) + " attacker scalingTriggerID " + std::to_string(attacker->scalingTriggerID));
 
     if (pHitEffect->recoverableDamage) {
-        health -= pHitEffect->recoverableDamage;
-        comboDamage += pHitEffect->recoverableDamage;
-        recoverableHealth += pHitEffect->recoverableDamage;
+        int recoverableDamage = pHitEffect->recoverableDamage * effectiveScaling / 100;
+        health -= recoverableDamage;
+        comboDamage += recoverableDamage;
+        recoverableHealth += recoverableDamage;
         recoverableHealthCooldown = 120;
 
         if (health <= 0) {
