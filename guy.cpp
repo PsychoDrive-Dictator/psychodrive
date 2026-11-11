@@ -447,6 +447,11 @@ bool Guy::RunFrame(bool advancingTime)
             DoPlaceKey();
         }
 
+        // landing by placekey is just no longer being airborne
+        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) <= Fixed(0) && airborne) {
+            airborne = false;
+        }
+
         noPlaceXNextFrame = false;
         noPlaceYNextFrame = false;
 
@@ -527,11 +532,6 @@ bool Guy::RunFrame(bool advancingTime)
             if (prevPosY == Fixed(0) && getPosY() > Fixed(0)) {
                 airborne = true; // i think we should go by statusKey instead?
             }
-        }
-        // let projectiles land though - akuma air fb and mai charged fan bounce
-        if (prevPosY > Fixed(0) && getPosY() - Fixed(landingAdjust) == Fixed(0) && airborne) {
-            airborne = false;
-            landed = true;
         }
 
         counterState = false;
