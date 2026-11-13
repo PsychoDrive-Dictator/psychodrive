@@ -101,7 +101,7 @@ public:
         return ret;
     }
 
-    Fixed operator - (const Fixed &in) {
+    Fixed operator - (const Fixed &in) const {
         Fixed ret;
         ret.data = data - in.data;
         return ret;

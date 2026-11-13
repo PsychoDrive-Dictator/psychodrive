@@ -4850,14 +4850,31 @@ void Guy::DoBranchKey(bool preHit)
                     break;
                 case 17: // distance to opponent? maybe to other stuff too
                     if (pOpponent) {
-                        Fixed distToOpponent = fixAbs(getPosX() - pOpponent->getPosX());
-                        if (branchParam0 == 9) {
-                            if (distToOpponent >= branchParam1) {
-                                doBranch = true;
+                        if (branchParam0 == 7 || branchParam0 == 8) {
+                            Fixed cornerWall = isProjectile ? projWallDistance : wallDistance;
+                            if (direction < Fixed(0)) {
+                                cornerWall = -cornerWall;
                             }
-                        } else if (branchParam0 == 10) {
-                            if (distToOpponent < branchParam1) {
-                                doBranch = true;
+                            Fixed distToCorner = fixAbs(cornerWall - getPosX());
+                            if (branchParam0 == 7) {
+                                if (distToCorner >= branchParam1) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam0 == 8) {
+                                if (distToCorner <= branchParam1) {
+                                    doBranch = true;
+                                }
+                            }
+                        } else if (branchParam0 == 9 || branchParam0 == 10) {
+                            Fixed distToOpponent = fixAbs(getPosX() - pOpponent->getPosX());
+                            if (branchParam0 == 9) {
+                                if (distToOpponent >= branchParam1) {
+                                    doBranch = true;
+                                }
+                            } else if (branchParam0 == 10) {
+                                if (distToOpponent <= branchParam1) {
+                                    doBranch = true;
+                                }
                             }
                         } else {
                             log(logUnknowns, "unknown type of distance branch");
