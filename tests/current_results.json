@@ -7639,6 +7639,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "ed_psycho_knuckle_behind",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 1029,
+                "firstFrame": 153,
+                "lastFrame": 668
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 287,
+                "firstFrame": 181,
+                "lastFrame": 614
+            },
+            {
+                "count": 624,
+                "firstFrame": 181,
+                "lastFrame": 668
+            },
+            {
+                "count": 4,
+                "firstFrame": 227,
+                "lastFrame": 490
+            },
+            {
+                "count": 221,
+                "firstFrame": 181,
+                "lastFrame": 614
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "ed_shin_dream_gel",
         "testVersion": "37",
         "finished": true,
