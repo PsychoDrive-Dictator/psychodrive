@@ -546,6 +546,7 @@ bool Guy::RunFrame(bool advancingTime)
         ignoreScreenPush = false;
         ignoreCornerPushback = false;
         inputIgnoresOpponentDirection = false;
+        getBehind = false;
         teleported = false;
 
         DoSwitchKey();
@@ -2216,8 +2217,20 @@ bool Guy::Push(Guy *pOtherGuy)
         } else {
             if (fixAbs(pushXLeft) < fixAbs(pushXRight)) {
                 pushNeeded = -pushXLeft;
-            } else {
+            } else if (fixAbs(pushXLeft) > fixAbs(pushXRight)) {
                 pushNeeded = -pushXRight;
+            } else {
+                Fixed directionToUse = direction;
+                if (getBehind) {
+                    directionToUse = -directionToUse;
+                } else if (pOpponent->getBehind) {
+                    directionToUse = pOpponent->direction;
+                }
+                if (directionToUse > Fixed(0)) {
+                    pushNeeded = -pushXLeft;
+                } else {
+                    pushNeeded = -pushXRight;
+                }
             }
         }
 
@@ -2711,6 +2724,7 @@ void Guy::CheckHit(Guy *pOtherGuy, std::vector<PendingHit> &pendingHitList)
 
         if (isGrab) {
             bool bIgnoreHitStun = hitbox.pHitData->common[0].attr2 & (1<<7);
+            // todo hack - there's a switchkey to grab people in crumple scripts instead of looking for our 'infinite hitstun'
             bool doGrab = (!pOtherGuy->getHitStun() || pOtherGuy->getHitStun() > 1000 || bIgnoreHitStun) && !pOtherGuy->throwProtectionFrames;
             if (doGrab) {
                 std::vector<HitBox> otherNullifyGrabBoxes;
@@ -6623,6 +6637,9 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x80000) {
             ignoreBodyPush = true;
+        }
+        if (flag & 0x800) {
+            getBehind = true;
         }
         if (flag & 0x40) {
             ignoreScreenPush = true;

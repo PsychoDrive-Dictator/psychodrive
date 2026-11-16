@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import json
-
+import os
+import subprocess
 characters = [
     "ryu",
     "luke",
@@ -38,6 +39,22 @@ characters = [
 ]
 
 dataPath = "./data/chars/"
+
+versions = subprocess.run(
+    ["./psychodrive", "printversions"],
+    capture_output=True,
+    text=True
+).stdout.split("\n")
+
+def findCharFile(char, targetVer, fileType):
+    lastGoodFile="bla"
+    for ver in versions:
+        fileName = dataPath + "/" + char + "/" + char + ver + "_" + fileType + ".json"
+        if os.path.isfile(fileName):
+            lastGoodFile = fileName
+        if ver == targetVer:
+            break
+    return lastGoodFile
 
 def findMoveByHitID(movesJson, hitID):
     for moveID in movesJson:
@@ -120,31 +137,28 @@ def compareScaling(moveLeft, moveRight, scalingString, descHeader):
                
 
 for char in characters:
-    dataPathWithChar = dataPath + char + "/"
-    # charWithVersion = char + "52"
     # hitsJson = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
     # movesJson = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    charWithVersion = char + "53"
-    hits21Json = json.load(open(dataPathWithChar + charWithVersion + "_hit.json"))
-    moves21Json = json.load(open(dataPathWithChar + charWithVersion + "_moves.json"))
-    tgroups21Json = json.load(open(dataPathWithChar + charWithVersion + "_trigger_groups.json"))
+    hits21Json = json.load(open(findCharFile(char, "54", "hit")))
+    moves21Json = json.load(open(findCharFile(char, "54", "moves")))
+    tgroups21Json = json.load(open(findCharFile(char, "54", "trigger_groups")))
 
-    for hitID in hits21Json:
-        hitParam = hits21Json[hitID]["param"]
-        # check movetime vs hitstun
-        for param in hitParam:
-            if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
-                print("movetime != hitstun")
-        #check burnout block is -4 compared to normal block
-        checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
-        checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
-        checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
-        checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
-        checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
-        checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
-        checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
-        checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
-        checkHitParamSuperGain(hitParam, "00", "16", "stand hit vs stand block")
+    # for hitID in hits21Json:
+    #     hitParam = hits21Json[hitID]["param"]
+    #     # check movetime vs hitstun
+    #     for param in hitParam:
+    #         if hitParam[param]["HitStun"] != hitParam[param]["MoveTime"]:
+    #             print("movetime != hitstun")
+    #     #check burnout block is -4 compared to normal block
+    #     checkHitParamHitStun(hitParam, "04", "16", -4, "burnout stand block vs stand block")
+    #     checkHitParamHitStun(hitParam, "16", "17", 0, "stand block vs crouch block")
+    #     checkHitParamHitStun(hitParam, "04", "05", 0, "burnout stand block vs burnout crouch block")
+    #     checkHitParamHitStun(hitParam, "00", "01", 0, "stand hit vs crouch hit")
+    #     checkHitParamHitStun(hitParam, "08", "09", 0, "stand counter vs crouch counter")
+    #     checkHitParamHitStun(hitParam, "12", "13", 0, "stand PC vs crouch PC")
+    #     checkHitParamHitStun(hitParam, "00", "08", 2, "stand hit vs stand counter")
+    #     checkHitParamHitStun(hitParam, "00", "12", 4, "stand hit vs stand PC")
+    #     checkHitParamSuperGain(hitParam, "00", "16", "stand hit vs stand block")
 
     # find hitboxes with certain flags
     # for moveID in moves21Json:
@@ -215,17 +229,17 @@ for char in characters:
     #                     print(char + " " + moveID + " StatusKey Side " + str(statusKey["Side"]) + " frames " + str(statusKey["_StartFrame"]) +
     #                           "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
 
-    # find certain SwitchKey OperationFlag bits
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "SwitchKey" in move:
-    #         for key in move["SwitchKey"]:
-    #             if isinstance(move["SwitchKey"][key], dict) and "OperationFlag" in move["SwitchKey"][key]:
-    #                 switchKey = move["SwitchKey"][key]
-    #                 if switchKey["OperationFlag"] != 0:
-    #                     print(char + " " + moveID + " switchkey OperationFlag " +
-    #                     str(switchKey["OperationFlag"]) + " frames " + str(switchKey["_StartFrame"]) +
-    #                     "-" + str(switchKey["_EndFrame"]))
+    # find certain SwitchKey SystemFlag bits
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "SwitchKey" in move:
+            for key in move["SwitchKey"]:
+                if isinstance(move["SwitchKey"][key], dict) and "SystemFlag" in move["SwitchKey"][key]:
+                    switchKey = move["SwitchKey"][key]
+                    if switchKey["SystemFlag"] & 2048:
+                        print(char + " " + moveID + " switchkey SystemFlag " +
+                        str(switchKey["SystemFlag"]) + " frames " + str(switchKey["_StartFrame"]) +
+                        "-" + str(switchKey["_EndFrame"]))
 
     # find SwitchKey timer stop bits
     # for moveID in moves21Json:

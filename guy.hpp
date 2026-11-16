@@ -669,6 +669,7 @@ private:
         ignoreScreenPush = false;
         ignoreCornerPushback = false;
         inputIgnoresOpponentDirection = false;
+        getBehind = false;
         crossUpProtection = false;
         noAccelNextFrame = false;
         posOffsetX = Fixed(0);
@@ -923,6 +924,7 @@ private:
     bool ignoreScreenPush : 1;
     bool ignoreCornerPushback : 1;
     bool inputIgnoresOpponentDirection : 1;
+    bool getBehind : 1;
     bool crossUpProtection : 1;
     bool noAccelNextFrame : 1;
     bool setPlaceX : 1;
