@@ -10788,6 +10788,140 @@ var currentResults =
         ]
     },
     {
+        "testName": "ken_sa3",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 437,
+                "firstFrame": 218,
+                "lastFrame": 758
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 15,
+                "firstFrame": 646,
+                "lastFrame": 660
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 691,
+                "lastFrame": 692
+            }
+        ]
+    },
+    {
+        "testName": "ken_sa3_corner",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 318,
+                "firstFrame": 346,
+                "lastFrame": 880
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 49,
+                "firstFrame": 774,
+                "lastFrame": 852
+            },
+            {
+                "count": 62,
+                "firstFrame": 819,
+                "lastFrame": 880
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 45,
+                "firstFrame": 774,
+                "lastFrame": 818
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 819,
+                "lastFrame": 820
+            }
+        ]
+    },
+    {
         "testName": "ken_throw_p1_p2_side",
         "testVersion": "39",
         "finished": true,
