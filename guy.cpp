@@ -2356,6 +2356,14 @@ bool Guy::Push(Guy *pOtherGuy)
             }
         }
 
+        // if we're pushing someone in hitstop, nobody else is gonna update that
+        if (getHitStop()) {
+            lastPosX = getPosX();
+        }
+        if (pOtherGuy->getHitStop()) {
+            pOtherGuy->lastPosX = pOtherGuy->getPosX();
+        }
+
         didPush = true;
         pOtherGuy->didPush = true;
 
