@@ -14138,6 +14138,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "yasmine_install_sideswitch",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 329,
+                "firstFrame": 326,
+                "lastFrame": 554
+            },
+            {
+                "count": 119,
+                "firstFrame": 339,
+                "lastFrame": 435
+            },
+            {
+                "count": 2,
+                "firstFrame": 349,
+                "lastFrame": 435
+            },
+            {
+                "count": 53,
+                "firstFrame": 339,
+                "lastFrame": 433
+            },
+            {
+                "count": 53,
+                "firstFrame": 339,
+                "lastFrame": 433
+            },
+            {
+                "count": 116,
+                "firstFrame": 419,
+                "lastFrame": 501
+            },
+            {
+                "count": 232,
+                "firstFrame": 340,
+                "lastFrame": 554
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 168,
+                "firstFrame": 382,
+                "lastFrame": 500
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 2,
+                "firstFrame": 468,
+                "lastFrame": 469
+            }
+        ]
+    },
+    {
         "testName": "yasmine_sa3",
         "testVersion": "50",
         "finished": true,
