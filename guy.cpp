@@ -4071,8 +4071,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
     }
 
     Fixed attackerDirection = attackerForDirection->direction;
+    if (attackerForDirection->innerDirection != attackerDirection && !attackerForDirection->pendingUnlockHit) {
+        attackerDirection = attackerForDirection->innerDirection;
+    }
     if (usePositionAsDirection) {
-        attackerDirection = attackerForDirection->direction;
         if (attackerForDirection->needsTurnaround(Fixed(0))) {
             attackerDirection *= Fixed(-1);
         }
