@@ -189,16 +189,16 @@ for char in characters:
     #         print(char + " " + moveID)
 
     # find certain branches
-    # for moveID in moves21Json:
-    #     move = moves21Json[moveID]
-    #     if "BranchKey" in move:
-    #         for key in move["BranchKey"]:
-    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-    #                 branchKey = move["BranchKey"][key]
-    #                 if branchKey["Type"] == 2:
-    #                     print(char + " " + moveID + " HIT branch params " + str(branchKey["Param00"]) +
-    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "BranchKey" in move:
+            for key in move["BranchKey"]:
+                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+                    branchKey = move["BranchKey"][key]
+                    if branchKey["Type"] == 28:
+                        print(char + " " + moveID + " FIGHT_STYLE branch params " + str(branchKey["Param00"]) +
+                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
     # for moveID in moves21Json:
@@ -230,16 +230,16 @@ for char in characters:
     #                           "-" + str(statusKey["_EndFrame"]) + " pose " + str(statusKey["PoseStatus"]))
 
     # find certain SwitchKey SystemFlag bits
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "SwitchKey" in move:
-            for key in move["SwitchKey"]:
-                if isinstance(move["SwitchKey"][key], dict) and "SystemFlag" in move["SwitchKey"][key]:
-                    switchKey = move["SwitchKey"][key]
-                    if switchKey["SystemFlag"] & 2048:
-                        print(char + " " + moveID + " switchkey SystemFlag " +
-                        str(switchKey["SystemFlag"]) + " frames " + str(switchKey["_StartFrame"]) +
-                        "-" + str(switchKey["_EndFrame"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "SwitchKey" in move:
+    #         for key in move["SwitchKey"]:
+    #             if isinstance(move["SwitchKey"][key], dict) and "SystemFlag" in move["SwitchKey"][key]:
+    #                 switchKey = move["SwitchKey"][key]
+    #                 if switchKey["SystemFlag"] & 2048:
+    #                     print(char + " " + moveID + " switchkey SystemFlag " +
+    #                     str(switchKey["SystemFlag"]) + " frames " + str(switchKey["_StartFrame"]) +
+    #                     "-" + str(switchKey["_EndFrame"]))
 
     # find SwitchKey timer stop bits
     # for moveID in moves21Json:

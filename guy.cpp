@@ -5044,6 +5044,11 @@ void Guy::DoBranchKey(bool preHit)
                         }
                     }
                     break;
+                case 28:
+                    if (styleInstall == branchParam0) {
+                        doBranch = true;
+                    }
+                    break;
                 case 29: // unique param
                     {
                         if (branchParam1 >= 0 && branchParam1 < uniqueParamCount) {
