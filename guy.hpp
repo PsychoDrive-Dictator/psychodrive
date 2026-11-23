@@ -1115,7 +1115,7 @@ private:
     uint16_t framesSinceLastInput;
 
     // hitting side
-    uint64_t canHitID;
+    __uint128_t canHitID;
 
     int prevHitStop;
     int hitStop;

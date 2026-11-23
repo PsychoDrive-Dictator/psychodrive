@@ -492,8 +492,9 @@ void loadHitBoxKeys(nlohmann::json* pHitBoxJson, std::vector<HitBoxKey>* pOutput
         }
         if (hitID == 15 || type == domain) {
             hitID = 15 + atoi(hitBoxID.c_str());
-            if (hitID >= 64) {
-                log("hitID overflow for domain boxes!");
+            if (hitID >= 128) {
+                fprintf(stderr, "hitID overflow for domain boxes! %s", std::to_string(hitID).c_str());
+                abort();
             }
         }
         newKey.hasHitID = hasHitID;
