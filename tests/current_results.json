@@ -12066,17 +12066,17 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 11,
-                "firstFrame": 730,
-                "lastFrame": 740
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 170,
+                "count": 135,
                 "firstFrame": 124,
                 "lastFrame": 1022
             },
             {
-                "count": 18,
+                "count": 4,
                 "firstFrame": 124,
                 "lastFrame": 1022
             },
