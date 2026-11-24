@@ -3865,6 +3865,9 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     if (perfectScaling) {
         effectiveScaling = effectiveScaling * 50 / 100;
     }
+    if (wallSlamScaling) {
+        effectiveScaling = effectiveScaling * 80 / 100;
+    }
 
     if (attacker->superAction) {
         if (attacker->superLevel == 1 && effectiveScaling < 30) {
@@ -4180,6 +4183,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
             resetHitStunOnTransition = true;
             knockDown = true;
             knockDownFrames = downTime;
+            kabeTataki = false;
         }
     }
 
@@ -5661,6 +5665,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     resetHitStunOnTransition = true;
                     knockDown = true;
                     wallSplat = false;
+                    wallSplatScaling = false;
+                    wallSlamScaling = true;
                 }
                 // crumple
                 blocking = false;
@@ -6191,6 +6197,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
         wallSplatScaling = false;
+        wallSlamScaling = false;
         stunSplat = false;
         wallLoopProtection = false;
         splatKnockDownFrames = 0;
@@ -6229,6 +6236,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         wallBounce = false; // just in case we didn't reach a wall
         wallSplat = false;
         wallSplatScaling = false;
+        wallSlamScaling = false;
         wallLoopProtection = false;
         stunSplat = false;
         splatKnockDownFrames = 0;
@@ -6633,7 +6641,8 @@ void Guy::DoSwitchKey(void)
         }
         if (flag & 0x8000000) {
             isDrive = true;
-            if (pOpponent && !pOpponent->driveScaling && pOpponent->currentScaling) {
+            if (pOpponent && !pOpponent->driveScaling &&
+                (pOpponent->currentScaling || pOpponent->wallSplatScaling || pOpponent->wallSlamScaling)) {
                 pOpponent->driveScaling = true;
             }
         }
