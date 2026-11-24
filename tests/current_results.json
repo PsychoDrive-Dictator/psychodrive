@@ -12061,6 +12061,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "rashid_ignore_inertia",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 11,
+                "firstFrame": 730,
+                "lastFrame": 740
+            },
+            {
+                "count": 170,
+                "firstFrame": 124,
+                "lastFrame": 1022
+            },
+            {
+                "count": 18,
+                "firstFrame": 124,
+                "lastFrame": 1022
+            },
+            {
+                "count": 91,
+                "firstFrame": 928,
+                "lastFrame": 1018
+            },
+            {
+                "count": 91,
+                "firstFrame": 928,
+                "lastFrame": 1018
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 69,
+                "firstFrame": 413,
+                "lastFrame": 1021
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "rashid_run_slide_corner_sideswitch",
         "testVersion": "52",
         "finished": true,
