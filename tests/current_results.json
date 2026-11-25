@@ -5227,6 +5227,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "arjun_hp_tc_adv",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 47,
+                "firstFrame": 138,
+                "lastFrame": 170
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 34,
+                "firstFrame": 128,
+                "lastFrame": 170
+            },
+            {
+                "count": 34,
+                "firstFrame": 128,
+                "lastFrame": 170
+            },
+            {
+                "count": 159,
+                "firstFrame": 104,
+                "lastFrame": 474
+            },
+            {
+                "count": 147,
+                "firstFrame": 162,
+                "lastFrame": 489
+            },
+            {
+                "count": 8,
+                "firstFrame": 363,
+                "lastFrame": 370
+            },
+            {
+                "count": 49,
+                "firstFrame": 352,
+                "lastFrame": 400
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "arjun_juggle_adv_forcepc",
         "testVersion": "54",
         "finished": true,
