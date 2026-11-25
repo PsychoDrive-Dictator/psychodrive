@@ -4427,7 +4427,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                     hitStun = 14;
                 }
 
-                if (hitStun == 0 || piyoBound) {
+                if (hitStun == 0 || piyoBound || (throwRelease == 0 && destY == 0)) {
                     hitStun = 1; // so AdvanceFrame knocks us down
                 }
 
@@ -7055,6 +7055,7 @@ void Guy::DoLockKey(void)
         if (type == 1) {
             if (pOpponent) {
                 pOpponent->nextAction = param01;
+                pOpponent->nextActionFrame = lockKey.param02;
                 pOpponent->nextActionOpponentAction = true;
                 pOpponent->hitStun = 50000;
                 pOpponent->juggleCounter = 0;
@@ -7084,11 +7085,11 @@ void Guy::DoLockKey(void)
                         pOpponent->bgOffsetX = Fixed(0);
                         pOpponent->airborne = airborne;
                     }
-                    pOpponent->velocityX = Fixed(0);
-                    pOpponent->velocityY = Fixed(0);
-                    pOpponent->accelX = Fixed(0);
-                    pOpponent->accelY = Fixed(0);
                 }
+                pOpponent->velocityX = Fixed(0);
+                pOpponent->velocityY = Fixed(0);
+                pOpponent->accelX = Fixed(0);
+                pOpponent->accelY = Fixed(0);
                 // for transition
                 pOpponent->AdvanceFrame(false);
                 // for placekey/etc
