@@ -11793,6 +11793,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "mai_hk_tc_followup",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 435,
+                "firstFrame": 113,
+                "lastFrame": 487
+            },
+            {
+                "count": 107,
+                "firstFrame": 187,
+                "lastFrame": 492
+            },
+            {
+                "count": 2,
+                "firstFrame": 197,
+                "lastFrame": 492
+            },
+            {
+                "count": 133,
+                "firstFrame": 113,
+                "lastFrame": 484
+            },
+            {
+                "count": 133,
+                "firstFrame": 113,
+                "lastFrame": 484
+            },
+            {
+                "count": 80,
+                "firstFrame": 237,
+                "lastFrame": 471
+            },
+            {
+                "count": 159,
+                "firstFrame": 237,
+                "lastFrame": 491
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 40,
+                "firstFrame": 197,
+                "lastFrame": 236
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "marisa_5hp_max_followup",
         "testVersion": "40",
         "finished": true,
