@@ -801,6 +801,7 @@ private:
         isDown = false;
         knockDownFrameCounter = 0;
         knockDownFrames = 0;
+        afterSlideKnockDownFrames = 0;
         splatKnockDownFrames = 0;
         nageKnockdown = false;
         ignorePlace = false;
@@ -1164,6 +1165,7 @@ private:
     int16_t pendingUnlockHit;
 
     int16_t knockDownFrames;
+    int16_t afterSlideKnockDownFrames;
     int16_t splatKnockDownFrames;
     int knockDownFrameCounter;
 

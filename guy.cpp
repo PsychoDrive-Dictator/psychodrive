@@ -4351,7 +4351,8 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                     } else {
                         knockDown = true;
                         slide = true;
-                        knockDownFrames = 31;
+                        knockDownFrames = 37;
+                        afterSlideKnockDownFrames = downTime;
                     }
                 }
             }
@@ -5765,7 +5766,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         nextAction = 333;
         slide = false;
         hitStun = knockDownFrames;
-        knockDownFrames = 9;
+        knockDownFrames = afterSlideKnockDownFrames;
+        afterSlideKnockDownFrames = 0;
 
         velocityX = groundBounceVelX;
         accelX = groundBounceAccelX;
