@@ -4404,7 +4404,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
 
                 nageKnockdown = true;
                 knockDown = true;
-                knockDownFrames = downTime;
+                knockDownFrames = pHitEffect->downTime;
+                if (knockDownFrames < 1) {
+                    knockDownFrames = 1;
+                }
                 // the bounddest for this is always positive
                 if (!groundBounce) {
                     groundSlideVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
@@ -4425,7 +4428,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 }
 
                 if (hitStun == 0 && throwRelease == 3) {
-                    hitStun = 14;
+                    hitStun = 16;
                 }
 
                 if (hitStun == 0 || piyoBound || (throwRelease == 0 && destY == 0)) {
