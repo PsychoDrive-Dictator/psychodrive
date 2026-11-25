@@ -5227,6 +5227,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "arjun_juggle_adv_forcepc",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 261,
+                "firstFrame": 152,
+                "lastFrame": 343
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 178,
+                "firstFrame": 152,
+                "lastFrame": 337
+            },
+            {
+                "count": 178,
+                "firstFrame": 152,
+                "lastFrame": 337
+            },
+            {
+                "count": 39,
+                "firstFrame": 152,
+                "lastFrame": 427
+            },
+            {
+                "count": 302,
+                "firstFrame": 176,
+                "lastFrame": 613
+            },
+            {
+                "count": 2,
+                "firstFrame": 384,
+                "lastFrame": 385
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 34,
+                "firstFrame": 384,
+                "lastFrame": 417
+            }
+        ]
+    },
+    {
         "testName": "bison_sa1_kill",
         "testVersion": "41",
         "finished": true,
