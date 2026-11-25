@@ -8716,14 +8716,14 @@ var currentResults =
         "finished": true,
         "errorTypes": [
             {
-                "count": 143,
-                "firstFrame": 325,
-                "lastFrame": 467
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
             },
             {
-                "count": 135,
+                "count": 125,
                 "firstFrame": 237,
-                "lastFrame": 333
+                "lastFrame": 324
             },
             {
                 "count": 4,
@@ -13545,9 +13545,9 @@ var currentResults =
                 "lastFrame": 404
             },
             {
-                "count": 473,
+                "count": 478,
                 "firstFrame": 96,
-                "lastFrame": 463
+                "lastFrame": 468
             },
             {
                 "count": 4,
@@ -13612,9 +13612,9 @@ var currentResults =
                 "lastFrame": 590
             },
             {
-                "count": 361,
+                "count": 366,
                 "firstFrame": 228,
-                "lastFrame": 457
+                "lastFrame": 462
             },
             {
                 "count": 3,

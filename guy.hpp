@@ -814,6 +814,7 @@ private:
         groundBounceVelY = Fixed(0);
         groundBounceAccelX = Fixed(0);
         groundBounceAccelY = Fixed(0);
+        groundSlideVelX = Fixed(0);
         wallBounce = false;
         wallSplat = false;
         wallSplatScaling = false;
@@ -1170,6 +1171,8 @@ private:
     Fixed groundBounceVelY;
     Fixed groundBounceAccelX;
     Fixed groundBounceAccelY;
+
+    Fixed groundSlideVelX;
 
     Fixed wallBounceVelX;
     Fixed wallBounceVelY;

@@ -4171,10 +4171,10 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 }
                 knockDown = true;
                 // slide velocity while on the ground?
-                groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime);
+                groundSlideVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime);
             } else {
                 knockDown = false;
-                groundBounceVelX = Fixed(0);
+                groundSlideVelX = Fixed(0);
             }
         }
 
@@ -4331,7 +4331,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                     knockDown = true;
                     tumble = true;
                     // todo move this into some kind of 'next vel' and debloat the guy struct
-                    groundBounceVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
+                    groundSlideVelX = Fixed(-pHitEffect->boundDest) / Fixed(downTime - 27); // TWENTY-SEVEN
                     knockDownFrames = downTime - 27;
                 }
                 if (moveType == 9 || moveType == 19) {
@@ -4406,7 +4406,7 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                 knockDownFrames = downTime;
                 // the bounddest for this is always positive
                 if (!groundBounce) {
-                    groundBounceVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
+                    groundSlideVelX = Fixed(direction.i() * -1 * hitVelDirection.i() * pHitEffect->boundDest) / Fixed(downTime);
                 }
 
                 // maybe we need to actually let the ground bounce through here
@@ -5752,8 +5752,8 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
             hitStun = knockDownFrames;
             knockDownFrames = 27;
 
-            velocityX = groundBounceVelX;
-            groundBounceVelX = 0.0f;
+            velocityX = groundSlideVelX;
+            groundSlideVelX = 0.0f;
         } else if (slide) {
             doSlideBounce = true;
         }
@@ -5930,10 +5930,10 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
                     nextAction = 330;
                     knockDownFrameCounter = pSim->frameCounter;
                     bool slide = false;
-                    if (groundBounceVelX != Fixed(0)) {
+                    if (groundSlideVelX != Fixed(0)) {
                         slide = true;
-                        velocityX = groundBounceVelX;
-                        groundBounceVelX = Fixed(0);
+                        velocityX = groundSlideVelX;
+                        groundSlideVelX = Fixed(0);
                     }
                     // nage slide or tumble
                     if ((throwRelease == 3 && !landed) || (nageKnockdown && slide) || (currentAction == 289)) {
