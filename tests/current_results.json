@@ -12262,6 +12262,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "marisa_command_grab",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 113,
+                "firstFrame": 310,
+                "lastFrame": 422
+            },
+            {
+                "count": 4,
+                "firstFrame": 314,
+                "lastFrame": 317
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 107,
+                "firstFrame": 316,
+                "lastFrame": 422
+            },
+            {
+                "count": 104,
+                "firstFrame": 319,
+                "lastFrame": 422
+            },
+            {
+                "count": 48,
+                "firstFrame": 315,
+                "lastFrame": 362
+            },
+            {
+                "count": 105,
+                "firstFrame": 315,
+                "lastFrame": 422
+            },
+            {
+                "count": 3,
+                "firstFrame": 318,
+                "lastFrame": 320
+            },
+            {
+                "count": 3,
+                "firstFrame": 315,
+                "lastFrame": 317
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "pushphysics_new_luke_ryu",
         "testVersion": "26",
         "finished": true,
