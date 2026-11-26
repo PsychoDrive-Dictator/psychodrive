@@ -1027,7 +1027,7 @@ bool Guy::MatchNormalCommandInput(CommandInput *pInput, uint32_t &inputBufferCur
         } else if (pInput->ngKeyFlags & bufferInput) {
             inputNg = true;
         }
-        if (pInput->failCondFlags & 2) {
+        if (pInput->failCondFlags & 2 && pInput->failKeyFlags != 0) {
             if ((bufferInput & 0xF) == (pInput->failKeyFlags & 0xF)) {
                 inputFail = true;
             }
