@@ -3945,7 +3945,7 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
                 minion->die = true;
             }
         }
-        if (pOpponent) {
+        if (pOpponent && pOpponent->debuffTimer) {
             pOpponent->debuffTimer = 1;
         }
     }
