@@ -1141,9 +1141,6 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         // }
         newAction.loopCount = (*pFab)["State"]["LoopCount"];
         newAction.startScale = (*pFab)["Combo"]["_StartScaling"];
-        if (newAction.startScale < 0) {
-            newAction.startScale = 0;
-        }
         newAction.comboScale = (*pFab)["Combo"]["ComboScaling"];
         if (newAction.comboScale < 0) {
             newAction.comboScale = 10;
@@ -1151,6 +1148,9 @@ void loadActionsFromMoves(nlohmann::json* pMovesJson, CharacterData* pRet, std::
         newAction.instantScale = (*pFab)["Combo"]["InstScaling"];
         if (newAction.instantScale < 0) {
             newAction.instantScale = 0;
+        }
+        if (newAction.startScale < 0) {
+            newAction.startScale = -newAction.instantScale;
         }
 
         if (pFab->contains("Projectile")) {

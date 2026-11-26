@@ -284,9 +284,6 @@ void Guy::UpdateActionData(void)
         loopCount = pCurrentAction->loopCount;
 
         actionInstantScale = pCurrentAction->instantScale;
-        if (pOpponent && !pOpponent->comboHits) {
-            actionInstantScale = 0;
-        }
     }
 }
 
@@ -727,10 +724,6 @@ bool Guy::ExecuteTrigger(Trigger *pTrigger)
     }
 
     triggerInstantScale = pTrigger->comboInst;
-    if (pOpponent && !pOpponent->comboHits) {
-        // todo is this right if projectiles hit out of order?
-        triggerInstantScale = 0;
-    }
     triggerSuperGainScaling = pTrigger->comboSuperScaling;
 
     superAction = flags & (1ULL<<15);
@@ -3784,9 +3777,23 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
     if (isGrab) {
         dmgValue = 0;
     }
+    if (applyHit && (comboHits == 0 || comboDamage == 0)) {
+        // instant scale never applies to the move that starts the combo
+        Guy *pMaybeParent = attacker->pParent ? attacker->pParent.pGuy : attacker;
+        if (pMaybeParent->scalingTriggerID == attacker->scalingTriggerID) {
+            pMaybeParent->triggerInstantScale = 0;
+            pMaybeParent->actionInstantScale = 0;
+        }
+        for (Guy *pAttackerMinionOrSibling : pMaybeParent->getMinions()) {
+            if (pAttackerMinionOrSibling->scalingTriggerID == attacker->scalingTriggerID) {
+                pAttackerMinionOrSibling->triggerInstantScale = 0;
+                pAttackerMinionOrSibling->actionInstantScale = 0;
+            }
+        }
+    }
     int attackerInstantScale = attacker->triggerInstantScale + attacker->actionInstantScale;
 
-    if (applyHit && (dmgValue || pHitEffect->recoverableDamage)) {
+    if (applyHit && (dmgValue || pHitEffect->recoverableDamage || attacker->pendingUnlockHit)) {
         if ((comboHits == 0 || comboDamage == 0)) {
             currentScaling = wallSplatScaling ? 80 : 100;
             pendingScaling = 0;
@@ -3803,12 +3810,20 @@ void Guy::ApplyHitEffectOnResources(HitEntry *pHitEffect, Guy *attacker, bool ap
         if (applyScaling) {
             if (comboHits == 0 && !wallSplatScaling) {
                 pendingScaling = attacker->pCurrentAction ? attacker->pCurrentAction->startScale : 0;
+                if (pendingScaling < 0) {
+                    weirdThirdHitPendingScaling = -pendingScaling;
+                    pendingScaling = 0;
+                }
                 pendingScaling += attackerInstantScale;
             } else {
                 pendingScaling = attacker->pCurrentAction ? attacker->pCurrentAction->comboScale : 10;
                 pendingScaling += attackerInstantScale;
                 if (currentScaling == 100) {
                     pendingScaling += 10;
+                    if (weirdThirdHitPendingScaling) {
+                        pendingScaling += weirdThirdHitPendingScaling;
+                        weirdThirdHitPendingScaling = 0;
+                    }
                 }
             }
             log(logHits, "queued " + std::to_string(pendingScaling) + " pending scaling")
@@ -6180,6 +6195,7 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
         comboDamage = 0;
         comboHits = 0;
         currentScaling = 0;
+        weirdThirdHitPendingScaling = 0;
         driveScaling = false;
         superGainScaling = 100;
         resetComboCount = false;
@@ -6224,7 +6240,6 @@ bool Guy::AdvanceFrame(bool advancingTime, bool endHitStopFrame, bool endWarudoF
 
     if (couldAct) {
         perfectScaling = false;
-
         chainComboMask = 0;
 
         DoInstantAction(584); // TO_NORMAL ? todo only on edge?

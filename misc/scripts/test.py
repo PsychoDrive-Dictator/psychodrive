@@ -189,16 +189,16 @@ for char in characters:
     #         print(char + " " + moveID)
 
     # find certain branches
-    for moveID in moves21Json:
-        move = moves21Json[moveID]
-        if "BranchKey" in move:
-            for key in move["BranchKey"]:
-                if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
-                    branchKey = move["BranchKey"][key]
-                    if branchKey["Type"] == 17:
-                        print(char + " " + moveID + " distance branch params " + str(branchKey["Param00"]) +
-                              " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
-                              str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
+    # for moveID in moves21Json:
+    #     move = moves21Json[moveID]
+    #     if "BranchKey" in move:
+    #         for key in move["BranchKey"]:
+    #             if isinstance(move["BranchKey"][key], dict) and "Type" in move["BranchKey"][key]:
+    #                 branchKey = move["BranchKey"][key]
+    #                 if branchKey["Type"] == 17:
+    #                     print(char + " " + moveID + " distance branch params " + str(branchKey["Param00"]) +
+    #                           " " + str(branchKey["Param01"]) + " " + str(branchKey["Param02"]) + " " +
+    #                           str(branchKey["Param03"]) + " " + str(branchKey["Param04"]))
 
     # find all key types in IMM_ actions
     # for moveID in moves21Json:
@@ -257,6 +257,13 @@ for char in characters:
     #                         mismatch = " (end frame mismatch!)"
     #                     print(char + " " + moveID + " (" + str(moveDuration) + " frames) timer stop frames " + str(switchKey["_StartFrame"]) +
     #                     "-" + str(switchKey["_EndFrame"]) + mismatch)
+
+    # find weird scaling
+    for moveID in moves21Json:
+        move = moves21Json[moveID]
+        if "fab" in move:
+            if move["fab"]["Combo"]["InstScaling"] > 0 and move["fab"]["Combo"]["_StartScaling"] == -1:
+                print(char + " " + moveID + " " + str(move["fab"]["Combo"]["InstScaling"]))
 
     # find certain SteerKey target types 
     # nextSteerKey = 0

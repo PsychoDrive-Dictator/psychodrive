@@ -784,6 +784,7 @@ private:
         beenHitThisFrame = false;
         currentScaling = 0;
         pendingScaling = 0;
+        weirdThirdHitPendingScaling = 0;
         driveScaling = false;
         superGainScaling = 100;
         perfectScaling = false;
@@ -1154,6 +1155,7 @@ private:
     // 2.0 was here
     int16_t currentScaling;
     int16_t pendingScaling;
+    int16_t weirdThirdHitPendingScaling;
     int16_t superGainScaling;
 
     int16_t comboHits;
