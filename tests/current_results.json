@@ -4825,6 +4825,73 @@ var currentResults =
         ]
     },
     {
+        "testName": "alex_command_grab",
+        "testVersion": "54",
+        "finished": true,
+        "errorTypes": [
+            {
+                "count": 318,
+                "firstFrame": 255,
+                "lastFrame": 551
+            },
+            {
+                "count": 4,
+                "firstFrame": 308,
+                "lastFrame": 311
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 242,
+                "firstFrame": 310,
+                "lastFrame": 551
+            },
+            {
+                "count": 239,
+                "firstFrame": 313,
+                "lastFrame": 551
+            },
+            {
+                "count": 74,
+                "firstFrame": 309,
+                "lastFrame": 382
+            },
+            {
+                "count": 243,
+                "firstFrame": 309,
+                "lastFrame": 551
+            },
+            {
+                "count": 3,
+                "firstFrame": 338,
+                "lastFrame": 340
+            },
+            {
+                "count": 3,
+                "firstFrame": 309,
+                "lastFrame": 311
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            },
+            {
+                "count": 0,
+                "firstFrame": -1,
+                "lastFrame": -1
+            }
+        ]
+    },
+    {
         "testName": "alex_heavy_dp_adv",
         "testVersion": "50",
         "finished": true,
