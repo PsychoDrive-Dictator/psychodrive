@@ -4456,6 +4456,17 @@ void Guy::ApplyHitEffect(HitEntry *pHitEffect, Guy *attacker, bool applyHit, boo
                     appliedAction = true;
                 }
 
+                // another dartboard condition there - i think it's turning around there that causes this?
+                if (pHitEffect->throwRelease == 1 && dmgType == 21 && backDamage) {
+                    hitStun = 1;
+                    // it stays for this frame then goes into knockdown
+                    // we won't runframe again at this vel so do it by hand
+                    hitVelX = Fixed(0);
+                    hitAccelX = Fixed(0);
+                    posX += velocityX * direction;
+                    // todo should probably turnaround here under certain conditions maybe
+                }
+
                 if (destY != 0) {
                     if (destY > 0) {
                         velocityY = Fixed(destY * 4) / Fixed(destTime);
